@@ -1,4 +1,6 @@
 dependencies {
+    compileOnly("org.springframework.security:spring-security-oauth2-authorization-server")
+
     implementation("io.micrometer:micrometer-core")
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.commons.validator)
@@ -22,6 +24,7 @@ dependencies {
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework:spring-webmvc")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation("org.springframework.security:spring-security-oauth2-authorization-server")
     testImplementation("org.springframework.security:spring-security-oauth2-resource-server")
     testImplementation(project(":server:ee:libs:platform:platform-user:platform-user-api"))
     testImplementation(project(":server:ee:libs:platform:platform-user:platform-user-scim"))

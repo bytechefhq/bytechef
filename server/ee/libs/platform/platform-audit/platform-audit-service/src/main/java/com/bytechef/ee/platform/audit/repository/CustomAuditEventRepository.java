@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.audit.repository;
 
 import com.bytechef.commons.util.LocalDateTimeUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -48,6 +49,7 @@ public class CustomAuditEventRepository implements AuditEventRepository {
     private static final String AUTHORIZATION_FAILURE = "AUTHORIZATION_FAILURE";
     private static final String DETAILS = "details";
     public static final String ANONYMOUS_USER = "anonymoususer";
+    public static final String TENANT_ID_DATA_KEY = CustomAuditEventRepository.class.getName() + ".tenantId";
 
     /**
      * Should be the same as in Liquibase migration.
@@ -64,6 +66,8 @@ public class CustomAuditEventRepository implements AuditEventRepository {
 
     private final ObjectProvider<TenantService> tenantServiceProvider;
 
+    private final @Nullable String systemUsername;
+
     private static final Logger log = LoggerFactory.getLogger(CustomAuditEventRepository.class);
 
     @SuppressFBWarnings({
@@ -72,11 +76,13 @@ public class CustomAuditEventRepository implements AuditEventRepository {
     public CustomAuditEventRepository(
         PersistenceAuditEventRepository persistenceAuditEventRepository, AuditEventConverter auditEventConverter,
         ObjectProvider<TenantService> tenantServiceProvider,
-        ObjectProvider<PlatformTransactionManager> transactionManagerProvider) {
+        ObjectProvider<PlatformTransactionManager> transactionManagerProvider,
+        ObjectProvider<ApplicationProperties> applicationPropertiesProvider) {
 
         this.persistenceAuditEventRepository = persistenceAuditEventRepository;
         this.auditEventConverter = auditEventConverter;
         this.tenantServiceProvider = tenantServiceProvider;
+        this.systemUsername = getSystemUsername(applicationPropertiesProvider.getIfAvailable());
 
         PlatformTransactionManager transactionManager = transactionManagerProvider.getIfAvailable();
 
@@ -122,11 +128,16 @@ public class CustomAuditEventRepository implements AuditEventRepository {
         persistentAuditEvent.setEventType(event.getType());
         persistentAuditEvent.setPrincipal(StringUtils.truncate(event.getPrincipal(), PRINCIPAL_COLUMN_MAX_LENGTH));
 
-        Map<String, String> eventData = auditEventConverter.convertDataToStrings(event.getData());
+        Map<String, Object> data = new HashMap<>(event.getData());
+
+        Object eventTenantId = data.remove(TENANT_ID_DATA_KEY);
+
+        Map<String, String> eventData = auditEventConverter.convertDataToStrings(data);
 
         persistentAuditEvent.setData(truncate(eventData));
 
-        String tenantId = resolveTenantId(event);
+        String tenantId =
+            resolveTenantId(event, eventTenantId instanceof String tenantIdString ? tenantIdString : null);
 
         if (tenantId == null) {
             save(persistentAuditEvent);
@@ -135,7 +146,7 @@ public class CustomAuditEventRepository implements AuditEventRepository {
         }
     }
 
-    private @Nullable String resolveTenantId(AuditEvent event) {
+    private @Nullable String resolveTenantId(AuditEvent event, @Nullable String eventTenantId) {
         if (!Objects.equals(TenantContext.getCurrentTenantId(), TenantContext.DEFAULT_TENANT_ID)) {
             return null;
         }
@@ -147,13 +158,29 @@ public class CustomAuditEventRepository implements AuditEventRepository {
                 return null;
             }
 
-            String detailsTenantId = getDetailsTenantId(event.getData(), tenantService);
+            if (Objects.equals(eventTenantId, TenantContext.DEFAULT_TENANT_ID)) {
+                return null;
+            }
+
+            List<String> tenantIds = tenantService.getTenantIds();
+
+            if (eventTenantId != null && tenantIds.contains(eventTenantId)) {
+                return eventTenantId;
+            }
+
+            String detailsTenantId = getDetailsTenantId(event.getData(), tenantIds);
 
             if (detailsTenantId != null) {
                 return detailsTenantId;
             }
 
-            return getPrincipalTenantId(event.getPrincipal(), tenantService);
+            String principal = event.getPrincipal();
+
+            if (Objects.equals(principal, systemUsername)) {
+                return null;
+            }
+
+            return getPrincipalTenantId(principal, tenantService);
         } catch (RuntimeException exception) {
             log.warn("Unable to resolve the tenant of an audit event principal", exception);
 
@@ -161,16 +188,14 @@ public class CustomAuditEventRepository implements AuditEventRepository {
         }
     }
 
-    private static @Nullable String getDetailsTenantId(Map<String, Object> data, TenantService tenantService) {
+    private static @Nullable String getDetailsTenantId(Map<String, Object> data, List<String> tenantIds) {
         if (data.get(DETAILS) instanceof TenantWebAuthenticationDetails tenantWebAuthenticationDetails) {
             String tenantId = tenantWebAuthenticationDetails.getTenantId();
 
-            if (tenantId != null && !Objects.equals(tenantId, TenantContext.DEFAULT_TENANT_ID)) {
-                List<String> tenantIds = tenantService.getTenantIds();
+            if (tenantId != null && !Objects.equals(tenantId, TenantContext.DEFAULT_TENANT_ID) &&
+                tenantIds.contains(tenantId)) {
 
-                if (tenantIds.contains(tenantId)) {
-                    return tenantId;
-                }
+                return tenantId;
             }
         }
 
@@ -188,11 +213,29 @@ public class CustomAuditEventRepository implements AuditEventRepository {
             ? tenantService.getTenantIdsByUserEmail(principal)
             : tenantService.getTenantIdsByUserLogin(principal.toLowerCase(Locale.ENGLISH));
 
-        if (tenantIds == null || tenantIds.isEmpty()) {
+        if (tenantIds == null || tenantIds.size() != 1) {
             return null;
         }
 
         return tenantIds.getFirst();
+    }
+
+    private static @Nullable String getSystemUsername(@Nullable ApplicationProperties applicationProperties) {
+        if (applicationProperties == null) {
+            return null;
+        }
+
+        ApplicationProperties.Security security = applicationProperties.getSecurity();
+
+        if (security == null) {
+            return null;
+        }
+
+        ApplicationProperties.Security.System system = security.getSystem();
+
+        String username = system.getUsername();
+
+        return StringUtils.isBlank(username) ? null : username;
     }
 
     private void save(PersistentAuditEvent persistentAuditEvent) {
