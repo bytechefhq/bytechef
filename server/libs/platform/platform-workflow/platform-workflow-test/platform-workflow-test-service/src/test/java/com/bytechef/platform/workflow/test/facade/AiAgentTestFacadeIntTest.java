@@ -193,7 +193,8 @@ class AiAgentTestFacadeIntTest {
 
     @Test
     void testExecuteAiAgentActionEvaluatesExtensions() {
-        String workflowId = createWorkflow(getAiAgentWorkflowDefinition("{}", ", \"clusterElements\": {\"tools\": \"${toolsList}\"}"));
+        String workflowId =
+            createWorkflow(getAiAgentWorkflowDefinition("{}", ", \"clusterElements\": {\"tools\": \"${toolsList}\"}"));
 
         workflowTestConfigurationService.saveWorkflowTestConfiguration(
             new WorkflowTestConfiguration(
