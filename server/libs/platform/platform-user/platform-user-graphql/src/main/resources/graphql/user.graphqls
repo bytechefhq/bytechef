@@ -5,7 +5,7 @@ extend type Query {
 
 extend type Mutation {
     deleteUser(login: String!): Boolean!
-    inviteUser(email: String!, password: String!, role: String!): Boolean!
+    inviteUser(email: String!, role: String!): Boolean!
     updateUser(login: String!, role: String!): AdminUser!
 }
 
