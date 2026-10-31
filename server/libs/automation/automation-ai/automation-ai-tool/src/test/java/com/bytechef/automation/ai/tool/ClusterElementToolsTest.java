@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,6 +34,7 @@ import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
@@ -42,6 +44,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,6 +67,9 @@ class ClusterElementToolsTest {
     private ComponentDefinitionFacade componentDefinitionFacade;
 
     @Mock
+    private ProjectOwnershipService projectOwnershipService;
+
+    @Mock
     private ProjectWorkflowFacade projectWorkflowFacade;
 
     @Mock
@@ -71,6 +77,12 @@ class ClusterElementToolsTest {
 
     @Mock
     private ScopedConnectionGuard scopedConnectionGuard;
+
+    @BeforeEach
+    void beforeEach() {
+        lenient().when(projectWorkflowService.getWorkflowProjectWorkflow(anyString()))
+            .thenAnswer(invocation -> new ProjectWorkflow(OWN_PROJECT_ID, 1, invocation.getArgument(0)));
+    }
 
     @Nested
     class ScopedProjectTest {
@@ -196,7 +208,7 @@ class ClusterElementToolsTest {
 
         assertThat(workflowInfo).isNotNull();
         verify(projectWorkflowFacade).updateWorkflow(anyString(), anyString(), anyInt());
-        verify(projectWorkflowService, never()).getWorkflowProjectWorkflow(any());
+        verify(projectOwnershipService).getOwnedProjectIds(any(), any());
     }
 
     private void mockProjectWorkflow() {
@@ -211,7 +223,8 @@ class ClusterElementToolsTest {
     private ClusterElementTools newTools() {
         return new ClusterElementTools(
             componentDefinitionFacade, projectWorkflowFacade,
-            new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService, scopedConnectionGuard));
+            new ScopedProjectGuard(new GrantingPermissionService(), projectOwnershipService, projectWorkflowService,
+                scopedConnectionGuard));
     }
 
     private static ToolContext scopedToolContext() {
