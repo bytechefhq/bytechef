@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.ai.mcp.facade.EmbeddedMcpServerFacade;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.graphql.error.GraphQlBadRequestException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -22,9 +23,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -69,8 +72,21 @@ class EmbeddedMcpServerGraphQlController {
         return embeddedMcpServerFacade.getMcpComponentDefinitions();
     }
 
+    @SchemaMapping(typeName = "McpComponent", field = "integrationId")
+    @Nullable
+    Long integrationId(McpComponent mcpComponent) {
+        return embeddedMcpServerFacade.fetchEmbeddedMcpComponentIntegrationId(mcpComponent.getId());
+    }
+
+    @QueryMapping
+    List<Integration> mcpComponentIntegrations() {
+        return embeddedMcpServerFacade.getMcpComponentIntegrations();
+    }
+
     @MutationMapping
-    McpComponent createEmbeddedMcpComponent(@Argument McpComponentWithToolsInput input) {
+    McpComponent createEmbeddedMcpComponent(
+        @Argument McpComponentWithToolsInput input, @Argument long integrationId) {
+
         McpComponent mcpComponent = new McpComponent(
             input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId());
 
@@ -78,7 +94,8 @@ class EmbeddedMcpServerGraphQlController {
             mcpComponent.setRequiredAuthorities(new HashSet<>(input.requiredAuthorities()));
         }
 
-        return embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, toMcpTools(input.tools()));
+        return embeddedMcpServerFacade.createEmbeddedMcpComponent(
+            mcpComponent, integrationId, toMcpTools(input.tools()));
     }
 
     @MutationMapping
@@ -117,7 +134,9 @@ class EmbeddedMcpServerGraphQlController {
     }
 
     @MutationMapping
-    McpComponent updateEmbeddedMcpComponent(@Argument long id, @Argument McpComponentWithToolsInput input) {
+    McpComponent updateEmbeddedMcpComponent(
+        @Argument long id, @Argument McpComponentWithToolsInput input, @Argument @Nullable Long integrationId) {
+
         if (input.version() == null) {
             throw new GraphQlBadRequestException(
                 "MISSING_FIELD", "version is required to update MCP component " + id, Map.of("field", "version"));
@@ -133,7 +152,7 @@ class EmbeddedMcpServerGraphQlController {
             input.requiredAuthorities() == null ? null : new HashSet<>(input.requiredAuthorities());
 
         return embeddedMcpServerFacade.updateEmbeddedMcpComponent(
-            mcpComponent, requiredAuthorities, toMcpTools(input.tools()));
+            mcpComponent, integrationId, requiredAuthorities, toMcpTools(input.tools()));
     }
 
     @MutationMapping

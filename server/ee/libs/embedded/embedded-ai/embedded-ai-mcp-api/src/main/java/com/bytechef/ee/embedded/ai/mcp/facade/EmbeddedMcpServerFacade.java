@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
+import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -24,7 +25,7 @@ import org.jspecify.annotations.Nullable;
  */
 public interface EmbeddedMcpServerFacade {
 
-    McpComponent createEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools);
+    McpComponent createEmbeddedMcpComponent(McpComponent mcpComponent, long integrationId, List<McpTool> mcpTools);
 
     McpServer createEmbeddedMcpServer(String name, Environment environment, Boolean enabled);
 
@@ -33,6 +34,9 @@ public interface EmbeddedMcpServerFacade {
     void deleteEmbeddedMcpServer(long mcpServerId);
 
     void deleteEmbeddedMcpTool(long mcpToolId);
+
+    @Nullable
+    Long fetchEmbeddedMcpComponentIntegrationId(long mcpComponentId);
 
     List<McpTool> getEmbeddedMcpComponentMcpTools(long mcpComponentId);
 
@@ -44,8 +48,11 @@ public interface EmbeddedMcpServerFacade {
 
     List<ComponentDefinition> getMcpComponentDefinitions();
 
+    List<Integration> getMcpComponentIntegrations();
+
     McpComponent updateEmbeddedMcpComponent(
-        McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools);
+        McpComponent mcpComponent, @Nullable Long integrationId, @Nullable Set<String> requiredAuthorities,
+        List<McpTool> mcpTools);
 
     McpServer updateEmbeddedMcpServer(
         long mcpServerId, String name, Boolean enabled, Boolean enforceToolAuthorization,

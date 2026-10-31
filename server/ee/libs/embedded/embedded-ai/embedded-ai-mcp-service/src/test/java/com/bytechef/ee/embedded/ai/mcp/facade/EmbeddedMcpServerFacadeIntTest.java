@@ -21,7 +21,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
@@ -87,6 +91,8 @@ class EmbeddedMcpServerFacadeIntTest {
     private static final long EMBEDDED_MCP_COMPONENT_ID = 20L;
     private static final long EMBEDDED_MCP_SERVER_ID = 10L;
     private static final long EMBEDDED_MCP_TOOL_ID = 30L;
+    private static final long INTEGRATION_ID = 40L;
+    private static final long OTHER_COMPONENT_INTEGRATION_ID = 41L;
 
     @MockitoBean
     private ComponentDefinitionService componentDefinitionService;
@@ -102,6 +108,9 @@ class EmbeddedMcpServerFacadeIntTest {
 
     @MockitoBean
     private McpComponentService mcpComponentService;
+
+    @MockitoBean
+    private McpIntegrationComponentService mcpIntegrationComponentService;
 
     @MockitoBean
     private McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
@@ -132,6 +141,10 @@ class EmbeddedMcpServerFacadeIntTest {
             .thenReturn(Optional.of(createMcpTool(EMBEDDED_MCP_TOOL_ID, EMBEDDED_MCP_COMPONENT_ID)));
         when(mcpToolService.fetchMcpTool(AUTOMATION_MCP_TOOL_ID))
             .thenReturn(Optional.of(createMcpTool(AUTOMATION_MCP_TOOL_ID, AUTOMATION_MCP_COMPONENT_ID)));
+        when(integrationService.getIntegration(INTEGRATION_ID))
+            .thenReturn(createIntegration(INTEGRATION_ID, "component"));
+        when(integrationService.getIntegration(OTHER_COMPONENT_INTEGRATION_ID))
+            .thenReturn(createIntegration(OTHER_COMPONENT_INTEGRATION_ID, "otherComponent"));
     }
 
     @AfterEach
@@ -205,8 +218,8 @@ class EmbeddedMcpServerFacadeIntTest {
         private void verifyNoServiceInteractions() {
             verifyNoInteractions(
                 componentDefinitionService, integrationInstanceConfigurationService, integrationService,
-                mcpComponentService, mcpIntegrationInstanceToolService, mcpServerFacade, mcpServerService,
-                mcpToolService, tagService);
+                mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceToolService,
+                mcpServerFacade, mcpServerService, mcpToolService, tagService);
         }
     }
 
@@ -219,14 +232,60 @@ class EmbeddedMcpServerFacadeIntTest {
         }
 
         @Test
-        void testCreateEmbeddedMcpComponent() {
+        void testCreateEmbeddedMcpComponentBindsItToTheIntegration() {
             McpComponent mcpComponent = createMcpComponent(null, EMBEDDED_MCP_SERVER_ID);
+            McpComponent createdMcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID);
             List<McpTool> mcpTools = List.of(new McpTool("tool", Map.of()));
 
-            when(mcpServerFacade.create(mcpComponent, mcpTools)).thenReturn(mcpComponent);
+            when(mcpServerFacade.create(mcpComponent, mcpTools)).thenReturn(createdMcpComponent);
 
-            assertThat(embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, mcpTools))
-                .isSameAs(mcpComponent);
+            assertThat(embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, INTEGRATION_ID, mcpTools))
+                .isSameAs(createdMcpComponent);
+
+            verify(mcpIntegrationComponentService).create(EMBEDDED_MCP_COMPONENT_ID, INTEGRATION_ID);
+        }
+
+        @Test
+        void testCreateEmbeddedMcpComponentRejectsAnIntegrationOnAnotherComponent() {
+            McpComponent mcpComponent = createMcpComponent(null, EMBEDDED_MCP_SERVER_ID);
+
+            assertThatThrownBy(
+                () -> embeddedMcpServerFacade.createEmbeddedMcpComponent(
+                    mcpComponent, OTHER_COMPONENT_INTEGRATION_ID, List.of()))
+                        .isInstanceOf(IllegalArgumentException.class);
+
+            verify(mcpServerFacade, never()).create(any(), any());
+            verify(mcpIntegrationComponentService, never()).create(anyLong(), anyLong());
+        }
+
+        @Test
+        void testFetchEmbeddedMcpComponentIntegrationId() {
+            when(mcpIntegrationComponentService.fetchMcpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID))
+                .thenReturn(Optional.of(new McpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID, INTEGRATION_ID)));
+
+            assertThat(embeddedMcpServerFacade.fetchEmbeddedMcpComponentIntegrationId(EMBEDDED_MCP_COMPONENT_ID))
+                .isEqualTo(INTEGRATION_ID);
+        }
+
+        @Test
+        void testFetchEmbeddedMcpComponentIntegrationIdOfALegacyComponent() {
+            when(mcpIntegrationComponentService.fetchMcpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID))
+                .thenReturn(Optional.empty());
+
+            assertThat(embeddedMcpServerFacade.fetchEmbeddedMcpComponentIntegrationId(EMBEDDED_MCP_COMPONENT_ID))
+                .isNull();
+        }
+
+        @Test
+        void testGetMcpComponentIntegrationsReturnsOnlyConfiguredPublishedIntegrations() {
+            Integration configuredIntegration = createIntegration(INTEGRATION_ID, "component");
+            Integration unconfiguredIntegration = createIntegration(OTHER_COMPONENT_INTEGRATION_ID, "otherComponent");
+
+            when(integrationInstanceConfigurationService.getIntegrationIds()).thenReturn(List.of(INTEGRATION_ID));
+            when(integrationService.getIntegrations(null, List.of(), null, Status.PUBLISHED))
+                .thenReturn(List.of(configuredIntegration, unconfiguredIntegration));
+
+            assertThat(embeddedMcpServerFacade.getMcpComponentIntegrations()).containsExactly(configuredIntegration);
         }
 
         @Test
@@ -287,10 +346,58 @@ class EmbeddedMcpServerFacadeIntTest {
             McpComponent mcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID);
             List<McpTool> mcpTools = List.of(new McpTool("tool", Map.of()));
 
+            when(mcpIntegrationComponentService.fetchMcpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID))
+                .thenReturn(Optional.of(new McpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID, INTEGRATION_ID)));
             when(mcpServerFacade.update(mcpComponent, null, mcpTools)).thenReturn(mcpComponent);
 
-            assertThat(embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, mcpTools))
+            assertThat(embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, null, mcpTools))
                 .isSameAs(mcpComponent);
+
+            verify(mcpIntegrationComponentService, never()).create(anyLong(), anyLong());
+        }
+
+        @Test
+        void testUpdateEmbeddedMcpComponentBindsALegacyComponent() {
+            McpComponent mcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID);
+
+            when(mcpIntegrationComponentService.fetchMcpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID))
+                .thenReturn(Optional.empty());
+
+            embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, INTEGRATION_ID, null, List.of());
+
+            verify(mcpIntegrationComponentService).create(EMBEDDED_MCP_COMPONENT_ID, INTEGRATION_ID);
+            verify(mcpServerFacade).update(mcpComponent, null, List.of());
+        }
+
+        @Test
+        void testUpdateEmbeddedMcpComponentRejectsRebindingToAnotherIntegration() {
+            McpComponent mcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID);
+
+            when(mcpIntegrationComponentService.fetchMcpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID))
+                .thenReturn(Optional.of(new McpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID, INTEGRATION_ID)));
+
+            assertThatThrownBy(
+                () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(
+                    mcpComponent, OTHER_COMPONENT_INTEGRATION_ID, null, List.of()))
+                        .isInstanceOf(IllegalArgumentException.class);
+
+            verify(mcpServerFacade, never()).update(any(), any(), any());
+        }
+
+        @Test
+        void testUpdateEmbeddedMcpComponentRejectsAComponentChangeAwayFromTheBoundIntegration() {
+            McpComponent mcpComponent = new McpComponent("otherComponent", 1, EMBEDDED_MCP_SERVER_ID, null);
+
+            mcpComponent.setId(EMBEDDED_MCP_COMPONENT_ID);
+
+            when(mcpIntegrationComponentService.fetchMcpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID))
+                .thenReturn(Optional.of(new McpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID, INTEGRATION_ID)));
+
+            assertThatThrownBy(
+                () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, null, List.of()))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            verify(mcpServerFacade, never()).update(any(), any(), any());
         }
 
         @Test
@@ -372,8 +479,9 @@ class EmbeddedMcpServerFacadeIntTest {
         void testCreateEmbeddedMcpComponentRejectsAutomationMcpServer() {
             McpComponent mcpComponent = createMcpComponent(null, AUTOMATION_MCP_SERVER_ID);
 
-            assertThatThrownBy(() -> embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, List.of()))
-                .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(
+                () -> embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, INTEGRATION_ID, List.of()))
+                    .isInstanceOf(IllegalArgumentException.class);
 
             verify(mcpServerFacade, never()).create(any(), any());
         }
@@ -425,7 +533,7 @@ class EmbeddedMcpServerFacadeIntTest {
             McpComponent mcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, AUTOMATION_MCP_SERVER_ID);
 
             assertThatThrownBy(
-                () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, List.of()))
+                () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, null, List.of()))
                     .isInstanceOf(IllegalArgumentException.class);
 
             verify(mcpServerFacade, never()).update(any(), any(), any());
@@ -484,7 +592,7 @@ class EmbeddedMcpServerFacadeIntTest {
             operation(
                 "createEmbeddedMcpComponent",
                 facade -> facade.createEmbeddedMcpComponent(
-                    createMcpComponent(null, EMBEDDED_MCP_SERVER_ID), List.of())),
+                    createMcpComponent(null, EMBEDDED_MCP_SERVER_ID), INTEGRATION_ID, List.of())),
             operation(
                 "createEmbeddedMcpServer",
                 facade -> facade.createEmbeddedMcpServer("Embedded", Environment.DEVELOPMENT, true)),
@@ -492,6 +600,9 @@ class EmbeddedMcpServerFacadeIntTest {
                 "deleteEmbeddedMcpComponent", facade -> facade.deleteEmbeddedMcpComponent(EMBEDDED_MCP_COMPONENT_ID)),
             operation("deleteEmbeddedMcpServer", facade -> facade.deleteEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID)),
             operation("deleteEmbeddedMcpTool", facade -> facade.deleteEmbeddedMcpTool(EMBEDDED_MCP_TOOL_ID)),
+            operation(
+                "fetchEmbeddedMcpComponentIntegrationId",
+                facade -> facade.fetchEmbeddedMcpComponentIntegrationId(EMBEDDED_MCP_COMPONENT_ID)),
             operation(
                 "getEmbeddedMcpComponentMcpTools",
                 facade -> facade.getEmbeddedMcpComponentMcpTools(EMBEDDED_MCP_COMPONENT_ID)),
@@ -501,10 +612,11 @@ class EmbeddedMcpServerFacadeIntTest {
             operation("getEmbeddedMcpServers", EmbeddedMcpServerFacade::getEmbeddedMcpServers),
             operation("getEmbeddedMcpServerTags", EmbeddedMcpServerFacade::getEmbeddedMcpServerTags),
             operation("getMcpComponentDefinitions", EmbeddedMcpServerFacade::getMcpComponentDefinitions),
+            operation("getMcpComponentIntegrations", EmbeddedMcpServerFacade::getMcpComponentIntegrations),
             operation(
                 "updateEmbeddedMcpComponent",
                 facade -> facade.updateEmbeddedMcpComponent(
-                    createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID), null, List.of())),
+                    createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID), null, null, List.of())),
             operation(
                 "updateEmbeddedMcpServer",
                 facade -> facade.updateEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID, "Renamed", false, null, null)),
@@ -546,6 +658,16 @@ class EmbeddedMcpServerFacadeIntTest {
         }
 
         return null;
+    }
+
+    private static Integration createIntegration(long id, String componentName) {
+        Integration integration = new Integration();
+
+        integration.setComponentName(componentName);
+        integration.setId(id);
+        integration.setName("integration-" + id);
+
+        return integration;
     }
 
     private static McpComponent createMcpComponent(Long id, long mcpServerId) {
