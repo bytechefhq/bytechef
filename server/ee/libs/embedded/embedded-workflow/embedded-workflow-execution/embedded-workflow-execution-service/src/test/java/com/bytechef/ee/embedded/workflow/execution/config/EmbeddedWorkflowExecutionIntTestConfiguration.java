@@ -28,8 +28,6 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.automation.configuration.service.EnvironmentServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
@@ -42,10 +40,19 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.file.storage.TriggerFileStorageImpl;
+import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.StringToTaskStateValueConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.StringToTriggerStateValueConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowTriggerConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.TaskStateValueToStringConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
+import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobServiceImpl;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionServiceImpl;
@@ -84,7 +91,6 @@ import tools.jackson.databind.ObjectMapper;
     excludeName = {
         "com.bytechef.automation.configuration.config.AutomationConfigurationJdbcRepositoryConfiguration",
         "com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration",
-        "com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationJdbcRepositoryConfiguration",
         "com.bytechef.platform.category.config.PlatformCategoryJdbcRepositoryConfiguration",
         "com.bytechef.platform.security.config.PlatformSecurityJdbcRepositoryConfiguration",
         "com.bytechef.platform.tag.config.PlatformTagJdbcRepositoryConfiguration"
@@ -109,9 +115,13 @@ public class EmbeddedWorkflowExecutionIntTestConfiguration {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
     }
 
+    /**
+     * Mirrors the EE environment service with no environment restriction. The EE implementation is not used because its
+     * module adds the project code workflow changelog, which needs the code workflow tables.
+     */
     @Bean
     EnvironmentService environmentService() {
-        return new EnvironmentServiceImpl(new ApplicationProperties());
+        return () -> Arrays.asList(Environment.values());
     }
 
     @Bean
@@ -156,14 +166,22 @@ public class EmbeddedWorkflowExecutionIntTestConfiguration {
                 new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
                 new ExecutionErrorToStringConverter(objectMapper),
                 new FileEntryToStringConverter(objectMapper),
+                new JobResumeIdToStringConverter(),
                 new MapWrapperToStringConverter(objectMapper),
                 new StringToExecutionErrorConverter(objectMapper),
                 new StringToFileEntryConverter(objectMapper),
+                new StringToJobResumeIdConverter(),
                 new StringToMapWrapperConverter(objectMapper),
+                new StringToTaskStateValueConverter(objectMapper),
+                new StringToTriggerStateValueConverter(objectMapper),
                 new StringToWebhooksConverter(objectMapper),
+                new StringToWorkflowExecutionIdConverter(),
                 new StringToWorkflowTaskConverter(objectMapper),
                 new StringToWorkflowTriggerConverter(objectMapper),
+                new TaskStateValueToStringConverter(objectMapper),
+                new TriggerStateValueToStringConverter(objectMapper),
                 new WebhooksToStringConverter(objectMapper),
+                new WorkflowExecutionIdToStringConverter(),
                 new WorkflowTaskToStringConverter(objectMapper),
                 new WorkflowTriggerToStringConverter(objectMapper));
         }
