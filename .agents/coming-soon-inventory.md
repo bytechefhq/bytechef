@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**45 whole-page** (20 hidden) · **30 partial** pages (7 with a commented-out section)
+**45 whole-page** (20 hidden) · **31 partial** pages (7 with a commented-out section)
 
 ---
 
