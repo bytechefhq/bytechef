@@ -11,9 +11,21 @@ import {
 import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {ProjectStatus, ProjectVersion} from '@/shared/middleware/automation/configuration';
-import {CheckIcon, DownloadIcon, EllipsisVerticalIcon, FileIcon, HistoryIcon, SendIcon, Trash2Icon} from 'lucide-react';
+import {
+    CheckIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    DownloadIcon,
+    EllipsisVerticalIcon,
+    FileIcon,
+    HistoryIcon,
+    SendIcon,
+    Trash2Icon,
+} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+
+import ProjectVersionWorkflowChanges from './ProjectVersionWorkflowChanges';
 
 interface ProjectVersionHistorySheetProps {
     deleteProjectVersionPending?: boolean;
@@ -40,6 +52,7 @@ const ProjectVersionHistorySheet = ({
     sheetOpen,
 }: ProjectVersionHistorySheetProps) => {
     const [deleteCandidateVersion, setDeleteCandidateVersion] = useState<number | undefined>();
+    const [expandedVersions, setExpandedVersions] = useState<Set<number>>(new Set());
     const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState<number | undefined>();
 
@@ -54,6 +67,20 @@ const ProjectVersionHistorySheet = ({
             }
 
             setDeleteCandidateVersion(undefined);
+        });
+    };
+
+    const handleToggleExpanded = (version: number) => {
+        setExpandedVersions((previousVersions) => {
+            const nextVersions = new Set(previousVersions);
+
+            if (nextVersions.has(version)) {
+                nextVersions.delete(version);
+            } else {
+                nextVersions.add(version);
+            }
+
+            return nextVersions;
         });
     };
 
@@ -95,6 +122,7 @@ const ProjectVersionHistorySheet = ({
                         const version = projectVersion.version!;
                         const published = projectVersion.status === ProjectStatus.Published;
                         const selected = selectedVersion === version;
+                        const expanded = expandedVersions.has(version);
                         const lastItem = index === projectVersions.length - 1;
 
                         return (
@@ -165,7 +193,36 @@ const ProjectVersionHistorySheet = ({
                                             {projectVersion.description ||
                                                 (published ? 'No description.' : 'Current working version.')}
                                         </p>
+
+                                        {expanded && (
+                                            <div
+                                                onClick={(event) => event.stopPropagation()}
+                                                onKeyDown={(event) => event.stopPropagation()}
+                                            >
+                                                <ProjectVersionWorkflowChanges
+                                                    draft={!published}
+                                                    expanded={expanded}
+                                                    projectId={projectId}
+                                                    projectVersion={version}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
+
+                                    <Button
+                                        aria-expanded={expanded}
+                                        aria-label={`Toggle changes of version ${version}`}
+                                        className="size-6"
+                                        icon={expanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+
+                                            handleToggleExpanded(version);
+                                        }}
+                                        onKeyDown={(event) => event.stopPropagation()}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
 
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>

@@ -1,9 +1,27 @@
 import {ProjectStatus, ProjectVersion} from '@/shared/middleware/automation/configuration';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render} from '@/shared/util/test-utils';
+import {fireEvent, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectVersionHistorySheet from '../ProjectVersionHistorySheet';
+
+const {useProjectVersionWorkflowChangeQuery, useProjectVersionWorkflowChangesQuery} = vi.hoisted(() => ({
+    useProjectVersionWorkflowChangeQuery: vi.fn(),
+    useProjectVersionWorkflowChangesQuery: vi.fn(),
+}));
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
+    ...(await importOriginal<Record<string, unknown>>()),
+    useProjectVersionWorkflowChangeQuery,
+    useProjectVersionWorkflowChangesQuery,
+}));
+
+vi.mock('@/shared/components/version-workflow-changes/WorkflowVersionChangesDialog', () => ({
+    default: ({baseVersionLabel, versionLabel}: {baseVersionLabel?: string; versionLabel: string}) => (
+        <div data-testid="mock-changes-dialog">{`${baseVersionLabel ?? ''}|${versionLabel}`}</div>
+    ),
+}));
 
 const projectVersions: ProjectVersion[] = [
     {status: ProjectStatus.Draft, version: 3},
@@ -22,6 +40,37 @@ describe('ProjectVersionHistorySheet', () => {
     const onSheetOpenChange = vi.fn();
 
     beforeEach(() => {
+        useProjectVersionWorkflowChangesQuery.mockReset();
+        useProjectVersionWorkflowChangeQuery.mockReset();
+
+        useProjectVersionWorkflowChangesQuery.mockReturnValue({
+            data: {
+                projectVersionWorkflowChanges: {
+                    baseVersion: 1,
+                    version: 2,
+                    workflows: [{changeCount: 2, changeType: 'MODIFIED', label: 'Sync orders', workflowUuid: 'uuid-1'}],
+                },
+            },
+            isLoading: false,
+        });
+        useProjectVersionWorkflowChangeQuery.mockImplementation(
+            (variables: {projectVersion: number}, options?: {enabled?: boolean}) => ({
+                data:
+                    options?.enabled === false
+                        ? undefined
+                        : {
+                              projectVersionWorkflowChange: {
+                                  baseVersion: variables.projectVersion === 3 ? 2 : 1,
+                                  changes: [],
+                                  changeType: 'MODIFIED',
+                                  label: 'Sync orders',
+                                  version: variables.projectVersion,
+                                  workflowUuid: 'uuid-1',
+                              },
+                          },
+                isLoading: false,
+            })
+        );
         onDeleteProjectVersion.mockReset();
         onRestoreProjectVersion.mockReset();
         onSheetOpenChange.mockReset();
@@ -121,5 +170,58 @@ describe('ProjectVersionHistorySheet', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Delete'}));
 
         expect(onDeleteProjectVersion).toHaveBeenCalledWith(2, expect.any(Function));
+    });
+
+    it('loads the changed workflows only when a version is expanded', () => {
+        renderSheet();
+
+        expect(useProjectVersionWorkflowChangesQuery).not.toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({enabled: true})
+        );
+
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 2'}));
+
+        expect(useProjectVersionWorkflowChangesQuery).toHaveBeenCalledWith(
+            {projectId: '7', projectVersion: 2},
+            expect.objectContaining({enabled: true})
+        );
+    });
+
+    it('shows the changed workflows of a version after expanding it', () => {
+        renderSheet();
+
+        expect(screen.queryByText('Sync orders')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 2'}));
+
+        expect(screen.getByText('Sync orders')).toBeInTheDocument();
+    });
+
+    it('does not select the version when a changed workflow is clicked', () => {
+        renderSheet();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 2'}));
+        fireEvent.click(screen.getByText('Sync orders'));
+
+        expect(screen.getByRole('option', {name: 'Version 2'})).toHaveAttribute('aria-selected', 'false');
+    });
+
+    it('opens the changes dialog with V1 \u2192 V2 labels for a published version', () => {
+        renderSheet();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 2'}));
+        fireEvent.click(screen.getByText('Sync orders'));
+
+        expect(screen.getByTestId('mock-changes-dialog')).toHaveTextContent('V1|V2');
+    });
+
+    it('opens the changes dialog with V2 \u2192 Draft labels for the draft version', () => {
+        renderSheet();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 3'}));
+        fireEvent.click(screen.getByText('Sync orders'));
+
+        expect(screen.getByTestId('mock-changes-dialog')).toHaveTextContent('V2|Draft');
     });
 });
