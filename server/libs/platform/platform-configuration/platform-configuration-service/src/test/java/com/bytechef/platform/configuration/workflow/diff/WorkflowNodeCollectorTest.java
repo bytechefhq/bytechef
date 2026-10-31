@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.workflow.diff;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -74,13 +75,18 @@ class WorkflowNodeCollectorTest {
 
     @Test
     void testCollectsConditionCaseTrueAndCaseFalseTasks() {
+        Map<String, Object> parameters = new LinkedHashMap<>();
+
+        parameters.put("rawExpression", "x");
+        parameters.put("caseTrue", List.of(task("a")));
+        parameters.put("caseFalse", List.of(task("b")));
+
         List<WorkflowNode> nodes = WorkflowNodeCollector.collect(
             Map.of(
                 "tasks", List.of(
                     Map.of(
                         "name", "condition_1", "type", "condition/v1",
-                        "parameters", Map.of(
-                            "rawExpression", "x", "caseTrue", List.of(task("a")), "caseFalse", List.of(task("b")))))));
+                        "parameters", parameters))));
 
         assertThat(nodes).extracting(WorkflowNode::name)
             .containsExactly("condition_1", "a", "b");
