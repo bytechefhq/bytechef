@@ -25,10 +25,70 @@ the project boundary decides what ships together.
 
 Access is governed by [workspace roles](/platform/settings/users#roles-and-permissions) - Admin,
 Editor, or Viewer - granted per member on the workspace and applying to every project inside it.
-There are no per-project roles.
+There are no per-project roles. In the Enterprise Edition a project also has a **visibility**, which
+decides who in the workspace can see it at all; see [Project visibility](#project-visibility) below.
 
 A project has two states, not three: a live **draft** that the editor writes to, and any number of
 **published** versions. Deleting a project is permanent - export it first if you might want it back.
+
+## Project visibility
+
+<Callout type="warn" title="Coming soon">
+    Project visibility is on the upcoming release track and is not yet available in the latest
+    released version of ByteChef. It is an Enterprise Edition feature.
+</Callout>
+
+Every project carries one visibility:
+
+| Visibility | Who can see the project |
+|---|---|
+| **Shared with workspace** (`WORKSPACE`) | Every member of the project's workspace. This is the default. |
+| **Private** (`PRIVATE`) | The project's creator, plus anyone it is shared with. |
+
+A project belongs to exactly one workspace, so it cannot be shared across the organization: the
+`ORGANIZATION` level that connections have does not exist for projects.
+
+**Specific people** is not a third level. It is a private project plus a list of named workspace
+members who were given access. Switching a project back to **Shared with workspace** keeps that list,
+so making it private again restores the same audience. Only members of the project's workspace can be
+named.
+
+### Everything in a project follows its visibility
+
+A project's workflows, deployments and workflow executions have no visibility of their own: they are
+exactly as visible as the project. When a project is private, a member who cannot see it
+
+- does not find the project, its workflows, its deployments or its executions in any list or search, and
+- is refused (HTTP 403, or a GraphQL `FORBIDDEN` error) when opening any of them directly.
+
+Visibility comes on top of workspace roles, not instead of them: a member still needs the scope for
+what they do, such as `WORKFLOW_EDIT` to change a workflow. Visibility only decides whether the project
+exists for them. It does not stop anything from running: deployments of a private project keep
+executing on their triggers as before.
+
+Organization admins (the `ROLE_ADMIN` authority) see every project, private or not.
+
+### Choosing and changing visibility
+
+- **When creating a project**, the **New Project** dialog offers **Shared with workspace** and
+  **Private**. People can be named only after the project exists.
+- **On the Projects page**, a project's visibility shows as a badge next to its name. For the
+  project's creator and for organization admins the badge is a button: click it to choose **Shared
+  with workspace**, **Private** or **Specific people**, and pick members from the workspace list.
+  Everyone else sees a read-only badge.
+- **Inside a project**, the project menu has a **Visibility** item that opens the same choices. It
+  is offered to the project's creator and to organization admins.
+
+Changes apply immediately; there is no separate save step. A workspace admin may also change a
+project's visibility and sharing through the API.
+
+When a project is deleted, its list of named people is deleted with it.
+
+Each change is recorded in the audit log as `PROJECT_VISIBILITY_CHANGED`, `PROJECT_ACCESS_GRANTED`
+or `PROJECT_ACCESS_REVOKED`. See [Audit Events](/platform/settings/audit-events).
+
+In the Community Edition every project is shared with its workspace and there is no visibility
+picker.
 
 ## Create Project
 

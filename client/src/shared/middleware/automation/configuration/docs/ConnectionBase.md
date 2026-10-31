@@ -24,6 +24,8 @@ Name | Type
 `name` | string
 `parameters` | { [key: string]: any; }
 `tags` | [Array&lt;Tag&gt;](Tag.md)
+`status` | string
+`visibility` | string
 `version` | number
 
 ## Example
@@ -50,6 +52,8 @@ const example = {
   "name": null,
   "parameters": null,
   "tags": null,
+  "status": null,
+  "visibility": null,
   "version": null,
 } satisfies ConnectionBase
 

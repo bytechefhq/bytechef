@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260810000002-01" author="Ivica Cardic">
+        <!--
+            Named-user grants: the people an owner has handed a resource they withheld from their workspace.
+
+            resource_id is polymorphic and deliberately carries no foreign key &#8212; the referenced row lives in
+            whichever table resource_type names, which a database constraint cannot express. The application
+            validates existence, workspace and type before writing, and deletes a resource's grants when the
+            resource itself is deleted so they cannot attach to a recycled id.
+
+            No permission column: a grant conveys visibility, and what the recipient may then do is decided by
+            the existing workspace-role scope machinery.
+        -->
+        <createTable tableName="resource_grant">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="resource_type" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resource_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!--
+            Also the concurrency control for grant(): a repeated or simultaneous grant of the same triple is
+            absorbed here rather than by a read-then-write check that two callers could both pass.
+        -->
+        <addUniqueConstraint
+            tableName="resource_grant"
+            columnNames="resource_type, resource_id, user_id"
+            constraintName="uk_resource_grant_type_resource_user"/>
+
+        <!-- Serves the list path: "which of these candidate resources has this user been granted?" -->
+        <createIndex tableName="resource_grant" indexName="idx_resource_grant_user">
+            <column name="user_id"/>
+            <column name="resource_type"/>
+        </createIndex>
+
+        <rollback>
+            <dropTable tableName="resource_grant"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

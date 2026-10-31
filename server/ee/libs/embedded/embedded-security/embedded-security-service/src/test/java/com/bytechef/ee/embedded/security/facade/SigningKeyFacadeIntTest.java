@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
@@ -59,7 +60,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
     EmbeddedScopeCacheService.class, EmbeddedUserRepository.class, PermissionScopeRegistry.class,
-    ProjectRepository.class, UserService.class, WorkspaceScopeCacheService.class, WorkspaceUserRepository.class
+    ProjectRepository.class, ResourceVisibilityResolver.class, UserService.class, WorkspaceScopeCacheService.class,
+    WorkspaceUserRepository.class
 })
 class SigningKeyFacadeIntTest {
 

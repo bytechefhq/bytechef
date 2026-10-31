@@ -16,19 +16,34 @@
 
 package com.bytechef.platform.connection.security;
 
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Decides who may view or replace a connection's secret values: only the member who created the connection. Tenant
- * admins can still use, rename, tag and delete connections they did not create, but not read or replace their secrets.
+ * Decides who may view or replace a connection's secret values: only the connection's owner, which is the member who
+ * created it or the member it was reassigned to. Tenant admins can still use, rename, tag and delete connections they
+ * do not own, but not read or replace their secrets. Organization connections are the exception: every tenant admin may
+ * view and replace their secrets.
  *
  * @author Ivica Cardic
  */
 public final class ConnectionSecrets {
 
     private ConnectionSecrets() {
+    }
+
+    public static boolean canCurrentUserAccessSecrets(
+        @Nullable String createdBy, @Nullable ResourceVisibility visibility) {
+
+        if (isCurrentUserCreator(createdBy)) {
+            return true;
+        }
+
+        return visibility == ResourceVisibility.ORGANIZATION &&
+            SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
     }
 
     public static boolean isCurrentUserCreator(@Nullable String createdBy) {

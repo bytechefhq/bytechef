@@ -332,6 +332,11 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testGetWorkspaceProjectDeploymentsHidesDeploymentsOfEmbeddedAutomationWorkflowProjects() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+
         ProjectDTO automationWorkflowProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDTO plainProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 

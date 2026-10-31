@@ -18,6 +18,8 @@ import com.bytechef.automation.configuration.security.ProjectDeploymentOwnership
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -53,6 +55,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -245,6 +248,13 @@ class EmbeddedUserFacadeIntTest {
         WorkspaceScopeCacheService.class
     })
     static class RealEmbeddedUserFacadeConfiguration {
+
+        @Bean
+        ResourceVisibilityResolver resourceVisibilityResolver() {
+            return (resourceType, workspaceId, candidates) -> candidates.stream()
+                .map(VisibilityRecord::id)
+                .collect(Collectors.toSet());
+        }
 
         @Bean
         CacheManager cacheManager() {

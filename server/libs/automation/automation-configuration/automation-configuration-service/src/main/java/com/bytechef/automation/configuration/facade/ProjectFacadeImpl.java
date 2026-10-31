@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
@@ -31,6 +32,7 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
@@ -51,6 +53,8 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
+import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -78,6 +82,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,10 +98,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
+    private final boolean eeEdition;
     private final PreBuiltTemplateService preBuiltTemplateService;
     private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
     private final ProjectWorkflowService projectWorkflowService;
+    private final ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
@@ -109,13 +117,17 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
 
-    @SuppressFBWarnings("EI2")
+    @SuppressFBWarnings({
+        "CT_CONSTRUCTOR_THROW", "EI2"
+    })
     public ProjectFacadeImpl(
+        @Value("${bytechef.edition:CE}") String edition,
         ApplicationProperties applicationProperties, CategoryService categoryService,
         ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
         ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService, ProjectOwnershipService projectOwnershipService,
-        ProjectService projectService,
+        ProjectService projectService, ProjectVisibilityFilter projectVisibilityFilter,
+        ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
         SharedTemplateFileStorage sharedTemplateFileStorage, SharedTemplateService sharedTemplateService,
         TagService tagService, WorkflowService workflowService,
@@ -123,13 +135,18 @@ public class ProjectFacadeImpl implements ProjectFacade {
         WorkflowNodeTestOutputService workflowNodeTestOutputService,
         List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
+        validateEdition(edition);
+
         this.categoryService = categoryService;
         this.componentDefinitionHelper = componentDefinitionHelper;
+        this.eeEdition = "EE".equalsIgnoreCase(edition);
         this.preBuiltTemplateService = preBuiltTemplateService;
         this.projectWorkflowService = projectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
+        this.resourceVisibilityPolicyRegistry = resourceVisibilityPolicyRegistry;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.publicUrl = applicationProperties.getPublicUrl();
@@ -146,6 +163,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @PreAuthorize("hasPermission(#projectDTO.workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public long createProject(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
+
+        applyCreateVisibility(project, projectDTO.visibility());
+
         Category category = projectDTO.category();
 
         if (category != null) {
@@ -410,6 +430,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public List<ProjectVersion> getProjectVersions(long id) {
+        return projectService.getProjectVersions(id);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public SharedProjectDTO getSharedProject(String projectUuid) {
         SharedProjectDTO sharedProjectDTO = null;
@@ -452,7 +479,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     public List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId) {
-        return projectWorkflowService.getProjectWorkflows(projectService.getWorkspaceProjectIds(workspaceId))
+        return projectWorkflowService.getProjectWorkflows(getVisibleWorkspaceProjectIds(workspaceId))
             .stream()
             .map(projectWorkflow -> new ProjectWorkflowDTO(
                 workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow, false))
@@ -583,6 +610,40 @@ public class ProjectFacadeImpl implements ProjectFacade {
         projectService.update(project);
     }
 
+    private void applyCreateVisibility(Project project, @Nullable ResourceVisibility requestedVisibility) {
+        if (!eeEdition) {
+            if (requestedVisibility != null && requestedVisibility != ResourceVisibility.WORKSPACE
+                && log.isInfoEnabled()) {
+
+                log.info(
+                    "Forcing WORKSPACE visibility for project (requested={}, eeEdition=false)", requestedVisibility);
+            }
+
+            project.setVisibility(ResourceVisibility.WORKSPACE);
+
+            return;
+        }
+
+        ResourceVisibility visibility = requestedVisibility == null
+            ? resourceVisibilityPolicyRegistry.defaultVisibility(ProjectVisibilityFilter.PROJECT)
+            : requestedVisibility;
+
+        if (!resourceVisibilityPolicyRegistry.supports(ProjectVisibilityFilter.PROJECT, visibility)) {
+            throw new ConfigurationException(
+                "Project does not support %s visibility".formatted(visibility),
+                ProjectErrorType.UNSUPPORTED_VISIBILITY);
+        }
+
+        project.setVisibility(visibility);
+    }
+
+    private static void validateEdition(String edition) {
+        if (edition == null || !("CE".equalsIgnoreCase(edition) || "EE".equalsIgnoreCase(edition))) {
+            throw new IllegalStateException(
+                "bytechef.edition must be CE or EE (case-insensitive); got '" + edition + "'");
+        }
+    }
+
     private List<Tag> checkTags(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
@@ -698,12 +759,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId());
     }
 
+    private List<Long> getVisibleWorkspaceProjectIds(long workspaceId) {
+        return projectVisibilityFilter
+            .filterVisible(projectService.getProjects(null, null, null, null, null, workspaceId))
+            .stream()
+            .map(Project::getId)
+            .toList();
+    }
+
     private List<ProjectDTO> getProjects(
         Boolean apiCollections, Long categoryId, Long tagId, Boolean projectDeployments, Status status,
         boolean includeAllFields, Long workspaceId) {
 
-        List<Project> projects = projectService
-            .getProjects(apiCollections, categoryId, projectDeployments, tagId, status, workspaceId);
+        List<Project> projects = projectVisibilityFilter.filterVisible(
+            projectService.getProjects(apiCollections, categoryId, projectDeployments, tagId, status, workspaceId));
 
         if (includeAllFields) {
             List<Long> projectIds = projects.stream()
