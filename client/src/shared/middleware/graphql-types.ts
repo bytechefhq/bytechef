@@ -1574,6 +1574,7 @@ export type McpComponent = {
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
   id: Scalars['ID']['output'];
+  integrationId?: Maybe<Scalars['ID']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   mcpServerId: Scalars['ID']['output'];
@@ -2064,6 +2065,7 @@ export type MutationCreateDataTableArgs = {
 
 export type MutationCreateEmbeddedMcpComponentArgs = {
   input: McpComponentWithToolsInput;
+  integrationId: Scalars['ID']['input'];
 };
 
 
@@ -2748,6 +2750,7 @@ export type MutationUpdateDataTableTagsArgs = {
 export type MutationUpdateEmbeddedMcpComponentArgs = {
   id: Scalars['ID']['input'];
   input: McpComponentWithToolsInput;
+  integrationId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -3318,6 +3321,7 @@ export type Query = {
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponentDefinitions: Array<ComponentDefinition>;
+  mcpComponentIntegrations: Array<Integration>;
   mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
   mcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
   mcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;

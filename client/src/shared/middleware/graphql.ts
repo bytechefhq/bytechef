@@ -1242,10 +1242,11 @@ export type CreateAutomationWorkflowProjectConfigurationMutation = { createAutom
 
 export type CreateEmbeddedMcpComponentMutationVariables = Exact<{
   input: Types.McpComponentWithToolsInput;
+  integrationId: string | number;
 }>;
 
 
-export type CreateEmbeddedMcpComponentMutation = { createEmbeddedMcpComponent: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
+export type CreateEmbeddedMcpComponentMutation = { createEmbeddedMcpComponent: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, integrationId: string | null, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
 
 export type CreateEmbeddedMcpServerMutationVariables = Exact<{
   input: Types.CreateEmbeddedMcpServerInput;
@@ -1337,7 +1338,7 @@ export type EmbeddedMcpComponentsByServerIdQueryVariables = Exact<{
 }>;
 
 
-export type EmbeddedMcpComponentsByServerIdQuery = { embeddedMcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, requiredAuthorities: Array<string>, version: number | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
+export type EmbeddedMcpComponentsByServerIdQuery = { embeddedMcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, integrationId: string | null, lastModifiedDate: any, mcpServerId: string, requiredAuthorities: Array<string>, version: number | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
 
 export type EmbeddedMcpServerTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1414,6 +1415,11 @@ export type McpComponentDefinitionsQueryVariables = Exact<{ [key: string]: never
 
 
 export type McpComponentDefinitionsQuery = { mcpComponentDefinitions: Array<{ clusterElementsCount: any, description: string | null, icon: string | null, name: string, title: string | null, version: number | null }> };
+
+export type McpComponentIntegrationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type McpComponentIntegrationsQuery = { mcpComponentIntegrations: Array<{ componentName: string, id: string, name: string }> };
 
 export type McpIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables = Exact<{
   mcpIntegrationInstanceConfigurationWorkflowId: string | number;
@@ -1515,10 +1521,11 @@ export type UpdateAutomationWorkflowProjectConfigurationWorkflowMutation = { upd
 export type UpdateEmbeddedMcpComponentMutationVariables = Exact<{
   id: string | number;
   input: Types.McpComponentWithToolsInput;
+  integrationId?: string | number | null | undefined;
 }>;
 
 
-export type UpdateEmbeddedMcpComponentMutation = { updateEmbeddedMcpComponent: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
+export type UpdateEmbeddedMcpComponentMutation = { updateEmbeddedMcpComponent: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, integrationId: string | null, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
 
 export type UpdateEmbeddedMcpServerMutationVariables = Exact<{
   id: string | number;
@@ -6707,8 +6714,8 @@ export const useCreateAutomationWorkflowProjectConfigurationMutation = <
     )};
 
 export const CreateEmbeddedMcpComponentDocument = new TypedDocumentString(`
-    mutation createEmbeddedMcpComponent($input: McpComponentWithToolsInput!) {
-  createEmbeddedMcpComponent(input: $input) {
+    mutation createEmbeddedMcpComponent($input: McpComponentWithToolsInput!, $integrationId: ID!) {
+  createEmbeddedMcpComponent(input: $input, integrationId: $integrationId) {
     id
     componentName
     componentVersion
@@ -6717,6 +6724,7 @@ export const CreateEmbeddedMcpComponentDocument = new TypedDocumentString(`
     connectionId
     createdBy
     createdDate
+    integrationId
     lastModifiedBy
     lastModifiedDate
     version
@@ -6986,6 +6994,7 @@ export const EmbeddedMcpComponentsByServerIdDocument = new TypedDocumentString(`
     componentVersion
     title
     connectionId
+    integrationId
     lastModifiedDate
     mcpServerId
     mcpTools {
@@ -7321,6 +7330,32 @@ export const useMcpComponentDefinitionsQuery = <
       {
     queryKey: variables === undefined ? ['mcpComponentDefinitions'] : ['mcpComponentDefinitions', variables],
     queryFn: fetcher<McpComponentDefinitionsQuery, McpComponentDefinitionsQueryVariables>(McpComponentDefinitionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const McpComponentIntegrationsDocument = new TypedDocumentString(`
+    query mcpComponentIntegrations {
+  mcpComponentIntegrations {
+    componentName
+    id
+    name
+  }
+}
+    `);
+
+export const useMcpComponentIntegrationsQuery = <
+      TData = McpComponentIntegrationsQuery,
+      TError = unknown
+    >(
+      variables?: McpComponentIntegrationsQueryVariables,
+      options?: Omit<UseQueryOptions<McpComponentIntegrationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpComponentIntegrationsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpComponentIntegrationsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['mcpComponentIntegrations'] : ['mcpComponentIntegrations', variables],
+    queryFn: fetcher<McpComponentIntegrationsQuery, McpComponentIntegrationsQueryVariables>(McpComponentIntegrationsDocument, variables),
     ...options
   }
     )};
@@ -7706,8 +7741,12 @@ export const useUpdateAutomationWorkflowProjectConfigurationWorkflowMutation = <
     )};
 
 export const UpdateEmbeddedMcpComponentDocument = new TypedDocumentString(`
-    mutation updateEmbeddedMcpComponent($id: ID!, $input: McpComponentWithToolsInput!) {
-  updateEmbeddedMcpComponent(id: $id, input: $input) {
+    mutation updateEmbeddedMcpComponent($id: ID!, $input: McpComponentWithToolsInput!, $integrationId: ID) {
+  updateEmbeddedMcpComponent(
+    id: $id
+    input: $input
+    integrationId: $integrationId
+  ) {
     id
     componentName
     componentVersion
@@ -7716,6 +7755,7 @@ export const UpdateEmbeddedMcpComponentDocument = new TypedDocumentString(`
     connectionId
     createdBy
     createdDate
+    integrationId
     lastModifiedBy
     lastModifiedDate
     version
