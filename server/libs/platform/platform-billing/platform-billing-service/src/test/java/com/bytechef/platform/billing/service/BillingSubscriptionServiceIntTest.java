@@ -26,7 +26,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -64,8 +64,8 @@ class BillingSubscriptionServiceIntTest {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    @AfterEach
-    void afterEach() {
+    @BeforeEach
+    void beforeEach() {
         billingSubscriptionRepository.deleteAll();
 
         getTrialStatusCache().clear();
