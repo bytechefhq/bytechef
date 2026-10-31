@@ -26,12 +26,12 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
@@ -43,8 +43,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A component registered only in the facade IntTests. Its functions run locally and answer with the connection
- * parameters they receive, so a test can prove that a facade loaded the connection row from the database and handed
- * it to the real definition service.
+ * parameters they receive, so a test can prove that a facade loaded the connection row from the database and handed it
+ * to the real definition service.
  *
  * <p>
  * Deliberately not a Spring stereotype: it is registered through {@code @SpringBootTest(classes = ...)} so the
@@ -96,8 +96,10 @@ public class FacadeTestComponentHandler implements ComponentHandler {
                             Map.of("subscription", getChannelId(connectionParameters) + "_" + webhookUrl), null);
                     })
                 .webhookDisable(
-                    (inputParameters, connectionParameters, outputParameters, workflowExecutionId, context) -> recordInvocation(
-                        "webhookDisable:" + outputParameters.getString("subscription"), connectionParameters))
+                    (
+                        inputParameters, connectionParameters, outputParameters, workflowExecutionId,
+                        context) -> recordInvocation(
+                            "webhookDisable:" + outputParameters.getString("subscription"), connectionParameters))
                 .dynamicWebhookRefresh(
                     (connectionParameters, outputParameters, context) -> new WebhookEnableOutput(
                         Map.of(
@@ -106,12 +108,16 @@ public class FacadeTestComponentHandler implements ComponentHandler {
                                 outputParameters.getString("subscription")),
                         null))
                 .webhookRequest(
-                    (inputParameters, connectionParameters, headers, parameters, body, method, output, context) -> null),
+                    (
+                        inputParameters, connectionParameters, headers, parameters, body, method, output,
+                        context) -> null),
             trigger("listen")
                 .type(TriggerType.LISTENER)
                 .listenerEnable(
-                    (inputParameters, connectionParameters, workflowExecutionId, listenerEmitter, context) -> recordInvocation(
-                        "listenerEnable:" + workflowExecutionId, connectionParameters))
+                    (
+                        inputParameters, connectionParameters, workflowExecutionId, listenerEmitter,
+                        context) -> recordInvocation(
+                            "listenerEnable:" + workflowExecutionId, connectionParameters))
                 .listenerDisable(
                     (inputParameters, connectionParameters, workflowExecutionId, context) -> recordInvocation(
                         "listenerDisable:" + workflowExecutionId, connectionParameters)));
@@ -155,7 +161,8 @@ public class FacadeTestComponentHandler implements ComponentHandler {
 
             String resolvedValue = clusterElementContextAware.resolveClusterElement(
                 SOURCE,
-                (clusterElement, sourceInputParameters, sourceConnectionParameters, extensions, componentConnections,
+                (
+                    clusterElement, sourceInputParameters, sourceConnectionParameters, extensions, componentConnections,
                     sourceContext) -> sourceInputParameters.getString("label", "noLabel") + "_" +
                         getChannelId(sourceConnectionParameters));
 
