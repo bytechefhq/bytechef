@@ -27,8 +27,6 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
-import com.bytechef.evaluator.Evaluator;
-import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacadeImpl;
@@ -60,7 +58,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.encryption", "com.bytechef.platform.configuration"
+        "com.bytechef.encryption", "com.bytechef.eval.config", "com.bytechef.platform.configuration"
     },
     excludeFilters = @ComponentScan.Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class))
 @EnableAspectJAutoProxy
@@ -78,11 +76,6 @@ public class PlatformConfigurationIntTestConfiguration {
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
-    }
-
-    @Bean
-    Evaluator evaluator() {
-        return SpelEvaluator.create();
     }
 
     @Bean
