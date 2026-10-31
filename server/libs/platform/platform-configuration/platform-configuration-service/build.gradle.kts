@@ -23,6 +23,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
 
     testImplementation("org.springframework.security:spring-security-core")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
@@ -32,4 +34,5 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-service"))
 }
