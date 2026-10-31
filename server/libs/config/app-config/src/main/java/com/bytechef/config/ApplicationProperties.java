@@ -206,6 +206,11 @@ public class ApplicationProperties {
     private Tenant tenant = new Tenant();
 
     /**
+     * Tool invocation log configuration
+     */
+    private ToolInvocationLog toolInvocationLog = new ToolInvocationLog();
+
+    /**
      * Database upgrade (Liquibase) configuration
      */
     private Upgrade upgrade = new Upgrade();
@@ -359,6 +364,10 @@ public class ApplicationProperties {
         return tenant;
     }
 
+    public ToolInvocationLog getToolInvocationLog() {
+        return toolInvocationLog;
+    }
+
     public Upgrade getUpgrade() {
         return upgrade;
     }
@@ -509,6 +518,10 @@ public class ApplicationProperties {
 
     public void setTenant(Tenant tenant) {
         this.tenant = tenant;
+    }
+
+    public void setToolInvocationLog(ToolInvocationLog toolInvocationLog) {
+        this.toolInvocationLog = toolInvocationLog;
     }
 
     public void setUpgrade(Upgrade upgrade) {
@@ -4832,6 +4845,25 @@ public class ApplicationProperties {
 
         public void setMode(Mode mode) {
             this.mode = mode;
+        }
+    }
+
+    /**
+     * Tool invocation log configuration.
+     */
+    public static class ToolInvocationLog {
+
+        /**
+         * Number of days tool invocation log records are kept
+         */
+        private long retentionDays;
+
+        public long getRetentionDays() {
+            return retentionDays;
+        }
+
+        public void setRetentionDays(long retentionDays) {
+            this.retentionDays = retentionDays;
         }
     }
 

@@ -309,6 +309,9 @@ bytechef:
   # Tenant support mode (SINGLE | MULTI - EE only) default: SINGLE
   tenant:
     mode: SINGLE
+  tool-invocation-log:
+    # Number of days tool invocation records are kept, default: 90
+    retention-days: 90
   webhook-url: http://127.0.0.1:7888/webhooks/{id}
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
