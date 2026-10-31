@@ -33,13 +33,17 @@ const enhanceAuthorizationUrl = (
     responseType: Oauth2Props['responseType'],
     extraQueryParametersRef: React.MutableRefObject<Oauth2Props['extraQueryParameters']>
 ) => {
+    const authorizationQueryParameters = Object.fromEntries(
+        Object.entries(extraQueryParametersRef.current ?? {}).filter(([key]) => key !== 'code_verifier')
+    );
+
     const query = objectToQuery({
         client_id: clientId,
         redirect_uri: redirectUri,
         response_type: responseType,
         scope,
         state,
-        ...extraQueryParametersRef.current,
+        ...authorizationQueryParameters,
     });
 
     return `${authorizeUrl}?${query}`;
@@ -193,7 +197,10 @@ const useOAuth2 = ({
                     const payload = message?.data?.payload;
 
                     if (responseType === 'code' && onCodeSuccess) {
-                        onCodeSuccess(payload);
+                        onCodeSuccess({
+                            ...payload,
+                            code_verifier: extraQueryParametersRef.current?.code_verifier,
+                        });
                     } else {
                         if (onTokenSuccess) {
                             onTokenSuccess(payload);
