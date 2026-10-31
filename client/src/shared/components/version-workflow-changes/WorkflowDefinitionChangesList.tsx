@@ -1,11 +1,40 @@
 import Badge, {BadgeStyleType} from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
 import {WorkflowChangeType, WorkflowDefinitionChange, WorkflowNodeChangeKind} from '@/shared/middleware/graphql';
+import {useState} from 'react';
 
 const KIND_BADGES: Record<WorkflowNodeChangeKind, {label: string; styleType: BadgeStyleType}> = {
     [WorkflowNodeChangeKind.Added]: {label: 'Added', styleType: 'success-outline'},
     [WorkflowNodeChangeKind.Modified]: {label: 'Modified', styleType: 'warning-outline'},
     [WorkflowNodeChangeKind.Moved]: {label: 'Moved', styleType: 'primary-outline'},
     [WorkflowNodeChangeKind.Removed]: {label: 'Removed', styleType: 'destructive-outline'},
+};
+
+const VALUE_PREVIEW_LENGTH = 160;
+
+interface ValueChangeTextProps {
+    text: string;
+}
+
+const ValueChangeText = ({text}: ValueChangeTextProps) => {
+    const [expanded, setExpanded] = useState(false);
+
+    if (text.length <= VALUE_PREVIEW_LENGTH) {
+        return <>{text}</>;
+    }
+
+    return (
+        <>
+            {expanded ? text : `${text.slice(0, VALUE_PREVIEW_LENGTH)}…`}
+
+            <Button
+                className="ml-1 h-auto p-0 font-sans text-xs"
+                label={expanded ? 'Show less' : 'Show more'}
+                onClick={() => setExpanded(!expanded)}
+                variant="link"
+            />
+        </>
+    );
 };
 
 interface WorkflowDefinitionChangesListProps {
@@ -59,7 +88,9 @@ const WorkflowDefinitionChangesList = ({changeType, changes}: WorkflowDefinition
                                         </dt>
 
                                         <dd className="font-mono break-all">
-                                            {`${valueChange.oldValue ?? '—'} → ${valueChange.newValue ?? '—'}`}
+                                            <ValueChangeText
+                                                text={`${valueChange.oldValue ?? '—'} → ${valueChange.newValue ?? '—'}`}
+                                            />
                                         </dd>
                                     </div>
                                 ))}

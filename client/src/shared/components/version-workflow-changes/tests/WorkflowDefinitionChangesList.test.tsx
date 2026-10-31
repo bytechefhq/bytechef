@@ -1,5 +1,5 @@
 import {WorkflowChangeType, WorkflowNodeChangeKind, WorkflowNodeChangeTarget} from '@/shared/middleware/graphql';
-import {render, screen} from '@/shared/util/test-utils';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it} from 'vitest';
 
 import WorkflowDefinitionChangesList from '../WorkflowDefinitionChangesList';
@@ -48,6 +48,32 @@ describe('WorkflowDefinitionChangesList', () => {
         expect(screen.getByText('"https://a" → "https://b"')).toBeInTheDocument();
         expect(screen.getByText('— → "x"')).toBeInTheDocument();
         expect(screen.getByText('"y" → —')).toBeInTheDocument();
+    });
+
+    it('collapses a long value and expands it on demand', async () => {
+        const longValue = `"${'a'.repeat(300)}"`;
+
+        render(
+            <WorkflowDefinitionChangesList
+                changes={[
+                    {
+                        ...changes[1],
+                        valueChanges: [{newValue: longValue, oldValue: null, path: 'metadata'}],
+                    },
+                ]}
+            />
+        );
+
+        expect(screen.queryByText(`— → ${longValue}`)).not.toBeInTheDocument();
+        expect(screen.getByText(/^— → "a+…$/)).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Show more'}));
+
+        expect(screen.getByText(`— → ${longValue}`)).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Show less'}));
+
+        expect(screen.getByText(/^— → "a+…$/)).toBeInTheDocument();
     });
 
     it('renders the empty state', () => {
