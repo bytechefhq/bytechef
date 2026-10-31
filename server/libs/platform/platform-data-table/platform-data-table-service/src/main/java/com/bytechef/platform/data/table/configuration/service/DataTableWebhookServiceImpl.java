@@ -23,6 +23,8 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookTyp
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.configuration.repository.DataTableWebhookRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +53,8 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
     @Override
     public long addWebhook(String baseName, String url, DataTableWebhookType type, long environmentId) {
+        validateUrl(url);
+
         String normalizedBaseName = DataTableServiceImpl.normalizeBaseName(baseName);
 
         Optional<DataTable> dataTableOptional = dataTableRepository.findByName(normalizedBaseName);
@@ -102,5 +106,27 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
     @Override
     public void removeWebhook(long id) {
         webhookRepository.deleteById(id);
+    }
+
+    private static void validateUrl(String url) {
+        try {
+            URI uri = URI.create(url);
+
+            String scheme = uri.getScheme();
+
+            // URI#getHost is null for host names such as bytechef_server that URL, and so delivery, accepts
+            if (("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) &&
+                !uri.toURL()
+                    .getHost()
+                    .isEmpty()) {
+
+                return;
+            }
+        } catch (IllegalArgumentException | MalformedURLException exception) {
+            throw new IllegalArgumentException(
+                "Data table webhook URL must be an absolute http or https URL with a host", exception);
+        }
+
+        throw new IllegalArgumentException("Data table webhook URL must be an absolute http or https URL with a host");
     }
 }
