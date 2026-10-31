@@ -349,6 +349,8 @@ class ClusterElementCallRecorderTest {
 
     @Test
     void testRecordsEachCallWithItsInputAndOutput() {
+        recorder.addListener(1, event -> {});
+
         ClusterElementCallRef first =
             recorder.callStarted(1, 10, "httpClient_1", "httpClient", null, null, "{\"a\":1}");
         ClusterElementCallRef second =
@@ -440,6 +442,8 @@ class ClusterElementCallRecorderTest {
 
     @Test
     void testCompletingAnUnknownCallRecordsAPartialRecord() {
+        recorder.addListener(1, event -> {});
+
         recorder.callCompleted(1, 10, new ClusterElementCallRef("id-1", "httpClient_1"), "out");
 
         ClusterElementCallRecord callRecord = recorder.drain(10)
@@ -479,7 +483,24 @@ class ClusterElementCallRecorderTest {
     }
 
     @Test
+    void testKeepsNoInputOrOutputWhileNoOneListensToTheJob() {
+        ClusterElementCallRef ref = recorder.callStarted(1, 10, "httpClient_1", "httpClient", null, null, "in");
+
+        recorder.callCompleted(1, 10, ref, "out");
+
+        ClusterElementCallRecord callRecord = recorder.drain(10)
+            .records()
+            .getFirst();
+
+        assertEquals(ClusterElementCallRecord.Status.COMPLETED, callRecord.status());
+        assertNull(callRecord.input());
+        assertNull(callRecord.output());
+    }
+
+    @Test
     void testCapsRecordedValues() {
+        recorder.addListener(1, event -> {});
+
         recorder.callStarted(1, 10, "httpClient_1", "httpClient", null, null, "x".repeat(70_000));
 
         assertEquals(

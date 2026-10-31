@@ -1699,6 +1699,9 @@ class AbstractAiAgentChatActionTest {
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
 
+        AutoCloseable handle = ClusterElementCallRecorder.getInstance()
+            .addListener(TOOL_CALL_JOB_ID, event -> {});
+
         List<ClusterElementCallRecord> records;
 
         try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
@@ -1711,6 +1714,8 @@ class AbstractAiAgentChatActionTest {
                 MockParametersFactory.create(new HashMap<String, Object>(suspend.continueParameters())),
                 MockParametersFactory.create(Map.of("approved", true)), null, createToolCallActionContext());
         } finally {
+            handle.close();
+
             records = ClusterElementCallRecorder.getInstance()
                 .drain(TOOL_CALL_TASK_EXECUTION_ID)
                 .records();
