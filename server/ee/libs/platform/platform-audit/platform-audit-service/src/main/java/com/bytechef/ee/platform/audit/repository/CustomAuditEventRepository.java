@@ -11,6 +11,7 @@ import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -45,6 +46,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class CustomAuditEventRepository implements AuditEventRepository {
 
     private static final String AUTHORIZATION_FAILURE = "AUTHORIZATION_FAILURE";
+    private static final String DETAILS = "details";
     public static final String ANONYMOUS_USER = "anonymoususer";
 
     /**
@@ -124,7 +126,7 @@ public class CustomAuditEventRepository implements AuditEventRepository {
 
         persistentAuditEvent.setData(truncate(eventData));
 
-        String tenantId = resolveTenantId(event.getPrincipal());
+        String tenantId = resolveTenantId(event);
 
         if (tenantId == null) {
             save(persistentAuditEvent);
@@ -133,10 +135,8 @@ public class CustomAuditEventRepository implements AuditEventRepository {
         }
     }
 
-    private @Nullable String resolveTenantId(String principal) {
-        if (StringUtils.isBlank(principal) ||
-            !Objects.equals(TenantContext.getCurrentTenantId(), TenantContext.DEFAULT_TENANT_ID)) {
-
+    private @Nullable String resolveTenantId(AuditEvent event) {
+        if (!Objects.equals(TenantContext.getCurrentTenantId(), TenantContext.DEFAULT_TENANT_ID)) {
             return null;
         }
 
@@ -147,22 +147,52 @@ public class CustomAuditEventRepository implements AuditEventRepository {
                 return null;
             }
 
-            EmailValidator emailValidator = EmailValidator.getInstance();
+            String detailsTenantId = getDetailsTenantId(event.getData(), tenantService);
 
-            List<String> tenantIds = emailValidator.isValid(principal)
-                ? tenantService.getTenantIdsByUserEmail(principal)
-                : tenantService.getTenantIdsByUserLogin(principal.toLowerCase(Locale.ENGLISH));
-
-            if (tenantIds == null || tenantIds.isEmpty()) {
-                return null;
+            if (detailsTenantId != null) {
+                return detailsTenantId;
             }
 
-            return tenantIds.getFirst();
+            return getPrincipalTenantId(event.getPrincipal(), tenantService);
         } catch (RuntimeException exception) {
             log.warn("Unable to resolve the tenant of an audit event principal", exception);
 
             return null;
         }
+    }
+
+    private static @Nullable String getDetailsTenantId(Map<String, Object> data, TenantService tenantService) {
+        if (data.get(DETAILS) instanceof TenantWebAuthenticationDetails tenantWebAuthenticationDetails) {
+            String tenantId = tenantWebAuthenticationDetails.getTenantId();
+
+            if (tenantId != null && !Objects.equals(tenantId, TenantContext.DEFAULT_TENANT_ID)) {
+                List<String> tenantIds = tenantService.getTenantIds();
+
+                if (tenantIds.contains(tenantId)) {
+                    return tenantId;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static @Nullable String getPrincipalTenantId(String principal, TenantService tenantService) {
+        if (StringUtils.isBlank(principal)) {
+            return null;
+        }
+
+        EmailValidator emailValidator = EmailValidator.getInstance();
+
+        List<String> tenantIds = emailValidator.isValid(principal)
+            ? tenantService.getTenantIdsByUserEmail(principal)
+            : tenantService.getTenantIdsByUserLogin(principal.toLowerCase(Locale.ENGLISH));
+
+        if (tenantIds == null || tenantIds.isEmpty()) {
+            return null;
+        }
+
+        return tenantIds.getFirst();
     }
 
     private void save(PersistentAuditEvent persistentAuditEvent) {
