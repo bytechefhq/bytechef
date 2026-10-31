@@ -38,8 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.sql.DataSource;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -51,11 +53,26 @@ import org.springframework.ai.session.SessionRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
+ * Runs against a real PostgreSQL container. Every test gets its own database, so the static repository cache (keyed by
+ * URL, username and password) never hands a repository from one test to another.
+ *
  * @author Ivica Cardic
  */
-class SessionChatMemoryUtilsTest {
+@Testcontainers
+class SessionChatMemoryUtilsIntTest {
+
+    private static final AtomicInteger DATABASE_COUNTER = new AtomicInteger();
+
+    @Container
+    private static final PostgreSQLContainer<?> POSTGRE_SQL_CONTAINER = new PostgreSQLContainer<>(
+        "postgres:16-alpine");
+
+    private static JdbcTemplate adminJdbcTemplate;
 
     private final List<Runnable> deferredCloseTasks = new ArrayList<>();
     private final List<Runnable> scheduledTasks = new ArrayList<>();
@@ -69,14 +86,21 @@ class SessionChatMemoryUtilsTest {
 
     private DriverManagerDataSource dataSource;
 
+    @BeforeAll
+    static void beforeAll() {
+        adminJdbcTemplate = new JdbcTemplate(
+            new DriverManagerDataSource(
+                POSTGRE_SQL_CONTAINER.getJdbcUrl(), POSTGRE_SQL_CONTAINER.getUsername(),
+                POSTGRE_SQL_CONTAINER.getPassword()));
+    }
+
     @BeforeEach
-    void setUp() {
-        dataSource = new DriverManagerDataSource(
-            "jdbc:h2:mem:" + System.nanoTime() + ";DB_CLOSE_DELAY=-1", "sa", "");
+    void beforeEach() {
+        dataSource = createDataSource();
     }
 
     @Test
-    void testGetDataSourceWithoutDataSourceConnectionNamesTheDataSourceNode() throws Exception {
+    void testGetDataSourceWithoutDataSourceConnectionNamesTheDataSourceNode() {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
         DataSourceFunction dataSourceFunction =
@@ -103,6 +127,9 @@ class SessionChatMemoryUtilsTest {
                         "connection for it.");
     }
 
+    /**
+     * A real Oracle database is not available here, so this case keeps a DataSource whose metadata reports Oracle.
+     */
     @Test
     void testCreateSessionRepositoryRejectsAnOracleDataSource() throws SQLException {
         DataSource oracleDataSource = mock(DataSource.class);
@@ -125,9 +152,9 @@ class SessionChatMemoryUtilsTest {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
         List<String> columnNames = jdbcTemplate.queryForList(
-            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'AI_SESSION_EVENT'", String.class);
+            "SELECT column_name FROM information_schema.columns WHERE table_name = 'ai_session_event'", String.class);
 
-        assertThat(columnNames).contains("ID", "SESSION_ID", "SEQ", "ARCHIVED", "SYNTHETIC", "METADATA");
+        assertThat(columnNames).contains("id", "session_id", "seq", "archived", "synthetic", "metadata");
     }
 
     @Test
@@ -160,14 +187,18 @@ class SessionChatMemoryUtilsTest {
     @Test
     void testGetSessionRepositoryReusesOneRepositoryPerDatabase() {
         String url = dataSource.getUrl();
+        String username = dataSource.getUsername();
+        String password = dataSource.getPassword();
 
         SessionRepository firstSessionRepository = SessionChatMemoryUtils.getSessionRepository(
-            new SingleConnectionDataSource(url, "sa", "", false));
+            new SingleConnectionDataSource(url, username, password, false));
         SessionRepository secondSessionRepository = SessionChatMemoryUtils.getSessionRepository(
-            new SingleConnectionDataSource(url, "sa", "", false));
+            new SingleConnectionDataSource(url, username, password, false));
+
+        DriverManagerDataSource otherDataSource = createDataSource();
+
         SessionRepository otherDatabaseSessionRepository = SessionChatMemoryUtils.getSessionRepository(
-            new SingleConnectionDataSource(
-                "jdbc:h2:mem:" + System.nanoTime() + ";DB_CLOSE_DELAY=-1", "sa", "", false));
+            new SingleConnectionDataSource(otherDataSource.getUrl(), username, password, false));
 
         assertThat(secondSessionRepository).isSameAs(firstSessionRepository);
         assertThat(otherDatabaseSessionRepository).isNotSameAs(firstSessionRepository);
@@ -178,39 +209,40 @@ class SessionChatMemoryUtilsTest {
         String url = dataSource.getUrl();
 
         SessionRepository adminSessionRepository = SessionChatMemoryUtils.getSessionRepository(
-            new SingleConnectionDataSource(url, "sa", "", false));
+            new SingleConnectionDataSource(url, dataSource.getUsername(), dataSource.getPassword(), false));
 
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-
-        jdbcTemplate.execute("CREATE USER memory_user PASSWORD 'secret' ADMIN");
+        String roleName = createLoginRole("secret");
 
         SessionRepository otherUserSessionRepository = SessionChatMemoryUtils.getSessionRepository(
-            new SingleConnectionDataSource(url, "memory_user", "secret", false));
+            new SingleConnectionDataSource(url, roleName, "secret", false));
 
         assertThat(otherUserSessionRepository).isNotSameAs(adminSessionRepository);
+
+        saveAndReadEvent(otherUserSessionRepository);
     }
 
     @Test
     void testGetSessionRepositoryUsesASeparateRepositoryForAnotherPassword() {
         String url = dataSource.getUrl();
+        String roleName = createLoginRole("original");
 
         SessionRepository originalPasswordSessionRepository = SessionChatMemoryUtils.getSessionRepository(
-            new SingleConnectionDataSource(url, "sa", "", false));
+            new SingleConnectionDataSource(url, roleName, "original", false));
 
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-
-        jdbcTemplate.execute("ALTER USER sa SET PASSWORD 'rotated'");
+        adminJdbcTemplate.execute("ALTER ROLE " + roleName + " PASSWORD 'rotated'");
 
         SessionRepository rotatedPasswordSessionRepository = SessionChatMemoryUtils.getSessionRepository(
-            new SingleConnectionDataSource(url, "sa", "rotated", false));
+            new SingleConnectionDataSource(url, roleName, "rotated", false));
 
         assertThat(rotatedPasswordSessionRepository).isNotSameAs(originalPasswordSessionRepository);
+
+        saveAndReadEvent(rotatedPasswordSessionRepository);
     }
 
     @Test
     void testGetSessionRepositoryClosesTheSuppliedSingleConnection() throws SQLException {
         SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
-            dataSource.getUrl(), "sa", "", false);
+            dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword(), false);
 
         try (Connection connection = singleConnectionDataSource.getConnection()) {
             SessionChatMemoryUtils.getSessionRepository(singleConnectionDataSource);
@@ -320,8 +352,32 @@ class SessionChatMemoryUtilsTest {
             .anyMatch(pooledSessionRepository -> pooledSessionRepository.sessionRepository() == sessionRepository);
     }
 
+    /**
+     * Creates a fresh database in the container and returns a DataSource for it, the PostgreSQL counterpart of a new
+     * in-memory H2 URL.
+     */
     private static DriverManagerDataSource createDataSource() {
-        return new DriverManagerDataSource("jdbc:h2:mem:" + System.nanoTime() + ";DB_CLOSE_DELAY=-1", "sa", "");
+        String databaseName = "session_memory_" + DATABASE_COUNTER.incrementAndGet();
+
+        adminJdbcTemplate.execute("CREATE DATABASE " + databaseName);
+
+        String url = POSTGRE_SQL_CONTAINER.getJdbcUrl()
+            .replace("/" + POSTGRE_SQL_CONTAINER.getDatabaseName(), "/" + databaseName);
+
+        return new DriverManagerDataSource(
+            url, POSTGRE_SQL_CONTAINER.getUsername(), POSTGRE_SQL_CONTAINER.getPassword());
+    }
+
+    /**
+     * Roles are cluster-wide in PostgreSQL, so each test gets its own. SUPERUSER mirrors the H2 ADMIN user the
+     * original test created and lets the role create the session tables in the public schema.
+     */
+    private static String createLoginRole(String password) {
+        String roleName = "memory_user_" + DATABASE_COUNTER.incrementAndGet();
+
+        adminJdbcTemplate.execute("CREATE ROLE " + roleName + " LOGIN SUPERUSER PASSWORD '" + password + "'");
+
+        return roleName;
     }
 
     private static void runTasks(List<Runnable> tasks) {
