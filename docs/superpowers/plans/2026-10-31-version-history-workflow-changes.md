@@ -745,7 +745,22 @@ git commit -m "6849 client - Show changed workflows per version in the integrati
 ### Task 16: End-to-end verification and docs
 
 **Files:**
-- Modify: `docs/src/content/docs/**` only if a page documents the version history panels (search for "Version History"); add one short paragraph on the changed-workflows list and the changes dialog.
+- Modify: `docs/content/docs/platform/automation/build/workflows/workflows.mdx` (section `### Project History`, after the screenshot)
+- Modify: `docs/content/docs/platform/embedded/build/workflows/index.mdx` (section `### Integration version history`, replacing nothing; append after "The current draft version appears at the top and cannot be expanded…")
+- Modify: `docs/content/docs/platform/embedded/build/automations/automation-workflows.mdx` (section `### Project version history`)
+
+The docs track the latest **released** version, so the existing text stays as is and each section gets a
+blockquote in the pages' existing style: `> **Coming soon.** …` stating that this is not yet available in
+the latest released version. Content of the note (same facts in all three, adjusted to the panel's names):
+- expanding a version (the draft included) lists the workflows added, removed or modified compared with the
+  previous version, with a summary such as "3 workflows changed (1 added, 2 modified)";
+- clicking a workflow opens a dialog with three tabs: **Changes** (trigger, task, cluster element, input and
+  output changes with old → new values), **Definition** (side-by-side diff of the workflow definition) and
+  **Canvas** (read-only canvas with added nodes green, modified amber, moved blue and removed red; a toggle
+  switches between the previous and the selected version);
+- the draft is compared with the last published version;
+- values of sensitive parameters such as passwords, tokens and API keys are shown as `••••••`.
+No em dashes in the prose.
 
 - [ ] **Step 1: Full server and client checks**
 
@@ -756,7 +771,7 @@ Expected: BUILD SUCCESSFUL; lint, typecheck and tests pass.
 
 Start infra and server (`cd server && docker compose -f docker-compose.dev.infra.yml up -d && cd .. && ./gradlew -p server/apps/server-app bootRun`) and client (`cd client && npm run dev`). In a project with two published versions and a draft with an edited task: expand each version row, open a modified workflow, verify the three tabs (changes list, side-by-side JSON diff, canvas with the amber node), toggle old/new, confirm a parameter named `password` shows `••••••` on both tabs, confirm the editable editor behind the dialog is unchanged after closing. Repeat for an Integration and an embedded Automation Workflow project.
 
-- [ ] **Step 3: Commit docs (if any) and finish**
+- [ ] **Step 3: Write the three Coming soon notes, then commit docs and finish**
 
 ```bash
 git add docs
