@@ -7,6 +7,7 @@ import DeployButton from '@/pages/automation/project/components/project-header/c
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
 import ProjectBreadcrumb from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumb';
+import ProjectBreadcrumbSkeleton from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumbSkeleton';
 import ProjectDeploymentsButton from '@/pages/automation/project/components/project-header/components/ProjectDeploymentsButton';
 import ProjectItemSelect from '@/pages/automation/project/components/project-header/components/ProjectItemSelect';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
@@ -117,7 +118,7 @@ const ProjectHeader = ({
             <div className="flex items-center gap-2">
                 <LeftSidebarButton onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)} />
 
-                {projectWorkflows && (
+                {projectWorkflows ? (
                     <ProjectBreadcrumb
                         itemSelect={
                             <ProjectItemSelect
@@ -129,6 +130,8 @@ const ProjectHeader = ({
                         }
                         project={project}
                     />
+                ) : (
+                    <ProjectBreadcrumbSkeleton />
                 )}
 
                 {loadingIndicator}

@@ -1,14 +1,13 @@
 import {Skeleton} from '@/components/ui/skeleton';
+import ProjectBreadcrumbSkeleton from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumbSkeleton';
 
 const ProjectSkeleton = () => {
     return (
         <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-2">
                 <Skeleton className="size-6" />
 
-                <Skeleton className="h-6 w-80" />
-
-                <Skeleton className="h-6 w-72" />
+                <ProjectBreadcrumbSkeleton />
             </div>
 
             <div className="flex items-center gap-4">

@@ -1,14 +1,13 @@
 import {Skeleton} from '@/components/ui/skeleton';
+import IntegrationBreadcrumbSkeleton from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationBreadcrumbSkeleton';
 
 const IntegrationSkeleton = () => {
     return (
         <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-2">
                 <Skeleton className="size-6" />
 
-                <Skeleton className="h-6 w-80" />
-
-                <Skeleton className="h-6 w-72" />
+                <IntegrationBreadcrumbSkeleton />
             </div>
 
             <div className="flex items-center gap-4">
