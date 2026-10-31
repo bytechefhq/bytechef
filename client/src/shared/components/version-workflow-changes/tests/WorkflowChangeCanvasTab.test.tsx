@@ -7,7 +7,7 @@ import {
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it, vi} from 'vitest';
 
-import WorkflowChangeCanvasTab from '../WorkflowChangeCanvasTab';
+import WorkflowChangeCanvasTab, {WorkflowChangeCanvasToolbar} from '../WorkflowChangeCanvasTab';
 
 vi.mock('../WorkflowChangeCanvas', () => ({
     default: ({highlights, workflow}: {highlights: Record<string, string>; workflow: {label: string}}) => (
@@ -59,7 +59,7 @@ const getHighlights = () => JSON.parse(screen.getByTestId('mock-change-canvas').
 
 describe('WorkflowChangeCanvasTab', () => {
     it('shows the new canvas with added, modified and moved highlights by default', () => {
-        render(<WorkflowChangeCanvasTab baseVersionLabel="V1" change={BASE_CHANGE} versionLabel="V2" />);
+        render(<WorkflowChangeCanvasTab change={BASE_CHANGE} selectedSide="new" />);
 
         expect(screen.getByTestId('mock-change-canvas')).toHaveAttribute('data-label', 'New label');
         expect(getHighlights()).toEqual({added_1: 'ADDED', modified_1: 'MODIFIED', moved_1: 'MOVED'});
@@ -68,12 +68,11 @@ describe('WorkflowChangeCanvasTab', () => {
     it('requests the definitions of the workflow components with their actions, triggers and cluster elements', () => {
         render(
             <WorkflowChangeCanvasTab
-                baseVersionLabel="V1"
                 change={{
                     ...BASE_CHANGE,
                     newDefinition: '{"label":"New label","tasks":[{"name":"http_1","type":"httpClient/v1/get"}]}',
                 }}
-                versionLabel="V2"
+                selectedSide="new"
             />
         );
 
@@ -88,44 +87,38 @@ describe('WorkflowChangeCanvasTab', () => {
         );
     });
 
-    it('switches to the old canvas with removed, modified and moved highlights', async () => {
-        render(<WorkflowChangeCanvasTab baseVersionLabel="V1" change={BASE_CHANGE} versionLabel="V2" />);
-
-        await userEvent.click(screen.getByRole('button', {name: 'V1'}));
+    it('shows the old canvas with removed, modified and moved highlights', () => {
+        render(<WorkflowChangeCanvasTab change={BASE_CHANGE} selectedSide="old" />);
 
         expect(screen.getByTestId('mock-change-canvas')).toHaveAttribute('data-label', 'Old label');
         expect(getHighlights()).toEqual({modified_1: 'MODIFIED', moved_1: 'MOVED', removed_1: 'REMOVED'});
     });
 
-    it('hides the toggle for an added workflow', () => {
+    it('falls back to the new canvas for an added workflow', () => {
         render(
             <WorkflowChangeCanvasTab
                 change={{...BASE_CHANGE, baseVersion: null, changeType: WorkflowChangeType.Added, oldDefinition: null}}
-                versionLabel="V2"
+                selectedSide="new"
             />
         );
 
-        expect(screen.queryByRole('button', {name: 'V2'})).not.toBeInTheDocument();
         expect(screen.getByTestId('mock-change-canvas')).toHaveAttribute('data-label', 'New label');
     });
 
-    it('hides the toggle and shows the old canvas for a removed workflow', () => {
+    it('falls back to the old canvas for a removed workflow', () => {
         render(
             <WorkflowChangeCanvasTab
-                baseVersionLabel="V1"
                 change={{...BASE_CHANGE, changeType: WorkflowChangeType.Removed, newDefinition: null}}
-                versionLabel="V2"
+                selectedSide="new"
             />
         );
 
-        expect(screen.queryByRole('button', {name: 'V1'})).not.toBeInTheDocument();
         expect(screen.getByTestId('mock-change-canvas')).toHaveAttribute('data-label', 'Old label');
     });
 
     it('highlights the root task of a changed cluster element as modified unless the task has its own change', () => {
         render(
             <WorkflowChangeCanvasTab
-                baseVersionLabel="V1"
                 change={{
                     ...BASE_CHANGE,
                     changes: [
@@ -144,7 +137,7 @@ describe('WorkflowChangeCanvasTab', () => {
                         entry(WorkflowNodeChangeKind.Added, 'agent_2'),
                     ],
                 }}
-                versionLabel="V2"
+                selectedSide="new"
             />
         );
 
@@ -155,10 +148,60 @@ describe('WorkflowChangeCanvasTab', () => {
         render(
             <WorkflowChangeCanvasTab
                 change={{...BASE_CHANGE, baseVersion: null, newDefinition: 'null', oldDefinition: null}}
-                versionLabel="V2"
+                selectedSide="new"
             />
         );
 
         expect(screen.queryByTestId('mock-change-canvas')).not.toBeInTheDocument();
+    });
+});
+
+describe('WorkflowChangeCanvasToolbar', () => {
+    it('reports the side picked in the version toggle', async () => {
+        const onSelectedSideChange = vi.fn();
+
+        render(
+            <WorkflowChangeCanvasToolbar
+                baseVersionLabel="V1"
+                change={BASE_CHANGE}
+                onSelectedSideChange={onSelectedSideChange}
+                selectedSide="new"
+                versionLabel="V2"
+            />
+        );
+
+        expect(screen.getByRole('radio', {name: 'V2 (after)'})).toHaveAttribute('aria-checked', 'true');
+
+        await userEvent.click(screen.getByRole('radio', {name: 'V1 (before)'}));
+
+        expect(onSelectedSideChange).toHaveBeenCalledWith('old');
+    });
+
+    it('hides the toggle but keeps the legend for an added workflow', () => {
+        render(
+            <WorkflowChangeCanvasToolbar
+                change={{...BASE_CHANGE, baseVersion: null, changeType: WorkflowChangeType.Added, oldDefinition: null}}
+                onSelectedSideChange={vi.fn()}
+                selectedSide="new"
+                versionLabel="V2"
+            />
+        );
+
+        expect(screen.queryAllByRole('radio')).toHaveLength(0);
+        expect(screen.getByText('Added')).toBeInTheDocument();
+    });
+
+    it('hides the toggle for a removed workflow', () => {
+        render(
+            <WorkflowChangeCanvasToolbar
+                baseVersionLabel="V1"
+                change={{...BASE_CHANGE, changeType: WorkflowChangeType.Removed, newDefinition: null}}
+                onSelectedSideChange={vi.fn()}
+                selectedSide="new"
+                versionLabel="V2"
+            />
+        );
+
+        expect(screen.queryAllByRole('radio')).toHaveLength(0);
     });
 });

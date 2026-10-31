@@ -80,7 +80,7 @@ const WorkflowDefinitionChangesList = ({changeType, changes}: WorkflowDefinition
                         </div>
 
                         {change.valueChanges.length > 0 && (
-                            <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-x-4 gap-y-1 pl-2 text-xs">
+                            <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-x-4 gap-y-1 pl-6 text-xs">
                                 {change.valueChanges.map((valueChange) => (
                                     <div className="contents" key={valueChange.path}>
                                         <dt className="truncate font-mono text-content-neutral-secondary">

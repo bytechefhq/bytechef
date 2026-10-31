@@ -1,13 +1,13 @@
-import Button from '@/components/Button/Button';
+import {ToggleGroup, ToggleGroupItem} from '@/components/ui/toggle-group';
 import {VersionWorkflowChange, WorkflowNodeChangeKind, WorkflowNodeChangeTarget} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 
 import WorkflowChangeCanvas from './WorkflowChangeCanvas';
 import {collectComponentNames, parseWorkflowDefinition} from './parseWorkflowDefinition';
 
-type SideType = 'new' | 'old';
+export type SideType = 'new' | 'old';
 
 const LEGEND: {className: string; label: string}[] = [
     {className: 'bg-green-500', label: 'Added'},
@@ -56,18 +56,64 @@ function deriveHighlights(change: VersionWorkflowChange, side: SideType): Record
     return highlights;
 }
 
-interface WorkflowChangeCanvasTabProps {
+export function resolveCanvasSide(change: VersionWorkflowChange, selectedSide: SideType): SideType {
+    if (selectedSide === 'new' && change.newDefinition) {
+        return 'new';
+    }
+
+    return change.oldDefinition ? 'old' : 'new';
+}
+
+interface WorkflowChangeCanvasToolbarProps {
     baseVersionLabel?: string;
     change: VersionWorkflowChange;
+    onSelectedSideChange: (side: SideType) => void;
+    selectedSide: SideType;
     versionLabel: string;
 }
 
-const WorkflowChangeCanvasTab = ({baseVersionLabel, change, versionLabel}: WorkflowChangeCanvasTabProps) => {
-    const [selectedSide, setSelectedSide] = useState<SideType>('new');
+export const WorkflowChangeCanvasToolbar = ({
+    baseVersionLabel,
+    change,
+    onSelectedSideChange,
+    selectedSide,
+    versionLabel,
+}: WorkflowChangeCanvasToolbarProps) => (
+    <div className="flex items-center gap-4">
+        {change.oldDefinition && change.newDefinition && (
+            <ToggleGroup
+                aria-label="Canvas version"
+                onValueChange={(value) => value && onSelectedSideChange(value as SideType)}
+                size="sm"
+                type="single"
+                value={resolveCanvasSide(change, selectedSide)}
+                variant="outline"
+            >
+                <ToggleGroupItem className="px-3" value="old">{`${baseVersionLabel} (before)`}</ToggleGroupItem>
 
-    const hasOldSide = !!change.oldDefinition;
-    const hasNewSide = !!change.newDefinition;
-    const side: SideType = selectedSide === 'new' && hasNewSide ? 'new' : hasOldSide ? 'old' : 'new';
+                <ToggleGroupItem className="px-3" value="new">{`${versionLabel} (after)`}</ToggleGroupItem>
+            </ToggleGroup>
+        )}
+
+        <ul className="flex items-center gap-3 text-xs text-content-neutral-secondary">
+            {LEGEND.map((legendItem) => (
+                <li className="flex items-center gap-1" key={legendItem.label}>
+                    <span className={`size-2.5 rounded-sm ${legendItem.className}`} />
+
+                    {legendItem.label}
+                </li>
+            ))}
+        </ul>
+    </div>
+);
+
+interface WorkflowChangeCanvasTabProps {
+    change: VersionWorkflowChange;
+    selectedSide: SideType;
+}
+
+const WorkflowChangeCanvasTab = ({change, selectedSide}: WorkflowChangeCanvasTabProps) => {
+    const side = resolveCanvasSide(change, selectedSide);
 
     const definition = side === 'new' ? change.newDefinition : change.oldDefinition;
 
@@ -92,44 +138,16 @@ const WorkflowChangeCanvasTab = ({baseVersionLabel, change, versionLabel}: Workf
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
     return (
-        <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-4">
-                {hasOldSide && hasNewSide ? (
-                    <div className="flex gap-1">
-                        <Button onClick={() => setSelectedSide('old')} variant={side === 'old' ? 'default' : 'outline'}>
-                            {baseVersionLabel}
-                        </Button>
-
-                        <Button onClick={() => setSelectedSide('new')} variant={side === 'new' ? 'default' : 'outline'}>
-                            {versionLabel}
-                        </Button>
-                    </div>
-                ) : (
-                    <span />
-                )}
-
-                <ul className="flex items-center gap-3 text-xs text-content-neutral-secondary">
-                    {LEGEND.map((legendItem) => (
-                        <li className="flex items-center gap-1" key={legendItem.label}>
-                            <span className={`size-2.5 rounded-sm ${legendItem.className}`} />
-
-                            {legendItem.label}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-
-            <div className="h-[60vh]">
-                {workflow && (
-                    <WorkflowChangeCanvas
-                        componentDefinitions={componentDefinitions ?? []}
-                        highlights={highlights}
-                        key={side}
-                        taskDispatcherDefinitions={taskDispatcherDefinitions ?? []}
-                        workflow={workflow}
-                    />
-                )}
-            </div>
+        <div className="h-[70vh]">
+            {workflow && (
+                <WorkflowChangeCanvas
+                    componentDefinitions={componentDefinitions ?? []}
+                    highlights={highlights}
+                    key={side}
+                    taskDispatcherDefinitions={taskDispatcherDefinitions ?? []}
+                    workflow={workflow}
+                />
+            )}
         </div>
     );
 };
