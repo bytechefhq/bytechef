@@ -18,7 +18,7 @@
         "not IE 11"
     ],
     "engines": {
-        "node": ">=24.0.0"
+        "node": ">=24.15.0"
     },
     "scripts": {
         "dev": "vite",
