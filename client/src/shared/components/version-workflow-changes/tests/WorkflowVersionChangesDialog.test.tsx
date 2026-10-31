@@ -10,6 +10,10 @@ vi.mock('@/shared/components/MonacoDiffEditorWrapper', () => ({
     ),
 }));
 
+vi.mock('../WorkflowChangeCanvasTab', () => ({
+    default: ({versionLabel}: {versionLabel: string}) => <div data-testid="mock-canvas-tab">{versionLabel}</div>,
+}));
+
 const change = {
     baseVersion: 1,
     changeType: WorkflowChangeType.Modified,
@@ -106,5 +110,22 @@ describe('WorkflowVersionChangesDialog', () => {
         render(<WorkflowVersionChangesDialog isLoading onClose={vi.fn()} open versionLabel="V2" />);
 
         expect(document.querySelector('svg.animate-spin')).toBeInTheDocument();
+    });
+
+    it('shows the canvas tab', async () => {
+        render(
+            <WorkflowVersionChangesDialog
+                baseVersionLabel="V1"
+                change={change}
+                isLoading={false}
+                onClose={vi.fn()}
+                open
+                versionLabel="V2"
+            />
+        );
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Canvas'}));
+
+        expect(screen.getByTestId('mock-canvas-tab')).toHaveTextContent('V2');
     });
 });

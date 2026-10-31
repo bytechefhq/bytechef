@@ -5,6 +5,7 @@ import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {VersionWorkflowChange} from '@/shared/middleware/graphql';
 import {Suspense, lazy} from 'react';
 
+import WorkflowChangeCanvasTab from './WorkflowChangeCanvasTab';
 import WorkflowDefinitionChangesList from './WorkflowDefinitionChangesList';
 
 const MonacoDiffEditorWrapper = lazy(() => import('@/shared/components/MonacoDiffEditorWrapper'));
@@ -49,9 +50,7 @@ const WorkflowVersionChangesDialog = ({
 
                                     <TabsTrigger value="definition">Definition</TabsTrigger>
 
-                                    <TabsTrigger disabled value="canvas">
-                                        Canvas
-                                    </TabsTrigger>
+                                    <TabsTrigger value="canvas">Canvas</TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="changes">
@@ -68,6 +67,14 @@ const WorkflowVersionChangesDialog = ({
                                             />
                                         </Suspense>
                                     </div>
+                                </TabsContent>
+
+                                <TabsContent value="canvas">
+                                    <WorkflowChangeCanvasTab
+                                        baseVersionLabel={baseVersionLabel}
+                                        change={change}
+                                        versionLabel={versionLabel}
+                                    />
                                 </TabsContent>
                             </Tabs>
                         )}
