@@ -38,7 +38,8 @@ import tools.jackson.databind.ObjectMapper;
 
 /**
  * Loads the embedded tool facade together with the real connected user and integration services and their JDBC
- * repositories.
+ * repositories. The automation configuration, category, security and tag modules are on the test runtime classpath only
+ * for the Liquibase changelogs the embedded tables reference, so their repository configurations are excluded.
  *
  * @version ee
  *
@@ -47,7 +48,14 @@ import tools.jackson.databind.ObjectMapper;
 @ComponentScan(
     basePackages = "com.bytechef.encryption",
     excludeFilters = @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class))
-@EnableAutoConfiguration
+@EnableAutoConfiguration(
+    excludeName = {
+        "com.bytechef.automation.configuration.config.AutomationConfigurationJdbcRepositoryConfiguration",
+        "com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration",
+        "com.bytechef.platform.category.config.PlatformCategoryJdbcRepositoryConfiguration",
+        "com.bytechef.platform.security.config.PlatformSecurityJdbcRepositoryConfiguration",
+        "com.bytechef.platform.tag.config.PlatformTagJdbcRepositoryConfiguration"
+    })
 @Import({
     ConnectedUserServiceImpl.class, ConnectionIdHelper.class, IntegrationInstanceConfigurationServiceImpl.class,
     IntegrationInstanceServiceImpl.class, IntegrationServiceImpl.class, JacksonConfiguration.class,
