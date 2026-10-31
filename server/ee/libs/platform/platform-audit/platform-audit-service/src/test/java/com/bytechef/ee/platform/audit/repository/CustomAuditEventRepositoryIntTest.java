@@ -45,6 +45,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -138,6 +142,39 @@ public class CustomAuditEventRepositoryIntTest {
         assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
         assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
         verify(tenantService, never()).getTenantIdsByUserEmail(anyString());
+    }
+
+    @Test
+    public void testMcpJwtAuthenticationSuccessIsPersistedInTheRequestTenantSchema() {
+        Jwt jwt = Jwt.withTokenValue("token")
+            .header("alg", "RS256")
+            .subject("test1@gmail.com")
+            .build();
+
+        JwtAuthenticationToken authentication = new JwtAuthenticationToken(jwt, List.of());
+
+        authentication.setDetails(createDetails(OTHER_TENANT_ID));
+
+        applicationEventPublisher.publishEvent(new AuthenticationSuccessEvent(authentication));
+
+        assertThat(countEvents(OTHER_TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+        assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+    }
+
+    @Test
+    public void testRedactedMcpBearerTokenFailureIsPersistedInTheRequestTenantSchema() {
+        BearerTokenAuthenticationToken authentication = new BearerTokenAuthenticationToken("secret-token");
+
+        authentication.setDetails(createDetails(OTHER_TENANT_ID));
+
+        applicationEventPublisher.publishEvent(
+            new AuthenticationFailureBadCredentialsEvent(
+                authentication, new InvalidBearerTokenException("Invalid token")));
+
+        assertThat(countEvents(OTHER_TENANT_SCHEMA, "[credential]", "AUTHENTICATION_FAILURE")).isEqualTo(1);
+        assertThat(countEvents(DEFAULT_SCHEMA, "[credential]", "AUTHENTICATION_FAILURE")).isZero();
+        assertThat(countAllEvents(TENANT_SCHEMA)).isZero();
     }
 
     @Test

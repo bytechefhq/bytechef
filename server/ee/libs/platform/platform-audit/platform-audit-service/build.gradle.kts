@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
 
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation("org.springframework.security:spring-security-oauth2-jose")
     testImplementation("org.springframework.security:spring-security-oauth2-resource-server")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))

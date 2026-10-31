@@ -24,6 +24,8 @@ import com.bytechef.platform.security.web.mcp.oauth2.McpBearerTokenResolver;
 import com.bytechef.platform.security.web.mcp.oauth2.McpEndpointRequestMatcher;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.security.web.mcp.oauth2.McpProtectedResourceUrls;
+import com.bytechef.platform.security.web.mcp.oauth2.McpTenantAuthenticationDetailsSource;
+import com.bytechef.platform.security.web.mcp.oauth2.McpTenantJwtAuthenticationProvider;
 import com.bytechef.platform.security.web.mcp.oauth2.McpTenantProtectedResourceMetadataAuthenticationEntryPoint;
 import com.bytechef.platform.security.web.mcp.oauth2.MultiIssuerJwtDecoder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,6 +48,9 @@ import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationConverter;
+import org.springframework.security.web.authentication.AuthenticationConverter;
 
 /**
  * @author Ivica Cardic
@@ -112,20 +117,36 @@ public class McpOAuth2ResourceServerSecurityConfigurerContributor implements Sec
             .validateAudienceClaim(false)
             .jwtDecoder(multiIssuerJwtDecoder)
             .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
-                .bearerTokenResolver(mcpBearerTokenResolver)
+                .authenticationConverter(
+                    createBearerTokenAuthenticationConverter(mcpBearerTokenResolver, mcpEndpointRequestMatcher))
                 .authenticationEntryPoint(new McpTenantProtectedResourceMetadataAuthenticationEntryPoint(
                     mcpEndpointRequestMatcher, publicUrl))
                 .jwt(jwt -> jwt.authenticationManager(createJwtAuthenticationManager(multiIssuerJwtDecoder))));
     }
 
     private AuthenticationManager createJwtAuthenticationManager(JwtDecoder jwtDecoder) {
-        ProviderManager providerManager = new ProviderManager(new JwtAuthenticationProvider(jwtDecoder));
+        ProviderManager providerManager = new ProviderManager(
+            new McpTenantJwtAuthenticationProvider(
+                new JwtAuthenticationProvider(jwtDecoder), mcpResourceServerProperties));
 
         if (authenticationEventPublisher != null) {
             providerManager.setAuthenticationEventPublisher(authenticationEventPublisher);
         }
 
         return providerManager;
+    }
+
+    private static AuthenticationConverter createBearerTokenAuthenticationConverter(
+        BearerTokenResolver bearerTokenResolver, McpEndpointRequestMatcher mcpEndpointRequestMatcher) {
+
+        BearerTokenAuthenticationConverter bearerTokenAuthenticationConverter =
+            new BearerTokenAuthenticationConverter();
+
+        bearerTokenAuthenticationConverter.setAuthenticationDetailsSource(
+            new McpTenantAuthenticationDetailsSource(mcpEndpointRequestMatcher));
+        bearerTokenAuthenticationConverter.setBearerTokenResolver(bearerTokenResolver);
+
+        return bearerTokenAuthenticationConverter;
     }
 
     private void customizeResourceClaims(
