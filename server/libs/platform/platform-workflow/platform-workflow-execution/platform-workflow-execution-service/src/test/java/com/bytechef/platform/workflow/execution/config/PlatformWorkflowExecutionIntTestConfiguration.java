@@ -16,10 +16,16 @@
 
 package com.bytechef.platform.workflow.execution.config;
 
+import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
@@ -77,16 +83,22 @@ public class PlatformWorkflowExecutionIntTestConfiguration {
                 new ExecutionErrorToStringConverter(objectMapper),
                 new FileEntryToStringConverter(objectMapper),
                 new JobResumeIdToStringConverter(),
+                new MapWrapperToStringConverter(objectMapper),
                 new StringToExecutionErrorConverter(objectMapper),
                 new StringToFileEntryConverter(objectMapper),
                 new StringToJobResumeIdConverter(),
+                new StringToMapWrapperConverter(objectMapper),
                 new StringToTaskStateValueConverter(objectMapper),
                 new StringToTriggerStateValueConverter(objectMapper),
+                new StringToWebhooksConverter(objectMapper),
                 new StringToWorkflowExecutionIdConverter(),
+                new StringToWorkflowTaskConverter(objectMapper),
                 new StringToWorkflowTriggerConverter(objectMapper),
                 new TaskStateValueToStringConverter(objectMapper),
                 new TriggerStateValueToStringConverter(objectMapper),
+                new WebhooksToStringConverter(objectMapper),
                 new WorkflowExecutionIdToStringConverter(),
+                new WorkflowTaskToStringConverter(objectMapper),
                 new WorkflowTriggerToStringConverter(objectMapper));
         }
     }
