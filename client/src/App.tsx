@@ -36,6 +36,7 @@ import {
     UsersIcon,
     VectorSquareIcon,
     Workflow,
+    WrenchIcon,
     ZapIcon,
 } from 'lucide-react';
 import {Suspense, lazy, useEffect, useLayoutEffect, useState} from 'react';
@@ -91,6 +92,11 @@ const automationNavigation: NavigationType[] = [
         href: '/automation/executions',
         icon: ActivityIcon,
         name: 'Workflow Executions',
+    },
+    {
+        href: '/automation/executions/tool-invocations',
+        icon: WrenchIcon,
+        name: 'Tool Invocations',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
@@ -205,6 +211,10 @@ function App() {
 
         if (navItem.href === '/automation/knowledge-bases') {
             return ai.knowledgeBase.enabled;
+        }
+
+        if (navItem.href === '/automation/executions/tool-invocations') {
+            return edition === EditionType.EE;
         }
 
         return true;
