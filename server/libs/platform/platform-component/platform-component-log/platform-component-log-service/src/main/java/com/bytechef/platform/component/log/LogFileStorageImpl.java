@@ -153,6 +153,13 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
+    public List<LogEntry> readLogEntries(long jobId, long taskExecutionId, String clusterElementCallId) {
+        return readLogEntries(jobId, taskExecutionId).stream()
+            .filter(logEntry -> clusterElementCallId.equals(logEntry.clusterElementCallId()))
+            .toList();
+    }
+
+    @Override
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         awaitPendingWrites(jobId);
 

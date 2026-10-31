@@ -40,4 +40,7 @@ public interface ComponentLogEntryRepository extends ListCrudRepository<Componen
 
     List<ComponentLogEntry> findAllByScopeAndJobIdAndTaskExecutionIdOrderById(
         int scope, long jobId, long taskExecutionId);
+
+    List<ComponentLogEntry> findAllByScopeAndJobIdAndTaskExecutionIdAndClusterElementCallIdOrderById(
+        int scope, long jobId, long taskExecutionId, String clusterElementCallId);
 }

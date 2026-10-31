@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.domain.LogEntry;
+import com.bytechef.platform.component.log.web.graphql.LogFileGraphQlController;
 import com.bytechef.platform.component.log.web.graphql.LogFileGraphQlController.LogFilterInput;
 import com.bytechef.platform.component.log.web.graphql.LogFileGraphQlController.LogPage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,7 +49,7 @@ public class EditorLogFileGraphQlController {
     public LogPage editorJobFileLogs(
         @Argument long jobId, @Argument LogFilterInput filter, @Argument Integer page, @Argument Integer size) {
 
-        List<LogEntry> allEntries = editorLogFileStorage.readLogEntriesByJobId(jobId);
+        List<LogEntry> allEntries = LogFileGraphQlController.readLogEntries(editorLogFileStorage, jobId, filter);
 
         List<LogEntry> filteredEntries = applyFilters(allEntries, filter);
 

@@ -68,6 +68,13 @@ public class JdbcLogFileStorage implements LogFileStorage {
     }
 
     @Override
+    public List<LogEntry> readLogEntries(long jobId, long taskExecutionId, String clusterElementCallId) {
+        return toLogEntries(
+            componentLogEntryRepository.findAllByScopeAndJobIdAndTaskExecutionIdAndClusterElementCallIdOrderById(
+                scope.ordinal(), jobId, taskExecutionId, clusterElementCallId));
+    }
+
+    @Override
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         return toLogEntries(componentLogEntryRepository.findAllByScopeAndJobIdOrderById(scope.ordinal(), jobId));
     }

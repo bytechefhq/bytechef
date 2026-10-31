@@ -18,6 +18,7 @@ package com.bytechef.platform.component.log.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.component.log.LogFileStorage;
+import com.bytechef.platform.component.log.LogFileStorageReader;
 import com.bytechef.platform.component.log.TriggerLogFileStorage;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -25,6 +26,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -52,7 +54,7 @@ public class LogFileGraphQlController {
     public LogPage jobFileLogs(
         @Argument long jobId, @Argument LogFilterInput filter, @Argument Integer page, @Argument Integer size) {
 
-        return toLogPage(logFileStorage.readLogEntriesByJobId(jobId), filter, page, size);
+        return toLogPage(readLogEntries(logFileStorage, jobId, filter), filter, page, size);
     }
 
     @QueryMapping
@@ -83,6 +85,20 @@ public class LogFileGraphQlController {
         logFileStorage.deleteLogEntries(jobId);
 
         return true;
+    }
+
+    public static List<LogEntry> readLogEntries(
+        LogFileStorageReader logFileStorageReader, long jobId, @Nullable LogFilterInput filter) {
+
+        if (filter == null || filter.taskExecutionId() == null) {
+            return logFileStorageReader.readLogEntriesByJobId(jobId);
+        }
+
+        if (filter.clusterElementCallId() == null) {
+            return logFileStorageReader.readLogEntries(jobId, filter.taskExecutionId());
+        }
+
+        return logFileStorageReader.readLogEntries(jobId, filter.taskExecutionId(), filter.clusterElementCallId());
     }
 
     private LogPage toLogPage(List<LogEntry> entries, LogFilterInput filter, Integer page, Integer size) {

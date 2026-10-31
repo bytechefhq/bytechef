@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.log.web.graphql;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -227,6 +228,43 @@ public class LogFileGraphQlControllerIntTest {
             .path("jobFileLogs.totalElements")
             .entity(Integer.class)
             .isEqualTo(3);
+    }
+
+    @Test
+    void testTaskExecutionFilterReadsOnlyThatTasksEntries() {
+        Instant now = Instant.parse("2026-09-04T10:00:00Z");
+
+        when(logFileStorage.readLogEntries(1L, 77L)).thenReturn(
+            List.of(logEntry(now, LogEntry.Level.INFO, "task entry")));
+
+        graphQlTester.document(JOB_FILE_LOGS_DOCUMENT)
+            .variable("jobId", "1")
+            .variable("filter", Map.of("taskExecutionId", "77"))
+            .execute()
+            .path("jobFileLogs.content[*].message")
+            .entityList(String.class)
+            .containsExactly("task entry");
+
+        verify(logFileStorage, never()).readLogEntriesByJobId(1L);
+    }
+
+    @Test
+    void testClusterElementCallFilterReadsOnlyThatCallsEntries() {
+        Instant now = Instant.parse("2026-09-04T10:00:00Z");
+
+        when(logFileStorage.readLogEntries(1L, 77L, "a")).thenReturn(
+            List.of(logEntry(now, LogEntry.Level.INFO, "from a", "a")));
+
+        graphQlTester.document(JOB_FILE_LOGS_DOCUMENT)
+            .variable("jobId", "1")
+            .variable("filter", Map.of("clusterElementCallId", "a", "taskExecutionId", "77"))
+            .execute()
+            .path("jobFileLogs.content[*].message")
+            .entityList(String.class)
+            .containsExactly("from a");
+
+        verify(logFileStorage, never()).readLogEntriesByJobId(1L);
+        verify(logFileStorage, never()).readLogEntries(1L, 77L);
     }
 
     private static LogEntry logEntry(Instant timestamp, LogEntry.Level level, String message) {
