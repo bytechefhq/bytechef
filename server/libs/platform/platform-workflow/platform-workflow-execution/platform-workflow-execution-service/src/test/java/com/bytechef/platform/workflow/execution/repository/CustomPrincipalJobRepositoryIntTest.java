@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,10 +180,11 @@ class CustomPrincipalJobRepositoryIntTest {
         List<Long> matchingJobIds = new ArrayList<>();
 
         for (int index = 0; index < 12; index++) {
+            boolean even = index % 2 == 0;
+
             matchingJobIds.add(
                 saveJob(
-                    10L + (index % 2) * 10L, index % 2 == 0 ? "wf1" : "wf2", Job.Status.STARTED, DAY, DAY,
-                    PlatformType.EMBEDDED));
+                    even ? 10L : 20L, even ? "wf1" : "wf2", Job.Status.STARTED, DAY, DAY, PlatformType.EMBEDDED));
         }
 
         saveJob(10L, "wf1", Job.Status.STARTED, DAY, DAY, PlatformType.AUTOMATION);
@@ -228,9 +230,9 @@ class CustomPrincipalJobRepositoryIntTest {
             Long.class, workflowId, parentTaskExecutionId, status.ordinal(), toTimestamp(startDate),
             toTimestamp(endDate));
 
-        principalJobRepository.save(new PrincipalJob(principalId, jobId, type));
+        principalJobRepository.save(new PrincipalJob(principalId, Validate.notNull(jobId, "jobId"), type));
 
-        return jobId;
+        return Validate.notNull(jobId, "jobId");
     }
 
     private long saveTaskExecution(long jobId) {
@@ -241,7 +243,7 @@ class CustomPrincipalJobRepositoryIntTest {
                 "VALUES (?, 0, 0, 0, 0, 0, '1s', 2, 0, '{}', 0, now(), 'system', now(), 'system') RETURNING id",
             Long.class, jobId);
 
-        return taskExecutionId;
+        return Validate.notNull(taskExecutionId, "taskExecutionId");
     }
 
     private static Timestamp toTimestamp(Instant instant) {
