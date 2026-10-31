@@ -227,8 +227,8 @@ class DataTableRowServiceIntTest {
     }
 
     /**
-     * Builds a service over the real Postgres data source whose connection metadata reports H2, so the code path
-     * used for databases without RETURNING runs against the real database.
+     * Builds a service over the real Postgres data source whose connection metadata reports H2, so the code path used
+     * for databases without RETURNING runs against the real database.
      */
     private DataTableRowService createReturningUnsupportedDataTableRowService() {
         DataSource h2ReportingDataSource = new DelegatingDataSource(dataSource) {
