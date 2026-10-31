@@ -1,4 +1,5 @@
 import IntegrationBreadcrumb from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationBreadcrumb';
+import IntegrationBreadcrumbSkeleton from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationBreadcrumbSkeleton';
 import IntegrationItemSelect from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationItemSelect';
 import IntegrationSkeleton from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationSkeleton';
 import LeftSidebarButton from '@/ee/pages/embedded/integration/components/integration-header/components/LeftSidebarButton';
@@ -97,7 +98,7 @@ const IntegrationHeader = ({
             <div className="flex items-center gap-2">
                 <LeftSidebarButton onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)} />
 
-                {integrationWorkflows && (
+                {integrationWorkflows ? (
                     <IntegrationBreadcrumb
                         integration={integration}
                         itemSelect={
@@ -109,6 +110,8 @@ const IntegrationHeader = ({
                             />
                         }
                     />
+                ) : (
+                    <IntegrationBreadcrumbSkeleton />
                 )}
 
                 {loadingIndicator}
