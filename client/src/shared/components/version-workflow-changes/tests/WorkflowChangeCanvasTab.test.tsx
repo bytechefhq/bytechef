@@ -123,4 +123,15 @@ describe('WorkflowChangeCanvasTab', () => {
 
         expect(getHighlights()).toEqual({agent_1: 'MODIFIED', agent_2: 'ADDED'});
     });
+
+    it('renders no canvas for a malformed definition', () => {
+        render(
+            <WorkflowChangeCanvasTab
+                change={{...BASE_CHANGE, baseVersion: null, oldDefinition: null, newDefinition: 'null'}}
+                versionLabel="V2"
+            />
+        );
+
+        expect(screen.queryByTestId('mock-change-canvas')).not.toBeInTheDocument();
+    });
 });

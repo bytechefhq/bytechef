@@ -72,7 +72,17 @@ const WorkflowChangeCanvasTab = ({baseVersionLabel, change, versionLabel}: Workf
     const definition = side === 'new' ? change.newDefinition : change.oldDefinition;
 
     const highlights = useMemo(() => deriveHighlights(change, side), [change, side]);
-    const workflow = useMemo(() => (definition ? parseWorkflowDefinition(definition) : undefined), [definition]);
+    const workflow = useMemo(() => {
+        if (!definition) {
+            return undefined;
+        }
+
+        try {
+            return parseWorkflowDefinition(definition);
+        } catch {
+            return undefined;
+        }
+    }, [definition]);
     const componentNames = useMemo(() => (workflow ? collectComponentNames(workflow) : []), [workflow]);
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery(

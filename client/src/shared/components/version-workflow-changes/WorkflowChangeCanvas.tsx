@@ -1,5 +1,4 @@
 import '@xyflow/react/dist/base.css';
-import RoundedSmoothStepEdge from '@/pages/platform/workflow-editor/edges/RoundedSmoothStepEdge';
 import ReadOnlyNode from '@/pages/platform/workflow-editor/nodes/ReadOnlyNode';
 import ReadOnlyPlaceholderNode from '@/pages/platform/workflow-editor/nodes/ReadOnlyPlaceholderNode';
 import {WorkflowChangeHighlightContext} from '@/pages/platform/workflow-editor/providers/workflowChangeHighlightContext';
@@ -17,6 +16,7 @@ import {
 import {Background, BackgroundVariant, Edge, Node, ReactFlow, ReactFlowProvider} from '@xyflow/react';
 import {useEffect, useRef, useState} from 'react';
 
+import ChangeCanvasEdge from './ChangeCanvasEdge';
 import {
     ChangeCanvasBottomGhostNode,
     ChangeCanvasLeftGhostNode,
@@ -25,7 +25,7 @@ import {
 
 const DEFAULT_CANVAS_WIDTH = 756;
 
-const EDGE_TYPES = {smoothstep: RoundedSmoothStepEdge};
+const EDGE_TYPES = {smoothstep: ChangeCanvasEdge};
 
 const NODE_TYPES = {
     readonly: ReadOnlyNode,
@@ -96,12 +96,29 @@ const WorkflowChangeCanvas = ({
             const nodes = graph.nodes
                 .filter((node) => node.id !== TRIGGER_PLACEHOLDER_NODE_ID && node.id !== FINAL_PLACEHOLDER_NODE_ID)
                 .map((node) => ({...node, type: NODE_TYPE_MAPPING[node.type ?? ''] ?? node.type}));
-            const edges = graph.edges.map((edge) => ({...edge, type: 'smoothstep'}));
+            const nodeIds = new Set(nodes.map((node) => node.id));
+            const edges = graph.edges
+                .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target))
+                .map((edge) => ({...edge, type: 'smoothstep'}));
 
-            const layoutResult = await getLayoutElements({canvasWidth, direction: layoutDirection, edges, nodes});
+            if (nodes.length === 0) {
+                if (!cancelled) {
+                    setElements({edges: [], nodes: []});
+                }
 
-            if (!cancelled) {
-                setElements({edges: layoutResult.edges, nodes: layoutResult.nodes});
+                return;
+            }
+
+            try {
+                const layoutResult = await getLayoutElements({canvasWidth, direction: layoutDirection, edges, nodes});
+
+                if (!cancelled) {
+                    setElements({edges: layoutResult.edges, nodes: layoutResult.nodes});
+                }
+            } catch {
+                if (!cancelled) {
+                    setElements({edges: [], nodes: []});
+                }
             }
         };
 
