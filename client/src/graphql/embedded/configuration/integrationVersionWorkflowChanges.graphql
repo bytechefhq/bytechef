@@ -1,0 +1,12 @@
+query integrationVersionWorkflowChanges($integrationId: ID!, $integrationVersion: Int!) {
+    integrationVersionWorkflowChanges(integrationId: $integrationId, integrationVersion: $integrationVersion) {
+        baseVersion
+        version
+        workflows {
+            workflowUuid
+            label
+            changeType
+            changeCount
+        }
+    }
+}
