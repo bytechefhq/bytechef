@@ -7,18 +7,17 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.facade.ScimUserFacade;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser.ScimFilter;
 import com.bytechef.ee.platform.user.scim.model.ScimEmail;
 import com.bytechef.ee.platform.user.scim.model.ScimListResponse;
 import com.bytechef.ee.platform.user.scim.model.ScimMeta;
 import com.bytechef.ee.platform.user.scim.model.ScimName;
-import com.bytechef.ee.platform.user.scim.model.ScimPatchOperation;
 import com.bytechef.ee.platform.user.scim.model.ScimPatchRequest;
 import com.bytechef.ee.platform.user.scim.model.ScimUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -51,10 +50,12 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 class ScimUserController {
 
+    private final ScimUserFacade scimUserFacade;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    ScimUserController(UserService userService) {
+    ScimUserController(ScimUserFacade scimUserFacade, UserService userService) {
+        this.scimUserFacade = scimUserFacade;
         this.userService = userService;
     }
 
@@ -114,20 +115,7 @@ class ScimUserController {
 
     @PostMapping
     ResponseEntity<ScimUser> createUser(@RequestBody ScimUser scimUser) {
-        AdminUserDTO adminUserDTO = new AdminUserDTO();
-
-        adminUserDTO.setLogin(scimUser.userName());
-        adminUserDTO.setEmail(extractPrimaryEmail(scimUser));
-        adminUserDTO.setActivated(scimUser.active());
-
-        if (scimUser.name() != null) {
-            adminUserDTO.setFirstName(scimUser.name()
-                .givenName());
-            adminUserDTO.setLastName(scimUser.name()
-                .familyName());
-        }
-
-        User createdUser = userService.create(adminUserDTO);
+        User createdUser = scimUserFacade.createUser(scimUser);
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(toScimUser(createdUser));
@@ -142,21 +130,8 @@ class ScimUserController {
                 .body(notFoundError("User", String.valueOf(id)));
         }
 
-        AdminUserDTO adminUserDTO = new AdminUserDTO();
-
-        adminUserDTO.setId(id);
-        adminUserDTO.setLogin(scimUser.userName());
-        adminUserDTO.setEmail(extractPrimaryEmail(scimUser));
-        adminUserDTO.setActivated(scimUser.active());
-
-        if (scimUser.name() != null) {
-            adminUserDTO.setFirstName(scimUser.name()
-                .givenName());
-            adminUserDTO.setLastName(scimUser.name()
-                .familyName());
-        }
-
-        Optional<User> updatedUser = userService.update(adminUserDTO);
+        Optional<User> updatedUser = ScimUserFacade.isDeactivation(existingUser.get(), scimUser)
+            ? scimUserFacade.deactivateUser(id, scimUser) : scimUserFacade.replaceUser(id, scimUser);
 
         if (updatedUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -175,72 +150,26 @@ class ScimUserController {
                 .body(notFoundError("User", String.valueOf(id)));
         }
 
-        User user = existingUser.get();
+        Optional<User> patchedUser = ScimUserFacade.isDeactivation(existingUser.get(), patchRequest)
+            ? scimUserFacade.deactivateUser(id, patchRequest) : scimUserFacade.patchUser(id, patchRequest);
 
-        for (ScimPatchOperation operation : patchRequest.operations()) {
-            if ("replace".equalsIgnoreCase(operation.operation())) {
-                applyReplaceOperation(user, operation);
-            }
+        if (patchedUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(notFoundError("User", String.valueOf(id)));
         }
 
-        userService.save(user);
-
-        return ResponseEntity.ok(toScimUser(user));
+        return ResponseEntity.ok(toScimUser(patchedUser.get()));
     }
 
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteUser(@PathVariable long id) {
-        Optional<User> user = userService.fetchUser(id);
-
-        if (user.isEmpty()) {
+        if (!scimUserFacade.deleteUser(id)) {
             return ResponseEntity.notFound()
                 .build();
         }
 
-        userService.delete(user.get()
-            .getLogin());
-
         return ResponseEntity.noContent()
             .build();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void applyReplaceOperation(User user, ScimPatchOperation operation) {
-        if (operation.path() != null) {
-            switch (operation.path()) {
-                case "active" -> user.setActivated(Boolean.parseBoolean(String.valueOf(operation.value())));
-                case "userName" -> user.setLogin(String.valueOf(operation.value()));
-                case "name.givenName" -> user.setFirstName(String.valueOf(operation.value()));
-                case "name.familyName" -> user.setLastName(String.valueOf(operation.value()));
-                default -> {
-                }
-            }
-        } else if (operation.value() instanceof Map) {
-            Map<String, Object> valueMap = (Map<String, Object>) operation.value();
-
-            if (valueMap.containsKey("active")) {
-                user.setActivated(Boolean.parseBoolean(String.valueOf(valueMap.get("active"))));
-            }
-        }
-    }
-
-    private String extractPrimaryEmail(ScimUser scimUser) {
-        if (scimUser.emails() != null) {
-            for (ScimEmail email : scimUser.emails()) {
-                if (email.primary()) {
-                    return email.value();
-                }
-            }
-
-            if (!scimUser.emails()
-                .isEmpty()) {
-                return scimUser.emails()
-                    .getFirst()
-                    .value();
-            }
-        }
-
-        return scimUser.userName();
     }
 
     private Map<String, Object> notFoundError(String resourceType, String id) {

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.facade.ScimGroupFacade;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser.ScimFilter;
 import com.bytechef.ee.platform.user.scim.model.ScimGroup;
@@ -46,10 +47,12 @@ import org.springframework.web.bind.annotation.RestController;
 class ScimGroupController {
 
     private final AuthorityService authorityService;
+    private final ScimGroupFacade scimGroupFacade;
 
     @SuppressFBWarnings("EI")
-    ScimGroupController(AuthorityService authorityService) {
+    ScimGroupController(AuthorityService authorityService, ScimGroupFacade scimGroupFacade) {
         this.authorityService = authorityService;
+        this.scimGroupFacade = scimGroupFacade;
     }
 
     @GetMapping
@@ -99,11 +102,7 @@ class ScimGroupController {
 
     @PostMapping
     ResponseEntity<ScimGroup> createGroup(@RequestBody ScimGroup scimGroup) {
-        Authority authority = new Authority();
-
-        authority.setName(scimGroup.displayName());
-
-        Authority createdAuthority = authorityService.create(authority);
+        Authority createdAuthority = scimGroupFacade.createGroup(scimGroup);
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(toScimGroup(createdAuthority));
@@ -111,20 +110,14 @@ class ScimGroupController {
 
     @PutMapping("/{id}")
     ResponseEntity<Object> replaceGroup(@PathVariable long id, @RequestBody ScimGroup scimGroup) {
-        Optional<Authority> existingAuthority = authorityService.fetchAuthority(id);
+        Optional<Authority> updatedAuthority = scimGroupFacade.replaceGroup(id, scimGroup);
 
-        if (existingAuthority.isEmpty()) {
+        if (updatedAuthority.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(notFoundError("Group", String.valueOf(id)));
         }
 
-        Authority authority = existingAuthority.get();
-
-        authority.setName(scimGroup.displayName());
-
-        Authority updatedAuthority = authorityService.update(authority);
-
-        return ResponseEntity.ok(toScimGroup(updatedAuthority));
+        return ResponseEntity.ok(toScimGroup(updatedAuthority.get()));
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
@@ -140,14 +133,10 @@ class ScimGroupController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteGroup(@PathVariable long id) {
-        Optional<Authority> authority = authorityService.fetchAuthority(id);
-
-        if (authority.isEmpty()) {
+        if (!scimGroupFacade.deleteGroup(id)) {
             return ResponseEntity.notFound()
                 .build();
         }
-
-        authorityService.delete(id);
 
         return ResponseEntity.noContent()
             .build();
