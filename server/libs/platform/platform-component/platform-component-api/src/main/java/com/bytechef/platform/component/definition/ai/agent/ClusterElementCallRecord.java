@@ -96,6 +96,11 @@ public record ClusterElementCallRecord(
         return map;
     }
 
+    public ClusterElementCallRecord withoutValues() {
+        return new ClusterElementCallRecord(
+            id, parentId, workflowNodeName, componentName, toolName, status, startDate, endDate, null, null, error);
+    }
+
     private static ClusterElementCallRecord mergeRecord(
         ClusterElementCallRecord existing, ClusterElementCallRecord incoming) {
 
