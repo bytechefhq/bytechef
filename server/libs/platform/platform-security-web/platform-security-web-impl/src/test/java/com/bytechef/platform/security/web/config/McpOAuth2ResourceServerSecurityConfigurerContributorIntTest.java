@@ -51,7 +51,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -75,6 +77,9 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.test.web.servlet.MockMvc;
@@ -178,7 +183,7 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token, tenantSecretKey);
 
         assertThat(httpResponse.statusCode()).isEqualTo(200);
-        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class))
+        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class, token))
             .containsExactly("000002:admin@localhost.com");
     }
 
@@ -187,11 +192,12 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         String forgedMcpServerSecretKey = String.valueOf(TenantKey.of("public"));
         String forgedEndpointUrl = "http://localhost:" + port + "/api/management/" + forgedMcpServerSecretKey + "/mcp";
 
-        HttpResponse<String> httpResponse = postInitialize(
-            signManagementJwt(forgedEndpointUrl), forgedMcpServerSecretKey);
+        String token = signManagementJwt(forgedEndpointUrl);
+
+        HttpResponse<String> httpResponse = postInitialize(token, forgedMcpServerSecretKey);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
-        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class)).isEmpty();
+        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class, token)).isEmpty();
     }
 
     @Test
@@ -210,8 +216,8 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
-        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class)).hasSize(1);
-        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class)).isEmpty();
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
+        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class, token)).isEmpty();
     }
 
     @Test
@@ -455,6 +461,7 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         return new JWTClaimsSet.Builder()
             .issuer(issuer)
             .subject("admin@localhost.com")
+            .jwtID(String.valueOf(UUID.randomUUID()))
             .issueTime(Date.from(Instant.now()))
             .expirationTime(Date.from(Instant.now()
                 .plus(5, ChronoUnit.MINUTES)));
@@ -542,21 +549,38 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
             recordedAuthenticationEvents.add(
                 new RecordedAuthenticationEvent(
-                    authenticationEvent, TenantContext.getCurrentTenantId() + ":" + authentication.getName()));
+                    authenticationEvent, getTokenValue(authentication),
+                    TenantContext.getCurrentTenantId() + ":" + authentication.getName()));
         }
 
         void clear() {
             recordedAuthenticationEvents.clear();
         }
 
-        List<String> getEvents(Class<? extends AbstractAuthenticationEvent> eventType) {
+        List<String> getEvents(Class<? extends AbstractAuthenticationEvent> eventType, String token) {
             return recordedAuthenticationEvents.stream()
                 .filter(recordedAuthenticationEvent -> eventType.isInstance(recordedAuthenticationEvent.event()))
+                .filter(recordedAuthenticationEvent -> token.equals(recordedAuthenticationEvent.token()))
                 .map(RecordedAuthenticationEvent::tenantPrincipal)
                 .toList();
         }
+
+        private static @Nullable String getTokenValue(Authentication authentication) {
+            if (authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
+                Jwt jwt = jwtAuthenticationToken.getToken();
+
+                return jwt.getTokenValue();
+            }
+
+            if (authentication instanceof BearerTokenAuthenticationToken bearerTokenAuthenticationToken) {
+                return bearerTokenAuthenticationToken.getToken();
+            }
+
+            return null;
+        }
     }
 
-    private record RecordedAuthenticationEvent(AbstractAuthenticationEvent event, String tenantPrincipal) {
+    private record RecordedAuthenticationEvent(
+        AbstractAuthenticationEvent event, @Nullable String token, String tenantPrincipal) {
     }
 }
