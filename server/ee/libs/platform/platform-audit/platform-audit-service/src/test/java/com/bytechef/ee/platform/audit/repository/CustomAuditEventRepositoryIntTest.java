@@ -42,9 +42,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
@@ -175,6 +177,21 @@ public class CustomAuditEventRepositoryIntTest {
         assertThat(countEvents(OTHER_TENANT_SCHEMA, "[credential]", "AUTHENTICATION_FAILURE")).isEqualTo(1);
         assertThat(countEvents(DEFAULT_SCHEMA, "[credential]", "AUTHENTICATION_FAILURE")).isZero();
         assertThat(countAllEvents(TENANT_SCHEMA)).isZero();
+    }
+
+    @Test
+    public void testRememberMeAuthenticationSuccessIsPersistedInTheCookieTenantSchema() {
+        RememberMeAuthenticationToken authentication = new RememberMeAuthenticationToken(
+            "remember-me-key", new User("admin", "", List.of()), List.of());
+
+        authentication.setDetails(createDetails(OTHER_TENANT_ID));
+
+        applicationEventPublisher.publishEvent(new AuthenticationSuccessEvent(authentication));
+
+        assertThat(countEvents(OTHER_TENANT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(TENANT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isZero();
+        assertThat(countEvents(DEFAULT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isZero();
+        verify(tenantService, never()).getTenantIdsByUserLogin(anyString());
     }
 
     @Test
