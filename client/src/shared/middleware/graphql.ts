@@ -371,12 +371,13 @@ export type AuditEventsQueryVariables = Exact<{
   fromDate?: any;
   toDate?: any;
   search?: string | null | undefined;
+  platform?: Types.PlatformType | null | undefined;
   page?: number | null | undefined;
   size?: number | null | undefined;
 }>;
 
 
-export type AuditEventsQuery = { auditEvents: { number: number, size: number, totalElements: any, totalPages: number, content: Array<{ eventDate: any, eventType: string, id: string, outcome: Types.AuditEventOutcome | null, principal: string, data: Array<{ key: string, value: string }> }> } };
+export type AuditEventsQuery = { auditEvents: { number: number, size: number, totalElements: any, totalPages: number, content: Array<{ eventDate: any, eventType: string, id: string, outcome: Types.AuditEventOutcome | null, platform: Types.PlatformType | null, principal: string, data: Array<{ key: string, value: string }> }> } };
 
 export type AuditEventTypesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3607,12 +3608,13 @@ export const useUpdateAiSkillTagsMutation = <
     )};
 
 export const AuditEventsDocument = new TypedDocumentString(`
-    query AuditEvents($eventType: String, $fromDate: Long, $toDate: Long, $search: String, $page: Int, $size: Int) {
+    query AuditEvents($eventType: String, $fromDate: Long, $toDate: Long, $search: String, $platform: PlatformType, $page: Int, $size: Int) {
   auditEvents(
     eventType: $eventType
     fromDate: $fromDate
     toDate: $toDate
     search: $search
+    platform: $platform
     page: $page
     size: $size
   ) {
@@ -3625,6 +3627,7 @@ export const AuditEventsDocument = new TypedDocumentString(`
       eventType
       id
       outcome
+      platform
       principal
     }
     number
