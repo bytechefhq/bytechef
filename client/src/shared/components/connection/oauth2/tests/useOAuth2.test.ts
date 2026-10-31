@@ -549,6 +549,71 @@ describe('useOAuth2', () => {
         expect(url.searchParams.get('prompt')).toBe('consent');
     });
 
+    it('should keep the PKCE code verifier out of the authorization URL', () => {
+        const props: UseOAuth2Props = {
+            ...defaultProps,
+            extraQueryParameters: {
+                code_challenge: 'test-challenge',
+                code_challenge_method: 'S256',
+                code_verifier: 'test-verifier',
+            },
+        };
+
+        const {result} = renderHook(() => useOAuth2(props));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const openCall = vi.mocked(window.open).mock.calls[0];
+        const url = new URL(openCall[0] as string);
+
+        expect(url.searchParams.get('code_challenge')).toBe('test-challenge');
+        expect(url.searchParams.get('code_challenge_method')).toBe('S256');
+        expect(url.searchParams.has('code_verifier')).toBe(false);
+    });
+
+    it('should pass the PKCE code verifier with the authorization code', () => {
+        const onCodeSuccess = vi.fn();
+        const props: UseOAuth2Props = {
+            ...defaultProps,
+            extraQueryParameters: {
+                code_challenge: 'test-challenge',
+                code_challenge_method: 'S256',
+                code_verifier: 'test-verifier',
+            },
+            onCodeSuccess,
+        };
+
+        const {result} = renderHook(() => useOAuth2(props));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+
+        act(() => {
+            window.dispatchEvent(
+                new MessageEvent('message', {
+                    data: {
+                        payload: {
+                            code: 'auth-code-123',
+                            state: savedState,
+                        },
+                        type: OAUTH_RESPONSE,
+                    },
+                })
+            );
+        });
+
+        expect(onCodeSuccess).toHaveBeenCalledWith({
+            code: 'auth-code-123',
+            code_verifier: 'test-verifier',
+            state: savedState,
+        });
+    });
+
     it('should register BroadcastChannel listener on getAuth', () => {
         renderHook(() => useOAuth2(defaultProps));
 

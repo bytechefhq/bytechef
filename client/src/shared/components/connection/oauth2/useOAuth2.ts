@@ -158,13 +158,17 @@ const useOAuth2 = ({
 
         const selectedScopes = selectedScopeKeys.join(' ');
 
+        const authorizationQueryParameters = Object.fromEntries(
+            Object.entries(extraQueryParametersRef.current ?? {}).filter(([key]) => key !== 'code_verifier')
+        );
+
         const authQuery = objectToQuery({
             client_id: clientId,
             redirect_uri: redirectUri,
             response_type: responseType,
             scope: selectedScopes,
             state,
-            ...extraQueryParametersRef.current,
+            ...authorizationQueryParameters,
         });
 
         const popupUrl = `${authorizationUrl}?${authQuery}`;
