@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,19 +29,27 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
+import com.bytechef.platform.configuration.web.rest.config.PlatformConfigurationRestTestConfiguration;
+import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
 /**
  * @author Ivica Cardic
  */
-class WebhookTriggerTestControllerTest {
+@ContextConfiguration(classes = PlatformConfigurationRestTestConfiguration.class)
+@WebMvcTest(WebhookTriggerTestController.class)
+@WorkflowConfigurationRestTestConfigurationSharedMocks
+class WebhookTriggerTestControllerIntTest {
 
     private static final long ENVIRONMENT_ID = 0L;
     private static final WebhookTriggerFlags VALIDATION_FLAGS = new WebhookTriggerFlags(false, false, true, false);
@@ -50,20 +57,24 @@ class WebhookTriggerTestControllerTest {
     private final WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
         PlatformType.AUTOMATION, -1L, "workflow-uuid", "trigger_1");
 
-    private WebhookTriggerTestController webhookTriggerTestController;
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
     private WebhookTriggerTestFacade webhookTriggerTestFacade;
+
+    @Autowired
     private WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
+
+    private WebTestClient webTestClient;
 
     @BeforeEach
     void beforeEach() {
-        webhookTriggerTestFacade = mock(WebhookTriggerTestFacade.class);
-        workflowNodeTestOutputFacade = mock(WorkflowNodeTestOutputFacade.class);
-
         when(webhookTriggerTestFacade.getWebhookTriggerFlags(any())).thenReturn(VALIDATION_FLAGS);
         when(webhookTriggerTestFacade.isWorkflowEnabled(any())).thenReturn(true);
 
-        webhookTriggerTestController = new WebhookTriggerTestController(
-            mock(EditorTempFileStorage.class), webhookTriggerTestFacade, workflowNodeTestOutputFacade);
+        webTestClient = MockMvcWebTestClient.bindTo(mockMvc)
+            .build();
     }
 
     @Test
@@ -71,10 +82,9 @@ class WebhookTriggerTestControllerTest {
         when(webhookTriggerTestFacade.validate(any(), any(), eq(ENVIRONMENT_ID)))
             .thenReturn(WebhookValidateResponse.badRequest());
 
-        ResponseEntity<?> responseEntity = executeWorkflow();
-
-        assertThat(responseEntity.getStatusCode()
-            .value()).isEqualTo(400);
+        executeWorkflow()
+            .expectStatus()
+            .isBadRequest();
 
         verify(workflowNodeTestOutputFacade, never()).saveWorkflowNodeTestOutput(any(), anyLong(), any());
     }
@@ -84,25 +94,28 @@ class WebhookTriggerTestControllerTest {
         when(webhookTriggerTestFacade.validate(any(), any(), eq(ENVIRONMENT_ID)))
             .thenReturn(WebhookValidateResponse.ok());
 
-        ResponseEntity<?> responseEntity = executeWorkflow();
+        executeWorkflow()
+            .expectStatus()
+            .isOk();
 
-        assertThat(responseEntity.getStatusCode()
-            .value()).isEqualTo(200);
-
+        ArgumentCaptor<WorkflowExecutionId> workflowExecutionIdArgumentCaptor =
+            ArgumentCaptor.forClass(WorkflowExecutionId.class);
         ArgumentCaptor<WebhookRequest> webhookRequestArgumentCaptor = ArgumentCaptor.forClass(WebhookRequest.class);
 
         verify(workflowNodeTestOutputFacade).saveWorkflowNodeTestOutput(
-            any(), eq(ENVIRONMENT_ID), webhookRequestArgumentCaptor.capture());
+            workflowExecutionIdArgumentCaptor.capture(), eq(ENVIRONMENT_ID), webhookRequestArgumentCaptor.capture());
 
-        assertThat(webhookRequestArgumentCaptor.getValue()
-            .validated()).isTrue();
+        WorkflowExecutionId savedWorkflowExecutionId = workflowExecutionIdArgumentCaptor.getValue();
+        WebhookRequest webhookRequest = webhookRequestArgumentCaptor.getValue();
+
+        assertThat(savedWorkflowExecutionId.getTriggerName()).isEqualTo("trigger_1");
+        assertThat(webhookRequest.validated()).isTrue();
     }
 
-    private ResponseEntity<?> executeWorkflow() {
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(
-            "POST", "/webhooks/" + workflowExecutionId + "/test/environments/" + ENVIRONMENT_ID);
-
-        return webhookTriggerTestController.executeWorkflow(
-            workflowExecutionId.toString(), ENVIRONMENT_ID, mockHttpServletRequest);
+    private WebTestClient.ResponseSpec executeWorkflow() {
+        return webTestClient
+            .post()
+            .uri("/webhooks/{id}/test/environments/{environmentId}", workflowExecutionId.toString(), ENVIRONMENT_ID)
+            .exchange();
     }
 }
