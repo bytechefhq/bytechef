@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package bytechef.automation.workflow.execution.remote.v1;
+
+import "automation_configuration_remote_service.proto";
+import "google/protobuf/timestamp.proto";
+import "platform_configuration_remote_service.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.automation.workflow.execution.remote.grpc.proto";
+
+service ProjectWorkflowExecutionRemoteService {
+  rpc GetTriggerExecutionWorkflowExecution(GetTriggerExecutionWorkflowExecutionRequest)
+      returns (RemoteWorkflowExecution);
+  rpc GetWorkflowExecution(GetWorkflowExecutionRequest) returns (RemoteWorkflowExecution);
+  rpc GetWorkflowExecutions(GetWorkflowExecutionsRequest) returns (RemoteWorkflowExecutionPage);
+}
+
+message GetTriggerExecutionWorkflowExecutionRequest {
+  int64 trigger_execution_id = 1;
+}
+
+message GetWorkflowExecutionRequest {
+  int64 id = 1;
+  bool lazy = 2;
+}
+
+message GetWorkflowExecutionsRequest {
+  optional bool embedded = 1;
+  optional int64 environment_id = 2;
+  optional string job_status = 3;
+  optional google.protobuf.Timestamp job_start_date = 4;
+  optional google.protobuf.Timestamp job_end_date = 5;
+  optional int64 project_id = 6;
+  optional int64 project_deployment_id = 7;
+  optional int64 connected_user_id = 8;
+  optional string workflow_id = 9;
+  optional int32 project_version = 10;
+  int64 workspace_id = 11;
+  int32 page_number = 12;
+}
+
+message RemoteWorkflowExecution {
+  int64 id = 1;
+  bytechef.automation.configuration.remote.v1.RemoteProject project = 2;
+  bytechef.automation.configuration.remote.v1.RemoteProjectDeployment project_deployment = 3;
+  optional int32 project_version = 4;
+  bytes job = 5;
+  bytechef.platform.configuration.remote.v1.RemoteWorkflow workflow = 6;
+  bytes trigger_execution = 7;
+  bytes focus_path = 8;
+  optional int64 task_execution_count = 9;
+}
+
+message RemoteWorkflowExecutionPage {
+  repeated RemoteWorkflowExecution content = 1;
+  int32 page_number = 2;
+  int32 page_size = 3;
+  int64 total_elements = 4;
+}
