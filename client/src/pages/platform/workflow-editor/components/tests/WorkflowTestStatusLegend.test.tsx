@@ -42,6 +42,7 @@ describe('WorkflowTestStatusLegend', () => {
     it('names each state and uses its canvas colour', () => {
         hoisted.nodeStates = {
             checkForViolations_1: {clusterElement: true, status: 'WITHHELD'},
+            slack_1: {clusterElement: true, status: 'DENIED'},
             var_1: {status: 'RUNNING'},
         };
 
@@ -49,5 +50,6 @@ describe('WorkflowTestStatusLegend', () => {
 
         expect(screen.getByText('Running').previousElementSibling).toHaveClass('bg-blue-500');
         expect(screen.getByText('Withheld').previousElementSibling).toHaveClass('bg-amber-500');
+        expect(screen.getByText('Denied').previousElementSibling).toHaveClass('bg-rose-500');
     });
 });

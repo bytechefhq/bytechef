@@ -11,6 +11,10 @@ describe('getTestNodeStateBorderClassName', () => {
         expect(getTestNodeStateBorderClassName({status: 'WITHHELD'})).toBe('border-amber-500 hover:border-amber-500');
     });
 
+    it('maps a denied call to a rose border', () => {
+        expect(getTestNodeStateBorderClassName({status: 'DENIED'})).toBe('border-rose-500 hover:border-rose-500');
+    });
+
     it('maps a redacted call to a sky border', () => {
         expect(getTestNodeStateBorderClassName({status: 'REDACTED'})).toBe('border-sky-500 hover:border-sky-500');
     });

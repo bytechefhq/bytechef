@@ -6,7 +6,7 @@ import {
     TriggerExecution,
 } from '@/shared/middleware/platform/workflow/execution';
 
-export type ClusterElementCallOutcomeType = 'BLOCKED' | 'REDACTED' | 'WITHHELD';
+export type ClusterElementCallOutcomeType = 'BLOCKED' | 'DENIED' | 'REDACTED' | 'WITHHELD';
 
 export interface ClusterElementCallTaskExecutionI extends TaskExecution {
     clusterElementCallId: string;
@@ -35,6 +35,7 @@ const parseValue = (value?: string) => {
 
 const OUTCOME_BY_STATUS: Partial<Record<ClusterElementCallRecordStatusEnum, ClusterElementCallOutcomeType>> = {
     [ClusterElementCallRecordStatusEnum.Blocked]: 'BLOCKED',
+    [ClusterElementCallRecordStatusEnum.Denied]: 'DENIED',
     [ClusterElementCallRecordStatusEnum.Redacted]: 'REDACTED',
     [ClusterElementCallRecordStatusEnum.Withheld]: 'WITHHELD',
 };

@@ -26,6 +26,7 @@ export default function useCalledClusterElementEdgeStyle(
         status === 'COMPLETED' && 'stroke-green-500',
         status === 'FAILED' && 'stroke-red-500',
         (status === 'BLOCKED' || status === 'WITHHELD') && 'stroke-amber-500',
+        status === 'DENIED' && 'stroke-rose-500',
         status === 'REDACTED' && 'stroke-sky-500'
     );
 

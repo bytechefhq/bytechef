@@ -12,6 +12,7 @@ const LEGEND_ITEMS: {className: string; label: string; status: StatusType}[] = [
     {className: 'bg-red-500', label: 'Failed', status: 'FAILED'},
     {className: 'bg-amber-500', label: 'Blocked', status: 'BLOCKED'},
     {className: 'bg-amber-500', label: 'Withheld', status: 'WITHHELD'},
+    {className: 'bg-rose-500', label: 'Denied', status: 'DENIED'},
     {className: 'bg-sky-500', label: 'Redacted', status: 'REDACTED'},
 ];
 
