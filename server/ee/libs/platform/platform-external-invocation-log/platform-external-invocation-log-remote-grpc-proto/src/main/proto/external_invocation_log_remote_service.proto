@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package bytechef.platform.external.invocation.log.remote.v1;
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.external.invocation.log.remote.grpc.proto";
+
+service ExternalInvocationLogRemoteService {
+  rpc RecordExternalInvocation(RecordExternalInvocationRequest) returns (google.protobuf.Empty);
+}
+
+message RecordExternalInvocationRequest {
+  bytes external_invocation_event = 1;
+}
