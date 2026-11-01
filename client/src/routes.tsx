@@ -100,6 +100,11 @@ const EmbeddedConnections = lazy(() =>
     import('@/ee/pages/embedded/connections/Connections').then((module) => ({default: module.Connections}))
 );
 const EmbeddedMcpServers = lazy(() => import('@/ee/pages/embedded/mcp-servers/McpServers'));
+const EmbeddedToolInvocations = lazy(() =>
+    import('@/ee/pages/embedded/tool-invocations/EmbeddedToolInvocations').then((module) => ({
+        default: module.EmbeddedToolInvocations,
+    }))
+);
 const EmbeddedIntegrationWorkflowExecutions = lazy(() =>
     import('@/ee/pages/embedded/workflow-executions/WorkflowExecutions').then((module) => ({
         default: module.WorkflowExecutions,
@@ -1072,6 +1077,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'executions',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper hasLeftSidebar>
+                                                    <EmbeddedToolInvocations />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'executions/tool-invocations',
                                 },
                                 {
                                     element: (

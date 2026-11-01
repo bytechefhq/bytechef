@@ -140,6 +140,11 @@ const embeddedNavigation: NavigationType[] = [
         icon: ActivityIcon,
         name: 'Workflow Executions',
     },
+    {
+        href: '/embedded/executions/tool-invocations',
+        icon: WrenchIcon,
+        name: 'Tool Invocations',
+    },
     {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
 ];
 
