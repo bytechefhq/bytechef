@@ -23,6 +23,6 @@ public record ClusterElementCallEvent(long jobId, long taskExecutionId, Type typ
     ClusterElementCallRecord record) {
 
     public enum Type {
-        STARTED, COMPLETED, FAILED, BLOCKED, REDACTED, WITHHELD
+        STARTED, COMPLETED, FAILED, BLOCKED, REDACTED, WITHHELD, DENIED
     }
 }

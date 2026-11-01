@@ -127,7 +127,8 @@ public final class ClusterElementCallRecorder {
         @Nullable String error) {
 
         if (status != ClusterElementCallRecord.Status.FAILED && status != ClusterElementCallRecord.Status.BLOCKED &&
-            status != ClusterElementCallRecord.Status.REDACTED && status != ClusterElementCallRecord.Status.WITHHELD) {
+            status != ClusterElementCallRecord.Status.REDACTED && status != ClusterElementCallRecord.Status.WITHHELD &&
+            status != ClusterElementCallRecord.Status.DENIED) {
 
             throw new IllegalArgumentException("Not an outcome status: " + status);
         }
@@ -217,7 +218,8 @@ public final class ClusterElementCallRecorder {
 
     private static ClusterElementCall mergeCall(ClusterElementCall existing, ClusterElementCall incoming) {
         boolean keepExisting = existing.status() == Status.FAILED ||
-            ((existing.status() == Status.BLOCKED || existing.status() == Status.WITHHELD) &&
+            ((existing.status() == Status.BLOCKED || existing.status() == Status.WITHHELD ||
+                existing.status() == Status.DENIED) &&
                 (incoming.status() == Status.COMPLETED || incoming.status() == Status.STARTED ||
                     incoming.status() == Status.REDACTED));
 
@@ -318,7 +320,7 @@ public final class ClusterElementCallRecorder {
                 case FAILED -> new ClusterElementCallRecord(
                     ref.id(), null, ref.workflowNodeName(), null, null, ClusterElementCallRecord.Status.FAILED, null,
                     now, null, null, ClusterElementCallRecord.cap(error));
-                case BLOCKED, REDACTED, WITHHELD -> new ClusterElementCallRecord(
+                case BLOCKED, REDACTED, WITHHELD, DENIED -> new ClusterElementCallRecord(
                     ref.id(), parentId, ref.workflowNodeName(), componentName, toolName,
                     ClusterElementCallRecord.Status.valueOf(type.name()), now, now, null,
                     ClusterElementCallRecord.cap(output), ClusterElementCallRecord.cap(error));
@@ -361,7 +363,7 @@ public final class ClusterElementCallRecorder {
                 case COMPLETED -> new ClusterElementCall(
                     workflowNodeName, inFlightCount > 0 ? Status.STARTED : Status.COMPLETED, now, now, null);
                 case FAILED -> new ClusterElementCall(workflowNodeName, Status.FAILED, now, now, error);
-                case BLOCKED, REDACTED, WITHHELD -> new ClusterElementCall(
+                case BLOCKED, REDACTED, WITHHELD, DENIED -> new ClusterElementCall(
                     workflowNodeName, Status.valueOf(type.name()), now, now, error);
             };
 
