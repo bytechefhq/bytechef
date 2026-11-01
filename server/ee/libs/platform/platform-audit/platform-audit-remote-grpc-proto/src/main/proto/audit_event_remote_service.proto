@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package bytechef.platform.audit.remote.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.audit.remote.grpc.proto";
+
+service AuditEventRemoteService {
+  rpc SaveAuditEvents(RemotePersistentAuditEvents) returns (google.protobuf.Empty);
+  rpc AddAuditEvent(RemoteAuditEvent) returns (google.protobuf.Empty);
+  rpc UpdateJobCreatedPlatform(UpdateJobCreatedPlatformRequest) returns (google.protobuf.Empty);
+  rpc FetchAuditEvents(FetchAuditEventsRequest) returns (RemoteAuditEventPage);
+  rpc FetchEventTypes(google.protobuf.Empty) returns (EventTypes);
+}
+
+message RemotePersistentAuditEvents {
+  repeated RemotePersistentAuditEvent events = 1;
+}
+
+message RemotePersistentAuditEvent {
+  optional int64 id = 1;
+  google.protobuf.Timestamp event_date = 2;
+  string event_type = 3;
+  optional string platform = 4;
+  optional string principal = 5;
+  map<string, string> data = 6;
+}
+
+message RemoteAuditEvent {
+  google.protobuf.Timestamp timestamp = 1;
+  string principal = 2;
+  string type = 3;
+  map<string, string> data = 4;
+}
+
+message UpdateJobCreatedPlatformRequest {
+  int64 job_id = 1;
+  string platform = 2;
+  google.protobuf.Timestamp since = 3;
+}
+
+message FetchAuditEventsRequest {
+  optional string event_type = 1;
+  optional google.protobuf.Timestamp from_date = 2;
+  optional google.protobuf.Timestamp to_date = 3;
+  optional string search = 4;
+  bool search_principal = 5;
+  optional string platform = 6;
+  int32 page = 7;
+  int32 size = 8;
+}
+
+message RemoteAuditEventPage {
+  repeated RemotePersistentAuditEvent events = 1;
+  int64 total_elements = 2;
+}
+
+message EventTypes {
+  repeated string event_types = 1;
+}
