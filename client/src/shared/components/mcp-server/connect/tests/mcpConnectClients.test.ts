@@ -1,5 +1,7 @@
 import {describe, expect, it} from 'vitest';
 
+import CursorLogo from '../client-logos/CursorLogo';
+import McpLogo from '../client-logos/McpLogo';
 import {McpConnectAuthModeType} from '../mcpConnectAuthMode';
 import {CHATGPT_API_KEY_NOTICE, MCP_CONNECT_CLIENTS, McpConnectContextI, McpConnectTabI} from '../mcpConnectClients';
 
@@ -49,6 +51,13 @@ describe('MCP_CONNECT_CLIENTS', () => {
             'Devin Desktop',
             'Any MCP client',
         ]);
+    });
+
+    it('uses the brand marks for Cursor and Any MCP client', () => {
+        const logosById = Object.fromEntries(MCP_CONNECT_CLIENTS.map((client) => [client.id, client.logo]));
+
+        expect(logosById['cursor']).toBe(CursorLogo);
+        expect(logosById['any-mcp-client']).toBe(McpLogo);
     });
 
     it('returns at least one tab for every client and mode', () => {

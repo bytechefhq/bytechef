@@ -1,7 +1,9 @@
-import {BotIcon, BoxIcon, CodeXmlIcon, PlugIcon} from 'lucide-react';
+import {BotIcon, CodeXmlIcon} from 'lucide-react';
 import {ComponentType} from 'react';
 
 import AnthropicLogo from './client-logos/AnthropicLogo';
+import CursorLogo from './client-logos/CursorLogo';
+import McpLogo from './client-logos/McpLogo';
 import OpenAiLogo from './client-logos/OpenAiLogo';
 import {MCP_API_KEY_PLACEHOLDER, McpConnectAuthModeType} from './mcpConnectAuthMode';
 import {buildCursorInstallUrl, buildVsCodeInstallUrl} from './mcpConnectDeepLinks';
@@ -360,7 +362,7 @@ export const MCP_CONNECT_CLIENTS: McpConnectClientI[] = [
         docsUrl: 'https://cursor.com/docs/context/mcp',
         getTabs: getCursorTabs,
         id: 'cursor',
-        logo: BoxIcon,
+        logo: CursorLogo,
         title: 'Cursor',
     },
     {
@@ -396,7 +398,7 @@ export const MCP_CONNECT_CLIENTS: McpConnectClientI[] = [
         docsUrl: 'https://modelcontextprotocol.io/clients',
         getTabs: getAnyMcpClientTabs,
         id: 'any-mcp-client',
-        logo: PlugIcon,
+        logo: McpLogo,
         title: 'Any MCP client',
     },
 ];
