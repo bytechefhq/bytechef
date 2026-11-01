@@ -8,13 +8,11 @@ import {twMerge} from 'tailwind-merge';
 import {McpConnectStepI} from './mcpConnectClients';
 
 interface McpConnectStepPropsI {
-    mcpServerUrl: string;
     number: number;
-    onRefresh?: () => void;
     step: McpConnectStepI;
 }
 
-const McpConnectStep = ({mcpServerUrl, number, onRefresh, step}: McpConnectStepPropsI) => (
+const McpConnectStep = ({number, step}: McpConnectStepPropsI) => (
     <li className="flex items-start gap-4">
         <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
             {number}
@@ -45,12 +43,7 @@ const McpConnectStep = ({mcpServerUrl, number, onRefresh, step}: McpConnectStepP
                 </a>
             )}
 
-            {step.codeSnippet && (
-                <McpServerConfigurationCode
-                    codeSnippet={step.codeSnippet}
-                    onRefresh={step.codeSnippet === mcpServerUrl ? onRefresh : undefined}
-                />
-            )}
+            {step.codeSnippet && <McpServerConfigurationCode codeSnippet={step.codeSnippet} />}
         </div>
     </li>
 );

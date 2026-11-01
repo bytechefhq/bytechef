@@ -6,7 +6,13 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import McpConnectPanel from '../McpConnectPanel';
 
 vi.mock('@/shared/components/mcp-server/McpServerConfigurationCode', () => ({
-    default: ({codeSnippet}: {codeSnippet: string}) => <pre data-testid="code-snippet">{codeSnippet}</pre>,
+    default: ({codeSnippet, onRefresh}: {codeSnippet: string; onRefresh?: () => void}) => (
+        <div>
+            <pre data-testid="code-snippet">{codeSnippet}</pre>
+
+            {onRefresh && <button onClick={onRefresh}>Regenerate</button>}
+        </div>
+    ),
 }));
 
 const MCP_SERVER_URL = 'https://example.com/api/automation/secret/mcp';
@@ -78,5 +84,37 @@ describe('McpConnectPanel', () => {
         expect(screen.getAllByText(/an admin API key created under Settings → Admin API Keys/).length).toBeGreaterThan(
             0
         );
+    });
+
+    it('offers exactly one regenerate button for every client when onRefresh is given', async () => {
+        const user = userEvent.setup();
+        const onRefresh = vi.fn();
+
+        render(<McpConnectPanel authenticationRequired={false} mcpServerUrl={MCP_SERVER_URL} onRefresh={onRefresh} />);
+
+        for (const clientTitle of [
+            'Claude',
+            'Claude Code',
+            'Cursor',
+            'VS Code',
+            'ChatGPT',
+            'Codex CLI',
+            'Devin Desktop',
+            'Any MCP client',
+        ]) {
+            await user.click(screen.getByRole('button', {name: new RegExp(`^${clientTitle}$`)}));
+
+            expect(screen.getAllByRole('button', {name: 'Regenerate'}), clientTitle).toHaveLength(1);
+        }
+
+        await user.click(screen.getByRole('button', {name: 'Regenerate'}));
+
+        expect(onRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows no regenerate button without onRefresh', () => {
+        render(<McpConnectPanel mcpServerUrl={MCP_SERVER_URL} />);
+
+        expect(screen.queryByRole('button', {name: 'Regenerate'})).not.toBeInTheDocument();
     });
 });

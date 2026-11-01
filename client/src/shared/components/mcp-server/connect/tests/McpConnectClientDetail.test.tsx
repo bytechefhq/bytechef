@@ -133,29 +133,4 @@ describe('McpConnectClientDetail', () => {
         expect(getCodeSnippets().some((snippet) => snippet.includes(newUrl))).toBe(true);
         expect(getCodeSnippets().some((snippet) => snippet.includes(MCP_SERVER_URL))).toBe(false);
     });
-
-    it('passes onRefresh only to the bare URL card', async () => {
-        const user = userEvent.setup();
-        const onRefresh = vi.fn();
-
-        render(
-            <McpConnectClientDetail
-                apiKeySource={API_KEY_SOURCE}
-                client={getClient('claude')}
-                mcpServerUrl={MCP_SERVER_URL}
-                mode="API_KEY"
-                onRefresh={onRefresh}
-            />
-        );
-
-        expect(getCodeSnippets()).toHaveLength(3);
-
-        const regenerateButtons = screen.getAllByRole('button', {name: 'Regenerate'});
-
-        expect(regenerateButtons).toHaveLength(1);
-
-        await user.click(regenerateButtons[0]);
-
-        expect(onRefresh).toHaveBeenCalledTimes(1);
-    });
 });
