@@ -15,6 +15,7 @@ import {
     isWorkflowEditorSource,
     useCopilotStore,
 } from '@/shared/components/copilot/stores/useCopilotStore';
+import {AI_PROVIDERS_LINK_LABEL} from '@/shared/constants';
 import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {AI_PROVIDERS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -198,7 +199,7 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
                             </p>
                         </div>
 
-                        <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>Go to AI Providers</Button>
+                        <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>{AI_PROVIDERS_LINK_LABEL}</Button>
                     </div>
                 ) : (
                     <CopilotRuntimeProvider source={source} suggestions={COPILOT_SUGGESTIONS}>

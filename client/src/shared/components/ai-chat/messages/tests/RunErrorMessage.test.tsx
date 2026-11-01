@@ -1,4 +1,5 @@
-import RunErrorMessage, {RunErrorDataI} from '@/shared/components/ai-chat/messages/RunErrorMessage';
+import RunErrorMessage from '@/shared/components/ai-chat/messages/RunErrorMessage';
+import {RunErrorDataI} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {DataMessagePartProps} from '@assistant-ui/react';
 import {render, screen} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
@@ -15,10 +16,7 @@ describe('RunErrorMessage', () => {
     it('links to the AI Providers settings when no AI provider is set up', () => {
         renderRunError({code: 'NO_AI_PROVIDER', message: 'No AI provider is set up for this environment.'});
 
-        expect(screen.getByRole('link', {name: 'Open AI Providers'})).toHaveAttribute(
-            'href',
-            '/automation/settings/ai-providers'
-        );
+        expect(screen.getByRole('link', {name: 'Open AI Providers'})).toHaveAttribute('href', '/settings/ai-providers');
     });
 
     it('shows only the message for other run errors', () => {

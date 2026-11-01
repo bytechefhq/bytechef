@@ -211,7 +211,7 @@ describe('KnowledgeBase embedding gate', () => {
         render(<KnowledgeBase />);
 
         expect(screen.getByRole('heading', {name: 'Turn on an embedding model'})).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Go to AI Providers'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Open AI Providers'})).toBeInTheDocument();
         expect(screen.queryByTestId('layout-sidebar-header')).not.toBeInTheDocument();
         expect(screen.queryByTestId('knowledge-base-info-card')).not.toBeInTheDocument();
         expect(screen.queryByTestId('knowledge-base-tabs')).not.toBeInTheDocument();
