@@ -5051,7 +5051,7 @@ public class ApplicationProperties {
             /**
              * Maximum number of items kept from each list in a saved test output
              */
-            private int maxSampleItems = 100;
+            private int maxSampleItems;
 
             public int getMaxSampleItems() {
                 return maxSampleItems;
