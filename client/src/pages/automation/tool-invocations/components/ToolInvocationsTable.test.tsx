@@ -63,6 +63,7 @@ describe('ToolInvocationsTable', () => {
         ['CONNECTION_REQUIRED', 'bg-surface-neutral-secondary'],
         ['APPROVAL_REQUIRED', 'bg-surface-neutral-secondary'],
         ['APPROVAL_DENIED', 'bg-surface-neutral-secondary'],
+        ['SUSPENDED', 'bg-surface-neutral-secondary'],
     ])('colours the %s outcome with %s', (outcome, className) => {
         render(<ToolInvocationsTable toolInvocationLogs={[{...baseLog, outcome}]} />);
 
