@@ -59,6 +59,19 @@ Each call is one row, newest first:
 The list shows 50 rows per page. Use the **Refresh** button in the page header to load the latest
 calls.
 
+### How a workflow tool call ends
+
+A workflow tool starts a workflow run and waits for it. The outcome reflects where the run was when
+the call returned:
+
+| Outcome | The workflow run |
+|---|---|
+| `SUCCESS` | Completed, and the call returned its output. |
+| `ERROR` | Failed, could not start, or was stopped before it finished. |
+| `TIMEOUT` | Was still running when the call stopped waiting for it. |
+| `APPROVAL_REQUIRED` | Paused at an approval step and waits for a person to decide. |
+| `SUSPENDED` | Paused at a step such as a delay and continues on its own later. |
+
 ---
 
 ## Filter invocations
