@@ -9,10 +9,11 @@ import {McpConnectStepI} from './mcpConnectClients';
 
 interface McpConnectStepPropsI {
     number: number;
+    onRefresh?: () => void;
     step: McpConnectStepI;
 }
 
-const McpConnectStep = ({number, step}: McpConnectStepPropsI) => (
+const McpConnectStep = ({number, onRefresh, step}: McpConnectStepPropsI) => (
     <li className="flex items-start gap-4">
         <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
             {number}
@@ -43,7 +44,7 @@ const McpConnectStep = ({number, step}: McpConnectStepPropsI) => (
                 </a>
             )}
 
-            {step.codeSnippet && <McpServerConfigurationCode codeSnippet={step.codeSnippet} />}
+            {step.codeSnippet && <McpServerConfigurationCode codeSnippet={step.codeSnippet} onRefresh={onRefresh} />}
         </div>
     </li>
 );

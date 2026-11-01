@@ -86,25 +86,36 @@ describe('McpConnectPanel', () => {
         );
     });
 
-    it('offers exactly one regenerate button for every client when onRefresh is given', async () => {
+    it('shows the URL once, inside the client steps, with one regenerate button per tab', async () => {
         const user = userEvent.setup();
         const onRefresh = vi.fn();
 
         render(<McpConnectPanel authenticationRequired={false} mcpServerUrl={MCP_SERVER_URL} onRefresh={onRefresh} />);
 
-        for (const clientTitle of [
-            'Claude',
-            'Claude Code',
-            'Cursor',
-            'VS Code',
-            'ChatGPT',
-            'Codex CLI',
-            'Devin Desktop',
-            'Any MCP client',
-        ]) {
+        expect(screen.queryByText('Server URL')).not.toBeInTheDocument();
+
+        const expectedRegenerateButtons: Record<string, number> = {
+            'Any MCP client': 1,
+            ChatGPT: 1,
+            Claude: 1,
+            'Claude Code': 1,
+            'Codex CLI': 1,
+            Cursor: 0,
+            'Devin Desktop': 1,
+            'VS Code': 0,
+        };
+
+        for (const [clientTitle, expectedCount] of Object.entries(expectedRegenerateButtons)) {
             await user.click(screen.getByRole('button', {name: new RegExp(`^${clientTitle}$`)}));
 
-            expect(screen.getAllByRole('button', {name: 'Regenerate'}), clientTitle).toHaveLength(1);
+            expect(screen.queryAllByRole('button', {name: 'Regenerate'}), clientTitle).toHaveLength(expectedCount);
+        }
+
+        for (const clientTitle of ['Cursor', 'VS Code']) {
+            await user.click(screen.getByRole('button', {name: new RegExp(`^${clientTitle}$`)}));
+            await user.click(screen.getByRole('tab', {name: 'Manual'}));
+
+            expect(screen.getAllByRole('button', {name: 'Regenerate'}), `${clientTitle} Manual`).toHaveLength(1);
         }
 
         await user.click(screen.getByRole('button', {name: 'Regenerate'}));

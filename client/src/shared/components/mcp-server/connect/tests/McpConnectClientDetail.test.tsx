@@ -133,4 +133,20 @@ describe('McpConnectClientDetail', () => {
         expect(getCodeSnippets().some((snippet) => snippet.includes(newUrl))).toBe(true);
         expect(getCodeSnippets().some((snippet) => snippet.includes(MCP_SERVER_URL))).toBe(false);
     });
+
+    it('puts regenerate only on the first snippet that contains the URL', () => {
+        render(
+            <McpConnectClientDetail
+                apiKeySource={API_KEY_SOURCE}
+                client={getClient('claude')}
+                mcpServerUrl={MCP_SERVER_URL}
+                mode="API_KEY"
+                onRefresh={vi.fn()}
+            />
+        );
+
+        expect(getCodeSnippets()).toHaveLength(3);
+        expect(screen.getAllByRole('button', {name: 'Regenerate'})).toHaveLength(1);
+        expect(getCodeSnippets()[0]).toBe(MCP_SERVER_URL);
+    });
 });
