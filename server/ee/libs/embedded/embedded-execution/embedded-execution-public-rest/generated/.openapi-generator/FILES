@@ -3,6 +3,7 @@ pom.xml
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/ActionApi.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/ApiUtil.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/ToolApi.java
+src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/ToolInvocationApi.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ErrorsInnerMetaModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ErrorsInnerModel.java
@@ -10,5 +11,10 @@ src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExecuteA
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExecuteActionRequestModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExecuteToolRequestModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/FunctionModel.java
+src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ToolInvocationKindModel.java
+src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ToolInvocationModel.java
+src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ToolInvocationOutcomeModel.java
+src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ToolInvocationPageModel.java
+src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ToolInvocationSurfaceModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ToolModel.java
 src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java
