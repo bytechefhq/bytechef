@@ -17,6 +17,8 @@ dependencies {
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:platform:platform-mail"))
+    testImplementation(project(":server:libs:platform:platform-notification:platform-notification-delivery"))
     testImplementation(project(":server:libs:platform:platform-notification:platform-notification-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }
