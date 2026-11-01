@@ -29,6 +29,7 @@ import com.bytechef.platform.component.definition.ai.agent.DataSourceFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Scheduler;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -221,6 +222,7 @@ class SessionChatMemoryUtilsIntTest {
         saveAndReadEvent(otherUserSessionRepository);
     }
 
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     @Test
     void testGetSessionRepositoryUsesASeparateRepositoryForAnotherPassword() {
         String url = dataSource.getUrl();
@@ -356,6 +358,7 @@ class SessionChatMemoryUtilsIntTest {
      * Creates a fresh database in the container and returns a DataSource for it, the PostgreSQL counterpart of a new
      * in-memory H2 URL.
      */
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private static DriverManagerDataSource createDataSource() {
         String databaseName = "session_memory_" + DATABASE_COUNTER.incrementAndGet();
 
@@ -372,6 +375,7 @@ class SessionChatMemoryUtilsIntTest {
      * Roles are cluster-wide in PostgreSQL, so each test gets its own. SUPERUSER mirrors the H2 ADMIN user the original
      * test created and lets the role create the session tables in the public schema.
      */
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private static String createLoginRole(String password) {
         String roleName = "memory_user_" + DATABASE_COUNTER.incrementAndGet();
 

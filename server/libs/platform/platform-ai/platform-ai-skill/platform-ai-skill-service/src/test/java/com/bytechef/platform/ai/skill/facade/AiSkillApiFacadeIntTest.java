@@ -24,6 +24,7 @@ import com.bytechef.platform.ai.skill.config.AiSkillIntTestConfiguration;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.repository.AiSkillRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -41,6 +42,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
 @SpringBootTest(classes = AiSkillIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 class AiSkillApiFacadeIntTest {

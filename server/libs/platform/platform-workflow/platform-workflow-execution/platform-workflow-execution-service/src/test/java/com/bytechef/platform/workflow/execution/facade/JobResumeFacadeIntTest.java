@@ -77,6 +77,8 @@ import org.springframework.transaction.support.TransactionTemplate;
     classes = PlatformWorkflowExecutionIntTestConfiguration.class)
 class JobResumeFacadeIntTest {
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     static final String SIGNING_SECRET = createSigningSecret();
 
     private static final long MISSING_JOB_ID = 999_999L;
@@ -821,7 +823,7 @@ class JobResumeFacadeIntTest {
     private static String createSigningSecret() {
         byte[] secretBytes = new byte[32];
 
-        new SecureRandom().nextBytes(secretBytes);
+        SECURE_RANDOM.nextBytes(secretBytes);
 
         return EncodingUtils.base64EncodeToString(secretBytes);
     }
