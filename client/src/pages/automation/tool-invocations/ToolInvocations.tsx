@@ -44,8 +44,6 @@ const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
     ],
 };
 
-const NON_WORKSPACE_SURFACES = new Set(['MCP_MANAGEMENT']);
-
 interface ToolInvocationsProps {
     environmentId?: number;
     mcpServerOptions?: Array<ComboBoxItemType>;
@@ -75,16 +73,7 @@ export const ToolInvocations = ({environmentId, mcpServerOptions, type, workspac
         toolInvocationLogsIsLoading,
     } = useToolInvocations({environmentId, type, workspaceScope});
 
-    const visibleSurfaceOptions = useMemo(() => {
-        const surfaceOptions = surfaceOptionsByType[type];
-
-        return [
-            ANY_FILTER_OPTION,
-            ...(workspaceScope === undefined
-                ? surfaceOptions
-                : surfaceOptions.filter((surfaceOption) => !NON_WORKSPACE_SURFACES.has(String(surfaceOption.value)))),
-        ];
-    }, [type, workspaceScope]);
+    const visibleSurfaceOptions = useMemo(() => [ANY_FILTER_OPTION, ...surfaceOptionsByType[type]], [type]);
 
     return (
         <LayoutContainer
