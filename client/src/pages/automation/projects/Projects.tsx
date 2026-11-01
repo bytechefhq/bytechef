@@ -19,6 +19,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -126,6 +127,8 @@ const Projects = () => {
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
+    const initialLoadComplete = useInitialLoadComplete(projectsIsLoading);
+
     const isFirstRun = !isFiltered && projects?.length === 0;
 
     useEffect(() => {
@@ -199,7 +202,7 @@ const Projects = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="Projects" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader

@@ -11,6 +11,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {useGetIntegrationCategoriesQuery} from '@/ee/shared/queries/embedded/integrationCategories.queries';
 import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -53,6 +54,8 @@ const Integrations = () => {
         categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
+
+    const initialLoadComplete = useInitialLoadComplete(integrationsLoading);
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
@@ -109,7 +112,7 @@ const Integrations = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="Integrations" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader

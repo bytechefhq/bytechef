@@ -10,6 +10,7 @@ import useKnowledgeBaseEmbeddingActive from '@/pages/automation/knowledge-bases/
 import useKnowledgeBases from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBases';
 import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {DatabaseIcon} from 'lucide-react';
@@ -21,6 +22,8 @@ const KnowledgeBases = () => {
         useKnowledgeBases();
 
     const {embeddingActive, isLoading: embeddingActiveLoading} = useKnowledgeBaseEmbeddingActive();
+
+    const initialLoadComplete = useInitialLoadComplete(isLoading || embeddingActiveLoading);
 
     const showKnowledgeBases = embeddingActive && knowledgeBases.length > 0;
 
@@ -58,7 +61,7 @@ const KnowledgeBases = () => {
             }
             leftSidebarBody={embeddingActive && <KnowledgeBasesLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="Knowledge Bases" />}
-            leftSidebarHidden={leftSidebarHidden}
+            leftSidebarHidden={!initialLoadComplete || leftSidebarHidden}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading || embeddingActiveLoading}>

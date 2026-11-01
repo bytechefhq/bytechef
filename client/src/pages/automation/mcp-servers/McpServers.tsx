@@ -9,6 +9,7 @@ import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/provide
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
@@ -60,6 +61,8 @@ const McpServers = () => {
     } = useMcpServers();
 
     const queryClient = useQueryClient();
+
+    const initialLoadComplete = useInitialLoadComplete(mcpServersIsLoading);
 
     const isFirstRun = !mcpServersIsLoading && !tagsIsLoading && !mcpServersError && validMcpServers.length === 0;
 
@@ -119,7 +122,7 @@ const McpServers = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="MCP Servers" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[mcpServersError, tagsError]} loading={mcpServersIsLoading || tagsIsLoading}>

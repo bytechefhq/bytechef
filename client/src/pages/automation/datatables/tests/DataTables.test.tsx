@@ -83,6 +83,24 @@ describe('DataTables', () => {
 
             expect(screen.queryByTestId('data-table-list')).not.toBeInTheDocument();
         });
+
+        it('should hide the left sidebar until the first load completes', () => {
+            hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn, isLoading: true});
+
+            const {rerender} = renderDataTables();
+
+            expect(screen.queryByTestId('left-sidebar-nav')).not.toBeInTheDocument();
+
+            hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn});
+
+            rerender(
+                <TooltipProvider>
+                    <DataTables />
+                </TooltipProvider>
+            );
+
+            expect(screen.getByTestId('left-sidebar-nav')).toBeInTheDocument();
+        });
     });
 
     describe('error state', () => {

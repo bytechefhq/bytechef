@@ -15,6 +15,7 @@ import {
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionsLeftSidebarNav from '@/shared/components/connection/ConnectionsLeftSidebarNav';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -58,6 +59,8 @@ export const Connections = () => {
         environmentId: currentEnvironmentId,
         tagId: tagId ? parseInt(tagId) : undefined,
     });
+
+    const initialLoadComplete = useInitialLoadComplete(connectionsIsLoading);
 
     const {
         data: unfilteredConnections,
@@ -127,7 +130,7 @@ export const Connections = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="Connections" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader

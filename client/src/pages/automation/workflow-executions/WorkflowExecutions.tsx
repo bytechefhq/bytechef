@@ -13,6 +13,7 @@ import {
     getWorkflowExecutionsFilters,
 } from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
 import FilterTitle from '@/shared/components/filters/FilterTitle';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -91,6 +92,8 @@ export const WorkflowExecutions = () => {
         workflowExecutionsIsLoading,
         workflows,
     } = useWorkflowExecutions();
+
+    const initialLoadComplete = useInitialLoadComplete(workflowExecutionsIsLoading);
 
     const activeFilters = useMemo(
         () =>
@@ -274,7 +277,7 @@ export const WorkflowExecutions = () => {
                 </div>
             }
             leftSidebarHeader={<Header position="sidebar" title="Workflow Executions" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>

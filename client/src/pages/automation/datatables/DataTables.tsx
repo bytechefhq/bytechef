@@ -8,12 +8,15 @@ import DataTablesFilterTitle from '@/pages/automation/datatables/components/Data
 import DataTablesLeftSidebarNav from '@/pages/automation/datatables/components/DataTablesLeftSidebarNav';
 import useDataTables from '@/pages/automation/datatables/components/hooks/useDataTables';
 import {DATA_TABLES_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Table2Icon} from 'lucide-react';
 
 const DataTables = () => {
     const {allTags, error, filteredTables, isLoading, tables, tagId, tagsByTableData} = useDataTables();
+
+    const initialLoadComplete = useInitialLoadComplete(isLoading);
 
     const isFirstRun = !isLoading && !tagId && tables.length === 0;
 
@@ -35,7 +38,7 @@ const DataTables = () => {
             }
             leftSidebarBody={<DataTablesLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="Data Tables" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading}>

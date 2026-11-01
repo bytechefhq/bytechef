@@ -6,6 +6,7 @@ import KnowledgeBaseTabs from '@/pages/automation/knowledge-base/components/Know
 import useKnowledgeBase from '@/pages/automation/knowledge-base/hooks/useKnowledgeBase';
 import KnowledgeBaseEmbeddingInactiveEmptyState from '@/pages/automation/knowledge-bases/components/KnowledgeBaseEmbeddingInactiveEmptyState';
 import useKnowledgeBaseEmbeddingActive from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBaseEmbeddingActive';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 
@@ -14,12 +15,14 @@ const KnowledgeBase = () => {
 
     const {embeddingActive, isLoading: embeddingActiveLoading} = useKnowledgeBaseEmbeddingActive();
 
+    const initialLoadComplete = useInitialLoadComplete(embeddingActiveLoading);
+
     return (
         <LayoutContainer
             header={<KnowledgeBaseHeader knowledgeBaseName={knowledgeBase?.name} />}
             leftSidebarBody={embeddingActive && <KnowledgeBaseLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="Knowledge Base" />}
-            leftSidebarHidden={!embeddingActive}
+            leftSidebarHidden={!initialLoadComplete || !embeddingActive}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading || embeddingActiveLoading}>

@@ -6,6 +6,7 @@ import AppEventList from '@/ee/pages/embedded/app-events/components/AppEventList
 import AppEventsFilterTitle from '@/ee/pages/embedded/app-events/components/AppEventsFilterTitle';
 import {EMBEDDED_APP_EVENTS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {useGetAppEventsQuery} from '@/ee/shared/queries/embedded/appEvents.queries';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -16,6 +17,8 @@ const AppEvents = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {data: appEvents, error: appEventsError, isLoading: appEventsIsLoading} = useGetAppEventsQuery();
+
+    const initialLoadComplete = useInitialLoadComplete(appEventsIsLoading);
 
     const isFirstRun = appEvents?.length === 0;
 
@@ -59,7 +62,7 @@ const AppEvents = () => {
                     />
                 }
                 leftSidebarHeader={<Header title="App Events" />}
-                leftSidebarHidden={isFirstRun}
+                leftSidebarHidden={!initialLoadComplete || isFirstRun}
                 leftSidebarWidth="64"
             >
                 {appEvents && appEvents.length > 0 ? (

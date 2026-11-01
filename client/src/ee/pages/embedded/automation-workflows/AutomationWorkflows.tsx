@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -61,6 +62,8 @@ const AutomationWorkflows = () => {
         error: projectsError,
         isLoading: projectsIsLoading,
     } = useAutomationWorkflowProjectsQuery();
+
+    const initialLoadComplete = useInitialLoadComplete(projectsIsLoading);
 
     const {data: categoriesData, isLoading: categoriesIsLoading} = useAutomationWorkflowProjectCategoriesQuery();
 
@@ -331,7 +334,7 @@ const AutomationWorkflows = () => {
                 />
             }
             leftSidebarHeader={<Header title="Automation Workflows" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[projectsError]} loading={projectsIsLoading}>
