@@ -28,31 +28,35 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @ConditionalOnEEVersion
-public class AuditEventService {
+public class AuditEventServiceImpl implements AuditEventService {
 
     private final PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     @SuppressFBWarnings("EI")
-    public AuditEventService(PersistenceAuditEventRepository persistenceAuditEventRepository) {
+    public AuditEventServiceImpl(PersistenceAuditEventRepository persistenceAuditEventRepository) {
         this.persistenceAuditEventRepository = persistenceAuditEventRepository;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<PersistentAuditEvent> fetchAuditEvents(AuditEventFilter auditEventFilter, Pageable pageable) {
 
         return persistenceAuditEventRepository.findAllFiltered(auditEventFilter, pageable);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<String> fetchEventTypes() {
         return persistenceAuditEventRepository.findDistinctEventTypes();
     }
 
+    @Override
     @Transactional(propagation = Propagation.NESTED)
     public void saveAll(List<PersistentAuditEvent> persistentAuditEvents) {
         persistenceAuditEventRepository.saveAll(persistentAuditEvents);
     }
 
+    @Override
     @Transactional
     public void updateJobCreatedPlatform(long jobId, PlatformType platform, LocalDateTime since) {
         persistenceAuditEventRepository.updateJobCreatedPlatform(jobId, platform, since);
