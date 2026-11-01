@@ -195,6 +195,19 @@ class RemoteTaskExecutionServiceClientIntTest {
     }
 
     @Test
+    void testGetJobUnfinishedTaskExecutions() {
+        createTaskExecution("completed", null, 1, TaskExecution.Status.COMPLETED);
+
+        TaskExecution startedTaskExecution = createTaskExecution("started", null, 2, TaskExecution.Status.STARTED);
+        TaskExecution createdTaskExecution = createTaskExecution("created", null, 3, TaskExecution.Status.CREATED);
+
+        assertThat(remoteTaskExecutionServiceClient.getJobUnfinishedTaskExecutions(jobId))
+            .extracting(TaskExecution::getId)
+            .containsExactlyInAnyOrder(startedTaskExecution.getId(), createdTaskExecution.getId());
+        assertThat(remoteTaskExecutionServiceClient.getJobUnfinishedTaskExecutions(Long.MAX_VALUE)).isEmpty();
+    }
+
+    @Test
     void testFetchLastJobTaskExecution() {
         createTaskExecution("first", null, 1, TaskExecution.Status.COMPLETED);
 
