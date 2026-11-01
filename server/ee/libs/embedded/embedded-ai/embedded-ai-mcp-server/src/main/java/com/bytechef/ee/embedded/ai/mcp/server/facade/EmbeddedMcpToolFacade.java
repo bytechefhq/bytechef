@@ -105,6 +105,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private static final String APPROVAL = "approval";
     private static final Set<String> APPROVAL_COMPONENT_NAMES = Set.of(APPROVAL, WAIT_FOR_APPROVAL);
     private static final String APPROVAL_REQUIRED_STATUS = "approval_required";
+    private static final String STOPPED_MESSAGE = "The workflow run was stopped before it finished.";
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -503,7 +504,13 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
                     eventBuilder.jobId(jobId);
 
-                    return getWorkflowRunResult(awaitJob(jobId));
+                    WorkflowToolRunResult jobRunResult = getWorkflowRunResult(awaitJob(jobId));
+
+                    if (jobRunResult.status() == WorkflowToolRunResult.Status.STOPPED) {
+                        eventBuilder.errorMessage(STOPPED_MESSAGE);
+                    }
+
+                    return jobRunResult;
                 },
                 WorkflowToolRunResult::getOutcome);
 
@@ -564,7 +571,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             status = WorkflowToolRunResult.Status.PAUSED;
         } else {
             result.put("status", "stopped");
-            result.put("message", "The workflow run was stopped before it finished.");
+            result.put("message", STOPPED_MESSAGE);
 
             status = WorkflowToolRunResult.Status.STOPPED;
         }

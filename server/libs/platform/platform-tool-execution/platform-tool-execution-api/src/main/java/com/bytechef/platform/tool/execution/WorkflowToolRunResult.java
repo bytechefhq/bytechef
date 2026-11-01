@@ -30,7 +30,9 @@ public record WorkflowToolRunResult(Status status, @Nullable Object result) {
     public ToolExecutionOutcome getOutcome() {
         return switch (status) {
             case APPROVAL_REQUIRED -> ToolExecutionOutcome.APPROVAL_REQUIRED;
-            case COMPLETED, PAUSED, STOPPED -> ToolExecutionOutcome.SUCCESS;
+            case COMPLETED -> ToolExecutionOutcome.SUCCESS;
+            case PAUSED -> ToolExecutionOutcome.SUSPENDED;
+            case STOPPED -> ToolExecutionOutcome.ERROR;
         };
     }
 

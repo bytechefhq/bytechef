@@ -27,5 +27,6 @@ public enum ToolExecutionOutcome {
     TIMEOUT,
     APPROVAL_REQUIRED,
     APPROVAL_DENIED,
-    RULE_BLOCKED
+    RULE_BLOCKED,
+    SUSPENDED
 }

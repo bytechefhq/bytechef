@@ -84,6 +84,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -722,7 +723,7 @@ class AutomationMcpToolFacadeIntTest {
             .doesNotContain("approval_required")
             .doesNotContain("resumeToken")
             .doesNotContain("formUrl");
-        assertThat(captureRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
+        assertThat(captureRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.SUSPENDED);
     }
 
     @Test
@@ -768,6 +769,27 @@ class AutomationMcpToolFacadeIntTest {
             .isInstanceOf(ToolExecutionException.class)
             .hasMessageContaining("was stopped")
             .hasCauseInstanceOf(ExecutionException.class);
+
+        ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+
+        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
+        assertThat(toolExecutionEvent.errorMessage()).contains("was stopped");
+    }
+
+    @Test
+    void testWorkflowToolRunThatDoesNotFinishInTimeIsRecordedAsATimeout() {
+        ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(completedJob());
+
+        when(jobCompletionAwaiter.await(anyLong(), any()))
+            .thenReturn(CompletableFuture.failedFuture(new TimeoutException("Job 5 did not finish within PT5M")));
+
+        assertThatThrownBy(() -> toolCallback.call("{}"))
+            .hasMessageContaining("did not finish");
+
+        ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+
+        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.TIMEOUT);
+        assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
     }
 
     @Test
