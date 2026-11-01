@@ -592,6 +592,46 @@ class ClusterElementCallRecorderTest {
     }
 
     @Test
+    void testRecordOutcomeStoresADeniedCallAndNotifies() {
+        List<ClusterElementCallEvent> events = new CopyOnWriteArrayList<>();
+
+        recorder.addListener(1, events::add);
+
+        String reason = "Denied by reviewer: not now";
+
+        ClusterElementCallRef ref = recorder.recordOutcome(
+            1L, 2L, "slack_1", "slack", null, ClusterElementCallRecord.Status.DENIED, reason, null);
+
+        ClusterElementCallDrain drain = recorder.drain(2L);
+
+        ClusterElementCallRecord callRecord = drain.records()
+            .getFirst();
+
+        assertEquals(ref.id(), callRecord.id());
+        assertEquals(ClusterElementCallRecord.Status.DENIED, callRecord.status());
+        assertEquals(reason, callRecord.output());
+        assertEquals(Status.DENIED, drain.calls()
+            .get("slack_1")
+            .status());
+        assertEquals(Type.DENIED, events.getFirst()
+            .type());
+    }
+
+    @Test
+    void testDeniedAggregateIsNotClearedByALaterCompletedCall() {
+        recorder.recordOutcome(1L, 2L, "slack_1", "slack", null, ClusterElementCallRecord.Status.DENIED, null, null);
+
+        ClusterElementCallRef ref = recorder.callStarted(1L, 2L, "slack_1", "slack", null, null, null);
+
+        recorder.callCompleted(1L, 2L, ref, null);
+
+        assertEquals(Status.DENIED, recorder.drain(2L)
+            .calls()
+            .get("slack_1")
+            .status());
+    }
+
+    @Test
     void testClaimFailureClaimsOnceAndSeesThroughCauses() {
         RuntimeException cause = new RuntimeException("x");
 
