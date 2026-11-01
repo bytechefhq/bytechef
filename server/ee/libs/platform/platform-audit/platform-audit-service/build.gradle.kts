@@ -40,6 +40,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testImplementation(project(":server:libs:platform:platform-mail"))
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))

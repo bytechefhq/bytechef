@@ -18,11 +18,15 @@ package com.bytechef.platform.ai.provider.facade;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.provider.audit.AiProviderAuditEvents;
+import com.bytechef.platform.ai.provider.audit.AiProviderAuditMapper;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderDTO;
 import com.bytechef.platform.ai.provider.ollama.OllamaModelClient;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.StringProperty;
@@ -67,9 +71,15 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
+    @Audited(event = AiProviderAuditEvents.AI_PROVIDER_DELETED, data = {
+        @AuditData(key = "aiProviderId", value = "#id"),
+        @AuditData(key = "environment", value = "#environment")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteAiProvider(int id, int environment) {
         Provider provider = getProvider(id);
+
+        propertyService.getProperty(provider.getKey(), Scope.PLATFORM, null, (long) environment);
 
         propertyService.delete(provider.getKey(), Scope.PLATFORM, null, (long) environment);
     }
@@ -261,6 +271,11 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
+    @Audited(event = AiProviderAuditEvents.AI_PROVIDER_UPDATED, data = {
+        @AuditData(key = "aiProviderId", value = "#id"),
+        @AuditData(key = "enabled", value = "#enabled"),
+        @AuditData(key = "environment", value = "#environment")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void updateAiProvider(int id, boolean enabled, int environment) {
         Provider provider = getProvider(id);
@@ -269,6 +284,10 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
+    @Audited(event = AiProviderAuditEvents.AI_PROVIDER_UPDATED, mapper = AiProviderAuditMapper.class, data = {
+        @AuditData(key = "aiProviderId", value = "#id"),
+        @AuditData(key = "environment", value = "#environment")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void updateAiProvider(int id, String apiKey, String url, int environment) {
         Provider provider = getProvider(id);

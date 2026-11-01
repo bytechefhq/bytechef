@@ -20,7 +20,11 @@ dependencies {
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:libs:config:app-config"))
+    testImplementation(project(":server:libs:platform:platform-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
 
     testImplementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
 }

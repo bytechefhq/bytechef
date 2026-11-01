@@ -12,6 +12,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.ee.platform.customcomponent.configuration.audit.CustomComponentAuditEvents;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
 import com.bytechef.ee.platform.customcomponent.configuration.service.CustomComponentService;
@@ -19,6 +20,8 @@ import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFile
 import com.bytechef.ee.platform.customcomponent.loader.ComponentHandlerLoader;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -102,8 +105,14 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     @Override
+    @Audited(event = CustomComponentAuditEvents.CUSTOM_COMPONENT_SAVED, data = {
+        @AuditData(key = "customComponentId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "version", value = "#result?.componentVersion"),
+        @AuditData(key = "language", value = "#language")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public void save(byte[] bytes, Language language) {
+    public CustomComponent save(byte[] bytes, Language language) {
         try {
             ComponentDefinition componentDefinition = loadComponentDefinition(language, bytes);
 
@@ -111,16 +120,17 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
                 componentDefinition.getName() + "_" + componentDefinition.getVersion() + "." + language.getExtension(),
                 bytes);
 
-            customComponentService.fetchCustomComponent(componentDefinition.getName(), componentDefinition.getVersion())
-                .ifPresentOrElse(
-                    customComponent -> update(customComponent, componentDefinition),
+            return customComponentService
+                .fetchCustomComponent(componentDefinition.getName(), componentDefinition.getVersion())
+                .map(customComponent -> update(customComponent, componentDefinition))
+                .orElseGet(
                     () -> create(language, componentDefinition, componentDefinition.getVersion(), componentFileEntry));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void create(
+    private CustomComponent create(
         Language language, ComponentDefinition componentDefinition, int componentVersion,
         FileEntry componentFileEntry) {
 
@@ -135,7 +145,7 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         customComponent.setTitle(OptionalUtils.orElse(componentDefinition.getTitle(), null));
         customComponent.setLanguage(language);
 
-        customComponentService.create(customComponent);
+        return customComponentService.create(customComponent);
     }
 
     /**
@@ -174,12 +184,12 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
             OptionalUtils.orElse(triggerDefinition.getDescription(), null));
     }
 
-    private void update(CustomComponent customComponent, ComponentDefinition componentDefinition) {
+    private CustomComponent update(CustomComponent customComponent, ComponentDefinition componentDefinition) {
         customComponent.setDescription(
             OptionalUtils.orElse(componentDefinition.getDescription(), null));
         customComponent.setIcon(OptionalUtils.orElse(componentDefinition.getIcon(), null));
         customComponent.setTitle(OptionalUtils.orElse(componentDefinition.getTitle(), null));
 
-        customComponentService.update(customComponent);
+        return customComponentService.update(customComponent);
     }
 }

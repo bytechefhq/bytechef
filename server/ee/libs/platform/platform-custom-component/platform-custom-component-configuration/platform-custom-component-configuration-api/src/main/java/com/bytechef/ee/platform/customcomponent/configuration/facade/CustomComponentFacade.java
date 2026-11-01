@@ -24,7 +24,7 @@ public interface CustomComponentFacade {
 
     List<CustomComponent> getCustomComponents();
 
-    void save(byte[] bytes, CustomComponent.Language language);
+    CustomComponent save(byte[] bytes, CustomComponent.Language language);
 
     @SuppressFBWarnings("EI")
     record CustomComponentDefinitionRecord(

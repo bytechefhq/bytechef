@@ -19,6 +19,14 @@ import java.util.List;
 public record ConnectedUserImportResultDTO(
     int createdCount, List<String> skippedExternalIds, List<RejectedRow> rejectedRows) {
 
+    public int rejectedCount() {
+        return rejectedRows.size();
+    }
+
+    public int skippedCount() {
+        return skippedExternalIds.size();
+    }
+
     @SuppressFBWarnings("EI")
     public record RejectedRow(int rowNumber, String reason) {
     }

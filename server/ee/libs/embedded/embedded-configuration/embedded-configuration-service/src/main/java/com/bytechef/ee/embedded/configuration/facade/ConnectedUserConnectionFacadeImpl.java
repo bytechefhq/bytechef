@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
@@ -17,6 +18,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -78,6 +81,12 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_CREATED, data = {
+        @AuditData(key = "connectionId", value = "#result"),
+        @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+        @AuditData(key = "name", value = "#connectionDTO.name"),
+        @AuditData(key = "componentName", value = "#connectionDTO.componentName")
+    })
     @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
     public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
@@ -88,6 +97,10 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_DELETED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "connectedUserId", value = "#connectedUserId")
+    })
     @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
     public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
         requireOwned(connectedUserId, connectionId);
@@ -135,6 +148,10 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_REAUTHORIZED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "connectedUserId", value = "#connectedUserId")
+    })
     @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
     public void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters) {
         ConnectionDTO connectionDTO = requireOwned(connectedUserId, connectionId);

@@ -8,8 +8,11 @@
 package com.bytechef.ee.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditEvents;
 import com.bytechef.ee.automation.configuration.service.WorkspaceService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -33,14 +36,23 @@ public class AdminWorkspaceFacadeImpl implements AdminWorkspaceFacade {
     }
 
     @Override
+    @Audited(event = WorkspaceAuditEvents.WORKSPACE_CREATED, data = {
+        @AuditData(key = "workspaceId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#workspace.name")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Workspace createWorkspace(Workspace workspace) {
         return workspaceService.create(workspace);
     }
 
     @Override
+    @Audited(event = WorkspaceAuditEvents.WORKSPACE_DELETED, data = {
+        @AuditData(key = "workspaceId", value = "#id")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteWorkspace(long id) {
+        workspaceService.getWorkspace(id);
+
         workspaceService.delete(id);
     }
 
@@ -57,6 +69,10 @@ public class AdminWorkspaceFacadeImpl implements AdminWorkspaceFacade {
     }
 
     @Override
+    @Audited(event = WorkspaceAuditEvents.WORKSPACE_UPDATED, data = {
+        @AuditData(key = "workspaceId", value = "#workspace.id"),
+        @AuditData(key = "name", value = "#workspace.name")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Workspace updateWorkspace(Workspace workspace) {
         return workspaceService.update(workspace);

@@ -149,11 +149,18 @@ class RegisteredClientServiceIntTest {
         fixtures.saveAuthorization("client-1", "alice", MANAGEMENT_URL, Instant.now());
         fixtures.saveConsent("client-1", "alice");
 
-        registeredClientService.deleteRegisteredClient("client-1");
+        assertThat(registeredClientService.deleteRegisteredClient("client-1")).isTrue();
 
         assertThat(registeredClientRepository.findById("client-1")).isNull();
         assertThat(fixtures.countAuthorizations()).isZero();
         assertThat(fixtures.countConsents()).isZero();
+    }
+
+    @Test
+    void testDeleteOfAMissingClientReportsThatNothingWasDeleted() {
+        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
+
+        assertThat(registeredClientService.deleteRegisteredClient("missing-client")).isFalse();
     }
 
     @Test

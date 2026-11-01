@@ -7,8 +7,11 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -50,6 +53,12 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
     @Override
     @Transactional
+    @Audited(event = ConnectionAuditEvents.CONNECTION_CREATED, data = {
+        @AuditData(key = "connectionId", value = "#result"),
+        @AuditData(key = "name", value = "#connectionDTO.name"),
+        @AuditData(key = "componentName", value = "#connectionDTO.componentName"),
+        @AuditData(key = "shared", value = "#shared")
+    })
     public long createConnection(ConnectionDTO connectionDTO, boolean shared) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
@@ -62,6 +71,9 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
     @Override
     @Transactional
+    @Audited(event = ConnectionAuditEvents.CONNECTION_DELETED, data = {
+        @AuditData(key = "connectionId", value = "#id")
+    })
     public void deleteConnection(long id) {
         requireEmbedded(id);
 
@@ -93,6 +105,11 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
     @Override
     @Transactional
+    @Audited(event = ConnectionAuditEvents.CONNECTION_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#id"),
+        @AuditData(key = "name", value = "#name"),
+        @AuditData(key = "shared", value = "#shared")
+    })
     public void updateConnection(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version) {
         requireEmbedded(id);
 
