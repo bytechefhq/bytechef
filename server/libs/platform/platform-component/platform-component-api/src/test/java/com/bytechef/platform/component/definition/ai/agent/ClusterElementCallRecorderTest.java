@@ -618,6 +618,31 @@ class ClusterElementCallRecorderTest {
     }
 
     @Test
+    void testCallDeniedEndsASuspendedCallAsDenied() {
+        ClusterElementCallRef ref = start(recorder, "{\"text\":\"hi\"}");
+
+        recorder.callSuspended(1, 10, ref);
+        recorder.callDenied(1, 10, ref, "Denied by reviewer: not now");
+
+        assertTrue(recorder.findSuspendedCall(10)
+            .isEmpty());
+
+        ClusterElementCallDrain drain = recorder.drain(10);
+
+        ClusterElementCallRecord callRecord = drain.records()
+            .getFirst();
+
+        assertEquals(ref.id(), callRecord.id());
+        assertEquals(ClusterElementCallRecord.Status.DENIED, callRecord.status());
+        assertEquals("Denied by reviewer: not now", callRecord.output());
+        assertEquals("httpClient", callRecord.componentName());
+        assertNotNull(callRecord.endDate());
+        assertEquals(Status.DENIED, drain.calls()
+            .get("httpClient_1")
+            .status());
+    }
+
+    @Test
     void testDeniedAggregateIsNotClearedByALaterCompletedCall() {
         recorder.recordOutcome(1L, 2L, "slack_1", "slack", null, ClusterElementCallRecord.Status.DENIED, null, null);
 
