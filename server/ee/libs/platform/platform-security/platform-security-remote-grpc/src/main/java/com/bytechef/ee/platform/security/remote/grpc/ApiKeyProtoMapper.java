@@ -66,8 +66,13 @@ public final class ApiKeyProtoMapper {
         Environment environment = apiKey.getEnvironment();
 
         RemoteApiKey.Builder builder = RemoteApiKey.newBuilder()
-            .setEnvironment(environment.ordinal())
-            .setUserId(apiKey.getUserId());
+            .setEnvironment(environment.ordinal());
+
+        Long userId = apiKey.getUserId();
+
+        if (userId != null) {
+            builder.setUserId(userId);
+        }
 
         if (apiKey.getCreatedBy() != null) {
             builder.setCreatedBy(apiKey.getCreatedBy());
