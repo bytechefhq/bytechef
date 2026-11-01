@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox/ComboBox';
 import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import {Input} from '@/components/Input/Input';
 import PageLoader from '@/components/PageLoader';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
@@ -13,11 +14,13 @@ import ConnectedUserImportDialog from '@/ee/pages/embedded/connected-users/compo
 import ConnectedUserTable from '@/ee/pages/embedded/connected-users/components/ConnectedUserTable';
 import ConnectedUsersFilterTitle from '@/ee/pages/embedded/connected-users/components/ConnectedUsersFilterTitle';
 import ConnectedUserSheet from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheet';
+import {EMBEDDED_CONNECTED_USERS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {ComponentDefinitionBasic, Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserFromJSON, type CredentialStatus} from '@/ee/shared/middleware/embedded/connected-user';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -126,6 +129,8 @@ const ConnectedUsers = () => {
 
     const navigate = useNavigate();
 
+    const environmentScopeNote = useEnvironmentScopeNote('Connected users');
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             createDateRange: {
@@ -162,6 +167,17 @@ const ConnectedUsers = () => {
     );
 
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false});
+
+    const hasActiveFilter = [
+        'createDateFrom',
+        'createDateTo',
+        'credentialStatus',
+        'integrationId',
+        'pageNumber',
+        'search',
+    ].some((parameterName) => !!searchParams.get(parameterName));
+
+    const isFirstRun = !connectedUsersLoading && !hasActiveFilter && connectedUsers?.length === 0;
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true});
 
@@ -214,23 +230,29 @@ const ConnectedUsers = () => {
                     centerTitle
                     position="main"
                     right={
-                        <div className="flex items-center gap-2">
-                            <Button
-                                icon={<UploadIcon />}
-                                label="Import"
-                                onClick={() => setImportDialogOpen(true)}
-                                variant="outline"
-                            />
+                        !isFirstRun && (
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    icon={<UploadIcon />}
+                                    label="Import"
+                                    onClick={() => setImportDialogOpen(true)}
+                                    variant="outline"
+                                />
 
-                            <Button label="New connected user" onClick={() => setCreateDialogOpen(true)} />
-                        </div>
+                                <Button label="New connected user" onClick={() => setCreateDialogOpen(true)} />
+                            </div>
+                        )
                     }
                     title={
-                        <ConnectedUsersFilterTitle
-                            filterData={{
-                                status: form.getValues('credentialStatus')!,
-                            }}
-                        />
+                        isFirstRun ? (
+                            'Connected Users'
+                        ) : (
+                            <ConnectedUsersFilterTitle
+                                filterData={{
+                                    status: form.getValues('credentialStatus')!,
+                                }}
+                            />
+                        )
                     }
                 />
             }
@@ -356,16 +378,37 @@ const ConnectedUsers = () => {
                 </Form>
             }
             leftSidebarHeader={<Header title="Connected Users" />}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[connectedUsersError]} loading={connectedUsersLoading}>
                 {connectedUsers && connectedUsers?.length > 0 ? (
                     <ConnectedUserTable connectedUsers={connectedUsers} />
-                ) : (
+                ) : hasActiveFilter ? (
                     <EmptyList
                         icon={<UsersIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by connecting new integrations."
-                        title="No Connected Users"
+                        message="No connected users match the current filter."
+                        title="No Matching Connected Users"
+                    />
+                ) : (
+                    <EmptyState
+                        actions={
+                            <>
+                                <Button label="Add Connected User" onClick={() => setCreateDialogOpen(true)} />
+
+                                <Button
+                                    icon={<UploadIcon />}
+                                    label="Import"
+                                    onClick={() => setImportDialogOpen(true)}
+                                    variant="outline"
+                                />
+                            </>
+                        }
+                        description="A connected user is one of your product's users, linked to the integrations they turn on and the connections they authorize. A user is added the first time they sign in through your embedded integrations, or you can add or import users here ahead of time."
+                        docsLink={{href: EMBEDDED_CONNECTED_USERS_DOCUMENTATION_URL, label: 'How connected users work'}}
+                        icon={<UsersIcon />}
+                        note={environmentScopeNote}
+                        title="No connected users yet"
                     />
                 )}
             </PageLoader>

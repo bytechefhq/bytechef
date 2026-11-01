@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -91,6 +92,10 @@ const AutomationWorkflows = () => {
     });
 
     const hasProjects = projects.length > 0;
+
+    const hasActiveFilter = !!categoryId || !!tagId;
+
+    const isFirstRun = !projectsIsLoading && !hasActiveFilter && !hasProjects;
 
     const createProjectMutation = useCreateAutomationWorkflowProjectMutation();
     const createWorkflowMutation = useCreateAutomationWorkflowProjectWorkflowMutation();
@@ -312,7 +317,9 @@ const AutomationWorkflows = () => {
                             />
                         }
                     />
-                ) : undefined
+                ) : (
+                    isFirstRun && <Header centerTitle={true} position="main" title="Automation Workflows" />
+                )
             }
             leftSidebarBody={
                 <AutomationWorkflowProjectsFilterSidebar
@@ -324,6 +331,7 @@ const AutomationWorkflows = () => {
                 />
             }
             leftSidebarHeader={<Header title="Automation Workflows" />}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[projectsError]} loading={projectsIsLoading}>
@@ -342,12 +350,18 @@ const AutomationWorkflows = () => {
                         projects={filteredProjects}
                         tags={tags || []}
                     />
-                ) : (
+                ) : hasActiveFilter ? (
                     <EmptyList
-                        button={<Button label="Create Project" onClick={handleNewProject} />}
                         icon={<FolderIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new project."
-                        title="No Projects"
+                        message="No projects match the selected filter."
+                        title="No Matching Projects"
+                    />
+                ) : (
+                    <EmptyState
+                        actions={<Button label="Create Project" onClick={handleNewProject} />}
+                        description="A project groups the workflow templates that ship with your product. Your connected users start from these templates and adjust their own copies in the embedded workflow builder."
+                        icon={<FolderIcon />}
+                        title="Create your first project"
                     />
                 )}
             </PageLoader>
