@@ -37,6 +37,10 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacadeImpl;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -46,6 +50,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowServiceImpl;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -152,11 +157,35 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootConfiguration
 public class AutomationConfigurationRemoteClientIntTestConfiguration {
 
+    private static final String EMBEDDED_AUTOMATION_PROJECT_NAME_CONDITION =
+        "EXISTS (SELECT 1 FROM project owned_project WHERE owned_project.id = %1$s AND " +
+            "position('__EMBEDDED_AUTOMATION__' in owned_project.name) = 1)";
+    private static final String EMBEDDED_PROJECT_DEPLOYMENT_NAME_CONDITION =
+        "EXISTS (SELECT 1 FROM project_deployment owned_deployment WHERE owned_deployment.id = %1$s AND " +
+            "position('__EMBEDDED__' in owned_deployment.name) = 1)";
+    private static final String MATCH_NOTHING = "%1$s = 0";
     private static final String USER_GRPC_SERVER_NAME = "automation-configuration-user-" + UUID.randomUUID();
 
     @Bean
     CacheManager cacheManager() {
         return new ConcurrentMapCacheManager();
+    }
+
+    @Bean
+    ProjectOwnerContributor embeddedAutomationWorkflowProjectOwnerContributor() {
+        return ProjectOwnerContributor.of(
+            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, EMBEDDED_AUTOMATION_PROJECT_NAME_CONDITION);
+    }
+
+    @Bean
+    ProjectOwnerContributor embeddedConnectedUserProjectOwnerContributor() {
+        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, MATCH_NOTHING);
+    }
+
+    @Bean
+    ProjectDeploymentOwnerContributor embeddedProjectDeploymentOwnerContributor() {
+        return ProjectDeploymentOwnerContributor.of(
+            ProjectDeploymentOwner.EMBEDDED, EMBEDDED_PROJECT_DEPLOYMENT_NAME_CONDITION);
     }
 
     @Bean
@@ -244,8 +273,8 @@ public class AutomationConfigurationRemoteClientIntTestConfiguration {
         return new ProjectFacadeImpl(
             new ApplicationProperties(), Mockito.mock(CategoryService.class),
             Mockito.mock(ComponentDefinitionHelper.class), Mockito.mock(PreBuiltTemplateService.class),
-            projectWorkflowService, projectDeploymentService, projectService,
-            Mockito.mock(ProjectDeploymentFacade.class), Mockito.mock(ProjectWorkflowFacade.class),
+            projectWorkflowService, projectDeploymentService, Mockito.mock(ProjectOwnershipService.class),
+            projectService, Mockito.mock(ProjectDeploymentFacade.class), Mockito.mock(ProjectWorkflowFacade.class),
             Mockito.mock(SharedTemplateFileStorage.class), Mockito.mock(SharedTemplateService.class),
             Mockito.mock(TagService.class), workflowService, Mockito.mock(WorkflowTestConfigurationService.class),
             Mockito.mock(WorkflowNodeTestOutputService.class), List.of());
