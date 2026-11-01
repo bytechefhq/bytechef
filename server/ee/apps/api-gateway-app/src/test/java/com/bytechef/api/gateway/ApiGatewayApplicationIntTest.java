@@ -28,12 +28,14 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
+import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -69,6 +71,9 @@ public class ApiGatewayApplicationIntTest {
 
     @Autowired
     private Environment environment;
+
+    @Autowired
+    private InfoEndpoint infoEndpoint;
 
     @Autowired
     private UserCleanupScheduler userCleanupScheduler;
@@ -107,6 +112,14 @@ public class ApiGatewayApplicationIntTest {
         assertThat(environment.getProperty("info.signUp.activationRequired")).isEqualTo("false");
         assertThat(environment.getProperty("info.signUp.enabled")).isEqualTo("true");
         assertThat(environment.getProperty("info.socialLogin.enabled")).isEqualTo("false");
+    }
+
+    @Test
+    void testAuthorizationServerIsOffByDefault() {
+        assertThat(environment.getProperty("bytechef.oauth2.authorization-server.enabled")).isEqualTo("false");
+        assertThat(infoEndpoint.info())
+            .extractingByKey("oauth2")
+            .isEqualTo(Map.of("authorizationServer", Map.of("enabled", "false")));
     }
 
     @Test
