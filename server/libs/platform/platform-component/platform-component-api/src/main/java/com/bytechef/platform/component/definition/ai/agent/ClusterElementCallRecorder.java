@@ -121,6 +121,10 @@ public final class ClusterElementCallRecorder {
         record(jobId, taskExecutionId, Type.FAILED, ref, null, null, null, null, null, error);
     }
 
+    public void callDenied(long jobId, long taskExecutionId, ClusterElementCallRef ref, @Nullable String details) {
+        record(jobId, taskExecutionId, Type.DENIED, ref, null, null, null, null, details, null);
+    }
+
     public ClusterElementCallRef recordOutcome(
         long jobId, long taskExecutionId, String workflowNodeName, @Nullable String componentName,
         @Nullable String parentId, ClusterElementCallRecord.Status status, @Nullable String details,
@@ -243,8 +247,8 @@ public final class ClusterElementCallRecorder {
         synchronized (taskExecutionCalls) {
             ClusterElementCall merged = taskExecutionCalls.record(type, ref.workflowNodeName(), error);
             ClusterElementCallRecord callRecord = taskExecutionCalls.recordCall(
-                type, ref, componentName, toolName, parentId, listened ? input : null, listened ? output : null,
-                error);
+                type, ref, componentName, toolName, parentId, listened ? input : null,
+                listened || type == Type.DENIED ? output : null, error);
 
             Status status = merged.status();
 
@@ -320,7 +324,10 @@ public final class ClusterElementCallRecorder {
                 case FAILED -> new ClusterElementCallRecord(
                     ref.id(), null, ref.workflowNodeName(), null, null, ClusterElementCallRecord.Status.FAILED, null,
                     now, null, null, ClusterElementCallRecord.cap(error));
-                case BLOCKED, REDACTED, WITHHELD, DENIED -> new ClusterElementCallRecord(
+                case DENIED -> new ClusterElementCallRecord(
+                    ref.id(), null, ref.workflowNodeName(), null, null, ClusterElementCallRecord.Status.DENIED, null,
+                    now, null, ClusterElementCallRecord.cap(output), null);
+                case BLOCKED, REDACTED, WITHHELD -> new ClusterElementCallRecord(
                     ref.id(), parentId, ref.workflowNodeName(), componentName, toolName,
                     ClusterElementCallRecord.Status.valueOf(type.name()), now, now, null,
                     ClusterElementCallRecord.cap(output), ClusterElementCallRecord.cap(error));
@@ -352,7 +359,7 @@ public final class ClusterElementCallRecorder {
 
             if (type == Type.STARTED) {
                 inFlightCount++;
-            } else if (type == Type.COMPLETED || type == Type.FAILED) {
+            } else if (type == Type.COMPLETED || type == Type.FAILED || type == Type.DENIED) {
                 inFlightCount = Math.max(inFlightCount - 1, 0);
             }
 
