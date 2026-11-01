@@ -17,16 +17,16 @@ import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.ee.platform.audit.job.AuditEventRetentionJob;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
+import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.ee.platform.external.invocation.log.job.ExternalInvocationLogRetentionJob;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
+import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -96,10 +96,10 @@ public class ExecutionApplicationIntTest {
     private ObjectProvider<ExternalInvocationLogRetentionJob> externalInvocationLogRetentionJobProvider;
 
     @Autowired
-    private ToolExecutionRecorder toolExecutionRecorder;
+    private ExternalInvocationRecorder externalInvocationRecorder;
 
     @Autowired
-    private ToolInvocationLogService toolInvocationLogService;
+    private ExternalInvocationLogService externalInvocationLogService;
 
     @Test
     void testAuditEventsAreStoredHere() {
@@ -138,6 +138,20 @@ public class ExecutionApplicationIntTest {
 
         assertThat(serviceNames).contains(
             "bytechef.automation.workflow.execution.remote.v1.ProjectWorkflowExecutionRemoteService");
+    }
+
+    @Test
+    void testExternalInvocationLogGrpcServiceIsServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains(
+            "bytechef.platform.external.invocation.log.remote.v1.ExternalInvocationLogRemoteService");
     }
 
     @Test
@@ -286,27 +300,27 @@ public class ExecutionApplicationIntTest {
 
         assertThat(
             jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM public.shedlock WHERE name = 'purgeExpiredToolInvocationLogs'", Integer.class))
+                "SELECT COUNT(*) FROM public.shedlock WHERE name = 'purgeExpiredExternalInvocationLogs'", Integer.class))
                     .isEqualTo(1);
     }
 
     @Test
-    void testRecordedToolExecutionIsWrittenToTheExecutionDatabase() {
+    void testRecordedExternalInvocationIsWrittenToTheExecutionDatabase() {
         String toolName = "execution_app_recorder_" + System.nanoTime();
 
-        String result = toolExecutionRecorder.record(
-            ToolExecutionEvent.builder(
-                PlatformType.EMBEDDED, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionKind.COMPONENT, toolName),
+        String result = externalInvocationRecorder.record(
+            ExternalInvocationEvent.builder(
+                PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.COMPONENT, toolName),
             () -> "done");
 
         assertThat(result).isEqualTo("done");
 
         await().atMost(Duration.ofSeconds(10))
             .untilAsserted(() -> assertThat(
-                toolInvocationLogService.getToolInvocationLogs(
-                    PlatformType.EMBEDDED, null, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null,
-                    null, 0))
-                        .extracting(ToolInvocationLog::getToolName, ToolInvocationLog::getOutcome)
-                        .contains(tuple(toolName, ToolExecutionOutcome.SUCCESS)));
+                externalInvocationLogService.getExternalInvocationLogs(
+                    PlatformType.EMBEDDED, null, ExternalInvocationSource.MCP_SERVER, null, null, null, null, null,
+                    null, null, 0))
+                        .extracting(ExternalInvocationLog::getToolName, ExternalInvocationLog::getOutcome)
+                        .contains(tuple(toolName, ExternalInvocationOutcome.SUCCESS)));
     }
 }

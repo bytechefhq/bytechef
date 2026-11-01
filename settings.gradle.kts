@@ -774,6 +774,8 @@ include("server:ee:libs:platform:platform-data-table:platform-data-table-remote-
 include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-api")
 include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-graphql")
 include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-remote-client")
+include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-remote-grpc")
+include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-remote-grpc-proto")
 include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-service")
 include("server:ee:libs:platform:platform-notification:platform-notification-remote-client")
 include("server:ee:libs:platform:platform-notification:platform-notification-remote-grpc")
