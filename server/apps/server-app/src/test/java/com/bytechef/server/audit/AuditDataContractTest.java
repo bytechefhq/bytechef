@@ -29,6 +29,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -45,20 +48,110 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
 import org.springframework.expression.spel.SpelNode;
+import org.springframework.expression.spel.ast.Assign;
+import org.springframework.expression.spel.ast.BeanReference;
 import org.springframework.expression.spel.ast.CompoundExpression;
+import org.springframework.expression.spel.ast.ConstructorReference;
+import org.springframework.expression.spel.ast.FunctionReference;
+import org.springframework.expression.spel.ast.Indexer;
+import org.springframework.expression.spel.ast.MethodReference;
 import org.springframework.expression.spel.ast.PropertyOrFieldReference;
+import org.springframework.expression.spel.ast.TypeReference;
 import org.springframework.expression.spel.ast.VariableReference;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * @author Ivica Cardic
  */
 class AuditDataContractTest {
 
+    private static final String AUDIT_EVENTS_CLASS_PATTERN = "classpath*:com/bytechef/**/*AuditEvents.class";
+    private static final Path AUDIT_EVENTS_DOCUMENT = Path.of(
+        "docs", "content", "docs", "platform", "settings", "audit-events.mdx");
     private static final String CLASS_PATTERN = "classpath*:com/bytechef/**/*.class";
     private static final String COMPONENT_PACKAGE_PATH = "/com/bytechef/component/";
     private static final String RESULT_VARIABLE = "result";
+    private static final List<String> READ_METHOD_PREFIXES = List.of(
+        "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
+    private static final String DEFINITION_EDIT = "workflow definition edit";
+    private static final String DELEGATES = "delegates to an audited method";
+    private static final String JOB_RUN = "job run, recorded by the job status listener";
+    private static final String TAGS = "tag assignment";
+    private static final String TOOL_SETTING = "per-tool setting of an audited MCP or A2A server";
+    private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
+    private static final String WORKFLOW_INPUTS = "workflow input or connection values";
+    private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
+        "IntegrationInstanceAdminFacadeImpl", DELEGATES,
+        "WebhookTriggerTestAdminFacadeImpl", "editor-time webhook trigger test");
+    private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
+        Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowEnabled", TOOL_SETTING),
+        Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
+        Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
+        Map.entry("AutomationWorkflowProjectAdminFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
+        Map.entry("AutomationWorkflowProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
+        Map.entry("ConnectedUserMcpServerFacadeImpl.enableMcpTool", TOOL_SETTING),
+        Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
+        Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
+        Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),
+        Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpServer", DELEGATES),
+        Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpTool", TOOL_SETTING),
+        Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpComponent", DELEGATES),
+        Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpServer", DELEGATES),
+        Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpServerSecretKey", DELEGATES),
+        Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpServerTags", TAGS),
+        Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpTool", TOOL_SETTING),
+        Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpToolEnabled", TOOL_SETTING),
+        Map.entry("IntegrationInstanceConfigurationFacadeImpl.createIntegrationInstanceConfigurationWorkflowJob",
+            JOB_RUN),
+        Map.entry("IntegrationInstanceConfigurationFacadeImpl.updateIntegrationInstanceConfigurationTags", TAGS),
+        Map.entry("IntegrationInstanceConfigurationFacadeImpl.updateIntegrationInstanceConfigurationWorkflow",
+            WORKFLOW_INPUTS),
+        Map.entry("IntegrationInstanceFacadeImpl.enableIntegrationInstanceWorkflowTriggers", TRIGGER_INTERNAL),
+        Map.entry("IntegrationInstanceFacadeImpl.updateIntegrationInstanceConfigurationWorkflowTriggers",
+            TRIGGER_INTERNAL),
+        Map.entry("IntegrationInstanceFacadeImpl.updateIntegrationInstanceWorkflow", WORKFLOW_INPUTS),
+        Map.entry("IntegrationTagFacadeImpl.updateIntegrationTags", TAGS),
+        Map.entry("IntegrationWorkflowFacadeImpl.updateWorkflow", DEFINITION_EDIT),
+        Map.entry("McpComponentServiceImpl.create", DELEGATES),
+        Map.entry("McpComponentServiceImpl.update", DELEGATES),
+        Map.entry(
+            "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.createMcpIntegrationInstanceConfigurationWorkflow",
+            TOOL_SETTING),
+        Map.entry(
+            "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.deleteMcpIntegrationInstanceConfigurationWorkflow",
+            TOOL_SETTING),
+        Map.entry(
+            "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.updateMcpIntegrationInstanceConfigurationWorkflow",
+            TOOL_SETTING),
+        Map.entry(
+            "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.updateMcpIntegrationInstanceConfigurationWorkflowEnabled",
+            TOOL_SETTING),
+        Map.entry(
+            "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.updateMcpIntegrationInstanceConfigurationWorkflowParameters",
+            TOOL_SETTING),
+        Map.entry("McpIntegrationInstanceToolFacadeImpl.enableMcpIntegrationInstanceTool", TOOL_SETTING),
+        Map.entry("McpIntegrationInstanceWorkflowFacadeImpl.enableMcpIntegrationInstanceWorkflow", TOOL_SETTING),
+        Map.entry("McpIntegrationInstanceWorkflowFacadeImpl.updateMcpIntegrationInstanceWorkflow", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowFacadeImpl.deleteMcpProjectWorkflow", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowServiceImpl.create", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowServiceImpl.delete", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowServiceImpl.update", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowServiceImpl.updateEnabled", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowServiceImpl.updateParameters", TOOL_SETTING),
+        Map.entry("McpServerFacadeImpl.updateMcpServerTags", TAGS),
+        Map.entry("McpToolServiceImpl.create", TOOL_SETTING),
+        Map.entry("McpToolServiceImpl.delete", TOOL_SETTING),
+        Map.entry("McpToolServiceImpl.update", TOOL_SETTING),
+        Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
+        Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
+        Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
+        Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
+        Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
+        Map.entry("WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer", DELEGATES),
+        Map.entry("WorkspaceMcpServerFacadeImpl.updateWorkspaceMcpServer", DELEGATES),
+        Map.entry("WorkspaceMcpServerFacadeImpl.updateWorkspaceMcpToolEnabled", TOOL_SETTING));
     private static final List<String> NON_SECRET_NAME_SUFFIXES = List.of(
         "count", "id", "ids", "name", "names", "type");
     private static final List<String> SECRET_NAME_FRAGMENTS = List.of(
@@ -67,15 +160,132 @@ class AuditDataContractTest {
     private static final SpelExpressionParser SPEL_EXPRESSION_PARSER = new SpelExpressionParser();
 
     private static List<Method> auditedMethods;
+    private static List<Method> guardedMethods;
 
     @BeforeAll
     static void beforeAll() throws IOException, ClassNotFoundException {
         auditedMethods = findAuditedMethods();
+        guardedMethods = findGuardedMethods();
     }
 
     @Test
     void testAuditedMethodsAreFound() {
-        assertThat(auditedMethods).hasSizeGreaterThan(50);
+        assertThat(auditedMethods).hasSizeGreaterThan(150);
+    }
+
+    @Test
+    void testEveryGuardedWriteIsAuditedOrDeliberatelySkipped() {
+        assertThat(guardedMethods).hasSizeGreaterThan(250);
+
+        Set<String> unauditedMethods = new TreeSet<>();
+        Set<String> usedSkips = new HashSet<>();
+
+        for (Method method : guardedMethods) {
+            String methodName = method.getName();
+
+            if (isReadMethod(methodName) || method.isAnnotationPresent(Audited.class)) {
+                continue;
+            }
+
+            Class<?> declaringClass = method.getDeclaringClass();
+
+            String className = declaringClass.getSimpleName();
+
+            if (UNAUDITED_GUARDED_CLASSES.containsKey(className)) {
+                usedSkips.add(className);
+
+                continue;
+            }
+
+            String qualifiedMethodName = className + "." + methodName;
+
+            if (UNAUDITED_GUARDED_METHODS.containsKey(qualifiedMethodName)) {
+                usedSkips.add(qualifiedMethodName);
+
+                continue;
+            }
+
+            unauditedMethods.add(qualifiedMethodName);
+        }
+
+        Set<String> staleSkips = new TreeSet<>(UNAUDITED_GUARDED_CLASSES.keySet());
+
+        staleSkips.addAll(UNAUDITED_GUARDED_METHODS.keySet());
+        staleSkips.removeAll(usedSkips);
+
+        assertThat(unauditedMethods).isEmpty();
+        assertThat(staleSkips).isEmpty();
+    }
+
+    @Test
+    void testNoAuditedMethodNamesAParameterResult() {
+        List<String> violations = new ArrayList<>();
+
+        for (Method method : auditedMethods) {
+            for (Parameter parameter : method.getParameters()) {
+                if (RESULT_VARIABLE.equals(parameter.getName())) {
+                    Class<?> declaringClass = method.getDeclaringClass();
+
+                    violations.add(declaringClass.getName() + "." + method.getName());
+                }
+            }
+        }
+
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    void testEveryAuditedEventIsDocumented() throws IOException {
+        String document = Files.readString(findAuditEventsDocument());
+
+        Set<String> undocumentedEvents = new TreeSet<>();
+
+        for (Method method : auditedMethods) {
+            Audited audited = method.getAnnotation(Audited.class);
+
+            String event = audited.event();
+
+            if (!document.contains("`" + event + "`")) {
+                undocumentedEvents.add(event);
+            }
+        }
+
+        assertThat(undocumentedEvents).isEmpty();
+    }
+
+    @Test
+    void testEveryDeclaredAuditEventIsAudited() throws IOException, ClassNotFoundException, IllegalAccessException {
+        Set<String> auditedEvents = new HashSet<>();
+
+        for (Method method : auditedMethods) {
+            Audited audited = method.getAnnotation(Audited.class);
+
+            auditedEvents.add(audited.event());
+        }
+
+        List<Class<?>> auditEventsClasses = findAuditEventsClasses();
+
+        assertThat(auditEventsClasses).isNotEmpty();
+
+        List<String> unusedEvents = new ArrayList<>();
+
+        for (Class<?> auditEventsClass : auditEventsClasses) {
+            for (Field field : auditEventsClass.getDeclaredFields()) {
+                int modifiers = field.getModifiers();
+
+                if (!Modifier.isStatic(modifiers) || !String.class.equals(field.getType())) {
+                    continue;
+                }
+
+                String event = (String) field.get(null);
+
+                if (!auditedEvents.contains(event)) {
+                    unusedEvents.add(auditEventsClass.getName() + "." + field.getName());
+                }
+            }
+        }
+
+        assertThat(unusedEvents).isEmpty();
     }
 
     @Test
@@ -87,6 +297,21 @@ class AuditDataContractTest {
 
             for (AuditData auditData : audited.data()) {
                 checkExpression(method, auditData, violations);
+            }
+        }
+
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    void testNoAuditDataExpressionCallsMethodsOrReachesOutsideItsVariables() {
+        List<String> violations = new ArrayList<>();
+
+        for (Method method : auditedMethods) {
+            Audited audited = method.getAnnotation(Audited.class);
+
+            for (AuditData auditData : audited.data()) {
+                collectForbiddenNodes(method, auditData, parse(auditData.value()), violations);
             }
         }
 
@@ -199,7 +424,7 @@ class AuditDataContractTest {
                 Class<?> returnType = method.getReturnType();
 
                 if (rootNode instanceof VariableReference && isVariable(rootNode, RESULT_VARIABLE) &&
-                    !isScalar(returnType)) {
+                    !isScalar(returnType) && !isStringId(returnType, auditData.key())) {
 
                     violations.add(
                         describe(method, auditData) + " records a whole " + returnType.getSimpleName() +
@@ -211,8 +436,28 @@ class AuditDataContractTest {
         assertThat(violations).isEmpty();
     }
 
+    private static boolean isReadMethod(String methodName) {
+        for (String readMethodPrefix : READ_METHOD_PREFIXES) {
+            if (methodName.equals(readMethodPrefix)) {
+                return true;
+            }
+
+            if (methodName.startsWith(readMethodPrefix) &&
+                Character.isUpperCase(methodName.charAt(readMethodPrefix.length()))) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static boolean isScalar(Class<?> type) {
         return type.isPrimitive() || type.isEnum() || Number.class.isAssignableFrom(type) || type == Boolean.class;
+    }
+
+    private static boolean isStringId(Class<?> type, String key) {
+        return type == String.class && (key.endsWith("Id") || key.endsWith("Uuid"));
     }
 
     private static boolean isSecretName(String lowerCaseName) {
@@ -276,6 +521,25 @@ class AuditDataContractTest {
         }
     }
 
+    private static void collectForbiddenNodes(
+        Method method, AuditData auditData, SpelNode spelNode, List<String> violations) {
+
+        if (spelNode instanceof Assign || spelNode instanceof BeanReference ||
+            spelNode instanceof ConstructorReference || spelNode instanceof FunctionReference ||
+            spelNode instanceof Indexer || spelNode instanceof MethodReference || spelNode instanceof TypeReference) {
+
+            Class<? extends SpelNode> nodeClass = spelNode.getClass();
+
+            violations.add(
+                describe(method, auditData) + " uses " + nodeClass.getSimpleName() + " '" + spelNode.toStringAST() +
+                    "'");
+        }
+
+        for (int index = 0; index < spelNode.getChildCount(); index++) {
+            collectForbiddenNodes(method, auditData, spelNode.getChild(index), violations);
+        }
+    }
+
     private static void collectNames(SpelNode spelNode, List<String> names) {
         if (spelNode instanceof VariableReference) {
             String variableReference = spelNode.toStringAST();
@@ -311,6 +575,45 @@ class AuditDataContractTest {
             auditData.value() + "'";
     }
 
+    private static List<Class<?>> findAuditEventsClasses() throws IOException, ClassNotFoundException {
+        PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
+            new PathMatchingResourcePatternResolver();
+        SimpleMetadataReaderFactory simpleMetadataReaderFactory = new SimpleMetadataReaderFactory();
+
+        ClassLoader classLoader = AuditDataContractTest.class.getClassLoader();
+
+        List<Class<?>> auditEventsClasses = new ArrayList<>();
+
+        for (Resource resource : pathMatchingResourcePatternResolver.getResources(AUDIT_EVENTS_CLASS_PATTERN)) {
+            MetadataReader metadataReader = simpleMetadataReaderFactory.getMetadataReader(resource);
+
+            AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();
+
+            Class<?> auditEventsClass = Class.forName(annotationMetadata.getClassName(), false, classLoader);
+
+            auditEventsClasses.add(auditEventsClass);
+        }
+
+        return auditEventsClasses;
+    }
+
+    private static Path findAuditEventsDocument() {
+        Path directory = Path.of("")
+            .toAbsolutePath();
+
+        while (directory != null) {
+            Path document = directory.resolve(AUDIT_EVENTS_DOCUMENT);
+
+            if (Files.isRegularFile(document)) {
+                return document;
+            }
+
+            directory = directory.getParent();
+        }
+
+        throw new IllegalStateException("Cannot find " + AUDIT_EVENTS_DOCUMENT + " above the working directory");
+    }
+
     private static List<Method> findAuditedMethods() throws IOException, ClassNotFoundException {
         PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
             new PathMatchingResourcePatternResolver();
@@ -341,6 +644,62 @@ class AuditDataContractTest {
 
             for (Method method : auditedClass.getDeclaredMethods()) {
                 if (!method.isSynthetic() && method.isAnnotationPresent(Audited.class)) {
+                    methods.add(method);
+                }
+            }
+        }
+
+        return methods;
+    }
+
+    private static List<Method> findGuardedMethods() throws IOException, ClassNotFoundException {
+        PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
+            new PathMatchingResourcePatternResolver();
+        SimpleMetadataReaderFactory simpleMetadataReaderFactory = new SimpleMetadataReaderFactory();
+
+        ClassLoader classLoader = AuditDataContractTest.class.getClassLoader();
+
+        String preAuthorizeName = PreAuthorize.class.getName();
+
+        List<Method> methods = new ArrayList<>();
+
+        for (Resource resource : pathMatchingResourcePatternResolver.getResources(CLASS_PATTERN)) {
+            URL url = resource.getURL();
+
+            String externalForm = url.toExternalForm();
+
+            if (externalForm.contains(COMPONENT_PACKAGE_PATH)) {
+                continue;
+            }
+
+            MetadataReader metadataReader = simpleMetadataReaderFactory.getMetadataReader(resource);
+
+            AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();
+
+            boolean classGuarded = annotationMetadata.hasAnnotation(preAuthorizeName);
+
+            if (annotationMetadata.isInterface() ||
+                !(classGuarded || annotationMetadata.hasAnnotatedMethods(preAuthorizeName))) {
+
+                continue;
+            }
+
+            String className = annotationMetadata.getClassName();
+
+            if (className.endsWith("Controller")) {
+                continue;
+            }
+
+            Class<?> guardedClass = Class.forName(className, false, classLoader);
+
+            for (Method method : guardedClass.getDeclaredMethods()) {
+                int modifiers = method.getModifiers();
+
+                if (method.isSynthetic() || !Modifier.isPublic(modifiers) || Modifier.isStatic(modifiers)) {
+                    continue;
+                }
+
+                if (classGuarded || method.isAnnotationPresent(PreAuthorize.class)) {
                     methods.add(method);
                 }
             }
