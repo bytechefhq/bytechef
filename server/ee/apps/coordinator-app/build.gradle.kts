@@ -47,6 +47,8 @@ dependencies {
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:config:microservice-config"))
+    implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-capture"))
+    implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))

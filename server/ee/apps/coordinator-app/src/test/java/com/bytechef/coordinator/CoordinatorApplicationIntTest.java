@@ -12,7 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.grpc.BindableService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -28,10 +31,25 @@ import org.springframework.core.env.Environment;
 public class CoordinatorApplicationIntTest {
 
     @Autowired
+    private ObjectProvider<AuditEventRepository> auditEventRepositoryProvider;
+
+    @Autowired
     private ApplicationContext applicationContext;
 
     @Autowired
     private Environment environment;
+
+    @Test
+    void testAuditEventsAreSentToExecutionApp() {
+        AuditEventRepository auditEventRepository = auditEventRepositoryProvider.getIfAvailable();
+
+        assertThat(auditEventRepository).isNotNull();
+
+        Class<?> auditEventRepositoryClass = AopUtils.getTargetClass(auditEventRepository);
+
+        assertThat(auditEventRepositoryClass.getName()).isEqualTo(
+            "com.bytechef.ee.platform.audit.remote.client.RemoteAuditEventRepositoryClient");
+    }
 
     @Test
     void testContextLoads() {

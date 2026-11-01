@@ -30,7 +30,10 @@ import java.util.List;
 import java.util.Locale;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -53,6 +56,9 @@ import org.springframework.test.context.ActiveProfiles;
 public class ApiGatewayApplicationIntTest {
 
     @Autowired
+    private ObjectProvider<AuditEventRepository> auditEventRepositoryProvider;
+
+    @Autowired
     private ApplicationContext applicationContext;
 
     @Autowired
@@ -69,6 +75,18 @@ public class ApiGatewayApplicationIntTest {
 
     @Autowired
     private UserService userService;
+
+    @Test
+    void testAuditEventsAreSentToExecutionApp() {
+        AuditEventRepository auditEventRepository = auditEventRepositoryProvider.getIfAvailable();
+
+        assertThat(auditEventRepository).isNotNull();
+
+        Class<?> auditEventRepositoryClass = AopUtils.getTargetClass(auditEventRepository);
+
+        assertThat(auditEventRepositoryClass.getName()).isEqualTo(
+            "com.bytechef.ee.platform.audit.remote.client.RemoteAuditEventRepositoryClient");
+    }
 
     @Test
     void testContextLoads() {

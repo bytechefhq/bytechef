@@ -44,6 +44,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-service"))
 
     implementation(project(":server:ee:libs:config:microservice-config"))
+    implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-capture"))
+    implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:config:security-sso-config"))
     implementation(project(":server:ee:libs:config:session-config"))
