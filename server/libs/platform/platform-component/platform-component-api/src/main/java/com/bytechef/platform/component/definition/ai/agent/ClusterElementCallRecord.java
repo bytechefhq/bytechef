@@ -98,7 +98,7 @@ public record ClusterElementCallRecord(
 
     public ClusterElementCallRecord withoutValues() {
         boolean outcome = status == Status.BLOCKED || status == Status.REDACTED || status == Status.WITHHELD ||
-            status == Status.DENIED;
+            status == Status.DENIED || status == Status.APPROVED;
 
         return new ClusterElementCallRecord(
             id, parentId, workflowNodeName, componentName, toolName, status, startDate, endDate, null,
@@ -140,6 +140,6 @@ public record ClusterElementCallRecord(
     }
 
     public enum Status {
-        STARTED, SUSPENDED, COMPLETED, FAILED, BLOCKED, REDACTED, WITHHELD, DENIED
+        STARTED, SUSPENDED, COMPLETED, FAILED, BLOCKED, REDACTED, WITHHELD, DENIED, APPROVED
     }
 }

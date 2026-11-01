@@ -56,7 +56,8 @@ class ClusterElementCallRecordTest {
 
     @Test
     void testToMapFromMapRoundTripsOutcomeStatuses() {
-        for (Status status : List.of(Status.BLOCKED, Status.REDACTED, Status.WITHHELD, Status.DENIED)) {
+        for (Status status : List.of(Status.BLOCKED, Status.REDACTED, Status.WITHHELD, Status.DENIED,
+            Status.APPROVED)) {
             ClusterElementCallRecord callRecord = new ClusterElementCallRecord(
                 "id-1", null, "guardrails_1", "checkForViolations", null, status, START, START, null, "{}", null);
 

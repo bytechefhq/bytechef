@@ -1800,6 +1800,48 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Test
+    void testApprovedGateCallKeepsTheReviewerAndCommentWithoutAListener() {
+        String suspendedToolResult = createSuspendedToolResult();
+
+        AgentToolSuspension agentToolSuspension = new AgentToolSuspension(
+            ConversationState.from(
+                List.of(
+                    ToolResponseMessage.builder()
+                        .responses(
+                            List.of(
+                                new ToolResponseMessage.ToolResponse(
+                                    "call-1", "SLACK_SEND_MESSAGE", suspendedToolResult)))
+                        .build())),
+            "call-1", suspendedToolResult, "id-1", "approvalGate_1");
+
+        List<ClusterElementCallRecord> records;
+
+        try {
+            AbstractAiAgentChatAction.endSuspendedCall(
+                agentToolSuspension, "{\"approvedByReviewer\":true,\"result\":\"message sent\"}",
+                new GateDecision.Approved("jane@example.com", "ship it"), createToolCallActionContext());
+        } finally {
+            records = ClusterElementCallRecorder.getInstance()
+                .drain(TOOL_CALL_TASK_EXECUTION_ID)
+                .records();
+        }
+
+        assertThat(records).hasSize(1);
+
+        ClusterElementCallRecord callRecord = records.getFirst();
+
+        assertThat(callRecord.id()).isEqualTo("id-1");
+        assertThat(callRecord.status()).isEqualTo(ClusterElementCallRecord.Status.APPROVED);
+        assertThat(callRecord.output())
+            .contains("\"approved\":true")
+            .contains("\"approvedBy\":\"jane@example.com\"")
+            .contains("\"comment\":\"ship it\"")
+            .doesNotContain("message sent");
+        assertThat(callRecord.withoutValues()
+            .output()).isEqualTo(callRecord.output());
+    }
+
+    @Test
     void testResumeLogsTheAnswerInsideTheSuspendedCall() throws Exception {
         stubModelLookup();
 

@@ -455,7 +455,7 @@ public abstract class AbstractAiAgentChatAction {
             toolResult = resumeData.isEmpty() ? NO_HUMAN_RESPONSE_TOOL_RESULT : JsonUtils.write(resumeData);
         }
 
-        endSuspendedCall(agentToolSuspension, toolResult, gateDecision instanceof GateDecision.Denied, context);
+        endSuspendedCall(agentToolSuspension, toolResult, gateDecision, context);
 
         List<Message> resumedConversation = agentToolSuspension.resumeConversation(toolResult);
 
@@ -483,8 +483,9 @@ public abstract class AbstractAiAgentChatAction {
         return new ClusterElementCallRef(callId, workflowNodeName);
     }
 
-    private static void endSuspendedCall(
-        AgentToolSuspension agentToolSuspension, String toolResult, boolean denied, ActionContext context) {
+    static void endSuspendedCall(
+        AgentToolSuspension agentToolSuspension, String toolResult, @Nullable GateDecision gateDecision,
+        ActionContext context) {
 
         ClusterElementCallRef clusterElementCallRef = getSuspendedCallRef(agentToolSuspension);
 
@@ -501,8 +502,11 @@ public abstract class AbstractAiAgentChatAction {
 
         ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
 
-        if (denied) {
+        if (gateDecision instanceof GateDecision.Denied) {
             clusterElementCallRecorder.callDenied(jobId, taskExecutionId, clusterElementCallRef, toolResult);
+        } else if (gateDecision instanceof GateDecision.Approved approved) {
+            clusterElementCallRecorder.callApproved(
+                jobId, taskExecutionId, clusterElementCallRef, createApprovalDetails(approved));
         } else {
             clusterElementCallRecorder.callCompleted(jobId, taskExecutionId, clusterElementCallRef, toolResult);
         }
@@ -513,6 +517,26 @@ public abstract class AbstractAiAgentChatAction {
 
             return null;
         });
+    }
+
+    private static String createApprovalDetails(GateDecision.Approved approved) {
+        Map<String, Object> approval = new HashMap<>();
+
+        approval.put("approved", true);
+
+        String reviewer = approved.reviewer();
+
+        if (reviewer != null) {
+            approval.put("approvedBy", reviewer);
+        }
+
+        String comment = approved.comment();
+
+        if (comment != null) {
+            approval.put("comment", comment);
+        }
+
+        return JsonUtils.write(approval);
     }
 
     @SuppressWarnings("unchecked")
