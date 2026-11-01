@@ -19,11 +19,14 @@ service JobRemoteService {
   rpc FetchJob(IdRequest) returns (JobResult);
   rpc FetchLastWorkflowJob(WorkflowIdRequest) returns (JobResult);
   rpc FetchTaskExecutionJob(IdRequest) returns (JobResult);
+  rpc GetChildJobIds(IdRequest) returns (Int64ListResponse);
   rpc GetJob(IdRequest) returns (RemoteJob);
+  rpc GetStaleJobs(StaleJobsRequest) returns (RemoteJobs);
   rpc GetTaskExecutionJob(IdRequest) returns (RemoteJob);
   rpc ResumeToStatusStarted(IdRequest) returns (RemoteJob);
   rpc SetStatusToStarted(IdRequest) returns (RemoteJob);
   rpc SetStatusToStopped(IdRequest) returns (RemoteJob);
+  rpc TryClaimResume(RemoteJob) returns (BoolResponse);
   rpc Update(RemoteJob) returns (RemoteJob);
 }
 
@@ -73,6 +76,15 @@ message BoolResponse {
   bool value = 1;
 }
 
+message Int64ListResponse {
+  repeated int64 values = 1;
+}
+
+message StaleJobsRequest {
+  string status = 1;
+  google.protobuf.Timestamp last_modified_date_before = 2;
+}
+
 message WorkflowIdRequest {
   string workflow_id = 1;
 }
@@ -117,6 +129,10 @@ message RemoteJob {
   optional int32 version = 17;
   repeated RemoteWebhook webhooks = 18;
   optional string workflow_id = 19;
+}
+
+message RemoteJobs {
+  repeated RemoteJob jobs = 1;
 }
 
 message RemoteJobParameters {

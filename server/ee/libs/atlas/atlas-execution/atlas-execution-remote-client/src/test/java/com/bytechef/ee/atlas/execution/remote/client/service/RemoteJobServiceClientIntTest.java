@@ -31,6 +31,7 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -97,6 +98,12 @@ class RemoteJobServiceClientIntTest {
     void afterEach() {
         managedChannel.shutdownNow();
         server.shutdownNow();
+
+        for (Job job : jobRepository.findAll()) {
+            if (job.getParentTaskExecutionId() != null) {
+                jobRepository.delete(job);
+            }
+        }
 
         taskExecutionRepository.deleteAll();
         jobRepository.deleteAll();
@@ -247,7 +254,51 @@ class RemoteJobServiceClientIntTest {
         assertThat(storedJob.getInputs()).isEqualTo(job.getInputs());
     }
 
+    @Test
+    void testGetChildJobIdsReturnsTheJobsStartedByTheParentTaskExecutions() {
+        long parentJobId = saveJob("workflow-1", Job.Status.STARTED);
+
+        long parentTaskExecutionId = saveTaskExecution(parentJobId);
+
+        long childJobId = saveJob("workflow-2", Job.Status.STARTED, parentTaskExecutionId);
+
+        saveJob("workflow-2", Job.Status.STARTED);
+
+        assertThat(remoteJobServiceClient.getChildJobIds(parentJobId)).containsExactly(childJobId);
+        assertThat(remoteJobServiceClient.getChildJobIds(childJobId)).isEmpty();
+    }
+
+    @Test
+    void testGetStaleJobsReturnsJobsOfTheStatusModifiedBeforeTheCutoff() {
+        long stoppedJobId = saveJob("workflow-1", Job.Status.STOPPED);
+
+        saveJob("workflow-1", Job.Status.STARTED);
+
+        assertThat(remoteJobServiceClient.getStaleJobs(Job.Status.STOPPED, Instant.now()
+            .plusSeconds(60)))
+                .extracting(Job::getId)
+                .containsExactly(stoppedJobId);
+        assertThat(remoteJobServiceClient.getStaleJobs(Job.Status.STOPPED, Instant.now()
+            .minusSeconds(3600))).isEmpty();
+    }
+
+    @Test
+    void testTryClaimResumeClaimsAStoppedJobOnlyOnce() {
+        long jobId = saveJob("workflow-1", Job.Status.STOPPED);
+
+        Job job = jobService.getJob(jobId);
+
+        assertThat(remoteJobServiceClient.tryClaimResume(job)).isTrue();
+        assertThat(jobService.getJob(jobId)
+            .getStatus()).isEqualTo(Job.Status.STARTED);
+        assertThat(remoteJobServiceClient.tryClaimResume(job)).isFalse();
+    }
+
     private long saveJob(String workflowId, Job.Status status) {
+        return saveJob(workflowId, status, null);
+    }
+
+    private long saveJob(String workflowId, Job.Status status, Long parentTaskExecutionId) {
         Job job = new Job();
 
         Map<String, Object> inputs = new LinkedHashMap<>();
@@ -259,6 +310,7 @@ class RemoteJobServiceClientIntTest {
         job.setInputs(inputs);
         job.setLabel("Orders");
         job.setMetadata(Map.of("source", "test"));
+        job.setParentTaskExecutionId(parentTaskExecutionId);
         job.setPriority(3);
         job.setStatus(status);
         job.setWorkflowId(workflowId);

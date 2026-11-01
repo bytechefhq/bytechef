@@ -15,12 +15,14 @@ import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobRemoteServiceGrpc;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobResult;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.StaleJobsRequest;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.WorkflowIdRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.google.protobuf.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.LongConsumer;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -89,24 +91,26 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public List<Long> getChildJobIds(long parentJobId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/get-child-job-ids/{parentJobId}")
-                .build(parentJobId),
-            new ParameterizedTypeReference<>() {});
+        return getStub().getChildJobIds(toIdRequest(parentJobId))
+            .getValuesList();
     }
 
     @Override
-    public List<Job> getStaleJobs(Job.Status status, java.time.Instant lastModifiedDateBefore) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/get-stale-jobs")
-                .queryParam("status", status.name())
-                .queryParam("lastModifiedDateBefore", lastModifiedDateBefore.toString())
-                .build(),
-            new ParameterizedTypeReference<>() {});
+    public List<Job> getStaleJobs(Job.Status status, Instant lastModifiedDateBefore) {
+        StaleJobsRequest staleJobsRequest = StaleJobsRequest.newBuilder()
+            .setStatus(status.name())
+            .setLastModifiedDateBefore(
+                Timestamp.newBuilder()
+                    .setSeconds(lastModifiedDateBefore.getEpochSecond())
+                    .setNanos(lastModifiedDateBefore.getNano())
+                    .build())
+            .build();
+
+        return getStub().getStaleJobs(staleJobsRequest)
+            .getJobsList()
+            .stream()
+            .map(atlasExecutionProtoMapper::toJob)
+            .toList();
     }
 
     @Override
@@ -141,14 +145,8 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public boolean tryClaimResume(Job job) {
-        Boolean claimed = loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/try-claim-resume")
-                .build(),
-            job, Boolean.class);
-
-        return Boolean.TRUE.equals(claimed);
+        return getStub().tryClaimResume(atlasExecutionProtoMapper.toProto(job))
+            .getValue();
     }
 
     @Override
