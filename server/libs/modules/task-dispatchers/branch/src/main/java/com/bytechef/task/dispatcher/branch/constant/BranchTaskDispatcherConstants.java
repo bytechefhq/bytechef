@@ -27,4 +27,5 @@ public class BranchTaskDispatcherConstants {
     public static final String CASES = "cases";
     public static final String KEY = "key";
     public static final String DEFAULT = "default";
+    public static final String VALUE = "value";
 }
