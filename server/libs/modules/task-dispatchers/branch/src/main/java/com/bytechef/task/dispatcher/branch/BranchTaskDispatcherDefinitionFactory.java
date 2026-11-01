@@ -29,6 +29,7 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.EXPRESSION;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.KEY;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.TASKS;
+import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.VALUE;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
@@ -128,6 +129,12 @@ public class BranchTaskDispatcherDefinitionFactory implements TaskDispatcherDefi
     private static OutputResponse fetchLastTaskOutput(
         Map<String, ?> branchCase, String workflowId, long environmentId,
         TaskListOutputDataSource taskListOutputDataSource) {
+
+        if (!branchCase.containsKey(TASKS)) {
+            Object value = branchCase.get(VALUE);
+
+            return value == null ? null : OutputResponse.of(value);
+        }
 
         List<Map<String, ?>> caseTasks = MapUtils.getList(branchCase, TASKS, new TypeReference<>() {}, List.of());
 
