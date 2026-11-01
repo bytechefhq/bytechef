@@ -70,7 +70,6 @@ export default function useNotifications() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedNotification, setSelectedNotification] = useState<Notification | undefined>(undefined);
-    const [notificationType, setNotificationType] = useState(selectedNotification?.type || NotificationTypeEnum.Email);
 
     const {
         data: notificationsData,
@@ -137,10 +136,16 @@ export default function useNotifications() {
     function saveNotification() {
         const formValues = getValues();
 
+        const {slackWebhookUrl} = formValues.settings;
+
         const updatedFormData = {
             ...selectedNotification,
             ...formValues,
             ...{notificationEventIds: formValues.notificationEventIds.map((id: string) => Number(id))},
+            settings:
+                typeof slackWebhookUrl === 'string'
+                    ? {...formValues.settings, slackWebhookUrl: slackWebhookUrl.trim()}
+                    : formValues.settings,
         };
 
         if (selectedNotification?.id) {
@@ -212,12 +217,8 @@ export default function useNotifications() {
                 settings: selectedNotification.settings || {},
                 type: selectedNotification.type || NotificationTypeEnum.Email,
             });
-
-            setNotificationType(selectedNotification.type || NotificationTypeEnum.Email);
         } else {
             form.reset(emptyFormValues);
-
-            setNotificationType(NotificationTypeEnum.Email);
         }
     }, [selectedNotification, form]);
 
@@ -234,7 +235,6 @@ export default function useNotifications() {
         isNotificationEventsLoading,
         isNotificationsLoading,
         notificationEvents,
-        notificationType,
         notificationsData,
         notificationsError,
         openDeleteDialog,
@@ -242,7 +242,6 @@ export default function useNotifications() {
         queryClient,
         saveNotification,
         selectedNotification,
-        setNotificationType,
         setSelectedNotification,
     };
 }

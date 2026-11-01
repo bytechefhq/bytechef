@@ -13,7 +13,7 @@ import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
-import {UseFormReturn} from 'react-hook-form';
+import {UseFormReturn, useWatch} from 'react-hook-form';
 
 import useNotifications, {NotificationFormValuesType} from '../hooks/useNotifications';
 
@@ -32,16 +32,11 @@ const NotificationDialog = ({
     saveNotification,
     selectedNotification,
 }: NotificationDialogProps) => {
-    const {
-        ff_1132,
-        isNotificationEventsLoading,
-        notificationEvents,
-        notificationType,
-        openEditDialog,
-        setNotificationType,
-    } = useNotifications();
+    const {ff_1132, isNotificationEventsLoading, notificationEvents, openEditDialog} = useNotifications();
 
     const {control, handleSubmit} = form;
+
+    const notificationType = useWatch({control, name: 'type'});
 
     return (
         <Dialog
@@ -123,14 +118,7 @@ const NotificationDialog = ({
                                             <FormLabel>Type</FormLabel>
 
                                             <FormControl>
-                                                <Select
-                                                    onValueChange={(value) => {
-                                                        field.onChange(value);
-
-                                                        setNotificationType(value as NotificationTypeEnum);
-                                                    }}
-                                                    value={field.value}
-                                                >
+                                                <Select onValueChange={field.onChange} value={field.value}>
                                                     <SelectTrigger className="w-full">
                                                         <SelectValue />
                                                     </SelectTrigger>
