@@ -16,6 +16,7 @@ import com.bytechef.ee.platform.user.remote.grpc.proto.FetchUserResponse;
 import com.bytechef.ee.platform.user.remote.grpc.proto.UserRemoteServiceGrpc;
 import com.bytechef.ee.remote.grpc.discovery.DiscoveryClientNameResolver;
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenClientInterceptor;
+import com.bytechef.platform.user.scheduler.UserCleanupScheduler;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
@@ -27,6 +28,7 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import java.util.List;
 import java.util.Locale;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +37,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -53,10 +56,16 @@ public class ApiGatewayApplicationIntTest {
     private ApplicationContext applicationContext;
 
     @Autowired
+    private DataSource dataSource;
+
+    @Autowired
     private DiscoveryClient discoveryClient;
 
     @Autowired
     private Environment environment;
+
+    @Autowired
+    private UserCleanupScheduler userCleanupScheduler;
 
     @Autowired
     private UserService userService;
@@ -118,6 +127,18 @@ public class ApiGatewayApplicationIntTest {
         assertThat(serviceNames).contains(
             "bytechef.platform.user.remote.v1.AuthorityRemoteService",
             "bytechef.platform.user.remote.v1.UserRemoteService");
+    }
+
+    @Test
+    void testUserCleanupJobTakesItsSchedulerLock() {
+        userCleanupScheduler.removeOldPersistentTokens();
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+        assertThat(
+            jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM public.shedlock WHERE name = 'removeOldPersistentTokens'", Integer.class))
+                    .isEqualTo(1);
     }
 
     @Test

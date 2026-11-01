@@ -35,6 +35,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import javax.sql.DataSource;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -47,6 +48,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.Environment;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -71,6 +73,9 @@ public class ExecutionApplicationIntTest {
 
     @Autowired
     private ConversionService conversionService;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Autowired
     private Environment environment;
@@ -208,6 +213,13 @@ public class ExecutionApplicationIntTest {
         assertThat(toolInvocationLogRetentionJob).isNotNull();
 
         assertThatCode(toolInvocationLogRetentionJob::purgeExpiredLogs).doesNotThrowAnyException();
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+        assertThat(
+            jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM public.shedlock WHERE name = 'purgeExpiredToolInvocationLogs'", Integer.class))
+                    .isEqualTo(1);
     }
 
     @Test
