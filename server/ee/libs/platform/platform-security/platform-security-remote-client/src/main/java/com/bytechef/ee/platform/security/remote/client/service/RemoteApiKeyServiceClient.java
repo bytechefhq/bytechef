@@ -71,6 +71,11 @@ public class RemoteApiKeyServiceClient implements ApiKeyService {
     }
 
     @Override
+    public Optional<ApiKey> fetchApiKey(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ApiKey getApiKey(String secretKey) {
         Optional<ApiKey> apiKey = fetchApiKey(secretKey);
 
