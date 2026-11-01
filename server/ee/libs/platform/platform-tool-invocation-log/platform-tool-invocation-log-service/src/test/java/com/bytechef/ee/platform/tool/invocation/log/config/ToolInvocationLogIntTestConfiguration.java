@@ -13,10 +13,13 @@ import com.bytechef.tenant.single.SingleTenantService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import org.springframework.boot.autoconfigure.AutoConfigurationExcludeFilter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -24,7 +27,9 @@ import org.springframework.context.annotation.Import;
  *
  * @author Ivica Cardic
  */
-@ComponentScan("com.bytechef.ee.platform.tool.invocation.log")
+@ComponentScan(
+    basePackages = "com.bytechef.ee.platform.tool.invocation.log",
+    excludeFilters = @Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class))
 @Import({
     LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class, SingleTenantService.class
 })

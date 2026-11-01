@@ -8,7 +8,6 @@
 package com.bytechef.ee.platform.tool.invocation.log;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -18,15 +17,12 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-@Component
-@ConditionalOnEEVersion
 public class ToolInvocationLogRetentionJob {
 
     private static final Logger log = LoggerFactory.getLogger(ToolInvocationLogRetentionJob.class);
