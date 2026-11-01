@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.config;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.facade.CodeEditorScriptInputFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -46,7 +47,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     ActionDefinitionFacade.class, ActionDefinitionService.class, ClusterElementDefinitionFacade.class,
-    ClusterElementDefinitionService.class, ComponentDefinitionService.class, ConnectionDefinitionService.class,
+    ClusterElementDefinitionService.class, CodeEditorScriptInputFacade.class, ComponentDefinitionService.class,
+    ConnectionDefinitionService.class,
     ConnectionService.class, EditorTempFileStorage.class, JobPrincipalAccessorRegistry.class,
     OAuth2Service.class, TaskDispatcherDefinitionService.class, TriggerDefinitionFacade.class,
     TriggerDefinitionService.class

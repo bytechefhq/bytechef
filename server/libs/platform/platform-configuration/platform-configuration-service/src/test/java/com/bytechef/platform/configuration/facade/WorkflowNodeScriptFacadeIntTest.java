@@ -32,7 +32,6 @@ import com.bytechef.atlas.configuration.repository.jdbc.JdbcWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.CodeEditorScriptInputFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -62,7 +61,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -192,7 +190,7 @@ class WorkflowNodeScriptFacadeIntTest {
     @Autowired
     private ClusterElementDefinitionService clusterElementDefinitionService;
 
-    @MockitoBean
+    @Autowired
     private CodeEditorScriptInputFacade codeEditorScriptInputFacade;
 
     @Autowired
