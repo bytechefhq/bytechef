@@ -14,7 +14,7 @@ import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
 import Register from '@/pages/account/public/Register';
 import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
 import VerifyEmail from '@/pages/account/public/VerifyEmail';
-import loadAutomationIndexRedirect from '@/pages/automation/getting-started/loadAutomationIndexRedirect';
+import loadGettingStartedIndexRedirect from '@/pages/automation/getting-started/loadAutomationIndexRedirect';
 import {AUTOMATION_GETTING_STARTED_ROUTE_PATH} from '@/pages/automation/getting-started/resolveAutomationIndexRedirect';
 import DevelopmentProjectDeploymentsRedirect from '@/pages/automation/project-deployments/DevelopmentProjectDeploymentsRedirect';
 import loadProject from '@/pages/automation/project/loadProject';
@@ -40,6 +40,7 @@ import {
 } from '@/shared/navigation/settingsPaths';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {EnvironmentKeys} from '@/shared/queries/platform/environments.queries';
+import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import redirectOutsideDevelopmentEnvironment from '@/shared/util/redirectOutsideDevelopmentEnvironment';
@@ -49,6 +50,8 @@ import {createBrowserRouter, redirect} from 'react-router-dom';
 
 const App = lazy(() => import('@/App'));
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
+const AiHub = lazy(() => import('@/ee/pages/automation/ai-hub/AiHub'));
+const AiHubToolApprovals = lazy(() => import('@/ee/pages/automation/ai-hub/settings/ToolApprovals'));
 const AiAutoMemories = lazy(() => import('@/pages/automation/ai/memories/Memories'));
 const AiSkills = lazy(() => import('@/pages/automation/ai/skills/AiSkills'));
 const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
@@ -227,6 +230,18 @@ const currentWorkspaceSettingsRoutes = {
                 </PrivateRoute>
             ),
             path: 'workspace-api-keys',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <AiHubToolApprovals />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'ai-hub/tool-approvals',
         },
     ],
 };
@@ -474,6 +489,26 @@ export const loadEnvironments = async (queryClient: QueryClient) => {
     }
 };
 
+const requestApplicationInfoOnce = async () => {
+    const {application, getApplicationInfo, loading} = applicationInfoStore.getState();
+
+    if (!application && !loading) {
+        await getApplicationInfo();
+    }
+};
+
+export const loadAutomationIndexRedirect = async (queryClient: QueryClient) => {
+    await requestApplicationInfoOnce();
+
+    const {ai, application} = applicationInfoStore.getState();
+
+    if (application?.edition === EditionType.EE && ai.hub.enabled) {
+        return redirect('ai-hub');
+    }
+
+    return redirect(await loadGettingStartedIndexRedirect(queryClient));
+};
+
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
         {
@@ -618,7 +653,7 @@ export const getRouter = (queryClient: QueryClient) =>
                             children: [
                                 {
                                     index: true,
-                                    loader: async () => redirect(await loadAutomationIndexRedirect(queryClient)),
+                                    loader: () => loadAutomationIndexRedirect(queryClient),
                                 },
                                 getAccountRoutes('/automation'),
                                 {
@@ -863,6 +898,30 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </LazyLoadWrapper>
                                     ),
                                     path: 'chats',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper hasLeftSidebar>
+                                                    <AiHub />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'ai-hub',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper hasLeftSidebar>
+                                                    <AiHub />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'ai-hub/chats/:chatId',
                                 },
                                 {
                                     element: (

@@ -37,6 +37,15 @@ const automationSectionNavItems: SettingsNavItemI[] = [
         ],
         title: 'AI',
     },
+    {
+        items: [
+            {
+                href: `${AUTOMATION_SETTINGS_PATH}/ai-hub/tool-approvals`,
+                title: 'Tool Approvals',
+            },
+        ],
+        title: 'AI Hub',
+    },
 ];
 
 const embeddedSectionNavItems: SettingsNavItemI[] = [
