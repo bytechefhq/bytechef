@@ -1,14 +1,8 @@
-import {RUN_ERROR_CODE_NO_AI_PROVIDER} from '@/shared/components/ai-chat/messages/toRunErrorData';
+import {RUN_ERROR_CODE_NO_AI_PROVIDER, RunErrorDataI} from '@/shared/components/ai-chat/messages/toRunErrorData';
+import {AI_PROVIDERS_LINK_LABEL, AI_PROVIDERS_SETTINGS_PATH} from '@/shared/constants';
 import {DataMessagePartProps} from '@assistant-ui/react';
 import {AlertCircleIcon} from 'lucide-react';
 import {Link} from 'react-router-dom';
-
-const AI_PROVIDERS_SETTINGS_PATH = '/automation/settings/ai-providers';
-
-export interface RunErrorDataI {
-    code?: string;
-    message: string;
-}
 
 /**
  * Renders a RUN_ERROR inline in the assistant bubble with red foreground, a left border, and an alert icon,
@@ -28,7 +22,7 @@ const RunErrorMessage = ({data}: DataMessagePartProps<RunErrorDataI>) => {
 
                 {data.code === RUN_ERROR_CODE_NO_AI_PROVIDER && (
                     <Link className="font-medium underline" to={AI_PROVIDERS_SETTINGS_PATH}>
-                        Open AI Providers
+                        {AI_PROVIDERS_LINK_LABEL}
                     </Link>
                 )}
             </div>
