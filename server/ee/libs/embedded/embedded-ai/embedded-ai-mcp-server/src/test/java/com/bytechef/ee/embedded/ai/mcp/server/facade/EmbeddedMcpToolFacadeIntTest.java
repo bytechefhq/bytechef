@@ -49,7 +49,6 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -64,6 +63,12 @@ import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.tool.execution.ToolExecutionEvent;
+import com.bytechef.platform.tool.execution.ToolExecutionKind;
+import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.tool.execution.config.ToolExecutionConfiguration;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -86,9 +91,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 
 /**
  * @version ee
@@ -103,6 +111,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
     properties = {
         "bytechef.edition=ee", "bytechef.workflow.repository.jdbc.enabled=true"
     })
+@RecordApplicationEvents
 class EmbeddedMcpToolFacadeIntTest {
 
     private static final String CLUSTER_ELEMENT_DESCRIPTION =
@@ -111,6 +120,9 @@ class EmbeddedMcpToolFacadeIntTest {
     private static final String NEW_WORKFLOW_CALL_TRIGGER_NAME = "newWorkflowCall_1";
     private static final String UNCONNECTED_EXTERNAL_USER_ID = "external-user-1";
     private static final String WORKFLOW_DESCRIPTION = "Sends an email to a customer";
+
+    @Autowired
+    private ApplicationEvents applicationEvents;
 
     @MockitoBean
     private ClusterElementDefinitionFacade clusterElementDefinitionFacade;
@@ -169,7 +181,9 @@ class EmbeddedMcpToolFacadeIntTest {
     @MockitoBean
     private TaskFileStorage taskFileStorage;
 
+    private long workflowConnectedUserId;
     private long integrationInstanceId;
+    private long mcpServerId;
     private String workflowId;
 
     @AfterEach
@@ -280,7 +294,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(componentDefinition.getConnection()).thenReturn(mock(ConnectionDefinition.class));
+        when(componentDefinition.isConnectionRequired()).thenReturn(true);
         when(componentDefinitionService.getComponentDefinition("httpClient", 1)).thenReturn(componentDefinition);
 
         assertThatThrownBy(() -> functionToolCallback.call("{}"))
@@ -288,6 +302,8 @@ class EmbeddedMcpToolFacadeIntTest {
 
         verify(jwtTokenService, never()).generateJwtToken(any(), anyLong(), anyInt(), any());
         verify(clusterElementDefinitionFacade, never()).executeTool(any(), anyInt(), any(), any(), any());
+
+        assertThat(getToolExecutionEvents()).isEmpty();
     }
 
     @Test
@@ -424,6 +440,31 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     @Test
+    void testCompletedWorkflowRunWhoseOutputLooksLikeAnApprovalIsRecordedAsASuccess() {
+        ToolCallback toolCallback = getConnectedWorkflowToolCallback(
+            List.of(Map.of("name", "script_1", "type", "script/v1/java")));
+
+        Job job = job(Job.Status.COMPLETED);
+
+        FileEntry outputsFileEntry = new FileEntry("outputs.json", "memory://outputs.json");
+
+        job.setOutputs(outputsFileEntry);
+
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
+        when(jobCompletionAwaiter.await(eq(5L), any())).thenReturn(CompletableFuture.completedFuture(job));
+        when(taskExecutionService.fetchLastJobTaskExecution(5L)).thenReturn(Optional.empty());
+        doAnswer(invocation -> Map.of("status", "approval_required")).when(taskFileStorage)
+            .readJobOutputs(outputsFileEntry);
+
+        Map<String, Object> result = readResult(toolCallback.call("{}"));
+
+        assertThat(result).containsEntry("status", "approval_required");
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> assertThat(toolExecutionEvent.outcome())
+                .isEqualTo(ToolExecutionOutcome.SUCCESS));
+    }
+
+    @Test
     void testWorkflowRunThatDidNotCompleteIsReportedAsAnError() {
         ToolCallback toolCallback = getConnectedWorkflowToolCallback(
             List.of(Map.of("name", "script_1", "type", "script/v1/java")));
@@ -457,6 +498,11 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThat(result)
             .containsEntry("status", "approval_required")
             .containsEntry("jobId", 5);
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_REQUIRED);
+                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
+            });
 
         verify(principalJobFacade).createJob(any(), eq(integrationInstanceId), eq(PlatformType.EMBEDDED));
     }
@@ -579,7 +625,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(componentDefinition.getConnection()).thenReturn(mock(ConnectionDefinition.class));
+        when(componentDefinition.isConnectionRequired()).thenReturn(true);
         when(componentDefinitionService.getComponentDefinition("httpClient", 1)).thenReturn(componentDefinition);
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
@@ -630,6 +676,209 @@ class EmbeddedMcpToolFacadeIntTest {
 
         assertThatThrownBy(() -> toolCallback.call("{}"))
             .hasMessage("Job 5 did not finish within 300 seconds");
+    }
+
+    @Test
+    void testClusterElementToolCallIsRecordedAsAnEmbeddedMcpInvocationOfTheConnectedUser() {
+        McpTool mcpTool = saveMcpTool("post", Map.of(), true);
+
+        long connectedUserId = insertConnectedUser();
+        long integrationId = insertIntegration("httpClient");
+        long connectionId = insertConnection();
+
+        long ownIntegrationInstanceId = insertIntegrationInstance(integrationId, connectedUserId, connectionId, 0);
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), integrationId);
+        mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
+            ownIntegrationInstanceId, Objects.requireNonNull(mcpTool.getId()), true);
+
+        mockPostClusterElementDefinition();
+
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+            embeddedMcpToolFacade.getFunctionToolCallback(
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+
+        assertThat(functionToolCallback).isNotNull();
+
+        when(clusterElementDefinitionFacade.executeTool(eq("httpClient"), eq(1), eq("post"), any(), any()))
+            .thenReturn(Map.of("ok", true));
+
+        functionToolCallback.call("{}");
+
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.type()).isEqualTo(PlatformType.EMBEDDED);
+                assertThat(toolExecutionEvent.surface()).isEqualTo(ToolExecutionSurface.MCP_EMBEDDED);
+                assertThat(toolExecutionEvent.kind()).isEqualTo(ToolExecutionKind.COMPONENT);
+                assertThat(toolExecutionEvent.toolName()).isEqualTo("HTTPCLIENT_POST");
+                assertThat(toolExecutionEvent.componentName()).isEqualTo("httpClient");
+                assertThat(toolExecutionEvent.componentVersion()).isEqualTo(1);
+                assertThat(toolExecutionEvent.operationName()).isEqualTo("post");
+                assertThat(toolExecutionEvent.connectionId()).isEqualTo(connectionId);
+                assertThat(toolExecutionEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
+                assertThat(toolExecutionEvent.externalUserId()).isEqualTo(CONNECTED_EXTERNAL_USER_ID);
+                assertThat(toolExecutionEvent.connectedUserId()).isEqualTo(connectedUserId);
+                assertThat(toolExecutionEvent.integrationInstanceId()).isEqualTo(ownIntegrationInstanceId);
+                assertThat(toolExecutionEvent.mcpServerId()).isEqualTo(mcpServerId);
+                assertThat(toolExecutionEvent.jobId()).isNull();
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
+            });
+    }
+
+    @Test
+    void testFailedClusterElementToolCallIsRecordedAsAnError() {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+            Map.of(), UNCONNECTED_EXTERNAL_USER_ID);
+
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1))
+            .thenReturn(mock(ComponentDefinition.class));
+        when(clusterElementDefinitionFacade.executeTool(eq("httpClient"), eq(1), eq("post"), any(), isNull()))
+            .thenThrow(new IllegalArgumentException("Bad request"));
+
+        assertThatThrownBy(() -> functionToolCallback.call("{}"))
+            .hasStackTraceContaining("Bad request");
+
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
+                assertThat(toolExecutionEvent.errorType()).isEqualTo("IllegalArgumentException");
+                assertThat(toolExecutionEvent.errorMessage()).isEqualTo("Bad request");
+                assertThat(toolExecutionEvent.externalUserId()).isEqualTo(UNCONNECTED_EXTERNAL_USER_ID);
+                assertThat(toolExecutionEvent.connectedUserId()).isNull();
+            });
+    }
+
+    @Test
+    void testClusterElementToolCallWithoutAConnectionIsRecordedAsConnectionRequired() {
+        McpTool mcpTool = saveMcpTool("post", Map.of(), true);
+
+        long connectedUserId = insertConnectedUser();
+
+        insertIntegration("httpClient");
+
+        long boundIntegrationId = insertIntegration("httpClient Code");
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), boundIntegrationId);
+
+        mockPostClusterElementDefinition();
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinition.isConnectionRequired()).thenReturn(true);
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1)).thenReturn(componentDefinition);
+
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+            embeddedMcpToolFacade.getFunctionToolCallback(
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+
+        assertThat(functionToolCallback).isNotNull();
+
+        functionToolCallback.call("{}");
+
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.CONNECTION_REQUIRED);
+                assertThat(toolExecutionEvent.connectedUserId()).isEqualTo(connectedUserId);
+                assertThat(toolExecutionEvent.connectionId()).isNull();
+                assertThat(toolExecutionEvent.integrationInstanceId()).isNull();
+            });
+    }
+
+    @Test
+    void testWorkflowToolRunIsRecordedAgainstItsJob() {
+        ToolCallback toolCallback = getConnectedWorkflowToolCallback(List.of());
+
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
+        when(jobCompletionAwaiter.await(eq(5L), any()))
+            .thenReturn(CompletableFuture.completedFuture(job(Job.Status.COMPLETED)));
+
+        toolCallback.call("{}");
+
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.type()).isEqualTo(PlatformType.EMBEDDED);
+                assertThat(toolExecutionEvent.surface()).isEqualTo(ToolExecutionSurface.MCP_EMBEDDED);
+                assertThat(toolExecutionEvent.kind()).isEqualTo(ToolExecutionKind.WORKFLOW);
+                assertThat(toolExecutionEvent.toolName()).isEqualTo("mappedTool");
+                assertThat(toolExecutionEvent.componentName()).isEqualTo("myComponent");
+                assertThat(toolExecutionEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
+                assertThat(toolExecutionEvent.externalUserId()).isEqualTo(CONNECTED_EXTERNAL_USER_ID);
+                assertThat(toolExecutionEvent.connectedUserId()).isEqualTo(workflowConnectedUserId);
+                assertThat(toolExecutionEvent.integrationInstanceId()).isEqualTo(integrationInstanceId);
+                assertThat(toolExecutionEvent.mcpServerId()).isEqualTo(mcpServerId);
+                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
+            });
+    }
+
+    @Test
+    void testTimedOutWorkflowToolRunIsRecordedAsATimeoutAgainstItsJob() {
+        ToolCallback toolCallback = getConnectedWorkflowToolCallback(List.of());
+
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
+        when(jobCompletionAwaiter.await(eq(5L), any()))
+            .thenReturn(CompletableFuture.failedFuture(new TimeoutException("Job 5 did not finish within PT5M")));
+
+        assertThatThrownBy(() -> toolCallback.call("{}"))
+            .hasMessage("Job 5 did not finish within 300 seconds");
+
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.TIMEOUT);
+                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
+                assertThat(toolExecutionEvent.integrationInstanceId()).isEqualTo(integrationInstanceId);
+            });
+    }
+
+    @Test
+    void testWorkflowToolRunThatFailsToStartIsRecordedAsAnError() {
+        ToolCallback toolCallback = getConnectedWorkflowToolCallback(List.of());
+
+        when(principalJobFacade.createJob(any(), anyLong(), any()))
+            .thenThrow(new IllegalArgumentException("Missing required input: email"));
+
+        assertThatThrownBy(() -> toolCallback.call("{}"))
+            .hasMessageContaining("Missing required input: email");
+
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
+                assertThat(toolExecutionEvent.errorType()).isEqualTo("IllegalArgumentException");
+                assertThat(toolExecutionEvent.errorMessage()).isEqualTo("Missing required input: email");
+                assertThat(toolExecutionEvent.integrationInstanceId()).isEqualTo(integrationInstanceId);
+                assertThat(toolExecutionEvent.jobId()).isNull();
+            });
+
+        verifyNoInteractions(jobCompletionAwaiter);
+    }
+
+    @Test
+    void testWorkflowToolCallWithoutAnIntegrationInstanceIsRecordedAsConnectionRequired() {
+        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(
+            Map.of("toolName", "mappedTool"), List.of(), UNCONNECTED_EXTERNAL_USER_ID, false, false);
+
+        assertThat(toolCallbacks).hasSize(1);
+
+        ToolCallback toolCallback = toolCallbacks.getFirst();
+
+        Map<String, Object> result = readResult(toolCallback.call("{}"));
+
+        assertThat(result).containsEntry("error", "connection_required");
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.CONNECTION_REQUIRED);
+                assertThat(toolExecutionEvent.toolName()).isEqualTo("mappedTool");
+                assertThat(toolExecutionEvent.externalUserId()).isEqualTo(UNCONNECTED_EXTERNAL_USER_ID);
+                assertThat(toolExecutionEvent.integrationInstanceId()).isNull();
+                assertThat(toolExecutionEvent.jobId()).isNull();
+            });
+
+        verifyNoInteractions(principalJobFacade, jobCompletionAwaiter);
+    }
+
+    private List<ToolExecutionEvent> getToolExecutionEvents() {
+        return applicationEvents.stream(ToolExecutionEvent.class)
+            .toList();
     }
 
     private ToolDefinition getClusterElementToolDefinition(Map<String, Object> parameters) {
@@ -688,6 +937,8 @@ class EmbeddedMcpToolFacadeIntTest {
 
         McpServer mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
+
+        mcpServerId = Objects.requireNonNull(mcpServer.getId());
 
         long environment = Environment.PRODUCTION.ordinal();
 
@@ -768,7 +1019,7 @@ class EmbeddedMcpToolFacadeIntTest {
             JsonUtils.write(toolParameters));
 
         if (connected) {
-            long connectedUserId = insert(
+            workflowConnectedUserId = insert(
                 """
                     INSERT INTO connected_user (external_id, enabled, environment, created_date, created_by,
                         last_modified_date, last_modified_by, version)
@@ -785,7 +1036,7 @@ class EmbeddedMcpToolFacadeIntTest {
                     VALUES (?, ?, ?, true, now(), 'system', now(), 'system', 0)
                     RETURNING id
                     """,
-                integrationInstanceConfigurationId, connectedUserId, connectionId);
+                integrationInstanceConfigurationId, workflowConnectedUserId, connectionId);
 
             jdbcTemplate.update(
                 """
@@ -797,7 +1048,7 @@ class EmbeddedMcpToolFacadeIntTest {
                 integrationInstanceId, integrationInstanceConfigurationWorkflowId);
 
             if (newerSiblingIntegrationInstance) {
-                insertNewerSiblingIntegrationInstance(connectedUserId, connectionId, environment);
+                insertNewerSiblingIntegrationInstance(workflowConnectedUserId, connectionId, environment);
             }
         }
 
@@ -917,8 +1168,9 @@ class EmbeddedMcpToolFacadeIntTest {
         McpServer mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
 
-        McpComponent mcpComponent = mcpComponentRepository.save(
-            new McpComponent("httpClient", 1, Objects.requireNonNull(mcpServer.getId()), null));
+        mcpServerId = Objects.requireNonNull(mcpServer.getId());
+
+        McpComponent mcpComponent = mcpComponentRepository.save(new McpComponent("httpClient", 1, mcpServerId, null));
 
         McpTool mcpTool = new McpTool(name, parameters, Objects.requireNonNull(mcpComponent.getId()));
 
@@ -949,6 +1201,7 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     @Configuration
+    @Import(ToolExecutionConfiguration.class)
     static class FacadeIntTestConfiguration {
 
         @Bean
@@ -966,7 +1219,8 @@ class EmbeddedMcpToolFacadeIntTest {
             McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
             McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
             PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
-            TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+            TaskFileStorage taskFileStorage, ToolExecutionRecorder toolExecutionRecorder,
+            WorkflowService workflowService) {
 
             return new EmbeddedMcpToolFacade(
                 clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
@@ -975,7 +1229,7 @@ class EmbeddedMcpToolFacadeIntTest {
                 integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
                 mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
                 mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade, "http://localhost:8080",
-                taskExecutionService, taskFileStorage, workflowService);
+                taskExecutionService, taskFileStorage, toolExecutionRecorder, workflowService);
         }
     }
 }

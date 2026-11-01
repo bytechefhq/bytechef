@@ -36,6 +36,7 @@ import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
+import com.bytechef.platform.tool.execution.config.ToolExecutionConfiguration;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import io.modelcontextprotocol.common.McpTransportContext;
@@ -78,7 +79,7 @@ class EmbeddedMcpServerConfigurationIntTest {
         ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
             .withPropertyValues("bytechef.edition=ee")
             .withBean("durableTaskFileStorage", TaskFileStorage.class, () -> mock(TaskFileStorage.class))
-            .withUserConfiguration(EmbeddedMcpServerConfiguration.class);
+            .withUserConfiguration(EmbeddedMcpServerConfiguration.class, ToolExecutionConfiguration.class);
 
         for (Class<?> mockedDependencyType : MOCKED_DEPENDENCY_TYPES) {
             applicationContextRunner = withMockBean(applicationContextRunner, mockedDependencyType);
