@@ -639,6 +639,75 @@ class WorkflowNodeOutputFacadeIntTest {
         return workflow.getId();
     }
 
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesBranchAggregateOutputForNestedTask() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "branch1", "type": "branch/v1", "parameters": {"cases": [{"key": "k1", "tasks": [{"name": "nested1", "type": "component/v1/action1", "parameters": {}}]}], "default": []}}
+                    ]
+                }
+                """);
+
+        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "branch1", "branch");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesConditionAggregateOutputForNestedTask() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "condition1", "type": "condition/v1", "parameters": {"caseTrue": [{"name": "nested1", "type": "component/v1/action1", "parameters": {}}], "caseFalse": []}}
+                    ]
+                }
+                """);
+
+        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "condition1", "condition");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesForkJoinAggregateOutputForNestedTask() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "forkJoin1", "type": "fork-join/v1", "parameters": {"branches": [[{"name": "nested1", "type": "component/v1/action1", "parameters": {}}]]}}
+                    ]
+                }
+                """);
+
+        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "forkJoin1", "fork-join");
+    }
+
+    private void assertDispatcherAggregateOutputExcludedForNestedTask(
+        String workflowId, String dispatcherWorkflowNodeName, String dispatcherName) {
+
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition(dispatcherName, 1))
+            .thenReturn(mock(TaskDispatcherDefinition.class));
+        when(taskDispatcherDefinitionService.isDynamicOutputDefined(dispatcherName, 1)).thenReturn(true);
+
+        OutputResponse variableOutputResponse = new OutputResponse(null, Map.of("item", "value"), null);
+
+        when(taskDispatcherDefinitionService.executeVariableProperties(eq(dispatcherName), eq(1), any()))
+            .thenReturn(variableOutputResponse);
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "nested1", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).hasSize(1);
+
+        WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputDTOs.getFirst();
+
+        assertThat(workflowNodeOutputDTO.workflowNodeName()).isEqualTo(dispatcherWorkflowNodeName);
+        assertThat(workflowNodeOutputDTO.variableOutputResponse()).isEqualTo(variableOutputResponse);
+        assertThat(workflowNodeOutputDTO.outputResponse()).isNull();
+
+        verify(taskDispatcherDefinitionService, never()).executeOutput(eq(dispatcherName), eq(1), any());
+        verify(taskDispatcherDefinitionService, times(1)).executeVariableProperties(eq(dispatcherName), eq(1), any());
+    }
+
     private static StringProperty requiredStringProperty(String name, String displayCondition) {
         ModifiableStringProperty modifiableStringProperty = ComponentDsl.string(name)
             .required(true);
