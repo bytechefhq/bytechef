@@ -295,7 +295,7 @@ components:
           description: "The input of the call, capped in length."
           type: "string"
         output:
-          description: "The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason). For a DENIED outcome, the reviewer's reason."
+          description: "The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason). For a DENIED outcome, the reviewer's reason. For an APPROVED approval-gate call, the reviewer (approvedBy) and their comment."
           type: "string"
         parentId:
           description: "The identifier of the call this call is nested under, such as a sub-agent call."
@@ -316,6 +316,7 @@ components:
             - "REDACTED"
             - "WITHHELD"
             - "DENIED"
+            - "APPROVED"
         toolName:
           description: "The name of the tool that was called."
           type: "string"
