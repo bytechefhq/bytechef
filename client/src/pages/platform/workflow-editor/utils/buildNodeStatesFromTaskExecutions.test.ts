@@ -181,18 +181,42 @@ describe('buildNodeStatesFromTaskExecutions', () => {
         });
     });
 
-    it.each(['BLOCKED', 'REDACTED', 'WITHHELD'] as const)('colours a cluster element call that was %s', (status) => {
+    it.each(['BLOCKED', 'DENIED', 'REDACTED', 'WITHHELD'] as const)(
+        'colours a cluster element call that was %s',
+        (status) => {
+            const nodeStates = buildNodeStatesFromTaskExecutions(
+                [
+                    {
+                        ...taskExecution('aiAgent_1', 'COMPLETED', 0, 5),
+                        clusterElementCalls: [{name: 'guardrails_1', status}],
+                    },
+                ],
+                false
+            );
+
+            expect(nodeStates.guardrails_1.status).toBe(status);
+        }
+    );
+
+    it('ranks denied above withheld and below failed', () => {
         const nodeStates = buildNodeStatesFromTaskExecutions(
             [
                 {
                     ...taskExecution('aiAgent_1', 'COMPLETED', 0, 5),
-                    clusterElementCalls: [{name: 'guardrails_1', status}],
+                    clusterElementCalls: [
+                        {name: 'a', status: 'WITHHELD'},
+                        {name: 'a', status: 'DENIED'},
+                        {name: 'a', status: 'WITHHELD'},
+                        {name: 'b', status: 'DENIED'},
+                        {name: 'b', status: 'FAILED'},
+                    ],
                 },
             ],
             false
         );
 
-        expect(nodeStates.guardrails_1.status).toBe(status);
+        expect(nodeStates.a.status).toBe('DENIED');
+        expect(nodeStates.b.status).toBe('FAILED');
     });
 
     it('ranks withheld above blocked and blocked above running, and failed above all', () => {

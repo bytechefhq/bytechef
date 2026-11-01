@@ -74,6 +74,12 @@ describe('WorkflowTaskExecutionItem', () => {
             expect(container.querySelector('svg.lucide-shield-alert.text-amber-500')).toBeInTheDocument();
         });
 
+        it('shows the rejected user for a denied row', () => {
+            const {container} = render(<WorkflowTaskExecutionItem taskExecution={createOutcomeExecution('DENIED')} />);
+
+            expect(container.querySelector('svg.lucide-user-x.text-rose-500')).toBeInTheDocument();
+        });
+
         it('shows the eraser for a redacted row', () => {
             const {container} = render(
                 <WorkflowTaskExecutionItem taskExecution={createOutcomeExecution('REDACTED')} />
