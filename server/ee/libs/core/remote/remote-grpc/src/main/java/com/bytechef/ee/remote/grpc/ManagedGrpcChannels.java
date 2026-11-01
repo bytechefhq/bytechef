@@ -14,6 +14,7 @@ import com.bytechef.ee.remote.grpc.interceptor.DeadlineClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextClientInterceptor;
+import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -45,10 +46,13 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
     private final Map<String, ManagedChannel> managedChannels = new ConcurrentHashMap<>();
     private final DataSize maxInboundMessageSize;
     private final boolean plaintext;
+    private final List<RemotePrincipalCodec> remotePrincipalCodecs;
     private final String serviceToken;
     private final Map<String, String> targets;
 
-    public ManagedGrpcChannels(ApplicationProperties applicationProperties) {
+    public ManagedGrpcChannels(
+        ApplicationProperties applicationProperties, List<RemotePrincipalCodec> remotePrincipalCodecs) {
+
         ApplicationProperties.Remote remote = applicationProperties.getRemote();
 
         ApplicationProperties.Remote.Grpc grpc = remote.getGrpc();
@@ -58,6 +62,7 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
         this.deadline = grpc.getDeadline();
         this.maxInboundMessageSize = grpc.getMaxInboundMessageSize();
         this.plaintext = grpc.isPlaintext();
+        this.remotePrincipalCodecs = List.copyOf(remotePrincipalCodecs);
         this.serviceToken = grpc.getServiceToken();
         this.targets = configuredTargets == null ? Map.of() : Map.copyOf(configuredTargets);
     }
@@ -144,7 +149,7 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
         ManagedChannelBuilder<?> managedChannelBuilder = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")
             .intercept(
-                new TenantContextClientInterceptor(), new UserContextClientInterceptor(),
+                new TenantContextClientInterceptor(), new UserContextClientInterceptor(remotePrincipalCodecs),
                 new ServiceTokenClientInterceptor(serviceToken));
 
         if (deadline != null) {

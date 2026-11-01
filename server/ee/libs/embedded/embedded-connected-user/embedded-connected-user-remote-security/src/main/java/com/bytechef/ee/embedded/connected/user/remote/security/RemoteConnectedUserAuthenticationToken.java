@@ -5,10 +5,10 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.remote.grpc.security;
+package com.bytechef.ee.embedded.connected.user.remote.security;
 
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.core.userdetails.User;
 

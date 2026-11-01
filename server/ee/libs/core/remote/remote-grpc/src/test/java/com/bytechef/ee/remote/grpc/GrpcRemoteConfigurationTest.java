@@ -171,7 +171,7 @@ class GrpcRemoteConfigurationTest {
 
         @Bean
         ManagedGrpcChannels managedGrpcChannels(ApplicationProperties applicationProperties) {
-            return new ManagedGrpcChannels(applicationProperties);
+            return new ManagedGrpcChannels(applicationProperties, List.of());
         }
 
         @Bean
