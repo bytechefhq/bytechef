@@ -1,7 +1,7 @@
 bytechef:
   ai:
     agent-utils:
-      # Hosts the web fetch tool may reach although they resolve to a private or loopback address
+      # Hosts the web fetch and A2A agent tools may reach although they resolve to a private or loopback address
       allowed-private-hosts: []
       shell:
         # Allow Shell Tools elements to run commands directly on the server instead of in a Docker container. Local

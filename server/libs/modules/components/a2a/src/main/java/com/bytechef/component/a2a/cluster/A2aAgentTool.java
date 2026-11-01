@@ -21,12 +21,14 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
+import com.bytechef.commons.util.UrlValidatorUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.a2a.A2A;
 import io.a2a.client.Client;
 import io.a2a.client.ClientEvent;
@@ -47,6 +49,7 @@ import io.a2a.spec.TaskStatus;
 import io.a2a.spec.TextPart;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -68,8 +71,15 @@ public class A2aAgentTool {
             "self-contained instruction.";
     private static final String DEFAULT_TOOL_NAME = "sendTaskToRemoteAgent";
 
-    public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ToolCallbackProviderFunction>clusterElement("agentTool")
+    private final Set<String> allowedPrivateHosts;
+
+    public final ClusterElementDefinition<ToolCallbackProviderFunction> clusterElementDefinition;
+
+    @SuppressFBWarnings("EI")
+    public A2aAgentTool(Set<String> allowedPrivateHosts) {
+        this.allowedPrivateHosts = Set.copyOf(allowedPrivateHosts);
+
+        this.clusterElementDefinition = ComponentDsl.<ToolCallbackProviderFunction>clusterElement("agentTool")
             .title("A2A Agent Tool")
             .description("Delegate a task to a remote A2A (Agent2Agent) agent.")
             .type(TOOLS)
@@ -79,12 +89,13 @@ public class A2aAgentTool {
                     .description(
                         "The URL of the remote A2A agent - for a ByteChef A2A Server, the endpoint URL from the " +
                             "server's Connect tab. The agent card is read from " +
-                            "<Agent URL>/.well-known/agent-card.json.")
+                            "<Agent URL>/.well-known/agent-card.json. Private and loopback addresses are not allowed.")
                     .required(true))
-            .object(() -> A2aAgentTool::apply);
+            .object(() -> this::apply);
+    }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    static ToolCallbackProvider apply(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    ToolCallbackProvider apply(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String agentUrl = inputParameters.getRequiredString(AGENT_URL);
         Map<String, String> headers = getAuthorizationHeaders(connectionParameters);
 
@@ -100,7 +111,9 @@ public class A2aAgentTool {
         return ToolCallbackProvider.from(toolCallback);
     }
 
-    private static String sendTask(String baseUrl, Map<String, String> headers, String task) {
+    private String sendTask(String baseUrl, Map<String, String> headers, String task) {
+        UrlValidatorUtils.validate(baseUrl.strip(), allowedPrivateHosts);
+
         StringBuilder responseBuilder = new StringBuilder();
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference<Throwable> errorReference = new AtomicReference<>();

@@ -17,8 +17,10 @@
 package com.bytechef.component.a2a.cluster;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.commons.util.UrlValidationException;
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -29,6 +31,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -130,6 +133,25 @@ class A2aAgentToolTest {
     }
 
     @Test
+    void testSendingATaskRefusesAnAgentUrlThatResolvesToALoopbackAddress() {
+        ToolCallback toolCallback = getToolCallback(new A2aAgentTool(Set.of()), Map.of());
+
+        assertThatThrownBy(() -> toolCallback.call("{\"task\": \"What is the latest Java release?\"}"))
+            .hasRootCauseInstanceOf(UrlValidationException.class)
+            .hasStackTraceContaining("private or loopback");
+    }
+
+    @Test
+    void testSendingATaskReachesAnAllowedPrivateHost() {
+        ToolCallback toolCallback = getToolCallback(new A2aAgentTool(Set.of("localhost")), Map.of());
+
+        assertThatThrownBy(() -> toolCallback.call("{\"task\": \"What is the latest Java release?\"}"))
+            .hasMessageContaining("Failed to send task to the remote agent")
+            .rootCause()
+            .isNotInstanceOf(UrlValidationException.class);
+    }
+
+    @Test
     void testGetAuthorizationHeadersSendsTheTokenAsABearerHeader() {
         Map<String, String> headers = A2aAgentTool.getAuthorizationHeaders(
             ParametersFactory.create(Map.of("token", "api-key")));
@@ -147,16 +169,22 @@ class A2aAgentToolTest {
     }
 
     private static ToolDefinition getToolDefinition(Map<String, ?> inputParameters) {
+        ToolCallback toolCallback = getToolCallback(new A2aAgentTool(Set.of()), inputParameters);
+
+        return toolCallback.getToolDefinition();
+    }
+
+    private static ToolCallback getToolCallback(A2aAgentTool a2aAgentTool, Map<String, ?> inputParameters) {
         Map<String, Object> toolInputParameters = new HashMap<>(inputParameters);
 
-        toolInputParameters.put("agentUrl", "http://localhost:9555/api/automation/a2a/secret");
+        toolInputParameters.put("agentUrl", "http://localhost:1/api/automation/a2a/secret");
 
-        ToolCallback[] toolCallbacks = A2aAgentTool.apply(
+        ToolCallback[] toolCallbacks = a2aAgentTool.apply(
             ParametersFactory.create(toolInputParameters), ParametersFactory.create(Map.of()), mock(Context.class))
             .getToolCallbacks();
 
         assertThat(toolCallbacks).hasSize(1);
 
-        return toolCallbacks[0].getToolDefinition();
+        return toolCallbacks[0];
     }
 }

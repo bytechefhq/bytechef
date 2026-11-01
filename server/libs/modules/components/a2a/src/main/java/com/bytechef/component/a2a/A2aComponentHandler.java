@@ -24,24 +24,46 @@ import com.bytechef.component.a2a.cluster.A2aAgentTool;
 import com.bytechef.component.a2a.connection.A2aConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.google.auto.service.AutoService;
+import com.bytechef.config.ApplicationProperties;
+import java.util.List;
+import java.util.Set;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@AutoService(ComponentHandler.class)
+@Component("a2a_v1_ComponentHandler")
 public class A2aComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(A2A)
-        .title("A2A")
-        .description("Delegate tasks to remote agents over the A2A (Agent2Agent) protocol.")
-        .icon("path:assets/a2a.svg")
-        .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-        .connection(A2aConnection.CONNECTION_DEFINITION)
-        .clusterElements(A2aAgentTool.CLUSTER_ELEMENT_DEFINITION);
+    private final ComponentDefinition componentDefinition;
+
+    public A2aComponentHandler(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Ai.AgentUtils agentUtils = applicationProperties.getAi()
+            .getAgentUtils();
+
+        A2aAgentTool a2aAgentTool = new A2aAgentTool(getAllowedPrivateHosts(agentUtils));
+
+        this.componentDefinition = component(A2A)
+            .title("A2A")
+            .description("Delegate tasks to remote agents over the A2A (Agent2Agent) protocol.")
+            .icon("path:assets/a2a.svg")
+            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+            .connection(A2aConnection.CONNECTION_DEFINITION)
+            .clusterElements(a2aAgentTool.clusterElementDefinition);
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
+    }
+
+    private static Set<String> getAllowedPrivateHosts(ApplicationProperties.Ai.AgentUtils agentUtils) {
+        List<String> allowedPrivateHosts = agentUtils.getAllowedPrivateHosts();
+
+        if (allowedPrivateHosts == null) {
+            return Set.of();
+        }
+
+        return Set.copyOf(allowedPrivateHosts);
     }
 }
