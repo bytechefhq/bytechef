@@ -52,6 +52,7 @@ public class SlackNotificationSender implements NotificationSender<SlackNotifica
                 "Notification " + notification.getId() + " has no Slack webhook URL configured");
         }
 
-        slackNotificationClient.send(slackWebhookUrl, slackNotificationHandler.getText(notificationHandlerContext));
+        slackNotificationClient.send(
+            slackWebhookUrl.strip(), slackNotificationHandler.getText(notificationHandlerContext));
     }
 }

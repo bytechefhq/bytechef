@@ -61,6 +61,19 @@ class SlackNotificationSenderTest {
     }
 
     @Test
+    void testSendStripsSurroundingWhitespaceFromWebhookUrl() {
+        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder().build();
+
+        when(slackNotificationHandler.getText(notificationHandlerContext)).thenReturn("Approval pending");
+
+        slackNotificationSender.send(
+            createNotification(Map.of("slackWebhookUrl", "  https://hooks.slack.com/services/T/B/X \n")),
+            slackNotificationHandler, notificationHandlerContext);
+
+        verify(slackNotificationClient).send("https://hooks.slack.com/services/T/B/X", "Approval pending");
+    }
+
+    @Test
     void testSendThrowsWhenWebhookUrlMissing() {
         NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder().build();
 
