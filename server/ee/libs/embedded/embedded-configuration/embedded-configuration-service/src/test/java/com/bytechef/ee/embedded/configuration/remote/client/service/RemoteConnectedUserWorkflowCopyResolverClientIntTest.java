@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.remote.client.ConnectedUserProjectRemoteClientIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.remote.client.EmbeddedConfigurationGrpcTestServer;
@@ -43,7 +43,7 @@ class RemoteConnectedUserWorkflowCopyResolverClientIntTest {
     private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
 
     @Autowired
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @Autowired
     private ConnectedUserProjectFacade connectedUserProjectFacade;
@@ -102,13 +102,13 @@ class RemoteConnectedUserWorkflowCopyResolverClientIntTest {
     }
 
     private String createPublishedTemplate() {
-        long projectId = automationWorkflowProjectFacade.createProject(
+        long projectId = automationProjectFacade.createProject(
             "Remote copy resolver " + UUID.randomUUID(), "", null, List.of(), null);
 
-        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+        String workflowUuid = automationProjectFacade.createProjectWorkflow(
             projectId, TEMPLATE_DEFINITION, null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId);
 
         automationWorkflowProjectConfigurationService.create(
             projectId, Environment.PRODUCTION.ordinal(), 1, true, true);

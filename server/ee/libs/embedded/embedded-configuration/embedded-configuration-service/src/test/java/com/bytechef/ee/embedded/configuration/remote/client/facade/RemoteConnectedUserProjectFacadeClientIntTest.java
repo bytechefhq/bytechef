@@ -14,7 +14,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.remote.client.ConnectedUserProjectRemoteClientIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.remote.client.EmbeddedConfigurationGrpcTestServer;
@@ -50,7 +50,7 @@ class RemoteConnectedUserProjectFacadeClientIntTest {
     private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
 
     @Autowired
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @Autowired
     private ConnectedUserProjectFacade connectedUserProjectFacade;
@@ -135,13 +135,13 @@ class RemoteConnectedUserProjectFacadeClientIntTest {
     }
 
     private String createPublishedTemplate() {
-        long projectId = automationWorkflowProjectFacade.createProject(
+        long projectId = automationProjectFacade.createProject(
             "Remote copy " + UUID.randomUUID(), "", null, List.of(), null);
 
-        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+        String workflowUuid = automationProjectFacade.createProjectWorkflow(
             projectId, TEMPLATE_DEFINITION, null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId);
 
         automationWorkflowProjectConfigurationService.create(
             projectId, Environment.PRODUCTION.ordinal(), 1, true, true);
