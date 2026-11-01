@@ -14,9 +14,12 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserSecurity;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import java.util.List;
 import java.util.function.Supplier;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,6 +156,16 @@ class AutomationMethodSecurityConfigurationIntTest {
 
         private PlatformUserApiKeyAuthenticationToken(User user) {
             super(1L, user);
+        }
+
+        @Override
+        public CredentialType getCredentialType() {
+            return CredentialType.PLATFORM_API_KEY;
+        }
+
+        @Override
+        public @Nullable PlatformType getPlatformType() {
+            return null;
         }
     }
 }

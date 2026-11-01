@@ -46,7 +46,8 @@ public class ApiPlatformApiKeyAuthenticationProvider implements AuthenticationPr
         }
 
         return new ApiPlatformApiKeyAuthenticationToken(
-            apiPlatformApiKeyAuthenticationToken.getEnvironmentId(), createSpringSecurityUser(apiKey.getName()));
+            apiPlatformApiKeyAuthenticationToken.getEnvironmentId(), createSpringSecurityUser(apiKey.getName()),
+            apiKey.getId());
     }
 
     @Override

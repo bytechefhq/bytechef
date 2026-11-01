@@ -7,7 +7,10 @@
 
 package com.bytechef.ee.platform.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.userdetails.User;
 
 /**
@@ -25,11 +28,21 @@ public class PlatformApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
         this.secretKey = secretKey;
     }
 
-    public PlatformApiKeyAuthenticationToken(long environmentId, User user) {
-        super(environmentId, user);
+    public PlatformApiKeyAuthenticationToken(long environmentId, User user, @Nullable Long apiKeyId) {
+        super(environmentId, user, apiKeyId);
     }
 
     public String getSecretKey() {
         return secretKey;
+    }
+
+    @Override
+    public CredentialType getCredentialType() {
+        return CredentialType.PLATFORM_API_KEY;
+    }
+
+    @Override
+    public @Nullable PlatformType getPlatformType() {
+        return null;
     }
 }

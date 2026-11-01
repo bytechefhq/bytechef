@@ -1,6 +1,7 @@
 dependencies {
     compileOnly("org.springframework.security:spring-security-oauth2-authorization-server")
 
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("io.micrometer:micrometer-core")
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.commons.validator)

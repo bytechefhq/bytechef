@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.security.web.configurer;
 
+import com.bytechef.platform.security.web.authentication.CredentialAuthenticationEventPublisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
@@ -29,6 +32,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
  */
 public final class ApiKeyAuthenticationManagerFactory {
 
+    private static final Logger log = LoggerFactory.getLogger(ApiKeyAuthenticationManagerFactory.class);
+
     private ApiKeyAuthenticationManagerFactory() {
     }
 
@@ -41,7 +46,16 @@ public final class ApiKeyAuthenticationManagerFactory {
             ObjectProvider<AuthenticationEventPublisher> authenticationEventPublisherProvider =
                 applicationContext.getBeanProvider(AuthenticationEventPublisher.class);
 
-            authenticationEventPublisherProvider.ifUnique(providerManager::setAuthenticationEventPublisher);
+            AuthenticationEventPublisher authenticationEventPublisher =
+                authenticationEventPublisherProvider.getIfUnique();
+
+            if (authenticationEventPublisher == null) {
+                log.warn(
+                    "No unique AuthenticationEventPublisher bean; API key authentication failures are not audited");
+            }
+
+            providerManager.setAuthenticationEventPublisher(
+                new CredentialAuthenticationEventPublisher(applicationContext, authenticationEventPublisher));
         }
 
         return providerManager;

@@ -16,26 +16,24 @@
 
 package com.bytechef.platform.security.web.authentication;
 
-import org.springframework.security.core.userdetails.User;
-
 /**
  * @author Ivica Cardic
  */
-public class PlatformApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+public enum CredentialType {
 
-    private String secretKey;
+    API_PLATFORM_API_KEY("ApiPlatformApiKey"),
+    AUTOMATION_API_KEY("AutomationApiKey"),
+    EMBEDDED_API_KEY("EmbeddedApiKey"),
+    EMBEDDED_MCP_SERVER_API_KEY("EmbeddedMcpServerApiKey"),
+    PLATFORM_API_KEY("PlatformApiKey");
 
-    public PlatformApiKeyAuthenticationToken(long environment, String secretKey, String tenantId) {
-        super(environment, tenantId);
+    private final String value;
 
-        this.secretKey = secretKey;
+    CredentialType(String value) {
+        this.value = value;
     }
 
-    public PlatformApiKeyAuthenticationToken(long environment, User user) {
-        super(environment, user);
-    }
-
-    public String getSecretKey() {
-        return secretKey;
+    public String getValue() {
+        return value;
     }
 }

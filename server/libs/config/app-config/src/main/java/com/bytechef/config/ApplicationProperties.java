@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -3064,6 +3065,14 @@ public class ApplicationProperties {
      */
     public static class Audit {
 
+        private static final Duration DEFAULT_CREDENTIAL_USAGE_INTERVAL = Duration.ofHours(1);
+
+        /**
+         * Minimum interval between two CREDENTIAL_USED events for the same credential (API key, connected user or token
+         * principal, per tenant and environment); zero or a negative value records every request
+         */
+        private Duration credentialUsageInterval = DEFAULT_CREDENTIAL_USAGE_INTERVAL;
+
         /**
          * Whether principals are masked (e.g. {@code a***@example.com}) when audit events are read through the API
          */
@@ -3085,6 +3094,10 @@ public class ApplicationProperties {
          */
         private long retentionDays;
 
+        public Duration getCredentialUsageInterval() {
+            return credentialUsageInterval;
+        }
+
         public boolean isMaskPrincipals() {
             return maskPrincipals;
         }
@@ -3099,6 +3112,11 @@ public class ApplicationProperties {
 
         public long getRetentionDays() {
             return retentionDays;
+        }
+
+        public void setCredentialUsageInterval(Duration credentialUsageInterval) {
+            this.credentialUsageInterval = Objects.requireNonNullElse(
+                credentialUsageInterval, DEFAULT_CREDENTIAL_USAGE_INTERVAL);
         }
 
         public void setMaskPrincipals(boolean maskPrincipals) {

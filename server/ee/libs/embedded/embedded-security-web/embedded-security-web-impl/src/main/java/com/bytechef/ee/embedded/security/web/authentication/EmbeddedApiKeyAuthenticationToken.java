@@ -8,8 +8,11 @@
 package com.bytechef.ee.embedded.security.web.authentication;
 
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.userdetails.User;
 
 /**
@@ -34,11 +37,17 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
         this.secretKey = secretKey;
     }
 
-    @SuppressFBWarnings("EI")
     public EmbeddedApiKeyAuthenticationToken(
         long environmentId, long connectedUserId, User user, boolean apiKeyAuthenticated) {
 
-        super(environmentId, user);
+        this(environmentId, connectedUserId, user, apiKeyAuthenticated, null);
+    }
+
+    @SuppressFBWarnings("EI")
+    public EmbeddedApiKeyAuthenticationToken(
+        long environmentId, long connectedUserId, User user, boolean apiKeyAuthenticated, @Nullable Long apiKeyId) {
+
+        super(environmentId, user, apiKeyId);
 
         this.apiKeyAuthenticated = apiKeyAuthenticated;
         this.connectedUserId = connectedUserId;
@@ -53,6 +62,11 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
     @Override
     public long connectedUserId() {
         return connectedUserId;
+    }
+
+    @Override
+    public @Nullable Long getConnectedUserId() {
+        return isAuthenticated() ? connectedUserId : null;
     }
 
     @Override
@@ -71,5 +85,15 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
 
     public String getSecretKey() {
         return secretKey;
+    }
+
+    @Override
+    public CredentialType getCredentialType() {
+        return CredentialType.EMBEDDED_API_KEY;
+    }
+
+    @Override
+    public PlatformType getPlatformType() {
+        return PlatformType.EMBEDDED;
     }
 }
