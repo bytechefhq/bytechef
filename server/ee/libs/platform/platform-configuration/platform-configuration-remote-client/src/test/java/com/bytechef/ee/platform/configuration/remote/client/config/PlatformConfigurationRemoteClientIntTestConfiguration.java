@@ -33,8 +33,10 @@ import com.bytechef.platform.configuration.workflow.connection.ComponentConnecti
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.CacheManager;
@@ -66,9 +68,11 @@ public class PlatformConfigurationRemoteClientIntTestConfiguration {
 
     @Bean
     ClusterElementDefinitionService clusterElementDefinitionService(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        ObjectProvider<MeterRegistry> meterRegistryObjectProvider) {
 
-        return new ClusterElementDefinitionServiceImpl(componentDefinitionRegistry, contextFactory);
+        return new ClusterElementDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, meterRegistryObjectProvider);
     }
 
     @Bean

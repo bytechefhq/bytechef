@@ -27,8 +27,10 @@ import com.bytechef.platform.component.service.TriggerDefinitionServiceImpl;
 import com.bytechef.platform.component.service.UnifiedApiDefinitionServiceImpl;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.IOException;
 import java.util.List;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import tools.jackson.databind.ObjectMapper;
@@ -86,7 +88,7 @@ public class ComponentWorkerFactory {
         ActionDefinitionServiceImpl actionDefinitionService = new ActionDefinitionServiceImpl(
             registry, contextFactory);
         ClusterElementDefinitionServiceImpl clusterElementDefinitionService = new ClusterElementDefinitionServiceImpl(
-            registry, contextFactory);
+            registry, contextFactory, new DefaultListableBeanFactory().getBeanProvider(MeterRegistry.class));
         ComponentDefinitionServiceImpl componentDefinitionService = new ComponentDefinitionServiceImpl(
             List.of(), registry, contextFactory);
         TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(

@@ -69,6 +69,7 @@ import com.bytechef.platform.workflow.execution.service.TriggerStateServiceImpl;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.ObjectProvider;
@@ -123,10 +124,13 @@ public class PlatformWorkflowExecutionRemoteClientIntTestConfiguration {
     @Bean
     JobResumeFacade jobResumeFacade(
         ApplicationEventPublisher applicationEventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
-        JobFacade jobFacade, JobService jobService, PlatformTransactionManager platformTransactionManager) {
+        JobFacade jobFacade, JobService jobService, ObjectProvider<MeterRegistry> meterRegistryObjectProvider,
+        PlatformTransactionManager platformTransactionManager, TaskExecutionService taskExecutionService,
+        TaskStateService taskStateService) {
 
         return new JobResumeFacadeImpl(
-            applicationEventPublisher, approvalTokensProvider, jobFacade, jobService, platformTransactionManager);
+            applicationEventPublisher, approvalTokensProvider, jobFacade, jobService, meterRegistryObjectProvider,
+            platformTransactionManager, taskExecutionService, taskStateService);
     }
 
     @Bean
