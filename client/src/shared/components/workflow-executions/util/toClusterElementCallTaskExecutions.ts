@@ -8,7 +8,13 @@ import {
 
 export type ClusterElementCallOutcomeType = 'BLOCKED' | 'DENIED' | 'REDACTED' | 'WITHHELD';
 
+export interface ClusterElementCallApprovalI {
+    comment?: string;
+    reviewer?: string;
+}
+
 export interface ClusterElementCallTaskExecutionI extends TaskExecution {
+    clusterElementCallApproval?: ClusterElementCallApprovalI;
     clusterElementCallId: string;
     clusterElementCallNote?: string;
     clusterElementCallOutcome?: ClusterElementCallOutcomeType;
@@ -92,8 +98,28 @@ const getNote = (record: ClusterElementCallRecord, taskStatus: TaskExecutionStat
     return undefined;
 };
 
+const toOptionalString = (value: unknown) => (typeof value === 'string' && value.trim() ? value : undefined);
+
+const getApproval = (record: ClusterElementCallRecord): ClusterElementCallApprovalI | undefined => {
+    if (record.status !== ClusterElementCallRecordStatusEnum.Approved) {
+        return undefined;
+    }
+
+    const details = parseValue(record.output);
+
+    if (typeof details !== 'object' || details === null) {
+        return {};
+    }
+
+    return {comment: toOptionalString(details.comment), reviewer: toOptionalString(details.approvedBy)};
+};
+
 const getStatus = (status: ClusterElementCallRecordStatusEnum): TaskExecutionStatusEnum => {
-    if (status === ClusterElementCallRecordStatusEnum.Completed || OUTCOME_BY_STATUS[status] !== undefined) {
+    if (
+        status === ClusterElementCallRecordStatusEnum.Completed ||
+        status === ClusterElementCallRecordStatusEnum.Approved ||
+        OUTCOME_BY_STATUS[status] !== undefined
+    ) {
         return TaskExecutionStatusEnum.Completed;
     }
 
@@ -132,6 +158,7 @@ export default function toClusterElementCallTaskExecutions(
         const title = callNumber === undefined ? baseTitle : `${baseTitle} #${callNumber}`;
 
         executionById.set(record.id, {
+            clusterElementCallApproval: getApproval(record),
             clusterElementCallId: record.id,
             clusterElementCallNote: getNote(record, taskExecution.status),
             clusterElementCallOutcome: OUTCOME_BY_STATUS[record.status],

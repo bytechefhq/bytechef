@@ -39,6 +39,9 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobEnded, taskExecution}: Work
     const callNote = isClusterElementCallTaskExecution(taskExecution)
         ? taskExecution.clusterElementCallNote
         : undefined;
+    const approval = isClusterElementCallTaskExecution(taskExecution)
+        ? taskExecution.clusterElementCallApproval
+        : undefined;
     const outcome = getClusterElementCallOutcome(taskExecution);
     const statusIcon = outcome ? (
         OUTCOME_ICONS[outcome]
@@ -64,6 +67,14 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobEnded, taskExecution}: Work
                         </span>
 
                         {callNote && <span className="text-xs text-muted-foreground">{callNote}</span>}
+
+                        {approval && (
+                            <span className="text-xs text-muted-foreground">
+                                {approval.reviewer ? `Approved by ${approval.reviewer}` : 'Approved'}
+                            </span>
+                        )}
+
+                        {approval?.comment && <span className="text-xs text-muted-foreground">{approval.comment}</span>}
                     </div>
                 </div>
             </div>

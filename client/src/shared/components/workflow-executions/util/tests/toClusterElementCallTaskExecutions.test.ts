@@ -192,6 +192,38 @@ describe('toClusterElementCallTaskExecutions', () => {
         expect(withheld.clusterElementCallOutcome).toBe('WITHHELD');
     });
 
+    it('maps an approved gate call to a completed row with the reviewer and comment', () => {
+        const [approved] = toClusterElementCallTaskExecutions(
+            createTaskExecution([
+                createRecord({
+                    id: 'a',
+                    output: '{"approved":true,"approvedBy":"jane@example.com","comment":"ship it"}',
+                    status: ClusterElementCallRecordStatusEnum.Approved,
+                }),
+            ])
+        );
+
+        expect(approved.clusterElementCallApproval).toEqual({comment: 'ship it', reviewer: 'jane@example.com'});
+        expect(approved.clusterElementCallOutcome).toBeUndefined();
+        expect(approved.status).toBe(TaskExecutionStatusEnum.Completed);
+    });
+
+    it('gives an approved gate call without details an empty approval', () => {
+        const [approved] = toClusterElementCallTaskExecutions(
+            createTaskExecution([createRecord({id: 'a', status: ClusterElementCallRecordStatusEnum.Approved})])
+        );
+
+        expect(approved.clusterElementCallApproval).toEqual({});
+    });
+
+    it('leaves a completed call without an approval', () => {
+        const [completed] = toClusterElementCallTaskExecutions(
+            createTaskExecution([createRecord({id: 'c', status: ClusterElementCallRecordStatusEnum.Completed})])
+        );
+
+        expect(completed.clusterElementCallApproval).toBeUndefined();
+    });
+
     it('maps a denied call to a completed DENIED outcome row', () => {
         const [denied] = toClusterElementCallTaskExecutions(
             createTaskExecution([createRecord({id: 'd', status: ClusterElementCallRecordStatusEnum.Denied})])
