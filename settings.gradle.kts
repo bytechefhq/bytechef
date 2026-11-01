@@ -612,6 +612,9 @@ include("server:ee:libs:automation:automation-data-table:automation-data-table-r
 include("server:ee:libs:automation:automation-task:automation-task-remote-client")
 include("server:ee:libs:automation:automation-task:automation-task-remote-rest")
 include("server:ee:libs:automation:automation-security-web:automation-security-web-impl")
+include("server:ee:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-remote-client")
+include("server:ee:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-remote-grpc")
+include("server:ee:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-remote-grpc-proto")
 
 include("server:ee:libs:config:cloud-config")
 include("server:ee:libs:config:cache-invalidation-config")

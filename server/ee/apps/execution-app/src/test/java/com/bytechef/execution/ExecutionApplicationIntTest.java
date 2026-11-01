@@ -127,6 +127,20 @@ public class ExecutionApplicationIntTest {
     }
 
     @Test
+    void testProjectWorkflowExecutionGrpcServiceIsServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains(
+            "bytechef.automation.workflow.execution.remote.v1.ProjectWorkflowExecutionRemoteService");
+    }
+
+    @Test
     void testAuditEventRetentionJobPurgesExpiredEvents() {
         AuditEventRetentionJob auditEventRetentionJob = auditEventRetentionJobProvider.getIfAvailable();
 
