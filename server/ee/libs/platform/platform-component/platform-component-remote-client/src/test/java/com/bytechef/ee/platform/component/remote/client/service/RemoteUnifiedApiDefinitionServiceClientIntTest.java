@@ -77,10 +77,8 @@ class RemoteUnifiedApiDefinitionServiceClientIntTest {
     }
 
     @Test
-    void testGetUnifiedApiComponentDefinitionsWithoutCategory() {
-        assertThat(createClient().getUnifiedApiComponentDefinitions(null))
-            .extracting(ComponentDefinition::getName)
-            .containsOnly(COMPONENT_NAME);
+    void testGetUnifiedApiComponentDefinitionsOfAnotherCategoryIsEmpty() {
+        assertThat(createClient().getUnifiedApiComponentDefinitions(UnifiedApiCategory.ACCOUNTING)).isEmpty();
     }
 
     @Test
