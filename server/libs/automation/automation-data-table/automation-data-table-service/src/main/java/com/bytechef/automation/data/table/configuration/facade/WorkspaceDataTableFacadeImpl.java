@@ -18,6 +18,9 @@ package com.bytechef.automation.data.table.configuration.facade;
 
 import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
 import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
@@ -48,6 +51,11 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_CREATED, data = {
+        @AuditData(key = "baseName", value = "#baseName"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     public void createTable(
         String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId) {
 
@@ -59,6 +67,11 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_DUPLICATED, data = {
+        @AuditData(key = "sourceDataTableId", value = "#tableId"),
+        @AuditData(key = "newBaseName", value = "#newBaseName"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     public void duplicateTable(long tableId, String newBaseName, long environmentId) {
         String baseName = dataTableService.getBaseNameById(tableId);
 

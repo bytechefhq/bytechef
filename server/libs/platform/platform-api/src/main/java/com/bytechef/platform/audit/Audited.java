@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.audit;
 
+import com.bytechef.platform.constant.PlatformType;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -35,4 +36,6 @@ public @interface Audited {
     String event();
 
     Class<? extends AuditMapper> mapper() default AuditMapper.None.class;
+
+    PlatformType[] platform() default {};
 }

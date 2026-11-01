@@ -40,7 +40,7 @@ public class RemoteAppEventServiceClient implements AppEventService {
     }
 
     @Override
-    public void delete(long id) {
+    public boolean delete(long id) {
         throw new UnsupportedOperationException();
     }
 

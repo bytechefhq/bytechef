@@ -20,6 +20,9 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditEvents;
+import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditMapper;
+import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerToolDTO;
@@ -36,6 +39,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -111,6 +115,9 @@ public class ConnectedUserMcpServerFacadeIntTest {
     @Autowired
     private McpToolRepository mcpToolRepository;
 
+    @Autowired
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
     @MockitoBean
     private PrincipalJobService principalJobService;
 
@@ -121,6 +128,8 @@ public class ConnectedUserMcpServerFacadeIntTest {
 
     @BeforeEach
     public void beforeEach() {
+        persistenceAuditEventRepository.deleteAll();
+
         toolsMcpServer = mcpServerRepository.save(
             new McpServer("Google", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
         workflowsMcpServer = mcpServerRepository.save(
@@ -566,6 +575,68 @@ public class ConnectedUserMcpServerFacadeIntTest {
             .containsExactly("Google", "Workflows only");
     }
 
+    @Test
+    public void testProvisionMcpServerRecordsTheConnectedUserAndTheServer() {
+        connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        assertThat(findSingleEventData(ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_SERVER_DELETED))
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectedUserId", String.valueOf(connectedUserId))
+            .containsEntry("mcpServerId", String.valueOf(toolsMcpServer.getId()));
+        assertThat(findSingleEventData(ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_SERVER_PROVISIONED))
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectedUserId", String.valueOf(connectedUserId))
+            .containsEntry("mcpServerId", String.valueOf(toolsMcpServer.getId()));
+    }
+
+    @Test
+    public void testDeleteThatRemovesNothingIsNotRecorded() {
+        assertThat(connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, toolsMcpServer.getId()))
+            .isTrue();
+        assertThat(connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, toolsMcpServer.getId()))
+            .isFalse();
+        assertThat(connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, Long.MAX_VALUE))
+            .isFalse();
+
+        assertThat(findSingleEventData(ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_SERVER_DELETED))
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("mcpServerId", String.valueOf(toolsMcpServer.getId()));
+    }
+
+    @Test
+    public void testRejectedProvisionRecordsAFailure() {
+        McpServer uncoveredMcpServer = mcpServerRepository.save(
+            new McpServer("Chat", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
+
+        saveMcpComponentWithTool("slack", uncoveredMcpServer);
+
+        assertThatThrownBy(
+            () -> connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, uncoveredMcpServer.getId()))
+                .isInstanceOf(ConfigurationException.class);
+
+        assertThat(findSingleEventData(ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_SERVER_PROVISIONED))
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", ConfigurationException.class.getName())
+            .containsEntry("mcpServerId", String.valueOf(uncoveredMcpServer.getId()));
+    }
+
+    @Test
+    public void testEnableConnectedUserMcpServerRecordsTheNewState() {
+        connectedUserMcpServerFacade.enableConnectedUserMcpServer(connectedUserId, toolsMcpServer.getId(), false);
+
+        assertThat(findSingleEventData(ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_SERVER_ENABLED_UPDATED))
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectedUserId", String.valueOf(connectedUserId))
+            .containsEntry("mcpServerId", String.valueOf(toolsMcpServer.getId()))
+            .containsEntry("enabled", "false");
+    }
+
+    private Map<String, String> findSingleEventData(String eventType) {
+        return EmbeddedMcpAuditIntTestConfiguration.findSingleEventData(persistenceAuditEventRepository, eventType);
+    }
+
     private void insertMcpWorkflow(
         String workflowId, String label, String description, String toolParameters, boolean configurationEnabled,
         boolean userEnabled, long integrationInstanceConfigurationId, long mcpIntegrationInstanceConfigurationId) {
@@ -625,13 +696,13 @@ public class ConnectedUserMcpServerFacadeIntTest {
     @Configuration
     @EnableCaching
     @Import({
-        ConnectedUserMcpServerFacadeImpl.class, ConnectedUserServiceImpl.class,
+        ConnectedUserMcpServerAuditMapper.class, ConnectedUserMcpServerFacadeImpl.class, ConnectedUserServiceImpl.class,
         IntegrationInstanceConfigurationServiceImpl.class,
         IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceServiceImpl.class,
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpServerServiceImpl.class,
-        WorkflowServiceImpl.class
+        WorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class FacadeIntTestConfiguration {
     }

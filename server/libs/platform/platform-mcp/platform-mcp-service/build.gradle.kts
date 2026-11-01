@@ -24,4 +24,7 @@ dependencies {
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
 }

@@ -15,6 +15,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -34,6 +35,8 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
@@ -112,6 +115,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_DELETED, data = {
+        @AuditData(key = "integrationInstanceId", value = "#integrationInstanceId")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void deleteIntegrationInstance(long integrationInstanceId) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
@@ -127,6 +133,10 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_ENABLED_UPDATED, data = {
+        @AuditData(key = "integrationInstanceId", value = "#integrationInstanceId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstance(long integrationInstanceId, boolean enable) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
@@ -143,6 +153,11 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_WORKFLOW_ENABLED_UPDATED, data = {
+        @AuditData(key = "integrationInstanceId", value = "#integrationInstanceId"),
+        @AuditData(key = "workflowId", value = "#workflowId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("isTenantAdmin() or isConnectedUser()")
     public void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable) {
         validateCurrentPrincipalIntegrationInstanceOwnership(integrationInstanceId);

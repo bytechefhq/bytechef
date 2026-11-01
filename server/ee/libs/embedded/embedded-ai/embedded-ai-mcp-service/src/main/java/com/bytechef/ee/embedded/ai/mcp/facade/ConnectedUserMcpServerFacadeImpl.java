@@ -11,6 +11,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditEvents;
+import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditMapper;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
@@ -37,6 +39,8 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -124,12 +128,19 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
+    @Audited(
+        event = ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_SERVER_DELETED,
+        mapper = ConnectedUserMcpServerAuditMapper.class, data = {
+            @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+            @AuditData(key = "mcpServerId", value = "#mcpServerId")
+        })
     @PreAuthorize("isTenantAdmin()")
-    public void deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId) {
+    public boolean deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId) {
         // Remove every per-user tool row whose underlying McpComponent points at the given server.
         // Since the read query rebuilds the (server -> tools) shape from these rows, removing them
         // makes the server vanish from this user's MCP Servers tab without any soft-delete flag.
         Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
+        boolean deleted = false;
 
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(connectedUserId);
@@ -155,11 +166,20 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
                 }
 
                 mcpIntegrationInstanceToolService.delete(toolRow.getId());
+
+                deleted = true;
             }
         }
+
+        return deleted;
     }
 
     @Override
+    @Audited(event = ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_SERVER_ENABLED_UPDATED, data = {
+        @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+        @AuditData(key = "mcpServerId", value = "#mcpServerId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void enableConnectedUserMcpServer(long connectedUserId, long mcpServerId, boolean enable) {
         Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
@@ -323,6 +343,10 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
+    @Audited(event = ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_SERVER_PROVISIONED, data = {
+        @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+        @AuditData(key = "mcpServerId", value = "#mcpServerId")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void provisionMcpServer(long connectedUserId, long mcpServerId) {
         ProvisionableConnectedUserMcpServerDTO provisionableMcpServer = getProvisionableMcpServers(connectedUserId)

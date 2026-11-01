@@ -53,7 +53,7 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
-    public void publishIntegration(long id, String description) {
+    public int publishIntegration(long id, String description) {
         throw new UnsupportedOperationException();
     }
 

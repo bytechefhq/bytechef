@@ -82,8 +82,9 @@ public interface DataTableService {
      * @param baseName      The logical base name of the table to be deleted. The name must not include a "dt_" prefix,
      *                      as it is added internally.
      * @param environmentId The target environmentID.
+     * @return whether a table was dropped
      */
-    void dropTable(String baseName, long environmentId);
+    boolean dropTable(String baseName, long environmentId);
 
     /**
      * Duplicates an existing dynamic data table in the specified environment. The new table will have a different base

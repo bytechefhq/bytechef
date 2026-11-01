@@ -45,8 +45,14 @@ public class AppEventServiceImpl implements AppEventService {
     }
 
     @Override
-    public void delete(long id) {
+    public boolean delete(long id) {
+        if (!appEventRepository.existsById(id)) {
+            return false;
+        }
+
         appEventRepository.deleteById(id);
+
+        return true;
     }
 
     @Override

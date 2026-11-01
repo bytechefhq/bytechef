@@ -12,6 +12,7 @@ import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.constant.UserConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -64,7 +65,7 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
 
         try {
             identityProvider = identityProviderService.getIdentityProvider(identityProviderId);
-        } catch (IllegalArgumentException illegalArgumentException) {
+        } catch (NoSuchElementException noSuchElementException) {
             log.debug("Identity provider not found for ID: {}", identityProviderId);
 
             return null;

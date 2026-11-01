@@ -21,10 +21,18 @@ package com.bytechef.automation.configuration.audit;
  */
 public final class ProjectAuditEvents {
 
+    public static final String PROJECT_CREATED = "PROJECT_CREATED";
+    public static final String PROJECT_DELETED = "PROJECT_DELETED";
+    public static final String PROJECT_DUPLICATED = "PROJECT_DUPLICATED";
     public static final String PROJECT_EXPORTED = "PROJECT_EXPORTED";
     public static final String PROJECT_IMPORTED = "PROJECT_IMPORTED";
+    public static final String PROJECT_PUBLISHED = "PROJECT_PUBLISHED";
+    public static final String PROJECT_SHARED_DELETED = "PROJECT_SHARED_DELETED";
     public static final String PROJECT_SHARED_EXPORTED = "PROJECT_SHARED_EXPORTED";
     public static final String PROJECT_TEMPLATE_IMPORTED = "PROJECT_TEMPLATE_IMPORTED";
+    public static final String PROJECT_UPDATED = "PROJECT_UPDATED";
+    public static final String PROJECT_VERSION_DELETED = "PROJECT_VERSION_DELETED";
+    public static final String PROJECT_VERSION_RESTORED = "PROJECT_VERSION_RESTORED";
 
     private ProjectAuditEvents() {
     }

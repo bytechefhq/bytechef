@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.audit.ProjectDeploymentAuditEvents;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -42,6 +43,8 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -147,6 +150,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_CREATED, data = {
+        @AuditData(key = "projectDeploymentId", value = "#result"),
+        @AuditData(key = "projectId", value = "#projectDeploymentDTO.projectId"),
+        @AuditData(key = "name", value = "#projectDeploymentDTO.name")
+    })
     @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         return createProjectDeployment(
@@ -157,6 +165,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_CREATED, data = {
+        @AuditData(key = "projectDeploymentId", value = "#result"),
+        @AuditData(key = "projectId", value = "#projectDeployment.projectId"),
+        @AuditData(key = "name", value = "#projectDeployment.name"),
+        @AuditData(key = "workflowId", value = "#workflowId")
+    })
     @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public long createProjectDeployment(
         ProjectDeployment projectDeployment, String workflowId, List<ProjectDeploymentWorkflowConnection> connections) {
@@ -172,6 +186,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_CREATED, data = {
+        @AuditData(key = "projectDeploymentId", value = "#result"),
+        @AuditData(key = "projectId", value = "#projectDeployment.projectId"),
+        @AuditData(key = "name", value = "#projectDeployment.name")
+    })
     @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public long createProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
@@ -221,6 +240,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_DELETED, data = {
+        @AuditData(key = "projectDeploymentId", value = "#id")
+    })
     public void deleteProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
 
@@ -265,6 +287,10 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_ENABLED_UPDATED, data = {
+        @AuditData(key = "projectDeploymentId", value = "#projectDeploymentId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     public void enableProjectDeployment(long projectDeploymentId, boolean enable) {
         List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
             .getProjectDeploymentWorkflows(projectDeploymentId);
@@ -285,6 +311,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_WORKFLOW_ENABLED_UPDATED, data = {
+        @AuditData(key = "projectDeploymentId", value = "#projectDeploymentId"),
+        @AuditData(key = "workflowId", value = "#workflowId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     public void enableProjectDeploymentWorkflow(long projectDeploymentId, String workflowId, boolean enable) {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = doEnableProjectDeploymentWorkflow(
             projectDeploymentId, workflowId, enable);
@@ -293,6 +324,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_WORKFLOW_ENABLED_UPDATED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "workflowId", value = "#workflowId"),
+        @AuditData(key = "environment", value = "#environment"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     public void enableProjectDeploymentWorkflow(
         long projectId, String workflowId, boolean enable, Environment environment) {
 
@@ -404,6 +441,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_UPDATED, data = {
+        @AuditData(key = "projectDeploymentId", value = "#projectDeploymentDTO.id"),
+        @AuditData(key = "projectId", value = "#projectDeploymentDTO.projectId"),
+        @AuditData(key = "name", value = "#projectDeploymentDTO.name")
+    })
     @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
     public void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         updateProjectDeployment(
@@ -415,6 +457,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_UPDATED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "projectVersion", value = "#projectVersion"),
+        @AuditData(key = "workflowUuid", value = "#workflowUuid"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public void updateProjectDeployment(
         long projectId, int projectVersion, String workflowUuid,
@@ -466,6 +514,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_UPDATED, data = {
+        @AuditData(key = "projectDeploymentId", value = "#projectDeployment.id"),
+        @AuditData(key = "projectId", value = "#projectDeployment.projectId"),
+        @AuditData(key = "name", value = "#projectDeployment.name")
+    })
     @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public void updateProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,

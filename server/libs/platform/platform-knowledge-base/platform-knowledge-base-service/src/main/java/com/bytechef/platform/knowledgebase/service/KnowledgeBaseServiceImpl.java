@@ -16,9 +16,14 @@
 
 package com.bytechef.platform.knowledgebase.service;
 
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvents;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +53,7 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
     @Transactional(readOnly = true)
     public KnowledgeBase getKnowledgeBase(Long id) {
         return knowledgeBaseRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("KnowledgeBase not found: " + id));
+            .orElseThrow(() -> new NoSuchElementException("Knowledge base " + id + " not found"));
     }
 
     @Override
@@ -64,6 +69,10 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_UPDATED, platform = PlatformType.AUTOMATION, data = {
+        @AuditData(key = "knowledgeBaseId", value = "#id"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     public KnowledgeBase updateKnowledgeBase(Long id, KnowledgeBase knowledgeBase) {
         KnowledgeBase existingKnowledgeBase = getKnowledgeBase(id);
 

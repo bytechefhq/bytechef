@@ -58,7 +58,7 @@ public interface AutomationWorkflowProjectFacade {
         publishProject(projectId, null);
     }
 
-    void publishProject(long projectId, @Nullable String description);
+    int publishProject(long projectId, @Nullable String description);
 
     void updateProject(
         long projectId, String name, String description, String category, List<String> tags,

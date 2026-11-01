@@ -1,0 +1,8 @@
+bytechef:
+  ai:
+    knowledge-base:
+      enabled: true
+
+spring:
+  liquibase:
+    contexts: configuration,connection,execution

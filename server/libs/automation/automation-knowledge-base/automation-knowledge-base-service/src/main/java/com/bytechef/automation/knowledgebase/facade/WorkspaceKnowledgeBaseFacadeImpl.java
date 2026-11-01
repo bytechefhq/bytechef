@@ -18,7 +18,10 @@ package com.bytechef.automation.knowledgebase.facade;
 
 import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBase;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvents;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
@@ -74,6 +77,12 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_CREATED, data = {
+        @AuditData(key = "knowledgeBaseId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     public KnowledgeBase createWorkspaceKnowledgeBase(
         KnowledgeBase knowledgeBase, Long workspaceId, long environmentId) {
 
@@ -93,6 +102,13 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_CLONED, data = {
+        @AuditData(key = "knowledgeBaseId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "sourceKnowledgeBaseId", value = "#knowledgeBaseId"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "environmentId", value = "#targetEnvironmentId")
+    })
     public KnowledgeBase cloneWorkspaceKnowledgeBase(
         Long knowledgeBaseId, Long workspaceId, long targetEnvironmentId, @Nullable String newName) {
 
@@ -141,7 +157,12 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_DELETED, data = {
+        @AuditData(key = "knowledgeBaseId", value = "#knowledgeBaseId")
+    })
     public void deleteWorkspaceKnowledgeBase(Long knowledgeBaseId) {
+        knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
+
         List<KnowledgeBaseDocument> documents = knowledgeBaseDocumentService.getKnowledgeBaseDocuments(knowledgeBaseId);
 
         for (KnowledgeBaseDocument document : documents) {

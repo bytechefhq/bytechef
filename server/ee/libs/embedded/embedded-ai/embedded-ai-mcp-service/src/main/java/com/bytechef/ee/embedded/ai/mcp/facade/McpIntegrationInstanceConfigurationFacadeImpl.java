@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceConfigurationAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -25,6 +26,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflo
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -92,6 +95,13 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @Audited(
+        event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_CREATED, data = {
+            @AuditData(key = "mcpIntegrationInstanceConfigurationId", value = "#result?.id"),
+            @AuditData(key = "mcpServerId", value = "#mcpServerId"),
+            @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
+            @AuditData(key = "workflowIds", value = "#selectedWorkflowIds")
+        })
     @PreAuthorize("isTenantAdmin()")
     public McpIntegrationInstanceConfiguration createMcpIntegrationInstanceConfiguration(
         long mcpServerId, long integrationInstanceConfigurationId, List<String> selectedWorkflowIds) {
@@ -101,6 +111,13 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @Audited(
+        event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_CREATED, data = {
+            @AuditData(key = "mcpIntegrationInstanceConfigurationId", value = "#result?.id"),
+            @AuditData(key = "mcpServerId", value = "#mcpServerId"),
+            @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
+            @AuditData(key = "workflowIds", value = "#selectedWorkflowIds")
+        })
     @PreAuthorize("isTenantAdmin()")
     public McpIntegrationInstanceConfiguration createMcpIntegrationInstanceConfiguration(
         long mcpServerId, long integrationInstanceConfigurationId, List<String> selectedWorkflowIds,
@@ -143,6 +160,10 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @Audited(
+        event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_DELETED, data = {
+            @AuditData(key = "mcpIntegrationInstanceConfigurationId", value = "#mcpIntegrationInstanceConfigurationId")
+        })
     @PreAuthorize("isTenantAdmin()")
     public void deleteMcpIntegrationInstanceConfiguration(long mcpIntegrationInstanceConfigurationId) {
         mcpIntegrationInstanceConfigurationService
@@ -173,6 +194,12 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @Audited(
+        event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_UPDATED, data = {
+            @AuditData(key = "mcpIntegrationInstanceConfigurationId", value = "#mcpIntegrationInstanceConfigurationId"),
+            @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
+            @AuditData(key = "workflowIds", value = "#selectedWorkflowIds")
+        })
     @PreAuthorize("isTenantAdmin()")
     public McpIntegrationInstanceConfiguration updateMcpIntegrationInstanceConfiguration(
         long mcpIntegrationInstanceConfigurationId, List<String> selectedWorkflowIds) {
@@ -182,6 +209,12 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @Audited(
+        event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_UPDATED, data = {
+            @AuditData(key = "mcpIntegrationInstanceConfigurationId", value = "#mcpIntegrationInstanceConfigurationId"),
+            @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
+            @AuditData(key = "workflowIds", value = "#selectedWorkflowIds")
+        })
     @PreAuthorize("isTenantAdmin()")
     public McpIntegrationInstanceConfiguration updateMcpIntegrationInstanceConfiguration(
         long mcpIntegrationInstanceConfigurationId, List<String> selectedWorkflowIds,
@@ -283,6 +316,13 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
+    @Audited(
+        event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_VERSION_UPDATED,
+        data = {
+            @AuditData(key = "mcpIntegrationInstanceConfigurationId", value = "#mcpIntegrationInstanceConfigurationId"),
+            @AuditData(key = "integrationVersion", value = "#integrationVersion"),
+            @AuditData(key = "workflowUuids", value = "#workflowUuids")
+        })
     @PreAuthorize("isTenantAdmin()")
     public void updateMcpIntegrationInstanceConfigurationVersion(
         long mcpIntegrationInstanceConfigurationId, int integrationVersion, List<String> workflowUuids) {
