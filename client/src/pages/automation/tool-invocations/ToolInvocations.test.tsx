@@ -117,6 +117,12 @@ describe('ToolInvocations', () => {
         expect(itemValues).not.toContain('MCP_MANAGEMENT');
     });
 
+    it('offers a paused run as an outcome filter', () => {
+        renderToolInvocations();
+
+        expect(renderedItemValues()).toContain('SUSPENDED');
+    });
+
     it('reads the invocations of the platform type and environment it is given', () => {
         renderToolInvocations({environmentId: 1, type: PlatformType.Embedded});
 

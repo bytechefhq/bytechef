@@ -29,6 +29,7 @@ const outcomeOptions = [
     {label: 'Timeout', value: 'TIMEOUT'},
     {label: 'Approval required', value: 'APPROVAL_REQUIRED'},
     {label: 'Approval denied', value: 'APPROVAL_DENIED'},
+    {label: 'Suspended', value: 'SUSPENDED'},
 ];
 
 const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
