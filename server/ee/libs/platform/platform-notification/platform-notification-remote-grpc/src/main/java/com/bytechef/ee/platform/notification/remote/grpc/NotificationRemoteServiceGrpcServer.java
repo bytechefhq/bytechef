@@ -17,6 +17,7 @@ import com.bytechef.platform.notification.handler.EmailNotificationHandler;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.NotificationSender;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
+import com.bytechef.platform.notification.handler.SlackNotificationHandler;
 import com.bytechef.platform.notification.handler.WebhookNotificationHandler;
 import com.bytechef.platform.notification.service.NotificationService;
 import com.google.protobuf.Empty;
@@ -86,7 +87,7 @@ public class NotificationRemoteServiceGrpcServer
      * The subject and content the calling app rendered with its own notification handler for the event.
      */
     private record RenderedNotificationHandler(String subject, String content, boolean html)
-        implements EmailNotificationHandler, WebhookNotificationHandler {
+        implements EmailNotificationHandler, SlackNotificationHandler, WebhookNotificationHandler {
 
         @Override
         public String getContent(NotificationHandlerContext notificationHandlerContext) {
@@ -94,8 +95,18 @@ public class NotificationRemoteServiceGrpcServer
         }
 
         @Override
+        public String getPayload(NotificationHandlerContext notificationHandlerContext) {
+            return content;
+        }
+
+        @Override
         public String getSubject(NotificationHandlerContext notificationHandlerContext) {
             return subject;
+        }
+
+        @Override
+        public String getText(NotificationHandlerContext notificationHandlerContext) {
+            return content;
         }
 
         @Override

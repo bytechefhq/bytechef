@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.platform.notification.remote.client.config.NotificationRemoteClientIntTestConfiguration;
 import com.bytechef.ee.platform.notification.remote.client.config.NotificationRemoteClientIntTestConfiguration.RecordingJavaMailSender;
+import com.bytechef.ee.platform.notification.remote.client.config.NotificationRemoteClientIntTestConfiguration.RecordingWebhookNotificationClient;
 import com.bytechef.ee.platform.notification.remote.grpc.NotificationProtoMapper;
 import com.bytechef.ee.platform.notification.remote.grpc.NotificationRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
@@ -63,6 +64,9 @@ class RemoteWebhookNotificationSenderIntTest {
     @Autowired
     private RecordingJavaMailSender recordingJavaMailSender;
 
+    @Autowired
+    private RecordingWebhookNotificationClient recordingWebhookNotificationClient;
+
     private ManagedChannel managedChannel;
     private Server server;
 
@@ -83,17 +87,26 @@ class RemoteWebhookNotificationSenderIntTest {
         }
 
         recordingJavaMailSender.clear();
+        recordingWebhookNotificationClient.clear();
     }
 
     @Test
-    void testSendIsHandledByTheServingAppsWebhookSenderWithoutMailing() throws IOException {
+    void testSendDeliversTheCallersPayloadThroughTheServingAppsWebhookSender() throws IOException {
         RemoteWebhookNotificationSender remoteWebhookNotificationSender = startServer(notificationSenderRegistry);
 
         assertThatCode(
             () -> remoteWebhookNotificationSender.send(
-                notification(), null, new NotificationHandlerContext.Builder().build()))
+                notification(), notificationHandlerContext -> "{\"jobId\":42}",
+                new NotificationHandlerContext.Builder().build()))
                     .doesNotThrowAnyException();
 
+        assertThat(recordingWebhookNotificationClient.getWebhookDeliveryRequests())
+            .singleElement()
+            .satisfies(webhookDeliveryRequest -> {
+                assertThat(webhookDeliveryRequest.url()).isEqualTo("https://hooks.example.com/jobs");
+                assertThat(webhookDeliveryRequest.payloadJson()).isEqualTo("{\"jobId\":42}");
+                assertThat(webhookDeliveryRequest.secret()).isEqualTo("hook-secret");
+            });
         assertThat(recordingJavaMailSender.getSentMimeMessages()).isEmpty();
     }
 
@@ -112,6 +125,7 @@ class RemoteWebhookNotificationSenderIntTest {
                     .isEqualTo(Status.Code.INTERNAL);
 
         assertThat(recordingJavaMailSender.getSentMimeMessages()).isEmpty();
+        assertThat(recordingWebhookNotificationClient.getWebhookDeliveryRequests()).isEmpty();
     }
 
     private RemoteWebhookNotificationSender startServer(NotificationSenderRegistry senderRegistry)
@@ -142,7 +156,8 @@ class RemoteWebhookNotificationSenderIntTest {
         notification.setId(6L);
         notification.setName("Failed jobs hook");
         notification.setNotificationEventIds(List.of(4L));
-        notification.setSettings(Map.of("email", "ops@example.com", "url", "https://hooks.example.com/jobs"));
+        notification.setSettings(Map.of(
+            "email", "ops@example.com", "webhook", "https://hooks.example.com/jobs", "webhookSecret", "hook-secret"));
         notification.setType(Notification.Type.WEBHOOK);
 
         return notification;
