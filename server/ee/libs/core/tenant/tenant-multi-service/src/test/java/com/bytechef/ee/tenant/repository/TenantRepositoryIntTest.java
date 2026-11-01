@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.tenant.config.TenantMultiServiceIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -59,6 +60,7 @@ class TenantRepositoryIntTest {
         tablesBefore = fetchTables();
     }
 
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     @AfterEach
     void afterEach() {
         for (String schema : fetchSchemas()) {

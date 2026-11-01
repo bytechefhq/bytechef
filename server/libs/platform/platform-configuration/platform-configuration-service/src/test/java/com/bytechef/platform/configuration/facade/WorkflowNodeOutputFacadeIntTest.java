@@ -62,6 +62,7 @@ import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,7 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
 @ActiveProfiles("testint")
 @PlatformConfigurationIntTestConfigurationSharedMocks
 @SpringBootTest(classes = PlatformConfigurationIntTestConfiguration.class)

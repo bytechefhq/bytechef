@@ -33,7 +33,9 @@ public class TenantChangelogProbeChange implements CustomTaskChange {
     private boolean setUp;
 
     @Override
-    @SuppressFBWarnings("SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING")
+    @SuppressFBWarnings({
+        "SQL_INJECTION_JDBC", "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"
+    })
     public void execute(Database database) throws CustomChangeException {
         JdbcConnection jdbcConnection = (JdbcConnection) database.getConnection();
 
