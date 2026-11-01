@@ -8,6 +8,10 @@ openapi:
       embedded: /api/embedded
       platform: /api/platform
 
+spring:
+  liquibase:
+    contexts: execution
+
 bytechef:
   data-storage:
     provider: JDBC
