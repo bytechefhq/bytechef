@@ -76,7 +76,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -98,7 +97,7 @@ class WorkflowNodeTestOutputFacadeIntTest {
     @Autowired
     private ClusterElementDefinitionService clusterElementDefinitionService;
 
-    @MockitoBean
+    @Autowired
     private CodeEditorScriptInputFacade codeEditorScriptInputFacade;
 
     @Autowired
@@ -396,6 +395,8 @@ class WorkflowNodeTestOutputFacadeIntTest {
         workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
             workflow.getId(), "aiAgent_1", "googleMail_1", 21L, false, ENVIRONMENT_ID);
 
+        when(triggerDefinitionService.getTriggerDefinition("manual", 1, "manual"))
+            .thenReturn(mock(TriggerDefinition.class));
         when(clusterElementDefinitionService.getClusterElementType("aiAgent", 1, "tools"))
             .thenReturn(new ClusterElementType("tools", "tools", "Tools", true, false));
         when(clusterElementDefinitionFacade.executeTool(

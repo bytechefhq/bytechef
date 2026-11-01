@@ -51,7 +51,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -100,7 +99,7 @@ class WorkflowNodeScriptFacadeIntTest {
     @Autowired
     private ClusterElementDefinitionService clusterElementDefinitionService;
 
-    @MockitoBean
+    @Autowired
     private CodeEditorScriptInputFacade codeEditorScriptInputFacade;
 
     @Autowired
