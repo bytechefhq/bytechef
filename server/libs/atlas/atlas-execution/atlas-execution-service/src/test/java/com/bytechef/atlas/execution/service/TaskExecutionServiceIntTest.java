@@ -26,6 +26,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.file.storage.domain.FileEntry;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,8 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @SpringBootTest(classes = AtlasExecutionServiceIntTestConfiguration.class)
 public class TaskExecutionServiceIntTest {
+
+    private static final int CONCURRENT_UPDATES = 4;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -205,6 +208,40 @@ public class TaskExecutionServiceIntTest {
 
         assertThat(completedTaskExecution.getStartDate()).isEqualTo(startDate);
         assertThat(getPersistedTaskExecution(taskExecutionId).getStartDate()).isEqualTo(startDate);
+
+        assertRowLockReleased(taskExecutionId);
+    }
+
+    @Test
+    public void testUpdateWithModifierKeepsEveryConcurrentUpdate() throws Exception {
+        long taskExecutionId = getId(saveTaskExecution(saveJob(), TaskExecution.Status.STARTED));
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        List<Future<TaskExecution>> futures = new ArrayList<>();
+
+        try (ExecutorService executorService = Executors.newFixedThreadPool(CONCURRENT_UPDATES)) {
+            for (int index = 0; index < CONCURRENT_UPDATES; index++) {
+                String branchName = "branch_" + index;
+
+                futures.add(executorService.submit(() -> {
+                    awaitLatch(startLatch);
+
+                    return taskExecutionService.update(
+                        taskExecutionId, lockedTaskExecution -> appendBranchName(lockedTaskExecution, branchName));
+                }));
+            }
+
+            startLatch.countDown();
+
+            for (Future<TaskExecution> future : futures) {
+                future.get(30, TimeUnit.SECONDS);
+            }
+        }
+
+        FileEntry output = Validate.notNull(getPersistedTaskExecution(taskExecutionId).getOutput(), "output");
+
+        assertThat(output.getName()
+            .split(",")).containsExactlyInAnyOrder("branch_0", "branch_1", "branch_2", "branch_3");
 
         assertRowLockReleased(taskExecutionId);
     }
@@ -454,6 +491,23 @@ public class TaskExecutionServiceIntTest {
                 .getId(),
                 children.get(3)
                     .getId());
+    }
+
+    private static void appendBranchName(TaskExecution taskExecution, String branchName) {
+        FileEntry output = taskExecution.getOutput();
+
+        String branchNames = output == null ? branchName : output.getName() + "," + branchName;
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
+
+            throw new IllegalStateException(interruptedException);
+        }
+
+        taskExecution.setOutput(new FileEntry(branchNames, "memory://outputs"));
     }
 
     private void assertRowLockReleased(long taskExecutionId) {
