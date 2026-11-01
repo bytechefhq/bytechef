@@ -16,6 +16,12 @@ export interface ToolInvocationsWorkspaceScopeI {
     workspaceId: number | undefined;
 }
 
+export interface UseToolInvocationsOptionsI {
+    environmentId?: number;
+    type: PlatformType;
+    workspaceScope?: ToolInvocationsWorkspaceScopeI;
+}
+
 interface ToolInvocationsFiltersI {
     endDate: Date | undefined;
     mcpServerId: string | undefined;
@@ -46,17 +52,26 @@ interface UseToolInvocationsI {
     toolInvocationLogsIsLoading: boolean;
 }
 
-const toFilterVariables = (filters: ToolInvocationsFiltersI): ToolInvocationLogsQueryVariables => ({
+const toFilterVariables = (
+    filters: ToolInvocationsFiltersI,
+    type: PlatformType,
+    environmentId?: number
+): ToolInvocationLogsQueryVariables => ({
+    environmentId: environmentId != null ? String(environmentId) : undefined,
     fromDate: filters.startDate ? filters.startDate.getTime() : undefined,
     mcpServerId: filters.mcpServerId ? Number(filters.mcpServerId) : undefined,
     outcome: filters.outcome || undefined,
     page: filters.pageNumber,
     surface: filters.surface || undefined,
     toDate: filters.endDate ? endOfDay(filters.endDate).getTime() : undefined,
-    type: PlatformType.Automation,
+    type,
 });
 
-export const useToolInvocations = (workspaceScope?: ToolInvocationsWorkspaceScopeI): UseToolInvocationsI => {
+export const useToolInvocations = ({
+    environmentId,
+    type,
+    workspaceScope,
+}: UseToolInvocationsOptionsI): UseToolInvocationsI => {
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(undefined);
     const [filterMcpServerId, setFilterMcpServerId] = useState<string | undefined>(undefined);
     const [filterOutcome, setFilterOutcome] = useState<string | undefined>(undefined);
@@ -64,14 +79,18 @@ export const useToolInvocations = (workspaceScope?: ToolInvocationsWorkspaceScop
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(undefined);
     const [filterSurface, setFilterSurface] = useState<string | undefined>(undefined);
 
-    const filterVariables = toFilterVariables({
-        endDate: filterEndDate,
-        mcpServerId: filterMcpServerId,
-        outcome: filterOutcome,
-        pageNumber: filterPageNumber,
-        startDate: filterStartDate,
-        surface: filterSurface,
-    });
+    const filterVariables = toFilterVariables(
+        {
+            endDate: filterEndDate,
+            mcpServerId: filterMcpServerId,
+            outcome: filterOutcome,
+            pageNumber: filterPageNumber,
+            startDate: filterStartDate,
+            surface: filterSurface,
+        },
+        type,
+        environmentId
+    );
     const workspaceScoped = workspaceScope !== undefined;
 
     const tenantQuery = useToolInvocationLogsQuery(filterVariables, {enabled: !workspaceScoped});
