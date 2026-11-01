@@ -9,13 +9,20 @@ package com.bytechef.ee.atlas.execution.remote.grpc;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.Int64ListResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobRemoteServiceGrpc;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobResult;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJob;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJobs;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.StaleJobsRequest;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.WorkflowIdRequest;
+import com.google.protobuf.Timestamp;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -53,6 +60,35 @@ public class JobRemoteServiceGrpcServer extends JobRemoteServiceGrpc.JobRemoteSe
     }
 
     @Override
+    public void getChildJobIds(IdRequest request, StreamObserver<Int64ListResponse> responseObserver) {
+        List<Long> childJobIds = jobService.getChildJobIds(request.getId());
+
+        responseObserver.onNext(
+            Int64ListResponse.newBuilder()
+                .addAllValues(childJobIds)
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getStaleJobs(StaleJobsRequest request, StreamObserver<RemoteJobs> responseObserver) {
+        Timestamp lastModifiedDateBefore = request.getLastModifiedDateBefore();
+
+        List<Job> staleJobs = jobService.getStaleJobs(
+            Job.Status.valueOf(request.getStatus()),
+            Instant.ofEpochSecond(lastModifiedDateBefore.getSeconds(), lastModifiedDateBefore.getNanos()));
+
+        RemoteJobs.Builder builder = RemoteJobs.newBuilder();
+
+        for (Job staleJob : staleJobs) {
+            builder.addJobs(atlasExecutionProtoMapper.toProto(staleJob));
+        }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void getJob(IdRequest request, StreamObserver<RemoteJob> responseObserver) {
         responseObserver.onNext(atlasExecutionProtoMapper.toProto(jobService.getJob(request.getId())));
         responseObserver.onCompleted();
@@ -79,6 +115,17 @@ public class JobRemoteServiceGrpcServer extends JobRemoteServiceGrpc.JobRemoteSe
     @Override
     public void setStatusToStopped(IdRequest request, StreamObserver<RemoteJob> responseObserver) {
         responseObserver.onNext(atlasExecutionProtoMapper.toProto(jobService.setStatusToStopped(request.getId())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void tryClaimResume(RemoteJob request, StreamObserver<BoolResponse> responseObserver) {
+        boolean claimed = jobService.tryClaimResume(atlasExecutionProtoMapper.toJob(request));
+
+        responseObserver.onNext(
+            BoolResponse.newBuilder()
+                .setValue(claimed)
+                .build());
         responseObserver.onCompleted();
     }
 
