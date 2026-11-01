@@ -18,6 +18,7 @@ package com.bytechef.async.config;
 
 import com.bytechef.tenant.concurrent.TenantTaskDecorator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.concurrent.Executor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -49,12 +50,14 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     public static final String MESSAGE_EVENT_EXECUTOR = "messageEventExecutor";
     public static final String TASK_EXECUTOR = "taskExecutor";
+    public static final String WEBHOOK_DELIVERY_EXECUTOR = "webhookDeliveryExecutor";
     public static final String WORKER_EXECUTOR = "workerExecutor";
     public static final String SYNC_WORKER_EXECUTOR = "syncWorkerExecutor";
 
     private static final int DEFAULT_SYNC_WORKER_CONCURRENCY = 5;
     private static final int DEFAULT_WORKER_CONCURRENCY = 10;
     private static final String SYNC_WORKER_CONCURRENCY_PROPERTY = "bytechef.worker.task.sync-concurrency-limit";
+    private static final Duration WEBHOOK_DELIVERY_TERMINATION_TIMEOUT = Duration.ofSeconds(10);
     private static final String WORKER_CONCURRENCY_PROPERTY = "bytechef.worker.task.subscriptions.default";
 
     private final Environment environment;
@@ -98,6 +101,17 @@ public class AsyncConfiguration implements AsyncConfigurer {
             SYNC_WORKER_CONCURRENCY_PROPERTY, Integer.class, DEFAULT_SYNC_WORKER_CONCURRENCY);
 
         return createExecutor("sync-worker-", concurrencyLimit);
+    }
+
+    @Bean(name = WEBHOOK_DELIVERY_EXECUTOR)
+    AsyncTaskExecutor webhookDeliveryExecutor() {
+        SimpleAsyncTaskExecutor executor = createExecutor(
+            "webhook-delivery-", SimpleAsyncTaskExecutor.UNBOUNDED_CONCURRENCY);
+
+        executor.setCancelRemainingTasksOnClose(true);
+        executor.setTaskTerminationTimeout(WEBHOOK_DELIVERY_TERMINATION_TIMEOUT.toMillis());
+
+        return executor;
     }
 
     @Bean(name = WORKER_EXECUTOR)
