@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.audit.listener;
 
-import com.bytechef.ee.platform.audit.repository.CustomAuditEventRepository;
+import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.authentication.TenantPrincipal;
 import com.bytechef.tenant.TenantContext;
@@ -78,7 +78,7 @@ public class CredentialRedactingAuthenticationAuditListener extends Authenticati
 
         Map<String, Object> data = new HashMap<>(auditEvent.getData());
 
-        data.put(CustomAuditEventRepository.TENANT_ID_DATA_KEY, tenantId);
+        data.put(AuditEventConverter.TENANT_ID_DATA_KEY, tenantId);
 
         super.publish(
             new AuditEvent(auditEvent.getTimestamp(), auditEvent.getPrincipal(), auditEvent.getType(), data));
