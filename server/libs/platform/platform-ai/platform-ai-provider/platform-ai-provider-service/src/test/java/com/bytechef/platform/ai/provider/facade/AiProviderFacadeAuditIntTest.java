@@ -25,7 +25,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.audit.AiProviderAuditEvents;
 import com.bytechef.platform.ai.provider.audit.AiProviderAuditMapper;
@@ -257,7 +257,7 @@ class AiProviderFacadeAuditIntTest {
     @Configuration
     @EnableMethodSecurity
     @Import({
-        AiProviderAuditMapper.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class,
+        AiProviderAuditMapper.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventServiceImpl.class,
         AuditMapperResolver.class
     })
     static class AuditConfiguration {
