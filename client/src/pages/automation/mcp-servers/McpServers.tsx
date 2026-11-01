@@ -1,7 +1,9 @@
 import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
+import {MCP_SERVERS_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
@@ -14,6 +16,17 @@ import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/compo
 import {useQueryClient} from '@tanstack/react-query';
 import {ServerIcon} from 'lucide-react';
 import {useEffect} from 'react';
+
+const MCP_SERVER_STEPS = [
+    {
+        description: 'Name it and choose whether clients must authenticate.',
+        id: 'createMcpServer',
+        label: 'Create an MCP server',
+        status: 'current' as const,
+    },
+    {id: 'addTools', label: 'Add component actions or workflows as tools', status: 'upcoming' as const},
+    {id: 'connectAiClient', label: "Add the server's URL to an AI client", status: 'upcoming' as const},
+];
 
 import McpServerDialog from './components/McpServerDialog';
 import McpServersFilterTitle from './components/McpServersFilterTitle';
@@ -47,6 +60,8 @@ const McpServers = () => {
     } = useMcpServers();
 
     const queryClient = useQueryClient();
+
+    const isFirstRun = !mcpServersIsLoading && !tagsIsLoading && !mcpServersError && validMcpServers.length === 0;
 
     useEffect(() => {
         return registerPostTurn(Source.MCP_SERVER, () => {
@@ -85,7 +100,7 @@ const McpServers = () => {
                                 uniqueProjects={uniqueProjects}
                             />
                         ) : (
-                            ''
+                            isFirstRun && 'MCP Servers'
                         )
                     }
                 />
@@ -104,6 +119,7 @@ const McpServers = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="MCP Servers" />}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[mcpServersError, tagsError]} loading={mcpServersIsLoading || tagsIsLoading}>
@@ -116,14 +132,22 @@ const McpServers = () => {
                 ) : validMcpServers.length > 0 ? (
                     <EmptyFilterResult entityName="MCP servers" entityTitle="MCP Servers" />
                 ) : (
-                    <EmptyList
-                        button={
+                    <EmptyState
+                        actions={
                             <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
                         }
-                        icon={<ServerIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new MCP server."
-                        title="No MCP Servers"
-                    />
+                        description="An MCP server turns component actions and workflows into tools that AI assistants like Claude or Cursor can call, through a single URL. Three steps to get there:"
+                        docsLink={{href: MCP_SERVERS_DOCUMENTATION_URL, label: 'How MCP servers work'}}
+                        icon={<ServerIcon />}
+                        title="Create your first MCP server"
+                    >
+                        <JourneySteps
+                            aria-label="Getting started"
+                            className="max-w-md"
+                            orientation="vertical"
+                            steps={MCP_SERVER_STEPS}
+                        />
+                    </EmptyState>
                 )}
             </PageLoader>
         </LayoutContainer>

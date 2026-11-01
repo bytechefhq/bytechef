@@ -7,8 +7,14 @@ const hoisted = vi.hoisted(() => {
     return {
         mockUseKnowledgeBase: vi.fn(),
         mockUseKnowledgeBaseEmbeddingActive: vi.fn(),
+        navigate: vi.fn(),
     };
 });
+
+vi.mock('react-router-dom', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('react-router-dom')>()),
+    useNavigate: () => hoisted.navigate,
+}));
 
 vi.mock('../hooks/useKnowledgeBase', () => ({
     default: hoisted.mockUseKnowledgeBase,
@@ -63,19 +69,25 @@ vi.mock('@/shared/layout/LayoutContainer', () => ({
         header,
         leftSidebarBody,
         leftSidebarHeader,
+        leftSidebarHidden,
     }: {
         children: React.ReactNode;
         header: React.ReactNode;
         leftSidebarBody: React.ReactNode;
         leftSidebarHeader: React.ReactNode;
+        leftSidebarHidden?: boolean;
         leftSidebarWidth: string;
     }) => (
         <div data-testid="layout-container">
             <div data-testid="layout-header">{header}</div>
 
-            <div data-testid="layout-sidebar-header">{leftSidebarHeader}</div>
+            {!leftSidebarHidden && (
+                <>
+                    <div data-testid="layout-sidebar-header">{leftSidebarHeader}</div>
 
-            <div data-testid="layout-sidebar-body">{leftSidebarBody}</div>
+                    <div data-testid="layout-sidebar-body">{leftSidebarBody}</div>
+                </>
+            )}
 
             <div data-testid="layout-content">{children}</div>
         </div>
@@ -193,12 +205,14 @@ describe('KnowledgeBase', () => {
 });
 
 describe('KnowledgeBase embedding gate', () => {
-    it('shows only the banner when embedding is not active', () => {
+    it('asks to turn on an embedding model, without the sidebar, when embedding is not active', () => {
         hoisted.mockUseKnowledgeBaseEmbeddingActive.mockReturnValue({embeddingActive: false, isLoading: false});
 
         render(<KnowledgeBase />);
 
-        expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'Turn on an embedding model'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Go to AI Providers'})).toBeInTheDocument();
+        expect(screen.queryByTestId('layout-sidebar-header')).not.toBeInTheDocument();
         expect(screen.queryByTestId('knowledge-base-info-card')).not.toBeInTheDocument();
         expect(screen.queryByTestId('knowledge-base-tabs')).not.toBeInTheDocument();
         expect(screen.queryByTestId('knowledge-base-left-sidebar')).not.toBeInTheDocument();

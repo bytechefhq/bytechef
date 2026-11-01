@@ -3,6 +3,7 @@ import {useToolInvocations} from '@/pages/automation/tool-invocations/hooks/useT
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {act} from '@testing-library/react';
+import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -16,6 +17,7 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     PlatformType: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
+    useEnvironmentsQuery: () => ({data: undefined}),
     useToolInvocationLogsQuery: hoisted.useToolInvocationLogsQueryMock,
     useWorkspaceMcpServersQuery: hoisted.useWorkspaceMcpServersQueryMock,
     useWorkspaceToolInvocationLogsQuery: hoisted.useWorkspaceToolInvocationLogsQueryMock,
@@ -23,10 +25,12 @@ vi.mock('@/shared/middleware/graphql', () => ({
 
 vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
     ToolInvocations: ({
+        firstRunEmptyState,
         mcpServerOptions,
         type,
         workspaceScope,
     }: {
+        firstRunEmptyState: ReactNode;
         mcpServerOptions: Array<{label: string; value: string}>;
     } & Parameters<typeof useToolInvocations>[0]) => {
         const {
@@ -57,6 +61,8 @@ vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
                         </li>
                     ))}
                 </ul>
+
+                {firstRunEmptyState}
             </div>
         );
     },
@@ -155,5 +161,27 @@ describe('AutomationToolInvocations', () => {
 
         expect(hoisted.useWorkspaceMcpServersQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
         expect(screen.queryAllByTestId('mcp-server-option')).toHaveLength(0);
+    });
+
+    it('guides a new user to create an MCP server when the environment has none', () => {
+        hoisted.useWorkspaceMcpServersQueryMock.mockReturnValue({
+            data: {workspaceMcpServers: [{environmentId: '3', id: '11', name: 'Sales tools'}]},
+        });
+
+        renderPage();
+
+        expect(screen.getByText('Create an MCP server').closest('li')).toHaveAttribute('aria-current', 'step');
+        expect(screen.getByText('Connect an AI client').closest('li')).not.toHaveAttribute('aria-current');
+    });
+
+    it('moves the guide on to connecting an AI client once the environment has an MCP server', () => {
+        hoisted.useWorkspaceMcpServersQueryMock.mockReturnValue({
+            data: {workspaceMcpServers: [{environmentId: '2', id: '11', name: 'Sales tools'}]},
+        });
+
+        renderPage();
+
+        expect(screen.getByText('Completed:')).toBeInTheDocument();
+        expect(screen.getByText('Connect an AI client').closest('li')).toHaveAttribute('aria-current', 'step');
     });
 });

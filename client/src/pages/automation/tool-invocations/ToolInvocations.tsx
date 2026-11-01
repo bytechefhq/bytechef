@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
@@ -16,7 +17,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {PlatformType} from '@/shared/middleware/graphql';
 import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
-import {useMemo} from 'react';
+import {ReactNode, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ANY_FILTER_OPTION = {label: 'Any', value: ''};
@@ -46,12 +47,20 @@ const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
 
 interface ToolInvocationsProps {
     environmentId?: number;
+    /* Replaces the generic empty state when nothing has been recorded yet and no filter is set. */
+    firstRunEmptyState?: ReactNode;
     mcpServerOptions?: Array<ComboBoxItemType>;
     type: PlatformType;
     workspaceScope?: ToolInvocationsWorkspaceScopeI;
 }
 
-export const ToolInvocations = ({environmentId, mcpServerOptions, type, workspaceScope}: ToolInvocationsProps) => {
+export const ToolInvocations = ({
+    environmentId,
+    firstRunEmptyState,
+    mcpServerOptions,
+    type,
+    workspaceScope,
+}: ToolInvocationsProps) => {
     const {
         filterEndDate,
         filterMcpServerId,
@@ -74,6 +83,16 @@ export const ToolInvocations = ({environmentId, mcpServerOptions, type, workspac
     } = useToolInvocations({environmentId, type, workspaceScope});
 
     const visibleSurfaceOptions = useMemo(() => [ANY_FILTER_OPTION, ...surfaceOptionsByType[type]], [type]);
+
+    const hasActiveFilters =
+        !!filterEndDate || !!filterMcpServerId || !!filterOutcome || !!filterStartDate || !!filterSurface;
+
+    const isFirstRun =
+        !toolInvocationLogsIsLoading &&
+        !toolInvocationLogsError &&
+        !hasActiveFilters &&
+        filterPageNumber === 0 &&
+        toolInvocationLogs.length === 0;
 
     return (
         <LayoutContainer
@@ -161,16 +180,25 @@ export const ToolInvocations = ({environmentId, mcpServerOptions, type, workspac
                 </div>
             }
             leftSidebarHeader={<Header position="sidebar" title="Tool Invocations" />}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[toolInvocationLogsError]} loading={toolInvocationLogsIsLoading}>
                 {toolInvocationLogs.length > 0 ? (
                     <ToolInvocationsTable toolInvocationLogs={toolInvocationLogs} />
+                ) : isFirstRun ? (
+                    firstRunEmptyState || (
+                        <EmptyState
+                            description="Each time an AI client calls a tool through an MCP server, the call is recorded here with its outcome and duration. Tool inputs and outputs are never stored."
+                            icon={<ActivityIcon />}
+                            title="No tool calls yet"
+                        />
+                    )
                 ) : (
                     <EmptyList
                         icon={<ActivityIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="No tool invocations have been recorded yet."
-                        title="No Tool Invocations"
+                        message="No tool invocations match the current filter."
+                        title="No Matching Tool Invocations"
                     />
                 )}
             </PageLoader>

@@ -74,6 +74,8 @@ const toolInvocationLog = {
     toolName: 'slack_sendMessage',
 };
 
+const recordedToolInvocationsState = () => ({...toolInvocationsState(), toolInvocationLogs: [toolInvocationLog]});
+
 const renderedItemValues = () => screen.getAllByTestId('combo-box-item').map((item) => item.textContent);
 
 describe('ToolInvocations', () => {
@@ -83,6 +85,8 @@ describe('ToolInvocations', () => {
     });
 
     it('offers only the automation surfaces on the tenant-wide automation page', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+
         renderToolInvocations();
 
         const itemValues = renderedItemValues();
@@ -94,6 +98,8 @@ describe('ToolInvocations', () => {
     });
 
     it('offers the automation and management surfaces on the workspace-scoped page', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+
         renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         const itemValues = renderedItemValues();
@@ -105,6 +111,8 @@ describe('ToolInvocations', () => {
     });
 
     it('offers only the embedded surfaces on the embedded page', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+
         renderToolInvocations({environmentId: 1, type: PlatformType.Embedded});
 
         const itemValues = renderedItemValues();
@@ -117,6 +125,8 @@ describe('ToolInvocations', () => {
     });
 
     it('offers a paused run as an outcome filter', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+
         renderToolInvocations();
 
         expect(renderedItemValues()).toContain('SUSPENDED');
@@ -132,12 +142,30 @@ describe('ToolInvocations', () => {
         });
     });
 
-    it('shows the empty state and no pagination when nothing has been recorded', () => {
+    it('shows the first-run empty state without filters or pagination when nothing has been recorded', () => {
         renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
-        expect(screen.getByText('No Tool Invocations')).toBeInTheDocument();
+        expect(screen.getByText('No tool calls yet')).toBeInTheDocument();
+        expect(screen.queryByText('Surface')).not.toBeInTheDocument();
         expect(screen.queryByRole('table')).not.toBeInTheDocument();
         expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
+    });
+
+    it('shows the first-run empty state it is given', () => {
+        renderToolInvocations({firstRunEmptyState: <div>Custom guide</div>});
+
+        expect(screen.getByText('Custom guide')).toBeInTheDocument();
+        expect(screen.queryByText('No tool calls yet')).not.toBeInTheDocument();
+    });
+
+    it('keeps the filters and shows a no-match state when a filter hides every record', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue({...toolInvocationsState(), filterOutcome: 'ERROR'});
+
+        renderToolInvocations({firstRunEmptyState: <div>Custom guide</div>});
+
+        expect(screen.getByText('No Matching Tool Invocations')).toBeInTheDocument();
+        expect(screen.getByText('Surface')).toBeInTheDocument();
+        expect(screen.queryByText('Custom guide')).not.toBeInTheDocument();
     });
 
     it('lists the invocations with pagination and moves to the page that is clicked', async () => {
@@ -158,7 +186,7 @@ describe('ToolInvocations', () => {
         renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
-        expect(screen.queryByText('No Tool Invocations')).not.toBeInTheDocument();
+        expect(screen.queryByText('No tool calls yet')).not.toBeInTheDocument();
         expect(screen.getByText(/Showing/)).toHaveTextContent('Showing 1 to 1 of 2 results');
 
         await userEvent.click(screen.getByText('2'));
@@ -197,10 +225,12 @@ describe('ToolInvocations', () => {
         renderToolInvocations();
 
         expect(screen.getByText('Some error occurred.')).toBeInTheDocument();
-        expect(screen.queryByText('No Tool Invocations')).not.toBeInTheDocument();
+        expect(screen.queryByText('No tool calls yet')).not.toBeInTheDocument();
     });
 
     it('offers the MCP server filter only when the workspace has MCP servers', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+
         const {unmount} = renderToolInvocations({mcpServerOptions: []});
 
         expect(screen.queryByText('MCP Server')).not.toBeInTheDocument();

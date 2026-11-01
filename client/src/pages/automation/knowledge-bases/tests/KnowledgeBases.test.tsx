@@ -1,4 +1,4 @@
-import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBases from '../KnowledgeBases';
@@ -9,6 +9,7 @@ const hoisted = vi.hoisted(() => {
         currentWorkspaceId: 1049,
         mockUseKnowledgeBaseEmbeddingActiveQuery: vi.fn(),
         mockUseKnowledgeBases: vi.fn(),
+        navigate: vi.fn(),
     };
 });
 
@@ -36,6 +37,11 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
         useKnowledgeBaseEmbeddingActiveQuery: hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery,
     };
 });
+
+vi.mock('react-router-dom', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('react-router-dom')>()),
+    useNavigate: () => hoisted.navigate,
+}));
 
 vi.mock('@/components/PageLoader', () => ({
     default: ({children, errors, loading}: {children: React.ReactNode; errors: unknown[]; loading: boolean}) =>
@@ -73,7 +79,11 @@ vi.mock('@/components/EmptyList', () => ({
 }));
 
 vi.mock('@/components/Button/Button', () => ({
-    default: ({children}: {children: React.ReactNode}) => <button data-testid="button">{children}</button>,
+    default: ({children, label, onClick}: {children?: React.ReactNode; label?: string; onClick?: () => void}) => (
+        <button data-testid="button" onClick={onClick}>
+            {children || label}
+        </button>
+    ),
 }));
 
 vi.mock('../components/CreateKnowledgeBaseDialog', () => ({
@@ -124,19 +134,25 @@ vi.mock('@/shared/layout/LayoutContainer', () => ({
         header,
         leftSidebarBody,
         leftSidebarHeader,
+        leftSidebarHidden,
     }: {
         children: React.ReactNode;
         header: React.ReactNode;
         leftSidebarBody: React.ReactNode;
         leftSidebarHeader: React.ReactNode;
+        leftSidebarHidden?: boolean;
         leftSidebarWidth: string;
     }) => (
         <div data-testid="layout-container">
             <div data-testid="layout-header">{header}</div>
 
-            <div data-testid="layout-sidebar-header">{leftSidebarHeader}</div>
+            {!leftSidebarHidden && (
+                <>
+                    <div data-testid="layout-sidebar-header">{leftSidebarHeader}</div>
 
-            <div data-testid="layout-sidebar-body">{leftSidebarBody}</div>
+                    <div data-testid="layout-sidebar-body">{leftSidebarBody}</div>
+                </>
+            )}
 
             <div data-testid="layout-content">{children}</div>
         </div>
@@ -250,7 +266,7 @@ describe('KnowledgeBases', () => {
         expect(screen.getByTestId('create-dialog-1049')).toBeInTheDocument();
     });
 
-    it('shows empty list when no knowledge bases', () => {
+    it('shows the getting-started guide without the sidebar when there are no knowledge bases', () => {
         hoisted.mockUseKnowledgeBases.mockReturnValue({
             ...defaultMockReturn,
             filteredKnowledgeBases: [],
@@ -259,20 +275,12 @@ describe('KnowledgeBases', () => {
 
         render(<KnowledgeBases />);
 
-        expect(screen.getByTestId('empty-list')).toBeInTheDocument();
-    });
-
-    it('shows default empty message when no tag filter', () => {
-        hoisted.mockUseKnowledgeBases.mockReturnValue({
-            ...defaultMockReturn,
-            filteredKnowledgeBases: [],
-            knowledgeBases: [],
-        });
-
-        render(<KnowledgeBases />);
-
-        expect(screen.getByText('No Knowledge Bases')).toBeInTheDocument();
-        expect(screen.getByText('Get started by creating a new knowledge base.')).toBeInTheDocument();
+        expect(screen.getByText('Create your first knowledge base')).toBeInTheDocument();
+        expect(screen.getByText('Turn on an embedding model').closest('li')).not.toHaveAttribute('aria-current');
+        expect(screen.getByText('Create a knowledge base').closest('li')).toHaveAttribute('aria-current', 'step');
+        expect(screen.getByTestId('create-dialog-1049')).toHaveTextContent('Create Knowledge Base');
+        expect(screen.queryByTestId('layout-sidebar-body')).not.toBeInTheDocument();
+        expect(screen.getByTestId('header-title')).toHaveTextContent('Knowledge Bases');
     });
 
     it('shows filtered empty message when tag filter active', () => {
@@ -286,6 +294,7 @@ describe('KnowledgeBases', () => {
 
         expect(screen.getByText('No Matching Knowledge Bases')).toBeInTheDocument();
         expect(screen.getByText('No knowledge bases match the selected tag.')).toBeInTheDocument();
+        expect(screen.getByTestId('left-sidebar-nav')).toBeInTheDocument();
     });
 
     it('does not render main header when no knowledge bases', () => {
@@ -301,7 +310,7 @@ describe('KnowledgeBases', () => {
     });
 });
 
-describe('KnowledgeBases embedding banner', () => {
+describe('KnowledgeBases embedding gate', () => {
     beforeEach(() => {
         windowResizeObserver();
         hoisted.mockUseKnowledgeBases.mockReturnValue({...defaultMockReturn});
@@ -312,39 +321,42 @@ describe('KnowledgeBases embedding banner', () => {
         vi.clearAllMocks();
     });
 
-    it('shows only the banner when embedding is not active', () => {
+    it('asks to turn the embedding model back on when knowledge bases exist but embedding is not active', async () => {
         hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
             data: {knowledgeBaseEmbeddingActive: false},
         });
 
         render(<KnowledgeBases />);
 
-        expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
-        expect(screen.getByText('Go to AI Providers')).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'Turn on an embedding model'})).toBeInTheDocument();
+
+        await userEvent.click(screen.getByText('Go to AI Providers'));
+
+        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/settings/ai-providers');
         expect(screen.queryByTestId('knowledge-base-list')).not.toBeInTheDocument();
         expect(screen.queryByTestId('empty-list')).not.toBeInTheDocument();
         expect(screen.queryByTestId('filter-title')).not.toBeInTheDocument();
         expect(screen.queryByText('New Knowledge Base')).not.toBeInTheDocument();
-        expect(screen.queryByTestId('left-sidebar-nav')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('layout-sidebar-body')).not.toBeInTheDocument();
     });
 
-    it('hides the banner when embedding is active', () => {
+    it('shows the list when embedding is active', () => {
         hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
             data: {knowledgeBaseEmbeddingActive: true},
         });
 
         render(<KnowledgeBases />);
 
-        expect(screen.queryByText('No embedding model is active')).not.toBeInTheDocument();
+        expect(screen.queryByText('Turn on an embedding model')).not.toBeInTheDocument();
         expect(screen.getByTestId('knowledge-base-list')).toBeInTheDocument();
     });
 
-    it('hides the banner by default when query has no data (fail-open)', () => {
+    it('shows the list by default when query has no data (fail-open)', () => {
         hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({data: undefined});
 
         render(<KnowledgeBases />);
 
-        expect(screen.queryByText('No embedding model is active')).not.toBeInTheDocument();
+        expect(screen.queryByText('Turn on an embedding model')).not.toBeInTheDocument();
     });
 
     it('shows the loader while the embedding query is loading', () => {
@@ -356,7 +368,7 @@ describe('KnowledgeBases embedding banner', () => {
         expect(screen.queryByTestId('knowledge-base-list')).not.toBeInTheDocument();
     });
 
-    it('shows only the banner when the knowledge base list is empty', () => {
+    it('starts the guide at the embedding model when there are no knowledge bases', () => {
         hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
             data: {knowledgeBaseEmbeddingActive: false},
         });
@@ -369,7 +381,9 @@ describe('KnowledgeBases embedding banner', () => {
 
         render(<KnowledgeBases />);
 
-        expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
+        expect(screen.getByText('Create your first knowledge base')).toBeInTheDocument();
+        expect(screen.getByText('Turn on an embedding model').closest('li')).toHaveAttribute('aria-current', 'step');
+        expect(screen.getByText('Go to AI Providers')).toBeInTheDocument();
         expect(screen.queryByText('Create Knowledge Base')).not.toBeInTheDocument();
     });
 });
