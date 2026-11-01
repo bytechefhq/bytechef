@@ -21,6 +21,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -161,6 +162,8 @@ const ConnectedUsers = () => {
         pageNumber: searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined,
         search: searchParams.get('search') ? searchParams.get('search')! : undefined,
     });
+
+    const initialLoadComplete = useInitialLoadComplete(connectedUsersLoading);
 
     const connectedUsers = connectedUsersPage?.content?.map((connectedUser: object) =>
         ConnectedUserFromJSON(connectedUser)
@@ -378,7 +381,7 @@ const ConnectedUsers = () => {
                 </Form>
             }
             leftSidebarHeader={<Header title="Connected Users" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[connectedUsersError]} loading={connectedUsersLoading}>

@@ -12,6 +12,7 @@ import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queri
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
@@ -74,6 +75,8 @@ const IntegrationInstanceConfigurations = () => {
         integrationId: searchParams.get('integrationId') ? parseInt(searchParams.get('integrationId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
+
+    const initialLoadComplete = useInitialLoadComplete(integrationInstanceConfigurationsLoading);
 
     const integrationInstanceConfigurationMap: Map<number, IntegrationInstanceConfiguration[]> = new Map<
         number,
@@ -217,7 +220,7 @@ const IntegrationInstanceConfigurations = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Instance Configurations" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader

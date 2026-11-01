@@ -6,6 +6,7 @@ import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
@@ -43,6 +44,8 @@ const McpServers = () => {
 
     const hasActiveFilter = filterData.id !== undefined;
 
+    const initialLoadComplete = useInitialLoadComplete(mcpServersIsLoading);
+
     const isFirstRun = !mcpServersIsLoading && !hasActiveFilter && validMcpServers.length === 0;
 
     return (
@@ -78,7 +81,7 @@ const McpServers = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="MCP Servers" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[mcpServersError, tagsError]} loading={mcpServersIsLoading || tagsIsLoading}>

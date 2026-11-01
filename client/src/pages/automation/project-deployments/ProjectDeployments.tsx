@@ -7,6 +7,7 @@ import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
@@ -95,6 +96,8 @@ const ProjectDeployments = () => {
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
+
+    const initialLoadComplete = useInitialLoadComplete(projectDeploymentsIsLoading);
 
     const projectDeploymentMap: Map<number, ProjectDeployment[]> = new Map<number, ProjectDeployment[]>();
 
@@ -213,7 +216,7 @@ const ProjectDeployments = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Deployments" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader

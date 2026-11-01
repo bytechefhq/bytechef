@@ -6,6 +6,7 @@ import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
 import {CHATS_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useWorkspaceChatWorkflowsQuery} from '@/shared/middleware/graphql';
@@ -33,6 +34,8 @@ const Chats = () => {
         environmentId: String(currentEnvironmentId),
         workspaceId: String(currentWorkspaceId),
     });
+
+    const initialLoadComplete = useInitialLoadComplete(chatWorkflowsIsLoading);
 
     const isFirstRun =
         !workflowExecutionId && !chatWorkflowsIsLoading && chatWorkflowsData?.workspaceChatWorkflows?.length === 0;
@@ -75,7 +78,7 @@ const Chats = () => {
             }
             leftSidebarBody={<ChatsSidebar />}
             leftSidebarHeader={<Header position="sidebar" title="Chats" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             {workflowExecutionId ? (

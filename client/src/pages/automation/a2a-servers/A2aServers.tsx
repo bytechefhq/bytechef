@@ -6,6 +6,7 @@ import PageLoader from '@/components/PageLoader';
 import {A2A_SERVERS_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {A2aServer} from '@/shared/middleware/graphql';
@@ -42,6 +43,8 @@ const A2aServers = () => {
         tagsIsLoading,
         uniqueProjects,
     } = useA2aServers();
+
+    const initialLoadComplete = useInitialLoadComplete(a2aServersIsLoading);
 
     const isFirstRun = !a2aServersIsLoading && !tagsIsLoading && !a2aServersError && a2aServers.length === 0;
 
@@ -112,7 +115,7 @@ const A2aServers = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="A2A Servers" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[a2aServersError, tagsError]} loading={a2aServersIsLoading || tagsIsLoading}>
