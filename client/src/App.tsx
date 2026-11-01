@@ -30,6 +30,7 @@ import {
     ServerCogIcon,
     ServerIcon,
     Settings2Icon,
+    SquareActivityIcon,
     SquareIcon,
     Table2Icon,
     UnplugIcon,
@@ -57,6 +58,8 @@ type NavigationType = {
     href: string;
     icon: LucideIcon;
 };
+
+const executionsNavigationGroup: NavigationGroupType = {icon: SquareActivityIcon, name: 'Executions'};
 
 const serversNavigationGroup: NavigationGroupType = {icon: ServerCogIcon, name: 'Servers'};
 
@@ -89,11 +92,13 @@ const automationNavigation: NavigationType[] = [
         name: 'A2A Servers',
     },
     {
+        group: executionsNavigationGroup,
         href: '/automation/executions',
         icon: ActivityIcon,
         name: 'Workflow Executions',
     },
     {
+        group: executionsNavigationGroup,
         href: '/automation/executions/tool-invocations',
         icon: WrenchIcon,
         name: 'Tool Invocations',
@@ -136,11 +141,13 @@ const embeddedNavigation: NavigationType[] = [
         name: 'Connected Users',
     },
     {
+        group: executionsNavigationGroup,
         href: '/embedded/executions',
         icon: ActivityIcon,
         name: 'Workflow Executions',
     },
     {
+        group: executionsNavigationGroup,
         href: '/embedded/executions/tool-invocations',
         icon: WrenchIcon,
         name: 'Tool Invocations',

@@ -170,7 +170,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
                         <nav aria-label="Main navigation">
                             <SidebarMenu>
                                 {sections.map((section, sectionIndex) => {
-                                    const group = collapsed && section.items.length < 2 ? undefined : section.group;
+                                    const group = section.items.length < 2 ? undefined : section.group;
 
                                     return (
                                         <Fragment key={`${section.group?.name || 'main'}-${sectionIndex}`}>
