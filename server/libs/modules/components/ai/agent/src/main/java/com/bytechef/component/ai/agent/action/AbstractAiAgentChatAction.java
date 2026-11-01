@@ -449,10 +449,14 @@ public abstract class AbstractAiAgentChatAction {
         Optional<GatedToolSuspension> gatedToolSuspensionOptional = GatedToolSuspension.from(
             continueParameters.toMap());
 
+        GateDecision gateDecision = null;
+
         if (gatedToolSuspensionOptional.isPresent()) {
+            gateDecision = GateDecision.from(data.toMap());
+
             toolResult = resolveGatedToolResumeData(
-                inputParameters, gatedToolSuspensionOptional.get(), GateDecision.from(data.toMap()),
-                connectionParameters, extensions, context);
+                inputParameters, gatedToolSuspensionOptional.get(), gateDecision, connectionParameters, extensions,
+                context, getSuspendedCallRef(agentToolSuspension));
 
             if (context instanceof ActionContextAware actionContextAware &&
                 ToolSuspension.isSuspendedToolResult(toolResult, actionContextAware.getSuspend())) {
@@ -465,7 +469,7 @@ public abstract class AbstractAiAgentChatAction {
             toolResult = resumeData.isEmpty() ? NO_HUMAN_RESPONSE_TOOL_RESULT : JsonUtils.write(resumeData);
         }
 
-        completeSuspendedCall(agentToolSuspension, toolResult, context);
+        endSuspendedCall(agentToolSuspension, toolResult, gateDecision instanceof GateDecision.Denied, context);
 
         List<Message> resumedConversation = agentToolSuspension.resumeConversation(toolResult);
 
@@ -482,13 +486,23 @@ public abstract class AbstractAiAgentChatAction {
             deferredToolCallReplay.conversation(), true, deferredToolCallReplay);
     }
 
-    private static void completeSuspendedCall(
-        AgentToolSuspension agentToolSuspension, String toolResult, ActionContext context) {
-
+    private static @Nullable ClusterElementCallRef getSuspendedCallRef(AgentToolSuspension agentToolSuspension) {
         String callId = agentToolSuspension.suspendedClusterElementCallId();
         String workflowNodeName = agentToolSuspension.suspendedClusterElementWorkflowNodeName();
 
-        if (callId == null || workflowNodeName == null || !(context instanceof ActionContextAware actionContext)) {
+        if (callId == null || workflowNodeName == null) {
+            return null;
+        }
+
+        return new ClusterElementCallRef(callId, workflowNodeName);
+    }
+
+    private static void endSuspendedCall(
+        AgentToolSuspension agentToolSuspension, String toolResult, boolean denied, ActionContext context) {
+
+        ClusterElementCallRef clusterElementCallRef = getSuspendedCallRef(agentToolSuspension);
+
+        if (clusterElementCallRef == null || !(context instanceof ActionContextAware actionContext)) {
             return;
         }
 
@@ -500,12 +514,16 @@ public abstract class AbstractAiAgentChatAction {
         }
 
         ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
-        ClusterElementCallRef clusterElementCallRef = new ClusterElementCallRef(callId, workflowNodeName);
 
-        clusterElementCallRecorder.callCompleted(jobId, taskExecutionId, clusterElementCallRef, toolResult);
+        if (denied) {
+            clusterElementCallRecorder.callDenied(jobId, taskExecutionId, clusterElementCallRef, toolResult);
+        } else {
+            clusterElementCallRecorder.callCompleted(jobId, taskExecutionId, clusterElementCallRef, toolResult);
+        }
 
         ClusterElementCallScope.callWith(clusterElementCallRef, () -> {
-            ToolCallLoggingToolCallback.logCall(context, workflowNodeName, null, toolResult);
+            ToolCallLoggingToolCallback.logCall(
+                context, clusterElementCallRef.workflowNodeName(), null, toolResult);
 
             return null;
         });
@@ -514,7 +532,8 @@ public abstract class AbstractAiAgentChatAction {
     @SuppressWarnings("unchecked")
     String resolveGatedToolResumeData(
         Parameters inputParameters, GatedToolSuspension gatedToolSuspension, GateDecision gateDecision,
-        Map<String, ComponentConnection> connectionParameters, Parameters extensions, ActionContext context)
+        Map<String, ComponentConnection> connectionParameters, Parameters extensions, ActionContext context,
+        @Nullable ClusterElementCallRef suspendedCallRef)
         throws Exception {
 
         String comment = gateDecision.comment();
@@ -540,30 +559,44 @@ public abstract class AbstractAiAgentChatAction {
         String gatedToolInput = gatedToolSuspension.toolInput();
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
-        ToolCallback gatedToolCallback = clusterElementMap.getClusterElements(BaseToolFunction.TOOLS)
-            .stream()
-            .flatMap(
-                clusterElement -> clusterElementToolCallbacks.build(clusterElement, connectionParameters, context)
-                    .stream())
-            .filter(toolCallback -> {
+        ClusterElement gatedClusterElement = null;
+        ToolCallback gatedToolCallback = null;
+
+        for (ClusterElement clusterElement : clusterElementMap.getClusterElements(BaseToolFunction.TOOLS)) {
+            for (ToolCallback toolCallback : clusterElementToolCallbacks.build(
+                clusterElement, connectionParameters, context)) {
+
                 ToolDefinition toolDefinition = toolCallback.getToolDefinition();
 
-                return gatedToolName.equals(toolDefinition.name());
-            })
-            .findFirst()
-            .map(DelegatingToolCallback::unwrap)
-            .orElseThrow(() -> new IllegalStateException(
+                if (gatedToolName.equals(toolDefinition.name())) {
+                    gatedClusterElement = clusterElement;
+                    gatedToolCallback = DelegatingToolCallback.unwrap(toolCallback);
+
+                    break;
+                }
+            }
+
+            if (gatedToolCallback != null) {
+                break;
+            }
+        }
+
+        if (gatedClusterElement == null || gatedToolCallback == null) {
+            throw new IllegalStateException(
                 "The approved tool '" + gatedToolName + "' is no longer configured on the agent node; the " +
-                    "approval cannot be applied."));
+                    "approval cannot be applied.");
+        }
 
         Map<String, Map<String, String>> toolSimulations =
             (Map<String, Map<String, String>>) inputParameters.get(TOOL_SIMULATIONS);
 
-        ToolCallback effectiveToolCallback = toolSimulations == null || toolSimulations.isEmpty()
-            ? gatedToolCallback
-            : createSimulationAwareToolCallback(
-                gatedToolCallback, toolSimulations,
-                resolveChatModel(inputParameters, connectionParameters, clusterElementMap, context), context);
+        ToolCallback effectiveToolCallback = observeApprovedToolCallback(
+            toolSimulations == null || toolSimulations.isEmpty()
+                ? gatedToolCallback
+                : createSimulationAwareToolCallback(
+                    gatedToolCallback, toolSimulations,
+                    resolveChatModel(inputParameters, connectionParameters, clusterElementMap, context), context),
+            gatedClusterElement, context);
 
         Map<String, Object> approvedResult = new HashMap<>();
 
@@ -580,11 +613,13 @@ public abstract class AbstractAiAgentChatAction {
         ToolContext toolContext = new ToolContext(new AiAgentToolContext(context).toMap());
 
         try {
-            String result = toolExecutionRecorder == null
-                ? effectiveToolCallback.call(gatedToolInput, toolContext)
-                : toolExecutionRecorder.record(
-                    createGateResolutionEventBuilder(gatedToolName, context),
-                    () -> effectiveToolCallback.call(gatedToolInput, toolContext));
+            String result = ClusterElementCallScope.callWith(
+                suspendedCallRef,
+                () -> toolExecutionRecorder == null
+                    ? effectiveToolCallback.call(gatedToolInput, toolContext)
+                    : toolExecutionRecorder.record(
+                        createGateResolutionEventBuilder(gatedToolName, context),
+                        () -> effectiveToolCallback.call(gatedToolInput, toolContext)));
 
             if (context instanceof ActionContextAware actionContextAware &&
                 ToolSuspension.isSuspendedToolResult(result, actionContextAware.getSuspend())) {
@@ -599,6 +634,20 @@ public abstract class AbstractAiAgentChatAction {
         }
 
         return JsonUtils.write(approvedResult);
+    }
+
+    private static ToolCallback observeApprovedToolCallback(
+        ToolCallback toolCallback, ClusterElement clusterElement, ActionContext context) {
+
+        if (!(context instanceof ActionContextAware actionContextAware)) {
+            return toolCallback;
+        }
+
+        return ClusterElementCallTarget.of(context)
+            .<ToolCallback>map(target -> new ClusterElementCallObservingToolCallback(
+                toolCallback, clusterElement.getWorkflowNodeName(), clusterElement.getComponentName(),
+                target.jobId(), target.taskExecutionId(), target.recorder(), actionContextAware::getSuspend))
+            .orElse(toolCallback);
     }
 
     private static void suspendUntilTheApprovedToolResumes(
