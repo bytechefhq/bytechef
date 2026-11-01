@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.platform.audit.listener;
 
+import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.platform.audit.repository.CustomAuditEventRepository;
 import com.bytechef.ee.platform.audit.util.AuditPlatformUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -142,11 +142,11 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
         }
 
         if (platformType != null) {
-            data.put(CustomAuditEventRepository.PLATFORM_DATA_KEY, platformType);
+            data.put(AuditEventConverter.PLATFORM_DATA_KEY, platformType);
         }
 
         if (tenantId != null) {
-            data.put(CustomAuditEventRepository.TENANT_ID_DATA_KEY, tenantId);
+            data.put(AuditEventConverter.TENANT_ID_DATA_KEY, tenantId);
         }
 
         try {

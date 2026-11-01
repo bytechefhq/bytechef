@@ -26,6 +26,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuditEventConverter {
 
+    public static final String PLATFORM_DATA_KEY =
+        "com.bytechef.ee.platform.audit.repository.CustomAuditEventRepository.platform";
+    public static final String TENANT_ID_DATA_KEY =
+        "com.bytechef.ee.platform.audit.repository.CustomAuditEventRepository.tenantId";
+
     /**
      * Convert a list of PersistentAuditEvent to a list of AuditEvent
      *

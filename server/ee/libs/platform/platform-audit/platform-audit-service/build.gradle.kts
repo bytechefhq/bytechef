@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
+    api(project(":server:ee:libs:platform:platform-audit:platform-audit-capture"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
