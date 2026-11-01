@@ -20,6 +20,7 @@ import com.bytechef.ee.remote.grpc.interceptor.TenantContextClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
+import com.bytechef.platform.security.web.authentication.PlatformUserAuthentication;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.health.v1.HealthCheckRequest;
@@ -30,8 +31,12 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
  * @version ee
@@ -79,6 +84,33 @@ class GrpcRemoteWireTest {
     }
 
     @Test
+    void testPlatformUserOauthTokenBindsTheCallersUser() throws Exception {
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new PlatformUserJwtAuthenticationToken(
+                    jwt(), new User("admin@localhost.com", "", authorities), authorities));
+
+        try (InProcessGrpc inProcessGrpc = startEcho("secret", new UserContextServerInterceptor())) {
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEqualTo("admin@localhost.com|true|ROLE_ADMIN");
+        }
+    }
+
+    @Test
+    void testOauthTokenThatIsNotAPlatformUserIsNotForwarded() throws Exception {
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new JwtAuthenticationToken(jwt(), new User("admin@localhost.com", "", authorities), authorities));
+
+        try (InProcessGrpc inProcessGrpc = startEcho("secret", new UserContextServerInterceptor())) {
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
+        }
+    }
+
+    @Test
     void testWrongTokenIsRejectedBeforeTheUserIsRead() throws Exception {
         SecurityContextHolder.getContext()
             .setAuthentication(
@@ -94,6 +126,21 @@ class GrpcRemoteWireTest {
         }
 
         verify(userContextServerInterceptor, never()).interceptCall(any(), any(), any());
+    }
+
+    private static class PlatformUserJwtAuthenticationToken extends JwtAuthenticationToken
+        implements PlatformUserAuthentication {
+
+        PlatformUserJwtAuthenticationToken(Jwt jwt, User user, List<GrantedAuthority> authorities) {
+            super(jwt, user, authorities);
+        }
+    }
+
+    private static Jwt jwt() {
+        return Jwt.withTokenValue("token")
+            .header("alg", "RS256")
+            .subject("admin@localhost.com")
+            .build();
     }
 
     private static InProcessGrpc startEcho(
