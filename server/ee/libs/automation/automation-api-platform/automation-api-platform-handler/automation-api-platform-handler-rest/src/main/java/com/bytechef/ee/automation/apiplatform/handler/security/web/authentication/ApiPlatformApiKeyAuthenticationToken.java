@@ -7,7 +7,9 @@
 
 package com.bytechef.ee.automation.apiplatform.handler.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.core.userdetails.User;
 
@@ -27,11 +29,21 @@ public class ApiPlatformApiKeyAuthenticationToken extends AbstractApiKeyAuthenti
     }
 
     @SuppressFBWarnings("EI")
-    public ApiPlatformApiKeyAuthenticationToken(long environmentId, User user) {
-        super(environmentId, user);
+    public ApiPlatformApiKeyAuthenticationToken(long environmentId, User user, Long apiKeyId) {
+        super(environmentId, user, apiKeyId);
     }
 
     public String getSecretKey() {
         return secretKey;
+    }
+
+    @Override
+    public CredentialType getCredentialType() {
+        return CredentialType.API_PLATFORM_API_KEY;
+    }
+
+    @Override
+    public PlatformType getPlatformType() {
+        return PlatformType.AUTOMATION;
     }
 }

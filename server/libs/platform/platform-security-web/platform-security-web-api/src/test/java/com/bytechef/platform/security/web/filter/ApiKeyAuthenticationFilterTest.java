@@ -22,8 +22,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -107,6 +110,16 @@ class ApiKeyAuthenticationFilterTest {
 
         TestApiKeyAuthenticationToken() {
             super(-1, "public");
+        }
+
+        @Override
+        public CredentialType getCredentialType() {
+            return CredentialType.PLATFORM_API_KEY;
+        }
+
+        @Override
+        public @Nullable PlatformType getPlatformType() {
+            return null;
         }
     }
 }

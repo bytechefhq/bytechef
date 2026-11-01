@@ -91,6 +91,9 @@ bytechef:
     # separately by bytechef.worker.task.*.
     concurrency-limit: 200
   audit:
+    # Minimum interval between two CREDENTIAL_USED events for the same credential (API key, connected user or token
+    # principal, per tenant and environment); zero or a negative value records every request (EE)
+    credential-usage-interval: 1h
     # Whether principals are masked (e.g. a***@example.com) when audit events are read through the API (EE)
     mask-principals: false
     # Whether passed permission checks on methods that change something are recorded as PERMISSION_CHECK events;

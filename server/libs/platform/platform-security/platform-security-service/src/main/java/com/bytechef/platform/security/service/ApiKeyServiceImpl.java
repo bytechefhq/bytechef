@@ -75,6 +75,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ApiKey> fetchApiKey(String secretKey, long environmentId) {
+        return apiKeyRepository.findBySecretKeyAndEnvironment(secretKey, (int) environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ApiKey getApiKey(String secretKey) {
         return apiKeyRepository.findBySecretKey(secretKey)
             .orElseThrow(() -> new IllegalArgumentException("Api key not found."));

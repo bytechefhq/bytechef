@@ -8,7 +8,9 @@
 package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.userdetails.User;
@@ -57,6 +59,11 @@ public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAu
     }
 
     @Override
+    public @Nullable Long getConnectedUserId() {
+        return isAuthenticated() ? connectedUserId : null;
+    }
+
+    @Override
     public String externalUserId() {
         return externalUserId;
     }
@@ -76,5 +83,15 @@ public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAu
 
     public boolean isEnvironmentRequested() {
         return environmentRequested;
+    }
+
+    @Override
+    public CredentialType getCredentialType() {
+        return CredentialType.EMBEDDED_MCP_SERVER_API_KEY;
+    }
+
+    @Override
+    public PlatformType getPlatformType() {
+        return PlatformType.EMBEDDED;
     }
 }

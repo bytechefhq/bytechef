@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
+import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * @version ee
@@ -79,6 +81,27 @@ class PlatformApiKeyAuthenticationProviderTest {
             .hasMessage("API key has no owner");
     }
 
+    @Test
+    void testInactiveUserIsRejectedWithoutTheSecretKeyInTheMessage() {
+        assertThatThrownBy(() -> newProvider(null, 1L, false, true).authenticate(newToken()))
+            .isInstanceOf(UserNotActivatedException.class)
+            .hasMessage("User admin@localhost.com was not activated");
+    }
+
+    @Test
+    void testMissingUserIsRejectedWithoutTheSecretKeyInTheMessage() {
+        assertThatThrownBy(() -> newProvider(null, 1L, true, false).authenticate(newToken()))
+            .isInstanceOf(UsernameNotFoundException.class)
+            .hasMessage("User 1 was not found in the database");
+    }
+
+    @Test
+    void testAuthenticatedTokenCarriesTheApiKeyId() {
+        Authentication authentication = newProvider(null).authenticate(newToken());
+
+        assertThat(((PlatformApiKeyAuthenticationToken) authentication).getApiKeyId()).isEqualTo(7L);
+    }
+
     private static PlatformApiKeyAuthenticationToken newToken() {
         return new PlatformApiKeyAuthenticationToken((int) ENVIRONMENT_ID, SECRET_KEY, "public");
     }
@@ -88,7 +111,15 @@ class PlatformApiKeyAuthenticationProviderTest {
     }
 
     private static PlatformApiKeyAuthenticationProvider newProvider(PlatformType platformType, Long userId) {
+        return newProvider(platformType, userId, true, true);
+    }
+
+    private static PlatformApiKeyAuthenticationProvider newProvider(
+        PlatformType platformType, Long userId, boolean activated, boolean userExists) {
+
         ApiKey apiKey = mock(ApiKey.class);
+
+        when(apiKey.getId()).thenReturn(7L);
 
         when(apiKey.getType()).thenReturn(platformType);
         when(apiKey.getUserId()).thenReturn(userId);
@@ -99,14 +130,14 @@ class PlatformApiKeyAuthenticationProviderTest {
 
         User user = mock(User.class);
 
-        when(user.isActivated()).thenReturn(true);
+        when(user.isActivated()).thenReturn(activated);
         when(user.getLogin()).thenReturn("admin@localhost.com");
         when(user.getPassword()).thenReturn("password");
         when(user.getAuthorityIds()).thenReturn(List.of(1L));
 
         UserService userService = mock(UserService.class);
 
-        when(userService.fetchUser(anyLong())).thenReturn(Optional.of(user));
+        when(userService.fetchUser(anyLong())).thenReturn(userExists ? Optional.of(user) : Optional.empty());
 
         Authority authority = mock(Authority.class);
 
