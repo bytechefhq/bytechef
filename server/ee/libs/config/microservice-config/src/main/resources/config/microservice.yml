@@ -307,6 +307,8 @@ bytechef:
     # Messaging provider between Coordinator and Workers (AMQP | JMS | KAFKA | REDIS) default: REDIS
     provider: REDIS
   oauth2:
+    authorization-server:
+      enabled: false
     #    predefinedApps:
     #      mailchimp:
     #        clientId: 123456789

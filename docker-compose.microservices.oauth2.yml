@@ -1,0 +1,12 @@
+# Turns on the OAuth 2.1 authorization server for MCP clients:
+#   docker compose -f docker-compose.microservices.yml -f docker-compose.microservices.oauth2.yml up -d
+
+services:
+  api-gateway-app:
+    environment: &bytechef-oauth2-environment
+      BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED: "true"
+      BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF: "true"
+      BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM: tenant_id
+      BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI: ${BYTECHEF_PUBLIC_URL:-http://localhost:8080}
+  configuration-app:
+    environment: *bytechef-oauth2-environment
