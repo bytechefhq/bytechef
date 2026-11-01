@@ -16,8 +16,10 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    implementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
+    testImplementation("io.micrometer:micrometer-core")
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("io.modelcontextprotocol.sdk:mcp:${libs.versions.io.modelcontextprotocol.sdk.get()}")
     testImplementation("org.assertj:assertj-core")
@@ -55,6 +57,7 @@ dependencies {
         isTransitive = false
     }
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
+    testImplementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-service"))
     testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
