@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-api"))
+    implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-api"))
     implementation("org.springframework.security:spring-security-core")
 
     runtimeOnly(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-service"))
