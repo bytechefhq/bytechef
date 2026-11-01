@@ -24,6 +24,7 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.EXPRESSION;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.KEY;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.TASKS;
+import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.VALUE;
 
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -134,7 +135,7 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
             taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
 
-            storeOutput(taskExecution, selectedCase.get("value"));
+            storeOutput(taskExecution, selectedCase.get(VALUE));
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         }
