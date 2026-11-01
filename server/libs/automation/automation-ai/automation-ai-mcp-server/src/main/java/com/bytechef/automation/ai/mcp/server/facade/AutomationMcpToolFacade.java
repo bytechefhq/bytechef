@@ -58,6 +58,7 @@ import com.bytechef.platform.tool.execution.ToolExecutionEvent;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.tool.execution.WorkflowToolRunResult;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
@@ -90,6 +91,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
     private static final Logger log = LoggerFactory.getLogger(AutomationMcpToolFacade.class);
 
+    private static final String APPROVAL_REQUIRED_STATUS = "approval_required";
     private static final long RESUME_POLL_INTERVAL_MILLIS = 500;
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
@@ -334,7 +336,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                 new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs),
                 projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
 
-            return toolExecutionRecorder.record(
+            WorkflowToolRunResult workflowToolRunResult = toolExecutionRecorder.record(
                 ToolExecutionEvent
                     .builder(PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW,
                         toolName)
@@ -344,28 +346,33 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                     .jobId(jobId),
                 () -> getWorkflowRunResult(
                     jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
-                        .join()));
+                        .join()),
+                WorkflowToolRunResult::getOutcome);
+
+            return workflowToolRunResult.result();
         };
     }
 
-    private @Nullable Object getWorkflowRunResult(Job job) {
+    private WorkflowToolRunResult getWorkflowRunResult(Job job) {
         if (isPausedOnApproval(job)) {
-            return describePendingApproval(job);
+            return new WorkflowToolRunResult(
+                WorkflowToolRunResult.Status.APPROVAL_REQUIRED, describePendingApproval(job));
         }
 
         if (isPausedOnWait(job)) {
-            return describePendingWait(job);
+            return new WorkflowToolRunResult(WorkflowToolRunResult.Status.PAUSED, describePendingWait(job));
         }
 
         JobExecutionErrors.checkForError(job, taskExecutionService);
         JobExecutionErrors.checkCompleted(job);
 
         if (job.getOutputs() == null) {
-            return null;
+            return WorkflowToolRunResult.completed(null);
         }
 
-        return getCallableResponseOutput(job)
-            .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
+        return WorkflowToolRunResult.completed(
+            getCallableResponseOutput(job)
+                .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs())));
     }
 
     private static boolean isPausedOnApproval(Job job) {
@@ -408,7 +415,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
         Map<String, Object> result = new HashMap<>();
 
-        result.put("status", "approval_required");
+        result.put("status", APPROVAL_REQUIRED_STATUS);
         result.put(
             "message",
             formUrl == null
@@ -530,7 +537,9 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         job = jobCompletionAwaiter.await(jobId, remaining.isNegative() ? Duration.ofSeconds(1) : remaining)
             .join();
 
-        return getWorkflowRunResult(job);
+        WorkflowToolRunResult workflowToolRunResult = getWorkflowRunResult(job);
+
+        return workflowToolRunResult.result();
     }
 
     public @Nullable Object resolveApprovalAndAwait(String resumeToken, Map<String, Object> data, long jobId) {

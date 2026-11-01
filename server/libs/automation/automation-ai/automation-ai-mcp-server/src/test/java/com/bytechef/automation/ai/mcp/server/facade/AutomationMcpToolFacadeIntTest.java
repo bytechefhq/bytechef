@@ -69,20 +69,22 @@ import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.tool.execution.ToolExecutionEvent;
+import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorderImpl;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -122,11 +124,11 @@ class AutomationMcpToolFacadeIntTest {
     private final McpComponentService mcpComponentService = mock(McpComponentService.class);
     private final McpProjectWorkflowService mcpProjectWorkflowService = mock(McpProjectWorkflowService.class);
     private final PrincipalJobFacade principalJobFacade = mock(PrincipalJobFacade.class);
+    private final List<Object> publishedEvents = new ArrayList<>();
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
         mock(ProjectDeploymentWorkflowService.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     private final TaskFileStorage taskFileStorage = mock(TaskFileStorage.class);
-    private final ToolExecutionRecorder toolExecutionRecorder = mock(ToolExecutionRecorder.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
     private final WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
 
@@ -156,6 +158,9 @@ class AutomationMcpToolFacadeIntTest {
         mcpToolServiceTarget = AopTestUtils.getUltimateTargetObject(mcpToolService);
 
         reset(mcpProjectServiceTarget, mcpServerServiceTarget, mcpToolServiceTarget);
+
+        ToolExecutionRecorder toolExecutionRecorder = new ToolExecutionRecorderImpl(
+            publishedEvents::add, mock(ObjectProvider.class));
 
         facade = new AutomationMcpToolFacade(
             (ObjectProvider<ApprovalTokens>) mock(ObjectProvider.class), clusterElementDefinitionFacade,
@@ -361,12 +366,6 @@ class AutomationMcpToolFacadeIntTest {
         givenEnabledMcpServer();
 
         when(mcpToolServiceTarget.fetchMcpTool(3L)).thenReturn(Optional.of(mcpTool(true)));
-        when(toolExecutionRecorder.record(any(), any(Supplier.class)))
-            .thenAnswer(invocation -> {
-                Supplier<Object> execution = invocation.getArgument(1);
-
-                return execution.get();
-            });
         when(clusterElementDefinitionFacade.executeTool(eq("slack"), eq(1), eq("sendMessage"), any(), isNull()))
             .thenAnswer(invocation -> {
                 executedSkippingChecks.set(AutomationAuthorizationContext.isSkipChecks());
@@ -554,7 +553,10 @@ class AutomationMcpToolFacadeIntTest {
 
             return 5L;
         });
-        when(toolExecutionRecorder.record(any(), any(Supplier.class))).thenReturn(Map.of("ok", true));
+
+        Job completedJob = completedJob();
+
+        when(jobCompletionAwaiter.await(eq(5L), any())).thenReturn(CompletableFuture.completedFuture(completedJob));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerMockedStatic = mockStatic(WorkflowTrigger.class);
             MockedStatic<WorkflowNodeType> workflowNodeTypeMockedStatic = mockStatic(WorkflowNodeType.class)) {
@@ -624,7 +626,10 @@ class AutomationMcpToolFacadeIntTest {
         when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
             .thenReturn(List.of(mappedMcpProjectWorkflow));
         when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
-        when(toolExecutionRecorder.record(any(), any(Supplier.class))).thenReturn(Map.of("ok", true));
+
+        Job completedJob = completedJob();
+
+        when(jobCompletionAwaiter.await(eq(5L), any())).thenReturn(CompletableFuture.completedFuture(completedJob));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerMockedStatic = mockStatic(WorkflowTrigger.class);
             MockedStatic<WorkflowNodeType> workflowNodeTypeMockedStatic = mockStatic(WorkflowNodeType.class)) {
@@ -662,8 +667,6 @@ class AutomationMcpToolFacadeIntTest {
         when(mcpServerServiceTarget.getMcpServer(30L)).thenReturn(
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.PRODUCTION, true));
         when(mcpToolServiceTarget.fetchMcpTool(3L)).thenReturn(Optional.of(mcpTool(true)));
-        when(toolExecutionRecorder.record(any(), any(Supplier.class))).thenReturn(Map.of("ok", true));
-
         functionToolCallback.call("{}");
 
         ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
@@ -685,6 +688,23 @@ class AutomationMcpToolFacadeIntTest {
         ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(job);
 
         assertThat(toolCallback.call("{}")).contains("approval_required");
+        assertThat(captureRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_REQUIRED);
+    }
+
+    @Test
+    void testCompletedWorkflowRunWhoseOutputLooksLikeAnApprovalIsRecordedAsASuccess() {
+        Job job = completedJob();
+        FileEntry outputs = new FileEntry("outputs.json", "memory://outputs.json");
+
+        when(job.getOutputs()).thenReturn(outputs);
+
+        ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(job);
+
+        doReturn(Map.of("status", "approval_required")).when(taskFileStorage)
+            .readJobOutputs(outputs);
+
+        assertThat(toolCallback.call("{}")).contains("approval_required");
+        assertThat(captureRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
     }
 
     @Test
@@ -702,6 +722,7 @@ class AutomationMcpToolFacadeIntTest {
             .doesNotContain("approval_required")
             .doesNotContain("resumeToken")
             .doesNotContain("formUrl");
+        assertThat(captureRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
     }
 
     @Test
@@ -789,9 +810,6 @@ class AutomationMcpToolFacadeIntTest {
         when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
         when(jobCompletionAwaiter.await(anyLong(), any())).thenReturn(CompletableFuture.completedFuture(job));
         when(taskExecutionService.fetchLastJobTaskExecution(5L)).thenReturn(Optional.empty());
-        when(toolExecutionRecorder.record(any(), any(Supplier.class)))
-            .thenAnswer(invocation -> invocation.getArgument(1, Supplier.class)
-                .get());
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerMockedStatic = mockStatic(WorkflowTrigger.class);
             MockedStatic<WorkflowNodeType> workflowNodeTypeMockedStatic = mockStatic(WorkflowNodeType.class)) {
@@ -805,14 +823,18 @@ class AutomationMcpToolFacadeIntTest {
     }
 
     private ToolExecutionEvent captureRecordedToolExecutionEvent() {
-        ArgumentCaptor<ToolExecutionEvent.Builder> builderArgumentCaptor =
-            ArgumentCaptor.forClass(ToolExecutionEvent.Builder.class);
+        assertThat(publishedEvents).hasSize(1);
 
-        verify(toolExecutionRecorder).record(builderArgumentCaptor.capture(), any(Supplier.class));
+        return (ToolExecutionEvent) publishedEvents.getFirst();
+    }
 
-        ToolExecutionEvent.Builder builder = builderArgumentCaptor.getValue();
+    private static Job completedJob() {
+        Job job = mock(Job.class);
 
-        return builder.build();
+        when(job.getId()).thenReturn(5L);
+        when(job.getStatus()).thenReturn(Job.Status.COMPLETED);
+
+        return job;
     }
 
     private FunctionToolCallback<Map<String, Object>, Object> givenListedTool() {
