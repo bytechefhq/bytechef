@@ -12,7 +12,8 @@ type NodeStatusType = WorkflowTestNodeStateI['status'];
 const STATUS_PRIORITY: Record<NodeStatusType, number> = {
     BLOCKED: 3,
     COMPLETED: 0,
-    FAILED: 5,
+    DENIED: 5,
+    FAILED: 6,
     REDACTED: 1,
     RUNNING: 2,
     WITHHELD: 4,

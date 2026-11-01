@@ -2,6 +2,7 @@ import {
     ClusterElementCallRecord,
     ClusterElementCallRecordStatusEnum,
     TaskExecution,
+    TaskExecutionStatusEnum,
 } from '@/shared/middleware/platform/workflow/execution';
 import {describe, expect, it} from 'vitest';
 
@@ -189,6 +190,16 @@ describe('toClusterElementCallTaskExecutions', () => {
         expect(redacted.clusterElementCallOutcome).toBe('REDACTED');
         expect(withheld.clusterElementCallNote).toBeUndefined();
         expect(withheld.clusterElementCallOutcome).toBe('WITHHELD');
+    });
+
+    it('maps a denied call to a completed DENIED outcome row', () => {
+        const [denied] = toClusterElementCallTaskExecutions(
+            createTaskExecution([createRecord({id: 'd', status: ClusterElementCallRecordStatusEnum.Denied})])
+        );
+
+        expect(denied.clusterElementCallNote).toBeUndefined();
+        expect(denied.clusterElementCallOutcome).toBe('DENIED');
+        expect(denied.status).toBe(TaskExecutionStatusEnum.Completed);
     });
 
     it('does not number outcome rows that share a title', () => {

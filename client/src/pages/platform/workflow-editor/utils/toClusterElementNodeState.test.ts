@@ -40,7 +40,7 @@ describe('toClusterElementNodeState', () => {
         ).toEqual({clusterElement: true, durationMillis: 31, error: 'boom', status: 'FAILED'});
     });
 
-    it.each(['BLOCKED', 'REDACTED', 'WITHHELD'] as const)('maps a %s call without a duration', (status) => {
+    it.each(['BLOCKED', 'DENIED', 'REDACTED', 'WITHHELD'] as const)('maps a %s call without a duration', (status) => {
         expect(
             toClusterElementNodeState({
                 endDate: '2026-10-23T10:00:00.412Z',
@@ -50,7 +50,7 @@ describe('toClusterElementNodeState', () => {
         ).toEqual({clusterElement: true, status});
     });
 
-    it.each(['BLOCKED', 'WITHHELD'] as const)('keeps a %s state when a later call completes', (status) => {
+    it.each(['BLOCKED', 'DENIED', 'WITHHELD'] as const)('keeps a %s state when a later call completes', (status) => {
         expect(
             toClusterElementNodeState(
                 {endDate: '2026-10-23T10:00:00.412Z', startDate: '2026-10-23T10:00:00Z', status: 'COMPLETED'},

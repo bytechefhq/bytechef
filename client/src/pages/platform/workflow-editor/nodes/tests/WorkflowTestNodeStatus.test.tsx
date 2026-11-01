@@ -22,6 +22,14 @@ describe('WorkflowTestNodeStatus', () => {
         expect(screen.queryByText('12ms')).toBeNull();
     });
 
+    it('shows a rejected user badge and no duration for a denied state', () => {
+        const {container} = render(<WorkflowTestNodeStatus testNodeState={{durationMillis: 12, status: 'DENIED'}} />);
+
+        expect(screen.getByTitle('Denied')).toHaveClass('border-rose-500', 'text-rose-500');
+        expect(container.querySelector('svg.lucide-user-x')).not.toBeNull();
+        expect(screen.queryByText('12ms')).toBeNull();
+    });
+
     it('shows an eraser badge and no duration for a redacted state', () => {
         const {container} = render(<WorkflowTestNodeStatus testNodeState={{durationMillis: 12, status: 'REDACTED'}} />);
 

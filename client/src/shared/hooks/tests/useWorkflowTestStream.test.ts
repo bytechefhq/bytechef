@@ -1246,6 +1246,7 @@ describe('useWorkflowTestStream', () => {
 
     it.each([
         ['cluster_element_blocked', 'BLOCKED'],
+        ['cluster_element_denied', 'DENIED'],
         ['cluster_element_redacted', 'REDACTED'],
         ['cluster_element_withheld', 'WITHHELD'],
     ])('routes %s events to the call handler', (eventName, status) => {

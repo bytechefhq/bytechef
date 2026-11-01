@@ -64,6 +64,22 @@ describe('getClusterElementIconStatuses', () => {
         ).toEqual({'/icons/httpClient.svg': 'FAILED'});
     });
 
+    it('ranks denied above withheld and below failed', () => {
+        expect(
+            getClusterElementIconStatuses(CLUSTER_ELEMENTS, {
+                httpClient_1: {status: 'WITHHELD'},
+                httpClient_2: {status: 'DENIED'},
+            })
+        ).toEqual({'/icons/httpClient.svg': 'DENIED'});
+
+        expect(
+            getClusterElementIconStatuses(CLUSTER_ELEMENTS, {
+                httpClient_1: {status: 'DENIED'},
+                httpClient_2: {status: 'FAILED'},
+            })
+        ).toEqual({'/icons/httpClient.svg': 'FAILED'});
+    });
+
     it('ranks redacted above completed and below running', () => {
         expect(
             getClusterElementIconStatuses(CLUSTER_ELEMENTS, {
