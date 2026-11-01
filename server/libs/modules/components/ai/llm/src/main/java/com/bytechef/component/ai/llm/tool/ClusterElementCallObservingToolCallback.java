@@ -35,7 +35,7 @@ import org.springframework.ai.tool.metadata.ToolMetadata;
 /**
  * @author Ivica Cardic
  */
-public class ClusterElementCallObservingToolCallback implements ToolCallback {
+public class ClusterElementCallObservingToolCallback implements DelegatingToolCallback {
 
     private final String componentName;
     private final ToolCallback delegate;
@@ -90,6 +90,11 @@ public class ClusterElementCallObservingToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         return observe(toolInput, () -> delegate.call(toolInput, toolContext));
+    }
+
+    @Override
+    public ToolCallback getDelegate() {
+        return delegate;
     }
 
     @Override

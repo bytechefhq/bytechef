@@ -295,6 +295,13 @@ class ClusterElementCallObservingToolCallbackTest {
     }
 
     @Test
+    void testUnwrapReachesTheObservedTool() {
+        ToolCallback toolCallback = createToolCallback(null);
+
+        assertThat(DelegatingToolCallback.unwrap(toolCallback)).isSameAs(delegate);
+    }
+
+    @Test
     void testWrapWithoutIdsReturnsSameCallbacks() {
         List<ToolCallback> toolCallbacks = List.of(delegate);
 
