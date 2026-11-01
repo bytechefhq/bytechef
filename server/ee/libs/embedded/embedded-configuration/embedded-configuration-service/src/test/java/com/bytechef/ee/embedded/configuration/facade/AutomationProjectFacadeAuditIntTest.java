@@ -47,7 +47,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -427,7 +427,7 @@ class AutomationProjectFacadeAuditIntTest {
     @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
     @EnableMethodSecurity
     @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
+        AuditAspect.class, AuditCaptureAspect.class, AuditEventServiceImpl.class, AuditMapperResolver.class
     })
     static class AuditConfiguration {
 

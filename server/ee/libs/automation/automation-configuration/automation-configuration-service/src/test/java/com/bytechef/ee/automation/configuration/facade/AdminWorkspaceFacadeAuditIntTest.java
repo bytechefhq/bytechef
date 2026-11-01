@@ -22,7 +22,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.ArrayList;
@@ -206,7 +206,7 @@ class AdminWorkspaceFacadeAuditIntTest {
 
     @Configuration
     @Import({
-        AdminWorkspaceFacadeImpl.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class,
+        AdminWorkspaceFacadeImpl.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventServiceImpl.class,
         AuditMapperResolver.class, WorkspaceServiceImpl.class
     })
     static class AuditConfiguration {

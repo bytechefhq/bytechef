@@ -27,7 +27,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
 import com.bytechef.platform.data.table.audit.DataTableAuditMapper;
@@ -210,7 +210,7 @@ class WorkspaceDataTableFacadeAuditIntTest {
 
     @Configuration
     @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class,
+        AuditAspect.class, AuditCaptureAspect.class, AuditEventServiceImpl.class, AuditMapperResolver.class,
         DataTableAuditMapper.class
     })
     static class AuditConfiguration {

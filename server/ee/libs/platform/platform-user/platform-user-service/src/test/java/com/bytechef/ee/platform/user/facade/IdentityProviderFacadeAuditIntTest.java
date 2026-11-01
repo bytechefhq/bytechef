@@ -17,7 +17,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.ee.platform.user.audit.IdentityProviderAuditEvents;
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import com.bytechef.ee.platform.user.repository.IdentityProviderRepository;
@@ -235,7 +235,7 @@ class IdentityProviderFacadeAuditIntTest {
     @EnableAutoConfiguration
     @EnableMethodSecurity
     @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class,
+        AuditAspect.class, AuditCaptureAspect.class, AuditEventServiceImpl.class, AuditMapperResolver.class,
         AuditJdbcConfiguration.class, EncryptionImpl.class, IdentityProviderFacadeImpl.class,
         IdentityProviderServiceImpl.class
     })

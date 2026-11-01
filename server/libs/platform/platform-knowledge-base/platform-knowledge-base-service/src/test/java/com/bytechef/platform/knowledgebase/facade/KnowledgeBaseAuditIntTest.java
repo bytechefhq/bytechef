@@ -29,7 +29,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvents;
@@ -281,7 +281,7 @@ class KnowledgeBaseAuditIntTest {
 
     @Configuration
     @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
+        AuditAspect.class, AuditCaptureAspect.class, AuditEventServiceImpl.class, AuditMapperResolver.class
     })
     static class AuditConfiguration {
 
