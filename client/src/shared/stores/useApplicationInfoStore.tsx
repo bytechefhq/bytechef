@@ -48,6 +48,11 @@ export interface ApplicationInfoI {
         enabled: boolean;
     };
     loading: boolean;
+    oauth2: {
+        authorizationServer: {
+            enabled: boolean;
+        };
+    };
     signUp: {
         activationRequired: boolean;
         enabled: boolean;
@@ -158,6 +163,11 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 enabled: json.helpHub.enabled === 'true',
                             },
                             loading: false,
+                            oauth2: {
+                                authorizationServer: {
+                                    enabled: json.oauth2?.authorizationServer?.enabled === 'true',
+                                },
+                            },
                             signUp: {
                                 activationRequired: json.signUp?.activationRequired === 'true',
                                 enabled: json.signUp?.enabled === 'true',
@@ -180,6 +190,11 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     enabled: true,
                 },
                 loading: false,
+                oauth2: {
+                    authorizationServer: {
+                        enabled: false,
+                    },
+                },
                 signUp: {
                     activationRequired: false,
                     enabled: true,

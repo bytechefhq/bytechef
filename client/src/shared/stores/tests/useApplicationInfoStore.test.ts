@@ -55,6 +55,22 @@ describe('applicationInfoStore', () => {
             });
         });
 
+        it('parses authorizationServer enabled from actuator info', async () => {
+            mockActuatorInfo({...ACTUATOR_INFO, oauth2: {authorizationServer: {enabled: 'true'}}});
+
+            await applicationInfoStore.getState().getApplicationInfo();
+
+            expect(applicationInfoStore.getState().oauth2.authorizationServer.enabled).toBe(true);
+        });
+
+        it('defaults authorizationServer to false when the field is missing', async () => {
+            mockActuatorInfo(ACTUATOR_INFO);
+
+            await applicationInfoStore.getState().getApplicationInfo();
+
+            expect(applicationInfoStore.getState().oauth2.authorizationServer.enabled).toBe(false);
+        });
+
         it('leaves blank or missing docs URLs undefined', async () => {
             mockActuatorInfo({
                 ...ACTUATOR_INFO,
