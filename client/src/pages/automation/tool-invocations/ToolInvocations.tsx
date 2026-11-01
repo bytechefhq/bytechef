@@ -2,7 +2,6 @@ import Button from '@/components/Button/Button';
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList';
-import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
@@ -12,6 +11,7 @@ import {
     ToolInvocationsWorkspaceScopeI,
     useToolInvocations,
 } from '@/pages/automation/tool-invocations/hooks/useToolInvocations';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -47,8 +47,8 @@ const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
 
 interface ToolInvocationsProps {
     environmentId?: number;
-    /* Replaces the generic empty state when nothing has been recorded yet and no filter is set. */
-    firstRunEmptyState?: ReactNode;
+    /* Shown instead of the filters and the table when nothing has been recorded yet and no filter is set. */
+    firstRunEmptyState: ReactNode;
     mcpServerOptions?: Array<ComboBoxItemType>;
     type: PlatformType;
     workspaceScope?: ToolInvocationsWorkspaceScopeI;
@@ -81,6 +81,8 @@ export const ToolInvocations = ({
         toolInvocationLogsIsFetching,
         toolInvocationLogsIsLoading,
     } = useToolInvocations({environmentId, type, workspaceScope});
+
+    const initialLoadComplete = useInitialLoadComplete(toolInvocationLogsIsLoading);
 
     const visibleSurfaceOptions = useMemo(() => [ANY_FILTER_OPTION, ...surfaceOptionsByType[type]], [type]);
 
@@ -180,20 +182,14 @@ export const ToolInvocations = ({
                 </div>
             }
             leftSidebarHeader={<Header position="sidebar" title="Tool Invocations" />}
-            leftSidebarHidden={isFirstRun}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[toolInvocationLogsError]} loading={toolInvocationLogsIsLoading}>
                 {toolInvocationLogs.length > 0 ? (
                     <ToolInvocationsTable toolInvocationLogs={toolInvocationLogs} />
                 ) : isFirstRun ? (
-                    firstRunEmptyState || (
-                        <EmptyState
-                            description="Each time an AI client calls a tool through an MCP server, the call is recorded here with its outcome and duration. Tool inputs and outputs are never stored."
-                            icon={<ActivityIcon />}
-                            title="No tool calls yet"
-                        />
-                    )
+                    firstRunEmptyState
                 ) : (
                     <EmptyList
                         icon={<ActivityIcon className="size-24 text-stroke-neutral-tertiary" />}

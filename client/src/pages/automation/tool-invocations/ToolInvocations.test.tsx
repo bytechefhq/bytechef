@@ -47,7 +47,11 @@ const renderToolInvocations = (props: Partial<Parameters<typeof ToolInvocations>
     render(
         <MemoryRouter>
             <TooltipProvider>
-                <ToolInvocations type={PlatformType.Automation} {...props} />
+                <ToolInvocations
+                    firstRunEmptyState={<div>First-run guide</div>}
+                    type={PlatformType.Automation}
+                    {...props}
+                />
             </TooltipProvider>
         </MemoryRouter>
     );
@@ -145,27 +149,20 @@ describe('ToolInvocations', () => {
     it('shows the first-run empty state without filters or pagination when nothing has been recorded', () => {
         renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
-        expect(screen.getByText('No tool calls yet')).toBeInTheDocument();
+        expect(screen.getByText('First-run guide')).toBeInTheDocument();
         expect(screen.queryByText('Surface')).not.toBeInTheDocument();
         expect(screen.queryByRole('table')).not.toBeInTheDocument();
         expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
     });
 
-    it('shows the first-run empty state it is given', () => {
-        renderToolInvocations({firstRunEmptyState: <div>Custom guide</div>});
-
-        expect(screen.getByText('Custom guide')).toBeInTheDocument();
-        expect(screen.queryByText('No tool calls yet')).not.toBeInTheDocument();
-    });
-
     it('keeps the filters and shows a no-match state when a filter hides every record', () => {
         hoisted.useToolInvocationsMock.mockReturnValue({...toolInvocationsState(), filterOutcome: 'ERROR'});
 
-        renderToolInvocations({firstRunEmptyState: <div>Custom guide</div>});
+        renderToolInvocations();
 
         expect(screen.getByText('No Matching Tool Invocations')).toBeInTheDocument();
         expect(screen.getByText('Surface')).toBeInTheDocument();
-        expect(screen.queryByText('Custom guide')).not.toBeInTheDocument();
+        expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
     });
 
     it('lists the invocations with pagination and moves to the page that is clicked', async () => {
@@ -186,7 +183,7 @@ describe('ToolInvocations', () => {
         renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
-        expect(screen.queryByText('No tool calls yet')).not.toBeInTheDocument();
+        expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
         expect(screen.getByText(/Showing/)).toHaveTextContent('Showing 1 to 1 of 2 results');
 
         await userEvent.click(screen.getByText('2'));
@@ -225,7 +222,7 @@ describe('ToolInvocations', () => {
         renderToolInvocations();
 
         expect(screen.getByText('Some error occurred.')).toBeInTheDocument();
-        expect(screen.queryByText('No tool calls yet')).not.toBeInTheDocument();
+        expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
     });
 
     it('offers the MCP server filter only when the workspace has MCP servers', () => {
