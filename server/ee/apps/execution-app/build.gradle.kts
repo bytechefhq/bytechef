@@ -60,6 +60,8 @@ dependencies {
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-grpc"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:config:microservice-config"))
+    implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-remote-grpc"))
+    implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:config:session-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))

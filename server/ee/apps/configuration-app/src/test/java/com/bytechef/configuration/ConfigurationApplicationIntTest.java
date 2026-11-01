@@ -44,7 +44,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
@@ -66,6 +69,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
     PostgreSQLContainerConfiguration.class, RedisContainerConfiguration.class
 })
 public class ConfigurationApplicationIntTest {
+
+    @Autowired
+    private ObjectProvider<AuditEventRepository> auditEventRepositoryProvider;
 
     private static final UserService GATEWAY_USER_SERVICE = mock(UserService.class);
 
@@ -101,6 +107,23 @@ public class ConfigurationApplicationIntTest {
 
         registry.add(
             "bytechef.remote.grpc.targets.api-gateway-app", () -> "localhost:" + gatewayServer.getPort());
+    }
+
+    @Test
+    void testAuditEventsAreSentToExecutionApp() {
+        AuditEventRepository auditEventRepository = auditEventRepositoryProvider.getIfAvailable();
+
+        assertThat(auditEventRepository).isNotNull();
+
+        Class<?> auditEventRepositoryClass = AopUtils.getTargetClass(auditEventRepository);
+
+        assertThat(auditEventRepositoryClass.getName()).isEqualTo(
+            "com.bytechef.ee.platform.audit.remote.client.RemoteAuditEventRepositoryClient");
+    }
+
+    @Test
+    void testAuditEventsQueryIsServed() {
+        assertThat(applicationContext.containsBean("auditEventGraphQlController")).isTrue();
     }
 
     @Test
