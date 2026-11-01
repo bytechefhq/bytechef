@@ -45,7 +45,7 @@ info:
     activationRequired: ${bytechef.sign-up.activation-required}
     enabled: ${bytechef.sign-up.enabled}
   socialLogin:
-    enabled: ${bytechef.security.social-login.enabled:false}
+    enabled: ${bytechef.security.social-login.enabled}
   userGuiding:
     containerId: ${bytechef.userGuiding.containerId:}
     enabled: ${bytechef.userGuiding.enabled:false}
@@ -341,6 +341,10 @@ bytechef:
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; script-src: https://*.command.ai; frame-src: https://*.command.ai; img-src: https://*.command.ai; media-src: https://*.command.ai; connect-src: https://*.command.ai; style-src: https://*.command.ai;"
     login:
+      enabled: false
+    social-login:
+      enabled: false
+    sso:
       enabled: false
   sign-up:
     activation-required: false
