@@ -19,7 +19,6 @@ import com.bytechef.platform.security.web.authentication.CredentialAuthenticatio
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +56,7 @@ class CredentialUsageAuditListenerIntTest {
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
-    private final MutableClock mutableClock = new MutableClock(Instant.parse("2026-11-01T10:00:00Z"));
+    private final Clock fixedClock = Clock.fixed(Instant.parse("2026-11-01T10:00:00Z"), ZoneOffset.UTC);
 
     @BeforeEach
     void beforeEach() {
@@ -67,7 +66,7 @@ class CredentialUsageAuditListenerIntTest {
     @Test
     void testFirstUseRecordsTheCredentialWithItsContext() {
         CredentialUsageAuditListener credentialUsageAuditListener = new CredentialUsageAuditListener(
-            new ApplicationProperties(), auditEventRepository, mutableClock,
+            new ApplicationProperties(), auditEventRepository, fixedClock,
             CredentialUsageAuditListener.MAX_TRACKED_CREDENTIALS);
 
         credentialUsageAuditListener.onApplicationEvent(createEvent(LOGIN));
@@ -114,29 +113,5 @@ class CredentialUsageAuditListenerIntTest {
         assertThat(persistentAuditEvents).hasSize(1);
 
         return persistentAuditEvents.getFirst();
-    }
-
-    private static final class MutableClock extends Clock {
-
-        private final Instant instant;
-
-        private MutableClock(Instant instant) {
-            this.instant = instant;
-        }
-
-        @Override
-        public ZoneId getZone() {
-            return ZoneOffset.UTC;
-        }
-
-        @Override
-        public Instant instant() {
-            return instant;
-        }
-
-        @Override
-        public Clock withZone(ZoneId zoneId) {
-            return this;
-        }
     }
 }

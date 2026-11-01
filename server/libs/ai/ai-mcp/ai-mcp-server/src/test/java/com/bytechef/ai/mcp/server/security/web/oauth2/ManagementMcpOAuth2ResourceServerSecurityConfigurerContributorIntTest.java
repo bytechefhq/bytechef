@@ -197,7 +197,8 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token, forgedMcpServerSecretKey);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
-        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token))
+            .containsExactly("public:admin@localhost.com");
         assertThat(authenticationEventRecorder.getEvents(CredentialAuthenticationSuccessEvent.class, token)).isEmpty();
     }
 
@@ -251,7 +252,8 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
             .firstValue("WWW-Authenticate")
             .orElse("")).startsWith("Bearer error=\"insufficient_scope\"")
                 .contains("scope=\"mcp:management\"");
-        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token))
+            .containsExactly("public:admin@localhost.com");
     }
 
     @Test
@@ -261,18 +263,8 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
-        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
-    }
-
-    @Test
-    void testForgedMcpServerSecretIsRejected() throws Exception {
-        String forgedMcpServerSecretKey = String.valueOf(TenantKey.of("public"));
-        String forgedEndpointUrl = "http://localhost:" + port + "/api/management/" + forgedMcpServerSecretKey + "/mcp";
-
-        HttpResponse<String> httpResponse = postInitialize(
-            signManagementJwt(forgedEndpointUrl), forgedMcpServerSecretKey);
-
-        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token))
+            .containsExactly("public:admin@localhost.com");
     }
 
     @Test
@@ -284,7 +276,8 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
-        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token))
+            .containsExactly("public:admin@localhost.com");
     }
 
     @Test

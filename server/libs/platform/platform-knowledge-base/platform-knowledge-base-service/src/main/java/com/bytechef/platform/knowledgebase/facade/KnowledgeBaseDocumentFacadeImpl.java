@@ -17,8 +17,12 @@
 package com.bytechef.platform.knowledgebase.facade;
 
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvents;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
@@ -76,6 +80,11 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_DOCUMENT_CREATED, platform = PlatformType.AUTOMATION, data = {
+        @AuditData(key = "knowledgeBaseDocumentId", value = "#result?.id"),
+        @AuditData(key = "knowledgeBaseId", value = "#knowledgeBaseId"),
+        @AuditData(key = "filename", value = "#filename")
+    })
     public KnowledgeBaseDocument createKnowledgeBaseDocument(
         Long knowledgeBaseId, String filename, String contentType, InputStream inputStream) {
 
@@ -96,6 +105,9 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_DOCUMENT_DELETED, platform = PlatformType.AUTOMATION, data = {
+        @AuditData(key = "knowledgeBaseDocumentId", value = "#id")
+    })
     public void deleteKnowledgeBaseDocument(Long id) {
         KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentService.getKnowledgeBaseDocument(id);
 

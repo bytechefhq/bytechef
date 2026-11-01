@@ -297,7 +297,7 @@ public class AuditAspect {
                 try {
                     auditMapper = auditMapperResolver.resolve(mapperClass);
 
-                    if (!auditMapper.shouldRecord(auditInvocation)) {
+                    if (auditFrame.getCaptureError() == null && !auditMapper.shouldRecord(auditInvocation)) {
                         return null;
                     }
 
@@ -314,6 +314,12 @@ public class AuditAspect {
 
             if (auditMapper != null) {
                 platform = resolveMapperPlatform(auditMapper, auditInvocation, audited, data);
+            }
+
+            PlatformType[] platforms = audited.platform();
+
+            if (platform == null && platforms.length > 0) {
+                platform = platforms[0];
             }
         }
 
@@ -393,7 +399,7 @@ public class AuditAspect {
 
             log.error(
                 "AUDIT DATA FAILURE: event {} data key '{}' with expression '{}' was not recorded because {}",
-                audited.event(), failure.key(), failure.expression(), failure.reason());
+                audited.event(), failure.key(), failure.expression(), failure.reason(), failure.cause());
         }
 
         data.put(DATA_ERROR, truncateValue(audited, DATA_ERROR, String.join(",", failedKeys)));

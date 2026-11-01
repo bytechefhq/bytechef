@@ -49,7 +49,7 @@ public class RemoteDataTableServiceClient implements DataTableService {
     }
 
     @Override
-    public void dropTable(String baseName, long environmentId) {
+    public boolean dropTable(String baseName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

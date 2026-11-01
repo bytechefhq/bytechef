@@ -9,6 +9,8 @@ package com.bytechef.platform.user.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -21,6 +23,7 @@ import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.audit.UserAuditEvents;
+import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -28,6 +31,7 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,11 +62,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 })
 class UserManagementFacadeAuditIntTest {
 
+    private static final String INVITE_PASSWORD = "Inv1tePassw0rd";
+
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     @Autowired
     private UserManagementFacade userManagementFacade;
+
+    @MockitoBean
+    private AuthorityService authorityService;
 
     @MockitoBean
     private UserService userService;
@@ -81,6 +90,47 @@ class UserManagementFacadeAuditIntTest {
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testInviteUserRecordsTheEmailAndRoleButNeverThePassword() {
+        when(authorityService.getAuthorities()).thenReturn(List.of(createAuthority(1L, "ROLE_USER")));
+        when(userService.fetchUserByEmail("carol@localhost.com")).thenReturn(Optional.empty());
+        when(userService.registerUser(any(), anyString())).thenReturn(new User());
+
+        userManagementFacade.inviteUser("carol@localhost.com", INVITE_PASSWORD, "ROLE_USER");
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(UserAuditEvents.USER_INVITED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("email", "carol@localhost.com")
+            .containsEntry("role", "ROLE_USER")
+            .doesNotContainValue(INVITE_PASSWORD)
+            .doesNotContainKey("dataError");
+    }
+
+    @Test
+    void testUpdateUserRoleRecordsTheLoginAndTheNewRole() {
+        User user = new User();
+
+        user.setLogin("bob@localhost.com");
+
+        when(authorityService.getAuthorities()).thenReturn(List.of(createAuthority(2L, "ROLE_ADMIN")));
+        when(userService.fetchUserByLogin("bob@localhost.com")).thenReturn(Optional.of(user));
+        when(userService.update(any())).thenReturn(Optional.of(user));
+
+        userManagementFacade.updateUserRole("bob@localhost.com", "ROLE_ADMIN");
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(UserAuditEvents.USER_ROLE_UPDATED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("login", "bob@localhost.com")
+            .containsEntry("role", "ROLE_ADMIN")
+            .doesNotContainKey("dataError");
     }
 
     @Test
@@ -116,6 +166,15 @@ class UserManagementFacadeAuditIntTest {
             .containsEntry("login", "ghost@localhost.com");
     }
 
+    private static Authority createAuthority(long id, String name) {
+        Authority authority = new Authority();
+
+        authority.setId(id);
+        authority.setName(name);
+
+        return authority;
+    }
+
     private PersistentAuditEvent findSingle() {
         Page<PersistentAuditEvent> page =
             persistenceAuditEventRepository.findAllFiltered(AuditEventFilter.empty(), PageRequest.of(0, 25));
@@ -132,9 +191,10 @@ class UserManagementFacadeAuditIntTest {
     static class UserManagementFacadeConfiguration {
 
         @Bean
-        UserManagementFacade userManagementFacade(TenantService tenantService, UserService userService) {
-            return new UserManagementFacadeImpl(
-                mock(AuthorityService.class), mock(MailService.class), tenantService, userService);
+        UserManagementFacade userManagementFacade(
+            AuthorityService authorityService, TenantService tenantService, UserService userService) {
+
+            return new UserManagementFacadeImpl(authorityService, mock(MailService.class), tenantService, userService);
         }
     }
 }

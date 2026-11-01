@@ -146,6 +146,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_CREATED, data = {
+        @AuditData(key = "projectId", value = "#result"),
+        @AuditData(key = "name", value = "#projectDTO.name"),
+        @AuditData(key = "workspaceId", value = "#projectDTO.workspaceId")
+    })
     @PreAuthorize("hasPermission(#projectDTO.workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public long createProject(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
@@ -169,8 +174,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_DELETED, data = {
+        @AuditData(key = "projectId", value = "#id")
+    })
     @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_DELETE')")
     public void deleteProject(long id) {
+        projectService.getProject(id);
+
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getAllProjectDeployments(id);
 
         for (ProjectDeployment projectDeployment : projectDeployments) {
@@ -202,6 +212,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_VERSION_DELETED, data = {
+        @AuditData(key = "projectId", value = "#id"),
+        @AuditData(key = "projectVersion", value = "#projectVersion")
+    })
     @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT') and hasPermission(#id, 'Project', 'DEPLOYMENT_PUSH')")
     public void deleteProjectVersion(long id, int projectVersion) {
         projectService.getPublishedProjectVersion(id, projectVersion);
@@ -224,6 +238,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_SHARED_DELETED, data = {
+        @AuditData(key = "projectId", value = "#id")
+    })
     @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_SETTINGS')")
     public void deleteSharedProject(long id) {
         Project project = projectService.getProject(id);
@@ -239,6 +256,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_DUPLICATED, data = {
+        @AuditData(key = "sourceProjectId", value = "#id"),
+        @AuditData(key = "projectId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW') and hasPermission(#id, 'Project', 'WORKFLOW_CREATE')")
     public ProjectDTO duplicateProject(long id) {
         Project project = projectService.getProject(id);
@@ -487,6 +509,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_PUBLISHED, data = {
+        @AuditData(key = "projectId", value = "#id"),
+        @AuditData(key = "projectVersion", value = "#result"),
+        @AuditData(key = "syncWithGit", value = "#syncWithGit")
+    })
     @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT') and hasPermission(#id, 'Project', 'DEPLOYMENT_PUSH')")
     public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = projectService.getProject(id);
@@ -517,6 +544,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_VERSION_RESTORED, data = {
+        @AuditData(key = "projectId", value = "#id"),
+        @AuditData(key = "projectVersion", value = "#projectVersion")
+    })
     @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT')")
     public void restoreProjectVersion(long id, int projectVersion) {
         Project project = projectService.getProject(id);
@@ -566,6 +597,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_UPDATED, data = {
+        @AuditData(key = "projectId", value = "#projectDTO.id"),
+        @AuditData(key = "name", value = "#projectDTO.name")
+    })
     @PreAuthorize("hasPermission(#projectDTO.id, 'Project', 'WORKFLOW_EDIT')")
     public void updateProject(ProjectDTO projectDTO) {
         List<Tag> tags = checkTags(projectDTO.tags());

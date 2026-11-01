@@ -26,6 +26,7 @@ import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -85,8 +86,8 @@ class KnowledgeBaseServiceIntTest {
     @Test
     void testGetKnowledgeBaseNotFound() {
         assertThatThrownBy(() -> knowledgeBaseService.getKnowledgeBase(Long.MAX_VALUE))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("KnowledgeBase not found");
+            .isInstanceOf(NoSuchElementException.class)
+            .hasMessage("Knowledge base " + Long.MAX_VALUE + " not found");
     }
 
     @Test

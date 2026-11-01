@@ -17,6 +17,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.ee.embedded.configuration.audit.AutomationWorkflowProjectAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
@@ -30,6 +31,8 @@ import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMe
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -110,6 +113,14 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_CREATED, data = {
+        @AuditData(key = "configurationId", value = "#result"),
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "environmentId", value = "#environmentId"),
+        @AuditData(key = "projectVersion", value = "#projectVersion"),
+        @AuditData(key = "enabled", value = "#enabled"),
+        @AuditData(key = "automationHubVisible", value = "#automationHubVisible")
+    })
     public long createConfiguration(
         long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible) {
 
@@ -138,6 +149,9 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_DELETED, data = {
+        @AuditData(key = "configurationId", value = "#id")
+    })
     public void deleteConfiguration(long id) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
@@ -161,6 +175,11 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @Audited(
+        event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_ENABLED_UPDATED, data = {
+            @AuditData(key = "configurationId", value = "#id"),
+            @AuditData(key = "enabled", value = "#enable")
+        })
     public void enableConfiguration(long id, boolean enable) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.updateEnabled(id, enable);
@@ -169,6 +188,13 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @Audited(
+        event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_WORKFLOW_ENABLED_UPDATED,
+        data = {
+            @AuditData(key = "configurationId", value = "#id"),
+            @AuditData(key = "workflowUuid", value = "#workflowUuid"),
+            @AuditData(key = "enabled", value = "#enable")
+        })
     public void enableConfigurationWorkflow(long id, String workflowUuid, boolean enable) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
@@ -285,6 +311,12 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_UPDATED, data = {
+        @AuditData(key = "configurationId", value = "#id"),
+        @AuditData(key = "projectVersion", value = "#projectVersion"),
+        @AuditData(key = "enabled", value = "#enabled"),
+        @AuditData(key = "automationHubVisible", value = "#automationHubVisible")
+    })
     public void updateConfiguration(long id, int projectVersion, boolean enabled, boolean automationHubVisible) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);

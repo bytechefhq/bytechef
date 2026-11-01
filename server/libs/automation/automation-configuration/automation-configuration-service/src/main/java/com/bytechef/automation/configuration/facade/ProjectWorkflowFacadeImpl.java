@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.audit.ProjectWorkflowAuditEvents;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -43,6 +44,8 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
@@ -150,6 +153,10 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @Audited(event = ProjectWorkflowAuditEvents.WORKFLOW_CREATED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "workflowId", value = "#result?.workflowId")
+    })
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
@@ -175,6 +182,9 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @Audited(event = ProjectWorkflowAuditEvents.WORKFLOW_DELETED, data = {
+        @AuditData(key = "workflowId", value = "#workflowId")
+    })
     @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_DELETE')")
     public void deleteWorkflow(String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
@@ -214,6 +224,11 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @Audited(event = ProjectWorkflowAuditEvents.WORKFLOW_DUPLICATED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "sourceWorkflowId", value = "#workflowId"),
+        @AuditData(key = "workflowId", value = "#result")
+    })
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public String duplicateWorkflow(long projectId, String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
@@ -535,6 +550,11 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @Audited(event = ProjectWorkflowAuditEvents.WORKFLOW_VERSION_RESTORED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "projectVersion", value = "#projectVersion"),
+        @AuditData(key = "workflowUuid", value = "#workflowUuid")
+    })
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_EDIT')")
     public void restoreProjectVersionWorkflow(long projectId, int projectVersion, String workflowUuid) {
         projectService.getPublishedProjectVersion(projectId, projectVersion);

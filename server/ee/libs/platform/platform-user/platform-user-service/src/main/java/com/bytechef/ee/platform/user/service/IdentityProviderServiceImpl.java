@@ -12,6 +12,7 @@ import com.bytechef.ee.platform.user.repository.IdentityProviderRepository;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,7 +71,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     @Transactional(readOnly = true)
     public IdentityProvider getIdentityProvider(long id) {
         return identityProviderRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Identity provider not found: " + id));
+            .orElseThrow(() -> new NoSuchElementException("Identity provider not found: " + id));
     }
 
     @Override

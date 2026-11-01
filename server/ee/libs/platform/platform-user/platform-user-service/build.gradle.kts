@@ -14,4 +14,13 @@ dependencies {
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-api"))
+
+    testImplementation("org.springframework.boot:spring-boot-liquibase")
+    testImplementation("org.springframework.security:spring-security-config")
+    testImplementation(project(":server:libs:config:app-config"))
+    testImplementation(project(":server:libs:core:encryption:encryption-impl"))
+    testImplementation(project(":server:libs:test:test-int-support"))
+
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
 }

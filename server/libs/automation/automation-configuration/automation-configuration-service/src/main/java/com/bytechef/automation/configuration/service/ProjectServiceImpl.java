@@ -109,7 +109,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional(readOnly = true)
     public Project getProject(long id) {
-        return OptionalUtils.get(projectRepository.findById(id));
+        return OptionalUtils.get(projectRepository.findById(id), "Project " + id + " not found");
     }
 
     @Override

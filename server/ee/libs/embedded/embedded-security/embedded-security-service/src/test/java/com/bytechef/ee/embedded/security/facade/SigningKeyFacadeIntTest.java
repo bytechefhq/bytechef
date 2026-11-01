@@ -29,6 +29,7 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -138,6 +139,15 @@ class SigningKeyFacadeIntTest {
         signingKeyFacade.delete(id);
 
         assertThat(signingKeyRepository.findById(id)).isEmpty();
+    }
+
+    @Test
+    void testDeleteOfAnUnknownSigningKeyFails() {
+        authenticate(OWNER_ADMIN_LOGIN, AuthorityConstants.ADMIN);
+
+        assertThatThrownBy(() -> signingKeyFacade.delete(Long.MAX_VALUE))
+            .isInstanceOf(NoSuchElementException.class)
+            .hasMessage("Signing key not found for id: " + Long.MAX_VALUE);
     }
 
     @Test

@@ -17,6 +17,7 @@
 package com.bytechef.platform.ai.provider.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -330,6 +331,21 @@ class AiProviderFacadeIntTest {
 
         assertThat(getSavedProperty(Provider.OLLAMA).getValue())
             .isEqualTo(Map.of("apiKey", "secret-token", "url", "http://ollama.example:11434"));
+    }
+
+    @Test
+    void testDeleteOfAnUnconfiguredProviderFails() {
+        assertThatThrownBy(() -> aiProviderFacade.deleteAiProvider(Provider.OLLAMA.getId(), ENVIRONMENT))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testDeleteRemovesAConfiguredProvider() {
+        enableOllama();
+
+        aiProviderFacade.deleteAiProvider(Provider.OLLAMA.getId(), ENVIRONMENT);
+
+        assertThat(propertyRepository.count()).isZero();
     }
 
     private void enableOllama() {

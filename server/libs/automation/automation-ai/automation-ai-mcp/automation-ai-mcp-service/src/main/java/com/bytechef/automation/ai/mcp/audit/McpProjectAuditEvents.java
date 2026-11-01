@@ -21,8 +21,10 @@ package com.bytechef.automation.ai.mcp.audit;
  */
 public final class McpProjectAuditEvents {
 
+    public static final String MCP_PROJECT_CLONED = "MCP_PROJECT_CLONED";
     public static final String MCP_PROJECT_CREATED = "MCP_PROJECT_CREATED";
     public static final String MCP_PROJECT_DELETED = "MCP_PROJECT_DELETED";
+    public static final String MCP_PROJECT_UPDATED = "MCP_PROJECT_UPDATED";
 
     private McpProjectAuditEvents() {
     }

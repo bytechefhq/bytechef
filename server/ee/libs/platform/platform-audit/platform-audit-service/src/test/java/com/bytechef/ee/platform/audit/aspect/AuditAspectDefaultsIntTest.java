@@ -10,6 +10,9 @@ package com.bytechef.ee.platform.audit.aspect;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -18,6 +21,7 @@ import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -25,6 +29,7 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -207,6 +212,43 @@ class AuditAspectDefaultsIntTest {
     }
 
     @Test
+    void testFailingDataExpressionLogsItsStackTrace() {
+        authenticate("alice", "ROLE_ADMIN");
+
+        Logger logger = (Logger) LoggerFactory.getLogger(AuditAspect.class);
+
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+
+        listAppender.start();
+        logger.addAppender(listAppender);
+
+        try {
+            defaultsTestService.updateWithExplodingValue(new ExplodingValue(), "finance");
+        } finally {
+            logger.detachAppender(listAppender);
+        }
+
+        assertThat(listAppender.list)
+            .filteredOn(loggingEvent -> loggingEvent.getFormattedMessage()
+                .startsWith("AUDIT DATA FAILURE"))
+            .singleElement()
+            .satisfies(loggingEvent -> assertThat(loggingEvent.getThrowableProxy()
+                .getClassName()).isEqualTo(StackOverflowError.class.getName()));
+    }
+
+    @Test
+    void testResultExpressionIsReportedWhenAParameterIsNamedResult() {
+        authenticate("alice", "ROLE_ADMIN");
+
+        assertThat(defaultsTestService.updateWithResultParameter("finance", "argument")).isEqualTo("returned");
+
+        assertThat(findSingle().getData())
+            .containsEntry("tag", "finance")
+            .containsEntry("dataError", "returned")
+            .doesNotContainKey("returned");
+    }
+
+    @Test
     void testDataEntryCannotOverwriteAMapperKey() {
         authenticate("alice", "ROLE_ADMIN");
 
@@ -272,6 +314,24 @@ class AuditAspectDefaultsIntTest {
             .doesNotContainKey("home");
     }
 
+    @Test
+    void testDeclaredPlatformIsRecordedWithoutAMapper() {
+        authenticate("alice", "ROLE_ADMIN");
+
+        assertThat(defaultsTestService.updateOnDeclaredPlatform()).isEqualTo("ok");
+
+        assertThat(findSingle().getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+    }
+
+    @Test
+    void testMapperPlatformWinsOverTheDeclaredPlatform() {
+        authenticate("alice", "ROLE_ADMIN");
+
+        assertThat(defaultsTestService.updateWithMapperPlatform()).isEqualTo("ok");
+
+        assertThat(findSingle().getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+    }
+
     private void authenticate(String principal, String authority) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
@@ -301,6 +361,11 @@ class AuditAspectDefaultsIntTest {
         @Bean
         DefaultsTestService defaultsTestService() {
             return new DefaultsTestService();
+        }
+
+        @Bean
+        EmbeddedAuditMapper embeddedAuditMapper() {
+            return new EmbeddedAuditMapper();
         }
 
         @Bean
@@ -393,6 +458,15 @@ class AuditAspectDefaultsIntTest {
             return "ok";
         }
 
+        @Audited(event = "RESULT_PARAMETER", data = {
+            @AuditData(key = "tag", value = "#tag"),
+            @AuditData(key = "returned", value = "#result")
+        })
+        @PreAuthorize("hasRole('ADMIN')")
+        public String updateWithResultParameter(String tag, String result) {
+            return "returned";
+        }
+
         @Audited(event = "MAPPER_AND_DATA", mapper = TagAuditMapper.class, data = {
             @AuditData(key = "tag", value = "#tag")
         })
@@ -417,12 +491,37 @@ class AuditAspectDefaultsIntTest {
             return "ok";
         }
 
+        @Audited(event = "DECLARED_PLATFORM", platform = PlatformType.AUTOMATION)
+        @PreAuthorize("hasRole('ADMIN')")
+        public String updateOnDeclaredPlatform() {
+            return "ok";
+        }
+
+        @Audited(event = "MAPPER_PLATFORM", mapper = EmbeddedAuditMapper.class, platform = PlatformType.AUTOMATION)
+        @PreAuthorize("hasRole('ADMIN')")
+        public String updateWithMapperPlatform() {
+            return "ok";
+        }
+
         @Audited(event = "TYPE_REFERENCE", data = {
             @AuditData(key = "home", value = "T(java.lang.System).getProperty('user.home')")
         })
         @PreAuthorize("hasRole('ADMIN')")
         public String updateWithTypeReference() {
             return "ok";
+        }
+    }
+
+    static class EmbeddedAuditMapper implements AuditMapper {
+
+        @Override
+        public Map<String, String> map(AuditInvocation auditInvocation) {
+            return Map.of();
+        }
+
+        @Override
+        public PlatformType platform(AuditInvocation auditInvocation) {
+            return PlatformType.EMBEDDED;
         }
     }
 

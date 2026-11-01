@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationWorkflowAuditMapper;
 import com.bytechef.ee.embedded.configuration.audit.WorkflowAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -96,6 +97,12 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @Audited(
+        event = WorkflowAuditEvents.INTEGRATION_WORKFLOW_CREATED, mapper = IntegrationWorkflowAuditMapper.class,
+        data = {
+            @AuditData(key = "integrationId", value = "#integrationId"),
+            @AuditData(key = "integrationWorkflowId", value = "#result")
+        })
     @PreAuthorize("isTenantAdmin()")
     public long addWorkflow(long integrationId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
@@ -113,6 +120,9 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @Audited(event = WorkflowAuditEvents.INTEGRATION_WORKFLOW_DELETED, data = {
+        @AuditData(key = "workflowId", value = "#workflowId")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void deleteWorkflow(String workflowId) {
         Integration integration = integrationService.getWorkflowIntegration(workflowId);

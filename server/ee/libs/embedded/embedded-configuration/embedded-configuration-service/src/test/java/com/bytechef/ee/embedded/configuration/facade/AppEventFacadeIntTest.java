@@ -101,9 +101,10 @@ class AppEventFacadeIntTest {
             .extracting(AppEvent::getId)
             .containsExactly(appEventId);
 
-        appEventFacade.delete(appEventId);
+        assertThat(appEventFacade.delete(appEventId)).isTrue();
 
         assertThat(appEventRepository.findById(appEventId)).isEmpty();
+        assertThat(appEventFacade.delete(appEventId)).isFalse();
     }
 
     @Test

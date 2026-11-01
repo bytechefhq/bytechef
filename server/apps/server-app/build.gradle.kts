@@ -379,6 +379,7 @@ dependencies {
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
+    testImplementation(project(":server:libs:platform:platform-api"))
     testImplementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
     testImplementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     testImplementation("org.springframework.boot:spring-boot-jdbc")

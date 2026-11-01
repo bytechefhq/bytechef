@@ -108,7 +108,7 @@ class AuditCaptureAspectIntTest {
     }
 
     @Test
-    void testThrowingCaptureStillRunsTheCallAndRecordsTheEventWithoutTheCapturedValue() {
+    void testThrowingCaptureStillRunsTheCallAndRecordsTheEventEvenWhenTheMapperWouldSkipIt() {
         authenticate("ROLE_ADMIN");
 
         assertThat(guardedAuditedService.throwingCapture(7L)).isEqualTo("ok");
@@ -199,6 +199,11 @@ class AuditCaptureAspectIntTest {
         @Override
         public Object capture(AuditInvocation auditInvocation) {
             throw new IllegalStateException("before-state read failed");
+        }
+
+        @Override
+        public boolean shouldRecord(AuditInvocation auditInvocation) {
+            return auditInvocation.captured() != null;
         }
 
         @Override
