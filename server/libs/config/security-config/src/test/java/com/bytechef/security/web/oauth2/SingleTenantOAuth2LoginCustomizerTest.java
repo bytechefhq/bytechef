@@ -32,7 +32,7 @@ class SingleTenantOAuth2LoginCustomizerTest {
         new ApplicationContextRunner()
             .withPropertyValues(
                 "bytechef.security.login.enabled=false", "bytechef.security.social-login.enabled=true",
-                "bytechef.tenant.mode=single")
+                "bytechef.security.sso.enabled=false", "bytechef.tenant.mode=single")
             .withUserConfiguration(
                 CustomOAuth2UserService.class, SingleTenantOAuth2LoginCustomizer.class, SocialOidcUserService.class)
             .run(context -> assertThat(context)
