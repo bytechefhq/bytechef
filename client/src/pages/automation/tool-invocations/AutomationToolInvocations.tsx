@@ -1,6 +1,6 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ToolInvocations} from '@/pages/automation/tool-invocations/ToolInvocations';
-import {useWorkspaceMcpServersQuery} from '@/shared/middleware/graphql';
+import {PlatformType, useWorkspaceMcpServersQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
 
@@ -30,6 +30,7 @@ export const AutomationToolInvocations = () => {
         <ToolInvocations
             key={`${currentWorkspaceId}-${currentEnvironmentId}`}
             mcpServerOptions={mcpServerOptions}
+            type={PlatformType.Automation}
             workspaceScope={workspaceScope}
         />
     );

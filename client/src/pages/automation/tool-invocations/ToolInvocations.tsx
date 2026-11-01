@@ -14,6 +14,7 @@ import {
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {PlatformType} from '@/shared/middleware/graphql';
 import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -30,23 +31,28 @@ const outcomeOptions = [
     {label: 'Approval denied', value: 'APPROVAL_DENIED'},
 ];
 
-const surfaceOptions = [
-    ANY_FILTER_OPTION,
-    {label: 'Automation MCP', value: 'MCP_AUTOMATION'},
-    {label: 'Embedded MCP', value: 'MCP_EMBEDDED'},
-    {label: 'Management MCP', value: 'MCP_MANAGEMENT'},
-    {label: 'Embedded API (Action)', value: 'EMBEDDED_API_ACTION'},
-    {label: 'Embedded API (Tool)', value: 'EMBEDDED_API_TOOL'},
-];
+const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
+    [PlatformType.Automation]: [
+        {label: 'Automation MCP', value: 'MCP_AUTOMATION'},
+        {label: 'Management MCP', value: 'MCP_MANAGEMENT'},
+    ],
+    [PlatformType.Embedded]: [
+        {label: 'Embedded MCP', value: 'MCP_EMBEDDED'},
+        {label: 'Embedded API (Action)', value: 'EMBEDDED_API_ACTION'},
+        {label: 'Embedded API (Tool)', value: 'EMBEDDED_API_TOOL'},
+    ],
+};
 
-const NON_WORKSPACE_SURFACES = new Set(['EMBEDDED_API_ACTION', 'EMBEDDED_API_TOOL', 'MCP_EMBEDDED', 'MCP_MANAGEMENT']);
+const NON_WORKSPACE_SURFACES = new Set(['MCP_MANAGEMENT']);
 
 interface ToolInvocationsProps {
+    environmentId?: number;
     mcpServerOptions?: Array<ComboBoxItemType>;
+    type: PlatformType;
     workspaceScope?: ToolInvocationsWorkspaceScopeI;
 }
 
-export const ToolInvocations = ({mcpServerOptions, workspaceScope}: ToolInvocationsProps) => {
+export const ToolInvocations = ({environmentId, mcpServerOptions, type, workspaceScope}: ToolInvocationsProps) => {
     const {
         filterEndDate,
         filterMcpServerId,
@@ -66,15 +72,18 @@ export const ToolInvocations = ({mcpServerOptions, workspaceScope}: ToolInvocati
         toolInvocationLogsError,
         toolInvocationLogsIsFetching,
         toolInvocationLogsIsLoading,
-    } = useToolInvocations(workspaceScope);
+    } = useToolInvocations({environmentId, type, workspaceScope});
 
-    const visibleSurfaceOptions = useMemo(
-        () =>
-            workspaceScope === undefined
+    const visibleSurfaceOptions = useMemo(() => {
+        const surfaceOptions = surfaceOptionsByType[type];
+
+        return [
+            ANY_FILTER_OPTION,
+            ...(workspaceScope === undefined
                 ? surfaceOptions
-                : surfaceOptions.filter((surfaceOption) => !NON_WORKSPACE_SURFACES.has(surfaceOption.value)),
-        [workspaceScope]
-    );
+                : surfaceOptions.filter((surfaceOption) => !NON_WORKSPACE_SURFACES.has(String(surfaceOption.value)))),
+        ];
+    }, [type, workspaceScope]);
 
     return (
         <LayoutContainer

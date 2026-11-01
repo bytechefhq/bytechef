@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {ToolInvocationsWorkspaceScopeI, useToolInvocations} from './useToolInvocations';
+import {ToolInvocationsWorkspaceScopeI, UseToolInvocationsOptionsI, useToolInvocations} from './useToolInvocations';
 
 const hoisted = vi.hoisted(() => ({
     useToolInvocationLogsQueryMock: vi.fn(),
@@ -23,7 +23,10 @@ const emptyQueryResult = () => ({
 });
 
 const renderUseToolInvocations = (workspaceScope?: ToolInvocationsWorkspaceScopeI) =>
-    renderHook(() => useToolInvocations(workspaceScope));
+    renderHook(() => useToolInvocations({type: 'AUTOMATION' as UseToolInvocationsOptionsI['type'], workspaceScope}));
+
+const renderUseEmbeddedToolInvocations = (environmentId?: number) =>
+    renderHook(() => useToolInvocations({environmentId, type: 'EMBEDDED' as UseToolInvocationsOptionsI['type']}));
 
 describe('useToolInvocations', () => {
     beforeEach(() => {
@@ -171,6 +174,7 @@ describe('useToolInvocations', () => {
         expect(result.current.filterPageNumber).toBe(0);
         expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             {
+                environmentId: undefined,
                 fromDate: startDate.getTime(),
                 mcpServerId: undefined,
                 outcome: 'ERROR',
@@ -192,6 +196,7 @@ describe('useToolInvocations', () => {
 
         expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             {
+                environmentId: undefined,
                 fromDate: undefined,
                 mcpServerId: undefined,
                 outcome: undefined,
@@ -214,6 +219,27 @@ describe('useToolInvocations', () => {
         expect(result.current.filterPageNumber).toBe(4);
         expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({page: 4, type: 'AUTOMATION'}),
+            {enabled: true}
+        );
+    });
+
+    it('queries the tenant-wide embedded log of the given environment', () => {
+        renderUseEmbeddedToolInvocations(2);
+
+        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+            expect.objectContaining({environmentId: '2', page: 0, type: 'EMBEDDED'}),
+            {enabled: true}
+        );
+        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(expect.anything(), {
+            enabled: false,
+        });
+    });
+
+    it('sends environment 0 as a filter instead of dropping it', () => {
+        renderUseEmbeddedToolInvocations(0);
+
+        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+            expect.objectContaining({environmentId: '0', type: 'EMBEDDED'}),
             {enabled: true}
         );
     });

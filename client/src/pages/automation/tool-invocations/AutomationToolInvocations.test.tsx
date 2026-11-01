@@ -24,11 +24,11 @@ vi.mock('@/shared/middleware/graphql', () => ({
 vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
     ToolInvocations: ({
         mcpServerOptions,
+        type,
         workspaceScope,
     }: {
         mcpServerOptions: Array<{label: string; value: string}>;
-        workspaceScope: Parameters<typeof useToolInvocations>[0];
-    }) => {
+    } & Parameters<typeof useToolInvocations>[0]) => {
         const {
             filterMcpServerId,
             filterOutcome,
@@ -36,7 +36,7 @@ vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
             handleMcpServerChange,
             handleOutcomeChange,
             handlePaginationClick,
-        } = useToolInvocations(workspaceScope);
+        } = useToolInvocations({type, workspaceScope});
 
         return (
             <div>

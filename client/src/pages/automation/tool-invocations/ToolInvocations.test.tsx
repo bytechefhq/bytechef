@@ -1,5 +1,6 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {PlatformType} from '@/shared/middleware/graphql';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -42,11 +43,11 @@ const toolInvocationsState = () => ({
     toolInvocationLogsIsLoading: false,
 });
 
-const renderToolInvocations = (props: Parameters<typeof ToolInvocations>[0] = {}) =>
+const renderToolInvocations = (props: Partial<Parameters<typeof ToolInvocations>[0]> = {}) =>
     render(
         <MemoryRouter>
             <TooltipProvider>
-                <ToolInvocations {...props} />
+                <ToolInvocations type={PlatformType.Automation} {...props} />
             </TooltipProvider>
         </MemoryRouter>
     );
@@ -81,34 +82,19 @@ describe('ToolInvocations', () => {
         hoisted.useToolInvocationsMock.mockReturnValue(toolInvocationsState());
     });
 
-    it('offers every surface on the tenant-wide page', () => {
-        render(
-            <MemoryRouter>
-                <TooltipProvider>
-                    <ToolInvocations />
-                </TooltipProvider>
-            </MemoryRouter>
-        );
+    it('offers only the automation surfaces on the tenant-wide automation page', () => {
+        renderToolInvocations();
 
-        expect(renderedItemValues()).toEqual(
-            expect.arrayContaining([
-                'EMBEDDED_API_ACTION',
-                'EMBEDDED_API_TOOL',
-                'MCP_AUTOMATION',
-                'MCP_EMBEDDED',
-                'MCP_MANAGEMENT',
-            ])
-        );
+        const itemValues = renderedItemValues();
+
+        expect(itemValues).toEqual(expect.arrayContaining(['MCP_AUTOMATION', 'MCP_MANAGEMENT']));
+        expect(itemValues).not.toContain('EMBEDDED_API_ACTION');
+        expect(itemValues).not.toContain('EMBEDDED_API_TOOL');
+        expect(itemValues).not.toContain('MCP_EMBEDDED');
     });
 
     it('offers only the surfaces that can occur in a workspace on the workspace-scoped page', () => {
-        render(
-            <MemoryRouter>
-                <TooltipProvider>
-                    <ToolInvocations workspaceScope={{environmentId: 2, workspaceId: 7}} />
-                </TooltipProvider>
-            </MemoryRouter>
-        );
+        renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         const itemValues = renderedItemValues();
 
@@ -117,6 +103,28 @@ describe('ToolInvocations', () => {
         expect(itemValues).not.toContain('EMBEDDED_API_TOOL');
         expect(itemValues).not.toContain('MCP_EMBEDDED');
         expect(itemValues).not.toContain('MCP_MANAGEMENT');
+    });
+
+    it('offers only the embedded surfaces on the embedded page', () => {
+        renderToolInvocations({environmentId: 1, type: PlatformType.Embedded});
+
+        const itemValues = renderedItemValues();
+
+        expect(itemValues).toEqual(
+            expect.arrayContaining(['EMBEDDED_API_ACTION', 'EMBEDDED_API_TOOL', 'MCP_EMBEDDED'])
+        );
+        expect(itemValues).not.toContain('MCP_AUTOMATION');
+        expect(itemValues).not.toContain('MCP_MANAGEMENT');
+    });
+
+    it('reads the invocations of the platform type and environment it is given', () => {
+        renderToolInvocations({environmentId: 1, type: PlatformType.Embedded});
+
+        expect(hoisted.useToolInvocationsMock).toHaveBeenCalledWith({
+            environmentId: 1,
+            type: PlatformType.Embedded,
+            workspaceScope: undefined,
+        });
     });
 
     it('shows the empty state and no pagination when nothing has been recorded', () => {
