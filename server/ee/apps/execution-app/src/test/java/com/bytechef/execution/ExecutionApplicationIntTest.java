@@ -9,18 +9,29 @@ package com.bytechef.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.awaitility.Awaitility.await;
 
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogRetentionJob;
+import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
 import com.bytechef.message.broker.memory.MemoryMessageBroker;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.tool.execution.ToolExecutionEvent;
+import com.bytechef.platform.tool.execution.ToolExecutionKind;
+import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import io.grpc.BindableService;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -69,6 +80,12 @@ public class ExecutionApplicationIntTest {
 
     @Autowired
     private ObjectProvider<ToolInvocationLogRetentionJob> toolInvocationLogRetentionJobProvider;
+
+    @Autowired
+    private ToolExecutionRecorder toolExecutionRecorder;
+
+    @Autowired
+    private ToolInvocationLogService toolInvocationLogService;
 
     @Test
     void testContextLoads() {
@@ -191,5 +208,25 @@ public class ExecutionApplicationIntTest {
         assertThat(toolInvocationLogRetentionJob).isNotNull();
 
         assertThatCode(toolInvocationLogRetentionJob::purgeExpiredLogs).doesNotThrowAnyException();
+    }
+
+    @Test
+    void testRecordedToolExecutionIsWrittenToTheExecutionDatabase() {
+        String toolName = "execution_app_recorder_" + System.nanoTime();
+
+        String result = toolExecutionRecorder.record(
+            ToolExecutionEvent.builder(
+                PlatformType.EMBEDDED, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionKind.COMPONENT, toolName),
+            () -> "done");
+
+        assertThat(result).isEqualTo("done");
+
+        await().atMost(Duration.ofSeconds(10))
+            .untilAsserted(() -> assertThat(
+                toolInvocationLogService.getToolInvocationLogs(
+                    PlatformType.EMBEDDED, null, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null,
+                    null, 0))
+                        .extracting(ToolInvocationLog::getToolName, ToolInvocationLog::getOutcome)
+                        .contains(tuple(toolName, ToolExecutionOutcome.SUCCESS)));
     }
 }
