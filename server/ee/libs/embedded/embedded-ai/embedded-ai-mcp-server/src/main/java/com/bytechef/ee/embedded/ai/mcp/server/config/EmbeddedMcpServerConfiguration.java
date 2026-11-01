@@ -41,6 +41,7 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.tenant.domain.TenantKey;
@@ -111,7 +112,7 @@ public class EmbeddedMcpServerConfiguration {
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
-        WorkflowService workflowService) {
+        ToolExecutionRecorder toolExecutionRecorder, WorkflowService workflowService) {
 
         return new EmbeddedMcpToolFacade(
             clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
@@ -120,7 +121,8 @@ public class EmbeddedMcpServerConfiguration {
             integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
             mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
             mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade,
-            applicationProperties.getPublicUrl(), taskExecutionService, durableTaskFileStorage, workflowService);
+            applicationProperties.getPublicUrl(), taskExecutionService, durableTaskFileStorage, toolExecutionRecorder,
+            workflowService);
     }
 
     @Bean

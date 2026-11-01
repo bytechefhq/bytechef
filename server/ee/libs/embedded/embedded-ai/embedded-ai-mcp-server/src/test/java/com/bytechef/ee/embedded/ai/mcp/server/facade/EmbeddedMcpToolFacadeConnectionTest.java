@@ -12,8 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import org.junit.jupiter.api.Test;
 
@@ -25,22 +26,38 @@ class EmbeddedMcpToolFacadeConnectionTest {
     private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
 
     @Test
-    void testConnectionRequiredWhenComponentDeclaresConnection() {
-        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
-
-        when(componentDefinition.getConnection()).thenReturn(mock(ConnectionDefinition.class));
-        when(componentDefinitionService.getComponentDefinition("slack", 1)).thenReturn(componentDefinition);
+    void testConnectionRequiredWhenComponentDeclaresARequiredConnection() {
+        stubComponentDefinition(
+            "slack",
+            ComponentDsl.component("slack")
+                .connection(
+                    ComponentDsl.connection()
+                        .authorizationRequired(true)));
 
         assertTrue(EmbeddedMcpToolFacade.isConnectionRequired(componentDefinitionService, "slack", 1));
     }
 
     @Test
-    void testConnectionNotRequiredForConnectionlessComponent() {
-        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+    void testConnectionNotRequiredWhenComponentDeclaresAnOptionalConnection() {
+        stubComponentDefinition(
+            "httpClient",
+            ComponentDsl.component("httpClient")
+                .connection(
+                    ComponentDsl.connection()
+                        .authorizationRequired(false)));
 
-        when(componentDefinition.getConnection()).thenReturn(null);
-        when(componentDefinitionService.getComponentDefinition("logger", 1)).thenReturn(componentDefinition);
+        assertFalse(EmbeddedMcpToolFacade.isConnectionRequired(componentDefinitionService, "httpClient", 1));
+    }
+
+    @Test
+    void testConnectionNotRequiredForConnectionlessComponent() {
+        stubComponentDefinition("logger", ComponentDsl.component("logger"));
 
         assertFalse(EmbeddedMcpToolFacade.isConnectionRequired(componentDefinitionService, "logger", 1));
+    }
+
+    private void stubComponentDefinition(String componentName, ModifiableComponentDefinition componentDefinition) {
+        when(componentDefinitionService.getComponentDefinition(componentName, 1))
+            .thenReturn(new ComponentDefinition(componentDefinition));
     }
 }
