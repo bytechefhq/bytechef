@@ -47,7 +47,7 @@ spring:
             - id: configuration-app
               uri: lb://configuration-app
               predicates:
-                - Path=/api/automation/**,/api/platform/**,/api/embedded/**,/graphql,/icons/**
+                - Path=/api/automation/**,/api/management/**,/api/platform/**,/api/embedded/**,/graphql,/icons/**
 
 bytechef:
   mail:

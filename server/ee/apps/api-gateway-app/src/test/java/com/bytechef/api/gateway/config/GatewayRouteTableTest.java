@@ -85,7 +85,9 @@ class GatewayRouteTableTest {
 
     @ParameterizedTest
     @CsvSource({
+        "/api/automation/abc123/mcp, configuration-app",
         "/api/automation/internal/projects/1, configuration-app",
+        "/api/management/mcp, configuration-app",
         "/api/automation/internal/workspaces/1/workflow-executions, execution-app",
         "/api/automation/internal/workspaces/1/projects, configuration-app",
         "/api/automation/internal/workflow-executions/5, execution-app",
