@@ -132,13 +132,15 @@ describe('DataTables', () => {
     });
 
     describe('empty state', () => {
-        it('should render empty state when no tables', () => {
+        it('should render the first-run empty state without the sidebar when no tables', () => {
             hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn, filteredTables: [], tables: []});
 
             renderDataTables();
 
-            expect(screen.getByText('No Data Tables')).toBeInTheDocument();
-            expect(screen.getByText('Get started by creating a new data table.')).toBeInTheDocument();
+            expect(screen.getByText('Create your first data table')).toBeInTheDocument();
+            expect(screen.getByText('How data tables work')).toBeInTheDocument();
+            expect(screen.getByTestId('create-dialog-trigger')).toBeInTheDocument();
+            expect(screen.queryByTestId('left-sidebar-nav')).not.toBeInTheDocument();
         });
 
         it('should render empty state with tag filter message', () => {
@@ -148,6 +150,7 @@ describe('DataTables', () => {
 
             expect(screen.getByText('No Matching Tables')).toBeInTheDocument();
             expect(screen.getByText('No data tables match the selected tag.')).toBeInTheDocument();
+            expect(screen.getByTestId('left-sidebar-nav')).toBeInTheDocument();
         });
     });
 });

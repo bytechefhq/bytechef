@@ -1,7 +1,9 @@
 import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
+import {A2A_SERVERS_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import Header from '@/shared/layout/Header';
@@ -15,6 +17,17 @@ import A2aServerList from './components/A2aServerList';
 import A2aServersFilterTitle from './components/A2aServersFilterTitle';
 import A2aServersLeftSidebarNav from './components/A2aServersLeftSidebarNav';
 import useA2aServers from './hooks/useA2aServers';
+
+const A2A_SERVER_STEPS = [
+    {
+        description: 'Name it and choose whether callers must authenticate.',
+        id: 'createA2aServer',
+        label: 'Create an A2A server',
+        status: 'current' as const,
+    },
+    {id: 'addSkills', label: 'Add project workflows as its skills', status: 'upcoming' as const},
+    {id: 'connectAgent', label: "Share the server's URL with another agent", status: 'upcoming' as const},
+];
 
 const A2aServers = () => {
     const {
@@ -30,6 +43,8 @@ const A2aServers = () => {
         uniqueProjects,
     } = useA2aServers();
 
+    const isFirstRun = !a2aServersIsLoading && !tagsIsLoading && !a2aServersError && a2aServers.length === 0;
+
     let pageContent;
 
     if (filteredA2aServers.length > 0) {
@@ -44,12 +59,20 @@ const A2aServers = () => {
         pageContent = <EmptyFilterResult entityName="A2A servers" entityTitle="A2A Servers" />;
     } else {
         pageContent = (
-            <EmptyList
-                button={<A2aServerDialog triggerNode={<Button label="Create A2A Server" />} />}
-                icon={<NetworkIcon className="size-24 text-stroke-neutral-tertiary" />}
-                message="Get started by creating a new A2A server to expose an agent-backed workflow."
-                title="No A2A Servers"
-            />
+            <EmptyState
+                actions={<A2aServerDialog triggerNode={<Button label="Create A2A Server" />} />}
+                description="An A2A server publishes an agent that other agents can discover and hand tasks to, over the Agent2Agent protocol. Each workflow you add becomes one of its skills. Three steps to get there:"
+                docsLink={{href: A2A_SERVERS_DOCUMENTATION_URL, label: 'How A2A servers work'}}
+                icon={<NetworkIcon />}
+                title="Create your first A2A server"
+            >
+                <JourneySteps
+                    aria-label="Getting started"
+                    className="max-w-md"
+                    orientation="vertical"
+                    steps={A2A_SERVER_STEPS}
+                />
+            </EmptyState>
         );
     }
 
@@ -74,7 +97,7 @@ const A2aServers = () => {
                                 uniqueProjects={uniqueProjects}
                             />
                         ) : (
-                            ''
+                            isFirstRun && 'A2A Servers'
                         )
                     }
                 />
@@ -89,6 +112,7 @@ const A2aServers = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="A2A Servers" />}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[a2aServersError, tagsError]} loading={a2aServersIsLoading || tagsIsLoading}>

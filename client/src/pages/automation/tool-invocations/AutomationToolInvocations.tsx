@@ -1,5 +1,6 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ToolInvocations} from '@/pages/automation/tool-invocations/ToolInvocations';
+import AutomationToolInvocationsEmptyState from '@/pages/automation/tool-invocations/components/AutomationToolInvocationsEmptyState';
 import {PlatformType, useWorkspaceMcpServersQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
@@ -21,6 +22,14 @@ export const AutomationToolInvocations = () => {
         [data]
     );
 
+    const hasMcpServer = useMemo(
+        () =>
+            (data?.workspaceMcpServers ?? []).some(
+                (mcpServer) => mcpServer != null && mcpServer.environmentId === String(currentEnvironmentId)
+            ),
+        [currentEnvironmentId, data]
+    );
+
     const workspaceScope = useMemo(
         () => ({environmentId: currentEnvironmentId, workspaceId: currentWorkspaceId}),
         [currentEnvironmentId, currentWorkspaceId]
@@ -28,6 +37,7 @@ export const AutomationToolInvocations = () => {
 
     return (
         <ToolInvocations
+            firstRunEmptyState={<AutomationToolInvocationsEmptyState hasMcpServer={hasMcpServer} />}
             key={`${currentWorkspaceId}-${currentEnvironmentId}`}
             mcpServerOptions={mcpServerOptions}
             type={PlatformType.Automation}

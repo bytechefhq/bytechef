@@ -1,7 +1,7 @@
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -26,8 +26,16 @@ vi.mock('../hooks/useMcpServers', () => ({
 }));
 
 vi.mock('@/shared/layout/LayoutContainer', () => ({
-    default: ({children, header}: {children: ReactNode; header: ReactNode}) => (
-        <div>
+    default: ({
+        children,
+        header,
+        leftSidebarHidden,
+    }: {
+        children: ReactNode;
+        header: ReactNode;
+        leftSidebarHidden?: boolean;
+    }) => (
+        <div data-left-sidebar-hidden={String(!!leftSidebarHidden)} data-testid="layout-container">
             {header}
 
             {children}
@@ -97,5 +105,14 @@ describe('McpServers', () => {
 
         expect(useCopilotPostTurnRegistry.getState().callbacks[Source.MCP_SERVER]).toBeUndefined();
         expect(invalidateQueriesSpy).not.toHaveBeenCalled();
+    });
+
+    it('should hide the sidebar and show the getting-started guide when there are no MCP servers', () => {
+        renderMcpServers();
+
+        expect(screen.getByTestId('layout-container')).toHaveAttribute('data-left-sidebar-hidden', 'true');
+        expect(screen.getByText('Create your first MCP server')).toBeInTheDocument();
+        expect(screen.getByText('Create an MCP server').closest('li')).toHaveAttribute('aria-current', 'step');
+        expect(screen.getByText('How MCP servers work')).toBeInTheDocument();
     });
 });

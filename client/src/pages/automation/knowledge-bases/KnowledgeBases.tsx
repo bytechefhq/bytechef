@@ -2,7 +2,8 @@ import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import CreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/CreateKnowledgeBaseDialog';
-import KnowledgeBaseEmbeddingInactiveAlert from '@/pages/automation/knowledge-bases/components/KnowledgeBaseEmbeddingInactiveAlert';
+import KnowledgeBaseEmbeddingInactiveEmptyState from '@/pages/automation/knowledge-bases/components/KnowledgeBaseEmbeddingInactiveEmptyState';
+import KnowledgeBasesEmptyState from '@/pages/automation/knowledge-bases/components/KnowledgeBasesEmptyState';
 import KnowledgeBasesFilterTitle from '@/pages/automation/knowledge-bases/components/KnowledgeBasesFilterTitle';
 import KnowledgeBasesLeftSidebarNav from '@/pages/automation/knowledge-bases/components/KnowledgeBasesLeftSidebarNav';
 import useKnowledgeBaseEmbeddingActive from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBaseEmbeddingActive';
@@ -22,6 +23,12 @@ const KnowledgeBases = () => {
     const {embeddingActive, isLoading: embeddingActiveLoading} = useKnowledgeBaseEmbeddingActive();
 
     const showKnowledgeBases = embeddingActive && knowledgeBases.length > 0;
+
+    const isLoaded = !isLoading && !embeddingActiveLoading;
+
+    const isFirstRun = isLoaded && !tagId && knowledgeBases.length === 0;
+
+    const leftSidebarHidden = isFirstRun || (isLoaded && !embeddingActive);
 
     return (
         <LayoutContainer
@@ -44,17 +51,22 @@ const KnowledgeBases = () => {
                                 tagsByKnowledgeBaseData={tagsByKnowledgeBaseData}
                             />
                         ) : (
-                            ''
+                            leftSidebarHidden && 'Knowledge Bases'
                         )
                     }
                 />
             }
             leftSidebarBody={embeddingActive && <KnowledgeBasesLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="Knowledge Bases" />}
+            leftSidebarHidden={leftSidebarHidden}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading || embeddingActiveLoading}>
-                {embeddingActive ? (
+                {isFirstRun ? (
+                    <KnowledgeBasesEmptyState embeddingActive={embeddingActive} workspaceId={currentWorkspaceId} />
+                ) : !embeddingActive ? (
+                    <KnowledgeBaseEmbeddingInactiveEmptyState />
+                ) : (
                     <div className="flex size-full">
                         {filteredKnowledgeBases.length > 0 ? (
                             <KnowledgeBaseList
@@ -64,24 +76,12 @@ const KnowledgeBases = () => {
                             />
                         ) : (
                             <EmptyList
-                                button={
-                                    <CreateKnowledgeBaseDialog
-                                        trigger={<Button>Create Knowledge Base</Button>}
-                                        workspaceId={currentWorkspaceId}
-                                    />
-                                }
                                 icon={<DatabaseIcon className="size-24 text-stroke-neutral-tertiary" />}
-                                message={
-                                    tagId
-                                        ? 'No knowledge bases match the selected tag.'
-                                        : 'Get started by creating a new knowledge base.'
-                                }
-                                title={tagId ? 'No Matching Knowledge Bases' : 'No Knowledge Bases'}
+                                message="No knowledge bases match the selected tag."
+                                title="No Matching Knowledge Bases"
                             />
                         )}
                     </div>
-                ) : (
-                    <KnowledgeBaseEmbeddingInactiveAlert />
                 )}
             </PageLoader>
         </LayoutContainer>
