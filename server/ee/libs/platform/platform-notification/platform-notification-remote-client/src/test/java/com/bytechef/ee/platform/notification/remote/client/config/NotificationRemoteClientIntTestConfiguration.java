@@ -12,9 +12,13 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.mail.MailService;
+import com.bytechef.platform.notification.delivery.SlackNotificationClient;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryRequest;
+import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
 import com.bytechef.platform.notification.handler.EmailNotificationSender;
 import com.bytechef.platform.notification.handler.NotificationSender;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
+import com.bytechef.platform.notification.handler.SlackNotificationSender;
 import com.bytechef.platform.notification.handler.WebhookNotificationSender;
 import com.bytechef.platform.notification.repository.NotificationRepository;
 import com.bytechef.platform.notification.service.NotificationService;
@@ -92,8 +96,22 @@ public class NotificationRemoteClientIntTestConfiguration {
     }
 
     @Bean
-    WebhookNotificationSender webhookNotificationSender() {
-        return new WebhookNotificationSender();
+    RecordingWebhookNotificationClient recordingWebhookNotificationClient() {
+        return new RecordingWebhookNotificationClient();
+    }
+
+    @Bean
+    SlackNotificationSender slackNotificationSender(
+        RecordingWebhookNotificationClient recordingWebhookNotificationClient) {
+
+        return new SlackNotificationSender(new SlackNotificationClient(recordingWebhookNotificationClient));
+    }
+
+    @Bean
+    WebhookNotificationSender webhookNotificationSender(
+        RecordingWebhookNotificationClient recordingWebhookNotificationClient) {
+
+        return new WebhookNotificationSender(recordingWebhookNotificationClient);
     }
 
     public static class RecordingJavaMailSender extends JavaMailSenderImpl {
@@ -111,6 +129,24 @@ public class NotificationRemoteClientIntTestConfiguration {
         @Override
         protected void doSend(MimeMessage[] mimeMessages, Object[] originalMessages) {
             sentMimeMessages.addAll(List.of(mimeMessages));
+        }
+    }
+
+    public static class RecordingWebhookNotificationClient extends WebhookNotificationClient {
+
+        private final List<WebhookDeliveryRequest> webhookDeliveryRequests = new CopyOnWriteArrayList<>();
+
+        public List<WebhookDeliveryRequest> getWebhookDeliveryRequests() {
+            return List.copyOf(webhookDeliveryRequests);
+        }
+
+        public void clear() {
+            webhookDeliveryRequests.clear();
+        }
+
+        @Override
+        public void deliver(WebhookDeliveryRequest webhookDeliveryRequest, WebhookRetry webhookRetry) {
+            webhookDeliveryRequests.add(webhookDeliveryRequest);
         }
     }
 

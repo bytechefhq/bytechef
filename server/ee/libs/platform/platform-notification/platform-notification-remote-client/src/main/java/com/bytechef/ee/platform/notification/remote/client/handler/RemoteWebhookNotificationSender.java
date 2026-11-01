@@ -38,6 +38,13 @@ public class RemoteWebhookNotificationSender extends AbstractRemoteNotificationS
         Notification notification, @Nullable WebhookNotificationHandler webhookNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
-        send(notification, SendNotificationRequest.newBuilder());
+        SendNotificationRequest.Builder sendNotificationRequestBuilder = SendNotificationRequest.newBuilder();
+
+        if (webhookNotificationHandler != null) {
+            sendNotificationRequestBuilder
+                .setContent(webhookNotificationHandler.getPayload(notificationHandlerContext));
+        }
+
+        send(notification, sendNotificationRequestBuilder);
     }
 }
