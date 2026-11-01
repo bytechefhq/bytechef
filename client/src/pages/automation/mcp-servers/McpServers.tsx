@@ -20,13 +20,12 @@ import {useEffect} from 'react';
 
 const MCP_SERVER_STEPS = [
     {
-        description: 'Name it and choose whether clients must authenticate.',
         id: 'createMcpServer',
         label: 'Create an MCP server',
         status: 'current' as const,
     },
-    {id: 'addTools', label: 'Add component actions or workflows as tools', status: 'upcoming' as const},
-    {id: 'connectAiClient', label: "Add the server's URL to an AI client", status: 'upcoming' as const},
+    {id: 'addTools', label: 'Add tools', status: 'upcoming' as const},
+    {id: 'connectAiClient', label: 'Connect an AI client', status: 'upcoming' as const},
 ];
 
 import McpServerDialog from './components/McpServerDialog';
@@ -139,17 +138,12 @@ const McpServers = () => {
                         actions={
                             <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
                         }
-                        description="An MCP server turns component actions and workflows into tools that AI assistants like Claude or Cursor can call, through a single URL. Three steps to get there:"
+                        description="An MCP server turns component actions and workflows into tools that AI assistants like Claude or Cursor can call, through a single URL."
                         docsLink={{href: MCP_SERVERS_DOCUMENTATION_URL, label: 'How MCP servers work'}}
                         icon={<ServerIcon />}
                         title="Create your first MCP server"
                     >
-                        <JourneySteps
-                            aria-label="Getting started"
-                            className="max-w-md"
-                            orientation="vertical"
-                            steps={MCP_SERVER_STEPS}
-                        />
+                        <JourneySteps aria-label="Getting started" steps={MCP_SERVER_STEPS} />
                     </EmptyState>
                 )}
             </PageLoader>
