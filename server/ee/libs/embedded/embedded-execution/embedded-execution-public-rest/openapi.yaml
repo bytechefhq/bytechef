@@ -1232,6 +1232,7 @@ components:
         - "APPROVAL_REQUIRED"
         - "APPROVAL_DENIED"
         - "RULE_BLOCKED"
+        - "SUSPENDED"
     ToolInvocationPage:
       description: "A page of a connected user's tool invocations."
       type: "object"
