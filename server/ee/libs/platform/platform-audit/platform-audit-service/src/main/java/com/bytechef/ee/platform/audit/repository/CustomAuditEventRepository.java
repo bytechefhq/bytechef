@@ -53,8 +53,8 @@ public class CustomAuditEventRepository implements AuditEventRepository {
     private static final String AUTHORIZATION_FAILURE = "AUTHORIZATION_FAILURE";
     private static final String DETAILS = "details";
     public static final String ANONYMOUS_USER = "anonymoususer";
-    public static final String PLATFORM_DATA_KEY = CustomAuditEventRepository.class.getName() + ".platform";
-    public static final String TENANT_ID_DATA_KEY = CustomAuditEventRepository.class.getName() + ".tenantId";
+    public static final String PLATFORM_DATA_KEY = AuditEventConverter.PLATFORM_DATA_KEY;
+    public static final String TENANT_ID_DATA_KEY = AuditEventConverter.TENANT_ID_DATA_KEY;
 
     /**
      * Should be the same as in Liquibase migration.
