@@ -35,6 +35,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserSharedConnectionRepository;
@@ -46,6 +47,13 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.ee.platform.audit.aspect.AuditAspect;
+import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
+import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
+import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
+import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
+import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -104,6 +112,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -181,6 +191,9 @@ class ConnectedUserConnectionFacadeIntTest {
 
     @Autowired
     private IntegrationService integrationService;
+
+    @Autowired
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     private final Map<Long, Connection> connections = new HashMap<>();
 
@@ -444,6 +457,9 @@ class ConnectedUserConnectionFacadeIntTest {
         assertThat(connectionId).isEqualTo(82705L);
 
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).containsExactly(82705L);
+        assertThat(findSingleConnectionEvent(ConnectionAuditEvents.CONNECTION_CREATED, 82705L).getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectedUserId", String.valueOf(connectedUserId));
     }
 
     @Test
@@ -554,6 +570,9 @@ class ConnectedUserConnectionFacadeIntTest {
             .singleElement()
             .satisfies(connectionIds -> assertThat(connectionIds).isEmpty());
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).isEmpty();
+        assertThat(findSingleConnectionEvent(ConnectionAuditEvents.CONNECTION_DELETED, 83201L).getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectedUserId", String.valueOf(connectedUserId));
     }
 
     @Test
@@ -568,6 +587,34 @@ class ConnectedUserConnectionFacadeIntTest {
         connectedUserConnectionFacade.reauthorizeConnectedUserConnection(connectedUserId, 83301L, parameters);
 
         verify(connectionFacade).replaceAuthorizationParameters(83301L, parameters);
+
+        assertThat(findSingleConnectionEvent(ConnectionAuditEvents.CONNECTION_REAUTHORIZED, 83301L).getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectedUserId", String.valueOf(connectedUserId))
+            .doesNotContainKey("parameters")
+            .doesNotContainValue("new");
+    }
+
+    private static boolean hasConnectionId(PersistentAuditEvent persistentAuditEvent, long connectionId) {
+        Map<String, String> data = persistentAuditEvent.getData();
+
+        return String.valueOf(connectionId)
+            .equals(data.get("connectionId"));
+    }
+
+    private PersistentAuditEvent findSingleConnectionEvent(String eventType, long connectionId) {
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+            AuditEventFilter.empty(), PageRequest.of(0, 100));
+
+        List<PersistentAuditEvent> persistentAuditEvents = page.getContent()
+            .stream()
+            .filter(persistentAuditEvent -> eventType.equals(persistentAuditEvent.getEventType()))
+            .filter(persistentAuditEvent -> hasConnectionId(persistentAuditEvent, connectionId))
+            .toList();
+
+        assertThat(persistentAuditEvents).hasSize(1);
+
+        return persistentAuditEvents.getFirst();
     }
 
     @Test
@@ -798,6 +845,9 @@ class ConnectedUserConnectionFacadeIntTest {
 
     @Configuration
     @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
+    @Import({
+        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
+    })
     static class ConnectedUserServiceConfiguration {
     }
 

@@ -74,7 +74,7 @@ public class RegisteredClientServiceImpl implements RegisteredClientService {
 
     @Override
     @Transactional
-    public void deleteRegisteredClient(String id) {
+    public boolean deleteRegisteredClient(String id) {
         if (tenantService.isMultiTenantEnabled()) {
             throw new ConfigurationException(
                 "OAuth2 clients are shared across tenants and cannot be deleted",
@@ -84,9 +84,11 @@ public class RegisteredClientServiceImpl implements RegisteredClientService {
         jdbcOperations.update("DELETE FROM oauth2_authorization WHERE registered_client_id = ?", id);
         jdbcOperations.update("DELETE FROM oauth2_authorization_consent WHERE registered_client_id = ?", id);
 
-        TenantScope.run(
+        int deletedCount = TenantScope.call(
             TenantContext.DEFAULT_TENANT_ID,
             () -> jdbcOperations.update("DELETE FROM oauth2_registered_client WHERE id = ?", id));
+
+        return deletedCount > 0;
     }
 
     @Override

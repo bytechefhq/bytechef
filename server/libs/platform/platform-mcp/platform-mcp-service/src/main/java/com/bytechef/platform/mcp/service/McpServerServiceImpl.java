@@ -16,8 +16,11 @@
 
 package com.bytechef.platform.mcp.service;
 
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.audit.McpServerAuditEvents;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.tenant.domain.TenantKey;
@@ -128,6 +131,11 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Audited(event = McpServerAuditEvents.MCP_SERVER_SECRET_KEY_ROTATED, data = {
+        @AuditData(key = "mcpServerId", value = "#mcpServerId"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "type", value = "#result?.type")
+    })
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpServer rotateSecretKey(long mcpServerId) {
         McpServer mcpServer = mcpServerRepository.findById(mcpServerId)

@@ -16,10 +16,13 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -76,6 +79,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_DISCONNECTED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void disconnectConnection(long connectionId) {
         projectDeploymentWorkflowService.deleteProjectDeploymentWorkflowConnection(connectionId);

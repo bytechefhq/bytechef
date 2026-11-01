@@ -22,10 +22,18 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.ee.platform.audit.aspect.AuditAspect;
+import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
+import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
+import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
+import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
+import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -48,6 +56,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -84,8 +94,16 @@ class ConnectionAdminFacadeIntTest {
     @MockitoBean
     private ConnectedUserConnectionService connectedUserConnectionService;
 
+    @Autowired
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
     @MockitoBean
     private PermissionService permissionService;
+
+    @BeforeEach
+    void beforeEach() {
+        persistenceAuditEventRepository.deleteAll();
+    }
 
     @AfterEach
     void afterEach() {
@@ -119,6 +137,7 @@ class ConnectionAdminFacadeIntTest {
 
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("slack")
+            .name("Team Slack")
             .build();
 
         when(permissionService.isTenantAdmin()).thenReturn(true);
@@ -140,6 +159,35 @@ class ConnectionAdminFacadeIntTest {
         verify(connectedUserConnectionService, times(2)).updateShared(7L, true);
         verify(connectedUserConnectionService).deleteByConnectionId(7L);
         verify(connectedUserConnectionService).getSharedConnectionIds();
+
+        assertThat(findSingleEvent(ConnectionAuditEvents.CONNECTION_CREATED).getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectionId", "7")
+            .containsEntry("name", "Team Slack")
+            .containsEntry("componentName", "slack")
+            .containsEntry("shared", "true");
+        assertThat(findSingleEvent(ConnectionAuditEvents.CONNECTION_DELETED).getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectionId", "7");
+        assertThat(findSingleEvent(ConnectionAuditEvents.CONNECTION_UPDATED).getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectionId", "7")
+            .containsEntry("name", "name")
+            .containsEntry("shared", "true");
+    }
+
+    private PersistentAuditEvent findSingleEvent(String eventType) {
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+            AuditEventFilter.empty(), PageRequest.of(0, 100));
+
+        List<PersistentAuditEvent> persistentAuditEvents = page.getContent()
+            .stream()
+            .filter(persistentAuditEvent -> eventType.equals(persistentAuditEvent.getEventType()))
+            .toList();
+
+        assertThat(persistentAuditEvents).hasSize(1);
+
+        return persistentAuditEvents.getFirst();
     }
 
     private void assertEveryOperationIsDenied() {
@@ -202,6 +250,11 @@ class ConnectionAdminFacadeIntTest {
 
             verify(connectionFacade, never()).delete(anyLong());
             verify(connectedUserConnectionService, never()).deleteByConnectionId(anyLong());
+
+            assertThat(findSingleEvent(ConnectionAuditEvents.CONNECTION_DELETED).getData())
+                .containsEntry("result", "ERROR")
+                .containsEntry("errorClass", NoSuchElementException.class.getName())
+                .containsEntry("connectionId", String.valueOf(AUTOMATION_CONNECTION_ID));
         }
 
         @Test
@@ -236,6 +289,9 @@ class ConnectionAdminFacadeIntTest {
 
     @Configuration
     @EnableMethodSecurity
+    @Import({
+        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
+    })
     static class MethodSecurityConfiguration {
 
         @Bean

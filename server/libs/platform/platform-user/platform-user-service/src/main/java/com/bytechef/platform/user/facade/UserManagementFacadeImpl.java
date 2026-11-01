@@ -17,8 +17,11 @@
 package com.bytechef.platform.user.facade;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.audit.UserAuditEvents;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
@@ -68,12 +71,21 @@ class UserManagementFacadeImpl implements UserManagementFacade {
     }
 
     @Override
+    @Audited(event = UserAuditEvents.USER_DELETED, data = {
+        @AuditData(key = "login", value = "#login")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteUser(String login) {
+        userService.getUser(login);
+
         userService.delete(login);
     }
 
     @Override
+    @Audited(event = UserAuditEvents.USER_INVITED, data = {
+        @AuditData(key = "email", value = "#email"),
+        @AuditData(key = "role", value = "#role")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void inviteUser(String email, String password, String role) {
         if (email.length() > UserConstants.LOGIN_MAX_LENGTH) {
@@ -139,6 +151,10 @@ class UserManagementFacadeImpl implements UserManagementFacade {
     }
 
     @Override
+    @Audited(event = UserAuditEvents.USER_ROLE_UPDATED, data = {
+        @AuditData(key = "login", value = "#login"),
+        @AuditData(key = "role", value = "#role")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public UserWithAuthorities updateUserRole(String login, String role) {
         List<Authority> allAuthorities = authorityService.getAuthorities();

@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.audit.ProjectAuditEvents;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
@@ -44,6 +45,8 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -259,12 +262,19 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_EXPORTED, data = {
+        @AuditData(key = "projectId", value = "#id"),
+        @AuditData(key = "projectVersion", value = "#projectVersion")
+    })
     @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
     public byte[] exportProject(long id, @Nullable Integer projectVersion) {
         return createTemplate(id, projectVersion, null, false);
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_SHARED_EXPORTED, data = {
+        @AuditData(key = "projectId", value = "#id")
+    })
     @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_SETTINGS')")
     public void exportSharedProject(long id, String description) {
         Project project = projectService.getProject(id);
@@ -442,12 +452,21 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_IMPORTED, data = {
+        @AuditData(key = "projectId", value = "#result"),
+        @AuditData(key = "workspaceId", value = "#workspaceId")
+    })
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public long importProject(byte[] projectData, long workspaceId) {
         return importProjectTemplate(projectData, workspaceId);
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_TEMPLATE_IMPORTED, data = {
+        @AuditData(key = "templateId", value = "#id"),
+        @AuditData(key = "projectId", value = "#result"),
+        @AuditData(key = "workspaceId", value = "#workspaceId")
+    })
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public long importProjectTemplate(String id, long workspaceId, boolean sharedProject) {
         byte[] data;
