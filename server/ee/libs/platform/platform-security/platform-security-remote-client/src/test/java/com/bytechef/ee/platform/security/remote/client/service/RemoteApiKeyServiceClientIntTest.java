@@ -15,7 +15,6 @@ import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.security.audit.ApiKeyAuditPublisher;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -40,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
@@ -201,10 +199,8 @@ class RemoteApiKeyServiceClientIntTest {
     static class Config {
 
         @Bean
-        ApiKeyService apiKeyService(
-            ApplicationEventPublisher applicationEventPublisher, ApiKeyRepository apiKeyRepository) {
-
-            return new ApiKeyServiceImpl(new ApiKeyAuditPublisher(applicationEventPublisher), apiKeyRepository);
+        ApiKeyService apiKeyService(ApiKeyRepository apiKeyRepository) {
+            return new ApiKeyServiceImpl(apiKeyRepository);
         }
 
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
