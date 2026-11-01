@@ -2944,6 +2944,12 @@ public class ApplicationProperties {
         private boolean maskPrincipals;
 
         /**
+         * Whether passed permission checks on methods that change something are recorded as PERMISSION_CHECK events;
+         * passed checks on read methods are never recorded, denied and failed checks always are
+         */
+        private boolean recordAllowedPermissionChecks;
+
+        /**
          * Cron expression of the audit retention job, evaluated in the JVM default time zone
          */
         private String retentionCron;
@@ -2957,6 +2963,10 @@ public class ApplicationProperties {
             return maskPrincipals;
         }
 
+        public boolean isRecordAllowedPermissionChecks() {
+            return recordAllowedPermissionChecks;
+        }
+
         public String getRetentionCron() {
             return retentionCron;
         }
@@ -2967,6 +2977,10 @@ public class ApplicationProperties {
 
         public void setMaskPrincipals(boolean maskPrincipals) {
             this.maskPrincipals = maskPrincipals;
+        }
+
+        public void setRecordAllowedPermissionChecks(boolean recordAllowedPermissionChecks) {
+            this.recordAllowedPermissionChecks = recordAllowedPermissionChecks;
         }
 
         public void setRetentionCron(String retentionCron) {

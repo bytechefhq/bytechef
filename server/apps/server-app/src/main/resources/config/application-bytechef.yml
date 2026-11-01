@@ -93,6 +93,9 @@ bytechef:
   audit:
     # Whether principals are masked (e.g. a***@example.com) when audit events are read through the API (EE)
     mask-principals: false
+    # Whether passed permission checks on methods that change something are recorded as PERMISSION_CHECK events;
+    # passed checks on read methods are never recorded, denied and failed checks always are (EE)
+    record-allowed-permission-checks: false
     # Cron expression of the audit retention job, evaluated in the JVM default time zone (EE)
     retention-cron: 0 0 2 * * *
     # Number of days audit events are kept; zero or a negative value disables the purge (EE)

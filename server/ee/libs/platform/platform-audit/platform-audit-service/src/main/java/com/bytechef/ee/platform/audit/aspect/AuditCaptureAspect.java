@@ -70,7 +70,7 @@ public class AuditCaptureAspect implements Ordered {
         AuditFrame auditFrame = AuditFrame.current();
         Audited audited = auditFrame == null ? null : auditFrame.getAudited();
 
-        if (audited != null) {
+        if (audited != null && audited.mapper() != AuditMapper.None.class) {
             try {
                 AuditMapper auditMapper = auditMapperResolver.resolve(audited.mapper());
                 AuditInvocation auditInvocation = AuditJoinPoints.createInvocation(
