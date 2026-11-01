@@ -16,12 +16,6 @@ import io.grpc.Metadata;
  */
 public final class GrpcMetadataKeys {
 
-    public static final Metadata.Key<String> API_KEY_AUTHENTICATED =
-        Metadata.Key.of("x-bytechef-api-key-authenticated", Metadata.ASCII_STRING_MARSHALLER);
-
-    public static final Metadata.Key<String> CONNECTED_USER_ID =
-        Metadata.Key.of("x-bytechef-connected-user-id", Metadata.ASCII_STRING_MARSHALLER);
-
     public static final Metadata.Key<String> ENVIRONMENT_ID =
         Metadata.Key.of("x-bytechef-environment-id", Metadata.ASCII_STRING_MARSHALLER);
 

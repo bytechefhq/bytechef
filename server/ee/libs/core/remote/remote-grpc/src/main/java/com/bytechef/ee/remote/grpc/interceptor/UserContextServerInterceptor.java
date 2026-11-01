@@ -8,7 +8,7 @@
 package com.bytechef.ee.remote.grpc.interceptor;
 
 import com.bytechef.ee.remote.grpc.security.RemoteApiKeyAuthenticationToken;
-import com.bytechef.ee.remote.grpc.security.RemoteConnectedUserAuthenticationToken;
+import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
 import io.grpc.ForwardingServerCallListener;
 import io.grpc.Metadata;
 import io.grpc.ServerCall;
@@ -32,6 +32,16 @@ import org.springframework.security.core.userdetails.User;
  * @version ee
  */
 public class UserContextServerInterceptor implements ServerInterceptor {
+
+    private final List<RemotePrincipalCodec> remotePrincipalCodecs;
+
+    public UserContextServerInterceptor() {
+        this(List.of());
+    }
+
+    public UserContextServerInterceptor(List<RemotePrincipalCodec> remotePrincipalCodecs) {
+        this.remotePrincipalCodecs = List.copyOf(remotePrincipalCodecs);
+    }
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
@@ -70,7 +80,7 @@ public class UserContextServerInterceptor implements ServerInterceptor {
         }
     }
 
-    private static Authentication toAuthentication(Metadata metadata) {
+    private Authentication toAuthentication(Metadata metadata) {
         byte[] loginBytes = metadata.get(GrpcMetadataKeys.USER_LOGIN);
         String principalKind = metadata.get(GrpcMetadataKeys.PRINCIPAL_KIND);
 
@@ -89,9 +99,18 @@ public class UserContextServerInterceptor implements ServerInterceptor {
         return switch (principalKind) {
             case PrincipalKind.USER -> UsernamePasswordAuthenticationToken.authenticated(login, null, authorities);
             case PrincipalKind.API_KEY -> toApiKeyAuthentication(login, authorities, metadata);
-            case PrincipalKind.CONNECTED_USER -> toConnectedUserAuthentication(login, metadata);
-            default -> null;
+            default -> decode(principalKind, login, metadata);
         };
+    }
+
+    private Authentication decode(String principalKind, String login, Metadata metadata) {
+        for (RemotePrincipalCodec remotePrincipalCodec : remotePrincipalCodecs) {
+            if (principalKind.equals(remotePrincipalCodec.getPrincipalKind())) {
+                return remotePrincipalCodec.decode(login, metadata);
+            }
+        }
+
+        return null;
     }
 
     private static Authentication toApiKeyAuthentication(
@@ -104,22 +123,6 @@ public class UserContextServerInterceptor implements ServerInterceptor {
         }
 
         return new RemoteApiKeyAuthenticationToken(environmentId, new User(login, "", authorities));
-    }
-
-    private static Authentication toConnectedUserAuthentication(String externalUserId, Metadata metadata) {
-        String apiKeyAuthenticated = metadata.get(GrpcMetadataKeys.API_KEY_AUTHENTICATED);
-        Long connectedUserId = parseLong(metadata.get(GrpcMetadataKeys.CONNECTED_USER_ID));
-        Long environmentId = parseLong(metadata.get(GrpcMetadataKeys.ENVIRONMENT_ID));
-
-        if (connectedUserId == null || environmentId == null ||
-            !("true".equals(apiKeyAuthenticated) || "false".equals(apiKeyAuthenticated))) {
-
-            return null;
-        }
-
-        return new RemoteConnectedUserAuthenticationToken(
-            environmentId, connectedUserId, new User(externalUserId, "", List.of()),
-            Boolean.parseBoolean(apiKeyAuthenticated));
     }
 
     private static Long parseLong(String value) {

@@ -8,7 +8,6 @@
 package com.bytechef.ee.remote.grpc;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import com.bytechef.tenant.TenantContext;
 import io.grpc.BindableService;
 import io.grpc.CallOptions;
@@ -22,9 +21,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -77,6 +78,8 @@ public final class EchoService implements BindableService {
         .setResponseMarshaller(new StringMarshaller())
         .build();
 
+    private final AtomicReference<Authentication> lastAuthentication = new AtomicReference<>();
+
     public static String echoPrincipal(Channel channel) {
         return ClientCalls.blockingUnaryCall(channel, ECHO_PRINCIPAL, CallOptions.DEFAULT, "");
     }
@@ -97,12 +100,21 @@ public final class EchoService implements BindableService {
         return ClientCalls.blockingUnaryCall(channel, NEVER_ANSWER, CallOptions.DEFAULT, "");
     }
 
+    public Authentication getLastAuthentication() {
+        return lastAuthentication.get();
+    }
+
     @Override
     public ServerServiceDefinition bindService() {
         return ServerServiceDefinition.builder("test.Echo")
             .addMethod(ECHO_PRINCIPAL, ServerCalls.asyncUnaryCall((request, responseObserver) -> {
-                responseObserver.onNext(describePrincipal(SecurityContextHolder.getContext()
-                    .getAuthentication()));
+                SecurityContext securityContext = SecurityContextHolder.getContext();
+
+                Authentication authentication = securityContext.getAuthentication();
+
+                lastAuthentication.set(authentication);
+
+                responseObserver.onNext(describePrincipal(authentication));
                 responseObserver.onCompleted();
             }))
             .addMethod(ECHO_TENANT, ServerCalls.asyncUnaryCall((request, responseObserver) -> {
@@ -134,12 +146,6 @@ public final class EchoService implements BindableService {
     }
 
     public static String describePrincipal(Authentication authentication) {
-        if (authentication instanceof ConnectedUserAuthentication connectedUserAuthentication) {
-            return "connected-user|" + connectedUserAuthentication.externalUserId() + "|" +
-                connectedUserAuthentication.connectedUserId() + "|" + connectedUserAuthentication.environmentId() +
-                "|" + connectedUserAuthentication.apiKeyAuthenticated();
-        }
-
         if (authentication instanceof AbstractApiKeyAuthenticationToken apiKeyAuthenticationToken) {
             return "api-key|" + apiKeyAuthenticationToken.getName() + "|" +
                 apiKeyAuthenticationToken.getEnvironmentId() + "|" + joinAuthorities(apiKeyAuthenticationToken);

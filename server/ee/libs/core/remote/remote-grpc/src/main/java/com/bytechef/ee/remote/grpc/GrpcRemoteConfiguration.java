@@ -12,6 +12,7 @@ import com.bytechef.ee.remote.grpc.discovery.DiscoveryClientNameResolverProvider
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
+import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
 import io.grpc.BindableService;
 import java.util.Arrays;
 import java.util.Collection;
@@ -154,8 +155,11 @@ public class GrpcRemoteConfiguration {
     @Bean
     @Order(USER_CONTEXT_INTERCEPTOR_ORDER)
     @GlobalServerInterceptor
-    UserContextServerInterceptor userContextServerInterceptor() {
-        return new UserContextServerInterceptor();
+    UserContextServerInterceptor userContextServerInterceptor(
+        ObjectProvider<RemotePrincipalCodec> remotePrincipalCodecProvider) {
+
+        return new UserContextServerInterceptor(remotePrincipalCodecProvider.orderedStream()
+            .toList());
     }
 
     private static boolean isBytechefService(BindableService bindableService) {

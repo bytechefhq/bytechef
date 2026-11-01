@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
     implementation(project(":server:ee:libs:core:tenant:tenant-remote-client"))
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-security"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))

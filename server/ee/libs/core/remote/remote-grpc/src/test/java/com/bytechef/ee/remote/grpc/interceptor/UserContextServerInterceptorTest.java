@@ -12,8 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.ee.remote.grpc.EchoService;
 import com.bytechef.ee.remote.grpc.InProcessGrpc;
 import com.bytechef.ee.remote.grpc.security.RemoteApiKeyAuthenticationToken;
-import com.bytechef.ee.remote.grpc.security.RemoteConnectedUserAuthenticationToken;
-import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
+import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -29,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -131,39 +131,6 @@ class UserContextServerInterceptorTest {
     }
 
     @Test
-    void testConnectedUserIsRebuiltAsConnectedUser() throws Exception {
-        SecurityContextHolder.getContext()
-            .setAuthentication(new TestConnectedUserAuthentication("external-user-1", 7L, 2L, true));
-
-        try (InProcessGrpc inProcessGrpc = start()) {
-            assertThat(EchoService.echoPrincipal(inProcessGrpc.channel()))
-                .isEqualTo("connected-user|external-user-1|7|2|false");
-        }
-    }
-
-    @Test
-    void testConnectedUserSurvivesASecondHop() throws Exception {
-        SecurityContextHolder.getContext()
-            .setAuthentication(
-                new RemoteConnectedUserAuthenticationToken(2L, 7L, new User("external-user-1", "", List.of()), true));
-
-        try (InProcessGrpc inProcessGrpc = start()) {
-            assertThat(EchoService.echoPrincipal(inProcessGrpc.channel()))
-                .isEqualTo("connected-user|external-user-1|7|2|true");
-        }
-    }
-
-    @Test
-    void testUnauthenticatedConnectedUserCarriesNoIdentity() throws Exception {
-        SecurityContextHolder.getContext()
-            .setAuthentication(new TestConnectedUserAuthentication("external-user-1", 7L, 2L, false));
-
-        try (InProcessGrpc inProcessGrpc = start()) {
-            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
-        }
-    }
-
-    @Test
     void testApiKeyUserKeepsEnvironmentAndAuthorities() throws Exception {
         SecurityContextHolder.getContext()
             .setAuthentication(
@@ -196,32 +163,6 @@ class UserContextServerInterceptorTest {
     }
 
     @Test
-    void testMalformedConnectedUserIdBindsNoIdentity() throws Exception {
-        try (InProcessGrpc inProcessGrpc = start(metadata -> {
-            metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, "connected-user");
-            metadata.put(GrpcMetadataKeys.USER_LOGIN, "external-user-1".getBytes(StandardCharsets.UTF_8));
-            metadata.put(GrpcMetadataKeys.CONNECTED_USER_ID, "seven");
-            metadata.put(GrpcMetadataKeys.ENVIRONMENT_ID, "2");
-            metadata.put(GrpcMetadataKeys.API_KEY_AUTHENTICATED, "false");
-        })) {
-            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
-        }
-    }
-
-    @Test
-    void testMalformedConnectedUserEnvironmentIdBindsNoIdentity() throws Exception {
-        try (InProcessGrpc inProcessGrpc = start(metadata -> {
-            metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, "connected-user");
-            metadata.put(GrpcMetadataKeys.USER_LOGIN, "external-user-1".getBytes(StandardCharsets.UTF_8));
-            metadata.put(GrpcMetadataKeys.CONNECTED_USER_ID, "7");
-            metadata.put(GrpcMetadataKeys.ENVIRONMENT_ID, "production");
-            metadata.put(GrpcMetadataKeys.API_KEY_AUTHENTICATED, "false");
-        })) {
-            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
-        }
-    }
-
-    @Test
     void testMalformedApiKeyEnvironmentIdBindsNoIdentity() throws Exception {
         try (InProcessGrpc inProcessGrpc = start(metadata -> {
             metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, "api-key");
@@ -233,20 +174,50 @@ class UserContextServerInterceptorTest {
     }
 
     @Test
-    void testNonBooleanApiKeyAuthenticatedBindsNoIdentity() throws Exception {
-        try (InProcessGrpc inProcessGrpc = start(metadata -> {
-            metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, "connected-user");
-            metadata.put(GrpcMetadataKeys.USER_LOGIN, "external-user-1".getBytes(StandardCharsets.UTF_8));
-            metadata.put(GrpcMetadataKeys.CONNECTED_USER_ID, "7");
-            metadata.put(GrpcMetadataKeys.ENVIRONMENT_ID, "2");
-            metadata.put(GrpcMetadataKeys.API_KEY_AUTHENTICATED, "yes");
-        })) {
+    void testCodecPrincipalIsRebuiltByTheCodecOfItsKind() throws Exception {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new TestingAuthenticationToken("robot-1", null, "ROLE_ROBOT"));
+
+        RobotRemotePrincipalCodec robotRemotePrincipalCodec = new RobotRemotePrincipalCodec();
+
+        try (InProcessGrpc inProcessGrpc = new InProcessGrpc(
+            new EchoService(), List.of(new UserContextServerInterceptor(List.of(robotRemotePrincipalCodec))),
+            List.of(new UserContextClientInterceptor(List.of(robotRemotePrincipalCodec))))) {
+
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEqualTo("robot:robot-1|true|");
+        }
+    }
+
+    @Test
+    void testCodecPrincipalIsNotSentWhenTheCodecDeclinesToEncode() throws Exception {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new TestingAuthenticationToken("declined", null, "ROLE_ROBOT"));
+
+        RobotRemotePrincipalCodec robotRemotePrincipalCodec = new RobotRemotePrincipalCodec();
+
+        try (InProcessGrpc inProcessGrpc = new InProcessGrpc(
+            new EchoService(), List.of(new UserContextServerInterceptor(List.of(robotRemotePrincipalCodec))),
+            List.of(new UserContextClientInterceptor(List.of(robotRemotePrincipalCodec))))) {
+
             assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
         }
     }
 
-    private static InProcessGrpc start(Consumer<Metadata> metadataWriter) throws Exception {
-        ClientInterceptor metadataInterceptor = new ClientInterceptor() {
+    @Test
+    void testCodecKindBindsNoIdentityWhenTheCodecRejectsTheMetadata() throws Exception {
+        try (InProcessGrpc inProcessGrpc = new InProcessGrpc(
+            new EchoService(), List.of(new UserContextServerInterceptor(List.of(new RobotRemotePrincipalCodec()))),
+            List.of(metadataInterceptor(metadata -> {
+                metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, "robot");
+                metadata.put(GrpcMetadataKeys.USER_LOGIN, "rejected".getBytes(StandardCharsets.UTF_8));
+            })))) {
+
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
+        }
+    }
+
+    private static ClientInterceptor metadataInterceptor(Consumer<Metadata> metadataWriter) {
+        return new ClientInterceptor() {
 
             @Override
             public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(
@@ -264,14 +235,51 @@ class UserContextServerInterceptorTest {
                 };
             }
         };
+    }
 
+    private static InProcessGrpc start(Consumer<Metadata> metadataWriter) throws Exception {
         return new InProcessGrpc(
-            new EchoService(), List.of(new UserContextServerInterceptor()), List.of(metadataInterceptor));
+            new EchoService(), List.of(new UserContextServerInterceptor()),
+            List.of(metadataInterceptor(metadataWriter)));
     }
 
     private static InProcessGrpc start() throws Exception {
         return new InProcessGrpc(
             new EchoService(), List.of(new UserContextServerInterceptor()),
             List.of(new UserContextClientInterceptor()));
+    }
+
+    private static final class RobotRemotePrincipalCodec implements RemotePrincipalCodec {
+
+        @Override
+        public String getPrincipalKind() {
+            return "robot";
+        }
+
+        @Override
+        public boolean supports(Authentication authentication) {
+            return authentication instanceof TestingAuthenticationToken;
+        }
+
+        @Override
+        public boolean encode(Authentication authentication, Metadata metadata) {
+            if ("declined".equals(authentication.getName())) {
+                return false;
+            }
+
+            metadata.put(GrpcMetadataKeys.USER_LOGIN, authentication.getName()
+                .getBytes(StandardCharsets.UTF_8));
+
+            return true;
+        }
+
+        @Override
+        public Authentication decode(String login, Metadata metadata) {
+            if ("rejected".equals(login)) {
+                return null;
+            }
+
+            return new TestingAuthenticationToken("robot:" + login, null, List.of());
+        }
     }
 }
