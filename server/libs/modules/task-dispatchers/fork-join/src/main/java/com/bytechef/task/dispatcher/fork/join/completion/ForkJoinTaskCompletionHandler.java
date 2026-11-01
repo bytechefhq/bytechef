@@ -34,6 +34,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -164,15 +165,48 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             taskDispatcher.dispatch(branchTaskExecution);
         } else {
+            int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
+
+            Object branchValue = taskExecution.getOutput() == null
+                ? null
+                : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+
+            taskExecutionService.update(
+                taskExecutionParentId,
+                lockedForkJoinTaskExecution -> putBranchOutput(lockedForkJoinTaskExecution, branch, branchValue));
+
             long branchesLeft = counterService.decrement(taskExecutionParentId);
 
             if (branchesLeft == 0) {
-                forkJoinTaskExecution.setEndDate(Instant.now());
+                TaskExecution completedForkJoinTaskExecution = taskExecutionService.update(
+                    taskExecutionParentId,
+                    lockedForkJoinTaskExecution -> lockedForkJoinTaskExecution.setEndDate(Instant.now()));
 
-                forkJoinTaskExecution = taskExecutionService.update(forkJoinTaskExecution);
-
-                taskCompletionHandler.handle(forkJoinTaskExecution);
+                taskCompletionHandler.handle(completedForkJoinTaskExecution);
             }
         }
+    }
+
+    private void putBranchOutput(TaskExecution forkJoinTaskExecution, int branch, Object branchValue) {
+        long jobId = Objects.requireNonNull(forkJoinTaskExecution.getJobId());
+        long forkJoinTaskExecutionId = Objects.requireNonNull(forkJoinTaskExecution.getId());
+
+        Map<String, Object> branchOutputs;
+
+        if (forkJoinTaskExecution.getOutput() != null) {
+            branchOutputs = new HashMap<>(readBranchOutputs(forkJoinTaskExecution.getOutput()));
+        } else {
+            branchOutputs = new HashMap<>();
+        }
+
+        branchOutputs.put(ForkJoinTaskDispatcherConstants.BRANCH_OUTPUT_KEY_PREFIX + branch, branchValue);
+
+        forkJoinTaskExecution.setOutput(
+            taskFileStorage.storeTaskExecutionOutput(jobId, forkJoinTaskExecutionId, branchOutputs));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> readBranchOutputs(FileEntry fileEntry) {
+        return (Map<String, Object>) taskFileStorage.readTaskExecutionOutput(fileEntry);
     }
 }
