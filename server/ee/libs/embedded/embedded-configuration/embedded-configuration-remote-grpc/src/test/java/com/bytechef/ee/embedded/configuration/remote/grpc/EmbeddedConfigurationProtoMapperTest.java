@@ -154,9 +154,10 @@ class EmbeddedConfigurationProtoMapperTest {
                     new ConnectedUserWorkflowTemplateDTO(
                         "uuid-1", "Sync", "Syncs", "2026-10-26T10:00:00Z",
                         List.of(
-                            new ConnectedUserWorkflowTemplateDTO.Component("airtable", "Airtable", "icon", true, 4L)),
+                            new ConnectedUserWorkflowTemplateDTO.Component("airtable", "Airtable", "icon", true, 4L,
+                                true)),
                         List.of(new ConnectedUserWorkflowTemplateDTO.Component("httpClient", "HTTP", "icon")),
-                        List.of(new ConnectedUserWorkflowTemplateDTO.Input("name", "Name", "STRING", true)),
+                        List.of(new ConnectedUserWorkflowTemplateDTO.Input("name", "Name", "STRING", true, true)),
                         "hasAuthority('ADMIN')", "workflow-1")),
                 "hasAuthority('ADMIN')", true, 3, Instant.parse("2026-10-26T10:00:00Z")));
 

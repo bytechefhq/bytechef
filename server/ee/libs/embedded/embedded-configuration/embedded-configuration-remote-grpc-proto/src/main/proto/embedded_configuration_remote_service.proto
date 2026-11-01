@@ -368,6 +368,8 @@ message RemoteAutomationWorkflowProject {
   repeated int64 tag_ids = 9;
   optional int32 version = 10;
   repeated RemoteWorkflowTemplate workflow_templates = 11;
+  optional int32 configuration_count = 12;
+  optional google.protobuf.Timestamp last_published_date = 13;
 }
 
 message RemoteAutomationWorkflowProjects {
@@ -392,6 +394,7 @@ message RemoteWorkflowTemplateComponent {
   optional int64 integration_id = 3;
   optional string name = 4;
   optional string title = 5;
+  optional bool provided = 6;
 }
 
 message RemoteWorkflowTemplateInput {
@@ -399,4 +402,5 @@ message RemoteWorkflowTemplateInput {
   optional string name = 2;
   optional bool required = 3;
   optional string type = 4;
+  optional bool provided = 5;
 }
