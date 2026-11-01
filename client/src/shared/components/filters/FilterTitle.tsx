@@ -13,7 +13,7 @@ const FilterTitle = ({filters}: FilterTitleProps) => {
     const activeFilters = filters.filter((filter) => !!filter.value);
 
     return (
-        <div className="flex flex-wrap items-center gap-1">
+        <div className="space-x-1">
             <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
             {activeFilters.map((filter) => (
