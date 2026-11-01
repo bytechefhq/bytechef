@@ -42,4 +42,20 @@ class WorkflowToolRunResultTest {
 
         assertThat(workflowToolRunResult.getOutcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_REQUIRED);
     }
+
+    @Test
+    void testRunPausedToResumeOnItsOwnIsSuspended() {
+        WorkflowToolRunResult workflowToolRunResult = new WorkflowToolRunResult(
+            WorkflowToolRunResult.Status.PAUSED, Map.of());
+
+        assertThat(workflowToolRunResult.getOutcome()).isEqualTo(ToolExecutionOutcome.SUSPENDED);
+    }
+
+    @Test
+    void testRunStoppedBeforeItFinishedIsAnError() {
+        WorkflowToolRunResult workflowToolRunResult = new WorkflowToolRunResult(
+            WorkflowToolRunResult.Status.STOPPED, Map.of());
+
+        assertThat(workflowToolRunResult.getOutcome()).isEqualTo(ToolExecutionOutcome.ERROR);
+    }
 }

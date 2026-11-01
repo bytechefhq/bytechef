@@ -523,6 +523,41 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThat(result)
             .containsEntry("status", "stopped")
             .containsEntry("jobId", 5);
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
+                assertThat(toolExecutionEvent.errorMessage())
+                    .isEqualTo("The workflow run was stopped before it finished.");
+                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
+            });
+    }
+
+    @Test
+    void testWorkflowRunPausedToResumeOnItsOwnIsRecordedAsSuspended() {
+        ToolCallback toolCallback = getConnectedWorkflowToolCallback(
+            List.of(Map.of("name", "delay_1", "type", "delay/v1/delay")));
+
+        Job job = job(Job.Status.STOPPED);
+
+        job.setMetadata(
+            Map.of(MetadataConstants.JOB_RESUME_ID, "resume-1", MetadataConstants.TASK_EXECUTION_RESUME_ID, 11L));
+
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
+        when(jobCompletionAwaiter.await(eq(5L), any())).thenReturn(CompletableFuture.completedFuture(job));
+        when(taskExecutionService.getTaskExecution(11L))
+            .thenReturn(taskExecution("delay_1", "delay/v1/delay", TaskExecution.Status.STARTED));
+
+        Map<String, Object> result = readResult(toolCallback.call("{}"));
+
+        assertThat(result)
+            .containsEntry("status", "suspended")
+            .containsEntry("jobId", 5);
+        assertThat(getToolExecutionEvents()).singleElement()
+            .satisfies(toolExecutionEvent -> {
+                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.SUSPENDED);
+                assertThat(toolExecutionEvent.errorMessage()).isNull();
+                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
+            });
     }
 
     @Test
