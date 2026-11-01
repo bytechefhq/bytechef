@@ -14,6 +14,8 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -37,31 +39,37 @@ public class ConnectionIdHelper {
         this.integrationInstanceService = integrationInstanceService;
     }
 
-    public Long getConnectionId(String externalUserid, String componentName, Long instanceId, Environment environment) {
-        Long connectionId;
+    public ConnectedUserConnection getConnectedUserConnection(
+        String externalUserId, String componentName, @Nullable Long instanceId, Environment environment) {
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
+
+        long connectedUserId = Objects.requireNonNull(connectedUser.getId());
+
+        IntegrationInstance integrationInstance;
 
         if (instanceId == null) {
-            ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserid, environment);
-
-            connectionId = integrationInstanceService
-                .fetchIntegrationInstance(connectedUser.getId(), componentName, environment)
-                .map(IntegrationInstance::getConnectionId)
+            integrationInstance = integrationInstanceService
+                .fetchIntegrationInstance(connectedUserId, componentName, environment)
                 .orElse(null);
         } else {
-            ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserid, environment);
+            integrationInstance = integrationInstanceService.getIntegrationInstance(instanceId);
 
-            IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(instanceId);
-
-            Long connectedUserId = connectedUser.getId();
-
-            if (!connectedUserId.equals(integrationInstance.getConnectedUserId())) {
+            if (!Objects.equals(connectedUserId, integrationInstance.getConnectedUserId())) {
                 throw new AccessDeniedException(
                     "Integration instance " + instanceId + " is not owned by the connected user");
             }
-
-            connectionId = integrationInstance.getConnectionId();
         }
 
-        return connectionId;
+        if (integrationInstance == null) {
+            return new ConnectedUserConnection(connectedUserId, null, null);
+        }
+
+        return new ConnectedUserConnection(
+            connectedUserId, integrationInstance.getId(), integrationInstance.getConnectionId());
+    }
+
+    public record ConnectedUserConnection(
+        long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Long connectionId) {
     }
 }
