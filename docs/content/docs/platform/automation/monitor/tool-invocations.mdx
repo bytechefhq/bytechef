@@ -1,10 +1,10 @@
 ---
 title: "Tool Invocations"
-description: "A log of the tools AI clients called through your MCP servers - which tool ran, how it ended, and how long it took."
+description: "A log of the tools AI clients called through your MCP servers and the management MCP server - which tool ran, how it ended, and how long it took."
 ---
 
-When an AI client calls a tool on one of your [MCP servers](/platform/automation/deploy/mcp-servers),
-ByteChef records the call. **Tool Invocations** lists those records, so you can see which tools are
+When an AI client calls a tool on one of your [MCP servers](/platform/automation/deploy/mcp-servers)
+or on the [management MCP server](/platform/settings/mcp-server), ByteChef records the call. **Tool Invocations** lists those records, so you can see which tools are
 being used, which ones fail, and how long they take. Open it from **Tool Invocations** in the left
 sidebar, next to **Workflow Executions**.
 
@@ -27,6 +27,13 @@ A record is written for every tool call an AI client makes through an MCP server
 The call is recorded whether it succeeds or fails. A call to a tool or a server that is turned off is
 rejected before it runs and is not recorded.
 
+Calls to the [management MCP server](/platform/settings/mcp-server), such as `listProjects` or
+`buildWorkflow`, are recorded too. A management call is listed under the workspace it worked in: the
+`workspaceId` it was given, or your only workspace when you belong to just one. It is listed under the
+environment it was given, or under Development when it named none. A call that named no workspace
+while you belong to several is recorded but appears on no page. A management tool that answers with
+an error is recorded as `ERROR`.
+
 The page lists automation calls only. Calls made through an embedded integration are recorded
 separately and appear on the embedded [Tool Invocations](/platform/embedded/monitor/tool-invocations)
 page.
@@ -40,7 +47,7 @@ Each call is one row, newest first:
 | Column | What it shows |
 |---|---|
 | **Tool** | The tool name the AI client called. |
-| **Surface** | Where the call came in. On this page it is always **Automation MCP**. |
+| **Surface** | Where the call came in: **Automation MCP** for one of your MCP servers, **Management MCP** for the management MCP server. |
 | **Component** | The component and the operation a component tool ran, such as `slack / sendMessage`. Workflow tools show a dash. |
 | **Outcome** | How the call ended, for example `SUCCESS`, `ERROR` or `TIMEOUT`. |
 | **Duration** | How long the call took, in milliseconds. |
@@ -70,7 +77,7 @@ the call returned:
 |---|---|
 | **Surface** | Calls that came in through one surface. |
 | **Outcome** | Calls that ended one way: Success, Error, Connection required, Timeout, Approval required, Approval denied or Suspended. |
-| **MCP Server** | Calls made through one MCP server. The filter appears when the workspace has at least one MCP server. |
+| **MCP Server** | Calls made through one MCP server. The filter appears when the workspace has at least one MCP server. Management MCP calls belong to no MCP server, so choosing one hides them. |
 | **Start date** / **End date** | Calls made within a date range. |
 
 ---
