@@ -16,31 +16,53 @@ interface McpConnectClientDetailPropsI {
     client: McpConnectClientI;
     mcpServerUrl: string;
     mode: McpConnectAuthModeType;
+    onRefresh?: () => void;
 }
 
-const McpConnectTabContent = ({tab}: {tab: McpConnectTabI}) => (
-    <div className="space-y-6">
-        {tab.notice && (
-            <Alert className="flex items-center gap-2" variant="default">
-                <span>
-                    <InfoCircledIcon />
-                </span>
+interface McpConnectTabContentPropsI {
+    mcpServerUrl: string;
+    onRefresh?: () => void;
+    tab: McpConnectTabI;
+}
 
-                <AlertTitle className="mb-0 text-muted-foreground">{tab.notice}</AlertTitle>
-            </Alert>
-        )}
+const McpConnectTabContent = ({mcpServerUrl, onRefresh, tab}: McpConnectTabContentPropsI) => {
+    const refreshStepIndex = tab.steps.findIndex((step) => step.codeSnippet?.includes(mcpServerUrl));
 
-        {tab.steps.length > 0 && (
-            <ol className="space-y-6">
-                {tab.steps.map((step, index) => (
-                    <McpConnectStep key={step.title} number={index + 1} step={step} />
-                ))}
-            </ol>
-        )}
-    </div>
-);
+    return (
+        <div className="space-y-6">
+            {tab.notice && (
+                <Alert className="flex items-center gap-2" variant="default">
+                    <span>
+                        <InfoCircledIcon />
+                    </span>
 
-const McpConnectClientDetail = ({apiKeySource, client, mcpServerUrl, mode}: McpConnectClientDetailPropsI) => {
+                    <AlertTitle className="mb-0 text-muted-foreground">{tab.notice}</AlertTitle>
+                </Alert>
+            )}
+
+            {tab.steps.length > 0 && (
+                <ol className="space-y-6">
+                    {tab.steps.map((step, index) => (
+                        <McpConnectStep
+                            key={step.title}
+                            number={index + 1}
+                            onRefresh={index === refreshStepIndex ? onRefresh : undefined}
+                            step={step}
+                        />
+                    ))}
+                </ol>
+            )}
+        </div>
+    );
+};
+
+const McpConnectClientDetail = ({
+    apiKeySource,
+    client,
+    mcpServerUrl,
+    mode,
+    onRefresh,
+}: McpConnectClientDetailPropsI) => {
     const [promptCopied, setPromptCopied] = useState(false);
 
     const promptCopiedTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -99,12 +121,12 @@ const McpConnectClientDetail = ({apiKeySource, client, mcpServerUrl, mode}: McpC
 
                     {tabs.map((tab) => (
                         <TabsContent className="mt-6" key={tab.id} value={tab.id}>
-                            <McpConnectTabContent tab={tab} />
+                            <McpConnectTabContent mcpServerUrl={mcpServerUrl} onRefresh={onRefresh} tab={tab} />
                         </TabsContent>
                     ))}
                 </Tabs>
             ) : (
-                <McpConnectTabContent tab={tabs[0]} />
+                <McpConnectTabContent mcpServerUrl={mcpServerUrl} onRefresh={onRefresh} tab={tabs[0]} />
             )}
 
             <div className="flex items-start justify-between gap-4 rounded-lg bg-muted/50 p-4">

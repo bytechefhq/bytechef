@@ -1,5 +1,4 @@
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
-import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -36,14 +35,6 @@ const McpConnectPanel = ({
 
     return (
         <div className="space-y-6">
-            {onRefresh && (
-                <fieldset className="space-y-2 border-0 p-0">
-                    <legend className="mb-2 text-sm font-medium text-muted-foreground">Server URL</legend>
-
-                    <McpServerConfigurationCode codeSnippet={mcpServerUrl} onRefresh={onRefresh} />
-                </fieldset>
-            )}
-
             <div className="flex flex-col gap-6 md:flex-row md:gap-8">
                 <div className="md:hidden">
                     <Select onValueChange={setSelectedClientId} value={selectedClient.id}>
@@ -94,6 +85,7 @@ const McpConnectPanel = ({
                         client={selectedClient}
                         mcpServerUrl={mcpServerUrl}
                         mode={mode}
+                        onRefresh={onRefresh}
                     />
                 </div>
             </div>
