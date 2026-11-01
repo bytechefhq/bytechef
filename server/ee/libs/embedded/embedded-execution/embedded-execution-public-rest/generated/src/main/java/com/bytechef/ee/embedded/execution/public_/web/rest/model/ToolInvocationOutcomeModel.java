@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The outcome of a tool invocation.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T09:08:13.694310+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T11:35:37.822293+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public enum ToolInvocationOutcomeModel {
   
   SUCCESS("SUCCESS"),
@@ -35,7 +35,9 @@ public enum ToolInvocationOutcomeModel {
   
   APPROVAL_DENIED("APPROVAL_DENIED"),
   
-  RULE_BLOCKED("RULE_BLOCKED");
+  RULE_BLOCKED("RULE_BLOCKED"),
+  
+  SUSPENDED("SUSPENDED");
 
   private final String value;
 
