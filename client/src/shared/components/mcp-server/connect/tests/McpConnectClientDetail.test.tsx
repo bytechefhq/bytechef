@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {describe, expect, it, vi} from 'vitest';
 
@@ -107,6 +107,31 @@ describe('McpConnectClientDetail', () => {
         await user.click(screen.getByRole('button', {name: 'Copy prompt'}));
 
         expect(writeTextSpy).toHaveBeenCalledWith(THEN_TRY_PROMPT);
+        expect(await screen.findByRole('button', {name: 'Prompt copied'})).toBeInTheDocument();
+    });
+
+    it('does not confirm the copy when the clipboard write fails', async () => {
+        const user = userEvent.setup();
+
+        const writeTextSpy = vi
+            .spyOn(navigator.clipboard, 'writeText')
+            .mockRejectedValue(new Error('Clipboard access denied'));
+
+        render(
+            <McpConnectClientDetail
+                apiKeySource={API_KEY_SOURCE}
+                client={getClient('claude')}
+                mcpServerUrl={MCP_SERVER_URL}
+                mode="URL_ONLY"
+            />
+        );
+
+        await user.click(screen.getByRole('button', {name: 'Copy prompt'}));
+
+        await waitFor(() => expect(writeTextSpy).toHaveBeenCalled());
+
+        expect(screen.getByRole('button', {name: 'Copy prompt'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Prompt copied'})).not.toBeInTheDocument();
     });
 
     it('rebuilds snippets when the URL changes', () => {
