@@ -13,7 +13,10 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
@@ -29,7 +32,22 @@ import org.springframework.test.context.TestPropertySource;
 public class WebhookApplicationIntTest {
 
     @Autowired
+    private ObjectProvider<AuditEventRepository> auditEventRepositoryProvider;
+
+    @Autowired
     private Environment environment;
+
+    @Test
+    void testAuditEventsAreSentToExecutionApp() {
+        AuditEventRepository auditEventRepository = auditEventRepositoryProvider.getIfAvailable();
+
+        assertThat(auditEventRepository).isNotNull();
+
+        Class<?> auditEventRepositoryClass = AopUtils.getTargetClass(auditEventRepository);
+
+        assertThat(auditEventRepositoryClass.getName()).isEqualTo(
+            "com.bytechef.ee.platform.audit.remote.client.RemoteAuditEventRepositoryClient");
+    }
 
     @Test
     public void testContextLoads() {

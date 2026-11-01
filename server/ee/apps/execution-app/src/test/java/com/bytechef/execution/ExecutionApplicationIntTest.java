@@ -16,6 +16,7 @@ import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.ee.platform.audit.job.AuditEventRetentionJob;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogRetentionJob;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
@@ -38,8 +39,10 @@ import java.util.concurrent.TimeUnit;
 import javax.sql.DataSource;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
@@ -69,6 +72,12 @@ public class ExecutionApplicationIntTest {
     private ApplicationContext applicationContext;
 
     @Autowired
+    private ObjectProvider<AuditEventRepository> auditEventRepositoryProvider;
+
+    @Autowired
+    private ObjectProvider<AuditEventRetentionJob> auditEventRetentionJobProvider;
+
+    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
@@ -91,6 +100,51 @@ public class ExecutionApplicationIntTest {
 
     @Autowired
     private ToolInvocationLogService toolInvocationLogService;
+
+    @Test
+    void testAuditEventsAreStoredHere() {
+        AuditEventRepository auditEventRepository = auditEventRepositoryProvider.getIfAvailable();
+
+        assertThat(auditEventRepository).isNotNull();
+
+        Class<?> auditEventRepositoryClass = AopUtils.getTargetClass(auditEventRepository);
+
+        assertThat(auditEventRepositoryClass.getName()).isEqualTo(
+            "com.bytechef.ee.platform.audit.repository.CustomAuditEventRepository");
+    }
+
+    @Test
+    void testAuditGrpcServiceIsServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains("bytechef.platform.audit.remote.v1.AuditEventRemoteService");
+    }
+
+    @Test
+    void testAuditEventRetentionJobPurgesExpiredEvents() {
+        AuditEventRetentionJob auditEventRetentionJob = auditEventRetentionJobProvider.getIfAvailable();
+
+        assertThat(auditEventRetentionJob).isNotNull();
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+        jdbcTemplate.update(
+            "INSERT INTO persistent_audit_event (principal, event_date, event_type) "
+                + "VALUES ('retention-test', NOW() - INTERVAL '400 days', 'RETENTION_TEST')");
+
+        auditEventRetentionJob.purgeExpiredEvents();
+
+        assertThat(
+            jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM persistent_audit_event WHERE event_type = 'RETENTION_TEST'", Integer.class))
+                    .isZero();
+    }
 
     @Test
     void testContextLoads() {
