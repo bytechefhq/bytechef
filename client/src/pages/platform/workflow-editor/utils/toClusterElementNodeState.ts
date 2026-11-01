@@ -7,6 +7,8 @@ export interface ClusterElementCallI {
     status?: string;
 }
 
+const STOPPED_STATUSES = new Set<string>(['BLOCKED', 'DENIED', 'WITHHELD']);
+
 function toMillis(date?: string | Date): number | undefined {
     if (date === undefined) {
         return undefined;
@@ -25,15 +27,17 @@ export default function toClusterElementNodeState(
         return {...current, clusterElement: true};
     }
 
-    if (call.status === 'BLOCKED' || call.status === 'REDACTED' || call.status === 'WITHHELD') {
-        if (call.status === 'REDACTED' && (current?.status === 'BLOCKED' || current?.status === 'WITHHELD')) {
+    const currentIsStopped = current !== undefined && STOPPED_STATUSES.has(current.status);
+
+    if (call.status === 'REDACTED' || (call.status !== undefined && STOPPED_STATUSES.has(call.status))) {
+        if (call.status === 'REDACTED' && currentIsStopped) {
             return {...current, clusterElement: true};
         }
 
-        return {clusterElement: true, status: call.status};
+        return {clusterElement: true, status: call.status as WorkflowTestNodeStateI['status']};
     }
 
-    if (call.status !== 'FAILED' && (current?.status === 'BLOCKED' || current?.status === 'WITHHELD')) {
+    if (call.status !== 'FAILED' && currentIsStopped) {
         return {...current, clusterElement: true};
     }
 

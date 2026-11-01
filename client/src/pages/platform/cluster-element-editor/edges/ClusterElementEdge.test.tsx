@@ -9,7 +9,10 @@ import ClusterElementEdge from './ClusterElementEdge';
 
 const {testNodeStatesState} = vi.hoisted(() => ({
     testNodeStatesState: {
-        value: {} as Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED' | 'BLOCKED' | 'REDACTED' | 'WITHHELD'}>,
+        value: {} as Record<
+            string,
+            {status: 'RUNNING' | 'COMPLETED' | 'FAILED' | 'BLOCKED' | 'DENIED' | 'REDACTED' | 'WITHHELD'}
+        >,
     },
 }));
 
@@ -73,6 +76,7 @@ describe('ClusterElementEdge', () => {
 
     it.each([
         ['BLOCKED', 'stroke-amber-500'],
+        ['DENIED', 'stroke-rose-500'],
         ['REDACTED', 'stroke-sky-500'],
         ['WITHHELD', 'stroke-amber-500'],
     ] as const)('colours the wire of a %s element %s', (status, className) => {

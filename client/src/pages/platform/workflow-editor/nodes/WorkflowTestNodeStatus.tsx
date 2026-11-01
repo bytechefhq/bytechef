@@ -1,4 +1,4 @@
-import {CheckIcon, EraserIcon, Loader2Icon, ShieldAlertIcon, ShieldBanIcon, XIcon} from 'lucide-react';
+import {CheckIcon, EraserIcon, Loader2Icon, ShieldAlertIcon, ShieldBanIcon, UserXIcon, XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 import {type WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
@@ -20,6 +20,7 @@ function formatTestNodeDuration(durationMillis: number): string {
 
 const OUTCOME_TITLES: Partial<Record<WorkflowTestNodeStateI['status'], string>> = {
     BLOCKED: 'Blocked',
+    DENIED: 'Denied',
     REDACTED: 'Redacted',
     WITHHELD: 'Withheld',
 };
@@ -45,6 +46,7 @@ const WorkflowTestNodeStatus = ({
                     testNodeState.status === 'FAILED' && 'border-red-500 text-red-500',
                     (testNodeState.status === 'BLOCKED' || testNodeState.status === 'WITHHELD') &&
                         'border-amber-500 text-amber-500',
+                    testNodeState.status === 'DENIED' && 'border-rose-500 text-rose-500',
                     testNodeState.status === 'REDACTED' && 'border-sky-500 text-sky-500'
                 )}
                 title={testNodeState.status === 'FAILED' ? testNodeState.error : OUTCOME_TITLES[testNodeState.status]}
@@ -58,6 +60,8 @@ const WorkflowTestNodeStatus = ({
                 {testNodeState.status === 'BLOCKED' && <ShieldBanIcon className="size-3.5" />}
 
                 {testNodeState.status === 'WITHHELD' && <ShieldAlertIcon className="size-3.5" />}
+
+                {testNodeState.status === 'DENIED' && <UserXIcon className="size-3.5" />}
 
                 {testNodeState.status === 'REDACTED' && <EraserIcon className="size-3.5" />}
             </span>

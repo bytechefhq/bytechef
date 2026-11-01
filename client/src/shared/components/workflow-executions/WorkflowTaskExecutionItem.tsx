@@ -12,7 +12,7 @@ import {
     getTaskExecutionDisplayStatus,
 } from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {TaskExecution, TaskExecutionStatusEnum} from '@/shared/middleware/platform/workflow/execution';
-import {CircleDashedIcon, EraserIcon, ShieldAlertIcon, ShieldBanIcon} from 'lucide-react';
+import {CircleDashedIcon, EraserIcon, ShieldAlertIcon, ShieldBanIcon, UserXIcon} from 'lucide-react';
 
 interface WorkflowTaskExecutionItemProps {
     attemptLabel?: string;
@@ -22,6 +22,7 @@ interface WorkflowTaskExecutionItemProps {
 
 const OUTCOME_ICONS = {
     BLOCKED: <ShieldBanIcon className="size-4 text-amber-500" />,
+    DENIED: <UserXIcon className="size-4 text-rose-500" />,
     REDACTED: <EraserIcon className="size-4 text-sky-500" />,
     WITHHELD: <ShieldAlertIcon className="size-4 text-amber-500" />,
 };
