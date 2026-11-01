@@ -7,9 +7,12 @@
 
 package com.bytechef.ee.platform.audit.aspect;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.util.AuditPlatformUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.AuditOutcome;
@@ -57,14 +60,14 @@ public class AuditAspect {
     private static final String PERMISSION_CHECK = "PERMISSION_CHECK";
 
     private static final String CAPTURE_ERROR = "captureError";
+    private static final String DATA_ERROR = "dataError";
     private static final String ERROR_CLASS = "errorClass";
     private static final String MAPPER_ERROR = "mapperError";
     private static final String METHOD = "method";
     private static final String NULL_DATA = "NULL_DATA";
     private static final String RESULT = "result";
     private static final String ROLLED_BACK = "ROLLED_BACK";
-
-    private static final Set<String> RESERVED_KEYS = Set.of(CAPTURE_ERROR, ERROR_CLASS, MAPPER_ERROR, METHOD, RESULT);
+    private static final String TRUNCATION_MARKER = "...";
 
     private static final String MISSING_CONTEXT_PRINCIPAL = "__NO_SECURITY_CONTEXT__";
 
@@ -79,13 +82,20 @@ public class AuditAspect {
 
     private final AuditEventService auditEventService;
     private final AuditMapperResolver auditMapperResolver;
+    private final boolean recordAllowedPermissionChecks;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
     })
-    public AuditAspect(AuditEventService auditEventService, AuditMapperResolver auditMapperResolver) {
+    public AuditAspect(
+        ApplicationProperties applicationProperties, AuditEventService auditEventService,
+        AuditMapperResolver auditMapperResolver) {
+
+        ApplicationProperties.Audit audit = applicationProperties.getAudit();
+
         this.auditEventService = auditEventService;
         this.auditMapperResolver = auditMapperResolver;
+        this.recordAllowedPermissionChecks = audit.isRecordAllowedPermissionChecks();
     }
 
     @Around("com.bytechef.ee.platform.audit.aspect.AuditPointcuts.preAuthorizedMethod()"
@@ -264,7 +274,9 @@ public class AuditAspect {
 
         Method method = methodSignature.getMethod();
 
-        if (audited == null && auditOutcome == AuditOutcome.SUCCESS && isReadMethod(method.getName())) {
+        if (audited == null && auditOutcome == AuditOutcome.SUCCESS &&
+            (!recordAllowedPermissionChecks || isReadMethod(method.getName()))) {
+
             return null;
         }
 
@@ -279,21 +291,26 @@ public class AuditAspect {
             AuditInvocation auditInvocation = AuditJoinPoints.createInvocation(
                 proceedingJoinPoint, audited.event(), result, auditFrame.getCaptured(), auditOutcome, errorClass);
             AuditMapper auditMapper = null;
+            Class<? extends AuditMapper> mapperClass = audited.mapper();
 
-            try {
-                auditMapper = auditMapperResolver.resolve(audited.mapper());
+            if (mapperClass != AuditMapper.None.class) {
+                try {
+                    auditMapper = auditMapperResolver.resolve(mapperClass);
 
-                if (!auditMapper.shouldRecord(auditInvocation)) {
-                    return null;
+                    if (!auditMapper.shouldRecord(auditInvocation)) {
+                        return null;
+                    }
+
+                    putMapperData(data, audited, auditMapper.map(auditInvocation));
+                } catch (Exception | LinkageError | StackOverflowError exception) {
+                    data.put(MAPPER_ERROR, truncate(exception.getClass()
+                        .getName()));
+
+                    reportMapperFailure(audited, exception);
                 }
-
-                putMapperData(data, audited, auditMapper.map(auditInvocation));
-            } catch (Exception | LinkageError | StackOverflowError exception) {
-                data.put(MAPPER_ERROR, truncate(exception.getClass()
-                    .getName()));
-
-                reportMapperFailure(audited, exception);
             }
+
+            putData(data, audited, auditInvocation);
 
             if (auditMapper != null) {
                 platform = resolveMapperPlatform(auditMapper, auditInvocation, audited, data);
@@ -301,7 +318,7 @@ public class AuditAspect {
         }
 
         if (platform == null) {
-            platform = resolvePackagePlatform(declaringTypeName);
+            platform = AuditPlatformUtils.resolvePlatform(declaringTypeName);
         }
 
         data.put(METHOD, truncate(targetMethod));
@@ -343,20 +360,43 @@ public class AuditAspect {
         }
     }
 
-    static @Nullable PlatformType resolvePackagePlatform(@Nullable String declaringTypeName) {
-        if (declaringTypeName == null) {
-            return null;
+    private void putData(Map<String, String> data, Audited audited, AuditInvocation auditInvocation) {
+        AuditDataEvaluator.Evaluation evaluation;
+
+        try {
+            evaluation = AuditDataEvaluator.evaluate(
+                audited.data(), auditInvocation, AuditData.RESERVED_KEYS, Set.copyOf(data.keySet()));
+        } catch (RuntimeException | LinkageError | StackOverflowError throwable) {
+            Class<? extends Throwable> throwableClass = throwable.getClass();
+
+            data.put(DATA_ERROR, truncate(throwableClass.getName()));
+
+            log.error("AUDIT DATA FAILURE: the data of event {} could not be evaluated", audited.event(), throwable);
+
+            return;
         }
 
-        if (declaringTypeName.contains(".embedded.")) {
-            return PlatformType.EMBEDDED;
+        Map<String, String> evaluatedData = evaluation.data();
+
+        evaluatedData.forEach((key, value) -> data.put(truncate(key), truncateValue(audited, key, value)));
+
+        List<AuditDataEvaluator.Failure> failures = evaluation.failures();
+
+        if (failures.isEmpty()) {
+            return;
         }
 
-        if (declaringTypeName.contains(".automation.")) {
-            return PlatformType.AUTOMATION;
+        List<String> failedKeys = new ArrayList<>();
+
+        for (AuditDataEvaluator.Failure failure : failures) {
+            failedKeys.add(failure.key());
+
+            log.error(
+                "AUDIT DATA FAILURE: event {} data key '{}' with expression '{}' was not recorded because {}",
+                audited.event(), failure.key(), failure.expression(), failure.reason());
         }
 
-        return null;
+        data.put(DATA_ERROR, truncateValue(audited, DATA_ERROR, String.join(",", failedKeys)));
     }
 
     private void putMapperData(Map<String, String> data, Audited audited, @Nullable Map<String, String> mapperData) {
@@ -369,9 +409,21 @@ public class AuditAspect {
         }
 
         mapperData.forEach((key, value) -> {
-            if (key != null && value != null && !RESERVED_KEYS.contains(key)) {
-                data.put(truncate(key), truncate(value));
+            if (key == null || value == null) {
+                return;
             }
+
+            if (AuditData.RESERVED_KEYS.contains(key)) {
+                log.error(
+                    "AUDIT MAPPING FAILURE: {} returned the reserved key '{}' for event {}; it was not recorded",
+                    audited.mapper()
+                        .getName(),
+                    key, audited.event());
+
+                return;
+            }
+
+            data.put(truncate(key), truncateValue(audited, key, value));
         });
     }
 
@@ -393,6 +445,18 @@ public class AuditAspect {
         }
 
         return value.substring(value.length() - COLUMN_MAX_LENGTH);
+    }
+
+    private static String truncateValue(Audited audited, String key, String value) {
+        if (value.length() <= COLUMN_MAX_LENGTH) {
+            return value;
+        }
+
+        log.warn(
+            "Audit event {} data key '{}' is {} characters long and was truncated to {}",
+            audited.event(), key, value.length(), COLUMN_MAX_LENGTH);
+
+        return value.substring(0, COLUMN_MAX_LENGTH - TRUNCATION_MARKER.length()) + TRUNCATION_MARKER;
     }
 
     private static Optional<String> resolvePrincipal() {

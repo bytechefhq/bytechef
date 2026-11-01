@@ -30,7 +30,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Audited {
 
+    AuditData[] data() default {};
+
     String event();
 
-    Class<? extends AuditMapper> mapper();
+    Class<? extends AuditMapper> mapper() default AuditMapper.None.class;
 }

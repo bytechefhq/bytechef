@@ -38,4 +38,15 @@ public interface AuditMapper {
     default boolean shouldRecord(AuditInvocation auditInvocation) {
         return true;
     }
+
+    final class None implements AuditMapper {
+
+        private None() {
+        }
+
+        @Override
+        public Map<String, String> map(AuditInvocation auditInvocation) {
+            throw new UnsupportedOperationException("AuditMapper.None marks an @Audited method without a mapper");
+        }
+    }
 }

@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -220,6 +221,11 @@ class WorkspaceUserAuditIntTest {
         WorkspaceUserAuditMapper.class, WorkspaceUserServiceImpl.class
     })
     static class Config {
+
+        @Bean
+        ApplicationProperties applicationProperties() {
+            return new ApplicationProperties();
+        }
 
         @Bean
         AuditEventService auditEventService() {

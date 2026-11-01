@@ -22,6 +22,7 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.util.AuditPlatformUtils;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
@@ -76,7 +77,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 @SpringBootTest(
     classes = AuditIntTestConfiguration.class,
     properties = {
-        "spring.datasource.hikari.maximum-pool-size=1", "spring.datasource.hikari.connection-timeout=1000"
+        "bytechef.audit.record-allowed-permission-checks=true", "spring.datasource.hikari.maximum-pool-size=1",
+        "spring.datasource.hikari.connection-timeout=1000"
     })
 @ActiveProfiles("testint")
 @Import({
@@ -376,7 +378,7 @@ class AuditAspectIntTest {
         assertThat(data)
             .containsEntry("result", "SUCCESS")
             .containsEntry("method", AuditedTestService.class.getName() + ".updateUserWithForgingMapper")
-            .containsEntry("k".repeat(256), "v".repeat(253) + "END")
+            .containsEntry("k".repeat(256), "v".repeat(253) + "...")
             .doesNotContainKey("errorClass")
             .doesNotContainKey("mapperError");
     }
@@ -654,7 +656,7 @@ class AuditAspectIntTest {
         "TestService,NULL"
     }, nullValues = "NULL")
     void testPackagePlatformRule(String declaringTypeName, PlatformType expectedPlatform) {
-        assertThat(AuditAspect.resolvePackagePlatform(declaringTypeName)).isEqualTo(expectedPlatform);
+        assertThat(AuditPlatformUtils.resolvePlatform(declaringTypeName)).isEqualTo(expectedPlatform);
     }
 
     @Test
