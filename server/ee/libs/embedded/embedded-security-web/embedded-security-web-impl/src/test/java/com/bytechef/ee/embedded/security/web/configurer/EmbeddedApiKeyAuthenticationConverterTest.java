@@ -76,12 +76,12 @@ class EmbeddedApiKeyAuthenticationConverterTest {
     }
 
     @Test
-    void testConvertWithNonJwtTokenAndInternalUrlThrowsIllegalArgumentException() {
+    void testConvertWithNonJwtTokenAndInternalUrlThrowsBadCredentialsException() {
         when(request.getHeader("Authorization")).thenReturn("Bearer invalid-token");
         when(request.getRequestURI()).thenReturn("/api/platform/internal/some-endpoint");
 
         assertThatThrownBy(() -> converter.convert(request))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(BadCredentialsException.class)
             .hasMessage("externalUserId parameter is required");
     }
 
@@ -105,6 +105,18 @@ class EmbeddedApiKeyAuthenticationConverterTest {
         assertThat(token.getExternalUserId()).isEqualTo(externalUserId);
         assertThat(token.getTenantId()).isEqualTo(tenantId);
         assertThat(token.getEnvironmentId()).isEqualTo(Environment.PRODUCTION.ordinal());
+    }
+
+    @Test
+    void testConvertWithMalformedNonJwtTokenThrowsBadCredentialsException() {
+        when(request.getHeader("Authorization")).thenReturn("Bearer not*base64");
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI()).thenReturn("/api/embedded/v1/user123/endpoint");
+
+        assertThatThrownBy(() -> converter.convert(request))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("Invalid API key")
+            .hasCauseInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -456,7 +468,7 @@ class EmbeddedApiKeyAuthenticationConverterTest {
     }
 
     @Test
-    void testConvertWithNonJwtTokenAndMeFrontendRouteThrowsIllegalArgumentException() {
+    void testConvertWithNonJwtTokenAndMeFrontendRouteThrowsBadCredentialsException() {
         String tenantKey = EncodingUtils.base64EncodeToString("test-tenant" + ":randomData");
 
         when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
@@ -464,7 +476,7 @@ class EmbeddedApiKeyAuthenticationConverterTest {
         when(request.getRequestURI()).thenReturn("/api/embedded/v1/me");
 
         assertThatThrownBy(() -> converter.convert(request))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(BadCredentialsException.class);
     }
 
     @Test

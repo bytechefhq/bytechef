@@ -18,12 +18,19 @@ package com.bytechef.platform.security.web.mcp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
 import jakarta.servlet.FilterChain;
@@ -31,12 +38,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.slf4j.LoggerFactory;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 /**
@@ -48,6 +62,7 @@ class TenantAwareApiKeyAuthenticationFilterTest {
     private static final String MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of(PATH_TENANT_ID));
     private static final String MCP_PATH = "/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY);
 
+    private final AuthenticationEventPublisher authenticationEventPublisher = mock(AuthenticationEventPublisher.class);
     private final AuthenticationManager authenticationManager = mock(AuthenticationManager.class);
     private final List<String> authenticationTenantIds = new ArrayList<>();
     private final List<String> chainTenantIds = new ArrayList<>();
@@ -350,6 +365,229 @@ class TenantAwareApiKeyAuthenticationFilterTest {
 
         assertThat(mockHttpServletResponse.getStatus()).isEqualTo(200);
         verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void testRejectedPathSecretIsPublishedAsAFailure() throws Exception {
+        TenantAwareApiKeyAuthenticationFilter publishingFilter = createPublishingFilter(
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/automation/"));
+
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(
+            "POST", "/api/automation/server-secret/mcp");
+
+        mockHttpServletRequest.setServletPath("/api/automation/server-secret/mcp");
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        publishingFilter.doFilter(mockHttpServletRequest, mockHttpServletResponse, recordingFilterChain);
+
+        ArgumentCaptor<Authentication> authenticationCaptor = ArgumentCaptor.forClass(Authentication.class);
+
+        verify(authenticationEventPublisher).publishAuthenticationFailure(
+            any(BadCredentialsException.class), authenticationCaptor.capture());
+
+        Authentication authentication = authenticationCaptor.getValue();
+
+        assertThat(authentication.getName()).isEqualTo(UnresolvedCredentialAuthenticationToken.PRINCIPAL);
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void testUnreadableApiKeyIsPublishedAsAFailureInsidePathTenant() throws Exception {
+        BadCredentialsException badCredentialsException = new BadCredentialsException("Malformed API key");
+        List<String> publishedTenantIds = new ArrayList<>();
+
+        TenantAwareApiKeyAuthenticationFilter publishingFilter = createPublishingFilter(httpServletRequest -> {
+            throw badCredentialsException;
+        });
+
+        doAnswer(invocation -> publishedTenantIds.add(TenantContext.getCurrentTenantId()))
+            .when(authenticationEventPublisher)
+            .publishAuthenticationFailure(any(), any());
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        publishingFilter.doFilter(getMcpRequest(), mockHttpServletResponse, recordingFilterChain);
+
+        verify(authenticationEventPublisher).publishAuthenticationFailure(eq(badCredentialsException), any());
+
+        assertThat(publishedTenantIds).containsExactly(PATH_TENANT_ID);
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void testAnonymousTenantlessRequestIsChallengedWithoutPublishingAFailure() throws Exception {
+        TenantAwareApiKeyAuthenticationFilter publishingFilter = new TenantAwareApiKeyAuthenticationFilter(
+            RegexRequestMatcher.regexMatcher("^/api/management(/[^/]+)?/mcp$"),
+            Pattern.compile("/api/management/([^/]+)/mcp"), "/api/management/mcp", authenticationManager,
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/management/"),
+            authenticationEventPublisher);
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        publishingFilter.doFilter(getCanonicalManagementRequest(), mockHttpServletResponse, recordingFilterChain);
+
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
+        assertThat(chainTenantIds).isEmpty();
+        verifyNoInteractions(authenticationEventPublisher, authenticationManager);
+    }
+
+    @Test
+    void testRejectionByTheAuthenticationManagerIsNotPublishedTwice() throws Exception {
+        TenantAwareApiKeyAuthenticationFilter publishingFilter = createPublishingFilter(
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/automation/"));
+
+        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("Invalid API key"));
+
+        MockHttpServletRequest mockHttpServletRequest = getMcpRequest();
+
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + TenantKey.of(PATH_TENANT_ID));
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        publishingFilter.doFilter(mockHttpServletRequest, mockHttpServletResponse, recordingFilterChain);
+
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
+        verify(authenticationEventPublisher, never()).publishAuthenticationFailure(
+            any(AuthenticationException.class), any());
+    }
+
+    @Test
+    void testCrossTenantApiKeyIsPublishedAsAFailureInsidePathTenant() throws Exception {
+        List<String> publishedTenantIds = new ArrayList<>();
+
+        TenantAwareApiKeyAuthenticationFilter publishingFilter = createPublishingFilter(
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/automation/"));
+
+        recordAuthenticationAndAuthenticateAnonymously();
+
+        doAnswer(invocation -> publishedTenantIds.add(TenantContext.getCurrentTenantId()))
+            .when(authenticationEventPublisher)
+            .publishAuthenticationFailure(any(), any());
+
+        MockHttpServletRequest mockHttpServletRequest = getMcpRequest();
+
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + TenantKey.of("tenanta"));
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        publishingFilter.doFilter(mockHttpServletRequest, mockHttpServletResponse, recordingFilterChain);
+
+        ArgumentCaptor<Authentication> authenticationCaptor = ArgumentCaptor.forClass(Authentication.class);
+
+        verify(authenticationEventPublisher).publishAuthenticationFailure(
+            any(BadCredentialsException.class), authenticationCaptor.capture());
+
+        Authentication authentication = authenticationCaptor.getValue();
+
+        assertThat(authentication.getName()).isEqualTo(UnresolvedCredentialAuthenticationToken.PRINCIPAL);
+        assertThat(publishedTenantIds).containsExactly(PATH_TENANT_ID);
+        assertThat(presentedApiKeys).containsExactly((String) null);
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(200);
+    }
+
+    @Test
+    void testCrossTenantApiKeyRejectedByTheAuthenticationManagerIsNotPublishedByTheFilter() throws Exception {
+        TenantAwareApiKeyAuthenticationFilter publishingFilter = createPublishingFilter(
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/automation/"));
+
+        when(authenticationManager.authenticate(any()))
+            .thenThrow(new BadCredentialsException("Authorization token does not exist"));
+
+        MockHttpServletRequest mockHttpServletRequest = getMcpRequest();
+
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + TenantKey.of("tenanta"));
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        publishingFilter.doFilter(mockHttpServletRequest, mockHttpServletResponse, recordingFilterChain);
+
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(401);
+        verify(authenticationEventPublisher, never()).publishAuthenticationFailure(
+            any(AuthenticationException.class), any());
+    }
+
+    @Test
+    void testFailedAuthenticationAnswersServiceUnavailableAndIsPublished() throws Exception {
+        List<String> publishedTenantIds = new ArrayList<>();
+
+        TenantAwareApiKeyAuthenticationFilter publishingFilter = createPublishingFilter(
+            new McpApiKeyAuthenticationConverter(() -> List.of(Environment.values()), "/api/automation/"));
+
+        when(authenticationManager.authenticate(any())).thenThrow(new IllegalStateException("Database unavailable"));
+
+        doAnswer(invocation -> publishedTenantIds.add(TenantContext.getCurrentTenantId()))
+            .when(authenticationEventPublisher)
+            .publishAuthenticationFailure(any(), any());
+
+        MockHttpServletRequest mockHttpServletRequest = getMcpRequest();
+
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + TenantKey.of(PATH_TENANT_ID));
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        publishingFilter.doFilter(mockHttpServletRequest, mockHttpServletResponse, recordingFilterChain);
+
+        verify(authenticationEventPublisher).publishAuthenticationFailure(
+            any(AuthenticationServiceException.class), any(UnresolvedCredentialAuthenticationToken.class));
+
+        assertThat(publishedTenantIds).containsExactly(PATH_TENANT_ID);
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(503);
+        assertThat(chainTenantIds).isEmpty();
+    }
+
+    @Test
+    void testFailedConversionAnswersServiceUnavailableAndIsPublished() throws Exception {
+        TenantAwareApiKeyAuthenticationFilter publishingFilter = createPublishingFilter(httpServletRequest -> {
+            throw new IllegalStateException("Database unavailable");
+        });
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        publishingFilter.doFilter(getMcpRequest(), mockHttpServletResponse, recordingFilterChain);
+
+        verify(authenticationEventPublisher).publishAuthenticationFailure(
+            any(AuthenticationServiceException.class), any(UnresolvedCredentialAuthenticationToken.class));
+
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(503);
+        assertThat(chainTenantIds).isEmpty();
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void testFailedAuthenticationIsLoggedWithoutTheMcpServerSecretKey() throws Exception {
+        TenantAwareApiKeyAuthenticationFilter publishingFilter = createPublishingFilter(httpServletRequest -> {
+            throw new IllegalStateException("Database unavailable");
+        });
+
+        Logger logger = (Logger) LoggerFactory.getLogger(TenantAwareApiKeyAuthenticationFilter.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+
+        listAppender.start();
+
+        logger.addAppender(listAppender);
+
+        try {
+            publishingFilter.doFilter(getMcpRequest(), new MockHttpServletResponse(), recordingFilterChain);
+        } finally {
+            logger.detachAppender(listAppender);
+        }
+
+        assertThat(listAppender.list)
+            .isNotEmpty()
+            .extracting(ILoggingEvent::getFormattedMessage)
+            .noneMatch(formattedMessage -> formattedMessage.contains(MCP_SERVER_SECRET_KEY));
+    }
+
+    private TenantAwareApiKeyAuthenticationFilter createPublishingFilter(
+        AuthenticationConverter authenticationConverter) {
+
+        return new TenantAwareApiKeyAuthenticationFilter(
+            RegexRequestMatcher.regexMatcher("^/api/automation/.+/mcp"),
+            Pattern.compile("/api/automation/(.+)/mcp"), null, authenticationManager, authenticationConverter,
+            authenticationEventPublisher);
     }
 
     private static McpApiKeyCredentials getCredentials(ApiKeyAuthenticationToken apiKeyAuthenticationToken) {

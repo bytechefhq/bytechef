@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.mcp;
 
+import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
 import jakarta.servlet.FilterChain;
@@ -30,12 +31,21 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springaicommunity.mcp.security.server.apikey.web.ApiKeyAuthenticationFilter;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationManagerResolver;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationConverter;
+import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
@@ -45,8 +55,13 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
 
     private static final String AUTHORIZATION_HEADER_NAME = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final String CROSS_TENANT_API_KEY_ATTRIBUTE =
+        TenantAwareApiKeyAuthenticationFilter.class.getName() + ".CROSS_TENANT_API_KEY";
     private static final Pattern TENANT_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
+    private static final Logger log = LoggerFactory.getLogger(TenantAwareApiKeyAuthenticationFilter.class);
+
+    private final @Nullable AuthenticationEventPublisher authenticationEventPublisher;
     private final Pattern mcpServerSecretPattern;
     private final @Nullable String tenantlessPath;
 
@@ -54,12 +69,33 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
         RequestMatcher requestMatcher, Pattern mcpServerSecretPattern, @Nullable String tenantlessPath,
         AuthenticationManager authenticationManager, AuthenticationConverter authenticationConverter) {
 
-        super(authenticationManager, new PathTenantAuthenticationConverter(authenticationConverter));
+        this(
+            requestMatcher, mcpServerSecretPattern, tenantlessPath, authenticationManager, authenticationConverter,
+            null);
+    }
 
+    public TenantAwareApiKeyAuthenticationFilter(
+        RequestMatcher requestMatcher, Pattern mcpServerSecretPattern, @Nullable String tenantlessPath,
+        AuthenticationManager authenticationManager, AuthenticationConverter authenticationConverter,
+        @Nullable AuthenticationEventPublisher authenticationEventPublisher) {
+
+        super(
+            authenticationManager,
+            new PathTenantAuthenticationConverter(authenticationConverter, authenticationEventPublisher));
+
+        this.authenticationEventPublisher = authenticationEventPublisher;
         this.mcpServerSecretPattern = mcpServerSecretPattern;
         this.tenantlessPath = tenantlessPath;
 
-        setFailureHandler(new McpServerDisabledAuthenticationFailureHandler(getFailureHandler()));
+        AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver =
+            getAuthenticationManagerResolver();
+
+        setAuthenticationManagerResolver(httpServletRequest -> new PublishingAuthenticationManager(
+            authenticationManagerResolver.resolve(httpServletRequest), httpServletRequest,
+            authenticationEventPublisher));
+        setFailureHandler(
+            new McpServerDisabledAuthenticationFailureHandler(
+                createServiceUnavailableAwareFailureHandler(getFailureHandler())));
         setRequestMatcher(requestMatcher);
     }
 
@@ -95,16 +131,55 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
         }
 
         if (tenantId == null) {
+            BadCredentialsException badCredentialsException = new BadCredentialsException(
+                "Invalid MCP server secret key");
+
+            if (authorization != null || !isTenantlessPath(httpServletRequest)) {
+                publishAuthenticationFailure(
+                    authenticationEventPublisher, badCredentialsException, httpServletRequest);
+            }
+
             AuthenticationFailureHandler authenticationFailureHandler = getFailureHandler();
 
             authenticationFailureHandler.onAuthenticationFailure(
-                httpServletRequest, httpServletResponse, new BadCredentialsException("Invalid MCP server secret key"));
+                httpServletRequest, httpServletResponse, badCredentialsException);
 
             return;
         }
 
         TenantContext.runWithTenantId(
             tenantId, () -> super.doFilterInternal(httpServletRequest, httpServletResponse, filterChain));
+    }
+
+    private static AuthenticationFailureHandler createServiceUnavailableAwareFailureHandler(
+        AuthenticationFailureHandler authenticationFailureHandler) {
+
+        AuthenticationEntryPointFailureHandler serviceUnavailableFailureHandler =
+            new AuthenticationEntryPointFailureHandler(new HttpStatusEntryPoint(HttpStatus.SERVICE_UNAVAILABLE));
+
+        serviceUnavailableFailureHandler.setRethrowAuthenticationServiceException(false);
+
+        return (httpServletRequest, httpServletResponse, authenticationException) -> {
+            if (authenticationException instanceof AuthenticationServiceException) {
+                serviceUnavailableFailureHandler.onAuthenticationFailure(
+                    httpServletRequest, httpServletResponse, authenticationException);
+
+                return;
+            }
+
+            authenticationFailureHandler.onAuthenticationFailure(
+                httpServletRequest, httpServletResponse, authenticationException);
+        };
+    }
+
+    private static AuthenticationServiceException toAuthenticationServiceException(
+        RuntimeException runtimeException, HttpServletRequest httpServletRequest) {
+
+        log.error(
+            "Rejecting MCP API key for a {} request: authentication failed in tenant {}",
+            httpServletRequest.getMethod(), TenantContext.getCurrentTenantId(), runtimeException);
+
+        return new AuthenticationServiceException("MCP API key authentication failed", runtimeException);
     }
 
     private boolean isTenantlessPath(HttpServletRequest httpServletRequest) {
@@ -120,6 +195,18 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
         }
 
         return parseTenantId(matcher.group(1));
+    }
+
+    private static void publishAuthenticationFailure(
+        @Nullable AuthenticationEventPublisher authenticationEventPublisher,
+        AuthenticationException authenticationException, HttpServletRequest httpServletRequest) {
+
+        if (authenticationEventPublisher == null) {
+            return;
+        }
+
+        authenticationEventPublisher.publishAuthenticationFailure(
+            authenticationException, new UnresolvedCredentialAuthenticationToken(httpServletRequest));
     }
 
     @Nullable
@@ -146,14 +233,38 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
     private static final class PathTenantAuthenticationConverter implements AuthenticationConverter {
 
         private final AuthenticationConverter authenticationConverter;
+        private final @Nullable AuthenticationEventPublisher authenticationEventPublisher;
 
-        private PathTenantAuthenticationConverter(AuthenticationConverter authenticationConverter) {
+        private PathTenantAuthenticationConverter(
+            AuthenticationConverter authenticationConverter,
+            @Nullable AuthenticationEventPublisher authenticationEventPublisher) {
+
             this.authenticationConverter = authenticationConverter;
+            this.authenticationEventPublisher = authenticationEventPublisher;
         }
 
         @Override
         @Nullable
         public Authentication convert(HttpServletRequest httpServletRequest) {
+            try {
+                return doConvert(httpServletRequest);
+            } catch (AuthenticationException authenticationException) {
+                publishAuthenticationFailure(authenticationEventPublisher, authenticationException, httpServletRequest);
+
+                throw authenticationException;
+            } catch (RuntimeException runtimeException) {
+                AuthenticationServiceException authenticationServiceException = toAuthenticationServiceException(
+                    runtimeException, httpServletRequest);
+
+                publishAuthenticationFailure(
+                    authenticationEventPublisher, authenticationServiceException, httpServletRequest);
+
+                throw authenticationServiceException;
+            }
+        }
+
+        @Nullable
+        private Authentication doConvert(HttpServletRequest httpServletRequest) {
             String authorization = httpServletRequest.getHeader(AUTHORIZATION_HEADER_NAME);
 
             if (authorization == null || !authorization.startsWith(BEARER_PREFIX)) {
@@ -166,7 +277,53 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
                 return authenticationConverter.convert(httpServletRequest);
             }
 
+            httpServletRequest.setAttribute(CROSS_TENANT_API_KEY_ATTRIBUTE, Boolean.TRUE);
+
             return authenticationConverter.convert(new WithoutAuthorizationHttpServletRequest(httpServletRequest));
+        }
+    }
+
+    private static final class PublishingAuthenticationManager implements AuthenticationManager {
+
+        private final AuthenticationManager authenticationManager;
+        private final @Nullable AuthenticationEventPublisher authenticationEventPublisher;
+        private final HttpServletRequest httpServletRequest;
+
+        private PublishingAuthenticationManager(
+            AuthenticationManager authenticationManager, HttpServletRequest httpServletRequest,
+            @Nullable AuthenticationEventPublisher authenticationEventPublisher) {
+
+            this.authenticationManager = authenticationManager;
+            this.authenticationEventPublisher = authenticationEventPublisher;
+            this.httpServletRequest = httpServletRequest;
+        }
+
+        @Override
+        public Authentication authenticate(Authentication authentication) {
+            Authentication authenticatedAuthentication;
+
+            try {
+                authenticatedAuthentication = authenticationManager.authenticate(authentication);
+            } catch (AuthenticationException authenticationException) {
+                throw authenticationException;
+            } catch (RuntimeException runtimeException) {
+                AuthenticationServiceException authenticationServiceException = toAuthenticationServiceException(
+                    runtimeException, httpServletRequest);
+
+                publishAuthenticationFailure(
+                    authenticationEventPublisher, authenticationServiceException, httpServletRequest);
+
+                throw authenticationServiceException;
+            }
+
+            if (httpServletRequest.getAttribute(CROSS_TENANT_API_KEY_ATTRIBUTE) != null) {
+                publishAuthenticationFailure(
+                    authenticationEventPublisher,
+                    new BadCredentialsException("API key does not belong to the MCP server tenant"),
+                    httpServletRequest);
+            }
+
+            return authenticatedAuthentication;
         }
     }
 

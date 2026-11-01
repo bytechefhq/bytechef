@@ -63,15 +63,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.authentication.AuthenticationEventPublisher;
-import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
@@ -191,7 +188,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     }
 
     @Test
-    void testForgedMcpServerSecretPublishesNoSuccess() throws Exception {
+    void testForgedMcpServerSecretPublishesAFailureAndNoSuccess() throws Exception {
         String forgedMcpServerSecretKey = String.valueOf(TenantKey.of("public"));
         String forgedEndpointUrl = "http://localhost:" + port + "/api/management/" + forgedMcpServerSecretKey + "/mcp";
 
@@ -200,6 +197,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token, forgedMcpServerSecretKey);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
         assertThat(authenticationEventRecorder.getEvents(CredentialAuthenticationSuccessEvent.class, token)).isEmpty();
     }
 
@@ -253,6 +251,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
             .firstValue("WWW-Authenticate")
             .orElse("")).startsWith("Bearer error=\"insufficient_scope\"")
                 .contains("scope=\"mcp:management\"");
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
     }
 
     @Test
@@ -262,6 +261,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
     }
 
     @Test
@@ -284,6 +284,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
     }
 
     @Test
@@ -528,13 +529,6 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
     @TestConfiguration(proxyBeanMethods = false)
     static class AuthenticationEventConfiguration {
-
-        @Bean
-        AuthenticationEventPublisher authenticationEventPublisher(
-            ApplicationEventPublisher applicationEventPublisher) {
-
-            return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
-        }
 
         @Bean
         AuthenticationEventRecorder authenticationEventRecorder() {

@@ -10,7 +10,6 @@ package com.bytechef.ee.platform.security.web.authentication;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -96,6 +95,14 @@ class PlatformApiKeyAuthenticationProviderTest {
     }
 
     @Test
+    void testUnknownSecretKeyIsRejectedAsBadCredentials() {
+        assertThatThrownBy(
+            () -> newProvider(null).authenticate(new PlatformApiKeyAuthenticationToken(0, "unknown", "public")))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Unknown API secret key");
+    }
+
+    @Test
     void testAuthenticatedTokenCarriesTheApiKeyId() {
         Authentication authentication = newProvider(null).authenticate(newToken());
 
@@ -126,7 +133,7 @@ class PlatformApiKeyAuthenticationProviderTest {
 
         ApiKeyService apiKeyService = mock(ApiKeyService.class);
 
-        when(apiKeyService.getApiKey(anyString())).thenReturn(apiKey);
+        when(apiKeyService.fetchApiKey(SECRET_KEY)).thenReturn(Optional.of(apiKey));
 
         User user = mock(User.class);
 

@@ -76,7 +76,7 @@ public class AutomationMcpServerJwtAccessFilter extends OncePerRequestFilter {
             return;
         }
 
-        Optional<McpServer> mcpServer = fetchMcpServer(matcher.group(1));
+        Optional<McpServer> mcpServer = mcpServerService.fetchMcpServer(matcher.group(1));
 
         if (mcpServer.isEmpty() || !isRequestedEnvironment(request, mcpServer.get()) ||
             !isWorkspaceMember(mcpServer.get())) {
@@ -87,14 +87,6 @@ public class AutomationMcpServerJwtAccessFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private Optional<McpServer> fetchMcpServer(String mcpServerSecretKey) {
-        try {
-            return Optional.of(mcpServerService.getMcpServer(mcpServerSecretKey));
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return Optional.empty();
-        }
     }
 
     private boolean isRequestedEnvironment(HttpServletRequest request, McpServer mcpServer) {

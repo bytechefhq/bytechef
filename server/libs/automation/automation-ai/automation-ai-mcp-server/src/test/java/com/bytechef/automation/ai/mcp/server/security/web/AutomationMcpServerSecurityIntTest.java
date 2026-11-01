@@ -220,6 +220,7 @@ class AutomationMcpServerSecurityIntTest {
         when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
         when(mcpServer.isEnabled()).thenReturn(true);
         when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(Optional.of(mcpServer));
     }
 
     private String seedApiKey(PlatformType type, Environment environment) {

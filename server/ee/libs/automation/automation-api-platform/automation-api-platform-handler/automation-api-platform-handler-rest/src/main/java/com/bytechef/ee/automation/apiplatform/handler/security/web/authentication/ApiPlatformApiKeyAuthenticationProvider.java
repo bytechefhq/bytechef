@@ -35,15 +35,10 @@ public class ApiPlatformApiKeyAuthenticationProvider implements AuthenticationPr
         ApiPlatformApiKeyAuthenticationToken apiPlatformApiKeyAuthenticationToken =
             (ApiPlatformApiKeyAuthenticationToken) authentication;
 
-        ApiKey apiKey;
-
-        try {
-            apiKey = apiKeyService.getApiKey(
-                apiPlatformApiKeyAuthenticationToken.getSecretKey(),
-                apiPlatformApiKeyAuthenticationToken.getEnvironmentId());
-        } catch (IllegalArgumentException e) {
-            throw new BadCredentialsException("Unknown API secret key", e);
-        }
+        ApiKey apiKey = apiKeyService
+            .fetchApiKey(apiPlatformApiKeyAuthenticationToken.getSecretKey(),
+                apiPlatformApiKeyAuthenticationToken.getEnvironmentId())
+            .orElseThrow(() -> new BadCredentialsException("Unknown API secret key"));
 
         return new ApiPlatformApiKeyAuthenticationToken(
             apiPlatformApiKeyAuthenticationToken.getEnvironmentId(), createSpringSecurityUser(apiKey.getName()),

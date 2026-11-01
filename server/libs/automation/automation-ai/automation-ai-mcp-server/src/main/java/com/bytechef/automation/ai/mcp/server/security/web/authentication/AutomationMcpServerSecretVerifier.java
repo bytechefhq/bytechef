@@ -76,13 +76,13 @@ public class AutomationMcpServerSecretVerifier implements McpServerSecretVerifie
 
     @Nullable
     private McpServer fetchSecretMatchingMcpServer(String mcpServerSecretKey) {
-        McpServer mcpServer;
+        Optional<McpServer> mcpServerOptional = mcpServerService.fetchMcpServer(mcpServerSecretKey);
 
-        try {
-            mcpServer = mcpServerService.getMcpServer(mcpServerSecretKey);
-        } catch (RuntimeException runtimeException) {
+        if (mcpServerOptional.isEmpty()) {
             return null;
         }
+
+        McpServer mcpServer = mcpServerOptional.get();
 
         String secretKey = mcpServer.getSecretKey();
 

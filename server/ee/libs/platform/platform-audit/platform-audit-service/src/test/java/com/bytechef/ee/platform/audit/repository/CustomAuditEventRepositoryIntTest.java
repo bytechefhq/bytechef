@@ -20,6 +20,7 @@ import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.platform.security.web.authentication.TenantPrincipal;
 import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
+import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.tenant.sql.BaseDataSource;
@@ -273,6 +274,17 @@ public class CustomAuditEventRepositoryIntTest {
 
         assertThat(countEvents(DEFAULT_SCHEMA, "unknown@gmail.com", "AUTHENTICATION_FAILURE")).isEqualTo(1);
         assertThat(countEvents(TENANT_SCHEMA, "unknown@gmail.com", "AUTHENTICATION_FAILURE")).isZero();
+    }
+
+    @Test
+    public void testUnresolvedCredentialIsPersistedInTheDefaultSchemaWithoutLookup() {
+        customAuditEventRepository.add(
+            createAuditEvent(UnresolvedCredentialAuthenticationToken.PRINCIPAL, "AUTHENTICATION_FAILURE"));
+
+        assertThat(countEvents(DEFAULT_SCHEMA, UnresolvedCredentialAuthenticationToken.PRINCIPAL,
+            "AUTHENTICATION_FAILURE")).isEqualTo(1);
+        verify(tenantService, never()).getTenantIdsByUserLogin(anyString());
+        verify(tenantService, never()).getTenantIdsByUserEmail(anyString());
     }
 
     @Test

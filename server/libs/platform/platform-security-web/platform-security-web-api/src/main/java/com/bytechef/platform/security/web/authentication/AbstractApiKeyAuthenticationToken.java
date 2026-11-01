@@ -30,8 +30,8 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
 
     private @Nullable Long apiKeyId;
     private long environmentId;
-    private String tenantId;
-    private User user;
+    private @Nullable String tenantId;
+    private @Nullable User user;
 
     public AbstractApiKeyAuthenticationToken() {
         super(List.of());
@@ -66,8 +66,17 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
     }
 
     @Override
+    public String getName() {
+        if (user == null) {
+            return UnresolvedCredentialAuthenticationToken.PRINCIPAL;
+        }
+
+        return super.getName();
+    }
+
+    @Override
     @SuppressFBWarnings("EI")
-    public Object getPrincipal() {
+    public @Nullable Object getPrincipal() {
         return user;
     }
 
@@ -83,7 +92,7 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
         return null;
     }
 
-    public String getTenantId() {
+    public @Nullable String getTenantId() {
         return tenantId;
     }
 

@@ -14,6 +14,7 @@ import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
+import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -182,7 +183,9 @@ public class CustomAuditEventRepository implements AuditEventRepository {
 
             String principal = event.getPrincipal();
 
-            if (Objects.equals(principal, systemUsername)) {
+            if (Objects.equals(principal, systemUsername) ||
+                Objects.equals(principal, UnresolvedCredentialAuthenticationToken.PRINCIPAL)) {
+
                 return null;
             }
 
