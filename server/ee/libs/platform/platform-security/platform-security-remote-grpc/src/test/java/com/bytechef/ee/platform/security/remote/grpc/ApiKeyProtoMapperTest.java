@@ -60,4 +60,17 @@ class ApiKeyProtoMapperTest {
         assertThat(mappedApiKey.getType()).isNull();
         assertThat(mappedApiKey.getEnvironment()).isEqualTo(Environment.DEVELOPMENT);
     }
+
+    @Test
+    void testApiKeyWithoutUserRoundTrip() {
+        ApiKey apiKey = new ApiKey();
+
+        apiKey.setEnvironment(Environment.DEVELOPMENT);
+        apiKey.setSecretKey("secret-key");
+
+        ApiKey mappedApiKey = ApiKeyProtoMapper.toApiKey(ApiKeyProtoMapper.toRemoteApiKey(apiKey));
+
+        assertThat(mappedApiKey.getUserId()).isNull();
+        assertThat(mappedApiKey.getSecretKey()).isEqualTo("secret-key");
+    }
 }
