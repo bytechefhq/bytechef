@@ -141,6 +141,20 @@ public class ExecutionApplicationIntTest {
     }
 
     @Test
+    void testToolInvocationLogGrpcServiceIsServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains(
+            "bytechef.platform.tool.invocation.log.remote.v1.ToolInvocationLogRemoteService");
+    }
+
+    @Test
     void testAuditEventRetentionJobPurgesExpiredEvents() {
         AuditEventRetentionJob auditEventRetentionJob = auditEventRetentionJobProvider.getIfAvailable();
 

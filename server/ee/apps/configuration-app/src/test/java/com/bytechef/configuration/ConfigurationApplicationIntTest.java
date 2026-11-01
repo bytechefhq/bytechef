@@ -133,6 +133,12 @@ public class ConfigurationApplicationIntTest {
     }
 
     @Test
+    void testToolInvocationsAreSentToExecutionApp() {
+        assertThat(
+            applicationContext.containsBean("remoteToolExecutionEventListener")).isTrue();
+    }
+
+    @Test
     void testJobCompletionIsAwaitedThroughTheMessageBroker() throws ClassNotFoundException {
         Object jobCompletionAwaiter = applicationContext.getBean(
             Class.forName("com.bytechef.platform.workflow.execution.JobCompletionAwaiter"));

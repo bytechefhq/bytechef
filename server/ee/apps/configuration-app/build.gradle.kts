@@ -106,6 +106,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-capture"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-graphql"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-remote-client"))
     implementation(project(":server:ee:libs:config:session-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))

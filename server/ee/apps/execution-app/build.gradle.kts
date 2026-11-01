@@ -88,6 +88,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-security:platform-security-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-service"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-client"))

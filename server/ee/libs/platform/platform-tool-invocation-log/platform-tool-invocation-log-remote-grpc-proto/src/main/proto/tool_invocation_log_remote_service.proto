@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package bytechef.platform.tool.invocation.log.remote.v1;
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.tool.invocation.log.remote.grpc.proto";
+
+service ToolInvocationLogRemoteService {
+  rpc RecordToolExecution(RecordToolExecutionRequest) returns (google.protobuf.Empty);
+}
+
+message RecordToolExecutionRequest {
+  bytes tool_execution_event = 1;
+}
