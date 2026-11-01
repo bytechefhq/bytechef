@@ -56,13 +56,11 @@ import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -83,8 +81,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
         AiAgentToolFacade aiAgentToolFacade, AiSkillFacade aiSkillFacade,
         List<AiAgentUtilsClusterElementContributor> clusterElementContributors,
         ClusterElementDefinitionService clusterElementDefinitionService, AiAutoMemoryService aiAutoMemoryService,
-        ProjectDeploymentService projectDeploymentService, ProjectService projectService,
-        ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider) {
+        ProjectDeploymentService projectDeploymentService, ProjectService projectService) {
 
         AiAgentUtilsAutoMemoryTool agentUtilsAutoMemoryTool = new AiAgentUtilsAutoMemoryTool(
             aiAutoMemoryService, projectDeploymentService, projectService);
@@ -94,7 +91,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             aiAgentToolFacade, clusterElementDefinitionService);
         AiAgentUtilsApprovalGate agentUtilsApprovalGate = new AiAgentUtilsApprovalGate(
             new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService),
-            clusterElementDefinitionService, toolExecutionRecorderObjectProvider.getIfAvailable());
+            clusterElementDefinitionService);
 
         List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(
             agentUtilsApprovalGate.clusterElementDefinition,

@@ -524,7 +524,7 @@ class SuspendableToolCallingManagerTest {
 
         ApprovalGateToolCallback approvalGateToolCallback = new ApprovalGateToolCallback(
             slackToolCallback, "Outbound messages", List.of(), Map.of(), mock(ClusterElementDefinitionService.class),
-            context, null, null);
+            context, null);
 
         ToolCallingManager delegate = mock(ToolCallingManager.class);
 
