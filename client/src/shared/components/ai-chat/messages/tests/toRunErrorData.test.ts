@@ -8,7 +8,7 @@ describe('toRunErrorData', () => {
         ).toEqual({
             code: 'NO_AI_PROVIDER',
             message:
-                'No AI provider is set up for this environment. Enable one in Settings > AI Providers. If you do not have permission, ask an administrator.',
+                'No AI provider is set up for this environment. Enable one in Settings > AI > Providers. If you do not have permission, ask an administrator.',
         });
     });
 
