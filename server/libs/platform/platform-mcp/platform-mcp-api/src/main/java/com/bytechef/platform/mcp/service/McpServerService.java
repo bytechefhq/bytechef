@@ -20,6 +20,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service interface for managing MCP servers within the system. Provides methods to create, update, delete, and query
@@ -62,6 +63,8 @@ public interface McpServerService {
     McpServer getMcpServer(long mcpServerId);
 
     String getMcpServerSecretKey(long mcpServerId);
+
+    Optional<McpServer> fetchMcpServer(String secretKey);
 
     /**
      * Retrieves an MCP server by its secret key.

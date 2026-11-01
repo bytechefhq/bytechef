@@ -20,7 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.CredentialAuthenticationEventPublisher;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
@@ -45,14 +49,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
@@ -259,6 +271,10 @@ class TenantAwareJwtAuthenticationFilterTest {
 
     @Test
     void testRejectsTokenWhoseTenantClaimDisagreesWithUrl() throws Exception {
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        tenantAwareJwtAuthenticationFilter.setAuthenticationEventPublisher(publisher);
+
         String path = automationPath("acme");
 
         authenticate(jwtWithTenant("victim", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
@@ -272,10 +288,17 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         assertThat(response.getStatus()).isEqualTo(401);
         assertThat(chainInvoked).isFalse();
+        assertThat(publisher.failures).singleElement()
+            .asString()
+            .startsWith("acme:");
     }
 
     @Test
     void testRejectsTokenMissingTheConfiguredTenantClaim() throws Exception {
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        tenantAwareJwtAuthenticationFilter.setAuthenticationEventPublisher(publisher);
+
         String path = automationPath("acme");
 
         authenticate(jwtNoTenant("mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
@@ -289,16 +312,38 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         assertThat(response.getStatus()).isEqualTo(401);
         assertThat(chainInvoked).isFalse();
+        assertThat(publisher.failures).singleElement()
+            .asString()
+            .startsWith("acme:");
+    }
+
+    @Test
+    void testRejectsSelfIssuerTokenWhenByteChefUserDoesNotExist() throws Exception {
+        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.empty());
+
+        assertThat(rejectSelfIssuerTokenForUserStatus()).containsExactly(
+            "acme:" + UsernameNotFoundException.class.getSimpleName() + ":User not found");
     }
 
     @Test
     void testRejectsSelfIssuerTokenWhenByteChefUserIsNotActive() throws Exception {
+        User user = mock(User.class);
+
+        when(user.isActivated()).thenReturn(false);
+        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
+
+        assertThat(rejectSelfIssuerTokenForUserStatus()).containsExactly(
+            "acme:" + DisabledException.class.getSimpleName() + ":User is not active");
+    }
+
+    private List<String> rejectSelfIssuerTokenForUserStatus() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
             authorityService, MCP_ENDPOINTS,
             List.of(mcpServerSecretVerifier), null, null);
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
 
-        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.empty());
+        filter.setAuthenticationEventPublisher(publisher);
 
         String path = automationPath("acme");
 
@@ -312,6 +357,8 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         assertThat(response.getStatus()).isEqualTo(401);
         assertThat(chainInvoked).isFalse();
+
+        return publisher.failures;
     }
 
     @Test
@@ -734,6 +781,239 @@ class TenantAwareJwtAuthenticationFilterTest {
         assertThat(response.getStatus()).isEqualTo(401);
     }
 
+    @Test
+    void testRevokedTokenIsRecordedInTheTokenTenant() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker((tokenValue, tenantId) -> true);
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        filter.setAuthenticationEventPublisher(publisher);
+
+        assertThat(doSelfIssuerRequest(filter)).isEqualTo(401);
+        assertThat(publisher.failures).containsExactly(
+            "acme:" + BadCredentialsException.class.getSimpleName() + ":Token is revoked");
+        assertThat(publisher.successCount).isZero();
+    }
+
+    @Test
+    void testFailedRevocationCheckIsRecordedAsAServiceFailure() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker((tokenValue, tenantId) -> {
+            throw new IllegalStateException("revocation store unavailable");
+        });
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        filter.setAuthenticationEventPublisher(publisher);
+
+        assertThat(doSelfIssuerRequest(filter)).isEqualTo(503);
+        assertThat(publisher.failures).containsExactly(
+            "acme:" + AuthenticationServiceException.class.getSimpleName() + ":Token revocation check failed");
+    }
+
+    @Test
+    void testMissingRevocationCheckerIsRecordedAsAServiceFailure() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker(null);
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        filter.setAuthenticationEventPublisher(publisher);
+
+        assertThat(doSelfIssuerRequest(filter)).isEqualTo(401);
+        assertThat(publisher.failures).containsExactly(
+            "acme:" + AuthenticationServiceException.class.getSimpleName() +
+                ":No token revocation checker is configured");
+    }
+
+    @Test
+    void testInsufficientScopeIsRecordedInTheUrlTenant() throws Exception {
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        tenantAwareJwtAuthenticationFilter.setAuthenticationEventPublisher(publisher);
+
+        String path = managementPath("acme");
+
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        tenantAwareJwtAuthenticationFilter.doFilter(request(path), response, (servletRequest, servletResponse) -> {});
+
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(publisher.failures).containsExactly(
+            "acme:" + BadCredentialsException.class.getSimpleName() + ":Insufficient scope");
+    }
+
+    @Test
+    void testFailedMcpServerDisabledCheckRespondsServiceUnavailable() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
+            new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties(), userService,
+            authorityService, MCP_ENDPOINTS, List.of(failingDisabledCheckVerifier()), null, null);
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        filter.setAuthenticationEventPublisher(publisher);
+
+        String path = automationPath("acme");
+
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicBoolean chainInvoked = new AtomicBoolean();
+
+        filter.doFilter(request(path), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(503);
+        assertThat(chainInvoked).isFalse();
+        assertThat(publisher.failures).containsExactly(
+            "acme:" + AuthenticationServiceException.class.getSimpleName() + ":MCP server disabled check failed");
+    }
+
+    @Test
+    void testFailingAuditWriteKeepsTheRejectionStatus() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker((tokenValue, tenantId) -> {
+            throw new IllegalStateException("revocation store unavailable");
+        });
+
+        filter.setAuthenticationEventPublisher(
+            new CredentialAuthenticationEventPublisher(event -> {}, new FailingAuthenticationEventPublisher()));
+
+        assertThat(doSelfIssuerRequest(filter)).isEqualTo(503);
+    }
+
+    @Test
+    void testDisabledServerRecordsNoAuthenticationEvent() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = disabledServerFilter(mcpResourceServerProperties());
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        filter.setAuthenticationEventPublisher(publisher);
+
+        String path = automationPath("acme");
+
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request(path), response, (servletRequest, servletResponse) -> {});
+
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(publisher.failures).isEmpty();
+        assertThat(publisher.successCount).isZero();
+    }
+
+    @Test
+    void testFailedUserStatusCheckRespondsServiceUnavailable() throws Exception {
+        when(userService.fetchUserByLogin("admin@localhost.com"))
+            .thenThrow(new IllegalStateException("database unavailable"));
+
+        TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
+            new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
+            authorityService, MCP_ENDPOINTS, List.of(mcpServerSecretVerifier), NOT_REVOKED_CHECKER, null);
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        filter.setAuthenticationEventPublisher(publisher);
+
+        assertThat(doSelfIssuerRequest(filter)).isEqualTo(503);
+        assertThat(publisher.failures).containsExactly(
+            "acme:" + AuthenticationServiceException.class.getSimpleName() + ":User status check failed");
+        assertThat(publisher.successCount).isZero();
+    }
+
+    @Test
+    void testFailedUserStatusCheckIsLoggedWithoutTheRequestPath() throws Exception {
+        when(userService.fetchUserByLogin("admin@localhost.com"))
+            .thenThrow(new IllegalStateException("database unavailable"));
+
+        TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
+            new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
+            authorityService, MCP_ENDPOINTS, List.of(mcpServerSecretVerifier), NOT_REVOKED_CHECKER, null);
+
+        Logger logger = (Logger) LoggerFactory.getLogger(TenantAwareJwtAuthenticationFilter.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+
+        listAppender.start();
+
+        logger.addAppender(listAppender);
+
+        try {
+            assertThat(doSelfIssuerRequest(filter)).isEqualTo(503);
+        } finally {
+            logger.detachAppender(listAppender);
+        }
+
+        String path = automationPath("acme");
+
+        assertThat(listAppender.list)
+            .isNotEmpty()
+            .extracting(ILoggingEvent::getFormattedMessage)
+            .noneMatch(formattedMessage -> formattedMessage.contains(path));
+    }
+
+    @Test
+    void testFailedAuthorityLookupRespondsServiceUnavailable() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker(NOT_REVOKED_CHECKER);
+
+        User user = mock(User.class);
+
+        when(user.isActivated()).thenReturn(true);
+        when(user.getAuthorityIds()).thenReturn(List.of(5L));
+        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
+        when(authorityService.fetchAuthority(5L)).thenThrow(new IllegalStateException("database unavailable"));
+
+        RecordingAuthenticationEventPublisher publisher = new RecordingAuthenticationEventPublisher();
+
+        filter.setAuthenticationEventPublisher(publisher);
+
+        assertThat(doSelfIssuerRequest(filter)).isEqualTo(503);
+        assertThat(publisher.failures).containsExactly(
+            "acme:" + AuthenticationServiceException.class.getSimpleName() + ":Authority lookup failed");
+        assertThat(publisher.successCount).isZero();
+    }
+
+    @Test
+    void testSuccessIsRecordedOnceBeforeTheTokenIsInstalled() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker(NOT_REVOKED_CHECKER);
+
+        List<Authentication> publishedAuthentications = new ArrayList<>();
+        AtomicReference<Authentication> contextAuthentication = new AtomicReference<>();
+        AtomicReference<String> publishTenantId = new AtomicReference<>();
+
+        filter.setAuthenticationEventPublisher(new AuthenticationEventPublisher() {
+
+            @Override
+            public void publishAuthenticationSuccess(Authentication authentication) {
+                SecurityContext securityContext = SecurityContextHolder.getContext();
+
+                contextAuthentication.set(securityContext.getAuthentication());
+                publishTenantId.set(TenantContext.getCurrentTenantId());
+                publishedAuthentications.add(authentication);
+            }
+
+            @Override
+            public void publishAuthenticationFailure(
+                AuthenticationException authenticationException, Authentication authentication) {
+
+                throw new AssertionError("Unexpected failure: " + authenticationException.getMessage());
+            }
+        });
+
+        assertThat(doSelfIssuerRequest(filter)).isEqualTo(200);
+        assertThat(publishedAuthentications).hasSize(1);
+        assertThat(contextAuthentication.get()).isNotSameAs(publishedAuthentications.getFirst());
+        assertThat(publishTenantId.get()).isEqualTo("acme");
+    }
+
+    private static McpServerSecretVerifier failingDisabledCheckVerifier() {
+        return new McpServerSecretVerifier() {
+
+            @Override
+            public Optional<Boolean> verifyMcpServerSecret(HttpServletRequest request) {
+                return Optional.of(false);
+            }
+
+            @Override
+            public Optional<String> getMcpServerDisabledMessage(HttpServletRequest request) {
+                throw new IllegalStateException("lookup failed");
+            }
+        };
+    }
+
     private TenantAwareJwtAuthenticationFilter selfIssuerFilterWithChecker(
         SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker) {
 
@@ -897,5 +1177,42 @@ class TenantAwareJwtAuthenticationFilterTest {
             .stream()
             .map(GrantedAuthority::getAuthority)
             .toList();
+    }
+
+    private static final class RecordingAuthenticationEventPublisher implements AuthenticationEventPublisher {
+
+        private final List<String> failures = new ArrayList<>();
+        private int successCount;
+
+        @Override
+        public void publishAuthenticationSuccess(Authentication authentication) {
+            successCount++;
+        }
+
+        @Override
+        public void publishAuthenticationFailure(
+            AuthenticationException authenticationException, Authentication authentication) {
+
+            Class<?> exceptionClass = authenticationException.getClass();
+
+            failures.add(
+                TenantContext.getCurrentTenantId() + ":" + exceptionClass.getSimpleName() + ":" +
+                    authenticationException.getMessage());
+        }
+    }
+
+    private static final class FailingAuthenticationEventPublisher implements AuthenticationEventPublisher {
+
+        @Override
+        public void publishAuthenticationSuccess(Authentication authentication) {
+            throw new IllegalStateException("audit store unavailable");
+        }
+
+        @Override
+        public void publishAuthenticationFailure(
+            AuthenticationException authenticationException, Authentication authentication) {
+
+            throw new IllegalStateException("audit store unavailable");
+        }
     }
 }

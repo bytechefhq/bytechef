@@ -49,13 +49,8 @@ public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvi
         PlatformApiKeyAuthenticationToken platformApiKeyAuthenticationToken =
             (PlatformApiKeyAuthenticationToken) authentication;
 
-        ApiKey apiKey;
-
-        try {
-            apiKey = apiKeyService.getApiKey(platformApiKeyAuthenticationToken.getSecretKey());
-        } catch (IllegalArgumentException e) {
-            throw new BadCredentialsException("Unknown API secret key", e);
-        }
+        ApiKey apiKey = apiKeyService.fetchApiKey(platformApiKeyAuthenticationToken.getSecretKey())
+            .orElseThrow(() -> new BadCredentialsException("Unknown API secret key"));
 
         if (apiKey.getType() != null) {
             throw new BadCredentialsException("Admin API key required");

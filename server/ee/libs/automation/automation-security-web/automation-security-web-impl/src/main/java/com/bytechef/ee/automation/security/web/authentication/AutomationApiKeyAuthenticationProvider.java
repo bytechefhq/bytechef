@@ -49,15 +49,10 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
         AutomationApiKeyAuthenticationToken automationApiKeyAuthenticationToken =
             (AutomationApiKeyAuthenticationToken) authentication;
 
-        ApiKey apiKey;
-
-        try {
-            apiKey = apiKeyService.getApiKey(
-                automationApiKeyAuthenticationToken.getSecretKey(),
-                automationApiKeyAuthenticationToken.getEnvironmentId());
-        } catch (IllegalArgumentException e) {
-            throw new BadCredentialsException("Unknown API secret key", e);
-        }
+        ApiKey apiKey = apiKeyService
+            .fetchApiKey(automationApiKeyAuthenticationToken.getSecretKey(),
+                automationApiKeyAuthenticationToken.getEnvironmentId())
+            .orElseThrow(() -> new BadCredentialsException("Unknown API secret key"));
 
         Long userId = apiKey.getUserId();
 

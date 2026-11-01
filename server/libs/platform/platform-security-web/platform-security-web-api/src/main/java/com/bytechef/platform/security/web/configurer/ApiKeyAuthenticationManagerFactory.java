@@ -17,6 +17,8 @@
 package com.bytechef.platform.security.web.configurer;
 
 import com.bytechef.platform.security.web.authentication.CredentialAuthenticationEventPublisher;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -38,26 +40,50 @@ public final class ApiKeyAuthenticationManagerFactory {
     }
 
     public static AuthenticationManager create(HttpSecurity http, AuthenticationProvider authenticationProvider) {
+        return create(authenticationProvider, createAuthenticationEventPublisher(http));
+    }
+
+    public static AuthenticationManager create(
+        AuthenticationProvider authenticationProvider,
+        @Nullable AuthenticationEventPublisher authenticationEventPublisher) {
+
         ProviderManager providerManager = new ProviderManager(authenticationProvider);
 
-        ApplicationContext applicationContext = http.getSharedObject(ApplicationContext.class);
-
-        if (applicationContext != null) {
-            ObjectProvider<AuthenticationEventPublisher> authenticationEventPublisherProvider =
-                applicationContext.getBeanProvider(AuthenticationEventPublisher.class);
-
-            AuthenticationEventPublisher authenticationEventPublisher =
-                authenticationEventPublisherProvider.getIfUnique();
-
-            if (authenticationEventPublisher == null) {
-                log.warn(
-                    "No unique AuthenticationEventPublisher bean; API key authentication failures are not audited");
-            }
-
-            providerManager.setAuthenticationEventPublisher(
-                new CredentialAuthenticationEventPublisher(applicationContext, authenticationEventPublisher));
+        if (authenticationEventPublisher != null) {
+            providerManager.setAuthenticationEventPublisher(authenticationEventPublisher);
         }
 
         return providerManager;
+    }
+
+    public static @Nullable AuthenticationEventPublisher createAuthenticationEventPublisher(HttpSecurity http) {
+        ApplicationContext applicationContext = http.getSharedObject(ApplicationContext.class);
+
+        if (applicationContext == null) {
+            log.warn("No ApplicationContext shared with HttpSecurity; API key authentications are not audited");
+
+            return null;
+        }
+
+        ObjectProvider<AuthenticationEventPublisher> authenticationEventPublisherProvider =
+            applicationContext.getBeanProvider(AuthenticationEventPublisher.class);
+
+        AuthenticationEventPublisher authenticationEventPublisher = authenticationEventPublisherProvider.getIfUnique();
+
+        if (authenticationEventPublisher == null) {
+            List<AuthenticationEventPublisher> authenticationEventPublishers = authenticationEventPublisherProvider
+                .stream()
+                .toList();
+
+            if (!authenticationEventPublishers.isEmpty()) {
+                throw new IllegalStateException(
+                    "Expected a single or primary AuthenticationEventPublisher bean, found " +
+                        authenticationEventPublishers.size() + "; API key authentication failures cannot be audited");
+            }
+
+            log.warn("No AuthenticationEventPublisher bean; API key authentication failures are not audited");
+        }
+
+        return new CredentialAuthenticationEventPublisher(applicationContext, authenticationEventPublisher);
     }
 }

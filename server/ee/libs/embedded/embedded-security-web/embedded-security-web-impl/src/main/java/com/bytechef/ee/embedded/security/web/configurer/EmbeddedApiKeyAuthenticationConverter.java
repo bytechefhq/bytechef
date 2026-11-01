@@ -100,14 +100,20 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
             if (matcher.matches()) {
                 externalUserId = matcher.group(1);
             } else {
-                throw new IllegalArgumentException("externalUserId parameter is required");
+                throw new BadCredentialsException("externalUserId parameter is required");
             }
 
             if (ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(externalUserId)) {
                 throw new BadCredentialsException("Non-JWT tokens are not accepted on this endpoint");
             }
 
-            TenantKey tenantKey = TenantKey.parse(authToken);
+            TenantKey tenantKey;
+
+            try {
+                tenantKey = TenantKey.parse(authToken);
+            } catch (IllegalArgumentException illegalArgumentException) {
+                throw new BadCredentialsException("Invalid API key", illegalArgumentException);
+            }
 
             return new EmbeddedApiKeyAuthenticationToken(
                 environment.ordinal(), externalUserId, authToken, tenantKey.getTenantId());

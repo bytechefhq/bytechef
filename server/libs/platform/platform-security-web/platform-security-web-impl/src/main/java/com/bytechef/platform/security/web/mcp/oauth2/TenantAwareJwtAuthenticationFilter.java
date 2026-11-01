@@ -41,11 +41,16 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -114,7 +119,9 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         Optional<McpEndpoint> mcpEndpoint = mcpEndpointRequestMatcher.findMcpEndpoint(request);
 
         if (mcpEndpoint.isEmpty()) {
-            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+            reject(
+                request, response, HttpServletResponse.SC_UNAUTHORIZED, jwtAuthenticationToken, null,
+                new BadCredentialsException("No MCP endpoint matches the request"));
 
             return;
         }
@@ -131,18 +138,22 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             tenantId = resolveTenantId(request, mcpEndpoint.get(), jwt, staticIssuer.orElse(null));
         } catch (IllegalArgumentException illegalArgumentException) {
             log.warn(
-                "Rejecting MCP JWT for {}: {}", request.getServletPath(), illegalArgumentException.getMessage(),
+                "Rejecting MCP JWT for a {} request: {}", request.getMethod(), illegalArgumentException.getMessage(),
                 illegalArgumentException);
 
-            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+            reject(
+                request, response, HttpServletResponse.SC_UNAUTHORIZED, jwtAuthenticationToken, null,
+                new BadCredentialsException(illegalArgumentException.getMessage(), illegalArgumentException));
 
             return;
         } catch (IllegalStateException illegalStateException) {
             log.error(
-                "Rejecting MCP JWT for {}: {}", request.getServletPath(), illegalStateException.getMessage(),
+                "Rejecting MCP JWT for a {} request: {}", request.getMethod(), illegalStateException.getMessage(),
                 illegalStateException);
 
-            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+            reject(
+                request, response, HttpServletResponse.SC_UNAUTHORIZED, jwtAuthenticationToken, null,
+                new BadCredentialsException(illegalStateException.getMessage(), illegalStateException));
 
             return;
         }
@@ -152,11 +163,9 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             mcpServerSecretVerified = isMcpServerSecretVerified(request, tenantId);
         } catch (RuntimeException runtimeException) {
-            log.error(
-                "Rejecting MCP JWT for {}: MCP server secret verification failed in tenant {}",
-                request.getServletPath(), tenantId, runtimeException);
-
-            reject(request, response, HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            rejectServiceUnavailable(
+                request, response, jwtAuthenticationToken, tenantId, "MCP server secret verification failed",
+                runtimeException);
 
             return;
         }
@@ -164,17 +173,29 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         String mcpServerDisabledMessage = null;
 
         if (!mcpServerSecretVerified) {
-            mcpServerDisabledMessage = getMcpServerDisabledMessage(request, tenantId);
+            try {
+                mcpServerDisabledMessage = getMcpServerDisabledMessage(request, tenantId);
+            } catch (RuntimeException runtimeException) {
+                rejectServiceUnavailable(
+                    request, response, jwtAuthenticationToken, tenantId, "MCP server disabled check failed",
+                    runtimeException);
+
+                return;
+            }
 
             if (mcpServerDisabledMessage == null) {
-                reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+                reject(
+                    request, response, HttpServletResponse.SC_UNAUTHORIZED, jwtAuthenticationToken, tenantId,
+                    new BadCredentialsException("Invalid MCP server secret key"));
 
                 return;
             }
         }
 
         if (staticIssuer.isEmpty()) {
-            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+            reject(
+                request, response, HttpServletResponse.SC_UNAUTHORIZED, jwtAuthenticationToken, tenantId,
+                new BadCredentialsException("Untrusted token issuer"));
 
             return;
         }
@@ -194,22 +215,31 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        List<GrantedAuthority> authorities = issuer.isSelf()
-            ? getSelfIssuedAuthorities(mcpJwtIdentity) : mcpJwtIdentity.authorities();
+        List<GrantedAuthority> authorities;
+
+        try {
+            authorities = issuer.isSelf() ? getSelfIssuedAuthorities(mcpJwtIdentity) : mcpJwtIdentity.authorities();
+        } catch (RuntimeException runtimeException) {
+            rejectServiceUnavailable(
+                request, response, jwtAuthenticationToken, mcpJwtIdentity.tenantId(), "Authority lookup failed",
+                runtimeException);
+
+            return;
+        }
 
         JwtAuthenticationToken authentication = new JwtAuthenticationToken(
             jwt, new org.springframework.security.core.userdetails.User(mcpJwtIdentity.login(), "", authorities),
             authorities);
-
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-
-        securityContext.setAuthentication(authentication);
 
         if (authenticationEventPublisher != null) {
             TenantContext.runWithTenantId(
                 mcpJwtIdentity.tenantId(),
                 () -> authenticationEventPublisher.publishAuthenticationSuccess(authentication));
         }
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(authentication);
 
         TenantContext.runWithTenantId(
             mcpJwtIdentity.tenantId(), () -> filterChain.doFilter(request, response));
@@ -221,7 +251,9 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         Jwt jwt, Issuer issuer, McpEndpoint mcpEndpoint, String tenantId) {
 
         if (!hasScope(jwtAuthenticationToken, mcpEndpoint.getScope())) {
-            reject(request, response, HttpServletResponse.SC_FORBIDDEN);
+            reject(
+                request, response, HttpServletResponse.SC_FORBIDDEN, jwtAuthenticationToken, tenantId,
+                new BadCredentialsException("Insufficient scope"));
 
             return null;
         }
@@ -229,22 +261,40 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         if (!mcpAudienceValidator.isAudienceValid(
             jwt, issuer, McpProtectedResourceUrls.resolveResourceUrl(publicUrl, request))) {
 
-            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
-
-            return null;
-        }
-
-        if (issuer.isSelf() && !isActiveByteChefUser(jwt.getSubject(), tenantId)) {
-            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+            reject(
+                request, response, HttpServletResponse.SC_UNAUTHORIZED, jwtAuthenticationToken, tenantId,
+                new BadCredentialsException("Invalid audience"));
 
             return null;
         }
 
         if (issuer.isSelf()) {
-            Integer revocationErrorStatus = getRevocationErrorStatus(jwt, tenantId);
+            AuthenticationException userRejection;
 
-            if (revocationErrorStatus != null) {
-                reject(request, response, revocationErrorStatus);
+            try {
+                userRejection = getUserRejection(jwt.getSubject(), tenantId);
+            } catch (RuntimeException runtimeException) {
+                rejectServiceUnavailable(
+                    request, response, jwtAuthenticationToken, tenantId, "User status check failed",
+                    runtimeException);
+
+                return null;
+            }
+
+            if (userRejection != null) {
+                reject(
+                    request, response, HttpServletResponse.SC_UNAUTHORIZED, jwtAuthenticationToken, tenantId,
+                    userRejection);
+
+                return null;
+            }
+
+            RevocationRejection revocationRejection = getRevocationRejection(jwt, tenantId);
+
+            if (revocationRejection != null) {
+                reject(
+                    request, response, revocationRejection.status(), jwtAuthenticationToken, tenantId,
+                    revocationRejection.authenticationException());
 
                 return null;
             }
@@ -253,13 +303,26 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             return mcpJwtIdentityMapper.map(jwt, issuer, jwtAuthenticationToken.getAuthorities(), tenantId);
         } catch (OAuth2AuthenticationException oAuth2AuthenticationException) {
-            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+            reject(
+                request, response, HttpServletResponse.SC_UNAUTHORIZED, jwtAuthenticationToken, tenantId,
+                new BadCredentialsException(oAuth2AuthenticationException.getMessage(), oAuth2AuthenticationException));
+
+            return null;
+        } catch (RuntimeException runtimeException) {
+            rejectServiceUnavailable(
+                request, response, jwtAuthenticationToken, tenantId, "Identity mapping failed", runtimeException);
 
             return null;
         }
     }
 
-    private void reject(HttpServletRequest request, HttpServletResponse response, int status) {
+    private void reject(
+        HttpServletRequest request, HttpServletResponse response, int status,
+        JwtAuthenticationToken jwtAuthenticationToken, @Nullable String tenantId,
+        AuthenticationException authenticationException) {
+
+        publishAuthenticationFailure(jwtAuthenticationToken, tenantId, authenticationException);
+
         if (status == HttpServletResponse.SC_UNAUTHORIZED) {
             mcpAuthenticationEntryPoint.sendChallenge(
                 request, response, status,
@@ -271,6 +334,39 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         } else {
             response.setStatus(status);
         }
+    }
+
+    private void rejectServiceUnavailable(
+        HttpServletRequest request, HttpServletResponse response, JwtAuthenticationToken jwtAuthenticationToken,
+        String tenantId, String message, RuntimeException runtimeException) {
+
+        log.error(
+            "Rejecting MCP JWT for a {} request: {} in tenant {}", request.getMethod(), message, tenantId,
+            runtimeException);
+
+        reject(
+            request, response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, jwtAuthenticationToken, tenantId,
+            new AuthenticationServiceException(message, runtimeException));
+    }
+
+    private void publishAuthenticationFailure(
+        JwtAuthenticationToken jwtAuthenticationToken, @Nullable String tenantId,
+        AuthenticationException authenticationException) {
+
+        if (authenticationEventPublisher == null) {
+            return;
+        }
+
+        if (tenantId == null) {
+            authenticationEventPublisher.publishAuthenticationFailure(authenticationException, jwtAuthenticationToken);
+
+            return;
+        }
+
+        TenantContext.runWithTenantId(
+            tenantId,
+            () -> authenticationEventPublisher.publishAuthenticationFailure(
+                authenticationException, jwtAuthenticationToken));
     }
 
     private static String resolveTenantId(
@@ -304,21 +400,13 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Nullable
     private String getMcpServerDisabledMessage(HttpServletRequest request, String tenantId) {
-        try {
-            return TenantContext.callWithTenantId(
-                tenantId,
-                () -> mcpServerSecretVerifiers.stream()
-                    .map(mcpServerSecretVerifier -> mcpServerSecretVerifier.getMcpServerDisabledMessage(request))
-                    .flatMap(Optional::stream)
-                    .findFirst()
-                    .orElse(null));
-        } catch (RuntimeException runtimeException) {
-            log.error(
-                "MCP server disabled check failed for {} in tenant {}", request.getServletPath(), tenantId,
-                runtimeException);
-
-            return null;
-        }
+        return TenantContext.callWithTenantId(
+            tenantId,
+            () -> mcpServerSecretVerifiers.stream()
+                .map(mcpServerSecretVerifier -> mcpServerSecretVerifier.getMcpServerDisabledMessage(request))
+                .flatMap(Optional::stream)
+                .findFirst()
+                .orElse(null));
     }
 
     private boolean isMcpServerSecretVerified(HttpServletRequest request, String tenantId) {
@@ -349,20 +437,32 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         return authorities;
     }
 
-    private boolean isActiveByteChefUser(String login, String tenantId) {
-        return TenantContext.callWithTenantId(
-            tenantId,
-            () -> userService.fetchUserByLogin(login)
-                .map(User::isActivated)
-                .orElse(false));
+    @Nullable
+    private AuthenticationException getUserRejection(String login, String tenantId) {
+        Optional<User> userOptional = TenantContext.callWithTenantId(
+            tenantId, () -> userService.fetchUserByLogin(login));
+
+        if (userOptional.isEmpty()) {
+            return new UsernameNotFoundException("User not found");
+        }
+
+        User user = userOptional.get();
+
+        if (!user.isActivated()) {
+            return new DisabledException("User is not active");
+        }
+
+        return null;
     }
 
     @Nullable
-    private Integer getRevocationErrorStatus(Jwt jwt, String tenantId) {
+    private RevocationRejection getRevocationRejection(Jwt jwt, String tenantId) {
         if (selfIssuedTokenRevocationChecker == null) {
             log.error("Rejecting self-issued MCP token: no SelfIssuedTokenRevocationChecker is configured");
 
-            return HttpServletResponse.SC_UNAUTHORIZED;
+            return new RevocationRejection(
+                HttpServletResponse.SC_UNAUTHORIZED,
+                new AuthenticationServiceException("No token revocation checker is configured"));
         }
 
         boolean revoked;
@@ -373,10 +473,17 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             log.error(
                 "Rejecting self-issued MCP token: revocation check failed for tenant {}", tenantId, runtimeException);
 
-            return HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+            return new RevocationRejection(
+                HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+                new AuthenticationServiceException("Token revocation check failed", runtimeException));
         }
 
-        return revoked ? Integer.valueOf(HttpServletResponse.SC_UNAUTHORIZED) : null;
+        if (revoked) {
+            return new RevocationRejection(
+                HttpServletResponse.SC_UNAUTHORIZED, new BadCredentialsException("Token is revoked"));
+        }
+
+        return null;
     }
 
     @Nullable
@@ -395,5 +502,8 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     private static boolean hasScope(JwtAuthenticationToken jwtAuthenticationToken, String scope) {
         return jwtAuthenticationToken.getAuthorities()
             .contains(new SimpleGrantedAuthority(SCOPE_AUTHORITY_PREFIX + scope));
+    }
+
+    private record RevocationRejection(int status, AuthenticationException authenticationException) {
     }
 }

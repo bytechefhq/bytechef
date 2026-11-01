@@ -16,6 +16,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.CredentialAuthenticationSuccessEvent;
 import com.bytechef.platform.security.web.authentication.CredentialType;
+import com.bytechef.platform.security.web.authentication.FailureLogRateLimiter;
 import com.bytechef.platform.security.web.authentication.TenantPrincipal;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
 import com.bytechef.tenant.TenantContext;
@@ -27,9 +28,9 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalLong;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,9 +63,8 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
 
     private final AuditEventRepository auditEventRepository;
     private final Clock clock;
-    private final AtomicLong nextFailureLogMillis = new AtomicLong(Long.MIN_VALUE);
+    private final FailureLogRateLimiter failureLogRateLimiter;
     private final @Nullable ConcurrentMap<CredentialKey, Long> recordedCredentials;
-    private final AtomicLong suppressedFailures = new AtomicLong();
 
     @Autowired
     @SuppressFBWarnings("EI")
@@ -85,6 +85,7 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
 
         this.auditEventRepository = auditEventRepository;
         this.clock = clock;
+        this.failureLogRateLimiter = new FailureLogRateLimiter(clock, FAILURE_LOG_INTERVAL);
         this.recordedCredentials = createRecordedCredentials(credentialUsageInterval, clock, maxTrackedCredentials);
     }
 
@@ -152,27 +153,21 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
                 recordedCredentials.remove(credentialKey, nowMillis);
             }
 
-            logPersistenceFailure(principal, credentialKey, nowMillis, exception);
+            logPersistenceFailure(principal, credentialKey, exception);
         }
     }
 
-    private void logPersistenceFailure(
-        String principal, CredentialKey credentialKey, long nowMillis, RuntimeException exception) {
+    private void logPersistenceFailure(String principal, CredentialKey credentialKey, RuntimeException exception) {
+        OptionalLong suppressedFailures = failureLogRateLimiter.tryAcquire();
 
-        long nextLogMillis = nextFailureLogMillis.get();
-
-        if (nowMillis < nextLogMillis ||
-            !nextFailureLogMillis.compareAndSet(nextLogMillis, nowMillis + FAILURE_LOG_INTERVAL.toMillis())) {
-
-            suppressedFailures.incrementAndGet();
-
+        if (suppressedFailures.isEmpty()) {
             return;
         }
 
         log.error(
             "AUDIT PERSISTENCE FAILURE: {} for {} was not recorded; the request is unaffected; {} similar failures " +
                 "suppressed since the last report: {}",
-            CREDENTIAL_USED, principal, suppressedFailures.getAndSet(0), credentialKey, exception);
+            CREDENTIAL_USED, principal, suppressedFailures.getAsLong(), credentialKey, exception);
     }
 
     private boolean markRecorded(CredentialKey credentialKey, long nowMillis) {
@@ -187,7 +182,6 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
         Duration credentialUsageInterval, Clock clock, long maxTrackedCredentials) {
 
         if (credentialUsageInterval.isZero() || credentialUsageInterval.isNegative()) {
-
             return null;
         }
 

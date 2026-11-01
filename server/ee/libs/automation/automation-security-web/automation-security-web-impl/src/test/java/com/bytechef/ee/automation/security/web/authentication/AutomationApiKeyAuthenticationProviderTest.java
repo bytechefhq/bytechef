@@ -22,6 +22,7 @@ import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -33,6 +34,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 class AutomationApiKeyAuthenticationProviderTest {
 
     private static final String SECRET_KEY = "secret-key-value";
+
+    @Test
+    void testUnknownSecretKeyIsRejectedAsBadCredentials() {
+        assertThatThrownBy(
+            () -> newProvider(true, true).authenticate(new AutomationApiKeyAuthenticationToken(0, "unknown", "public")))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Unknown API secret key");
+    }
 
     @Test
     void testAuthenticatedTokenCarriesTheApiKeyId() {
@@ -68,7 +77,7 @@ class AutomationApiKeyAuthenticationProviderTest {
 
         ApiKeyService apiKeyService = mock(ApiKeyService.class);
 
-        when(apiKeyService.getApiKey(SECRET_KEY, 0L)).thenReturn(apiKey);
+        when(apiKeyService.fetchApiKey(SECRET_KEY, 0L)).thenReturn(Optional.of(apiKey));
 
         User user = mock(User.class);
 

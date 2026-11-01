@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.configurer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.security.web.authentication.CredentialAuthenticationSuccessEvent;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -64,7 +66,18 @@ class ApiKeyAuthenticationManagerFactoryTest {
         when(httpSecurity.getSharedObject(ApplicationContext.class)).thenReturn(applicationContext);
         when(applicationContext.getBeanProvider(AuthenticationEventPublisher.class))
             .thenReturn(authenticationEventPublisherProvider);
+        when(authenticationEventPublisherProvider.stream()).thenAnswer(invocation -> Stream.empty());
         when(authenticationProvider.supports(any())).thenReturn(true);
+    }
+
+    @Test
+    void testAmbiguousAuthenticationEventPublishersFailFast() {
+        when(authenticationEventPublisherProvider.stream()).thenAnswer(
+            invocation -> Stream.of(authenticationEventPublisher, mock(AuthenticationEventPublisher.class)));
+
+        assertThatThrownBy(() -> ApiKeyAuthenticationManagerFactory.create(httpSecurity, authenticationProvider))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("found 2");
     }
 
     @Test
@@ -108,6 +121,22 @@ class ApiKeyAuthenticationManagerFactoryTest {
 
         verify(authenticationEventPublisher, times(2)).publishAuthenticationFailure(any(), any());
         verify(applicationContext, never()).publishEvent(any(ApplicationEvent.class));
+    }
+
+    @Test
+    void testFailingFailureAuditKeepsTheAuthenticationException() {
+        when(authenticationEventPublisherProvider.getIfUnique()).thenReturn(authenticationEventPublisher);
+        when(authenticationProvider.authenticate(any())).thenThrow(new BadCredentialsException("Invalid API key"));
+
+        doThrow(new IllegalStateException("audit store unavailable"))
+            .when(authenticationEventPublisher)
+            .publishAuthenticationFailure(any(), any());
+
+        AuthenticationManager authenticationManager =
+            ApiKeyAuthenticationManagerFactory.create(httpSecurity, authenticationProvider);
+
+        assertThatThrownBy(() -> authenticationManager.authenticate(new TestingAuthenticationToken("secret", "secret")))
+            .isInstanceOf(BadCredentialsException.class);
     }
 
     @Test

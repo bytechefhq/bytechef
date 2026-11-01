@@ -25,6 +25,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,12 @@ public class McpServerServiceImpl implements McpServerService {
     public McpServer getMcpServer(String secretKey) {
         return mcpServerRepository.findBySecretKey(secretKey)
             .orElseThrow(() -> new IllegalArgumentException("MCP server for the given secret key not found"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<McpServer> fetchMcpServer(String secretKey) {
+        return mcpServerRepository.findBySecretKey(secretKey);
     }
 
     @Override

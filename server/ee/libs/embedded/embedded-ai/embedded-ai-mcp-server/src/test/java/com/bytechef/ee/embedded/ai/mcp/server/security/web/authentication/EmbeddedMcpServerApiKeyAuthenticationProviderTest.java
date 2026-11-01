@@ -23,6 +23,8 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
+import com.bytechef.platform.security.web.authentication.CredentialType;
+import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import java.util.Optional;
@@ -37,6 +39,7 @@ import org.springframework.security.core.Authentication;
  */
 class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
 
+    private static final Long CONNECTED_USER_ID = 77L;
     private static final long ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
     private static final String EXTERNAL_USER_ID = "ext-user-1";
     private static final long MCP_SERVER_ID = 1050L;
@@ -85,13 +88,26 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
 
     @Test
     void testAuthenticateRejectsUnknownMcpServerSecretKey() {
-        when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY))
-            .thenThrow(new IllegalArgumentException("MCP server for the given secret key not found"));
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(BadCredentialsException.class)
             .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
                 new EmbeddedMcpServerApiKeyAuthenticationToken(
                     ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY)));
+    }
+
+    @Test
+    void testAuthenticateLetsAServerLookupFailurePropagate() {
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_SECRET_KEY))
+            .thenThrow(new IllegalStateException("database down"));
+
+        EmbeddedMcpServerApiKeyAuthenticationToken embeddedMcpServerApiKeyAuthenticationToken =
+            new EmbeddedMcpServerApiKeyAuthenticationToken(
+                ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY);
+
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+                embeddedMcpServerApiKeyAuthenticationToken));
     }
 
     @Test
@@ -179,6 +195,7 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
 
         ConnectedUser connectedUser = mock(ConnectedUser.class);
 
+        when(connectedUser.getId()).thenReturn(CONNECTED_USER_ID);
         when(connectedUser.isEnabled()).thenReturn(true);
         when(connectedUser.getExternalId()).thenReturn(EXTERNAL_USER_ID);
         when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID))
@@ -191,6 +208,24 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
         assertThat(authentication).isInstanceOf(EmbeddedMcpServerApiKeyAuthenticationToken.class);
         assertThat(authentication.isAuthenticated()).isTrue();
         assertThat(authentication.getName()).isEqualTo(EXTERNAL_USER_ID);
+
+        EmbeddedMcpServerApiKeyAuthenticationToken embeddedMcpServerApiKeyAuthenticationToken =
+            (EmbeddedMcpServerApiKeyAuthenticationToken) authentication;
+
+        assertThat(embeddedMcpServerApiKeyAuthenticationToken.getConnectedUserId()).isEqualTo(CONNECTED_USER_ID);
+        assertThat(embeddedMcpServerApiKeyAuthenticationToken.getCredentialType())
+            .isEqualTo(CredentialType.EMBEDDED_MCP_SERVER_API_KEY);
+    }
+
+    @Test
+    void testUnauthenticatedTokenHasNoConnectedUserAndAnUnresolvedName() {
+        EmbeddedMcpServerApiKeyAuthenticationToken embeddedMcpServerApiKeyAuthenticationToken =
+            new EmbeddedMcpServerApiKeyAuthenticationToken(
+                ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY);
+
+        assertThat(embeddedMcpServerApiKeyAuthenticationToken.getConnectedUserId()).isNull();
+        assertThat(embeddedMcpServerApiKeyAuthenticationToken.getName())
+            .isEqualTo(UnresolvedCredentialAuthenticationToken.PRINCIPAL);
     }
 
     @Test
@@ -254,6 +289,6 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
         when(mcpServer.getType()).thenReturn(type);
         when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
         when(mcpServer.isEnabled()).thenReturn(enabled);
-        when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(Optional.of(mcpServer));
     }
 }

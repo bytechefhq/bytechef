@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.security.web.configurer;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -16,22 +17,36 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.authentication.CredentialAuthenticationSuccessEvent;
+import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.domain.TenantKey;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ContextConfiguration;
@@ -63,6 +78,9 @@ class PlatformApiKeySecurityConfigurerIntTest {
     private ApiKeyService apiKeyService;
 
     @Autowired
+    private AuthenticationEventRecorder authenticationEventRecorder;
+
+    @Autowired
     private AuthorityService authorityService;
 
     @Autowired
@@ -77,9 +95,18 @@ class PlatformApiKeySecurityConfigurerIntTest {
     void beforeEach() {
         reset(apiKeyService, authorityService, userService);
 
+        authenticationEventRecorder.clear();
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply(SecurityMockMvcConfigurers.springSecurity())
             .build();
+    }
+
+    @AfterEach
+    void afterEach() {
+        assertThat(authenticationEventRecorder.getStoredFailureTexts())
+            .noneMatch(storedFailureText -> storedFailureText.contains(API_SECRET_KEY))
+            .noneMatch(storedFailureText -> storedFailureText.contains("not-a-tenant-key"));
     }
 
     @Test
@@ -131,12 +158,62 @@ class PlatformApiKeySecurityConfigurerIntTest {
                 .isUnauthorized());
     }
 
+    @Test
+    void testAdminApiKeyPublishesOneCredentialSuccessAndNoSpringSuccess() throws Exception {
+        mockApiKey(null);
+
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.get(PLATFORM_PATH)
+                    .servletPath(PLATFORM_PATH)
+                    .header("Authorization", "Bearer " + API_SECRET_KEY))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk());
+
+        assertThat(authenticationEventRecorder.getPrincipals(CredentialAuthenticationSuccessEvent.class))
+            .containsExactly("admin@localhost.com");
+        assertThat(authenticationEventRecorder.getPrincipals(AuthenticationSuccessEvent.class)).isEmpty();
+        assertThat(authenticationEventRecorder.getPrincipals(AbstractAuthenticationFailureEvent.class)).isEmpty();
+    }
+
+    @Test
+    void testAutomationApiKeyPublishesAFailureForTheUnresolvedCredential() throws Exception {
+        mockApiKey(PlatformType.AUTOMATION);
+
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.get(PLATFORM_PATH)
+                    .servletPath(PLATFORM_PATH)
+                    .header("Authorization", "Bearer " + API_SECRET_KEY))
+            .andExpect(MockMvcResultMatchers.status()
+                .isUnauthorized());
+
+        assertThat(authenticationEventRecorder.getPrincipals(AbstractAuthenticationFailureEvent.class))
+            .containsExactly(UnresolvedCredentialAuthenticationToken.PRINCIPAL);
+        assertThat(authenticationEventRecorder.getPrincipals(CredentialAuthenticationSuccessEvent.class)).isEmpty();
+    }
+
+    @Test
+    void testUnparseableApiKeyPublishesAFailureForTheUnresolvedCredential() throws Exception {
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.get(PLATFORM_PATH)
+                    .servletPath(PLATFORM_PATH)
+                    .header("Authorization", "Bearer not-a-tenant-key"))
+            .andExpect(MockMvcResultMatchers.status()
+                .isUnauthorized());
+
+        assertThat(authenticationEventRecorder.getPrincipals(AbstractAuthenticationFailureEvent.class))
+            .containsExactly(UnresolvedCredentialAuthenticationToken.PRINCIPAL);
+        assertThat(authenticationEventRecorder.getPrincipals(CredentialAuthenticationSuccessEvent.class)).isEmpty();
+    }
+
     private void mockApiKey(PlatformType type) {
         ApiKey apiKey = mock(ApiKey.class);
 
         when(apiKey.getType()).thenReturn(type);
         when(apiKey.getUserId()).thenReturn(100L);
-        when(apiKeyService.getApiKey(anyString())).thenReturn(apiKey);
+        when(apiKeyService.fetchApiKey(anyString())).thenReturn(Optional.of(apiKey));
 
         User user = mock(User.class);
 
@@ -156,6 +233,16 @@ class PlatformApiKeySecurityConfigurerIntTest {
     @EnableWebMvc
     @EnableWebSecurity
     static class SecurityFilterChainTestConfiguration {
+
+        @Bean
+        AuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+            return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
+        }
+
+        @Bean
+        AuthenticationEventRecorder authenticationEventRecorder() {
+            return new AuthenticationEventRecorder();
+        }
 
         @Bean
         ApiKeyService apiKeyService() {
@@ -193,6 +280,68 @@ class PlatformApiKeySecurityConfigurerIntTest {
                         apiKeyService, () -> List.of(Environment.values()), authorityService, userService),
                     Customizer.withDefaults())
                 .build();
+        }
+    }
+
+    static class AuthenticationEventRecorder implements ApplicationListener<ApplicationEvent> {
+
+        private final List<ApplicationEvent> applicationEvents = new CopyOnWriteArrayList<>();
+
+        @Override
+        public void onApplicationEvent(ApplicationEvent applicationEvent) {
+            if (applicationEvent instanceof AbstractAuthenticationEvent ||
+                applicationEvent instanceof CredentialAuthenticationSuccessEvent) {
+
+                applicationEvents.add(applicationEvent);
+            }
+        }
+
+        void clear() {
+            applicationEvents.clear();
+        }
+
+        List<String> getStoredFailureTexts() {
+            List<String> storedFailureTexts = new ArrayList<>();
+
+            for (ApplicationEvent applicationEvent : applicationEvents) {
+                if (!(applicationEvent instanceof AbstractAuthenticationFailureEvent failureEvent)) {
+                    continue;
+                }
+
+                Authentication authentication = failureEvent.getAuthentication();
+
+                storedFailureTexts.add(authentication.getName());
+                storedFailureTexts.add(String.valueOf(authentication.getDetails()));
+
+                for (Throwable throwable = failureEvent.getException(); throwable != null; throwable =
+                    throwable.getCause()) {
+
+                    storedFailureTexts.add(throwable.getClass()
+                        .getName());
+                    storedFailureTexts.add(String.valueOf(throwable.getMessage()));
+                }
+            }
+
+            return storedFailureTexts;
+        }
+
+        List<String> getPrincipals(Class<? extends ApplicationEvent> eventType) {
+            return applicationEvents.stream()
+                .filter(eventType::isInstance)
+                .map(AuthenticationEventRecorder::getAuthentication)
+                .map(Authentication::getName)
+                .toList();
+        }
+
+        private static Authentication getAuthentication(ApplicationEvent applicationEvent) {
+            if (applicationEvent instanceof AbstractAuthenticationEvent abstractAuthenticationEvent) {
+                return abstractAuthenticationEvent.getAuthentication();
+            }
+
+            CredentialAuthenticationSuccessEvent credentialAuthenticationSuccessEvent =
+                (CredentialAuthenticationSuccessEvent) applicationEvent;
+
+            return credentialAuthenticationSuccessEvent.getAuthentication();
         }
     }
 }

@@ -44,6 +44,9 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.authentication.CredentialAuthenticationSuccessEvent;
+import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
+import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
@@ -59,8 +62,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -71,15 +76,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -125,6 +139,9 @@ class ManagementMcpServerSecurityConfigurerIntTest {
         private ApiKeyService apiKeyService;
 
         @Autowired
+        private AuthenticationEventRecorder authenticationEventRecorder;
+
+        @Autowired
         private AuthorityService authorityService;
 
         @Autowired
@@ -142,6 +159,8 @@ class ManagementMcpServerSecurityConfigurerIntTest {
         void beforeEach() {
             reset(apiKeyService, authorityService, propertyService, userService);
 
+            authenticationEventRecorder.clear();
+
             CAPTURED_TENANT_ID.set(null);
 
             mockMcpServerProperty();
@@ -149,6 +168,14 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
+        }
+
+        @AfterEach
+        void afterEach() {
+            assertThat(authenticationEventRecorder.getStoredFailureTexts())
+                .noneMatch(storedFailureText -> storedFailureText.contains(API_SECRET_KEY))
+                .noneMatch(storedFailureText -> storedFailureText.contains(CANONICAL_API_SECRET_KEY))
+                .noneMatch(storedFailureText -> storedFailureText.contains(NON_TENANT_BEARER_TOKEN));
         }
 
         @Test
@@ -357,6 +384,78 @@ class ManagementMcpServerSecurityConfigurerIntTest {
                     .isOk());
         }
 
+        @Test
+        void testValidAdminApiKeyPublishesOneCredentialSuccessAndNoSpringSuccess() throws Exception {
+            mockApiKey(null, Environment.PRODUCTION);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .header("Authorization", "Bearer " + API_SECRET_KEY))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isOk());
+
+            assertThat(authenticationEventRecorder.getPrincipals(CredentialAuthenticationSuccessEvent.class))
+                .containsExactly("admin@localhost.com");
+            assertThat(authenticationEventRecorder.getPrincipals(AuthenticationSuccessEvent.class)).isEmpty();
+            assertThat(authenticationEventRecorder.getPrincipals(AbstractAuthenticationFailureEvent.class)).isEmpty();
+        }
+
+        @Test
+        void testTypedApiKeyPublishesAFailureUnderTheApiKeyFingerprint() throws Exception {
+            mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+
+            McpApiKeyCredentials mcpApiKeyCredentials = new McpApiKeyCredentials(
+                Environment.PRODUCTION, null, API_SECRET_KEY);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/management/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .header("Authorization", "Bearer " + API_SECRET_KEY))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+
+            assertThat(authenticationEventRecorder.getPrincipals(AbstractAuthenticationFailureEvent.class))
+                .containsExactly(mcpApiKeyCredentials.getId())
+                .doesNotContain(API_SECRET_KEY);
+            assertThat(authenticationEventRecorder.getPrincipals(CredentialAuthenticationSuccessEvent.class))
+                .isEmpty();
+        }
+
+        @Test
+        void testUnparseablePathSecretPublishesAFailureForTheUnresolvedCredential() throws Exception {
+            mockApiKey(null, Environment.PRODUCTION);
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/management/wrong-secret/mcp")
+                        .servletPath("/api/management/wrong-secret/mcp")
+                        .header("Authorization", "Bearer " + API_SECRET_KEY))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+
+            assertThat(authenticationEventRecorder.getPrincipals(AbstractAuthenticationFailureEvent.class))
+                .containsExactly(UnresolvedCredentialAuthenticationToken.PRINCIPAL);
+            assertThat(authenticationEventRecorder.getPrincipals(CredentialAuthenticationSuccessEvent.class))
+                .isEmpty();
+        }
+
+        @Test
+        void testAnonymousRequestToTheCanonicalEndpointPublishesNoFailure() throws Exception {
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post(CANONICAL_MCP_PATH)
+                        .servletPath(CANONICAL_MCP_PATH))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+
+            assertThat(authenticationEventRecorder.getPrincipals(AbstractAuthenticationFailureEvent.class)).isEmpty();
+            assertThat(authenticationEventRecorder.getPrincipals(CredentialAuthenticationSuccessEvent.class))
+                .isEmpty();
+        }
+
         private static MockHttpSession createUiSession() {
             MockHttpSession mockHttpSession = new MockHttpSession();
 
@@ -422,6 +521,17 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             @Bean
             ApiKeyService apiKeyService() {
                 return mock(ApiKeyService.class);
+            }
+
+            @Bean
+            AuthenticationEventPublisher
+                authenticationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+                return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
+            }
+
+            @Bean
+            AuthenticationEventRecorder authenticationEventRecorder() {
+                return new AuthenticationEventRecorder();
             }
 
             @Bean
@@ -496,6 +606,68 @@ class ManagementMcpServerSecurityConfigurerIntTest {
                             userService),
                         Customizer.withDefaults())
                     .build();
+            }
+        }
+
+        static class AuthenticationEventRecorder implements ApplicationListener<ApplicationEvent> {
+
+            private final List<ApplicationEvent> applicationEvents = new CopyOnWriteArrayList<>();
+
+            @Override
+            public void onApplicationEvent(ApplicationEvent applicationEvent) {
+                if (applicationEvent instanceof AbstractAuthenticationEvent ||
+                    applicationEvent instanceof CredentialAuthenticationSuccessEvent) {
+
+                    applicationEvents.add(applicationEvent);
+                }
+            }
+
+            void clear() {
+                applicationEvents.clear();
+            }
+
+            List<String> getStoredFailureTexts() {
+                List<String> storedFailureTexts = new ArrayList<>();
+
+                for (ApplicationEvent applicationEvent : applicationEvents) {
+                    if (!(applicationEvent instanceof AbstractAuthenticationFailureEvent failureEvent)) {
+                        continue;
+                    }
+
+                    Authentication authentication = failureEvent.getAuthentication();
+
+                    storedFailureTexts.add(authentication.getName());
+                    storedFailureTexts.add(String.valueOf(authentication.getDetails()));
+
+                    for (Throwable throwable = failureEvent.getException(); throwable != null; throwable =
+                        throwable.getCause()) {
+
+                        storedFailureTexts.add(throwable.getClass()
+                            .getName());
+                        storedFailureTexts.add(String.valueOf(throwable.getMessage()));
+                    }
+                }
+
+                return storedFailureTexts;
+            }
+
+            List<String> getPrincipals(Class<? extends ApplicationEvent> eventType) {
+                return applicationEvents.stream()
+                    .filter(eventType::isInstance)
+                    .map(AuthenticationEventRecorder::getAuthentication)
+                    .map(Authentication::getName)
+                    .toList();
+            }
+
+            private static Authentication getAuthentication(ApplicationEvent applicationEvent) {
+                if (applicationEvent instanceof AbstractAuthenticationEvent abstractAuthenticationEvent) {
+                    return abstractAuthenticationEvent.getAuthentication();
+                }
+
+                CredentialAuthenticationSuccessEvent credentialAuthenticationSuccessEvent =
+                    (CredentialAuthenticationSuccessEvent) applicationEvent;
+
+                return credentialAuthenticationSuccessEvent.getAuthentication();
             }
         }
     }
@@ -673,6 +845,8 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
             doReturn(mcpServer).when(mcpServerService)
                 .getMcpServer(AUTOMATION_MCP_SERVER_SECRET_KEY);
+            doReturn(Optional.of(mcpServer)).when(mcpServerService)
+                .fetchMcpServer(AUTOMATION_MCP_SERVER_SECRET_KEY);
         }
 
         @Configuration
