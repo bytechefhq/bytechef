@@ -1,0 +1,129 @@
+---
+title: "Tool Invocations"
+description: "A log of the tools and actions your connected users' AI agents and your own code ran through ByteChef - which one ran, for whom, how it ended, and how long it took."
+---
+
+When a connected user's AI agent calls a tool on an [embedded MCP server](/platform/embedded/configure/mcp-servers),
+or your backend executes an action or a tool through the [Component Kit](/platform/embedded/build/component-kit),
+ByteChef records the call. **Tool Invocations** lists those records, so you can see which tools your
+customers use, which ones fail, and how long they take. Open it from **Tool Invocations** in the left
+sidebar, next to **Workflow Executions**.
+
+The page is available on Enterprise Edition only.
+
+<Callout type="info">
+    A record holds the identity and outcome of a call only: which tool or action ran, for which
+    connected user, how it ended, and how long it took. The input parameters and the output are never
+    stored.
+</Callout>
+
+---
+
+## What is recorded
+
+A record is written for every call made on behalf of a connected user through one of three surfaces:
+
+| Surface | Calls recorded |
+|---|---|
+| **Embedded MCP** | Component tools and workflow tools an AI agent calls through an embedded MCP server. |
+| **Embedded API (Action)** | Actions executed with `POST /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}`. |
+| **Embedded API (Tool)** | Tools executed with `POST /{externalUserId}/tools`. |
+
+The call is recorded whether it succeeds or fails, including when the connected user has not
+connected the integration the tool needs. A call that is rejected before it runs, such as a call to a
+server that is turned off or a call without a connected user, is not recorded.
+
+For a workflow tool, the record also carries the id of the workflow execution the call started. The
+API returns it as `jobId`, so you can find the run in
+[Workflow Executions](/platform/embedded/monitor/workflow-executions).
+
+The page lists embedded calls only. Calls made through an automation MCP server are recorded
+separately and appear on the automation [Tool Invocations](/platform/automation/monitor/tool-invocations)
+page.
+
+---
+
+## The invocations table
+
+Each call is one row, newest first:
+
+| Column | What it shows |
+|---|---|
+| **Tool** | The tool name the AI agent called, or the action name your code executed. |
+| **Surface** | Where the call came in: **Embedded MCP**, **Embedded API (Action)** or **Embedded API (Tool)**. |
+| **Component** | The component and the operation that ran, such as `slack / sendMessage`. Workflow tools show a dash. |
+| **Outcome** | How the call ended, for example `SUCCESS`, `ERROR`, `CONNECTION_REQUIRED` or `TIMEOUT`. |
+| **Duration** | How long the call took, in milliseconds. |
+| **Date** | When the call was made. |
+
+The list shows 50 rows per page. Use the **Refresh** button in the page header to load the latest
+calls.
+
+---
+
+## Filter invocations
+
+| Filter | Narrows the list to |
+|---|---|
+| **Surface** | Calls that came in through one surface. |
+| **Outcome** | Calls that ended one way. |
+| **Start date** / **End date** | Calls made within a date range. |
+
+---
+
+## One connected user's calls
+
+To see the calls made for a single connected user, open the user from
+[Connected Users](/platform/embedded/monitor/connected-users) and select the **Tool Invocations** tab
+in the user's sheet. It lists that user's most recent calls with the same columns.
+
+Your own application can read the same history for a connected user from the embedded API:
+
+```http
+GET /api/embedded/v1/{externalUserId}/tool-invocations HTTP/1.1
+Host: your-bytechef-host.example.com
+Authorization: Bearer <API Key>
+X-Environment: PRODUCTION
+```
+
+The endpoint accepts the same `surface`, `outcome`, `startDate` and `endDate` filters as the page, plus
+`pageNumber`. It returns only the calls of the user named in the path. See the
+[API reference](/openapi/backend/embedded-tool-invocation).
+
+---
+
+## Scope
+
+The list is scoped to the current environment.
+Switching the environment in the left sidebar reloads the list and clears the filters. A call made in
+Production does not appear while you are looking at Development.
+
+---
+
+## Who can see it
+
+The page and the connected user tab are shown to organization admins. Connected users cannot read the
+log through the ByteChef UI; your backend reads a user's history with the API call above.
+
+---
+
+## Retention
+
+Records are deleted after 90 days. A cleanup job runs once a day, at 02:30 server time. In a
+multi-tenant installation it cleans up every tenant's records, and one tenant's failure does not stop
+the others.
+
+| Property | Purpose |
+|---|---|
+| `bytechef.tool-invocation-log.retention-days` | How many days a record is kept. Defaults to `90`. |
+
+---
+
+## See also
+
+- [MCP Servers](/platform/embedded/configure/mcp-servers) - expose your integrations as tools to your
+  connected users' AI agents.
+- [Component Kit](/platform/embedded/build/component-kit) - execute actions and tools for a connected
+  user from your own code.
+- [Workflow Executions](/platform/embedded/monitor/workflow-executions) - the runs started when an AI
+  agent calls a workflow tool.

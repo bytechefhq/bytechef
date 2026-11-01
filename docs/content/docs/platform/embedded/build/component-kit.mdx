@@ -81,6 +81,8 @@ Content-Type: application/json
 
 The response is the provider's own response, returned as-is.
 
+Every tool call is recorded as a [tool invocation](/platform/embedded/monitor/tool-invocations) on the **Embedded API (Tool)** surface, whether it succeeds or fails.
+
 ## Calling an action
 
 When your code has already decided what to run, address the action directly. The input goes under `input`, and the result comes back wrapped in `result`:
@@ -97,6 +99,8 @@ Content-Type: application/json
 ```
 
 This is also the surface to use when an operation takes a **file**: set `bodyContentType` to `BINARY` or `FORM_DATA` in the input and the endpoint resolves the referenced content into a file entry before the action runs. The tools endpoint has no equivalent, so file-bearing operations stay in your code rather than in the model's hands.
+
+Every action call is recorded as a [tool invocation](/platform/embedded/monitor/tool-invocations) on the **Embedded API (Action)** surface. Your backend reads a user's tool and action calls with `GET /api/embedded/v1/{externalUserId}/tool-invocations`; see the [API reference](/openapi/backend/embedded-tool-invocation).
 
 <Callout title="ComponentKit in the Sample App">
     The [Sample App](/platform/embedded/get-started/quick-start/sample-app) includes a "ComponentKit Playground" that calls a single action directly, and a tool-based AI chat page that runs the full catalogue-and-choose flow.
