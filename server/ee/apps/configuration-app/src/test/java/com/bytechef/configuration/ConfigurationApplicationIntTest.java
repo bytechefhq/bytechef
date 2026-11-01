@@ -28,6 +28,7 @@ import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -107,6 +108,37 @@ public class ConfigurationApplicationIntTest {
 
         registry.add(
             "bytechef.remote.grpc.targets.api-gateway-app", () -> "localhost:" + gatewayServer.getPort());
+    }
+
+    @Test
+    void testManagementAndAutomationMcpServersAreProtected() {
+        List<String> scopes = applicationContext.getBeansOfType(McpEndpoint.class)
+            .values()
+            .stream()
+            .map(McpEndpoint::getScope)
+            .toList();
+
+        assertThat(scopes).containsExactlyInAnyOrder("mcp:automation", "mcp:management");
+    }
+
+    @Test
+    void testWorkflowExecutionsAreReadFromExecutionApp() throws ClassNotFoundException {
+        Object projectWorkflowExecutionFacade = applicationContext.getBean(
+            Class.forName("com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade"));
+
+        assertThat(AopUtils.getTargetClass(projectWorkflowExecutionFacade)
+            .getName()).isEqualTo(
+                "com.bytechef.ee.automation.workflow.execution.remote.client.facade."
+                    + "RemoteProjectWorkflowExecutionFacadeClient");
+    }
+
+    @Test
+    void testJobCompletionIsAwaitedThroughTheMessageBroker() throws ClassNotFoundException {
+        Object jobCompletionAwaiter = applicationContext.getBean(
+            Class.forName("com.bytechef.platform.workflow.execution.JobCompletionAwaiter"));
+
+        assertThat(AopUtils.getTargetClass(jobCompletionAwaiter)
+            .getName()).isEqualTo("com.bytechef.platform.webhook.executor.JobCompletionAwaiterImpl");
     }
 
     @Test

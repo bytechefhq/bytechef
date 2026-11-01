@@ -30,6 +30,8 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
+    implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server"))
+    implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-configuration:ai-mcp-server-configuration-graphql"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-graphql"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
@@ -37,6 +39,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-getting-started:automation-getting-started-service"))
     implementation(project(":server:libs:automation:automation-task:automation-task-graphql"))
     implementation(project(":server:libs:automation:automation-task:automation-task-service"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp-server"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-graphql"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-service"))
     implementation(project(":server:libs:automation:automation-swagger"))
@@ -83,6 +86,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-service"))
     implementation(project(":server:libs:platform:platform-swagger"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    implementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-service"))
+    implementation(project(":server:libs:platform:platform-webhook:platform-webhook-job-completion-awaiter"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-service"))
@@ -97,7 +102,9 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-grpc"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:ee:libs:automation:automation-task:automation-task-remote-rest"))
+    implementation(project(":server:ee:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-remote-client"))
     implementation(project(":server:ee:libs:config:microservice-config"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-capture"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-graphql"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-remote-client"))
@@ -156,5 +163,10 @@ dependencies {
     testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
     testImplementation("io.grpc:grpc-netty")
     testImplementation(project(":server:ee:libs:platform:platform-user:platform-user-remote-grpc"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
+}
+
+tasks.named<Test>("testIntegration") {
+    maxHeapSize = "1g"
 }
