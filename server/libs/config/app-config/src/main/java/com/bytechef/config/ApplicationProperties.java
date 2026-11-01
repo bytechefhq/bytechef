@@ -2933,12 +2933,12 @@ public class ApplicationProperties {
         /**
          * Cron expression of the audit retention job, evaluated in the JVM default time zone
          */
-        private String retentionCron = "0 0 2 * * *";
+        private String retentionCron;
 
         /**
          * Number of days audit events are kept. Zero or a negative value disables the purge
          */
-        private long retentionDays = 365;
+        private long retentionDays;
 
         public boolean isMaskPrincipals() {
             return maskPrincipals;

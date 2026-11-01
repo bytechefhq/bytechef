@@ -90,6 +90,13 @@ bytechef:
     # There is no queue: a submitter waits for a permit. Workflow task and trigger execution are bounded
     # separately by bytechef.worker.task.*.
     concurrency-limit: 200
+  audit:
+    # Whether principals are masked (e.g. a***@example.com) when audit events are read through the API (EE)
+    mask-principals: false
+    # Cron expression of the audit retention job, evaluated in the JVM default time zone (EE)
+    retention-cron: 0 0 2 * * *
+    # Number of days audit events are kept; zero or a negative value disables the purge (EE)
+    retention-days: 365
   cache:
     # Cache provider (CAFFEINE) default: CAFFEINE
     provider: CAFFEINE
