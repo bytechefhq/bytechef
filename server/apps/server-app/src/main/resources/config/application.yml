@@ -54,6 +54,9 @@ info:
     documentationUrl: ${docs.documentation-url:}
     reportBugUrl: ${docs.report-bug-url:}
   featureFlags: ${bytechef.feature-flags}
+  oauth2:
+    authorizationServer:
+      enabled: ${bytechef.oauth2.authorization-server.enabled}
   helpHub:
     enabled: ${bytechef.help-hub.enabled}
     commandBar:
