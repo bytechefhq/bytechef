@@ -125,6 +125,13 @@ const getClaudeCodeTabs = ({apiKeySource, mode, url}: McpConnectContextI): McpCo
             description: `${replaceApiKeyText(apiKeySource)} Then run this in your terminal.`,
             title: 'Add the server with your API key',
         },
+        {
+            codeSnippet: toJson({
+                mcpServers: {bytechef: {headers: {Authorization: BEARER_HEADER_VALUE}, type: 'http', url}},
+            }),
+            description: `Or share it with your team: add this to .mcp.json in your project. ${replaceApiKeyText(apiKeySource)}`,
+            title: 'Or add it to .mcp.json',
+        },
     ]);
 
     if (mode === 'API_KEY') {
@@ -298,12 +305,11 @@ const getCodexCliTabs = ({apiKeySource, mode, url}: McpConnectContextI): McpConn
 };
 
 const getDevinDesktopTabs = ({apiKeySource, mode, url}: McpConnectContextI): McpConnectTabI[] => {
-    const apiKeyHeader = mode === 'API_KEY';
+    const apiKeyHeader = mode !== 'URL_ONLY';
 
     const descriptions: Record<McpConnectAuthModeType, string> = {
         API_KEY: `Add a custom server, paste this configuration and save. ${replaceApiKeyText(apiKeySource)}`,
-        API_KEY_OR_OAUTH:
-            'Add a custom server, paste this configuration and save. Devin Desktop asks you to sign in to ByteChef when it connects.',
+        API_KEY_OR_OAUTH: `Add a custom server, paste this configuration and save. ${replaceApiKeyText(apiKeySource)}`,
         URL_ONLY: 'Add a custom server, paste this configuration and save.',
     };
 

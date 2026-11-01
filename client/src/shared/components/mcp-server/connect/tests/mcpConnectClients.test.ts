@@ -131,4 +131,24 @@ describe('MCP_CONNECT_CLIENTS', () => {
         expect(vsCodeAction.label).toBe('Add to VS Code');
         expect(decodeHref(vsCodeAction.href)).toContain('${input:bytechef-api-key}');
     });
+
+    it('keeps the API key header for Devin Desktop when OAuth is available', () => {
+        const devinDesktop = MCP_CONNECT_CLIENTS.find((client) => client.id === 'devin-desktop')!;
+
+        const text = devinDesktop.getTabs(createContext('API_KEY_OR_OAUTH')).map(collectTabText).join('\n');
+
+        expect(text).toContain('"Authorization": "Bearer YOUR_API_KEY"');
+        expect(text).not.toMatch(/sign in/i);
+    });
+
+    it('offers a .mcp.json snippet with the http type for Claude Code', () => {
+        const claudeCode = MCP_CONNECT_CLIENTS.find((client) => client.id === 'claude-code')!;
+
+        for (const mode of ['API_KEY', 'API_KEY_OR_OAUTH'] as McpConnectAuthModeType[]) {
+            const manualTab = claudeCode.getTabs(createContext(mode)).find((tab) => tab.id === 'MANUAL')!;
+
+            expect(collectTabText(manualTab), mode).toContain('"type": "http"');
+            expect(collectTabText(manualTab), mode).toContain('.mcp.json');
+        }
+    });
 });

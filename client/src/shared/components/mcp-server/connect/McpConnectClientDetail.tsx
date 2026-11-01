@@ -16,18 +16,9 @@ interface McpConnectClientDetailPropsI {
     client: McpConnectClientI;
     mcpServerUrl: string;
     mode: McpConnectAuthModeType;
-    onRefresh?: () => void;
 }
 
-const McpConnectTabContent = ({
-    mcpServerUrl,
-    onRefresh,
-    tab,
-}: {
-    mcpServerUrl: string;
-    onRefresh?: () => void;
-    tab: McpConnectTabI;
-}) => (
+const McpConnectTabContent = ({tab}: {tab: McpConnectTabI}) => (
     <div className="space-y-6">
         {tab.notice && (
             <Alert className="flex items-center gap-2" variant="default">
@@ -42,26 +33,14 @@ const McpConnectTabContent = ({
         {tab.steps.length > 0 && (
             <ol className="space-y-6">
                 {tab.steps.map((step, index) => (
-                    <McpConnectStep
-                        key={step.title}
-                        mcpServerUrl={mcpServerUrl}
-                        number={index + 1}
-                        onRefresh={onRefresh}
-                        step={step}
-                    />
+                    <McpConnectStep key={step.title} number={index + 1} step={step} />
                 ))}
             </ol>
         )}
     </div>
 );
 
-const McpConnectClientDetail = ({
-    apiKeySource,
-    client,
-    mcpServerUrl,
-    mode,
-    onRefresh,
-}: McpConnectClientDetailPropsI) => {
+const McpConnectClientDetail = ({apiKeySource, client, mcpServerUrl, mode}: McpConnectClientDetailPropsI) => {
     const [promptCopied, setPromptCopied] = useState(false);
 
     const promptCopiedTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -120,12 +99,12 @@ const McpConnectClientDetail = ({
 
                     {tabs.map((tab) => (
                         <TabsContent className="mt-6" key={tab.id} value={tab.id}>
-                            <McpConnectTabContent mcpServerUrl={mcpServerUrl} onRefresh={onRefresh} tab={tab} />
+                            <McpConnectTabContent tab={tab} />
                         </TabsContent>
                     ))}
                 </Tabs>
             ) : (
-                <McpConnectTabContent mcpServerUrl={mcpServerUrl} onRefresh={onRefresh} tab={tabs[0]} />
+                <McpConnectTabContent tab={tabs[0]} />
             )}
 
             <div className="flex items-start justify-between gap-4 rounded-lg bg-muted/50 p-4">
