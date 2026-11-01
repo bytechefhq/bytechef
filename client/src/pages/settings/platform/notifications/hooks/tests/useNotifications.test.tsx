@@ -1,8 +1,12 @@
-import {NotificationEventTypeEnum} from '@/shared/middleware/platform/notification';
-import {renderHook} from '@testing-library/react';
+import {NotificationEventTypeEnum, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
+import {act, renderHook} from '@testing-library/react';
 import {describe, expect, it, vi} from 'vitest';
 
 import useNotifications, {notificationFormSchema} from '../useNotifications';
+
+const {createNotificationMutate} = vi.hoisted(() => ({
+    createNotificationMutate: vi.fn(),
+}));
 
 vi.mock('@/shared/queries/platform/notificationEvents.queries', () => ({
     useGetNotificationEventsQuery: vi.fn(() => ({
@@ -24,7 +28,7 @@ vi.mock('@/shared/queries/platform/notifications.queries', () => ({
 }));
 
 vi.mock('@/shared/mutations/platform/notifications.mutations', () => ({
-    useCreateNotificationMutation: vi.fn(() => ({mutate: vi.fn()})),
+    useCreateNotificationMutation: vi.fn(() => ({mutate: createNotificationMutate})),
     useDeleteNotificationMutation: vi.fn(() => ({mutate: vi.fn()})),
     useUpdateNotificationMutation: vi.fn(() => ({mutate: vi.fn()})),
 }));
@@ -79,6 +83,27 @@ describe('useNotifications', () => {
             NotificationEventTypeEnum.JobStarted,
             NotificationEventTypeEnum.JobStopped,
         ]);
+    });
+
+    it('saves a Slack webhook URL without surrounding whitespace', () => {
+        const {result} = renderHook(() => useNotifications());
+
+        act(() => {
+            result.current.form.reset({
+                name: 'Failures',
+                notificationEventIds: ['1'],
+                settings: {slackWebhookUrl: '  https://hooks.slack.com/services/T/B/X  '},
+                type: NotificationTypeEnum.Slack,
+            });
+        });
+
+        act(() => {
+            result.current.saveNotification();
+        });
+
+        expect(createNotificationMutate).toHaveBeenCalledWith(
+            expect.objectContaining({settings: {slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}})
+        );
     });
 });
 

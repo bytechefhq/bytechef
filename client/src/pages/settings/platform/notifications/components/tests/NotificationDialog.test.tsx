@@ -2,33 +2,33 @@ import {NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useForm} from 'react-hook-form';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import {NotificationFormValuesType} from '../../hooks/useNotifications';
 import NotificationDialog from '../NotificationDialog';
-
-const {hookState} = vi.hoisted(() => ({
-    hookState: {notificationType: 'EMAIL' as string},
-}));
 
 vi.mock('../../hooks/useNotifications', () => ({
     default: () => ({
         ff_1132: true,
         isNotificationEventsLoading: false,
         notificationEvents: [],
-        notificationType: hookState.notificationType,
         openEditDialog: vi.fn(),
-        setNotificationType: vi.fn(),
     }),
 }));
 
-function NotificationDialogHarness({saveNotification}: {saveNotification: (data: NotificationFormValuesType) => void}) {
+interface NotificationDialogHarnessProps {
+    saveNotification: (data: NotificationFormValuesType) => void;
+    settings?: Record<string, unknown>;
+    type: NotificationTypeEnum;
+}
+
+function NotificationDialogHarness({saveNotification, settings = {}, type}: NotificationDialogHarnessProps) {
     const form = useForm<NotificationFormValuesType>({
         defaultValues: {
             name: 'Failures',
             notificationEventIds: ['1'],
-            settings: {},
-            type: NotificationTypeEnum.Slack,
+            settings,
+            type,
         },
     });
 
@@ -43,16 +43,10 @@ function NotificationDialogHarness({saveNotification}: {saveNotification: (data:
 }
 
 describe('NotificationDialog', () => {
-    beforeEach(() => {
-        hookState.notificationType = NotificationTypeEnum.Email;
-    });
-
     it('saves the Slack webhook URL under settings.slackWebhookUrl for a Slack notification', async () => {
-        hookState.notificationType = NotificationTypeEnum.Slack;
-
         const saveNotification = vi.fn();
 
-        render(<NotificationDialogHarness saveNotification={saveNotification} />);
+        render(<NotificationDialogHarness saveNotification={saveNotification} type={NotificationTypeEnum.Slack} />);
 
         await userEvent.type(screen.getByLabelText('Slack Webhook URL'), 'https://hooks.slack.com/services/T/B/X');
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
@@ -64,8 +58,21 @@ describe('NotificationDialog', () => {
     });
 
     it('does not show the Slack webhook URL field for an email notification', () => {
-        render(<NotificationDialogHarness saveNotification={vi.fn()} />);
+        render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Email} />);
 
         expect(screen.queryByLabelText('Slack Webhook URL')).not.toBeInTheDocument();
+    });
+
+    it('shows the saved Slack webhook URL when an existing Slack notification is opened', () => {
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                settings={{slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}}
+                type={NotificationTypeEnum.Slack}
+            />
+        );
+
+        expect(screen.getByLabelText('Slack Webhook URL')).toHaveValue('https://hooks.slack.com/services/T/B/X');
+        expect(screen.queryByLabelText('Email')).not.toBeInTheDocument();
     });
 });
