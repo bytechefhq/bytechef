@@ -158,7 +158,7 @@ class EmbeddedConfigurationProtoMapperTest {
                         List.of(new ConnectedUserWorkflowTemplateDTO.Component("httpClient", "HTTP", "icon")),
                         List.of(new ConnectedUserWorkflowTemplateDTO.Input("name", "Name", "STRING", true)),
                         "hasAuthority('ADMIN')", "workflow-1")),
-                "hasAuthority('ADMIN')", true));
+                "hasAuthority('ADMIN')", true, 3, Instant.parse("2026-10-26T10:00:00Z")));
 
         assertThat(embeddedConfigurationProtoMapper.toAutomationWorkflowProjectDTOs(
             embeddedConfigurationProtoMapper.toRemoteAutomationWorkflowProjects(automationWorkflowProjectDTOs)))
