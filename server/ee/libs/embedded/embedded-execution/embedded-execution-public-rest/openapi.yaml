@@ -10,6 +10,8 @@ tags:
     description: "The Embedded App Event Trigger Public API"
   - name: "request-trigger"
     description: "The Embedded Request Trigger Public API"
+  - name: "tool-invocation"
+    description: "The Embedded Tool Invocation Public API"
 paths:
 #  /components:
 #    get:
@@ -511,6 +513,81 @@ paths:
 #          description: "Limit Exceeded"
 #        "500":
 #          description: "Internal Error"
+  /{externalUserId}/tool-invocations:
+    get:
+      description: "Returns a page of the connected user's tool invocations: embedded MCP component and workflow\
+        \ tool calls, executeAction calls and executeTool calls. Tool inputs and outputs are not included."
+      summary: "Returns a page of the connected user's tool invocations"
+      tags:
+        - "tool-invocation"
+      operationId: "getToolInvocationsPage"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "surface"
+          description: "Return only invocations made through this surface."
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/ToolInvocationSurface"
+        - name: "outcome"
+          description: "Return only invocations with this outcome."
+          in: "query"
+          required: false
+          schema:
+            $ref: "#/components/schemas/ToolInvocationOutcome"
+        - name: "startDate"
+          description: "Return only invocations recorded at or after this instant."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "endDate"
+          description: "Return only invocations recorded at or before this instant."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "pageNumber"
+          description: "The number of the page to return."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: 0
+      responses:
+        "200":
+          description: "The page of tool invocations."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolInvocationPage"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+      security:
+        - bearerAuth: [ ]
+        - jwtBearerAuth: [ ]
 components:
   securitySchemes:
     bearerAuth:
@@ -1087,6 +1164,105 @@ components:
           description: The type of the tool
           type: "string"
           default: "function"
+    ToolInvocation:
+      description: "A record of a single tool invocation."
+      type: "object"
+      properties:
+        componentName:
+          description: "The name of the component the tool belongs to."
+          type: "string"
+        componentVersion:
+          description: "The version of the component the tool belongs to."
+          type: "integer"
+          format: "int32"
+        createdDate:
+          description: "When the invocation was recorded."
+          type: "string"
+          format: "date-time"
+        durationMs:
+          description: "How long the invocation took, in milliseconds."
+          type: "integer"
+          format: "int32"
+        errorMessage:
+          description: "The error message of a failed invocation."
+          type: "string"
+        errorType:
+          description: "The error type of a failed invocation."
+          type: "string"
+        id:
+          description: "The id of the invocation record."
+          type: "integer"
+          format: "int64"
+        integrationInstanceId:
+          description: "The id of the integration instance the invocation ran on."
+          type: "integer"
+          format: "int64"
+        jobId:
+          description: "The id of the workflow run a workflow tool started."
+          type: "integer"
+          format: "int64"
+        kind:
+          $ref: "#/components/schemas/ToolInvocationKind"
+        operationName:
+          description: "The name of the action or cluster element the tool ran."
+          type: "string"
+        outcome:
+          $ref: "#/components/schemas/ToolInvocationOutcome"
+        surface:
+          $ref: "#/components/schemas/ToolInvocationSurface"
+        toolName:
+          description: "The name of the tool."
+          type: "string"
+    ToolInvocationKind:
+      description: "What a tool invocation ran."
+      type: "string"
+      enum:
+        - "COMPONENT"
+        - "WORKFLOW"
+        - "CONTRIBUTED"
+        - "MANAGEMENT_TOOL"
+    ToolInvocationOutcome:
+      description: "The outcome of a tool invocation."
+      type: "string"
+      enum:
+        - "SUCCESS"
+        - "ERROR"
+        - "CONNECTION_REQUIRED"
+        - "TIMEOUT"
+        - "APPROVAL_REQUIRED"
+        - "APPROVAL_DENIED"
+        - "RULE_BLOCKED"
+    ToolInvocationPage:
+      description: "A page of a connected user's tool invocations."
+      type: "object"
+      properties:
+        content:
+          description: "The tool invocations on this page."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ToolInvocation"
+        number:
+          description: "The current page."
+          type: "integer"
+        numberOfElements:
+          description: "The number of elements."
+          type: "integer"
+        size:
+          description: "The size of the page."
+          type: "integer"
+        totalElements:
+          description: "The total number of elements."
+          type: "integer"
+        totalPages:
+          description: "The total number of pages."
+          type: "integer"
+    ToolInvocationSurface:
+      description: "The surface a tool invocation was made through."
+      type: "string"
+      enum:
+        - "MCP_EMBEDDED"
+        - "EMBEDDED_API_ACTION"
+        - "EMBEDDED_API_TOOL"
 #    Trigger:
 #      type: "object"
 #      required:
