@@ -14,6 +14,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -226,5 +227,10 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
                 .path(TASK_EXECUTION_SERVICE + "/update")
                 .build(),
             taskExecution, TaskExecution.class);
+    }
+
+    @Override
+    public TaskExecution update(long id, Consumer<TaskExecution> taskExecutionModifier) {
+        throw new UnsupportedOperationException();
     }
 }
