@@ -9,3 +9,6 @@ export const EMBEDDED_INSTANCE_CONFIGURATIONS_DOCUMENTATION_URL =
     'https://docs.bytechef.io/platform/embedded/configure/instance-configurations';
 
 export const EMBEDDED_INTEGRATIONS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/embedded/build/integrations';
+
+export const EMBEDDED_TOOL_INVOCATIONS_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/embedded/monitor/tool-invocations';
