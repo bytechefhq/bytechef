@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.jspecify.annotations.Nullable;
@@ -63,6 +64,8 @@ final class AuditDataEvaluator {
         arguments.forEach(evaluationContext::setVariable);
 
         evaluationContext.setVariable(RESULT_VARIABLE, auditInvocation.result());
+
+        boolean resultParameter = arguments.containsKey(RESULT_VARIABLE);
 
         Set<String> variableNames = new HashSet<>(arguments.keySet());
 
@@ -116,6 +119,15 @@ final class AuditDataEvaluator {
                     continue;
                 }
 
+                if (resultParameter && referencesVariable(expression, RESULT_VARIABLE)) {
+                    failures.add(
+                        new Failure(
+                            key, expressionString,
+                            "the variable #result is ambiguous, a parameter is also named result"));
+
+                    continue;
+                }
+
                 Object value = expression.getValue(evaluationContext);
 
                 if (value != null) {
@@ -125,11 +137,35 @@ final class AuditDataEvaluator {
                 Class<? extends Throwable> throwableClass = throwable.getClass();
 
                 failures.add(
-                    new Failure(key, expressionString, throwableClass.getSimpleName() + ": " + throwable.getMessage()));
+                    new Failure(
+                        key, expressionString, throwableClass.getSimpleName() + ": " + throwable.getMessage(),
+                        throwable));
             }
         }
 
         return new Evaluation(data, failures);
+    }
+
+    private static boolean referencesVariable(Expression expression, String variableName) {
+        if (!(expression instanceof SpelExpression spelExpression)) {
+            return false;
+        }
+
+        return referencesVariable(spelExpression.getAST(), variableName);
+    }
+
+    private static boolean referencesVariable(SpelNode spelNode, String variableName) {
+        if (spelNode instanceof VariableReference && Objects.equals(spelNode.toStringAST(), "#" + variableName)) {
+            return true;
+        }
+
+        for (int index = 0; index < spelNode.getChildCount(); index++) {
+            if (referencesVariable(spelNode.getChild(index), variableName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static @Nullable String findUnknownVariableName(Expression expression, Set<String> variableNames) {
@@ -170,6 +206,10 @@ final class AuditDataEvaluator {
         }
     }
 
-    record Failure(String key, String expression, String reason) {
+    record Failure(String key, String expression, String reason, @Nullable Throwable cause) {
+
+        Failure(String key, String expression, String reason) {
+            this(key, expression, reason, null);
+        }
     }
 }

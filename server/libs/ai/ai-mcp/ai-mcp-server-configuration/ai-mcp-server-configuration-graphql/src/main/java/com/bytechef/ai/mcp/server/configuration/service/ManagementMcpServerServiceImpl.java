@@ -16,7 +16,9 @@
 
 package com.bytechef.ai.mcp.server.configuration.service;
 
+import com.bytechef.ai.mcp.server.configuration.audit.ManagementMcpServerAuditEvents;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.tenant.domain.TenantKey;
@@ -74,6 +76,7 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
     }
 
     @Override
+    @Audited(event = ManagementMcpServerAuditEvents.MANAGEMENT_MCP_SERVER_SECRET_KEY_ROTATED)
     @PreAuthorize("isTenantAdmin()")
     public String updateManagementMcpServerUrl() {
         String secretKey = String.valueOf(TenantKey.of());

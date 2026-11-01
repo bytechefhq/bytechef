@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.a2a.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.ai.a2a.audit.A2aAuditEvents;
 import com.bytechef.automation.ai.a2a.domain.A2aProject;
 import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
@@ -37,6 +38,8 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
@@ -107,6 +110,12 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     }
 
     @Override
+    @Audited(event = A2aAuditEvents.A2A_PROJECT_CREATED, data = {
+        @AuditData(key = "a2aProjectId", value = "#result?.id"),
+        @AuditData(key = "a2aServerId", value = "#a2aServerId"),
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "projectVersion", value = "#projectVersion")
+    })
     @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT') and " +
         "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public A2aProject createA2aProject(
@@ -116,6 +125,12 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     }
 
     @Override
+    @Audited(event = A2aAuditEvents.A2A_PROJECT_CREATED, data = {
+        @AuditData(key = "a2aProjectId", value = "#result?.id"),
+        @AuditData(key = "a2aServerId", value = "#a2aServerId"),
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "projectVersion", value = "#projectVersion")
+    })
     @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT') and " +
         "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public A2aProject createA2aProject(
@@ -168,6 +183,9 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     }
 
     @Override
+    @Audited(event = A2aAuditEvents.A2A_PROJECT_DELETED, data = {
+        @AuditData(key = "a2aProjectId", value = "#a2aProjectId")
+    })
     @PreAuthorize("hasPermission(#a2aProjectId, 'A2aProject', 'A2A_EDIT')")
     public void deleteA2aProject(long a2aProjectId) {
         A2aProject a2aProject = a2aProjectService.fetchA2aProject(a2aProjectId)
@@ -177,12 +195,18 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     }
 
     @Override
+    @Audited(event = A2aAuditEvents.A2A_PROJECT_UPDATED, data = {
+        @AuditData(key = "a2aProjectId", value = "#a2aProjectId")
+    })
     @PreAuthorize("hasPermission(#a2aProjectId, 'A2aProject', 'A2A_EDIT')")
     public A2aProject updateA2aProject(long a2aProjectId, List<String> selectedWorkflowIds) {
         return updateA2aProject(a2aProjectId, selectedWorkflowIds, List.of());
     }
 
     @Override
+    @Audited(event = A2aAuditEvents.A2A_PROJECT_UPDATED, data = {
+        @AuditData(key = "a2aProjectId", value = "#a2aProjectId")
+    })
     @PreAuthorize("hasPermission(#a2aProjectId, 'A2aProject', 'A2A_EDIT')")
     public A2aProject updateA2aProject(
         long a2aProjectId, List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations) {

@@ -21,6 +21,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
@@ -131,7 +132,8 @@ public class CreateMcpProjectToolCallback implements ToolCallback {
                         .size()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
-        } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
+        } catch (IllegalArgumentException | NoSuchElementException
+            | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.audit.AutomationWorkflowProjectAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
@@ -19,6 +20,8 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Comparator;
@@ -62,11 +65,18 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     }
 
     @Override
+    @Audited(event = AutomationWorkflowProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOW_DELETED, data = {
+        @AuditData(key = "connectedUserProjectWorkflowId", value = "#connectedUserProjectWorkflowId")
+    })
     public void deleteProjectWorkflow(long connectedUserProjectWorkflowId) {
         connectedUserProjectFacade.deleteProjectWorkflow(connectedUserProjectWorkflowId);
     }
 
     @Override
+    @Audited(event = AutomationWorkflowProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOW_ENABLED_UPDATED, data = {
+        @AuditData(key = "connectedUserProjectWorkflowId", value = "#connectedUserProjectWorkflowId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     public void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable) {
         connectedUserProjectFacade.enableProjectWorkflow(connectedUserProjectWorkflowId, enable);
     }
@@ -98,6 +108,10 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     }
 
     @Override
+    @Audited(event = AutomationWorkflowProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOWS_PROVISIONED, data = {
+        @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+        @AuditData(key = "workflowUuids", value = "#workflows.![workflowUuid]")
+    })
     public void provisionProjectWorkflows(
         long connectedUserId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows) {
 

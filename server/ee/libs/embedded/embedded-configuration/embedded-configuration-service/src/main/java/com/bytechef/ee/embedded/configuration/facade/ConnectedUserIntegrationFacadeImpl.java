@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -45,6 +46,8 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.Authorization;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -361,6 +364,11 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_PROVISIONED, data = {
+        @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+        @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
+        @AuditData(key = "integrationInstanceId", value = "#result")
+    })
     @PreAuthorize("isTenantAdmin()")
     public long provisionIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId,

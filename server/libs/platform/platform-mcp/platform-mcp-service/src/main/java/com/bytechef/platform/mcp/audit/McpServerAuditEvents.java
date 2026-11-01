@@ -21,7 +21,10 @@ package com.bytechef.platform.mcp.audit;
  */
 public final class McpServerAuditEvents {
 
+    public static final String MCP_SERVER_CREATED = "MCP_SERVER_CREATED";
+    public static final String MCP_SERVER_DELETED = "MCP_SERVER_DELETED";
     public static final String MCP_SERVER_SECRET_KEY_ROTATED = "MCP_SERVER_SECRET_KEY_ROTATED";
+    public static final String MCP_SERVER_UPDATED = "MCP_SERVER_UPDATED";
 
     private McpServerAuditEvents() {
     }

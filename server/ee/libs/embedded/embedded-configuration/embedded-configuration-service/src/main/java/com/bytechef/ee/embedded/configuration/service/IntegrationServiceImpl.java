@@ -54,7 +54,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     @Override
     @Transactional(readOnly = true)
     public Integration getIntegration(long id) {
-        return OptionalUtils.get(integrationRepository.findById(id));
+        return OptionalUtils.get(integrationRepository.findById(id), "Integration " + id + " not found");
     }
 
     @Override

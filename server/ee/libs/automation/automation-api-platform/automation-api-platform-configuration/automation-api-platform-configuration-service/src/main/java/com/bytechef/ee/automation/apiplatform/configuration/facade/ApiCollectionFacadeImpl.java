@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.ee.automation.apiplatform.configuration.audit.ApiCollectionAuditEvents;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
@@ -29,6 +30,8 @@ import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectio
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -104,6 +107,13 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @Audited(event = ApiCollectionAuditEvents.API_COLLECTION_CREATED, data = {
+        @AuditData(key = "apiCollectionId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#apiCollectionDTO.name"),
+        @AuditData(key = "projectId", value = "#apiCollectionDTO.projectId"),
+        @AuditData(key = "projectDeploymentId", value = "#result?.projectDeploymentId"),
+        @AuditData(key = "environment", value = "#apiCollectionDTO.environment")
+    })
     @PreAuthorize("hasPermission(#apiCollectionDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
     public ApiCollectionDTO createApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
@@ -162,6 +172,9 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @Audited(event = ApiCollectionAuditEvents.API_COLLECTION_DELETED, data = {
+        @AuditData(key = "apiCollectionId", value = "#id")
+    })
     public void deleteApiCollection(long id) {
         ApiCollection apiCollection = apiCollectionService.getApiCollection(id);
 

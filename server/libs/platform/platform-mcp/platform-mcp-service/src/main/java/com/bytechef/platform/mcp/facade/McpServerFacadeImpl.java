@@ -17,6 +17,12 @@
 package com.bytechef.platform.mcp.facade;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.mcp.audit.McpComponentAuditEvents;
+import com.bytechef.platform.mcp.audit.McpComponentAuditMapper;
+import com.bytechef.platform.mcp.audit.McpServerAuditEvents;
+import com.bytechef.platform.mcp.audit.McpServerAuditMapper;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -60,6 +66,12 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_CREATED, mapper = McpComponentAuditMapper.class, data = {
+        @AuditData(key = "mcpComponentId", value = "#result?.id"),
+        @AuditData(key = "mcpServerId", value = "#mcpComponent.mcpServerId"),
+        @AuditData(key = "componentName", value = "#mcpComponent.componentName"),
+        @AuditData(key = "componentVersion", value = "#mcpComponent.componentVersion")
+    })
     @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent, List<McpTool> mcpTools) {
         McpComponent savedComponent = mcpComponentService.create(mcpComponent);
@@ -76,8 +88,13 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_DELETED, mapper = McpComponentAuditMapper.class, data = {
+        @AuditData(key = "mcpComponentId", value = "#mcpComponentId")
+    })
     @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_EDIT')")
     public void deleteMcpComponent(long mcpComponentId) {
+        mcpComponentService.getMcpComponent(mcpComponentId);
+
         for (McpTool mcpTool : mcpToolService.getMcpComponentMcpTools(mcpComponentId)) {
             mcpToolService.delete(mcpTool);
         }
@@ -86,8 +103,13 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @Audited(event = McpServerAuditEvents.MCP_SERVER_DELETED, mapper = McpServerAuditMapper.class, data = {
+        @AuditData(key = "mcpServerId", value = "#mcpServerId")
+    })
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public void deleteMcpServer(long mcpServerId) {
+        mcpServerService.getMcpServer(mcpServerId);
+
         for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
                 .forEach(mcpToolService::delete);
@@ -139,6 +161,12 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_UPDATED, mapper = McpComponentAuditMapper.class, data = {
+        @AuditData(key = "mcpComponentId", value = "#mcpComponent.id"),
+        @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
+        @AuditData(key = "componentName", value = "#result?.componentName"),
+        @AuditData(key = "componentVersion", value = "#result?.componentVersion")
+    })
     @PreAuthorize("hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')")
     public McpComponent update(
         McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools) {

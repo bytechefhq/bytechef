@@ -31,7 +31,7 @@ public interface IntegrationFacade {
         @Nullable Long categoryId, boolean integrationInstanceConfigurations, @Nullable Long tagId,
         @Nullable Status status, boolean includeAllFields);
 
-    void publishIntegration(long id, @Nullable String description);
+    int publishIntegration(long id, @Nullable String description);
 
     void updateIntegration(IntegrationDTO integration);
 }

@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface ConnectedUserMcpServerFacade {
 
-    void deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId);
+    boolean deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId);
 
     void enableConnectedUserMcpServer(long connectedUserId, long mcpServerId, boolean enable);
 

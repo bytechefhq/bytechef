@@ -800,7 +800,9 @@ public class ProjectFacadeIntTest {
 
             assertThat(workspaceProjectWorkflows.size()).isEqualTo(60);
 
-            for (ProjectDTO workspaceProject : workspaceProjects) {
+            List<ProjectDTO> remainingWorkspaceProjects = workspaceProjects.subList(1, workspaceProjects.size());
+
+            for (ProjectDTO workspaceProject : remainingWorkspaceProjects) {
                 projectFacade.deleteProject(workspaceProject.id());
             }
         }

@@ -13,6 +13,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -36,6 +37,8 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -133,6 +136,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_CREATED, data = {
+        @AuditData(key = "integrationInstanceConfigurationId", value = "#result"),
+        @AuditData(key = "integrationId", value = "#integrationInstanceConfigurationDTO.integrationId"),
+        @AuditData(key = "name", value = "#integrationInstanceConfigurationDTO.name"),
+        @AuditData(key = "environment", value = "#integrationInstanceConfigurationDTO.environment")
+    })
     @PreAuthorize("isTenantAdmin()")
     public long createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
@@ -211,6 +220,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_DELETED, data = {
+        @AuditData(key = "integrationInstanceConfigurationId", value = "#id")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void deleteIntegrationInstanceConfiguration(long id) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
@@ -259,6 +271,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_ENABLED_UPDATED, data = {
+        @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstanceConfiguration(long integrationInstanceConfigurationId, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
@@ -282,6 +298,11 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ENABLED_UPDATED, data = {
+        @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
+        @AuditData(key = "workflowId", value = "#workflowId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void enableIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId, boolean enable) {
@@ -461,6 +482,11 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_UPDATED, data = {
+        @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationDTO.id"),
+        @AuditData(key = "integrationId", value = "#integrationInstanceConfigurationDTO.integrationId"),
+        @AuditData(key = "name", value = "#integrationInstanceConfigurationDTO.name")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
