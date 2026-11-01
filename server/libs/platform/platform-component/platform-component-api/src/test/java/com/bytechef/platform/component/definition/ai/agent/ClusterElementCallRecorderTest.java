@@ -643,6 +643,31 @@ class ClusterElementCallRecorderTest {
     }
 
     @Test
+    void testCallApprovedKeepsTheApprovalOnTheSuspendedCallWithoutAListener() {
+        ClusterElementCallRef ref = start(recorder, "{\"text\":\"hi\"}");
+
+        recorder.callSuspended(1, 10, ref);
+        recorder.callApproved(1, 10, ref, "{\"approved\":true,\"approvedBy\":\"jane\",\"comment\":\"ship it\"}");
+
+        assertTrue(recorder.findSuspendedCall(10)
+            .isEmpty());
+
+        ClusterElementCallDrain drain = recorder.drain(10);
+
+        ClusterElementCallRecord callRecord = drain.records()
+            .getFirst();
+
+        assertEquals(ref.id(), callRecord.id());
+        assertEquals(ClusterElementCallRecord.Status.APPROVED, callRecord.status());
+        assertEquals("{\"approved\":true,\"approvedBy\":\"jane\",\"comment\":\"ship it\"}", callRecord.output());
+        assertNull(callRecord.input());
+        assertNotNull(callRecord.endDate());
+        assertEquals(Status.COMPLETED, drain.calls()
+            .get("httpClient_1")
+            .status());
+    }
+
+    @Test
     void testDeniedAggregateIsNotClearedByALaterCompletedCall() {
         recorder.recordOutcome(1L, 2L, "slack_1", "slack", null, ClusterElementCallRecord.Status.DENIED, null, null);
 
