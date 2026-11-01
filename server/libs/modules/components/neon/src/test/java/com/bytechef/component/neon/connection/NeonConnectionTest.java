@@ -108,8 +108,7 @@ class NeonConnectionTest {
     }
 
     private static Authorization getAuthorization(AuthorizationType type) {
-        List<? extends Authorization> authorizations = NeonConnection.CONNECTION_DEFINITION.getAuthorizations()
-            .orElseThrow();
+        List<? extends Authorization> authorizations = NeonConnection.CONNECTION_DEFINITION.getAuthorizations();
 
         return authorizations.stream()
             .filter(authorization -> authorization.getType() == type)

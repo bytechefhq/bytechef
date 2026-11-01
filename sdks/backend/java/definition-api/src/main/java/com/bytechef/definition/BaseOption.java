@@ -27,7 +27,9 @@ public interface BaseOption<T> {
      *
      * @return
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     /**
      *

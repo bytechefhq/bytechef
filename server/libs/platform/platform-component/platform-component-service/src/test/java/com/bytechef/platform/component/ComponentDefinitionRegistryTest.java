@@ -238,7 +238,6 @@ public class ComponentDefinitionRegistryTest {
             ComponentDefinition slackComponentDefinition = slackComponentHandler.getDefinition();
 
             List<ComponentIndex.ItemSummary> actionSummaries = slackComponentDefinition.getActions()
-                .orElse(List.of())
                 .stream()
                 .map(actionDefinition -> new ComponentIndex.ItemSummary(
                     actionDefinition.getName(), actionDefinition.getTitle()
@@ -275,15 +274,12 @@ public class ComponentDefinitionRegistryTest {
                 .orElseThrow();
 
             assertThat(slackStub.getTitle()).contains("Slack");
-            assertThat(slackStub.getActions()
-                .orElse(List.of())).isNotEmpty();
+            assertThat(slackStub.getActions()).isNotEmpty();
             assertThat(slackStub.getConnection()).isPresent();
 
             assertThat(slackStub.getActions()
-                .orElseThrow()
                 .getFirst()
-                .getProperties()
-                .orElse(List.of())).isEmpty();
+                .getProperties()).isEmpty();
         }
 
         @Test
@@ -293,17 +289,14 @@ public class ComponentDefinitionRegistryTest {
             ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition("slack", 1);
 
             assertThat(componentDefinition.getActions()
-                .orElseThrow()
                 .stream()
                 .anyMatch(actionDefinition -> !actionDefinition.getProperties()
-                    .orElse(List.of())
                     .isEmpty()))
                         .isTrue();
 
             assertThat(componentDefinition.getConnection()
                 .orElseThrow()
-                .getAuthorizations()
-                .orElse(List.of())).isNotEmpty();
+                .getAuthorizations()).isNotEmpty();
         }
 
         @Test
@@ -329,10 +322,8 @@ public class ComponentDefinitionRegistryTest {
                 .orElseThrow();
 
             assertThat(slackComponentDefinition.getActions()
-                .orElseThrow()
                 .stream()
                 .anyMatch(actionDefinition -> !actionDefinition.getProperties()
-                    .orElse(List.of())
                     .isEmpty()))
                         .isTrue();
         }
@@ -415,7 +406,6 @@ public class ComponentDefinitionRegistryTest {
                 componentDefinitionRegistry.getComponentDefinition("slack", 1);
 
             String actionName = slackComponentDefinition.getActions()
-                .orElseThrow()
                 .getFirst()
                 .getName();
 
@@ -453,7 +443,6 @@ public class ComponentDefinitionRegistryTest {
             assertThat(stub.getTitle()).contains("Fake");
             assertThat(stub.getIcon()).contains("path:assets/fake.svg");
             assertThat(stub.getComponentCategories()
-                .orElseThrow()
                 .getFirst()
                 .name()).isEqualTo("communication");
             assertThat(stub.getConnection()
@@ -461,20 +450,16 @@ public class ComponentDefinitionRegistryTest {
                 .getVersion()).isEqualTo(2);
             assertThat(stub.getConnection()
                 .orElseThrow()
-                .getAuthorizationRequired()).contains(false);
-            assertThat(stub.getActions()
-                .orElseThrow()).hasSize(1);
+                .getAuthorizationRequired()).isFalse();
+            assertThat(stub.getActions()).hasSize(1);
             assertThat(stub.getTriggers()
-                .orElseThrow()
                 .getFirst()
                 .getType()).isEqualTo(TriggerType.STATIC_WEBHOOK);
             assertThat(stub.getClusterElements()
-                .orElseThrow()
                 .getFirst()
                 .getType()
                 .key()).isEqualTo("tools");
-            assertThat(stub.getInputs()
-                .orElseThrow()).hasSize(1);
+            assertThat(stub.getInputs()).hasSize(1);
             assertThat(stub.getUnifiedApi()
                 .map(UnifiedApiDefinition::getCategory)).contains(UnifiedApiCategory.CRM);
 
@@ -543,10 +528,8 @@ public class ComponentDefinitionRegistryTest {
                 assertThat(componentDefinitions)
                     .filteredOn(componentDefinition -> "slack".equals(componentDefinition.getName()))
                     .singleElement()
-                    .satisfies(slackComponentDefinition -> assertThat(slackComponentDefinition.getActions()
-                        .orElse(List.of()))
-                            .anySatisfy(actionDefinition -> assertThat(actionDefinition.getProperties()
-                                .orElse(List.of())).isNotEmpty()));
+                    .satisfies(slackComponentDefinition -> assertThat(slackComponentDefinition.getActions())
+                        .anySatisfy(actionDefinition -> assertThat(actionDefinition.getProperties()).isNotEmpty()));
             }
 
             assertThat(bulkLoadCount.get()).isOne();

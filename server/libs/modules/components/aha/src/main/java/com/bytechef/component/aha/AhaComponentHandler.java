@@ -34,7 +34,6 @@ import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -48,9 +47,7 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
             String name = modifiableActionDefinition.getName();
 
             if (Objects.equals(name, "createFeature")) {
-                Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
-
-                List<Property> properties = new ArrayList<>(propertiesOptional.orElse(List.of()));
+                List<Property> properties = new ArrayList<>(modifiableActionDefinition.getProperties());
 
                 properties.addFirst(
                     string(PRODUCT_ID)
@@ -80,15 +77,13 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        Optional<List<? extends Authorization>> optionalAuthorizations =
-            modifiableConnectionDefinition.getAuthorizations();
+        List<? extends Authorization> authorizations = modifiableConnectionDefinition.getAuthorizations();
 
-        if (optionalAuthorizations.isPresent()) {
-            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+        if (!authorizations.isEmpty()) {
             ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
 
-            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
-            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
+            List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
+            List<Property> properties = new ArrayList<>(existingProperties);
 
             properties.addFirst(
                 string(SUBDOMAIN)

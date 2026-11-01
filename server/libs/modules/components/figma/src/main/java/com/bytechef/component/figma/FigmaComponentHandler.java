@@ -36,7 +36,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.naming.ConfigurationException;
 
 /**
@@ -67,11 +66,9 @@ public class FigmaComponentHandler extends AbstractFigmaComponentHandler {
         modifiableConnectionDefinition.help("",
             "https://docs.bytechef.io/reference/components/figma_v1#connection-setup");
 
-        Optional<List<? extends Authorization>> optionalAuthorizations =
-            modifiableConnectionDefinition.getAuthorizations();
+        List<? extends Authorization> authorizations = modifiableConnectionDefinition.getAuthorizations();
 
-        if (optionalAuthorizations.isPresent()) {
-            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+        if (!authorizations.isEmpty()) {
             ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
 
             modifiableAuthorization

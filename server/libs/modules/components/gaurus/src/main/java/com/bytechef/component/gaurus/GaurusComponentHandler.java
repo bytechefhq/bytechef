@@ -46,7 +46,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,8 +69,7 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
     private static final String TYPE = "type";
 
     public ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
-        Optional<Map<String, Object>> metadata = modifiableActionDefinition.getMetadata();
-        Map<String, Object> metadataMap = metadata.orElseGet(Collections::emptyMap);
+        Map<String, Object> metadataMap = modifiableActionDefinition.getMetadata();
 
         Optional<OutputDefinition> outputDefinitionOptional = modifiableActionDefinition.getOutputDefinition();
         Http.ResponseType responseType;
@@ -90,21 +88,18 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
         String path = (String) metadataMap.get("path");
 
         modifiableActionDefinition.perform((PerformFunction) (inputParameters, connectionParameters, context) -> {
-            Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
+            List<? extends Property> properties = modifiableActionDefinition.getProperties();
 
             String normalizedPath = path;
-            if (propertiesOptional.isPresent()) {
-                List<? extends Property> properties = propertiesOptional.get();
 
-                for (Property property : properties) {
-                    Map<String, Object> propertyMetadata = property.getMetadata();
+            for (Property property : properties) {
+                Map<String, Object> propertyMetadata = property.getMetadata();
 
-                    if (propertyMetadata.get(TYPE) == PropertyType.PATH) {
-                        normalizedPath = normalizedPath.replace(
-                            "{" + property.getName() + "}",
-                            URLEncoder.encode(
-                                inputParameters.getRequiredString(property.getName()), StandardCharsets.UTF_8));
-                    }
+                if (propertyMetadata.get(TYPE) == PropertyType.PATH) {
+                    normalizedPath = normalizedPath.replace(
+                        "{" + property.getName() + "}",
+                        URLEncoder.encode(
+                            inputParameters.getRequiredString(property.getName()), StandardCharsets.UTF_8));
                 }
             }
 
@@ -130,12 +125,12 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
                 .configuration(
                     Http.allowUnauthorizedCerts(connectionParameters.getBoolean(ALLOW_SELF_SIGNED_CERT, false))
                         .responseType(responseType))
-                .headers(getHeaders(inputParameters, propertiesOptional, clientId, requestId, timestamp, signature))
-                .queryParameters(getValuesMap(inputParameters, propertiesOptional, PropertyType.QUERY))
+                .headers(getHeaders(inputParameters, properties, clientId, requestId, timestamp, signature))
+                .queryParameters(getValuesMap(inputParameters, properties, PropertyType.QUERY))
                 .body(
                     getBody(
                         (BodyContentType) metadataMap.get("bodyContentType"),
-                        (String) metadataMap.get("mimeType"), inputParameters, propertiesOptional))
+                        (String) metadataMap.get("mimeType"), inputParameters, properties))
                 .execute();
 
             return response.getBody();
@@ -207,9 +202,9 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
     }
 
     private static @NonNull Map<String, List<String>> getHeaders(
-        Parameters inputParameters, Optional<List<? extends Property>> propertiesOptional, String clientId,
+        Parameters inputParameters, List<? extends Property> properties, String clientId,
         String requestId, String timestamp, String signature) {
-        Map<String, List<String>> headers = getValuesMap(inputParameters, propertiesOptional, PropertyType.HEADER);
+        Map<String, List<String>> headers = getValuesMap(inputParameters, properties, PropertyType.HEADER);
 
         headers.put(CLIENT_ID, List.of(clientId));
         headers.put("requestId", List.of(requestId));
@@ -221,18 +216,19 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
 
     private static Http.Body getBody(
         BodyContentType bodyContentType, String mimeType, Parameters inputParameters,
-        Optional<List<? extends Property>> propertiesOptional) {
+        List<? extends Property> properties) {
 
         if (bodyContentType == null) {
             return null;
         }
 
-        if (propertiesOptional.isPresent()) {
-            List<? extends Property> properties = propertiesOptional.get();
-
+        if (properties != null && !properties.isEmpty()) {
             List<? extends Property> bodyProperties = properties.stream()
-                .filter(property -> Objects.equals(property.getMetadata()
-                    .get(TYPE), PropertyType.BODY))
+                .filter(property -> {
+                    Map<String, Object> metadata = property.getMetadata();
+
+                    return Objects.equals(metadata.get(TYPE), PropertyType.BODY);
+                })
                 .toList();
 
             if (bodyProperties.size() == 1) {
@@ -294,15 +290,16 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
     }
 
     private static Map<String, List<String>> getValuesMap(
-        Parameters inputParameters, Optional<List<? extends Property>> propertiesOptional, PropertyType propertyType) {
+        Parameters inputParameters, List<? extends Property> properties, PropertyType propertyType) {
 
         Map<String, List<String>> valuesMap = new HashMap<>();
 
-        if (propertiesOptional.isPresent()) {
-            List<? extends Property> properties = propertiesOptional.get();
+        if (properties != null) {
             for (Property property : properties) {
-                if (Objects.equals(property.getMetadata()
-                    .get(TYPE), propertyType)) {
+
+                Map<String, Object> metadata = property.getMetadata();
+
+                if (Objects.equals(metadata.get(TYPE), propertyType)) {
                     List<String> values;
 
                     if (property.getType() == Property.Type.ARRAY) {

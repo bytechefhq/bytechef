@@ -19,7 +19,6 @@ package com.bytechef.platform.component.task.handler;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerProvider;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -64,13 +63,12 @@ public final class ComponentTaskHandlerProvider implements TaskHandlerProvider {
 
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
-        return OptionalUtils.orElse(componentDefinition.getActions(), List.of())
+        return componentDefinition.getActions()
             .stream()
             .collect(
                 Collectors.toMap(
                     actionDefinition -> BeanUtils.getBeanName(
-                        componentDefinition.getName(), componentDefinition.getVersion(),
-                        actionDefinition.getName()),
+                        componentDefinition.getName(), componentDefinition.getVersion(), actionDefinition.getName()),
                     actionDefinition -> {
                         ComponentHandlerLoader.ComponentTaskHandlerFunction componentTaskHandlerFunction =
                             componentHandlerEntry.componentTaskHandlerFunction();
