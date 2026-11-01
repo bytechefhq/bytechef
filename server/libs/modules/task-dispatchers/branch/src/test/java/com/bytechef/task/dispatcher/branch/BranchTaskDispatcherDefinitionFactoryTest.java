@@ -18,7 +18,9 @@
 
 package com.bytechef.task.dispatcher.branch;
 
+import com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutputDataSource;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -29,7 +31,10 @@ public class BranchTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
+        TaskListOutputDataSource stubDataSource = (workflowId, lastTaskName, lastTaskType, environmentId) -> null;
+
         JsonFileAssert.assertEquals(
-            "definition/branch_v1.json", new BranchTaskDispatcherDefinitionFactory().getDefinition());
+            "definition/branch_v1.json",
+            new BranchTaskDispatcherDefinitionFactory(Optional.of(stubDataSource)).getDefinition());
     }
 }
