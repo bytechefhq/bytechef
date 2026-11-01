@@ -1,4 +1,5 @@
-import RunErrorMessage, {RunErrorDataI} from '@/shared/components/ai-chat/messages/RunErrorMessage';
+import RunErrorMessage from '@/shared/components/ai-chat/messages/RunErrorMessage';
+import {RunErrorDataI} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {DataMessagePartProps} from '@assistant-ui/react';
 import {render, screen} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';

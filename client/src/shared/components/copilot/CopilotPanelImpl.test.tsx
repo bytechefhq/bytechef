@@ -166,6 +166,14 @@ describe('CopilotPanelContent closeGlobalPanel', () => {
     });
 });
 
+describe('CopilotPanelContent without an AI provider', () => {
+    it('offers the same Open AI Providers action as a coded run error', () => {
+        render(<CopilotPanelContent />, {wrapper});
+
+        expect(screen.getByRole('button', {name: 'Open AI Providers'})).toBeInTheDocument();
+    });
+});
+
 describe('CopilotPanelContent header', () => {
     beforeEach(() => {
         useCopilotPanelStore.setState({compactHeader: false, copilotPanelOpen: true});

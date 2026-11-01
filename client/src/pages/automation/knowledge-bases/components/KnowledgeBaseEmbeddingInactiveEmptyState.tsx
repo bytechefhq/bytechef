@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import {KNOWLEDGE_BASES_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
-import {AI_PROVIDERS_PATH} from '@/pages/automation/knowledge-bases/components/KnowledgeBasesEmptyState';
+import {AI_PROVIDERS_LINK_LABEL, AI_PROVIDERS_SETTINGS_PATH} from '@/shared/constants';
 import {SparklesIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
@@ -11,7 +11,9 @@ const KnowledgeBaseEmbeddingInactiveEmptyState = () => {
 
     return (
         <EmptyState
-            actions={<Button label="Go to AI Providers" onClick={() => void navigate(AI_PROVIDERS_PATH)} />}
+            actions={
+                <Button label={AI_PROVIDERS_LINK_LABEL} onClick={() => void navigate(AI_PROVIDERS_SETTINGS_PATH)} />
+            }
             description="Documents in a knowledge base are searched by meaning, which needs an embedding model. Enable OpenAI, Mistral or Ollama for this environment to upload and search documents again."
             docsLink={{href: KNOWLEDGE_BASES_DOCUMENTATION_URL, label: 'How knowledge bases work'}}
             icon={<SparklesIcon />}
