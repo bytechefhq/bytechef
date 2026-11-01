@@ -770,6 +770,34 @@ class AutomationMcpToolFacadeIntTest {
             .hasCauseInstanceOf(ExecutionException.class);
     }
 
+    @Test
+    void testWorkflowToolRunThatFailsToStartIsRecordedAsAnError() {
+        ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(completedJob());
+
+        when(principalJobFacade.createJob(any(), anyLong(), any()))
+            .thenThrow(new IllegalArgumentException("Missing required input: email"));
+
+        assertThatThrownBy(() -> toolCallback.call("{}"))
+            .hasMessageContaining("Missing required input: email");
+
+        ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+
+        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
+        assertThat(toolExecutionEvent.errorType()).isEqualTo("IllegalArgumentException");
+        assertThat(toolExecutionEvent.errorMessage()).isEqualTo("Missing required input: email");
+        assertThat(toolExecutionEvent.mcpServerId()).isEqualTo(30L);
+        assertThat(toolExecutionEvent.jobId()).isNull();
+    }
+
+    @Test
+    void testWorkflowToolRunRecordsTheJobId() {
+        ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(completedJob());
+
+        toolCallback.call("{}");
+
+        assertThat(captureRecordedToolExecutionEvent().jobId()).isEqualTo(5L);
+    }
+
     private ToolDefinition getToolDefinition(Map<String, Object> parameters) {
         McpTool mcpTool = new McpTool("post", parameters, 1L);
 
