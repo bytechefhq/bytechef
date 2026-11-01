@@ -165,41 +165,44 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             taskDispatcher.dispatch(branchTaskExecution);
         } else {
-            TaskExecution forkJoinTaskExecutionForUpdate =
-                taskExecutionService.getTaskExecutionForUpdate(taskExecutionParentId);
-
             int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
-            long jobId = Objects.requireNonNull(forkJoinTaskExecutionForUpdate.getJobId());
-
-            Map<String, Object> branchOutputs;
-
-            if (forkJoinTaskExecutionForUpdate.getOutput() != null) {
-                branchOutputs = new HashMap<>(readBranchOutputs(forkJoinTaskExecutionForUpdate.getOutput()));
-            } else {
-                branchOutputs = new HashMap<>();
-            }
 
             Object branchValue = taskExecution.getOutput() == null
                 ? null
                 : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
 
-            branchOutputs.put(ForkJoinTaskDispatcherConstants.BRANCH_OUTPUT_KEY_PREFIX + branch, branchValue);
-
-            forkJoinTaskExecutionForUpdate.setOutput(
-                taskFileStorage.storeTaskExecutionOutput(jobId, taskExecutionParentId, branchOutputs));
+            taskExecutionService.update(
+                taskExecutionParentId,
+                lockedForkJoinTaskExecution -> putBranchOutput(lockedForkJoinTaskExecution, branch, branchValue));
 
             long branchesLeft = counterService.decrement(taskExecutionParentId);
 
             if (branchesLeft == 0) {
-                forkJoinTaskExecutionForUpdate.setEndDate(Instant.now());
+                TaskExecution completedForkJoinTaskExecution = taskExecutionService.update(
+                    taskExecutionParentId,
+                    lockedForkJoinTaskExecution -> lockedForkJoinTaskExecution.setEndDate(Instant.now()));
 
-                forkJoinTaskExecutionForUpdate = taskExecutionService.update(forkJoinTaskExecutionForUpdate);
-
-                taskCompletionHandler.handle(forkJoinTaskExecutionForUpdate);
-            } else {
-                taskExecutionService.update(forkJoinTaskExecutionForUpdate);
+                taskCompletionHandler.handle(completedForkJoinTaskExecution);
             }
         }
+    }
+
+    private void putBranchOutput(TaskExecution forkJoinTaskExecution, int branch, Object branchValue) {
+        long jobId = Objects.requireNonNull(forkJoinTaskExecution.getJobId());
+        long forkJoinTaskExecutionId = Objects.requireNonNull(forkJoinTaskExecution.getId());
+
+        Map<String, Object> branchOutputs;
+
+        if (forkJoinTaskExecution.getOutput() != null) {
+            branchOutputs = new HashMap<>(readBranchOutputs(forkJoinTaskExecution.getOutput()));
+        } else {
+            branchOutputs = new HashMap<>();
+        }
+
+        branchOutputs.put(ForkJoinTaskDispatcherConstants.BRANCH_OUTPUT_KEY_PREFIX + branch, branchValue);
+
+        forkJoinTaskExecution.setOutput(
+            taskFileStorage.storeTaskExecutionOutput(jobId, forkJoinTaskExecutionId, branchOutputs));
     }
 
     @SuppressWarnings("unchecked")
