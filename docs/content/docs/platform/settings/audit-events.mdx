@@ -38,9 +38,9 @@ Each entry is a row in `persistent_audit_event` plus its data map in `persistent
 - **Event ID** - the entry's identifier.
 - **Principal** - the acting user's login.
 - **Platform** - **Automation** or **Embedded**, the side of the product the action belongs to. API key events take it from the key's own type, job events from the job's owner, and other actions from the area of the product that performed them. Sign-in events, platform-wide actions, and entries recorded before the platform was tracked have none.
-- **Event type** - the verb, e.g. `WORKFLOW_UPDATED`, `CONNECTION_DELETED`. The full set is catalogued below.
+- **Event type** - the verb, e.g. `PROJECT_PUBLISHED`, `CONNECTION_DELETED`. The full set is catalogued below.
 - **Event date** - when it happened.
-- **Data** - a string-to-string map of whatever the emitting site chose to record, typically the affected resource's id and name. Null values are dropped rather than stored.
+- **Data** - a string-to-string map of whatever the emitting site chose to record, typically the affected resource's id and name. Null values are dropped rather than stored. A value an operation declares that is longer than 256 characters keeps its beginning and ends in `...`; values recorded by sign-ins and `CREDENTIAL_USED` are cut at 256 characters without the marker. When a value cannot be computed, the entry is still written without it: `dataError` lists the keys that failed, or holds the exception class when none of the values could be evaluated. A failure in the event's mapper is recorded under `mapperError` as the exception class, or as `NULL_DATA` when the mapper returned nothing. When the state before the change could not be read, `captureError` holds the exception class and the entry is written even if the event would otherwise have been skipped.
 
 Anything you want to filter on later has to be in the **Data** map - that is what **Search** matches besides the principal.
 
@@ -60,30 +60,51 @@ The **Event type** group of the filter menu is populated from the events your in
 
 | Area | Event types |
 |---|---|
-| **Users** | `USER_CREATED`, `USER_ACTIVATED`, `USER_PASSWORD_CHANGED`, `USER_DELETED` |
+| **Users** | `USER_INVITED`, `USER_ROLE_UPDATED`, `USER_DELETED` |
+| **Identity providers** | `IDENTITY_PROVIDER_CREATED`, `IDENTITY_PROVIDER_UPDATED`, `IDENTITY_PROVIDER_DELETED` |
+| **OAuth2 clients** | `OAUTH2_CLIENT_DELETED`, `OAUTH2_CLIENT_GRANT_REVOKED`, `OAUTH2_CLIENT_ALL_GRANTS_REVOKED` - deleting a client that does not exist is not recorded |
 | **SCIM provisioning** | `SCIM_USER_CREATED`, `SCIM_USER_UPDATED`, `SCIM_USER_PATCHED`, `SCIM_USER_DEACTIVATED`, `SCIM_USER_DELETED`, `SCIM_GROUP_CREATED`, `SCIM_GROUP_UPDATED`, `SCIM_GROUP_DELETED` - recorded under the `scim:<identity provider name> (<identity provider id>)` principal; a PUT or PATCH that deactivates an active user is recorded once, as `SCIM_USER_DEACTIVATED` |
+| **Workspaces** | `WORKSPACE_CREATED`, `WORKSPACE_UPDATED`, `WORKSPACE_DELETED` |
 | **Workspace membership** | `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, `WORKSPACE_USER_ROLE_UPDATED` |
 | **Custom roles** | `CUSTOM_ROLE_CREATED`, `CUSTOM_ROLE_UPDATED`, `CUSTOM_ROLE_DELETED` |
-| **Projects** | `PROJECT_CREATED`, `PROJECT_UPDATED`, `PROJECT_DELETED` |
-| **Workflows** | `WORKFLOW_CREATED`, `WORKFLOW_UPDATED`, `WORKFLOW_DELETED` |
-| **Deployments** | `DEPLOYMENT_CREATED`, `DEPLOYMENT_UPDATED`, `DEPLOYMENT_ENABLED`, `DEPLOYMENT_DISABLED`, `DEPLOYMENT_DELETED` |
-| **Connections** | `CONNECTION_CREATED`, `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_GRANTED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_REASSIGNED`, `WORKFLOW_PAUSED` |
+| **Projects** | `PROJECT_CREATED`, `PROJECT_UPDATED`, `PROJECT_DELETED`, `PROJECT_PUBLISHED`, `PROJECT_VERSION_DELETED`, `PROJECT_EXPORTED`, `PROJECT_SHARED_EXPORTED`, `PROJECT_IMPORTED`, `PROJECT_TEMPLATE_IMPORTED`, `PROJECT_DUPLICATED`, `PROJECT_SHARED_DELETED`, `PROJECT_VERSION_RESTORED` - publishing records the new project version; a duplicate records the source and the new project |
+| **Workflows** | `WORKFLOW_CREATED`, `WORKFLOW_DELETED`, `WORKFLOW_DUPLICATED`, `WORKFLOW_VERSION_RESTORED`, `INTEGRATION_WORKFLOW_CREATED`, `INTEGRATION_WORKFLOW_DELETED`, `AUTOMATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED`, `INTEGRATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED` - `AUTOMATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED` covers the workflows of embedded automation projects; edits to a workflow definition are not recorded one by one; publishing the project or integration records the result |
+| **Deployments** | `DEPLOYMENT_CREATED`, `DEPLOYMENT_UPDATED`, `DEPLOYMENT_ENABLED_UPDATED`, `DEPLOYMENT_WORKFLOW_ENABLED_UPDATED`, `DEPLOYMENT_DELETED` - enabling or disabling records `enabled` as `true` or `false` |
+| **Connections (embedded)** | `CONNECTION_CREATED`, `CONNECTION_UPDATED`, `CONNECTION_REAUTHORIZED`, `CONNECTION_DISCONNECTED`, `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_GRANTED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_REASSIGNED`, `WORKFLOW_PAUSED` - connections managed through the embedded admin and connected-user APIs |
 | **API keys** | `API_KEY_CREATED`, `API_KEY_DELETED`, `WORKSPACE_API_KEY_CREATED`, `WORKSPACE_API_KEY_DELETED` |
-| **Custom components** | `CUSTOM_COMPONENT_CREATED`, `CUSTOM_COMPONENT_UPDATED`, `CUSTOM_COMPONENT_DELETED`, `CUSTOM_COMPONENT_ENABLED`, `CUSTOM_COMPONENT_DISABLED`, `CUSTOM_COMPONENT_PUBLISHED` |
-| **Data tables** | `DATA_TABLE_CREATED`, `DATA_TABLE_COLUMN_ADDED`, `DATA_TABLE_DELETED` |
-| **Knowledge bases** | `KB_CREATED`, `KB_UPDATED`, `KB_DELETED`, `KB_ASSIGNED_TO_WORKSPACE`, `KB_REMOVED_FROM_WORKSPACE` |
+| **Signing keys (embedded)** | `SIGNING_KEY_CREATED`, `SIGNING_KEY_UPDATED`, `SIGNING_KEY_DELETED` |
+| **Connected users (embedded)** | `CONNECTED_USER_CREATED`, `CONNECTED_USER_UPDATED`, `CONNECTED_USER_ENABLED_UPDATED`, `CONNECTED_USER_DELETED`, `CONNECTED_USERS_IMPORTED` - an import records how many users were created, skipped and rejected |
+| **AI providers** | `AI_PROVIDER_UPDATED`, `AI_PROVIDER_DELETED` - the provider's API key is never recorded, and its URL is recorded without user info, query or fragment |
+| **Custom components** | `CUSTOM_COMPONENT_ENABLED`, `CUSTOM_COMPONENT_DISABLED`, `CUSTOM_COMPONENT_PUBLISHED`, `CUSTOM_COMPONENT_SAVED` - an uploaded component, created or replaced, with its id, name, version and language |
+| **Data tables** | `DATA_TABLE_CREATED`, `DATA_TABLE_DUPLICATED`, `DATA_TABLE_RENAMED`, `DATA_TABLE_DELETED`, `DATA_TABLE_COLUMN_ADDED`, `DATA_TABLE_COLUMN_RENAMED`, `DATA_TABLE_COLUMN_REMOVED` - changes to a table's structure; deleting a table that does not exist is not recorded; rows are data and are not recorded |
+| **Knowledge bases** | `KB_CREATED`, `KB_CLONED`, `KB_UPDATED`, `KB_DELETED`, `KB_DOCUMENT_CREATED`, `KB_DOCUMENT_DELETED` - the workspace is recorded on `KB_CREATED` and `KB_CLONED` |
 | **API collections** | `API_COLLECTION_CREATED`, `API_COLLECTION_DELETED` |
-| **MCP** | `MCP_PROJECT_CREATED`, `MCP_PROJECT_DELETED` |
+| **MCP** | `MCP_SERVER_CREATED`, `MCP_SERVER_UPDATED`, `MCP_SERVER_DELETED`, `MCP_SERVER_SECRET_KEY_ROTATED`, `MCP_COMPONENT_CREATED`, `MCP_COMPONENT_UPDATED`, `MCP_COMPONENT_DELETED`, `MCP_PROJECT_CREATED`, `MCP_PROJECT_UPDATED`, `MCP_PROJECT_CLONED`, `MCP_PROJECT_DELETED`, `MANAGEMENT_MCP_SERVER_SECRET_KEY_ROTATED` - the secret key itself is never recorded |
+| **A2A** | `A2A_SERVER_CREATED`, `A2A_SERVER_UPDATED`, `A2A_SERVER_DELETED`, `A2A_PROJECT_CREATED`, `A2A_PROJECT_UPDATED`, `A2A_PROJECT_DELETED` |
 | **Context store** | `CONTEXT_STORE_SOURCE_CREATED`, `CONTEXT_STORE_SOURCE_DELETED`, `CONTEXT_STORE_SOURCE_ENABLED`, `CONTEXT_STORE_SOURCE_DISABLED` |
 | **AI Hub** | `AI_HUB_WORKSPACE_SETTINGS_UPDATED`, `AI_HUB_CHAT_CREATED`, `AI_HUB_CHAT_DELETED` |
-| **Integrations (embedded)** | `INTEGRATION_CREATED`, `INTEGRATION_UPDATED`, `INTEGRATION_DELETED` |
+| **Integrations (embedded)** | `INTEGRATION_CREATED`, `INTEGRATION_UPDATED`, `INTEGRATION_DELETED`, `INTEGRATION_PUBLISHED`, `INTEGRATION_INSTANCE_CONFIGURATION_CREATED`, `INTEGRATION_INSTANCE_CONFIGURATION_UPDATED`, `INTEGRATION_INSTANCE_CONFIGURATION_ENABLED_UPDATED`, `INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ENABLED_UPDATED`, `INTEGRATION_INSTANCE_CONFIGURATION_DELETED`, `INTEGRATION_INSTANCE_PROVISIONED`, `INTEGRATION_INSTANCE_ENABLED_UPDATED`, `INTEGRATION_INSTANCE_WORKFLOW_ENABLED_UPDATED`, `INTEGRATION_INSTANCE_DELETED` - publishing records the new integration version; `INTEGRATION_INSTANCE_*` events concern one connected user's instance |
+| **Automation workflow projects (embedded)** | `AUTOMATION_WORKFLOW_PROJECT_CREATED`, `AUTOMATION_WORKFLOW_PROJECT_UPDATED`, `AUTOMATION_WORKFLOW_PROJECT_DUPLICATED`, `AUTOMATION_WORKFLOW_PROJECT_PUBLISHED`, `AUTOMATION_WORKFLOW_PROJECT_DELETED`, `AUTOMATION_WORKFLOW_CREATED`, `AUTOMATION_WORKFLOW_DUPLICATED`, `AUTOMATION_WORKFLOW_DELETED`, `AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_CREATED`, `AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_UPDATED`, `AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_ENABLED_UPDATED`, `AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_WORKFLOW_ENABLED_UPDATED`, `AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_DELETED`, `CONNECTED_USER_PROJECT_WORKFLOWS_PROVISIONED`, `CONNECTED_USER_PROJECT_WORKFLOW_ENABLED_UPDATED`, `CONNECTED_USER_PROJECT_WORKFLOW_DELETED` - publishing records the new project version; a configuration pins a published project version to an environment |
+| **MCP servers (embedded)** | `MCP_INTEGRATION_INSTANCE_CONFIGURATION_CREATED`, `MCP_INTEGRATION_INSTANCE_CONFIGURATION_UPDATED`, `MCP_INTEGRATION_INSTANCE_CONFIGURATION_VERSION_UPDATED`, `MCP_INTEGRATION_INSTANCE_CONFIGURATION_DELETED`, `CONNECTED_USER_MCP_SERVER_PROVISIONED`, `CONNECTED_USER_MCP_SERVER_ENABLED_UPDATED`, `CONNECTED_USER_MCP_SERVER_DELETED` - the selected workflows are recorded by id; removing a server the connected user does not have is not recorded |
+| **App events (embedded)** | `APP_EVENT_CREATED`, `APP_EVENT_UPDATED`, `APP_EVENT_DELETED` - deleting an app event that does not exist is not recorded |
 | **Jobs** | `JOB_CREATED`, `JOB_STARTED`, `JOB_COMPLETED`, `JOB_FAILED`, `JOB_STOPPED` - recorded under the `SYSTEM` principal, with the job id in the data |
-| **Access checks** | `PERMISSION_CHECK` - a guarded call that was denied or failed, or a successful call that changes something; successful reads are not recorded |
+| **Authentication** | `AUTHENTICATION_SUCCESS`, `AUTHENTICATION_FAILURE` - a sign-in, or a rejected sign-in or credential; see [Credential use](#credential-use) |
+| **Credentials** | `CREDENTIAL_USED` - a request authenticated with an API key, an embedded connected-user token or an MCP token; see [Credential use](#credential-use) |
+| **Access checks** | `PERMISSION_CHECK` - a guarded call without an event type of its own that was denied or failed; see [Permission checks](#permission-checks) |
+
+### Credential use
+
+API keys, embedded connected-user tokens and MCP tokens authenticate every request, so recording each one as a sign-in would bury the log. Instead, `CREDENTIAL_USED` is recorded the first time a credential is used and then at most once per `bytechef.audit.credential-usage-interval` (one hour by default) on each server instance. Each instance tracks up to 10,000 credentials; beyond that, a credential can be recorded again before its interval ends, and a use whose entry could not be written is recorded again on the next request. A credential is the combination of tenant, credential type, principal, environment, API key and connected user, so two API keys of the same user are tracked separately. The data holds `credentialType` and, where they apply, `apiKeyId`, `connectedUserId` and `environmentId`; an MCP server reached with an API key records that key's `apiKeyId`. Requests to an MCP server that does not require authentication carry no credential and are not recorded. Failed authentications are not throttled: each one is recorded as `AUTHENTICATION_FAILURE`. This includes an API key or token that cannot be read or matched to a credential, recorded under the `[unresolved credential]` principal with the caller's address, an API key sent to an MCP server of another tenant, recorded in the MCP server's tenant (the key is ignored, so a server that does not require authentication still answers), and an MCP token rejected for any reason, for example its scope, audience, revocation, an inactive user or a wrong MCP server key. A request to a disabled MCP server is answered without recording a failure. When a check itself fails, for example because the database is unavailable, the request is answered with `503 Service Unavailable` and the reason says so instead of naming the token.
+
+### Permission checks
+
+A guarded call that is denied or fails is recorded with `DENIED` or `ERROR` as its result: under its own event type when it has one, for example `PROJECT_DELETED`, and as `PERMISSION_CHECK` otherwise. Passed checks are not recorded as `PERMISSION_CHECK`: an operation with its own event type above is recorded with the result `SUCCESS`, carrying the affected resource, unless the call changed nothing, such as a SCIM request that matched no user or the deletion of a workspace API key that did not exist. A successful audited operation called from inside another audited operation is recorded with the result `ROLLED_BACK` when the transaction it ran in does not commit while the outer operation's entries are still saved, for example when it ran in a transaction of its own. Entries are saved inside the caller's transaction when there is one, so if that transaction rolls back, its entries roll back with it, whatever their result; the server logs an `AUDIT PERSISTENCE FAILURE` line instead. Set `bytechef.audit.record-allowed-permission-checks` to `true` to record passed checks on calls that change something as well; passed checks recorded this way have the result `ALLOWED`. Passed checks on reads are never recorded: calls whose method name starts with `count`, `exists`, `fetch`, `find`, `get`, `has`, `is`, `list`, `load`, `read` or `search` followed by an uppercase letter, or is exactly one of those words.
 
 ## What is not logged
 
 - **Secret values.** The log records that a credential was created or deleted, by whom, and when - never the secret material.
 - **Workflow execution data.** Execution inputs and outputs live in execution history, so the audit log stays focused on privileged administrative actions rather than data flow.
+- **Fine-grained edits.** Tag assignments, edits to a workflow definition, workflow input and connection values, the settings of individual MCP and A2A tools, and webhook trigger tests started from the workflow editor are not recorded. A denied or failed attempt is still recorded as `PERMISSION_CHECK`.
 
 ## Retention
 
@@ -95,6 +116,13 @@ Audit entries persist in your operational database. A scheduled job deletes entr
 | `bytechef.audit.retention-cron` | `0 0 2 * * *` | When the purge runs - daily at 02:00 local time. |
 
 A `retention-days` of zero or less disables the purge rather than deleting the whole trail. Retention is instance-wide, not per workspace.
+
+## Configuration
+
+| Property | Default | Meaning |
+|---|---|---|
+| `bytechef.audit.credential-usage-interval` | `1h` | Minimum time between two `CREDENTIAL_USED` entries for the same credential. Zero or a negative value records every request. |
+| `bytechef.audit.record-allowed-permission-checks` | `false` | Also record passed permission checks on calls that change something. |
 
 ## Masking principals
 
