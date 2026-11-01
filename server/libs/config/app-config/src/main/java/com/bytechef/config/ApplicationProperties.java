@@ -2943,8 +2943,9 @@ public class ApplicationProperties {
         private static final Duration DEFAULT_CREDENTIAL_USAGE_INTERVAL = Duration.ofHours(1);
 
         /**
-         * Minimum interval between two CREDENTIAL_USED events for the same credential (API key, connected user or token
-         * principal, per tenant and environment); zero or a negative value records every request
+         * Minimum interval between two CREDENTIAL_USED events for the same credential (per tenant, credential type,
+         * principal, environment, API key and connected user) on each server instance; zero or a negative value records
+         * every request
          */
         private Duration credentialUsageInterval = DEFAULT_CREDENTIAL_USAGE_INTERVAL;
 
@@ -2954,8 +2955,9 @@ public class ApplicationProperties {
         private boolean maskPrincipals;
 
         /**
-         * Whether passed permission checks on methods that change something are recorded as PERMISSION_CHECK events;
-         * passed checks on read methods are never recorded, denied and failed checks always are
+         * Whether passed permission checks on methods that change something and have no event type of their own are
+         * recorded as PERMISSION_CHECK events with the result ALLOWED; @Audited methods are recorded under their own
+         * event type regardless of this setting, and passed checks on read methods never are
          */
         private boolean recordAllowedPermissionChecks;
 
