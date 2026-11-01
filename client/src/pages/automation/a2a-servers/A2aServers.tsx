@@ -21,13 +21,12 @@ import useA2aServers from './hooks/useA2aServers';
 
 const A2A_SERVER_STEPS = [
     {
-        description: 'Name it and choose whether callers must authenticate.',
         id: 'createA2aServer',
         label: 'Create an A2A server',
         status: 'current' as const,
     },
-    {id: 'addSkills', label: 'Add project workflows as its skills', status: 'upcoming' as const},
-    {id: 'connectAgent', label: "Share the server's URL with another agent", status: 'upcoming' as const},
+    {id: 'addSkills', label: 'Add workflows as skills', status: 'upcoming' as const},
+    {id: 'connectAgent', label: 'Connect another agent', status: 'upcoming' as const},
 ];
 
 const A2aServers = () => {
@@ -64,17 +63,12 @@ const A2aServers = () => {
         pageContent = (
             <EmptyState
                 actions={<A2aServerDialog triggerNode={<Button label="Create A2A Server" />} />}
-                description="An A2A server publishes an agent that other agents can discover and hand tasks to, over the Agent2Agent protocol. Each workflow you add becomes one of its skills. Three steps to get there:"
+                description="An A2A server publishes an agent that other agents can discover and hand tasks to, over the Agent2Agent protocol. Each workflow you add becomes one of its skills."
                 docsLink={{href: A2A_SERVERS_DOCUMENTATION_URL, label: 'How A2A servers work'}}
                 icon={<NetworkIcon />}
                 title="Create your first A2A server"
             >
-                <JourneySteps
-                    aria-label="Getting started"
-                    className="max-w-md"
-                    orientation="vertical"
-                    steps={A2A_SERVER_STEPS}
-                />
+                <JourneySteps aria-label="Getting started" steps={A2A_SERVER_STEPS} />
             </EmptyState>
         );
     }
