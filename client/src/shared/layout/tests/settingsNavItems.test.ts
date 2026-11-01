@@ -16,10 +16,13 @@ const splitAtOrganization = (navItems: SettingsNavItemI[]) => {
 };
 
 describe('getSettingsNavItems', () => {
-    it('lists Memories under an AI group of the Automation current workspace, not under the Organization AI group', () => {
+    it('lists Memories and Hub under an AI group of the Automation current workspace, not under the Organization AI group', () => {
         const {organization, section} = splitAtOrganization(getSettingsNavItems(PlatformType.AUTOMATION));
 
-        expect(findAiGroup(section)?.items).toEqual([{href: '/automation/settings/ai/memories', title: 'Memories'}]);
+        expect(findAiGroup(section)?.items).toEqual([
+            {href: '/automation/settings/ai/memories', title: 'Memories'},
+            {href: '/automation/settings/ai/hub', title: 'Hub'},
+        ]);
         expect(findAiGroup(organization)?.items?.map((item) => item.title)).toEqual([
             'Providers',
             'Skills',
@@ -43,6 +46,12 @@ describe('getSettingsNavItems', () => {
             'Skills',
             'Web Search',
         ]);
+    });
+
+    it('lists no AI Hub group in Automation', () => {
+        const navItems = getSettingsNavItems(PlatformType.AUTOMATION);
+
+        expect(navItems.find((navItem) => navItem.title === 'AI Hub')).toBeUndefined();
     });
 
     it('lists no Embedded Memories page in Automation', () => {

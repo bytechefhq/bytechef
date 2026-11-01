@@ -34,6 +34,10 @@ const automationSectionNavItems: SettingsNavItemI[] = [
                 href: MEMORIES_SETTINGS_PATH,
                 title: 'Memories',
             },
+            {
+                href: `${AUTOMATION_SETTINGS_PATH}/ai/hub`,
+                title: 'Hub',
+            },
         ],
         title: 'AI',
     },
