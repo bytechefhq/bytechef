@@ -18,37 +18,47 @@ package com.bytechef.platform.tool.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.tool.execution.config.ToolExecutionConfiguration;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import java.util.List;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Ivica Cardic
  */
-class ToolExecutionRecorderTest {
+@SpringJUnitConfig(
+    classes = {
+        ToolExecutionConfiguration.class, ToolExecutionRecorderIntTest.ToolExecutionRecorderIntTestConfiguration.class
+    })
+class ToolExecutionRecorderIntTest {
 
-    private ApplicationEventPublisher applicationEventPublisher;
-    private ToolExecutionRecorderImpl toolExecutionRecorder;
+    @Autowired
+    private MeterRegistry meterRegistry;
+
+    @Autowired
+    private ToolExecutionEventCollector toolExecutionEventCollector;
+
+    @Autowired
+    private ToolExecutionRecorder toolExecutionRecorder;
 
     @BeforeEach
-    @SuppressWarnings("unchecked")
     void beforeEach() {
-        applicationEventPublisher = mock(ApplicationEventPublisher.class);
-
-        ObjectProvider<io.micrometer.core.instrument.MeterRegistry> meterRegistryProvider = mock(ObjectProvider.class);
-
-        when(meterRegistryProvider.getIfAvailable()).thenReturn(null);
-
-        toolExecutionRecorder = new ToolExecutionRecorderImpl(applicationEventPublisher, meterRegistryProvider);
+        meterRegistry.clear();
+        toolExecutionEventCollector.reset();
     }
 
     @Test
@@ -63,7 +73,7 @@ class ToolExecutionRecorderTest {
 
         assertThat(result).isSameAs(output);
 
-        ToolExecutionEvent event = capturePublishedEvent();
+        ToolExecutionEvent event = getPublishedEvent();
 
         assertThat(event.outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
         assertThat(event.surface()).isEqualTo(ToolExecutionSurface.MCP_AUTOMATION);
@@ -89,7 +99,7 @@ class ToolExecutionRecorderTest {
                         throw failure;
                     }));
 
-        ToolExecutionEvent event = capturePublishedEvent();
+        ToolExecutionEvent event = getPublishedEvent();
 
         assertThat(event.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
         assertThat(event.errorType()).isEqualTo("IllegalStateException");
@@ -109,7 +119,7 @@ class ToolExecutionRecorderTest {
                         throw new CompletionException(new TimeoutException("timed out"));
                     }));
 
-        assertThat(capturePublishedEvent().outcome()).isEqualTo(ToolExecutionOutcome.TIMEOUT);
+        assertThat(getPublishedEvent().outcome()).isEqualTo(ToolExecutionOutcome.TIMEOUT);
     }
 
     @Test
@@ -121,7 +131,7 @@ class ToolExecutionRecorderTest {
 
         toolExecutionRecorder.record(connectionRequired);
 
-        assertThat(capturePublishedEvent()).isSameAs(connectionRequired);
+        assertThat(getPublishedEvent()).isSameAs(connectionRequired);
     }
 
     @Test
@@ -140,14 +150,92 @@ class ToolExecutionRecorderTest {
                         throw new RuntimeException(longMessage);
                     }));
 
-        assertThat(capturePublishedEvent().errorMessage()).hasSize(ToolExecutionEvent.ERROR_MESSAGE_MAX_LENGTH);
+        assertThat(getPublishedEvent().errorMessage()).hasSize(ToolExecutionEvent.ERROR_MESSAGE_MAX_LENGTH);
     }
 
-    private ToolExecutionEvent capturePublishedEvent() {
-        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+    @Test
+    void testRecordIncrementsTheInvocationCounterTaggedWithSurfaceAndOutcome() {
+        toolExecutionRecorder.record(
+            ToolExecutionEvent.builder(
+                PlatformType.EMBEDDED, ToolExecutionSurface.EMBEDDED_API_TOOL, ToolExecutionKind.COMPONENT,
+                "slack_sendMessage"),
+            () -> "ok");
 
-        verify(applicationEventPublisher).publishEvent(captor.capture());
+        toolExecutionRecorder.record(
+            ToolExecutionEvent.builder(
+                PlatformType.EMBEDDED, ToolExecutionSurface.EMBEDDED_API_TOOL, ToolExecutionKind.COMPONENT,
+                "slack_sendMessage"),
+            () -> "ok");
 
-        return (ToolExecutionEvent) captor.getValue();
+        Counter counter = meterRegistry.find(ToolExecutionRecorderImpl.INVOCATION_COUNTER)
+            .tag("surface", "EMBEDDED_API_TOOL")
+            .tag("outcome", "SUCCESS")
+            .counter();
+
+        assertThat(counter).isNotNull();
+        assertThat(counter.count()).isEqualTo(2.0);
+    }
+
+    @Test
+    void testAFailingListenerDoesNotBreakTheToolCall() {
+        toolExecutionEventCollector.failOnNextEvent();
+
+        Object result = toolExecutionRecorder.record(
+            ToolExecutionEvent.builder(
+                PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT,
+                "slack_sendMessage"),
+            () -> "ok");
+
+        assertThat(result).isEqualTo("ok");
+    }
+
+    private ToolExecutionEvent getPublishedEvent() {
+        List<ToolExecutionEvent> toolExecutionEvents = toolExecutionEventCollector.getToolExecutionEvents();
+
+        assertThat(toolExecutionEvents).hasSize(1);
+
+        return toolExecutionEvents.getFirst();
+    }
+
+    static class ToolExecutionEventCollector {
+
+        private final AtomicBoolean failOnNextEvent = new AtomicBoolean();
+        private final List<ToolExecutionEvent> toolExecutionEvents = new CopyOnWriteArrayList<>();
+
+        void failOnNextEvent() {
+            failOnNextEvent.set(true);
+        }
+
+        List<ToolExecutionEvent> getToolExecutionEvents() {
+            return List.copyOf(toolExecutionEvents);
+        }
+
+        @EventListener
+        void onToolExecutionEvent(ToolExecutionEvent toolExecutionEvent) {
+            if (failOnNextEvent.getAndSet(false)) {
+                throw new IllegalStateException("Listener failed");
+            }
+
+            toolExecutionEvents.add(toolExecutionEvent);
+        }
+
+        void reset() {
+            failOnNextEvent.set(false);
+            toolExecutionEvents.clear();
+        }
+    }
+
+    @Configuration
+    static class ToolExecutionRecorderIntTestConfiguration {
+
+        @Bean
+        MeterRegistry meterRegistry() {
+            return new SimpleMeterRegistry();
+        }
+
+        @Bean
+        ToolExecutionEventCollector toolExecutionEventCollector() {
+            return new ToolExecutionEventCollector();
+        }
     }
 }
