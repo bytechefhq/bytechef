@@ -14,6 +14,7 @@ import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdResponse;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.PlatformWorkflowExecutionProtoMapper;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.CreateChildJobRequest;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.CreatePrincipalJobRequest;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.CreatePrincipalLinkedJobRequest;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.PrincipalJobFacadeRemoteServiceGrpc;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.constant.PlatformType;
@@ -80,7 +81,14 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     public long createPrincipalLinkedJob(
         long referenceJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
 
-        throw new UnsupportedOperationException();
+        IdResponse idResponse = getStub().createPrincipalLinkedJob(
+            CreatePrincipalLinkedJobRequest.newBuilder()
+                .setJobParameters(platformWorkflowExecutionProtoMapper.toProto(jobParametersDTO))
+                .setPlatformType(platformType.name())
+                .setReferenceJobId(referenceJobId)
+                .build());
+
+        return idResponse.getId();
     }
 
     @Override

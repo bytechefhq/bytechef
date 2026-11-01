@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.remote.client.subflow;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
@@ -22,6 +23,7 @@ import com.bytechef.ee.automation.configuration.remote.client.config.AutomationC
 import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
 import com.bytechef.ee.automation.configuration.remote.grpc.ChildJobPrincipalFactoryRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
+import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -29,6 +31,8 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
+import io.grpc.ServerInterceptors;
+import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import java.io.IOException;
@@ -39,6 +43,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.grpc.server.exception.GrpcExceptionHandlerInterceptor;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -86,8 +91,10 @@ class RemoteChildJobPrincipalFactoryClientIntTest {
         server = InProcessServerBuilder.forName(name)
             .directExecutor()
             .addService(
-                new ChildJobPrincipalFactoryRemoteServiceGrpcServer(
-                    childJobPrincipalFactory, new AutomationConfigurationProtoMapper(objectMapper)))
+                ServerInterceptors.intercept(
+                    new ChildJobPrincipalFactoryRemoteServiceGrpcServer(
+                        childJobPrincipalFactory, new AutomationConfigurationProtoMapper(objectMapper)),
+                    new GrpcExceptionHandlerInterceptor(new GrpcRemoteExceptionHandler())))
             .build()
             .start();
 
@@ -158,5 +165,18 @@ class RemoteChildJobPrincipalFactoryClientIntTest {
 
         assertThat(childJob.getWorkflowId()).isEqualTo(childWorkflow.getId());
         assertThat(principalJobService.fetchJobPrincipalId(childJobId, PlatformType.AUTOMATION)).isEmpty();
+    }
+
+    @Test
+    void testCreatePrincipalLinkedJobOfAReferenceWithoutAPrincipalFails() {
+        Workflow referenceWorkflow = automationConfigurationIntTestData.createWorkflow("Reference");
+        Workflow linkedWorkflow = automationConfigurationIntTestData.createWorkflow("Linked");
+
+        long referenceJobId = jobFacade.createJob(new JobParametersDTO(referenceWorkflow.getId()));
+
+        assertThatThrownBy(() -> remoteChildJobPrincipalFactoryClient.createPrincipalLinkedJob(
+            referenceJobId, new JobParametersDTO(linkedWorkflow.getId())))
+                .isInstanceOf(StatusRuntimeException.class)
+                .hasMessageContaining("no principal found for reference job " + referenceJobId);
     }
 }

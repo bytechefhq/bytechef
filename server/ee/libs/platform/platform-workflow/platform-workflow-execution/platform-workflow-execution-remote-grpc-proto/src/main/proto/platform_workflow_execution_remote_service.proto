@@ -28,6 +28,7 @@ service JobResumeFacadeRemoteService {
 service PrincipalJobFacadeRemoteService {
   rpc CreateChildJob(CreateChildJobRequest) returns (bytechef.atlas.execution.remote.v1.IdResponse);
   rpc CreateJob(CreatePrincipalJobRequest) returns (bytechef.atlas.execution.remote.v1.IdResponse);
+  rpc CreatePrincipalLinkedJob(CreatePrincipalLinkedJobRequest) returns (bytechef.atlas.execution.remote.v1.IdResponse);
   rpc CreateSyncJob(CreatePrincipalJobRequest) returns (bytechef.atlas.execution.remote.v1.RemoteJob);
 }
 
@@ -106,6 +107,12 @@ message ResumeJobStreamingResponse {
 
 message CreateChildJobRequest {
   int64 parent_job_id = 1;
+  bytechef.atlas.execution.remote.v1.RemoteJobParameters job_parameters = 2;
+  string platform_type = 3;
+}
+
+message CreatePrincipalLinkedJobRequest {
+  int64 reference_job_id = 1;
   bytechef.atlas.execution.remote.v1.RemoteJobParameters job_parameters = 2;
   string platform_type = 3;
 }
