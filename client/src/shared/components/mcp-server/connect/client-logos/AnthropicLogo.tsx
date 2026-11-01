@@ -1,0 +1,19 @@
+interface AnthropicLogoPropsI {
+    className?: string;
+}
+
+const AnthropicLogo = ({className}: AnthropicLogoPropsI) => (
+    <svg
+        aria-hidden="true"
+        className={className}
+        fill="currentColor"
+        viewBox="0 0 500 500"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path d="M284.254,95.506l123.19,308.988H475L351.81,95.506H284.254L284.254,95.506z" />
+
+        <path d="M141.337,282.223l42.152-108.587l42.152,108.587H141.337L141.337,282.223z M148.171,95.506 L25,404.494h68.87l25.19-64.888h128.861l25.186,64.888h68.87L218.807,95.506H148.171L148.171,95.506z" />
+    </svg>
+);
+
+export default AnthropicLogo;
