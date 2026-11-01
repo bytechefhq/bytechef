@@ -21,10 +21,12 @@ package com.bytechef.component.firecrawl.constant;
  */
 public class FirecrawlConstants {
 
+    public static final String ACTIVITY_TTL = "activityTtl";
     public static final String ALLOW_EXTERNAL_LINKS = "allowExternalLinks";
     public static final String ALLOW_SUBDOMAINS = "allowSubdomains";
     public static final String BLOCK_ADS = "blockAds";
     public static final String CATEGORIES = "categories";
+    public static final String CODE = "code";
     public static final String COUNTRY = "country";
     public static final String CRAWL_ENTIRE_DOMAIN = "crawlEntireDomain";
     public static final String DELAY = "delay";
@@ -42,6 +44,8 @@ public class FirecrawlConstants {
     public static final String INCLUDE_PROFILE = "includeProfile";
     public static final String INCLUDE_SUBDOMAINS = "includeSubdomains";
     public static final String INCLUDE_TAGS = "includeTags";
+    public static final String INTERACTION_TYPE = "interactionType";
+    public static final String LANGUAGE = "language";
     public static final String LANGUAGES = "languages";
     public static final String LIMIT = "limit";
     public static final String LOCATION = "location";
@@ -59,14 +63,19 @@ public class FirecrawlConstants {
     public static final String REGEX_ON_FULL_URL = "regexOnFullURL";
     public static final String REMOVE_BASE64_IMAGES = "removeBase64Images";
     public static final String SAVE_CHANGES = "saveChanges";
+    public static final String SCRAPE_ID = "scrapeId";
     public static final String SCRAPE_OPTIONS = "scrapeOptions";
     public static final String SEARCH = "search";
+    public static final String SESSION_ID = "sessionId";
     public static final String SITEMAP = "sitemap";
     public static final String SKIP_TLS_VERIFICATION = "skipTlsVerification";
     public static final String SOURCES = "sources";
+    public static final String STATUS = "status";
     public static final String STORE_IN_CACHE = "storeInCache";
+    public static final String STREAM_WEB_VIEW = "streamWebView";
     public static final String TBS = "tbs";
     public static final String TIMEOUT = "timeout";
+    public static final String TTL = "ttl";
     public static final String URL = "url";
     public static final String WAIT_FOR = "waitFor";
     public static final String WEBHOOK = "webhook";
