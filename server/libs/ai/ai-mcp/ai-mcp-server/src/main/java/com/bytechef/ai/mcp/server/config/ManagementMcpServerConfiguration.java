@@ -17,13 +17,17 @@
 package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.ai.mcp.server.tool.ToolInvocationRecordingToolCallback;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
+import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.platform.tool.execution.ToolExecutionKind;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
@@ -102,13 +106,16 @@ public class ManagementMcpServerConfiguration {
     private final ScriptTools scriptTools;
     private final ClusterElementTools clusterElementTools;
     private final List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors;
+    private final ToolExecutionRecorder toolExecutionRecorder;
+    private final WorkspaceScopeResolver workspaceScopeResolver;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
         ComponentTools componentTools, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools,
         TaskTools taskTools, TaskDispatcherTools taskDispatcherTools, ScriptTools scriptTools,
         ClusterElementTools clusterElementTools,
-        List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors) {
+        List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors,
+        ToolExecutionRecorder toolExecutionRecorder, WorkspaceScopeResolver workspaceScopeResolver) {
 
         this.componentTools = componentTools;
         this.projectTools = projectTools;
@@ -118,6 +125,8 @@ public class ManagementMcpServerConfiguration {
         this.scriptTools = scriptTools;
         this.clusterElementTools = clusterElementTools;
         this.mcpServerToolCallbackContributors = mcpServerToolCallbackContributors;
+        this.toolExecutionRecorder = toolExecutionRecorder;
+        this.workspaceScopeResolver = workspaceScopeResolver;
     }
 
     @Bean
@@ -159,13 +168,24 @@ public class ManagementMcpServerConfiguration {
             projectTools, projectWorkflowTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
             clusterElementTools);
 
-        List<ToolCallback> toolCallbacks = new ArrayList<>(List.of(ToolCallbacks.from(tools.toArray())));
+        List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+        for (ToolCallback toolCallback : ToolCallbacks.from(tools.toArray())) {
+            toolCallbacks.add(recording(toolCallback, ToolExecutionKind.MANAGEMENT_TOOL));
+        }
 
         for (McpServerToolCallbackContributor contributor : mcpServerToolCallbackContributors) {
-            toolCallbacks.addAll(contributor.getToolCallbacks());
+            for (ToolCallback toolCallback : contributor.getToolCallbacks()) {
+                toolCallbacks.add(recording(toolCallback, ToolExecutionKind.CONTRIBUTED));
+            }
         }
 
         return ToolCallbackProvider.from(toolCallbacks);
+    }
+
+    private ToolCallback recording(ToolCallback toolCallback, ToolExecutionKind kind) {
+        return new ToolInvocationRecordingToolCallback(
+            toolCallback, kind, toolExecutionRecorder, workspaceScopeResolver);
     }
 
     private McpAsyncServer createMcpAsyncServer(WebMvcStreamableServerTransportProvider transportProvider) {
