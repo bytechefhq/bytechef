@@ -25,6 +25,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.CredentialAuthenticationEventPublisher;
+import com.bytechef.platform.security.web.authentication.PlatformUserAuthentication;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
@@ -393,7 +394,8 @@ class TenantAwareJwtAuthenticationFilterTest {
                 currentUserLogin.set(SecurityUtils.fetchCurrentUserLogin());
             });
 
-        assertThat(authentication.get()).isInstanceOf(JwtAuthenticationToken.class);
+        assertThat(authentication.get()).isInstanceOf(JwtAuthenticationToken.class)
+            .isInstanceOf(PlatformUserAuthentication.class);
         assertThat(authentication.get()
             .getPrincipal()).isInstanceOf(UserDetails.class);
         assertThat(currentUserLogin.get()).contains("admin@localhost.com");
@@ -414,6 +416,7 @@ class TenantAwareJwtAuthenticationFilterTest {
                 .getAuthentication()));
 
         assertThat(authorityNames(authentication.get())).doesNotContain("ROLE_ADMIN");
+        assertThat(authentication.get()).isNotInstanceOf(PlatformUserAuthentication.class);
     }
 
     @Test

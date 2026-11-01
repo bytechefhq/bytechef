@@ -227,9 +227,12 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        JwtAuthenticationToken authentication = new JwtAuthenticationToken(
-            jwt, new org.springframework.security.core.userdetails.User(mcpJwtIdentity.login(), "", authorities),
-            authorities);
+        org.springframework.security.core.userdetails.User userDetails =
+            new org.springframework.security.core.userdetails.User(mcpJwtIdentity.login(), "", authorities);
+
+        JwtAuthenticationToken authentication = issuer.isSelf()
+            ? new PlatformUserJwtAuthenticationToken(jwt, userDetails, authorities)
+            : new JwtAuthenticationToken(jwt, userDetails, authorities);
 
         if (authenticationEventPublisher != null) {
             TenantContext.runWithTenantId(
