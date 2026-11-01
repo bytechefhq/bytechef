@@ -154,6 +154,39 @@ class ToolExecutionRecorderIntTest {
     }
 
     @Test
+    void testRecordResolvesTheOutcomeFromTheResult() {
+        Object result = toolExecutionRecorder.record(
+            ToolExecutionEvent.builder(
+                PlatformType.EMBEDDED, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionKind.WORKFLOW, "runWorkflow"),
+            () -> "paused",
+            output -> "paused".equals(output) ? ToolExecutionOutcome.APPROVAL_REQUIRED : ToolExecutionOutcome.SUCCESS);
+
+        assertThat(result).isEqualTo("paused");
+        assertThat(getPublishedEvent().outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_REQUIRED);
+    }
+
+    @Test
+    void testRecordKeepsWhatTheExecutionSetsOnTheBuilder() {
+        ToolExecutionEvent.Builder toolExecutionEventBuilder = ToolExecutionEvent.builder(
+            PlatformType.EMBEDDED, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionKind.WORKFLOW, "runWorkflow");
+
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(
+                () -> toolExecutionRecorder.record(
+                    toolExecutionEventBuilder,
+                    () -> {
+                        toolExecutionEventBuilder.jobId(5L);
+
+                        throw new IllegalStateException("Job 5 failed");
+                    }));
+
+        ToolExecutionEvent event = getPublishedEvent();
+
+        assertThat(event.jobId()).isEqualTo(5L);
+        assertThat(event.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
+    }
+
+    @Test
     void testRecordIncrementsTheInvocationCounterTaggedWithSurfaceAndOutcome() {
         toolExecutionRecorder.record(
             ToolExecutionEvent.builder(

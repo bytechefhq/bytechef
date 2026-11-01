@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.tool.execution;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +24,13 @@ import java.util.function.Supplier;
  */
 public interface ToolExecutionRecorder {
 
-    <V> V record(ToolExecutionEvent.Builder builder, Supplier<V> execution);
+    default <V> V record(ToolExecutionEvent.Builder builder, Supplier<V> execution) {
+        return record(builder, execution, result -> ToolExecutionOutcome.SUCCESS);
+    }
+
+    <V> V record(
+        ToolExecutionEvent.Builder builder, Supplier<V> execution,
+        Function<? super V, ToolExecutionOutcome> outcomeResolver);
 
     void record(ToolExecutionEvent event);
 }
