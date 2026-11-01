@@ -30,7 +30,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useMcpProjectsByServerIdQuery: () => ({data: undefined}),
 }));
 
-vi.mock('@/shared/components/mcp-server/McpServerConfiguration', () => ({
+vi.mock('@/shared/components/mcp-server/connect/McpConnectPanel', () => ({
     default: () => <div>Server configuration</div>,
 }));
 
