@@ -261,5 +261,12 @@ describe('AppSidebar', () => {
             expect(screen.queryByRole('button', {name: 'Servers'})).not.toBeInTheDocument();
             expect(screen.getByRole('link', {name: 'MCP Servers'})).toBeInTheDocument();
         });
+
+        it('renders a one-item group as a plain row on the expanded sidebar', () => {
+            renderSidebar(true, '/automation/projects', [...navigation, groupedNavigation[navigation.length]]);
+
+            expect(screen.queryByRole('button', {name: 'Servers'})).not.toBeInTheDocument();
+            expect(screen.getByRole('link', {name: 'MCP Servers'})).toBeInTheDocument();
+        });
     });
 });
