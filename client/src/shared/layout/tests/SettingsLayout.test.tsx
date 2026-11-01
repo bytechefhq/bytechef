@@ -15,6 +15,7 @@ vi.mock('@/shared/layout/LayoutContainer', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    EditionType: {CE: 'CE', EE: 'EE'},
     useApplicationInfoStore: () => false,
 }));
 

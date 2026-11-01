@@ -6,6 +6,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import Settings, {SettingsNavItemI} from '../Settings';
 
 const hoisted = vi.hoisted(() => ({
+    aiHubEnabled: false,
+    edition: 'EE' as 'CE' | 'EE',
     enabledFeatureFlags: [] as string[],
 }));
 
@@ -18,7 +20,13 @@ vi.mock('@/shared/layout/LayoutContainer', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
-    useApplicationInfoStore: () => false,
+    EditionType: {CE: 'CE', EE: 'EE'},
+    useApplicationInfoStore: (selector: (state: unknown) => unknown) =>
+        selector({
+            ai: {hub: {enabled: hoisted.aiHubEnabled}},
+            application: {edition: hoisted.edition},
+            billing: {enabled: false},
+        }),
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
@@ -42,6 +50,8 @@ const aiNavGroup: SettingsNavItemI = {
 
 describe('Settings', () => {
     beforeEach(() => {
+        hoisted.aiHubEnabled = false;
+        hoisted.edition = 'EE';
         hoisted.enabledFeatureFlags = [];
     });
 
@@ -171,6 +181,38 @@ describe('Settings', () => {
 
         expect(screen.getByRole('link', {name: 'API Keys'})).not.toHaveAttribute('aria-current');
         expect(screen.getByRole('link', {name: 'Admin API Keys'})).toHaveAttribute('aria-current', 'page');
+    });
+
+    describe('AI Hub tool approvals entry', () => {
+        const aiHubNavGroup: SettingsNavItemI = {
+            items: [{href: '/automation/settings/ai-hub/tool-approvals', title: 'Tool Approvals'}],
+            title: 'AI Hub',
+        };
+
+        it('shows the entry on the EE edition with the AI Hub enabled', () => {
+            hoisted.aiHubEnabled = true;
+
+            renderSettings([{title: 'Organization'}, aiHubNavGroup], '/automation/settings/ai-hub/tool-approvals');
+
+            expect(screen.getByRole('link', {name: 'Tool Approvals'})).toBeInTheDocument();
+        });
+
+        it('hides the entry and its group when the AI Hub is disabled', () => {
+            renderSettings([{href: '/settings/users', title: 'Users'}, aiHubNavGroup]);
+
+            expect(screen.queryByText('AI Hub')).not.toBeInTheDocument();
+            expect(screen.queryByText('Tool Approvals')).not.toBeInTheDocument();
+        });
+
+        it('hides the entry on the CE edition even when the AI Hub is enabled', () => {
+            hoisted.aiHubEnabled = true;
+            hoisted.edition = 'CE';
+
+            renderSettings([{href: '/settings/users', title: 'Users'}, aiHubNavGroup]);
+
+            expect(screen.queryByText('AI Hub')).not.toBeInTheDocument();
+            expect(screen.queryByText('Tool Approvals')).not.toBeInTheDocument();
+        });
     });
 
     it('names the browser tab after the current settings page', () => {

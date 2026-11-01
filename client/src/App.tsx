@@ -8,7 +8,7 @@ import useAutomationGettingStartedCompleted from '@/pages/automation/getting-sta
 import shouldShowAutomationGettingStarted from '@/pages/automation/getting-started/shouldShowAutomationGettingStarted';
 import {useCloseProjectsLeftSidebarOnLeave} from '@/pages/automation/project/hooks/useCloseProjectsLeftSidebarOnLeave';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {AUTOMATION_GETTING_STARTED_PATH, EMBEDDED_GETTING_STARTED_PATH} from '@/pages/home/constants/platformModes';
+import {EMBEDDED_GETTING_STARTED_PATH} from '@/pages/home/constants/platformModes';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -20,6 +20,12 @@ import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
+import {
+    NavigationType,
+    automationNavigation,
+    executionsNavigationGroup,
+    filterAutomationNavigation,
+} from '@/shared/navigation/automationNavigation';
 import {resolveShellPlatformMode} from '@/shared/navigation/platformMode';
 import {isStandaloneRoute} from '@/shared/navigation/standaloneRoutes';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -28,26 +34,16 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
-    ActivityIcon,
-    FolderIcon,
     HammerIcon,
     HistoryIcon,
-    Layers3Icon,
-    LayoutTemplateIcon,
     Link2Icon,
-    LucideIcon,
-    MessagesSquareIcon,
-    NetworkIcon,
-    RadioTowerIcon,
     RocketIcon,
     ServerIcon,
     Settings2Icon,
     SlidersHorizontalIcon,
     SquareIcon,
-    Table2Icon,
     UnplugIcon,
     UsersIcon,
-    VectorSquareIcon,
     Workflow,
     ZapIcon,
 } from 'lucide-react';
@@ -57,81 +53,6 @@ import {useShallow} from 'zustand/react/shallow';
 
 const CopilotPanel = lazy(() => import('@/shared/components/copilot/CopilotPanel'));
 const GlobalSearchDialog = lazy(() => import('@/components/GlobalSearch/GlobalSearchDialog'));
-
-type NavigationGroupType = {
-    icon: LucideIcon;
-    name: string;
-};
-
-type NavigationType = {
-    group?: NavigationGroupType;
-    name: string;
-    href: string;
-    icon: LucideIcon;
-};
-
-const executionsNavigationGroup: NavigationGroupType = {icon: ActivityIcon, name: 'Executions'};
-
-const serversNavigationGroup: NavigationGroupType = {icon: RadioTowerIcon, name: 'Servers'};
-
-const automationNavigation: NavigationType[] = [
-    {
-        href: AUTOMATION_GETTING_STARTED_PATH,
-        icon: RocketIcon,
-        name: 'Getting Started',
-    },
-    {
-        href: '/automation/projects',
-        icon: FolderIcon,
-        name: 'Projects',
-    },
-    {
-        href: '/automation/deployments',
-        icon: Layers3Icon,
-        name: 'Project Deployments',
-    },
-    {
-        href: '/automation/api-platform',
-        icon: LayoutTemplateIcon,
-        name: 'API Collections',
-    },
-    {
-        group: serversNavigationGroup,
-        href: '/automation/mcp-servers',
-        icon: ServerIcon,
-        name: 'MCP Servers',
-    },
-    {
-        group: serversNavigationGroup,
-        href: '/automation/a2a-servers',
-        icon: NetworkIcon,
-        name: 'A2A Servers',
-    },
-    {
-        group: executionsNavigationGroup,
-        href: '/automation/workflow-executions',
-        icon: HistoryIcon,
-        name: 'Workflow Executions',
-    },
-    {
-        group: executionsNavigationGroup,
-        href: '/automation/external-invocations',
-        icon: HammerIcon,
-        name: 'External Invocations',
-    },
-    {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
-    {
-        href: '/automation/datatables',
-        icon: Table2Icon,
-        name: 'Data Tables',
-    },
-    {
-        href: '/automation/knowledge-bases',
-        icon: VectorSquareIcon,
-        name: 'Knowledge Base',
-    },
-    {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
-];
 
 const embeddedNavigation: NavigationType[] = [
     {href: EMBEDDED_GETTING_STARTED_PATH, icon: RocketIcon, name: 'Getting Started'},
@@ -262,36 +183,13 @@ function App() {
         isAdmin,
     });
 
-    const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
-        if (navItem.href === AUTOMATION_GETTING_STARTED_PATH) {
-            return showAutomationGettingStarted;
-        }
-
-        if (
-            currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT &&
-            edition === EditionType.EE &&
-            navItem.href === '/automation/projects'
-        ) {
-            return false;
-        }
-
-        if (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && navItem.href === '/automation/deployments') {
-            return false;
-        }
-
-        if (navItem.href === '/automation/api-platform') {
-            return ff_1023;
-        }
-
-        if (navItem.href === '/automation/knowledge-bases') {
-            return ai.knowledgeBase.enabled;
-        }
-
-        if (navItem.href === '/automation/external-invocations') {
-            return edition === EditionType.EE;
-        }
-
-        return true;
+    const filteredAutomationNavigation = filterAutomationNavigation({
+        aiHubEnabled: ai.hub.enabled,
+        apiPlatformEnabled: ff_1023,
+        currentEnvironmentId,
+        edition,
+        gettingStartedVisible: showAutomationGettingStarted,
+        knowledgeBaseEnabled: ai.knowledgeBase.enabled,
     });
 
     const filteredEmbeddedNavigation = embeddedNavigation.filter((navItem) => {
