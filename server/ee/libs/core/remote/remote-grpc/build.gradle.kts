@@ -35,6 +35,8 @@ dependencies {
     testImplementation("io.grpc:grpc-inprocess")
     testImplementation("io.grpc:grpc-services")
     testImplementation("org.springframework.graphql:spring-graphql")
+    testImplementation("org.springframework.security:spring-security-oauth2-jose")
+    testImplementation("org.springframework.security:spring-security-oauth2-resource-server")
     testImplementation(project(":server:libs:test:test-support"))
     testImplementation(
         testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
