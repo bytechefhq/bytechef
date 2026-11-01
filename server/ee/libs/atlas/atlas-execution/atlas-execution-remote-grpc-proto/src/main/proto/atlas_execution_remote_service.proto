@@ -33,6 +33,7 @@ service TaskExecutionRemoteService {
   rpc Create(RemoteTaskExecution) returns (RemoteTaskExecution);
   rpc FetchLastJobTaskExecution(IdRequest) returns (TaskExecutionResult);
   rpc GetJobTaskExecutions(IdRequest) returns (RemoteTaskExecutions);
+  rpc GetJobUnfinishedTaskExecutions(IdRequest) returns (RemoteTaskExecutions);
   rpc GetParentTaskExecutions(IdRequest) returns (RemoteTaskExecutions);
   rpc GetTaskExecution(IdRequest) returns (RemoteTaskExecution);
   rpc GetTaskExecutionForUpdate(IdRequest) returns (RemoteTaskExecution);

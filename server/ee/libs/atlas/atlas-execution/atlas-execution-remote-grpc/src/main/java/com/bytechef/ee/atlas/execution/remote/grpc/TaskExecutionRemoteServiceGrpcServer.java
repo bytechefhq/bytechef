@@ -70,6 +70,16 @@ public class TaskExecutionRemoteServiceGrpcServer
     }
 
     @Override
+    public void getJobUnfinishedTaskExecutions(
+        IdRequest request, StreamObserver<RemoteTaskExecutions> responseObserver) {
+
+        responseObserver.onNext(
+            atlasExecutionProtoMapper
+                .toRemoteTaskExecutions(taskExecutionService.getJobUnfinishedTaskExecutions(request.getId())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void getParentTaskExecutions(IdRequest request, StreamObserver<RemoteTaskExecutions> responseObserver) {
         responseObserver.onNext(
             atlasExecutionProtoMapper
