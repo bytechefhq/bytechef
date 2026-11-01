@@ -18,3 +18,5 @@ spring:
   grpc:
     server:
       port: 0
+  liquibase:
+    contexts: user

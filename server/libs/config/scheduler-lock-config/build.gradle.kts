@@ -3,9 +3,11 @@ dependencies {
     implementation(libs.net.javacrumbs.shedlock.shedlock.spring)
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-jdbc")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
 
     testImplementation("org.liquibase:liquibase-core")
+    testImplementation("org.springframework.boot:spring-boot-jdbc")
     testImplementation("org.springframework.boot:spring-boot-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")

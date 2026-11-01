@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":server:libs:config:jdbc-config"))
     implementation(project(":server:libs:config:logback-config"))
     implementation(project(":server:libs:config:liquibase-config"))
+    implementation(project(":server:libs:config:scheduler-lock-config"))
     implementation(project(":server:libs:config:security-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
