@@ -90,9 +90,9 @@ public class WebhookNotificationClient {
         httpHeaders.set("X-ByteChef-Timestamp", String.valueOf(timestamp));
         httpHeaders.set("X-ByteChef-Delivery", String.valueOf(UUID.randomUUID()));
 
-        for (Map.Entry<String, String> header : webhookDeliveryRequest.headers()
-            .entrySet()) {
+        Map<String, String> headers = webhookDeliveryRequest.headers();
 
+        for (Map.Entry<String, String> header : headers.entrySet()) {
             httpHeaders.set(header.getKey(), header.getValue());
         }
 
