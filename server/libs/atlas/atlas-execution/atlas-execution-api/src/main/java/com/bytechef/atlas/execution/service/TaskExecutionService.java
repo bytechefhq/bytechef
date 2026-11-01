@@ -20,6 +20,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author Ivica Cardic
@@ -83,4 +84,14 @@ public interface TaskExecutionService {
     List<TaskExecution> getParentTaskExecutions(long parentId);
 
     TaskExecution update(TaskExecution taskExecution);
+
+    /**
+     * Locks the task execution with the given id, applies the modifier to its current state and saves it, all in one
+     * transaction, so concurrent read-modify-write updates of the same task execution cannot overwrite each other.
+     *
+     * @param id                    the id of the task execution
+     * @param taskExecutionModifier modifies the locked task execution before it is saved
+     * @return the saved task execution
+     */
+    TaskExecution update(long id, Consumer<TaskExecution> taskExecutionModifier);
 }

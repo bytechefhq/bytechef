@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -323,6 +324,20 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
             // Do not override initial workflow task definition
 
             taskExecution.setWorkflowTask(currentTaskExecution.getWorkflowTask());
+
+            return taskExecutionRepository.save(taskExecution);
+        } finally {
+            taskExecutionRepository.unlockForUpdate(id);
+        }
+    }
+
+    @Override
+    public TaskExecution update(long id, Consumer<TaskExecution> taskExecutionModifier) {
+        TaskExecution taskExecution = taskExecutionRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
+
+        try {
+            taskExecutionModifier.accept(taskExecution);
 
             return taskExecutionRepository.save(taskExecution);
         } finally {
