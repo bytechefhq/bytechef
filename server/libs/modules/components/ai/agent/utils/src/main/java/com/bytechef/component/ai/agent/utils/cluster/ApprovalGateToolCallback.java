@@ -35,11 +35,6 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ActionContextAware.ApprovalLinks;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -76,16 +71,13 @@ public class ApprovalGateToolCallback implements DelegatingToolCallback {
     private final ActionContextAware actionContext;
 
     @Nullable
-    private final ToolExecutionRecorder toolExecutionRecorder;
-
-    @Nullable
     private final Duration approvalExpiry;
 
     public ApprovalGateToolCallback(
         ToolCallback delegate, @Nullable String gateName, List<ClusterElement> approvalChannelClusterElements,
         Map<String, ComponentConnection> componentConnections,
         ClusterElementDefinitionService clusterElementDefinitionService, ActionContextAware actionContext,
-        @Nullable ToolExecutionRecorder toolExecutionRecorder, @Nullable Duration approvalExpiry) {
+        @Nullable Duration approvalExpiry) {
 
         this.delegate = delegate;
         this.gateName = gateName;
@@ -93,7 +85,6 @@ public class ApprovalGateToolCallback implements DelegatingToolCallback {
         this.componentConnections = Map.copyOf(componentConnections);
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.actionContext = actionContext;
-        this.toolExecutionRecorder = toolExecutionRecorder;
         this.approvalExpiry = approvalExpiry;
     }
 
@@ -152,24 +143,7 @@ public class ApprovalGateToolCallback implements DelegatingToolCallback {
 
         actionContext.suspend(new ActionContext.Suspend(continueParameters, expiresAt));
 
-        recordGateRaised();
-
         return ToolSuspension.suspendedToolResult(actionContext);
-    }
-
-    private void recordGateRaised() {
-        if (toolExecutionRecorder == null) {
-            return;
-        }
-
-        toolExecutionRecorder.record(
-            ToolExecutionEvent
-                .builder(
-                    actionContext.getPlatformType(), ToolExecutionSurface.AI_AGENT, ToolExecutionKind.COMPONENT,
-                    getName())
-                .jobId(actionContext.getJobId())
-                .outcome(ToolExecutionOutcome.APPROVAL_REQUIRED)
-                .build());
     }
 
     private void deliverApprovalRequest(

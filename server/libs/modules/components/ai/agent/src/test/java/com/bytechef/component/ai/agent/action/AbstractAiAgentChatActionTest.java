@@ -75,9 +75,6 @@ import com.bytechef.platform.component.definition.ai.agent.SessionConversationHi
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -90,7 +87,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -130,7 +126,6 @@ import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;
-import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -2075,7 +2070,7 @@ class AbstractAiAgentChatActionTest {
         @BeforeEach
         void setUp() {
             action = new AbstractAiAgentChatAction(
-                aiAgentToolFacade, clusterElementDefinitionService, mock(ToolCallingManager.class), null) {};
+                aiAgentToolFacade, clusterElementDefinitionService, mock(ToolCallingManager.class)) {};
 
             lenient().when(context.isEditorEnvironment())
                 .thenReturn(false);
@@ -2096,7 +2091,7 @@ class AbstractAiAgentChatActionTest {
         void testApprovedToolNestedUnderAnApprovalGateRunsTheUnwrappedTool() throws Exception {
             AiAgentUtilsApprovalGate aiAgentUtilsApprovalGate = new AiAgentUtilsApprovalGate(
                 new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService),
-                clusterElementDefinitionService, null);
+                clusterElementDefinitionService);
 
             ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> approvalGateDefinition =
                 aiAgentUtilsApprovalGate.clusterElementDefinition;
@@ -2327,65 +2322,6 @@ class AbstractAiAgentChatActionTest {
                 .doesNotContain("\"result\"");
         }
 
-        @Test
-        @SuppressWarnings("unchecked")
-        void testRejectedRecordsApprovalDeniedAuditEvent() throws Exception {
-            ToolExecutionRecorder toolExecutionRecorder = mock(ToolExecutionRecorder.class);
-
-            AbstractAiAgentChatAction auditedAction = createAuditedAction(toolExecutionRecorder);
-
-            auditedAction.resolveGatedToolResumeData(
-                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME),
-                data(false, "not now"), Map.of(), EXTENSIONS, context);
-
-            ArgumentCaptor<com.bytechef.platform.tool.execution.ToolExecutionEvent> eventArgumentCaptor =
-                ArgumentCaptor.forClass(com.bytechef.platform.tool.execution.ToolExecutionEvent.class);
-
-            verify(toolExecutionRecorder).record(eventArgumentCaptor.capture());
-
-            com.bytechef.platform.tool.execution.ToolExecutionEvent toolExecutionEvent =
-                eventArgumentCaptor.getValue();
-
-            assertThat(toolExecutionEvent.surface()).isEqualTo(ToolExecutionSurface.AI_AGENT);
-            assertThat(toolExecutionEvent.toolName()).isEqualTo(GATED_TOOL_NAME);
-            assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_DENIED);
-        }
-
-        @Test
-        @SuppressWarnings("unchecked")
-        void testApprovedExecutionRunsThroughTheAuditRecorder() throws Exception {
-            when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class))).thenReturn("message sent: ts=1721");
-
-            ToolExecutionRecorder toolExecutionRecorder = mock(ToolExecutionRecorder.class);
-
-            when(toolExecutionRecorder.record(
-                any(com.bytechef.platform.tool.execution.ToolExecutionEvent.Builder.class), any(Supplier.class)))
-                    .thenAnswer(invocation -> ((Supplier<Object>) invocation.getArgument(1)).get());
-
-            AbstractAiAgentChatAction auditedAction = createAuditedAction(toolExecutionRecorder);
-
-            String resumeData = auditedAction.resolveGatedToolResumeData(
-                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME),
-                data(true, null), Map.of(), EXTENSIONS, context);
-
-            verify(toolExecutionRecorder).record(
-                any(com.bytechef.platform.tool.execution.ToolExecutionEvent.Builder.class), any(Supplier.class));
-            verify(toolCallback).call(eq(GATED_TOOL_INPUT), any(ToolContext.class));
-
-            assertThat(resumeData).contains("message sent: ts=1721");
-        }
-
-        @SuppressWarnings("unchecked")
-        private AbstractAiAgentChatAction createAuditedAction(ToolExecutionRecorder toolExecutionRecorder) {
-            ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider = mock(ObjectProvider.class);
-
-            when(toolExecutionRecorderObjectProvider.getIfAvailable()).thenReturn(toolExecutionRecorder);
-
-            return new AbstractAiAgentChatAction(
-                aiAgentToolFacade, clusterElementDefinitionService, mock(ToolCallingManager.class),
-                toolExecutionRecorderObjectProvider) {};
-        }
-
         private static GatedToolSuspension continueParameters(String gatedToolName) {
             Map<String, Object> continueParameters = Map.of(
                 ToolSuspendConstants.GATED_TOOL_NAME, gatedToolName,
@@ -2411,7 +2347,7 @@ class AbstractAiAgentChatActionTest {
             AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
             ToolCallingManager toolCallingManager) {
 
-            super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, null);
+            super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
         }
     }
 }

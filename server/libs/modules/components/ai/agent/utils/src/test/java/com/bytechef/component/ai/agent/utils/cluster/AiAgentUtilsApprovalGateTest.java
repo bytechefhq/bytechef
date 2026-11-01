@@ -43,7 +43,7 @@ class AiAgentUtilsApprovalGateTest {
 
     private final ClusterElementToolCallbacks clusterElementToolCallbacks = mock(ClusterElementToolCallbacks.class);
     private final AiAgentUtilsApprovalGate approvalGate = new AiAgentUtilsApprovalGate(
-        clusterElementToolCallbacks, mock(ClusterElementDefinitionService.class), null);
+        clusterElementToolCallbacks, mock(ClusterElementDefinitionService.class));
 
     @Test
     void testGateIsATypeOfTool() {

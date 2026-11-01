@@ -25,6 +25,5 @@ public enum ToolExecutionSurface {
     MCP_EMBEDDED,
     MCP_MANAGEMENT,
     EMBEDDED_API_ACTION,
-    EMBEDDED_API_TOOL,
-    AI_AGENT
+    EMBEDDED_API_TOOL
 }
