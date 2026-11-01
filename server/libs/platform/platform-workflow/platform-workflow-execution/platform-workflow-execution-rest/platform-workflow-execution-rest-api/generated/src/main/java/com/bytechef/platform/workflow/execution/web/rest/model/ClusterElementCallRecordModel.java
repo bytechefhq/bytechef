@@ -64,7 +64,9 @@ public class ClusterElementCallRecordModel {
     
     WITHHELD("WITHHELD"),
     
-    DENIED("DENIED");
+    DENIED("DENIED"),
+    
+    APPROVED("APPROVED");
 
     private final String value;
 
@@ -222,11 +224,11 @@ public class ClusterElementCallRecordModel {
   }
 
   /**
-   * The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason). For a DENIED outcome, the reviewer's reason.
+   * The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason). For a DENIED outcome, the reviewer's reason. For an APPROVED approval-gate call, the reviewer (approvedBy) and their comment.
    * @return output
    */
   
-  @Schema(name = "output", description = "The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason). For a DENIED outcome, the reviewer's reason.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "output", description = "The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason). For a DENIED outcome, the reviewer's reason. For an APPROVED approval-gate call, the reviewer (approvedBy) and their comment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("output")
   public @Nullable String getOutput() {
     return output;
