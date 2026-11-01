@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.remote.grpc;
 
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.ChildJobPrincipalFactoryRemoteServiceGrpc;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.CreateChildJobRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.CreatePrincipalLinkedJobRequest;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdResponse;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,6 +44,21 @@ public class ChildJobPrincipalFactoryRemoteServiceGrpcServer
         responseObserver.onNext(
             IdResponse.newBuilder()
                 .setId(childJobId)
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void createPrincipalLinkedJob(
+        CreatePrincipalLinkedJobRequest request, StreamObserver<IdResponse> responseObserver) {
+
+        long jobId = childJobPrincipalFactory.createPrincipalLinkedJob(
+            request.getReferenceJobId(),
+            automationConfigurationProtoMapper.toJobParametersDTO(request.getJobParameters()));
+
+        responseObserver.onNext(
+            IdResponse.newBuilder()
+                .setId(jobId)
                 .build());
         responseObserver.onCompleted();
     }

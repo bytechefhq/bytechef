@@ -12,6 +12,7 @@ option java_package = "com.bytechef.ee.automation.configuration.remote.grpc.prot
 
 service ChildJobPrincipalFactoryRemoteService {
   rpc CreateChildJob(CreateChildJobRequest) returns (IdResponse);
+  rpc CreatePrincipalLinkedJob(CreatePrincipalLinkedJobRequest) returns (IdResponse);
 }
 
 service PermissionRemoteService {
@@ -82,6 +83,11 @@ message IdResponse {
 
 message CreateChildJobRequest {
   int64 parent_job_id = 1;
+  bytechef.atlas.execution.remote.v1.RemoteJobParameters job_parameters = 2;
+}
+
+message CreatePrincipalLinkedJobRequest {
+  int64 reference_job_id = 1;
   bytechef.atlas.execution.remote.v1.RemoteJobParameters job_parameters = 2;
 }
 

@@ -238,6 +238,18 @@ class RemotePrincipalJobFacadeClientIntTest {
     }
 
     @Test
+    void testCreatePrincipalLinkedJobOfAReferenceWithoutPrincipalFails() {
+        long referenceJobId = remotePrincipalJobFacadeClient.createJob(
+            new JobParametersDTO(workflow.getId(), Map.of("orderId", 1)), PRINCIPAL_ID, PlatformType.AUTOMATION);
+
+        assertThatThrownBy(
+            () -> remotePrincipalJobFacadeClient.createPrincipalLinkedJob(
+                referenceJobId, new JobParametersDTO(workflow.getId(), Map.of("orderId", 2)), PlatformType.EMBEDDED))
+                    .isInstanceOf(StatusRuntimeException.class)
+                    .hasMessageContaining("no principal found for reference job " + referenceJobId);
+    }
+
+    @Test
     void testCreateChildJobOfAParentWithoutPrincipalHasNoPrincipal() {
         long parentJobId = remotePrincipalJobFacadeClient.createJob(
             new JobParametersDTO(workflow.getId(), Map.of("orderId", 1)), PRINCIPAL_ID, PlatformType.AUTOMATION);

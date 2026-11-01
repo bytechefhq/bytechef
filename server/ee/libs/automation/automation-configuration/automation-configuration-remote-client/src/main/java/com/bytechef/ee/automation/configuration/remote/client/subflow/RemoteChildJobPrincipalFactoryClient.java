@@ -11,6 +11,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.ChildJobPrincipalFactoryRemoteServiceGrpc;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.CreateChildJobRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.CreatePrincipalLinkedJobRequest;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdResponse;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -39,10 +40,7 @@ public class RemoteChildJobPrincipalFactoryClient implements ChildJobPrincipalFa
 
     @Override
     public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO) {
-        ChildJobPrincipalFactoryRemoteServiceGrpc.ChildJobPrincipalFactoryRemoteServiceBlockingStub stub =
-            ChildJobPrincipalFactoryRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
-
-        IdResponse idResponse = stub.createChildJob(
+        IdResponse idResponse = getStub().createChildJob(
             CreateChildJobRequest.newBuilder()
                 .setJobParameters(automationConfigurationProtoMapper.toProto(jobParametersDTO))
                 .setParentJobId(parentJobId)
@@ -53,6 +51,16 @@ public class RemoteChildJobPrincipalFactoryClient implements ChildJobPrincipalFa
 
     @Override
     public long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO) {
-        throw new UnsupportedOperationException();
+        IdResponse idResponse = getStub().createPrincipalLinkedJob(
+            CreatePrincipalLinkedJobRequest.newBuilder()
+                .setJobParameters(automationConfigurationProtoMapper.toProto(jobParametersDTO))
+                .setReferenceJobId(referenceJobId)
+                .build());
+
+        return idResponse.getId();
+    }
+
+    private ChildJobPrincipalFactoryRemoteServiceGrpc.ChildJobPrincipalFactoryRemoteServiceBlockingStub getStub() {
+        return ChildJobPrincipalFactoryRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
     }
 }

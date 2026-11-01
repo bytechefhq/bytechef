@@ -11,6 +11,7 @@ import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJob;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.CreateChildJobRequest;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.CreatePrincipalJobRequest;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.CreatePrincipalLinkedJobRequest;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.PrincipalJobFacadeRemoteServiceGrpc;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -56,6 +57,21 @@ public class PrincipalJobFacadeRemoteServiceGrpcServer
                     principalJobFacade.createJob(
                         platformWorkflowExecutionProtoMapper.toJobParametersDTO(request.getJobParameters()),
                         request.getJobPrincipalId(),
+                        PlatformType.valueOf(request.getPlatformType())))
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void createPrincipalLinkedJob(
+        CreatePrincipalLinkedJobRequest request, StreamObserver<IdResponse> responseObserver) {
+
+        responseObserver.onNext(
+            IdResponse.newBuilder()
+                .setId(
+                    principalJobFacade.createPrincipalLinkedJob(
+                        request.getReferenceJobId(),
+                        platformWorkflowExecutionProtoMapper.toJobParametersDTO(request.getJobParameters()),
                         PlatformType.valueOf(request.getPlatformType())))
                 .build());
         responseObserver.onCompleted();
