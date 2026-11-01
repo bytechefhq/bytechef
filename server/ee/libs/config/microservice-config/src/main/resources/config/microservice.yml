@@ -167,12 +167,19 @@ bytechef:
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false
+    hub:
+      # Whether the AI Hub is enabled
+      enabled: false
     knowledge-base:
       enabled: false
       # Number of concurrent consumers per knowledge base message route (used by AMQP | JMS brokers)
       subscriptions:
         document-chunk-update-events: 1
         document-process-events: 1
+    mcp:
+      server:
+        # Whether the management MCP server is enabled
+        enabled: true
     memory:
       aws:
         bucket-prefix: bytechef-chat-memory
