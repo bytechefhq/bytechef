@@ -332,21 +332,26 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
             inputs.put(triggerName, resolvedTriggerInputs);
             inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, triggerName);
 
-            long jobId = principalJobFacade.createJob(
-                new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs),
-                projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
+            ToolExecutionEvent.Builder eventBuilder = ToolExecutionEvent
+                .builder(PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW,
+                    toolName)
+                .environment(Math.toIntExact(mcpServer.getEnvironmentId()))
+                .mcpServerId(mcpServerId)
+                .workspaceId(workspaceId);
 
             WorkflowToolRunResult workflowToolRunResult = toolExecutionRecorder.record(
-                ToolExecutionEvent
-                    .builder(PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW,
-                        toolName)
-                    .environment(Math.toIntExact(mcpServer.getEnvironmentId()))
-                    .mcpServerId(mcpServerId)
-                    .workspaceId(workspaceId)
-                    .jobId(jobId),
-                () -> getWorkflowRunResult(
-                    jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
-                        .join()),
+                eventBuilder,
+                () -> {
+                    long jobId = principalJobFacade.createJob(
+                        new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs),
+                        projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
+
+                    eventBuilder.jobId(jobId);
+
+                    return getWorkflowRunResult(
+                        jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
+                            .join());
+                },
                 WorkflowToolRunResult::getOutcome);
 
             return workflowToolRunResult.result();
