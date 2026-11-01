@@ -45,6 +45,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.test.config.TestWorkflowExecutorIntTestConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,6 +68,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(
     classes = TestWorkflowExecutorIntTestConfiguration.class,
     properties = "bytechef.workflow.repository.jdbc.enabled=true")
+@SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
 class AiAgentTestFacadeIntTest {
 
     private static final String AI_AGENT_NODE_NAME = "aiAgent1";
