@@ -14,6 +14,7 @@ import com.bytechef.ee.tenant.repository.TenantRepository;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.Tenancy;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -89,6 +90,7 @@ class MultiTenantServiceIntTest {
         assertThat(fetchProbeTenantIds("bytechef_000001")).containsExactly("000001");
     }
 
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private int countAppliedChangeSets(String schema) {
         Integer count = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM " + schema + ".databasechangelog WHERE id LIKE '20261031000000%'", Integer.class);
@@ -96,6 +98,7 @@ class MultiTenantServiceIntTest {
         return count == null ? 0 : count;
     }
 
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private List<String> fetchProbeTenantIds(String schema) {
         return jdbcTemplate.queryForList("SELECT tenant_id FROM " + schema + ".tenant_changelog_probe", String.class);
     }
