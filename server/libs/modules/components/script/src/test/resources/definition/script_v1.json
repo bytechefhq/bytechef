@@ -237,7 +237,7 @@
     }, {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "function perform(input, context) {\n\treturn null;\n}",
+      "defaultValue": "function perform(input, connection, context) {\n    // input holds the values defined in the Input panel (top right of this editor).\n    //\n    // connection holds the parameters of each connection defined in the\n    // Connections panel (bottom right of this editor), keyed by its name:\n    // const token = connection[\"my-connection\"].token;\n    //\n    // Reach another component's action through the context:\n    // const response = context.component.httpClient.get(\n    //     {uri: \"https://api.example.com/items\"}, \"my-connection\");\n\n    return null;\n}",
       "description": "Add your JavaScript custom logic here.",
       "displayCondition": null,
       "exampleValue": null,
@@ -498,7 +498,7 @@
     }, {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context):\n\treturn None",
+      "defaultValue": "def perform(input, connection, context):\n    # input holds the values defined in the Input panel (top right of this editor).\n    #\n    # connection holds the parameters of each connection defined in the\n    # Connections panel (bottom right of this editor), keyed by its name:\n    # token = connection[\"my-connection\"][\"token\"]\n    #\n    # Reach another component's action through the context:\n    # response = context.component.httpClient.get(\n    #     {\"uri\": \"https://api.example.com/items\"}, \"my-connection\")\n\n    return None",
       "description": "Add your Python custom logic here.",
       "displayCondition": null,
       "exampleValue": null,
@@ -759,7 +759,7 @@
     }, {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context)\n\treturn null;\nend",
+      "defaultValue": "def perform(input, connection, context)\n  # input holds the values defined in the Input panel (top right of this editor).\n  #\n  # connection holds the parameters of each connection defined in the\n  # Connections panel (bottom right of this editor), keyed by its name:\n  # token = connection[\"my-connection\"][\"token\"]\n  #\n  # Reach another component's action through the context:\n  # response = context.component.httpClient.get(\n  #   { \"uri\" => \"https://api.example.com/items\" }, \"my-connection\")\n\n  return nil\nend",
       "description": "Add your Ruby custom logic here.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1006,7 +1006,7 @@
     }, {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "function perform(input, context) {\n\treturn null;\n}",
+      "defaultValue": "function perform(input, connection, context) {\n    // input holds the values defined in the Input panel (top right of this editor).\n    //\n    // connection holds the parameters of each connection defined in the\n    // Connections panel (bottom right of this editor), keyed by its name:\n    // const token = connection[\"my-connection\"].token;\n    //\n    // Reach another component's action through the context:\n    // const response = context.component.httpClient.get(\n    //     {uri: \"https://api.example.com/items\"}, \"my-connection\");\n\n    return null;\n}",
       "description": "Custom JavaScript code to execute as a tool.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1258,7 +1258,7 @@
     }, {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context):\n\treturn None",
+      "defaultValue": "def perform(input, connection, context):\n    # input holds the values defined in the Input panel (top right of this editor).\n    #\n    # connection holds the parameters of each connection defined in the\n    # Connections panel (bottom right of this editor), keyed by its name:\n    # token = connection[\"my-connection\"][\"token\"]\n    #\n    # Reach another component's action through the context:\n    # response = context.component.httpClient.get(\n    #     {\"uri\": \"https://api.example.com/items\"}, \"my-connection\")\n\n    return None",
       "description": "Custom Python code to execute as a tool.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1510,7 +1510,7 @@
     }, {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context)\n\treturn nil;\nend",
+      "defaultValue": "def perform(input, connection, context)\n  # input holds the values defined in the Input panel (top right of this editor).\n  #\n  # connection holds the parameters of each connection defined in the\n  # Connections panel (bottom right of this editor), keyed by its name:\n  # token = connection[\"my-connection\"][\"token\"]\n  #\n  # Reach another component's action through the context:\n  # response = context.component.httpClient.get(\n  #   { \"uri\" => \"https://api.example.com/items\" }, \"my-connection\")\n\n  return nil\nend",
       "description": "Custom Ruby code to execute as a tool.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1548,7 +1548,7 @@
     "properties": [ {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "function perform(input, context) {\n\treturn null;\n}",
+      "defaultValue": "function perform(input, context) {\n    // input.item holds the item being processed.\n    //\n    // Reach another component's action through the context:\n    // const response = context.component.httpClient.get(\n    //     {uri: \"https://api.example.com/items\"});\n\n    return null;\n}",
       "description": "Custom JavaScript code to process items. The item is available as 'item' parameter.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1586,7 +1586,7 @@
     "properties": [ {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context):\n\treturn None",
+      "defaultValue": "def perform(input, context):\n    # input.item holds the item being processed.\n    #\n    # Reach another component's action through the context:\n    # response = context.component.httpClient.get(\n    #     {\"uri\": \"https://api.example.com/items\"})\n\n    return None",
       "description": "Custom Python code to process items. The item is available as 'item' parameter.",
       "displayCondition": null,
       "exampleValue": null,
@@ -1624,7 +1624,7 @@
     "properties": [ {
       "advancedOption": null,
       "controlType": "CODE_EDITOR",
-      "defaultValue": "def perform(input, context)\n\treturn null;\nend",
+      "defaultValue": "def perform(input, context)\n  # input.item holds the item being processed.\n  #\n  # Reach another component's action through the context:\n  # response = context.component.httpClient.get(\n  #   { \"uri\" => \"https://api.example.com/items\" })\n\n  return nil\nend",
       "description": "Custom Ruby code to process items. The item is available as 'item' parameter.",
       "displayCondition": null,
       "exampleValue": null,
