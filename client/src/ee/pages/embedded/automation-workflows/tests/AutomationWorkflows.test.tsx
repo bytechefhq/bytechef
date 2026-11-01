@@ -186,7 +186,7 @@ describe('AutomationWorkflows', () => {
 
         renderWithProviders(<AutomationWorkflows />);
 
-        expect(screen.getByText('No Projects')).toBeInTheDocument();
+        expect(screen.getByText('Create your first project')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: /create project/i})).toBeInTheDocument();
     });
 
@@ -255,14 +255,15 @@ describe('AutomationWorkflows', () => {
         expect(screen.queryByText('Unused')).toBeNull();
     });
 
-    it('hides the header but keeps the left sidebar when there are no projects', () => {
+    it('hides the left sidebar and shows the page title in the main header on first run', () => {
         hoisted.projects = [];
 
         renderWithProviders(<AutomationWorkflows />);
 
-        expect(screen.getByText('No Projects')).toBeInTheDocument();
+        expect(screen.getByText('Create your first project')).toBeInTheDocument();
+        expect(screen.getAllByText('Automation Workflows')).toHaveLength(1);
         expect(screen.queryByRole('button', {name: /^new project$/i})).toBeNull();
-        expect(screen.getByText('Categories')).toBeInTheDocument();
+        expect(screen.queryByText('Categories')).toBeNull();
     });
 
     it('opens the project dialog when New Project is clicked', async () => {

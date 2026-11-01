@@ -1,7 +1,9 @@
 import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
+import EmptyFilterResult from '@/components/EmptyFilterResult';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import ConnectionsFilterTitle from '@/ee/pages/embedded/connections/components/ConnectionsFilterTitle';
+import {EMBEDDED_CONNECTIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {Connection} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
@@ -12,6 +14,7 @@ import {
 } from '@/ee/shared/queries/embedded/connections.queries';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionsLeftSidebarNav from '@/shared/components/connection/ConnectionsLeftSidebarNav';
+import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -29,6 +32,8 @@ export const Connections = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const [searchParams] = useSearchParams();
+
+    const environmentScopeNote = useEnvironmentScopeNote('Connections');
 
     const componentName = searchParams.get('componentName');
     const tagId = searchParams.get('tagId');
@@ -69,16 +74,18 @@ export const Connections = () => {
 
     const componentRowsAreLoading = componentsLoading || connectionsIsLoading || unfilteredConnectionsIsLoading;
 
+    const isFirstRun = !hasActiveFilter && connections?.length === 0;
+
     return (
         <LayoutContainer
             header={
-                connections &&
-                connections.length > 0 &&
-                componentDefinitions && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={
+                        connections &&
+                        connections.length > 0 &&
+                        componentDefinitions && (
                             <ConnectionDialog
                                 componentDefinitions={componentDefinitions}
                                 connection={
@@ -93,16 +100,20 @@ export const Connections = () => {
                                 useCreateConnectionMutation={useCreateConnectionMutation}
                                 useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                             />
-                        }
-                        title={
+                        )
+                    }
+                    title={
+                        ((connections && connections.length > 0) || hasActiveFilter) && componentDefinitions ? (
                             <ConnectionsFilterTitle
                                 componentDefinitions={componentDefinitions}
                                 filterData={filterData}
                                 tags={tags}
                             />
-                        }
-                    />
-                )
+                        ) : (
+                            isFirstRun && 'Connections'
+                        )
+                    }
+                />
             }
             leftSidebarBody={
                 <ConnectionsLeftSidebarNav
@@ -116,6 +127,7 @@ export const Connections = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="Connections" />}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader
@@ -131,9 +143,11 @@ export const Connections = () => {
                             tags={tags}
                         />
                     )
+                ) : hasActiveFilter ? (
+                    <EmptyFilterResult entityName="connections" entityTitle="Connections" />
                 ) : (
-                    <EmptyList
-                        button={
+                    <EmptyState
+                        actions={
                             componentDefinitions && (
                                 <ConnectionDialog
                                     componentDefinitions={componentDefinitions}
@@ -151,9 +165,11 @@ export const Connections = () => {
                                 />
                             )
                         }
-                        icon={<Link2Icon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="You do not have any Connections created yet."
-                        title="No Connections"
+                        description="A connection stores the credentials an app needs, like an API key or an OAuth sign-in, so integration workflows can act in that app. Mark a connection as shared and every connected user in the environment can use it."
+                        docsLink={{href: EMBEDDED_CONNECTIONS_DOCUMENTATION_URL, label: 'How connections work'}}
+                        icon={<Link2Icon />}
+                        note={environmentScopeNote}
+                        title="Create your first connection"
                     />
                 )}
             </PageLoader>

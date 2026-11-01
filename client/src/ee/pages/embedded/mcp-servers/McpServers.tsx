@@ -1,9 +1,11 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-executions-sheet/IntegrationInstanceConfigurationWorkflowExecutionsSheet';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
@@ -37,6 +39,12 @@ const McpServers = () => {
         validMcpServers,
     } = useMcpServers();
 
+    const environmentScopeNote = useEnvironmentScopeNote('MCP servers');
+
+    const hasActiveFilter = filterData.id !== undefined;
+
+    const isFirstRun = !mcpServersIsLoading && !hasActiveFilter && validMcpServers.length === 0;
+
     return (
         <LayoutContainer
             header={
@@ -57,7 +65,7 @@ const McpServers = () => {
                                 uniqueIntegrations={uniqueIntegrations}
                             />
                         ) : (
-                            ''
+                            isFirstRun && 'MCP Servers'
                         )
                     }
                 />
@@ -70,6 +78,7 @@ const McpServers = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="MCP Servers" />}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[mcpServersError, tagsError]} loading={mcpServersIsLoading || tagsIsLoading}>
@@ -79,14 +88,21 @@ const McpServers = () => {
 
                         <IntegrationInstanceConfigurationWorkflowExecutionsSheet />
                     </WorkflowReadOnlyProvider>
-                ) : (
+                ) : hasActiveFilter ? (
                     <EmptyList
-                        button={
+                        icon={<ServerIcon className="size-24 text-stroke-neutral-tertiary" />}
+                        message="No MCP servers match the selected filter."
+                        title="No Matching MCP Servers"
+                    />
+                ) : (
+                    <EmptyState
+                        actions={
                             <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
                         }
-                        icon={<ServerIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new MCP server."
-                        title="No MCP Servers"
+                        description="An MCP server lets AI assistants, like Claude or Cursor, call tools for your connected users. You choose which component actions and integration workflows it exposes as tools."
+                        icon={<ServerIcon />}
+                        note={environmentScopeNote}
+                        title="Create your first MCP server"
                     />
                 )}
             </PageLoader>

@@ -1,6 +1,8 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
+import {EMBEDDED_INTEGRATIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationsFilterTitle from '@/ee/pages/embedded/integrations/components/IntegrationsFilterTitle';
 import UnifiedApiLeftSidebarNav from '@/ee/pages/embedded/integrations/components/UnifiedApiLeftSidebarNav';
@@ -63,27 +65,34 @@ const Integrations = () => {
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
+    const hasActiveFilter = !!categoryId || !!tagId || !!unifiedApiCategory;
+
+    const isFirstRun = !hasActiveFilter && integrations?.length === 0;
+
     return (
         <LayoutContainer
             header={
-                integrations &&
-                integrations?.length > 0 && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
-                            integrations &&
-                            integrations.length > 0 && (
-                                <Button
-                                    aria-label="Create Integration"
-                                    label="New Integration"
-                                    onClick={() => setShowIntegrationDialog(true)}
-                                />
-                            )
-                        }
-                        title={<IntegrationsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
-                    />
-                )
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={
+                        integrations &&
+                        integrations.length > 0 && (
+                            <Button
+                                aria-label="Create Integration"
+                                label="New Integration"
+                                onClick={() => setShowIntegrationDialog(true)}
+                            />
+                        )
+                    }
+                    title={
+                        (integrations && integrations.length > 0) || hasActiveFilter ? (
+                            <IntegrationsFilterTitle categories={categories} filterData={filterData} tags={tags} />
+                        ) : (
+                            isFirstRun && 'Integrations'
+                        )
+                    }
+                />
             }
             leftSidebarBody={
                 <CategoryTagLeftSidebarNav
@@ -100,6 +109,7 @@ const Integrations = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="Integrations" />}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader
@@ -114,18 +124,25 @@ const Integrations = () => {
                         tags={tags}
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
-                ) : (
+                ) : hasActiveFilter ? (
                     <EmptyList
-                        button={
+                        icon={<SquareIcon className="size-24 text-stroke-neutral-tertiary" />}
+                        message="No integrations match the selected filter."
+                        title="No Matching Integrations"
+                    />
+                ) : (
+                    <EmptyState
+                        actions={
                             <Button
                                 aria-label="Create Integration"
                                 label="Create Integration"
                                 onClick={() => setShowIntegrationDialog(true)}
                             />
                         }
-                        icon={<SquareIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new integrations."
-                        title="No Integrations"
+                        description="An integration connects your product to a third-party app, like Slack or HubSpot. You build its workflows here, publish a version, and your users turn it on from inside your product."
+                        docsLink={{href: EMBEDDED_INTEGRATIONS_DOCUMENTATION_URL, label: 'How integrations work'}}
+                        icon={<SquareIcon />}
+                        title="Create your first integration"
                     />
                 )}
             </PageLoader>

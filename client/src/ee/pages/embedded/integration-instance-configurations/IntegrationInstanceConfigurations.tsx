@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import IntegrationInstanceConfigurationsEmptyState from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsEmptyState';
 import IntegrationInstanceConfigurationsFilterTitle from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsFilterTitle';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
@@ -106,36 +107,42 @@ const IntegrationInstanceConfigurations = () => {
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
+    const hasActiveFilter = !!integrationId || !!tagId;
+
+    const isFirstRun = !hasActiveFilter && integrationInstanceConfigurations?.length === 0;
+
     return (
         <LayoutContainer
             header={
-                integrationInstanceConfigurations &&
-                integrationInstanceConfigurations?.length > 0 && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
-                            integrationInstanceConfigurations &&
-                            integrationInstanceConfigurations?.length > 0 && (
-                                <IntegrationInstanceConfigurationDialog
-                                    integrationInstanceConfiguration={
-                                        {
-                                            environmentId: currentEnvironmentId,
-                                        } as IntegrationInstanceConfiguration
-                                    }
-                                    triggerNode={<Button label="New Instance Configuration" />}
-                                />
-                            )
-                        }
-                        title={
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={
+                        integrationInstanceConfigurations &&
+                        integrationInstanceConfigurations?.length > 0 && (
+                            <IntegrationInstanceConfigurationDialog
+                                integrationInstanceConfiguration={
+                                    {
+                                        environmentId: currentEnvironmentId,
+                                    } as IntegrationInstanceConfiguration
+                                }
+                                triggerNode={<Button label="New Instance Configuration" />}
+                            />
+                        )
+                    }
+                    title={
+                        (integrationInstanceConfigurations && integrationInstanceConfigurations.length > 0) ||
+                        hasActiveFilter ? (
                             <IntegrationInstanceConfigurationsFilterTitle
                                 filterData={filterData}
                                 integrations={integrations}
                                 tags={tags}
                             />
-                        }
-                    />
-                )
+                        ) : (
+                            isFirstRun && 'Instance Configurations'
+                        )
+                    }
+                />
             }
             leftSidebarBody={
                 <>
@@ -210,6 +217,7 @@ const IntegrationInstanceConfigurations = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Instance Configurations" />}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader
@@ -257,22 +265,14 @@ const IntegrationInstanceConfigurations = () => {
                             <IntegrationInstanceConfigurationWorkflowExecutionsSheet />
                         </WorkflowReadOnlyProvider>
                     </div>
-                ) : (
+                ) : hasActiveFilter ? (
                     <EmptyList
-                        button={
-                            <IntegrationInstanceConfigurationDialog
-                                integrationInstanceConfiguration={
-                                    {
-                                        environmentId: currentEnvironmentId,
-                                    } as IntegrationInstanceConfiguration
-                                }
-                                triggerNode={<Button label="Create Instance Configuration" />}
-                            />
-                        }
                         icon={<Settings2Icon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new integration instance configuration."
-                        title="No Integration Configuration Instances"
+                        message="No instance configurations match the selected filter."
+                        title="No Matching Instance Configurations"
                     />
+                ) : (
+                    <IntegrationInstanceConfigurationsEmptyState />
                 )}
             </PageLoader>
         </LayoutContainer>
