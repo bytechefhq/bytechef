@@ -228,7 +228,11 @@ class RemoteTriggerLifecycleFacadeClientIntTest {
 
             ApplicationProperties.Coordinator.Trigger trigger = coordinator.getTrigger();
 
-            return new QuartzTriggerScheduler(trigger.getPolling(), scheduler);
+            ApplicationProperties.Coordinator.Trigger.Polling polling = trigger.getPolling();
+
+            polling.setCheckPeriod(5);
+
+            return new QuartzTriggerScheduler(polling, scheduler);
         }
     }
 }
