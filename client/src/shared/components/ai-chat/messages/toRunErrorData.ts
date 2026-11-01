@@ -1,14 +1,18 @@
-import {type RunErrorDataI} from '@/shared/components/ai-chat/messages/RunErrorMessage';
 import {humanizeAgentErrorMessage} from '@/shared/components/ai-chat/messages/humanizeAgentErrorMessage';
 
 export const RUN_ERROR_CODE_NO_AI_PROVIDER = 'NO_AI_PROVIDER';
+
+export interface RunErrorDataI {
+    code?: string;
+    message: string;
+}
 
 const FALLBACK_MESSAGE = 'The agent run failed before completing this turn.';
 
 const RUN_ERROR_CODE_MESSAGES: Record<string, string> = {
     MODEL_SELECTION_INCOMPLETE: 'Your model selection is incomplete. Pick a model again.',
     [RUN_ERROR_CODE_NO_AI_PROVIDER]:
-        'No AI provider is set up for this environment. Enable one in Settings > AI Providers. If you do not have permission, ask an administrator.',
+        'No AI provider is set up for this environment. Enable one in Settings > AI > Providers. If you do not have permission, ask an administrator.',
     SELECTED_MODEL_UNAVAILABLE: 'The model you picked is no longer available. Pick another model in the model picker.',
 };
 
