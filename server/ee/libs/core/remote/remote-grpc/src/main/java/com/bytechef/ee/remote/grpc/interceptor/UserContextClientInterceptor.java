@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.remote.grpc.interceptor;
 
+import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -17,6 +17,7 @@ import io.grpc.ForwardingClientCall;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,12 +27,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * Sends the login and authorities of the caller's interactively authenticated platform user with every outgoing call;
- * API-key and connected-user principals are not carried.
+ * Sends the caller's principal with every outgoing call: an interactively authenticated platform user or an API-key
+ * user with their login and authorities, or a principal kind written by a {@link RemotePrincipalCodec}.
  *
  * @version ee
  */
 public class UserContextClientInterceptor implements ClientInterceptor {
+
+    private final List<RemotePrincipalCodec> remotePrincipalCodecs;
+
+    public UserContextClientInterceptor() {
+        this(List.of());
+    }
+
+    public UserContextClientInterceptor(List<RemotePrincipalCodec> remotePrincipalCodecs) {
+        this.remotePrincipalCodecs = List.copyOf(remotePrincipalCodecs);
+    }
 
     @Override
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(
@@ -52,14 +63,22 @@ public class UserContextClientInterceptor implements ClientInterceptor {
         };
     }
 
-    private static void putPrincipal(Authentication authentication, Metadata metadata) {
+    private void putPrincipal(Authentication authentication, Metadata metadata) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return;
         }
 
-        if (authentication instanceof ConnectedUserAuthentication connectedUserAuthentication) {
-            putConnectedUser(connectedUserAuthentication, metadata);
-        } else if (authentication instanceof AbstractApiKeyAuthenticationToken apiKeyAuthenticationToken) {
+        for (RemotePrincipalCodec remotePrincipalCodec : remotePrincipalCodecs) {
+            if (remotePrincipalCodec.supports(authentication)) {
+                if (remotePrincipalCodec.encode(authentication, metadata)) {
+                    metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, remotePrincipalCodec.getPrincipalKind());
+                }
+
+                return;
+            }
+        }
+
+        if (authentication instanceof AbstractApiKeyAuthenticationToken apiKeyAuthenticationToken) {
             putApiKeyUser(apiKeyAuthenticationToken, metadata);
         } else if (authentication instanceof UsernamePasswordAuthenticationToken ||
             authentication instanceof RememberMeAuthenticationToken) {
@@ -93,25 +112,6 @@ public class UserContextClientInterceptor implements ClientInterceptor {
                 metadata.put(GrpcMetadataKeys.USER_AUTHORITY, authority.getBytes(StandardCharsets.UTF_8));
             }
         }
-    }
-
-    private static void putConnectedUser(
-        ConnectedUserAuthentication connectedUserAuthentication, Metadata metadata) {
-
-        String externalUserId = connectedUserAuthentication.externalUserId();
-
-        if (externalUserId == null) {
-            return;
-        }
-
-        metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, PrincipalKind.CONNECTED_USER);
-        metadata.put(GrpcMetadataKeys.USER_LOGIN, externalUserId.getBytes(StandardCharsets.UTF_8));
-        metadata.put(
-            GrpcMetadataKeys.CONNECTED_USER_ID, String.valueOf(connectedUserAuthentication.connectedUserId()));
-        metadata.put(GrpcMetadataKeys.ENVIRONMENT_ID, String.valueOf(connectedUserAuthentication.environmentId()));
-        metadata.put(
-            GrpcMetadataKeys.API_KEY_AUTHENTICATED,
-            String.valueOf(connectedUserAuthentication.apiKeyAuthenticated()));
     }
 
     private static void putUser(Authentication authentication, Metadata metadata) {

@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-security"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-grpc"))

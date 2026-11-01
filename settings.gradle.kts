@@ -654,6 +654,7 @@ include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-grpc")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-grpc-proto")
+include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-security")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-rest")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service")
 include("server:ee:libs:embedded:embedded-execution:embedded-execution-api")

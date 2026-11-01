@@ -20,6 +20,7 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class ManagedGrpcChannelsTest {
     @Test
     void testTargetOverrideIsUsed() {
         try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
-            applicationProperties("token", Map.of("api-gateway-app", "localhost:19090")))) {
+            applicationProperties("token", Map.of("api-gateway-app", "localhost:19090")), List.of())) {
 
             Channel channel = managedGrpcChannels.getChannel("api-gateway-app");
 
@@ -46,7 +47,7 @@ class ManagedGrpcChannelsTest {
     @Test
     void testDefaultTargetIsDiscovery() {
         try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
-            applicationProperties("token", Map.of()))) {
+            applicationProperties("token", Map.of()), List.of())) {
 
             assertThat(managedGrpcChannels.getTarget("api-gateway-app")).isEqualTo("discovery:///api-gateway-app");
         }
@@ -55,7 +56,7 @@ class ManagedGrpcChannelsTest {
     @Test
     void testChannelIsCachedPerServiceId() {
         try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
-            applicationProperties("token", Map.of("api-gateway-app", "localhost:19090")))) {
+            applicationProperties("token", Map.of("api-gateway-app", "localhost:19090")), List.of())) {
 
             assertThat(managedGrpcChannels.getChannel("api-gateway-app"))
                 .isSameAs(managedGrpcChannels.getChannel("api-gateway-app"));
@@ -65,7 +66,7 @@ class ManagedGrpcChannelsTest {
     @Test
     void testBlankTokenFailsOnFirstChannel() {
         try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
-            applicationProperties("", Map.of("api-gateway-app", "localhost:19090")))) {
+            applicationProperties("", Map.of("api-gateway-app", "localhost:19090")), List.of())) {
 
             assertThatThrownBy(() -> managedGrpcChannels.getChannel("api-gateway-app"))
                 .isInstanceOf(IllegalStateException.class)
@@ -76,7 +77,7 @@ class ManagedGrpcChannelsTest {
     @Test
     void testInstanceChannelIsCachedPerInstanceId() {
         try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
-            applicationProperties("token", Map.of()))) {
+            applicationProperties("token", Map.of()), List.of())) {
 
             ServiceInstance first = serviceInstance("worker-app:1", 19091);
             ServiceInstance second = serviceInstance("worker-app:2", 19092);
@@ -89,7 +90,7 @@ class ManagedGrpcChannelsTest {
     @Test
     void testInstanceChannelAuthenticatesAsServiceId() {
         try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
-            applicationProperties("token", Map.of()))) {
+            applicationProperties("token", Map.of()), List.of())) {
 
             assertThat(managedGrpcChannels.getChannel(serviceInstance("worker-app:1", 19091))
                 .authority()).isEqualTo("worker-app");
@@ -99,7 +100,7 @@ class ManagedGrpcChannelsTest {
     @Test
     void testInstanceWithoutGrpcPortFails() {
         try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
-            applicationProperties("token", Map.of()))) {
+            applicationProperties("token", Map.of()), List.of())) {
 
             ServiceInstance serviceInstance = new DefaultServiceInstance(
                 "worker-app:1", "worker-app", "localhost", 8080, false, Map.of());
@@ -125,14 +126,14 @@ class ManagedGrpcChannelsTest {
                 .getGrpc()
                 .setMaxInboundMessageSize(DataSize.ofMegabytes(8));
 
-            try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(applicationProperties)) {
+            try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(applicationProperties, List.of())) {
                 Channel channel = managedGrpcChannels.getChannel(serviceInstance("echo:1", server.getPort()));
 
                 assertThat(EchoService.large(channel, 6 * 1024 * 1024)).hasSize(6 * 1024 * 1024);
             }
 
             try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
-                applicationProperties("token", Map.of()))) {
+                applicationProperties("token", Map.of()), List.of())) {
 
                 Channel channel = managedGrpcChannels.getChannel(serviceInstance("echo:2", server.getPort()));
 
@@ -155,7 +156,8 @@ class ManagedGrpcChannelsTest {
             .start();
 
         try {
-            ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(applicationProperties("token", Map.of()));
+            ManagedGrpcChannels managedGrpcChannels =
+                new ManagedGrpcChannels(applicationProperties("token", Map.of()), List.of());
 
             Channel channel = managedGrpcChannels.getChannel(serviceInstance("echo:1", server.getPort()));
 
