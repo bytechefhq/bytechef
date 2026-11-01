@@ -1,0 +1,26 @@
+dependencies {
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-tx")
+    implementation("org.springframework.boot:spring-boot-actuator")
+    implementation("org.springframework.data:spring-data-commons")
+    implementation("org.springframework.security:spring-security-web")
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
+    implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-capture"))
+
+    implementation(project(":server:ee:libs:core:remote:remote-grpc"))
+    implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-remote-grpc"))
+
+    testImplementation("io.grpc:grpc-inprocess")
+    testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation("org.springframework:spring-test")
+    testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation(project(":server:libs:config:app-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:core:tenant:tenant-api"))
+    testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
+}
