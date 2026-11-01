@@ -10,9 +10,9 @@ package com.bytechef.ee.embedded.configuration.remote.client.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.remote.client.ConnectedUserProjectRemoteClientIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.remote.client.EmbeddedConfigurationGrpcTestServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.AutomationWorkflowProjectFacadeRemoteServiceGrpcServer;
@@ -35,21 +35,21 @@ import tools.jackson.databind.ObjectMapper;
 class RemoteAutomationWorkflowProjectFacadeClientIntTest {
 
     @Autowired
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     private EmbeddedConfigurationGrpcTestServer embeddedConfigurationGrpcTestServer;
-    private RemoteAutomationWorkflowProjectFacadeClient remoteAutomationWorkflowProjectFacadeClient;
+    private RemoteAutomationProjectFacadeClient remoteAutomationProjectFacadeClient;
 
     @BeforeEach
     void beforeEach() throws IOException {
         embeddedConfigurationGrpcTestServer = EmbeddedConfigurationGrpcTestServer.start(
             new AutomationWorkflowProjectFacadeRemoteServiceGrpcServer(
-                automationWorkflowProjectFacade, new EmbeddedConfigurationProtoMapper(objectMapper)));
+                automationProjectFacade, new EmbeddedConfigurationProtoMapper(objectMapper)));
 
-        remoteAutomationWorkflowProjectFacadeClient = new RemoteAutomationWorkflowProjectFacadeClient(
+        remoteAutomationProjectFacadeClient = new RemoteAutomationProjectFacadeClient(
             embeddedConfigurationGrpcTestServer.getGrpcChannels(), objectMapper);
     }
 
@@ -62,39 +62,39 @@ class RemoteAutomationWorkflowProjectFacadeClientIntTest {
     void testGetPublishedProjectsReturnsThePublishedProjectsWithTheirWorkflowTemplates() {
         String projectName = "Remote published " + UUID.randomUUID();
 
-        long projectId = automationWorkflowProjectFacade.createProject(
+        long projectId = automationProjectFacade.createProject(
             projectName, "Published for connected users", null, List.of(), null);
 
-        String leadsWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+        String leadsWorkflowUuid = automationProjectFacade.createProjectWorkflow(
             projectId, """
                 {"label":"Sync leads","description":"Copies new leads","triggers":[],"tasks":[]}
                 """, null);
-        String ordersWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+        String ordersWorkflowUuid = automationProjectFacade.createProjectWorkflow(
             projectId, """
                 {"label":"Sync orders","description":"Copies new orders","triggers":[],"tasks":[]}
                 """, "connectedUser.metadata.plan == 'gold'");
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId);
 
-        long draftProjectId = automationWorkflowProjectFacade.createProject(
+        long draftProjectId = automationProjectFacade.createProject(
             "Remote draft " + UUID.randomUUID(), "", null, List.of(), null);
 
-        automationWorkflowProjectFacade.createProjectWorkflow(draftProjectId, null, null);
+        automationProjectFacade.createProjectWorkflow(draftProjectId, null, null);
 
-        List<AutomationWorkflowProjectDTO> remoteAutomationWorkflowProjectDTOs =
-            remoteAutomationWorkflowProjectFacadeClient.getPublishedProjects();
+        List<AutomationProjectDTO> remoteAutomationWorkflowProjectDTOs =
+            remoteAutomationProjectFacadeClient.getPublishedProjects();
 
         assertThat(remoteAutomationWorkflowProjectDTOs).usingRecursiveComparison()
-            .isEqualTo(automationWorkflowProjectFacade.getPublishedProjects());
+            .isEqualTo(automationProjectFacade.getPublishedProjects());
 
-        AutomationWorkflowProjectDTO automationWorkflowProjectDTO = remoteAutomationWorkflowProjectDTOs.stream()
+        AutomationProjectDTO automationProjectDTO = remoteAutomationWorkflowProjectDTOs.stream()
             .filter(remoteAutomationWorkflowProjectDTO -> remoteAutomationWorkflowProjectDTO.id() == projectId)
             .findFirst()
             .orElseThrow();
 
-        assertThat(automationWorkflowProjectDTO.name()).isEqualTo(projectName);
-        assertThat(automationWorkflowProjectDTO.lastPublishedVersion()).isEqualTo(1);
-        assertThat(automationWorkflowProjectDTO.workflowTemplates())
+        assertThat(automationProjectDTO.name()).isEqualTo(projectName);
+        assertThat(automationProjectDTO.lastPublishedVersion()).isEqualTo(1);
+        assertThat(automationProjectDTO.workflowTemplates())
             .extracting(ConnectedUserWorkflowTemplateDTO::workflowUuid, ConnectedUserWorkflowTemplateDTO::label)
             .containsExactlyInAnyOrder(
                 tuple(leadsWorkflowUuid, "Sync leads"),
