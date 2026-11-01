@@ -34,8 +34,10 @@ import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ComponentDefinitionWrapper;
 import com.bytechef.platform.component.util.OpenApiClientUtils;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.Nulls;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
@@ -64,6 +66,7 @@ public class ComponentDefinitionReader {
     public ComponentDefinitionReader(ApiConnectorFileStorage apiConnectorFileStorage, ObjectMapper objectMapper) {
         this.apiConnectorFileStorage = apiConnectorFileStorage;
         this.objectMapper = objectMapper.rebuild()
+            .changeDefaultNullHandling(setterInfo -> JsonSetter.Value.forValueNulls(Nulls.SKIP))
             .addMixIn(Property.class, PropertyMixIn.class)
             .addMixIn(BaseProperty.BaseValueProperty.class, PropertyMixIn.class)
             .addModules(
