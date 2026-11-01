@@ -9,6 +9,7 @@ package com.bytechef.ee.remote.grpc.interceptor;
 
 import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.PlatformUserAuthentication;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -27,8 +28,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * Sends the caller's principal with every outgoing call: an interactively authenticated platform user or an API-key
- * user with their login and authorities, or a principal kind written by a {@link RemotePrincipalCodec}.
+ * Sends the caller's principal with every outgoing call: an interactively authenticated platform user, a
+ * {@link PlatformUserAuthentication} or an API-key user with their login and authorities, or a principal kind written
+ * by a {@link RemotePrincipalCodec}.
  *
  * @version ee
  */
@@ -81,7 +83,8 @@ public class UserContextClientInterceptor implements ClientInterceptor {
         if (authentication instanceof AbstractApiKeyAuthenticationToken apiKeyAuthenticationToken) {
             putApiKeyUser(apiKeyAuthenticationToken, metadata);
         } else if (authentication instanceof UsernamePasswordAuthenticationToken ||
-            authentication instanceof RememberMeAuthenticationToken) {
+            authentication instanceof RememberMeAuthenticationToken ||
+            authentication instanceof PlatformUserAuthentication) {
 
             putUser(authentication, metadata);
         }
