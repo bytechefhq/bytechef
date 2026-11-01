@@ -63,6 +63,6 @@ public record ClusterElementCall(
     }
 
     public enum Status {
-        STARTED, COMPLETED, FAILED, BLOCKED, REDACTED, WITHHELD
+        STARTED, COMPLETED, FAILED, BLOCKED, REDACTED, WITHHELD, DENIED
     }
 }
