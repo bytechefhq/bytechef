@@ -15,6 +15,7 @@ import {
     isWorkflowEditorSource,
     useCopilotStore,
 } from '@/shared/components/copilot/stores/useCopilotStore';
+import {AI_PROVIDERS_LINK_LABEL, AI_PROVIDERS_SETTINGS_PATH} from '@/shared/constants';
 import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type SuggestionConfig} from '@assistant-ui/react';
@@ -25,8 +26,6 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const ANIMATION_DURATION_MS = 300;
-
-const AI_PROVIDERS_SETTINGS_PATH = '/automation/settings/ai-providers';
 
 const COPILOT_SUGGESTIONS: SuggestionConfig[] = [
     {
@@ -199,7 +198,7 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
                             </p>
                         </div>
 
-                        <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>Go to AI Providers</Button>
+                        <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>{AI_PROVIDERS_LINK_LABEL}</Button>
                     </div>
                 ) : (
                     <CopilotRuntimeProvider source={source} suggestions={COPILOT_SUGGESTIONS}>

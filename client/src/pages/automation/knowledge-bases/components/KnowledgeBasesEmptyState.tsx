@@ -3,11 +3,10 @@ import EmptyState from '@/components/EmptyState/EmptyState';
 import JourneySteps, {type JourneyStepI} from '@/components/JourneySteps/JourneySteps';
 import {KNOWLEDGE_BASES_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
 import CreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/CreateKnowledgeBaseDialog';
+import {AI_PROVIDERS_LINK_LABEL, AI_PROVIDERS_SETTINGS_PATH} from '@/shared/constants';
 import {BookOpenTextIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
-
-export const AI_PROVIDERS_PATH = '/automation/settings/ai-providers';
 
 interface KnowledgeBasesEmptyStateProps {
     embeddingActive: boolean;
@@ -26,7 +25,11 @@ const KnowledgeBasesEmptyState = ({embeddingActive, workspaceId}: KnowledgeBases
             {
                 ...(!embeddingActive && {
                     action: (
-                        <Button label="Go to AI Providers" onClick={() => void navigate(AI_PROVIDERS_PATH)} size="sm" />
+                        <Button
+                            label={AI_PROVIDERS_LINK_LABEL}
+                            onClick={() => void navigate(AI_PROVIDERS_SETTINGS_PATH)}
+                            size="sm"
+                        />
                     ),
                     description: 'Enable OpenAI, Mistral or Ollama for this environment.',
                 }),
