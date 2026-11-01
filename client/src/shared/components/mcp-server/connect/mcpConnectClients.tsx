@@ -171,6 +171,12 @@ const getCursorTabs = ({apiKeySource, mode, url}: McpConnectContextI): McpConnec
                 description: oneClickDescriptions[mode],
                 title: 'Install in Cursor',
             },
+            {
+                description:
+                    'Cursor loads the new server only after a reload. The server then shows up under Cursor Settings → Tools & MCPs.',
+                path: ['Command Palette', 'Developer: Reload Window'],
+                title: 'Reload Cursor',
+            },
         ]),
         manualTab([
             {

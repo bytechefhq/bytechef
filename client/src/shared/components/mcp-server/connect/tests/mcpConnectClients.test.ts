@@ -128,6 +128,18 @@ describe('MCP_CONNECT_CLIENTS', () => {
         }
     });
 
+    it('tells the user to reload Cursor after the one-click install', () => {
+        const cursor = MCP_CONNECT_CLIENTS.find((client) => client.id === 'cursor')!;
+
+        for (const mode of AUTH_MODES) {
+            const oneClickTab = cursor.getTabs(createContext(mode)).find((tab) => tab.id === 'ONE_CLICK')!;
+            const lastStep = oneClickTab.steps[oneClickTab.steps.length - 1];
+
+            expect(lastStep.title, mode).toBe('Reload Cursor');
+            expect(lastStep.path, mode).toEqual(['Command Palette', 'Developer: Reload Window']);
+        }
+    });
+
     it('uses the base64 Cursor link and the VS Code input prompt for API keys', () => {
         const cursor = MCP_CONNECT_CLIENTS.find((client) => client.id === 'cursor')!;
         const vsCode = MCP_CONNECT_CLIENTS.find((client) => client.id === 'vs-code')!;
