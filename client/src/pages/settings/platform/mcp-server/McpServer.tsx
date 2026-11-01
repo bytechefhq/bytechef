@@ -1,4 +1,4 @@
-import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConfiguration';
+import McpConnectPanel from '@/shared/components/mcp-server/connect/McpConnectPanel';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useManagementMcpServerCanonicalUrlQuery} from '@/shared/middleware/graphql';
@@ -23,9 +23,9 @@ const McpServer = () => {
                     <div className="space-y-4">
                         <h2 className="font-semibold text-foreground">MCP server URL</h2>
 
-                        <McpServerConfiguration
+                        <McpConnectPanel
+                            apiKeySource="an admin API key created under Settings → Admin API Keys"
                             mcpServerUrl={canonicalUrlData.managementMcpServerCanonicalUrl}
-                            signInWithByteChefAvailable
                         />
                     </div>
                 )}

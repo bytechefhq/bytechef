@@ -18,22 +18,22 @@ vi.mock('@/shared/layout/Header', () => ({
     default: () => null,
 }));
 
-vi.mock('@/shared/components/mcp-server/McpServerConfiguration', () => ({
+vi.mock('@/shared/components/mcp-server/connect/McpConnectPanel', () => ({
     default: ({
+        apiKeySource,
         authenticationRequired,
         mcpServerUrl,
         onRefresh,
-        signInWithByteChefAvailable,
     }: {
+        apiKeySource?: string;
         authenticationRequired?: boolean;
         mcpServerUrl: string;
         onRefresh?: () => void;
-        signInWithByteChefAvailable?: boolean;
     }) => (
         <div
+            data-api-key-source={apiKeySource}
             data-authentication-required={String(authenticationRequired)}
             data-mcp-server-url={mcpServerUrl}
-            data-sign-in-with-bytechef-available={String(signInWithByteChefAvailable)}
             data-testid="mcp-server-configuration"
         >
             {onRefresh && <button onClick={onRefresh}>Regenerate canonical</button>}
@@ -62,12 +62,12 @@ describe('McpServer', () => {
         );
     });
 
-    it('tells the canonical url block that signing in with ByteChef is an alternative to the API key', () => {
+    it('asks for an admin API key on the management server', () => {
         render(<McpServer />);
 
         expect(screen.getByTestId('mcp-server-configuration')).toHaveAttribute(
-            'data-sign-in-with-bytechef-available',
-            'true'
+            'data-api-key-source',
+            'an admin API key created under Settings → Admin API Keys'
         );
     });
 

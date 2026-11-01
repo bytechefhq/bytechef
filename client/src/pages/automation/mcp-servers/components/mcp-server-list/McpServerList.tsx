@@ -3,7 +3,7 @@ import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-co
 import McpServerListItem from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItem';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import McpServerCollapsibleItem from '@/shared/components/mcp-server/McpServerCollapsibleItem';
-import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConfiguration';
+import McpConnectPanel from '@/shared/components/mcp-server/connect/McpConnectPanel';
 import {McpServer, Tag, useMcpProjectsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useMemo} from 'react';
@@ -45,7 +45,7 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                     return (
                         <McpServerCollapsibleItem
                             connectContent={
-                                <McpServerConfiguration
+                                <McpConnectPanel
                                     authenticationRequired={mcpServer.authenticationRequired}
                                     mcpServerUrl={mcpServer.url}
                                     onRefresh={handleRefresh}
