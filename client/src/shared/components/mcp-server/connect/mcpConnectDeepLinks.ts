@@ -10,7 +10,7 @@ interface McpInstallLinkOptionsI {
 const encodeBase64 = (value: string): string => {
     const bytes = new TextEncoder().encode(value);
 
-    return btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(''));
+    return btoa(Array.from(bytes, (byte) => String.fromCodePoint(byte)).join(''));
 };
 
 export const buildCursorInstallUrl = ({apiKeyHeader, url}: McpInstallLinkOptionsI): string => {

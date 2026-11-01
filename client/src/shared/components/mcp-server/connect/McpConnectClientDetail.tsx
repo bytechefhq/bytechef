@@ -75,13 +75,16 @@ const McpConnectClientDetail = ({
     const Logo = client.logo;
 
     const handleCopyPrompt = () => {
-        navigator.clipboard.writeText(THEN_TRY_PROMPT);
+        navigator.clipboard.writeText(THEN_TRY_PROMPT).then(
+            () => {
+                setPromptCopied(true);
 
-        setPromptCopied(true);
+                clearTimeout(promptCopiedTimeoutRef.current);
 
-        clearTimeout(promptCopiedTimeoutRef.current);
-
-        promptCopiedTimeoutRef.current = setTimeout(() => setPromptCopied(false), 2000);
+                promptCopiedTimeoutRef.current = setTimeout(() => setPromptCopied(false), 2000);
+            },
+            () => setPromptCopied(false)
+        );
     };
 
     useEffect(() => () => clearTimeout(promptCopiedTimeoutRef.current), []);
@@ -137,7 +140,7 @@ const McpConnectClientDetail = ({
                 </div>
 
                 <Button
-                    aria-label="Copy prompt"
+                    aria-label={promptCopied ? 'Prompt copied' : 'Copy prompt'}
                     icon={promptCopied ? <CheckIcon /> : <CopyIcon />}
                     onClick={handleCopyPrompt}
                     size="iconSm"
