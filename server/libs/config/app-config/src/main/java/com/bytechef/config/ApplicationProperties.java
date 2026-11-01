@@ -885,7 +885,8 @@ public class ApplicationProperties {
         public static class AgentUtils {
 
             /**
-             * Hosts the web fetch tool may reach even though they resolve to a private or loopback address.
+             * Hosts the web fetch and A2A agent tools may reach even though they resolve to a private or loopback
+             * address.
              */
             private List<String> allowedPrivateHosts;
 
