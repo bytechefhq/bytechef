@@ -40,7 +40,7 @@ export interface ClusterElementCallRecord {
      */
     input?: string;
     /**
-     * The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason).
+     * The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason). For a DENIED outcome, the reviewer's reason.
      */
     output?: string;
     /**
@@ -77,6 +77,7 @@ export const ClusterElementCallRecordStatusEnum = {
     Blocked: 'BLOCKED',
     Redacted: 'REDACTED',
     Withheld: 'WITHHELD',
+    Denied: 'DENIED',
 } as const;
 export type ClusterElementCallRecordStatusEnum = typeof ClusterElementCallRecordStatusEnum[keyof typeof ClusterElementCallRecordStatusEnum];
 
