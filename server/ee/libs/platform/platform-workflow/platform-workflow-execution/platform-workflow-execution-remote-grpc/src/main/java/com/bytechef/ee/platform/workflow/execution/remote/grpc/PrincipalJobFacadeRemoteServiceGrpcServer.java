@@ -78,6 +78,21 @@ public class PrincipalJobFacadeRemoteServiceGrpcServer
     }
 
     @Override
+    public void createPrincipalLinkedJobForPrincipal(
+        CreatePrincipalJobRequest request, StreamObserver<IdResponse> responseObserver) {
+
+        responseObserver.onNext(
+            IdResponse.newBuilder()
+                .setId(
+                    principalJobFacade.createPrincipalLinkedJob(
+                        platformWorkflowExecutionProtoMapper.toJobParametersDTO(request.getJobParameters()),
+                        request.getJobPrincipalId(),
+                        PlatformType.valueOf(request.getPlatformType())))
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void createSyncJob(CreatePrincipalJobRequest request, StreamObserver<RemoteJob> responseObserver) {
         responseObserver.onNext(
             platformWorkflowExecutionProtoMapper.toProto(

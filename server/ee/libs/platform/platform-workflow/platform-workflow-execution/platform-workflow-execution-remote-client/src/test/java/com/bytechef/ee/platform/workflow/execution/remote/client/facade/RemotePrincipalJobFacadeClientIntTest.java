@@ -250,6 +250,21 @@ class RemotePrincipalJobFacadeClientIntTest {
     }
 
     @Test
+    void testCreatePrincipalLinkedJobForAPrincipalStoresTheJobAndLinksThePrincipal() {
+        long jobId = remotePrincipalJobFacadeClient.createPrincipalLinkedJob(
+            new JobParametersDTO(workflow.getId(), Map.of("orderId", 3)), PRINCIPAL_ID, PlatformType.AUTOMATION);
+
+        Job job = jobService.getJob(jobId);
+
+        assertThat(job.getWorkflowId()).isEqualTo(workflow.getId());
+        assertThat(job.getInputs()).isEqualTo(Map.of("orderId", 3));
+        assertThat(principalJobService.fetchJobPrincipalId(jobId, PlatformType.AUTOMATION)).contains(PRINCIPAL_ID);
+        assertThat(applicationEvents.stream(StartJobEvent.class))
+            .extracting(StartJobEvent::getJobId)
+            .containsExactly(jobId);
+    }
+
+    @Test
     void testCreateChildJobOfAParentWithoutPrincipalHasNoPrincipal() {
         long parentJobId = remotePrincipalJobFacadeClient.createJob(
             new JobParametersDTO(workflow.getId(), Map.of("orderId", 1)), PRINCIPAL_ID, PlatformType.AUTOMATION);
