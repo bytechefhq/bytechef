@@ -128,8 +128,12 @@ class StateValueDataStorageIntTest {
             .orElseThrow();
 
         assertThat(taskState.getValue())
-            .isEqualTo(new StateValueReference(ENVIRONMENT_ID, PlatformType.AUTOMATION));
-        assertThat(fetchTaskStateEntry()).hasValue(Map.of("approved", false));
+            .isInstanceOfSatisfying(StateValueReference.class, reference -> {
+                assertThat(reference.environmentId()).isEqualTo(ENVIRONMENT_ID);
+                assertThat(reference.type()).isEqualTo(PlatformType.AUTOMATION);
+            });
+        assertThat(getTaskStateEntries()).containsOnly(Map.entry(
+            ((StateValueReference) taskState.getValue()).key(), Map.of("approved", false)));
         assertThat(taskStateService.<Map<String, Object>>fetchValue(JOB_RESUME_ID))
             .hasValue(Map.of("approved", false));
         assertThat(taskStateService.<Map<String, Object>>fetchUnlockedValue(JOB_RESUME_ID))
@@ -156,8 +160,43 @@ class StateValueDataStorageIntTest {
         taskStateService.save(JOB_RESUME_ID, "second");
 
         assertThat(taskStateRepository.count()).isEqualTo(1);
-        assertThat(fetchTaskStateEntry()).hasValue("second");
+        assertThat(getTaskStateEntries()).containsOnlyKeys(getTaskStateReference().key());
+        assertThat(getTaskStateEntries()).containsValue("second");
         assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("second");
+    }
+
+    @Test
+    void testRolledBackTaskStateSaveKeepsCommittedValue() {
+        taskStateService.save(JOB_RESUME_ID, "first");
+
+        StateValueReference reference = getTaskStateReference();
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        transactionTemplate.executeWithoutResult(status -> {
+            taskStateService.save(JOB_RESUME_ID, "second");
+
+            status.setRollbackOnly();
+        });
+
+        assertThat(getTaskStateReference()).isEqualTo(reference);
+        assertThat(getTaskStateEntries()).containsOnly(Map.entry(reference.key(), "first"));
+        assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("first");
+    }
+
+    @Test
+    void testRolledBackTaskStateDeleteKeepsValue() {
+        taskStateService.save(JOB_RESUME_ID, "value");
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        transactionTemplate.executeWithoutResult(status -> {
+            taskStateService.delete(JOB_RESUME_ID);
+
+            status.setRollbackOnly();
+        });
+
+        assertThat(taskStateRepository.count()).isEqualTo(1);
+        assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("value");
     }
 
     @Test
@@ -167,7 +206,7 @@ class StateValueDataStorageIntTest {
         taskStateService.delete(JOB_RESUME_ID);
 
         assertThat(taskStateRepository.count()).isZero();
-        assertThat(fetchTaskStateEntry()).isEmpty();
+        assertThat(getTaskStateEntries()).isEmpty();
     }
 
     @Test
@@ -180,7 +219,7 @@ class StateValueDataStorageIntTest {
             .orElseThrow();
 
         assertThat(taskState.getValue()).isEqualTo("inline");
-        assertThat(fetchTaskStateEntry()).isEmpty();
+        assertThat(getTaskStateEntries()).isEmpty();
         assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("inline");
     }
 
@@ -220,8 +259,12 @@ class StateValueDataStorageIntTest {
             .orElseThrow();
 
         assertThat(triggerState.getValue())
-            .isEqualTo(new StateValueReference(ENVIRONMENT_ID, PlatformType.AUTOMATION));
-        assertThat(fetchTriggerStateEntry()).hasValue(Map.of("cursor", "page-2"));
+            .isInstanceOfSatisfying(StateValueReference.class, reference -> {
+                assertThat(reference.environmentId()).isEqualTo(ENVIRONMENT_ID);
+                assertThat(reference.type()).isEqualTo(PlatformType.AUTOMATION);
+            });
+        assertThat(getTriggerStateEntries()).containsOnly(Map.entry(
+            ((StateValueReference) triggerState.getValue()).key(), Map.of("cursor", "page-2")));
         assertThat(triggerStateService.<Map<String, Object>>fetchValue(WORKFLOW_EXECUTION_ID))
             .hasValue(Map.of("cursor", "page-2"));
     }
@@ -233,20 +276,26 @@ class StateValueDataStorageIntTest {
         triggerStateService.delete(WORKFLOW_EXECUTION_ID);
 
         assertThat(triggerStateRepository.count()).isZero();
-        assertThat(fetchTriggerStateEntry()).isEmpty();
+        assertThat(getTriggerStateEntries()).isEmpty();
     }
 
-    private Optional<Object> fetchTaskStateEntry() {
-        return dataStorage.fetch(
+    private StateValueReference getTaskStateReference() {
+        TaskState taskState = taskStateRepository.findByJobResumeId(JOB_RESUME_ID.toString())
+            .orElseThrow();
+
+        return (StateValueReference) taskState.getValue();
+    }
+
+    private Map<String, Object> getTaskStateEntries() {
+        return dataStorage.getAll(
             StateValueDataStorage.TASK_STATE_COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION,
-            String.valueOf(JOB_ID), StateValueDataStorage.toKey(JOB_RESUME_ID.toString()), ENVIRONMENT_ID,
-            PlatformType.AUTOMATION);
+            String.valueOf(JOB_ID), ENVIRONMENT_ID, PlatformType.AUTOMATION);
     }
 
-    private Optional<Object> fetchTriggerStateEntry() {
-        return dataStorage.fetch(
+    private Map<String, Object> getTriggerStateEntries() {
+        return dataStorage.getAll(
             StateValueDataStorage.TRIGGER_STATE_COMPONENT_NAME, DataStorageScope.WORKFLOW, "workflow-uuid",
-            StateValueDataStorage.toKey(WORKFLOW_EXECUTION_ID.toString()), ENVIRONMENT_ID, PlatformType.AUTOMATION);
+            ENVIRONMENT_ID, PlatformType.AUTOMATION);
     }
 
     private void setProvider(ApplicationProperties.DataStorage.Provider provider) {

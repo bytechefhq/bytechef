@@ -69,8 +69,11 @@ public class TriggerStateServiceImpl implements TriggerStateService {
 
         Object storedValue = stateValueDataStorage.write(
             getKey(workflowExecutionId), value,
-            stateValueDataStorage.fetchReference(
-                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
+            stateValueDataStorage.fetchLocation(
+                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()),
+            triggerStateOptional
+                .map(TriggerState::getValue)
+                .orElse(null));
 
         triggerStateOptional.ifPresentOrElse(
             triggerState -> {

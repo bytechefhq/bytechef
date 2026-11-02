@@ -21,5 +21,5 @@ import com.bytechef.platform.constant.PlatformType;
 /**
  * @author Ivica Cardic
  */
-public record StateValueReference(long environmentId, PlatformType type) {
+public record StateValueReference(long environmentId, PlatformType type, String key) {
 }
