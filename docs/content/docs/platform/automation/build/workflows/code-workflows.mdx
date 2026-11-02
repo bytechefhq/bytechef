@@ -1077,6 +1077,10 @@ curl -X POST "$BYTECHEF_URL/api/automation/v1/projects/deploy?workspaceId=1&enab
   -F "projectFile=@src/sample_code_project.py"
 ```
 
+With Enterprise Edition role-based access control, which is on the upcoming release track, the deploy
+endpoint requires both `PROJECT_CREATE` and `PROJECT_PUBLISH` on the workspace. A caller without them
+gets HTTP 403.
+
 What the endpoint does:
 
 - **It saves *and* publishes.** The upload is saved as the project's draft and published in the same call, so the
@@ -1107,7 +1111,7 @@ Responses:
 | `204 No Content` | The project was saved and published, and enabled when `enable=true`. |
 | `400 Bad Request` | The file is missing or fails to load, its language is unsupported or Java uploads are disabled, or a required parameter is missing. The body names the reason. |
 | `401 Unauthorized` | The API key is unknown in that environment, is not a workspace API key, or `X-ENVIRONMENT` is not a valid environment. |
-| `403 Forbidden` | The key's user is not an administrator. |
+| `403 Forbidden` | The key's user may not deploy. Without role-based access control the user is not an administrator. With it, the user lacks `PROJECT_CREATE` or `PROJECT_PUBLISH` on the workspace; with `enable=true`, also `DEPLOYMENT_CREATE` or `DEPLOYMENT_EDIT`, or the right to use a connection the workflow binds. |
 
 A second endpoint, `POST /api/automation/v1/projects/{id}/git/pull`, pulls a project from its configured Git
 repository instead of taking an upload.
