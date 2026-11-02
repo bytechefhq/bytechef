@@ -2,7 +2,9 @@ import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
+import {PRODUCTION_ENVIRONMENT} from '@/shared/constants';
 import {Workflow} from '@/shared/middleware/automation/configuration';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {act, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -128,6 +130,7 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
             workflowExecutionSheetOpen: false,
         });
 
+        environmentStore.setState({currentEnvironmentId: PRODUCTION_ENVIRONMENT});
         useWorkspaceStore.setState({currentWorkspaceId: 1});
     });
 
@@ -153,7 +156,14 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
         expect(screen.getByRole('tab', {name: 'Workflow'})).toHaveAttribute('data-state', 'inactive');
         expect(screen.getByText('No Executions')).toBeInTheDocument();
         expect(queryMock).toHaveBeenCalledWith(
-            {id: 1, pageNumber: 0, projectDeploymentId: 3, projectVersion: 3, workflowId: 'workflow1'},
+            {
+                environmentId: PRODUCTION_ENVIRONMENT,
+                id: 1,
+                pageNumber: 0,
+                projectDeploymentId: 3,
+                projectVersion: 3,
+                workflowId: 'workflow1',
+            },
             true
         );
     });
@@ -176,7 +186,14 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
 
         expect(document.querySelector('header')).toHaveTextContent('Subflow /workflow1/ V4');
         expect(queryMock).toHaveBeenLastCalledWith(
-            {id: 1, pageNumber: 0, projectDeploymentId: 3, projectVersion: 4, workflowId: 'workflow1-v4'},
+            {
+                environmentId: PRODUCTION_ENVIRONMENT,
+                id: 1,
+                pageNumber: 0,
+                projectDeploymentId: 3,
+                projectVersion: 4,
+                workflowId: 'workflow1-v4',
+            },
             true
         );
     });
@@ -434,7 +451,13 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
         expect(screen.queryByText('Workflow panel workflow1')).not.toBeInTheDocument();
         expect(document.querySelector('header')).toHaveTextContent('Subflow /workflow2');
         expect(queryMock).toHaveBeenLastCalledWith(
-            {id: 1, pageNumber: 0, projectDeploymentId: 3, workflowId: 'workflow2'},
+            {
+                environmentId: PRODUCTION_ENVIRONMENT,
+                id: 1,
+                pageNumber: 0,
+                projectDeploymentId: 3,
+                workflowId: 'workflow2',
+            },
             true
         );
     });

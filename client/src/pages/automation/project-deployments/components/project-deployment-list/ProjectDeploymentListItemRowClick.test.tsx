@@ -6,6 +6,10 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/shared/mutations/automation/projectDeployments.mutations', () => ({
     useDeleteProjectDeploymentMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableProjectDeploymentMutation: () => ({isPending: false, mutate: vi.fn()}),

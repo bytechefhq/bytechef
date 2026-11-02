@@ -6,8 +6,10 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tool
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import ProjectDeploymentListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemDropdownMenu';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ProjectDeployment, ProjectStatus, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
 import {
@@ -44,6 +46,7 @@ const ProjectDeploymentListItem = ({
     const setProjectDeploymentEnabled = useProjectDeploymentsEnabledStore(
         ({setProjectDeploymentEnabled}) => setProjectDeploymentEnabled
     );
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {captureProjectDeploymentEnabled} = useAnalytics();
 
@@ -51,6 +54,8 @@ const ProjectDeploymentListItem = ({
         projectDeployment.projectId!,
         projectDeployment.projectId != null
     );
+
+    const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
     const queryClient = useQueryClient();
 
@@ -122,7 +127,9 @@ const ProjectDeploymentListItem = ({
     const enabledWorkflowCount = enabledProjectDeploymentWorkflows.length;
 
     const isDeploymentSwitchDisabled =
-        enableProjectDeploymentMutation.isPending || (enabledWorkflowCount < 1 && !projectDeployment.enabled);
+        !canEditDeployment ||
+        enableProjectDeploymentMutation.isPending ||
+        (enabledWorkflowCount < 1 && !projectDeployment.enabled);
 
     const lastPublishedProjectVersion = (projectVersions ?? [])
         .filter((projectVersion) => projectVersion.status === ProjectStatus.Published)
@@ -179,6 +186,7 @@ const ProjectDeploymentListItem = ({
                                                 updateTagsRequest: {tags: tags || []},
                                             })}
                                             id={projectDeployment.id!}
+                                            readOnly={!canEditDeployment}
                                             remainingTags={remainingTags}
                                             tags={projectDeployment.tags}
                                             updateTagsMutation={updateProjectDeploymentTagsMutation}
@@ -209,6 +217,7 @@ const ProjectDeploymentListItem = ({
                                 {enableProjectDeploymentMutation.isPending && <LoadingIcon />}
 
                                 <Switch
+                                    aria-label="Enable Deployment"
                                     checked={projectDeployment.enabled}
                                     disabled={isDeploymentSwitchDisabled}
                                     onCheckedChange={handleOnCheckedChange}
