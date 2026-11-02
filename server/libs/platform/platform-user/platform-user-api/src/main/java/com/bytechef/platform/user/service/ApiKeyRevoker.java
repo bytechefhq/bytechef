@@ -35,8 +35,7 @@ public interface ApiKeyRevoker {
      *
      * <p>
      * Called inside the delete's transaction and before the user row goes, so a failure rolls the account back with the
-     * keys rather than leaving one without the other. Revoking key by key rather than in bulk keeps each deletion on
-     * the audit trail: a credential that disappears without a record is the gap the trail exists to close.
+     * keys rather than leaving one without the other. The deletions are not audited.
      *
      * @param userId the user being deleted
      */
