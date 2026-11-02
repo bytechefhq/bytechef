@@ -300,7 +300,7 @@ public class McpServerGraphQlControllerIntTest {
             createMockTag(1L, "tag1"),
             createMockTag(2L, "tag2"));
 
-        when(mcpServerFacade.updateMcpServerTags(anyLong(), any())).thenReturn(mockTags);
+        when(mcpServerFacade.updateSharedMcpServerTags(anyLong(), any())).thenReturn(mockTags);
 
         // When & Then
         this.graphQlTester
@@ -320,7 +320,7 @@ public class McpServerGraphQlControllerIntTest {
             .entityList(Object.class)
             .hasSize(2);
 
-        verify(mcpServerFacade).updateMcpServerTags(eq(1L), any());
+        verify(mcpServerFacade).updateSharedMcpServerTags(eq(1L), any());
     }
 
     @Test
@@ -337,7 +337,7 @@ public class McpServerGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(mcpServerFacade).deleteMcpServer(1L);
+        verify(mcpServerFacade).deleteSharedMcpServer(1L);
     }
 
     @Test
