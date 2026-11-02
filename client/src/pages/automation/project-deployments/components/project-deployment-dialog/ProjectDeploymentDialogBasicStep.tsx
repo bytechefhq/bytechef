@@ -15,6 +15,7 @@ import ProjectDeploymentDialogBasicStepTagsSelect from '@/pages/automation/proje
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
@@ -22,7 +23,7 @@ import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {InfoIcon, LayersIcon, PlusIcon, RefreshCwIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
-import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
+import {Control, UseFormGetValues, UseFormSetValue, useWatch} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectDialogBasicStepProps {
@@ -61,6 +62,8 @@ const ProjectDeploymentDialogBasicStep = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const environmentId = useWatch({control, name: 'environmentId'});
+
     const {data: projects} = useGetWorkspaceProjectsQuery({
         apiCollections: false,
         id: currentWorkspaceId!,
@@ -70,6 +73,8 @@ const ProjectDeploymentDialogBasicStep = ({
     const {data: environmentsData} = useEnvironmentsQuery(undefined, {enabled: environmentEditable});
 
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
+
+    const isDevelopmentEnvironment = (environmentId ?? currentEnvironmentId) === DEVELOPMENT_ENVIRONMENT;
 
     const currentProjectName = projects?.find((project) => project.id === currentProjectId)?.name;
 
@@ -273,7 +278,7 @@ const ProjectDeploymentDialogBasicStep = ({
                 />
             )}
 
-            {!changeProjectVersion && (
+            {!changeProjectVersion && !isDevelopmentEnvironment && (
                 <FormField
                     control={control}
                     name="tags"
