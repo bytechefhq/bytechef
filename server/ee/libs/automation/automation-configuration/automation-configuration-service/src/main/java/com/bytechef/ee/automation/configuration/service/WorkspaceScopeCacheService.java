@@ -129,14 +129,18 @@ public class WorkspaceScopeCacheService {
         Optional<WorkspaceUser> implicitWorkspaceUser = workspaceUserRepository
             .findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId, workspaceId);
 
-        if (implicitWorkspaceUser.isPresent()) {
+        if (implicitWorkspaceUser.isPresent()
+            && !workspaceUserRepository.existsByUserIdAndWorkspaceIdAndEnvironmentIsNotNull(userId, workspaceId)) {
+
             return dispatchScopes(implicitWorkspaceUser.get(), userId, workspaceId);
         }
 
         Set<String> unionScopes = new HashSet<>();
 
         for (WorkspaceUser workspaceUser : workspaceUserRepository.findAllByUserIdAndWorkspaceId(userId, workspaceId)) {
-            unionScopes.addAll(dispatchScopes(workspaceUser, userId, workspaceId));
+            if (workspaceUser.getEnvironment() != null) {
+                unionScopes.addAll(dispatchScopes(workspaceUser, userId, workspaceId));
+            }
         }
 
         return unionScopes;
@@ -155,6 +159,10 @@ public class WorkspaceScopeCacheService {
 
         if (environmentWorkspaceUser.isPresent()) {
             return environmentWorkspaceUser;
+        }
+
+        if (workspaceUserRepository.existsByUserIdAndWorkspaceIdAndEnvironmentIsNotNull(userId, workspaceId)) {
+            return Optional.empty();
         }
 
         return workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId, workspaceId);

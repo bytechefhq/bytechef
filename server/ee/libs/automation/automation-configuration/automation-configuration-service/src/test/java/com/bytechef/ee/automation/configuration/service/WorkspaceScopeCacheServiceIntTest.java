@@ -133,6 +133,26 @@ class WorkspaceScopeCacheServiceIntTest {
     }
 
     @Test
+    void testGetWorkspaceScopesForAnEnvironmentIgnoresAnImplicitRowBesideEnvironmentRows() {
+        workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.ADMIN));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT));
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+            .isEmpty();
+    }
+
+    @Test
+    void testGetWorkspaceScopesIgnoresAnImplicitRowBesideEnvironmentRows() {
+        workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.ADMIN));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT));
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId))
+            .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER));
+    }
+
+    @Test
     void testTwoEnvironmentsDoNotShareACacheEntry() {
         workspaceUserRepository.save(
             WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.EDITOR, Environment.DEVELOPMENT));
