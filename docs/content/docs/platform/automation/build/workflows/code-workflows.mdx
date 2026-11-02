@@ -136,6 +136,10 @@ Two things to know about what the endpoint does:
 - **It upserts by name.** The project is matched on the `name` in the definition. First deploy creates
   the project; every deploy after that adds a new version to it.
 
+With Enterprise Edition role-based access control, which is on the upcoming release track, the deploy
+endpoint requires both `PROJECT_CREATE` and `PROJECT_PUBLISH` on the workspace. A caller without them
+gets HTTP 403.
+
 A second endpoint, `POST /api/automation/v1/projects/{id}/git/pull`, pulls a project from its
 configured Git repository instead of taking an upload.
 
