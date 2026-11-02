@@ -25,6 +25,7 @@ import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
 import java.util.Set;
@@ -193,6 +194,33 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testHasWorkspaceRoleDeniesAMemberInExplicitMode() {
+        addMember(WorkspaceRole.ADMIN, Environment.DEVELOPMENT);
+        addMember(WorkspaceRole.ADMIN, Environment.STAGING);
+        addMember(WorkspaceRole.ADMIN, Environment.PRODUCTION);
+
+        assertThat(permissionService.hasWorkspaceRole(workspaceId, "ADMIN")).isFalse();
+        assertThat(permissionService.hasWorkspaceRole(workspaceId, "VIEWER")).isFalse();
+    }
+
+    @Test
+    void testHasResourceRoleDeniesAMemberInExplicitMode() {
+        addMember(WorkspaceRole.ADMIN, Environment.PRODUCTION);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("Connection", ResourceOwner.ofWorkspace(workspaceId)));
+
+        assertThat(resourcePermissionService.hasResourceRole(1L, "Connection", "ADMIN")).isFalse();
+    }
+
+    @Test
+    void testGetMyWorkspaceRoleNullForAMemberInExplicitMode() {
+        addMember(WorkspaceRole.ADMIN, Environment.PRODUCTION);
+
+        assertThat(permissionService.getMyWorkspaceRole(workspaceId)).isNull();
+    }
+
+    @Test
     void testHasWorkspaceRoleFailsClosedOnInvalidRoleOrdinal() {
         // A corrupted or legacy workspace_role ordinal hydrated via Spring Data JDBC (which bypasses the constructor's
         // range validation) must fail closed - deny - rather than throw ArrayIndexOutOfBoundsException as a 500.
@@ -324,6 +352,34 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testGetMyWorkspaceScopesForAnEnvironmentResolvesThatEnvironmentsRole() {
+        addMember(WorkspaceRole.EDITOR, Environment.STAGING);
+
+        assertThat(permissionService.getMyWorkspaceScopes(workspaceId, Environment.STAGING))
+            .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
+        assertThat(permissionService.getMyWorkspaceScopes(workspaceId, Environment.PRODUCTION)).isEmpty();
+    }
+
+    @Test
+    void testGetMyWorkspaceScopesForAnEnvironmentReturnsAllScopesForTenantAdmin() {
+        authenticate(LOGIN, AuthorityConstants.ADMIN);
+
+        assertThat(permissionService.getMyWorkspaceScopes(workspaceId, Environment.PRODUCTION))
+            .isEqualTo(permissionScopeRegistry.getAllScopeNames());
+    }
+
+    @Test
+    void testGetMyWorkspaceScopesForAnEnvironmentEmptyWhenSecurityContextEmpty() {
+        addMember(WorkspaceRole.ADMIN, Environment.PRODUCTION);
+
+        SecurityContextHolder.clearContext();
+
+        PermissionService targetPermissionService = AopTestUtils.getUltimateTargetObject(permissionService);
+
+        assertThat(targetPermissionService.getMyWorkspaceScopes(workspaceId, Environment.PRODUCTION)).isEmpty();
+    }
+
+    @Test
     void testGetMyWorkspaceRoleNullWhenSecurityContextEmpty() {
         addMember(WorkspaceRole.ADMIN);
 
@@ -390,6 +446,50 @@ class PermissionServiceIntTest {
         projectWorkflowRepository.save(new ProjectWorkflow(project.getId(), 1, workflowId, UUID.randomUUID()));
 
         assertThat(permissionService.hasWorkflowScope(workflowId, "WORKFLOW_EDIT")).isTrue();
+    }
+
+    @Test
+    void testHasWorkflowScopeIfProjectWorkflowGrantsWhenTheWorkflowBelongsToNoProject() {
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow(
+                "integration-workflow-" + UUID.randomUUID(), "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                    .isTrue();
+    }
+
+    @Test
+    void testHasWorkflowScopeIfProjectWorkflowDeniesAProjectWorkflowWithoutTheScope() {
+        addMember(WorkspaceRole.VIEWER, Environment.DEVELOPMENT);
+
+        String workflowId = createProjectWorkflow();
+
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow(workflowId, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
+    }
+
+    @Test
+    void testHasWorkflowScopeIfProjectWorkflowGrantsAProjectWorkflowWithTheScope() {
+        addMember(WorkspaceRole.EDITOR, Environment.DEVELOPMENT);
+
+        String workflowId = createProjectWorkflow();
+
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow(workflowId, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isTrue();
+    }
+
+    @Test
+    void testHasWorkflowScopeDeniesAMemberWhoHoldsTheScopeOnlyInProduction() {
+        addMember(WorkspaceRole.EDITOR, Environment.PRODUCTION);
+        addMember(WorkspaceRole.VIEWER, Environment.DEVELOPMENT);
+
+        String workflowId = createProjectWorkflow();
+
+        assertThat(permissionService.hasWorkflowScope(workflowId, "WORKFLOW_EDIT", Environment.DEVELOPMENT)).isFalse();
+        assertThat(permissionService.hasWorkflowScope(workflowId, "WORKFLOW_EDIT", Environment.PRODUCTION)).isTrue();
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow(workflowId, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
     }
 
     @Test
@@ -482,6 +582,10 @@ class PermissionServiceIntTest {
         return workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, workspaceRole));
     }
 
+    private WorkspaceUser addMember(WorkspaceRole workspaceRole, Environment environment) {
+        return workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, workspaceRole, environment));
+    }
+
     private void changeRole(WorkspaceUser workspaceUser, WorkspaceRole workspaceRole) {
         WorkspaceUser persistedWorkspaceUser = workspaceUserRepository.findById(workspaceUser.getId())
             .orElseThrow();
@@ -504,10 +608,20 @@ class PermissionServiceIntTest {
         return projectRepository.save(project);
     }
 
+    private String createProjectWorkflow() {
+        Project project = createProject();
+
+        String workflowId = "wf-" + UUID.randomUUID();
+
+        projectWorkflowRepository.save(new ProjectWorkflow(project.getId(), 1, workflowId, UUID.randomUUID()));
+
+        return workflowId;
+    }
+
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resourceOwnershipResolver));
+            workspaceUserRepository, List.of(resourceOwnershipResolver), List.of());
     }
 
     private static void authenticate(String login, String authority) {
