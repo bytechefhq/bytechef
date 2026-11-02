@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.notification.handler;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryRequest;
 import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
 import com.bytechef.platform.notification.domain.Notification;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class WebhookNotificationSender implements NotificationSender<WebhookNotificationHandler> {
 
     private final WebhookNotificationClient webhookNotificationClient;
