@@ -27,7 +27,7 @@
     "type": "STRING"
   } ],
   "resources": null,
-  "taskProperties": null,
+  "taskProperties": [ ],
   "title": "Stop Job",
   "variableProperties": null,
   "version": 1

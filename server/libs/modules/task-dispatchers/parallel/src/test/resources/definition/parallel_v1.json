@@ -4,7 +4,7 @@
   "icon": "path:assets/parallel.svg",
   "name": "parallel",
   "outputDefinition": null,
-  "properties": null,
+  "properties": [ ],
   "resources": null,
   "taskProperties": [ {
     "advancedOption": false,

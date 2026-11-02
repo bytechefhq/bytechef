@@ -4,7 +4,7 @@
   "icon": "path:assets/fork-join.svg",
   "name": "fork-join",
   "outputDefinition": null,
-  "properties": null,
+  "properties": [ ],
   "resources": null,
   "taskProperties": [ {
     "advancedOption": false,
