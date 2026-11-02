@@ -19,12 +19,14 @@ export interface McpServerWorkflowDialogProps {
 
 export interface McpServerToolsContentProps {
     activeToolsTab: McpServerToolsTabType;
+    canEdit?: boolean;
     mcpServer: McpServer;
     onAddComponentClick: () => void;
     onAddWorkflowsClick: () => void;
 }
 
 export interface McpServerTabsProps {
+    canEdit?: boolean;
     connectContent: ReactNode;
     mcpComponentDialog: ComponentType<McpServerComponentDialogProps>;
     mcpServer: McpServer;
@@ -33,6 +35,7 @@ export interface McpServerTabsProps {
 }
 
 const McpServerTabs = ({
+    canEdit = true,
     connectContent,
     mcpComponentDialog: McpComponentDialog,
     mcpServer,
@@ -65,7 +68,7 @@ const McpServerTabs = ({
                         <TabsTrigger value="connect">Connect</TabsTrigger>
                     </TabsList>
 
-                    {activeTab !== 'connect' && (
+                    {canEdit && activeTab !== 'connect' && (
                         <Button
                             icon={<PlusIcon />}
                             label={isComponentsTab ? 'Add Component' : 'Add Workflows'}
@@ -80,6 +83,7 @@ const McpServerTabs = ({
                     <TabsContent className="pt-2" key={toolsTab} value={toolsTab}>
                         <ToolsContent
                             activeToolsTab={toolsTab}
+                            canEdit={canEdit}
                             mcpServer={mcpServer}
                             onAddComponentClick={() => setShowMcpComponentDialog(true)}
                             onAddWorkflowsClick={() => setShowWorkflowDialog(true)}

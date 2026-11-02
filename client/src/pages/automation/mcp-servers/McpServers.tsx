@@ -5,10 +5,12 @@ import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import {MCP_SERVERS_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -42,6 +44,10 @@ export enum Type {
 
 const McpServers = () => {
     const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canCreateMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_CREATE');
 
     const {
         allComponentNames,
@@ -84,7 +90,7 @@ const McpServers = () => {
                             <div className="flex items-center gap-1">
                                 <CopilotButton source={Source.MCP_SERVER} />
 
-                                {validMcpServers.length > 0 && (
+                                {canCreateMcpServer && validMcpServers.length > 0 && (
                                     <McpServerDialog
                                         mcpServer={undefined}
                                         triggerNode={<Button label="New MCP Server" />}
@@ -136,7 +142,12 @@ const McpServers = () => {
                 ) : (
                     <EmptyState
                         actions={
-                            <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
+                            canCreateMcpServer && (
+                                <McpServerDialog
+                                    mcpServer={undefined}
+                                    triggerNode={<Button label="Create MCP Server" />}
+                                />
+                            )
                         }
                         description="An MCP server turns component actions and workflows into tools that AI assistants like Claude or Cursor can call, through a single URL."
                         docsLink={{href: MCP_SERVERS_DOCUMENTATION_URL, label: 'How MCP servers work'}}
