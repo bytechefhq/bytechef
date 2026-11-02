@@ -138,9 +138,10 @@ public interface Property extends BaseProperty {
         }
 
         /**
-         * Returns the data source that resolves this property's nested properties at runtime.
+         * Returns the data source that resolves this property's nested properties at runtime. A dynamic properties
+         * property exists only to resolve its nested properties, so the data source is required.
          *
-         * @return the dynamic properties data source
+         * @return the dynamic properties data source, never {@code null}
          */
         PropertiesDataSource<?> getDynamicPropertiesDataSource();
     }
