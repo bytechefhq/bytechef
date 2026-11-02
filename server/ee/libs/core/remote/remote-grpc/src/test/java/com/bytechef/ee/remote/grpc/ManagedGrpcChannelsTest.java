@@ -174,6 +174,39 @@ class ManagedGrpcChannelsTest {
         }
     }
 
+    @Test
+    void testCallRetriesUntilAServiceThatIsStillStartingBecomesReachable() throws Exception {
+        Server portReservingServer = ServerBuilder.forPort(0)
+            .build()
+            .start();
+
+        int port = portReservingServer.getPort();
+
+        portReservingServer.shutdownNow();
+        portReservingServer.awaitTermination(5, TimeUnit.SECONDS);
+
+        Server server = ServerBuilder.forPort(port)
+            .addService(new EchoService())
+            .build();
+
+        try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
+            applicationProperties("token", Map.of("echo-app", "localhost:" + port)), List.of())) {
+
+            Channel channel = managedGrpcChannels.getChannel("echo-app");
+
+            ListenableFuture<String> responseFuture = ClientCalls.futureUnaryCall(
+                channel.newCall(EchoService.SLOW_ECHO, CallOptions.DEFAULT), "0");
+
+            Thread.sleep(300);
+
+            server.start();
+
+            assertThat(responseFuture.get(15, TimeUnit.SECONDS)).isEqualTo("done");
+        } finally {
+            server.shutdownNow();
+        }
+    }
+
     private static ServiceInstance serviceInstance(String instanceId, int grpcPort) {
         return new DefaultServiceInstance(
             instanceId, "worker-app", "localhost", 8080, false, Map.of("grpc-port", String.valueOf(grpcPort)));
