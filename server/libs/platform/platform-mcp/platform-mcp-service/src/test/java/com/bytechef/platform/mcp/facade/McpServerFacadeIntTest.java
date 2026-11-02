@@ -40,16 +40,20 @@ import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -99,7 +103,8 @@ class McpServerFacadeIntTest {
 
     @BeforeEach
     void beforeEach() {
-        mcpServerFacade = new McpServerFacadeImpl(mcpComponentService, mcpServerService, mcpToolService, tagService);
+        mcpServerFacade = new McpServerFacadeImpl(
+            mcpComponentService, mcpServerService, mcpServerTypeDefinitions(), mcpToolService, tagService);
 
         mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
@@ -284,6 +289,162 @@ class McpServerFacadeIntTest {
         return new McpTool(name, Map.of(), mcpComponentId);
     }
 
+    @Test
+    void testEmbeddedMcpServerIsRejected() {
+        McpServer embeddedMcpServer = saveEmbeddedMcpServer();
+
+        long embeddedMcpServerId = embeddedMcpServer.getId();
+
+        assertRejected(() -> mcpServerFacade.getMcpServer(embeddedMcpServerId));
+        assertRejected(() -> mcpServerFacade.updateMcpServer(embeddedMcpServerId, "Renamed", false, null, null));
+        assertRejected(() -> mcpServerFacade.rotateMcpServerSecretKey(embeddedMcpServerId));
+        assertRejected(() -> mcpServerFacade.updateMcpServerTags(embeddedMcpServerId, List.of()));
+        assertRejected(() -> mcpServerFacade.getMcpServerMcpComponents(embeddedMcpServerId));
+        assertRejected(() -> mcpServerFacade.deleteMcpServer(embeddedMcpServerId));
+
+        McpServer currentMcpServer = mcpServerService.getMcpServer(embeddedMcpServerId);
+
+        assertThat(currentMcpServer.getName()).isEqualTo("embedded-server");
+    }
+
+    @Test
+    void testEmbeddedMcpComponentIsRejected() {
+        McpServer embeddedMcpServer = saveEmbeddedMcpServer();
+
+        long embeddedMcpServerId = embeddedMcpServer.getId();
+
+        McpComponent embeddedMcpComponent = mcpComponentService.create(
+            new McpComponent("component", 1, embeddedMcpServerId, null));
+
+        long embeddedMcpComponentId = embeddedMcpComponent.getId();
+
+        McpComponent changedMcpComponent = new McpComponent(
+            "component", 1, embeddedMcpServerId, null, embeddedMcpComponent.getVersion());
+
+        changedMcpComponent.setId(embeddedMcpComponentId);
+
+        assertRejected(
+            () -> mcpServerFacade.createMcpComponent(new McpComponent("component", 1, embeddedMcpServerId, null)));
+        assertRejected(
+            () -> mcpServerFacade.create(new McpComponent("component", 1, embeddedMcpServerId, null), List.of()));
+        assertRejected(() -> mcpServerFacade.getMcpComponent(embeddedMcpComponentId));
+        assertRejected(() -> mcpServerFacade.getMcpComponentMcpTools(embeddedMcpComponentId));
+        assertRejected(() -> mcpServerFacade.update(changedMcpComponent, null, List.of()));
+        assertRejected(() -> mcpServerFacade.deleteMcpComponent(embeddedMcpComponentId));
+
+        assertThat(mcpComponentService.getMcpServerMcpComponents(embeddedMcpServerId)).hasSize(1);
+    }
+
+    @Test
+    void testEmbeddedMcpToolIsRejected() {
+        McpServer embeddedMcpServer = saveEmbeddedMcpServer();
+
+        McpComponent embeddedMcpComponent = mcpComponentService.create(
+            new McpComponent("component", 1, embeddedMcpServer.getId(), null));
+
+        long embeddedMcpComponentId = embeddedMcpComponent.getId();
+
+        McpTool embeddedMcpTool = mcpToolService.create(getMcpTool("tool", embeddedMcpComponentId));
+
+        long embeddedMcpToolId = embeddedMcpTool.getId();
+
+        assertRejected(() -> mcpServerFacade.createMcpTool(getMcpTool("other", embeddedMcpComponentId)));
+        assertRejected(() -> mcpServerFacade.fetchMcpTool(embeddedMcpToolId));
+        assertRejected(() -> mcpServerFacade.updateMcpTool(embeddedMcpTool));
+        assertRejected(() -> mcpServerFacade.deleteMcpTool(embeddedMcpTool));
+
+        assertThat(mcpToolService.getMcpComponentMcpTools(embeddedMcpComponentId)).hasSize(1);
+    }
+
+    @Test
+    void testMovingAnMcpToolIntoAnEmbeddedMcpComponentIsRejected() {
+        McpServer embeddedMcpServer = saveEmbeddedMcpServer();
+
+        McpComponent embeddedMcpComponent = mcpComponentService.create(
+            new McpComponent("component", 1, embeddedMcpServer.getId(), null));
+        McpComponent mcpComponent = mcpComponentService.create(
+            new McpComponent("component", 1, mcpServer.getId(), null));
+
+        McpTool mcpTool = mcpToolService.create(getMcpTool("tool", mcpComponent.getId()));
+
+        mcpTool.setMcpComponentId(embeddedMcpComponent.getId());
+
+        assertRejected(() -> mcpServerFacade.updateMcpTool(mcpTool));
+    }
+
+    @Test
+    void testListingsOmitEmbeddedMcpComponentsAndTools() {
+        McpServer embeddedMcpServer = saveEmbeddedMcpServer();
+
+        McpComponent embeddedMcpComponent = mcpComponentService.create(
+            new McpComponent("component", 1, embeddedMcpServer.getId(), null));
+        McpComponent mcpComponent = mcpComponentService.create(
+            new McpComponent("component", 1, mcpServer.getId(), null));
+
+        mcpToolService.create(getMcpTool("embedded-tool", embeddedMcpComponent.getId()));
+
+        McpTool mcpTool = mcpToolService.create(getMcpTool("tool", mcpComponent.getId()));
+
+        assertThat(mcpServerFacade.getMcpComponents())
+            .extracting(McpComponent::getId)
+            .containsExactly(mcpComponent.getId());
+        assertThat(mcpServerFacade.getMcpTools())
+            .extracting(McpTool::getId)
+            .containsExactly(mcpTool.getId());
+    }
+
+    @Test
+    void testMcpServerTypeWithoutADefinitionIsRejected() {
+        McpServerFacade mcpServerFacadeWithoutDefinitions = new McpServerFacadeImpl(
+            mcpComponentService, mcpServerService, new StaticListableBeanFactory().getBeanProvider(
+                McpServerTypeDefinition.class),
+            mcpToolService, tagService);
+
+        long mcpServerId = mcpServer.getId();
+
+        assertRejected(() -> mcpServerFacadeWithoutDefinitions.getMcpServer(mcpServerId));
+        assertThat(mcpServerFacadeWithoutDefinitions.getMcpComponents()).isEmpty();
+    }
+
+    private static void assertRejected(ThrowingCallable throwingCallable) {
+        assertThatThrownBy(throwingCallable)
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessageContaining("can only be administered through their own MCP server operations");
+    }
+
+    private static ObjectProvider<McpServerTypeDefinition> mcpServerTypeDefinitions() {
+        StaticListableBeanFactory staticListableBeanFactory = new StaticListableBeanFactory();
+
+        staticListableBeanFactory.addBean("automation", new TestMcpServerTypeDefinition(PlatformType.AUTOMATION, true));
+        staticListableBeanFactory.addBean("embedded", new TestMcpServerTypeDefinition(PlatformType.EMBEDDED, false));
+
+        return staticListableBeanFactory.getBeanProvider(McpServerTypeDefinition.class);
+    }
+
+    private McpServer saveEmbeddedMcpServer() {
+        return mcpServerRepository.save(
+            new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
+    }
+
+    private record TestMcpServerTypeDefinition(PlatformType type, boolean sharedAdministration)
+        implements McpServerTypeDefinition {
+
+        @Override
+        public PlatformType getType() {
+            return type;
+        }
+
+        @Override
+        public boolean isSharedAdministration() {
+            return sharedAdministration;
+        }
+
+        @Override
+        public String resolvePath(String secretKey) {
+            return "/" + secretKey;
+        }
+    }
+
     @Nested
     @Import({
         PlatformMcpMethodSecurityTestConfiguration.class, McpServerFacadeIntTest.MethodSecurityFacadeConfiguration.class
@@ -392,7 +553,8 @@ class McpServerFacadeIntTest {
             McpComponentService mcpComponentService, McpServerService mcpServerService, McpToolService mcpToolService,
             TagService tagService) {
 
-            return new McpServerFacadeImpl(mcpComponentService, mcpServerService, mcpToolService, tagService);
+            return new McpServerFacadeImpl(
+                mcpComponentService, mcpServerService, mcpServerTypeDefinitions(), mcpToolService, tagService);
         }
     }
 }

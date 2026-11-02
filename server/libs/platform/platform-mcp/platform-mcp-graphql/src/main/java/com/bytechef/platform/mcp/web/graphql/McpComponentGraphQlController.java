@@ -21,13 +21,10 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.mcp.domain.McpComponent;
-import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
-import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
-import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashSet;
 import java.util.List;
@@ -54,66 +51,45 @@ public class McpComponentGraphQlController {
     private final ComponentDefinitionService componentDefinitionService;
     private final McpComponentService mcpComponentService;
     private final McpServerFacade mcpServerFacade;
-    private final McpServerService mcpServerService;
-    private final McpServerTypeDefinitions mcpServerTypeDefinitions;
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
     public McpComponentGraphQlController(
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, McpComponentService mcpComponentService,
-        McpServerFacade mcpServerFacade, McpServerService mcpServerService,
-        List<McpServerTypeDefinition> mcpServerTypeDefinitions, McpToolService mcpToolService) {
+        McpServerFacade mcpServerFacade, McpToolService mcpToolService) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
         this.mcpComponentService = mcpComponentService;
         this.mcpServerFacade = mcpServerFacade;
-        this.mcpServerService = mcpServerService;
-        this.mcpServerTypeDefinitions = new McpServerTypeDefinitions(mcpServerTypeDefinitions);
         this.mcpToolService = mcpToolService;
     }
 
     @QueryMapping
     public McpComponent mcpComponent(@Argument long id) {
-        McpComponent mcpComponent = mcpServerFacade.getMcpComponent(id);
-
-        checkMcpServerSharedAdministration(mcpComponent.getMcpServerId());
-
-        return mcpComponent;
+        return mcpServerFacade.getMcpComponent(id);
     }
 
     @QueryMapping
     public List<McpComponent> mcpComponents() {
-        Set<Long> sharedAdministrationMcpServerIds =
-            mcpServerTypeDefinitions.getSharedAdministrationMcpServerIds(mcpServerService);
-
-        return mcpComponentService.getMcpComponents()
-            .stream()
-            .filter(mcpComponent -> sharedAdministrationMcpServerIds.contains(mcpComponent.getMcpServerId()))
-            .toList();
+        return mcpServerFacade.getMcpComponents();
     }
 
     @QueryMapping
     public List<McpComponent> mcpComponentsByServerId(@Argument long mcpServerId) {
-        checkMcpServerSharedAdministration(mcpServerId);
-
         return mcpServerFacade.getMcpServerMcpComponents(mcpServerId);
     }
 
     @MutationMapping
     public McpComponent createMcpComponent(@Argument McpComponentInput input) {
-        checkMcpServerSharedAdministration(input.mcpServerId());
-
-        return mcpComponentService.create(
+        return mcpServerFacade.createMcpComponent(
             new McpComponent(
                 input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId()));
     }
 
     @MutationMapping
     public McpComponent createMcpComponentWithTools(@Argument McpComponentWithToolsInput input) {
-        checkMcpServerSharedAdministration(input.mcpServerId());
-
         McpComponent mcpComponent = new McpComponent(
             input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId());
 
@@ -131,9 +107,6 @@ public class McpComponentGraphQlController {
 
     @MutationMapping
     public McpComponent updateMcpComponentWithTools(@Argument long id, @Argument McpComponentWithToolsInput input) {
-        checkMcpComponentSharedAdministration(id);
-        checkMcpServerSharedAdministration(input.mcpServerId());
-
         McpComponent mcpComponent = new McpComponent(
             input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId(),
             input.version());
@@ -152,8 +125,6 @@ public class McpComponentGraphQlController {
 
     @MutationMapping
     public boolean deleteMcpComponent(@Argument long id) {
-        checkMcpComponentSharedAdministration(id);
-
         mcpServerFacade.deleteMcpComponent(id);
 
         return true;
@@ -188,18 +159,6 @@ public class McpComponentGraphQlController {
             .collect(Collectors.toMap(
                 mcpComponent -> mcpComponent,
                 mcpComponent -> mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())));
-    }
-
-    private void checkMcpComponentSharedAdministration(long mcpComponentId) {
-        McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpComponentId);
-
-        checkMcpServerSharedAdministration(mcpComponent.getMcpServerId());
-    }
-
-    private void checkMcpServerSharedAdministration(long mcpServerId) {
-        McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
-
-        mcpServerTypeDefinitions.checkSharedAdministration(mcpServer.getType());
     }
 
     public record McpComponentInput(String componentName, int componentVersion, Long mcpServerId, Long connectionId) {
