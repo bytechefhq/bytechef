@@ -6,6 +6,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import Chats from '../Chats';
 
 const hoisted = vi.hoisted(() => ({
+    journeyLoading: false,
     mockUseWorkspaceChatWorkflowsQuery: vi.fn(),
 }));
 
@@ -19,7 +20,12 @@ vi.mock('@/pages/automation/journey/useAutomationJourney', async () => {
         typeof import('@/pages/automation/journey/getAutomationJourney')
     >('@/pages/automation/journey/getAutomationJourney');
 
-    return {useAutomationJourney: () => ({isLoading: false, journey: getAutomationJourney([], [])})};
+    return {
+        useAutomationJourney: () =>
+            hoisted.journeyLoading
+                ? {isLoading: true, journey: undefined}
+                : {isLoading: false, journey: getAutomationJourney([], [])},
+    };
 });
 
 vi.mock('@/shared/layout/LayoutContainer', () => ({
@@ -59,6 +65,7 @@ const renderChats = () =>
 
 describe('Chats', () => {
     beforeEach(() => {
+        hoisted.journeyLoading = false;
         hoisted.mockUseWorkspaceChatWorkflowsQuery.mockReset();
     });
 
@@ -77,6 +84,19 @@ describe('Chats', () => {
         expect(screen.getByRole('button', {name: /Go to Projects/})).toBeInTheDocument();
         expect(screen.getByText('Create a project').closest('li')).toHaveAttribute('aria-current', 'step');
         expect(screen.getByText('Deploy and enable')).toBeInTheDocument();
+    });
+
+    it('waits for the journey to load before showing the empty state', () => {
+        hoisted.journeyLoading = true;
+        hoisted.mockUseWorkspaceChatWorkflowsQuery.mockReturnValue({
+            data: {workspaceChatWorkflows: []},
+            isLoading: false,
+        });
+
+        renderChats();
+
+        expect(screen.queryByText('No chat workflows yet')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: /Go to Projects/})).not.toBeInTheDocument();
     });
 
     it('keeps the sidebar and asks to pick a chat when chat workflows exist', () => {
