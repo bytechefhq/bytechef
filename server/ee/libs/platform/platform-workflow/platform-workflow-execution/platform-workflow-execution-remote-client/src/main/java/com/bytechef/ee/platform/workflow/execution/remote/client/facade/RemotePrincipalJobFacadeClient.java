@@ -79,7 +79,12 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     public long createPrincipalLinkedJob(
         JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType platformType) {
 
-        throw new UnsupportedOperationException();
+        return loadBalancedRestClient.post(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(PRINCIPAL_JOB_FACADE + "/create-principal-linked-job-for-principal")
+                .build(),
+            new CreateJobRequest(jobParametersDTO, jobPrincipalId, platformType), Long.class);
     }
 
     @SuppressFBWarnings("EI")
