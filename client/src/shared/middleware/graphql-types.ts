@@ -432,6 +432,7 @@ export type ApprovalTaskInput = {
   assigneeId?: InputMaybe<Scalars['ID']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   dueDate?: InputMaybe<Scalars['String']['input']>;
+  environmentId?: InputMaybe<Scalars['Int']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   name: Scalars['String']['input'];
   priority?: InputMaybe<ApprovalTaskPriority>;
