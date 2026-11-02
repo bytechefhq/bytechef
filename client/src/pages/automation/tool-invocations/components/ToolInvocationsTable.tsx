@@ -5,6 +5,8 @@ import {twMerge} from 'tailwind-merge';
 type ToolInvocationLogItemType = ToolInvocationLogsQuery['toolInvocationLogs']['content'][number];
 
 interface ToolInvocationsTableProps {
+    mcpServerNames?: Record<string, string>;
+    showSurface?: boolean;
     toolInvocationLogs: Array<ToolInvocationLogItemType>;
 }
 
@@ -13,7 +15,6 @@ const SURFACE_LABELS: Record<string, string> = {
     EMBEDDED_API_TOOL: 'Embedded API (Tool)',
     MCP_AUTOMATION: 'Automation MCP',
     MCP_EMBEDDED: 'Embedded MCP',
-    MCP_MANAGEMENT: 'Management MCP',
 };
 
 const outcomeClassName = (outcome: string): string => {
@@ -28,7 +29,22 @@ const outcomeClassName = (outcome: string): string => {
     return 'bg-surface-neutral-secondary text-content-neutral-secondary';
 };
 
-const componentLabel = (toolInvocationLog: ToolInvocationLogItemType): string => {
+const mcpServerLabel = (
+    toolInvocationLog: ToolInvocationLogItemType,
+    mcpServerNames: Record<string, string> | undefined
+): string => {
+    if (toolInvocationLog.mcpServerId == null) {
+        return '—';
+    }
+
+    return mcpServerNames?.[String(toolInvocationLog.mcpServerId)] || '—';
+};
+
+const sourceLabel = (toolInvocationLog: ToolInvocationLogItemType): string => {
+    if (toolInvocationLog.kind === 'WORKFLOW') {
+        return toolInvocationLog.workflowName || toolInvocationLog.componentName || 'Workflow';
+    }
+
     const componentName = toolInvocationLog.componentName || '—';
 
     return toolInvocationLog.operationName ? `${componentName} / ${toolInvocationLog.operationName}` : componentName;
@@ -42,15 +58,17 @@ const formatCreatedDate = (createdDate: unknown): string => {
     return new Date(Number(createdDate)).toLocaleString();
 };
 
-const ToolInvocationsTable = ({toolInvocationLogs}: ToolInvocationsTableProps) => (
+const ToolInvocationsTable = ({mcpServerNames, showSurface = true, toolInvocationLogs}: ToolInvocationsTableProps) => (
     <Table>
         <TableHeader>
             <TableRow>
                 <TableHead>Tool</TableHead>
 
-                <TableHead>Surface</TableHead>
+                {showSurface && <TableHead>Surface</TableHead>}
 
-                <TableHead>Component</TableHead>
+                <TableHead>MCP Server</TableHead>
+
+                <TableHead>Source</TableHead>
 
                 <TableHead>Outcome</TableHead>
 
@@ -65,9 +83,13 @@ const ToolInvocationsTable = ({toolInvocationLogs}: ToolInvocationsTableProps) =
                 <TableRow key={toolInvocationLog.id}>
                     <TableCell className="font-semibold">{toolInvocationLog.toolName || '—'}</TableCell>
 
-                    <TableCell>{SURFACE_LABELS[toolInvocationLog.surface] || toolInvocationLog.surface}</TableCell>
+                    {showSurface && (
+                        <TableCell>{SURFACE_LABELS[toolInvocationLog.surface] || toolInvocationLog.surface}</TableCell>
+                    )}
 
-                    <TableCell>{componentLabel(toolInvocationLog)}</TableCell>
+                    <TableCell>{mcpServerLabel(toolInvocationLog, mcpServerNames)}</TableCell>
+
+                    <TableCell>{sourceLabel(toolInvocationLog)}</TableCell>
 
                     <TableCell>
                         <span
