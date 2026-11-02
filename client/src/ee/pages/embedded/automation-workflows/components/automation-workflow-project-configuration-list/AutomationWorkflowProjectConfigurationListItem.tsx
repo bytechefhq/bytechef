@@ -5,6 +5,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import Switch from '@/components/Switch/Switch';
@@ -17,7 +18,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {Environment} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, EllipsisVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
+import {ChevronDownIcon, EllipsisVerticalIcon, PencilIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 import {MouseEvent, useCallback, useRef, useState} from 'react';
 
 import AutomationWorkflowProjectConfigurationWorkflowList from './AutomationWorkflowProjectConfigurationWorkflowList';
@@ -31,6 +32,7 @@ interface AutomationWorkflowProjectConfigurationListItemProps {
     environments: Environment[];
     onDelete: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
+    onUpdateVersion: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     project: AutomationWorkflowProjectType;
 }
 
@@ -39,6 +41,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
     environments,
     onDelete,
     onEdit,
+    onUpdateVersion,
     project,
 }: AutomationWorkflowProjectConfigurationListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -184,6 +187,15 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                                     label="Edit"
                                     onClick={() => onEdit(configuration)}
                                 />
+
+                                <DropdownMenuItem
+                                    aria-label="Update Project Version"
+                                    icon={<RefreshCcwIcon />}
+                                    label="Update Project Version"
+                                    onClick={() => onUpdateVersion(configuration)}
+                                />
+
+                                <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
                                     aria-label="Delete Configuration"

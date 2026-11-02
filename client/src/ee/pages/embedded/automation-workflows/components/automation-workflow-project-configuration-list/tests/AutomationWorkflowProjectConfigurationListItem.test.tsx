@@ -92,7 +92,13 @@ const project = {
 };
 
 const renderItem = (
-    overrides: {configuration?: typeof configuration; onDelete?: () => void; project?: typeof project} = {}
+    overrides: {
+        configuration?: typeof configuration;
+        onDelete?: () => void;
+        onEdit?: () => void;
+        onUpdateVersion?: () => void;
+        project?: typeof project;
+    } = {}
 ) =>
     render(
         <TooltipProvider>
@@ -100,7 +106,8 @@ const renderItem = (
                 configuration={overrides.configuration ?? configuration}
                 environments={environments}
                 onDelete={overrides.onDelete ?? vi.fn()}
-                onEdit={vi.fn()}
+                onEdit={overrides.onEdit ?? vi.fn()}
+                onUpdateVersion={overrides.onUpdateVersion ?? vi.fn()}
                 project={overrides.project ?? project}
             />
         </TooltipProvider>
@@ -194,6 +201,27 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         expect(mocks.enableConfigurationMutate.mock.calls[0][0]).toEqual({enable: true, id: 'configuration-1'});
         expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationWorkflowProjectConfigurations']});
         expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationWorkflowProjects']});
+    });
+
+    it('offers editing and updating the project version as separate actions', async () => {
+        const user = userEvent.setup();
+
+        const onEdit = vi.fn();
+        const onUpdateVersion = vi.fn();
+
+        renderItem({onEdit, onUpdateVersion});
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Update Project Version'}));
+
+        expect(onUpdateVersion).toHaveBeenCalledWith(configuration);
+        expect(onEdit).not.toHaveBeenCalled();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Edit Configuration'}));
+
+        expect(onEdit).toHaveBeenCalledWith(configuration);
+        expect(onUpdateVersion).toHaveBeenCalledTimes(1);
     });
 
     it('explains that deleting a configuration pauses automations until it is recreated', async () => {
