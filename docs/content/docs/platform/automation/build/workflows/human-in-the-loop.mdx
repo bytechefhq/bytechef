@@ -93,6 +93,12 @@ Form** link/button that opens the dynamic form in the browser. The approver
 fills in the fields, hits *Approve* or *Discard*, and the workflow resumes
 with each field name as a data pill.
 
+In a chat - the workflow editor's test chat, the Chats page, AI Hub workflow
+chats, and the `@bytechef/chat` embeddable widget - the form will render
+inside the approval card instead, and the resumed run will continue in the
+same conversation. The `@bytechef/chat` widget will fall back to the **Open
+Approval Form** link when the form contains a File or Custom HTML field.
+
 Available field types: Checkbox, Custom HTML, Date Picker, Datetime Picker,
 Email, File, Hidden Field, Input, Number, Password, Radio Button, Select
 (single or multi), and Textarea.
