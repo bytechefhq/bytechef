@@ -249,6 +249,41 @@ class ApprovalNotificationMonitorIntTest {
     }
 
     @Test
+    void testHangingReminderDeliveryTimesOutAndClearsTheReminderMarkerForTheNextSweep() {
+        long jobId = saveApprovalJob(hoursFromNow(4), hoursFromNow(-1), null);
+
+        saveNotification(
+            RecordingWebhookNotificationSender.HANGING_NOTIFICATION_NAME, Notification.Type.WEBHOOK,
+            NotificationEvent.Type.JOB_APPROVAL_EXPIRING);
+
+        monitor(REMINDER_LEAD_TIME, null).notifyPendingApprovals();
+
+        assertThat(recordingWebhookNotificationSender.getAttemptedNotificationNames())
+            .containsExactly(RecordingWebhookNotificationSender.HANGING_NOTIFICATION_NAME);
+        assertThat(getMarker(jobId, ApprovalNotificationMonitor.APPROVAL_REMINDER_SENT_AT)).isNull();
+    }
+
+    @Test
+    void testOneHangingChannelDoesNotHideADeliveredOne() {
+        long jobId = saveApprovalJob(hoursFromNow(4), hoursFromNow(-1), null);
+
+        saveNotification(
+            RecordingWebhookNotificationSender.HANGING_NOTIFICATION_NAME, Notification.Type.WEBHOOK,
+            NotificationEvent.Type.JOB_APPROVAL_EXPIRING);
+        saveNotification(
+            RecordingWebhookNotificationSender.DELAYED_NOTIFICATION_NAME, Notification.Type.WEBHOOK,
+            NotificationEvent.Type.JOB_APPROVAL_EXPIRING);
+
+        monitor(REMINDER_LEAD_TIME, null).notifyPendingApprovals();
+
+        assertThat(recordingWebhookNotificationSender.getAttemptedNotificationNames())
+            .containsExactlyInAnyOrder(
+                RecordingWebhookNotificationSender.HANGING_NOTIFICATION_NAME,
+                RecordingWebhookNotificationSender.DELAYED_NOTIFICATION_NAME);
+        assertThat(getMarker(jobId, ApprovalNotificationMonitor.APPROVAL_REMINDER_SENT_AT)).isNotNull();
+    }
+
+    @Test
     void testSweepContinuesPastAJobWhoseClaimFailsUnexpectedly() {
         long firstJobId = saveApprovalJob(hoursFromNow(4), hoursFromNow(-1), null);
         long secondJobId = saveApprovalJob(hoursFromNow(4), hoursFromNow(-1), null);
@@ -270,6 +305,38 @@ class ApprovalNotificationMonitorIntTest {
         NotificationHandlerContext notificationHandlerContext = notificationHandlerContexts.getFirst();
 
         assertThat(notificationHandlerContext.getJobId()).isIn(firstJobId, secondJobId);
+    }
+
+    @Test
+    void testInterruptedSweepStopsWithoutClaimingTheRemainingJobs() {
+        long firstJobId = saveApprovalJob(hoursFromNow(4), hoursFromNow(-1), null);
+        long secondJobId = saveApprovalJob(hoursFromNow(4), hoursFromNow(-1), null);
+
+        saveNotification("ok", Notification.Type.WEBHOOK, NotificationEvent.Type.JOB_APPROVAL_EXPIRING);
+
+        doAnswer(invocation -> {
+            Object staleJobs = invocation.callRealMethod();
+
+            Thread currentThread = Thread.currentThread();
+
+            currentThread.interrupt();
+
+            return staleJobs;
+        }).when(jobService)
+            .getStaleJobs(any(), any());
+
+        boolean interruptedAfterTheSweep;
+
+        try {
+            monitor(REMINDER_LEAD_TIME, null).notifyPendingApprovals();
+        } finally {
+            interruptedAfterTheSweep = Thread.interrupted();
+        }
+
+        assertThat(interruptedAfterTheSweep).isTrue();
+        assertThat(recordingWebhookNotificationSender.getAttemptedNotificationNames()).isEmpty();
+        assertThat(getMarker(firstJobId, ApprovalNotificationMonitor.APPROVAL_REMINDER_SENT_AT)).isNull();
+        assertThat(getMarker(secondJobId, ApprovalNotificationMonitor.APPROVAL_REMINDER_SENT_AT)).isNull();
     }
 
     @Test
@@ -436,12 +503,46 @@ class ApprovalNotificationMonitorIntTest {
         assertThat(getMarker(jobId, ApprovalNotificationMonitor.APPROVAL_REMINDER_SENT_AT)).isNotNull();
     }
 
+    @Test
+    void testReminderAndEscalationOfOneJobShareOneDeliveryWait() {
+        long jobId = saveApprovalJob(hoursFromNow(4), hoursFromNow(-5), null);
+
+        saveNotification(
+            RecordingWebhookNotificationSender.HANGING_NOTIFICATION_NAME, Notification.Type.WEBHOOK,
+            NotificationEvent.Type.JOB_APPROVAL_EXPIRING);
+        saveNotification(
+            RecordingWebhookNotificationSender.HANGING_NOTIFICATION_NAME, Notification.Type.WEBHOOK,
+            NotificationEvent.Type.JOB_APPROVAL_ESCALATED);
+
+        Duration deliveryWaitTimeout = Duration.ofSeconds(1);
+
+        long startNanos = System.nanoTime();
+
+        monitor(REMINDER_LEAD_TIME, ESCALATION_AFTER, deliveryWaitTimeout).notifyPendingApprovals();
+
+        Duration elapsed = Duration.ofNanos(System.nanoTime() - startNanos);
+
+        assertThat(elapsed).isLessThan(deliveryWaitTimeout.multipliedBy(3)
+            .dividedBy(2));
+        assertThat(recordingWebhookNotificationSender.getAttemptedNotificationNames())
+            .containsExactly(RecordingWebhookNotificationSender.HANGING_NOTIFICATION_NAME);
+        assertThat(getMarker(jobId, ApprovalNotificationMonitor.APPROVAL_REMINDER_SENT_AT)).isNull();
+        assertThat(getMarker(jobId, ApprovalNotificationMonitor.APPROVAL_ESCALATED_AT)).isNull();
+    }
+
     private ApprovalNotificationMonitor monitor(
         @Nullable Duration reminderLeadTime, @Nullable Duration escalationAfter) {
 
+        return monitor(reminderLeadTime, escalationAfter, Duration.ofMillis(200));
+    }
+
+    private ApprovalNotificationMonitor monitor(
+        @Nullable Duration reminderLeadTime, @Nullable Duration escalationAfter, Duration deliveryWaitTimeout) {
+
         return new ApprovalNotificationMonitor(
             null, escalationAfter, jobService, notificationHandlerRegistry, notificationSenderRegistry,
-            notificationService, PUBLIC_URL, reminderLeadTime, taskExecutionService, tenantService);
+            notificationService, PUBLIC_URL, reminderLeadTime, taskExecutionService, tenantService,
+            deliveryWaitTimeout);
     }
 
     private long saveApprovalJob(Instant expiresAt, Instant startedAt, @Nullable Instant raisedAt) {

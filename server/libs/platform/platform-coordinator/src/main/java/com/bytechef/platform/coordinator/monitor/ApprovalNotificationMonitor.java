@@ -55,10 +55,13 @@ public class ApprovalNotificationMonitor {
     static final String APPROVAL_ESCALATED_AT = "approvalEscalatedAt";
     static final String APPROVAL_REMINDER_SENT_AT = "approvalReminderSentAt";
 
+    private static final Duration DELIVERY_WAIT_TIMEOUT = Duration.ofSeconds(45);
+
     private static final Logger log = LoggerFactory.getLogger(ApprovalNotificationMonitor.class);
 
     private final ApprovalNotificationDispatcher approvalNotificationDispatcher;
     private final @Nullable ApprovalTokens approvalTokens;
+    private final Duration deliveryWaitTimeout;
     private final @Nullable Duration escalationAfter;
     private final JobService jobService;
     private final @Nullable String publicUrl;
@@ -74,9 +77,24 @@ public class ApprovalNotificationMonitor {
         @Nullable String publicUrl, @Nullable Duration reminderLeadTime, TaskExecutionService taskExecutionService,
         TenantService tenantService) {
 
+        this(
+            approvalTokens, escalationAfter, jobService, notificationHandlerRegistry, notificationSenderRegistry,
+            notificationService, publicUrl, reminderLeadTime, taskExecutionService, tenantService,
+            DELIVERY_WAIT_TIMEOUT);
+    }
+
+    @SuppressFBWarnings("EI")
+    ApprovalNotificationMonitor(
+        @Nullable ApprovalTokens approvalTokens, @Nullable Duration escalationAfter, JobService jobService,
+        NotificationHandlerRegistry notificationHandlerRegistry,
+        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService,
+        @Nullable String publicUrl, @Nullable Duration reminderLeadTime, TaskExecutionService taskExecutionService,
+        TenantService tenantService, Duration deliveryWaitTimeout) {
+
         this.approvalNotificationDispatcher = new ApprovalNotificationDispatcher(
             notificationHandlerRegistry, notificationSenderRegistry, notificationService);
         this.approvalTokens = approvalTokens;
+        this.deliveryWaitTimeout = deliveryWaitTimeout;
         this.escalationAfter = positiveOrNull(escalationAfter);
         this.jobService = jobService;
         this.publicUrl = publicUrl;
@@ -93,6 +111,10 @@ public class ApprovalNotificationMonitor {
         }
 
         for (String tenantId : tenantService.getTenantIds()) {
+            if (isInterrupted()) {
+                return;
+            }
+
             try {
                 TenantContext.runWithTenantId(tenantId, this::notifyCurrentTenant);
             } catch (RuntimeException runtimeException) {
@@ -117,6 +139,12 @@ public class ApprovalNotificationMonitor {
         }
 
         for (Job job : stoppedJobs) {
+            if (isInterrupted()) {
+                log.info("Approval-notification sweep interrupted; the remaining jobs are left for the next sweep");
+
+                return;
+            }
+
             try {
                 notifyJob(job, now);
             } catch (RuntimeException runtimeException) {
@@ -148,18 +176,27 @@ public class ApprovalNotificationMonitor {
         Instant expiresAt = SuspendUtils.extractSuspendExpiresAt(taskExecution.getMetadata());
 
         Job currentJob = job;
+        long deliveryDeadlineNanos = System.nanoTime() + deliveryWaitTimeout.toNanos();
 
         if (reminderPending && isReminderDue(expiresAt, now)) {
             currentJob = claimAndSend(
                 currentJob, jobResumeId.toString(), APPROVAL_REMINDER_SENT_AT,
-                NotificationEvent.Type.JOB_APPROVAL_EXPIRING, expiresAt, now);
+                NotificationEvent.Type.JOB_APPROVAL_EXPIRING, expiresAt, now, deliveryDeadlineNanos);
         }
 
-        if (currentJob != null && escalationPending && isEscalationDue(taskExecution, expiresAt, now)) {
+        if (currentJob != null && escalationPending && !isInterrupted()
+            && System.nanoTime() - deliveryDeadlineNanos < 0 && isEscalationDue(taskExecution, expiresAt, now)) {
+
             claimAndSend(
                 currentJob, jobResumeId.toString(), APPROVAL_ESCALATED_AT,
-                NotificationEvent.Type.JOB_APPROVAL_ESCALATED, expiresAt, now);
+                NotificationEvent.Type.JOB_APPROVAL_ESCALATED, expiresAt, now, deliveryDeadlineNanos);
         }
+    }
+
+    private static boolean isInterrupted() {
+        Thread currentThread = Thread.currentThread();
+
+        return currentThread.isInterrupted();
     }
 
     private boolean isReminderDue(@Nullable Instant expiresAt, Instant now) {
@@ -194,7 +231,7 @@ public class ApprovalNotificationMonitor {
 
     private @Nullable Job claimAndSend(
         Job job, String jobResumeId, String markerKey, NotificationEvent.Type eventType,
-        @Nullable Instant expiresAt, Instant now) {
+        @Nullable Instant expiresAt, Instant now, long deliveryDeadlineNanos) {
 
         Job claimedJob;
 
@@ -207,7 +244,7 @@ public class ApprovalNotificationMonitor {
         ApprovalNotificationDispatcher.Result result;
 
         try {
-            result = send(claimedJob, jobResumeId, eventType, expiresAt);
+            result = send(claimedJob, jobResumeId, eventType, expiresAt, deliveryDeadlineNanos);
         } catch (RuntimeException runtimeException) {
             log.warn("Could not send the {} notification for job {}", eventType, job.getId(), runtimeException);
 
@@ -222,7 +259,8 @@ public class ApprovalNotificationMonitor {
     }
 
     private ApprovalNotificationDispatcher.Result send(
-        Job job, String jobResumeId, NotificationEvent.Type eventType, @Nullable Instant expiresAt) {
+        Job job, String jobResumeId, NotificationEvent.Type eventType, @Nullable Instant expiresAt,
+        long deliveryDeadlineNanos) {
 
         Optional<String> formUrl = ApprovalFormUrls.buildFormUrl(publicUrl, jobResumeId, approvalTokens, expiresAt);
 
@@ -234,7 +272,7 @@ public class ApprovalNotificationMonitor {
             .jobName(job.getLabel())
             .build();
 
-        return approvalNotificationDispatcher.dispatch(eventType, notificationHandlerContext);
+        return approvalNotificationDispatcher.dispatch(eventType, notificationHandlerContext, deliveryDeadlineNanos);
     }
 
     private @Nullable Job releaseClaim(Job claimedJob, String markerKey) {

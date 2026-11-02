@@ -23,13 +23,16 @@ import com.bytechef.platform.notification.handler.WebhookNotificationHandler;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ivica Cardic
  */
 public class RecordingWebhookNotificationSender implements NotificationSender<WebhookNotificationHandler> {
 
+    public static final String DELAYED_NOTIFICATION_NAME = "delayed";
     public static final String FAILING_NOTIFICATION_NAME = "failing";
+    public static final String HANGING_NOTIFICATION_NAME = "hanging";
 
     private final List<String> attemptedNotificationNames = new CopyOnWriteArrayList<>();
     private final List<NotificationHandlerContext> deliveredNotificationHandlerContexts =
@@ -50,7 +53,21 @@ public class RecordingWebhookNotificationSender implements NotificationSender<We
         attemptedNotificationNames.add(name);
 
         if (FAILING_NOTIFICATION_NAME.equals(name)) {
-            throw new IllegalStateException("webhook unreachable");
+            return CompletableFuture.failedFuture(new IllegalStateException("webhook unreachable"));
+        }
+
+        if (DELAYED_NOTIFICATION_NAME.equals(name)) {
+            return CompletableFuture.runAsync(
+                () -> {
+                    notificationHandler.getPayload(notificationHandlerContext);
+
+                    deliveredNotificationHandlerContexts.add(notificationHandlerContext);
+                },
+                CompletableFuture.delayedExecutor(50, TimeUnit.MILLISECONDS));
+        }
+
+        if (HANGING_NOTIFICATION_NAME.equals(name)) {
+            return new CompletableFuture<>();
         }
 
         notificationHandler.getPayload(notificationHandlerContext);
