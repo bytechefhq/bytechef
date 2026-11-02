@@ -355,12 +355,19 @@ class ApprovalTaskFacadeIntTest {
         void testAdminManagesManualApprovalTasks() {
             when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
 
-            ApprovalTask approvalTask =
-                securedApprovalTaskFacade.createManualApprovalTask(manualApprovalTask("Review"));
+            ApprovalTask manualApprovalTask = manualApprovalTask("Review");
 
-            assertThat(securedApprovalTaskFacade.getApprovalTasks((Integer) null))
+            manualApprovalTask.setEnvironment(Environment.PRODUCTION);
+
+            ApprovalTask approvalTask = securedApprovalTaskFacade.createManualApprovalTask(manualApprovalTask);
+
+            assertThat(approvalTaskService.getApprovalTask(Objects.requireNonNull(approvalTask.getId())))
+                .extracting(ApprovalTask::getJobResumeId)
+                .isNull();
+            assertThat(securedApprovalTaskFacade.getApprovalTasks(Environment.PRODUCTION.ordinal()))
                 .extracting(ApprovalTask::getId)
                 .containsExactly(approvalTask.getId());
+            assertThat(securedApprovalTaskFacade.getApprovalTasks(Environment.DEVELOPMENT.ordinal())).isEmpty();
 
             securedApprovalTaskFacade.deleteApprovalTask(Objects.requireNonNull(approvalTask.getId()));
 
@@ -383,7 +390,6 @@ class ApprovalTaskFacadeIntTest {
         private static ApprovalTask manualApprovalTask(String name) {
             ApprovalTask approvalTask = new ApprovalTask();
 
-            approvalTask.setJobResumeId("manual-" + name);
             approvalTask.setName(name);
 
             return approvalTask;
