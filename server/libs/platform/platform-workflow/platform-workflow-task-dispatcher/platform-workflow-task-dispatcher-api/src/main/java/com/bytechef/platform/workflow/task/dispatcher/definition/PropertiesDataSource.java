@@ -17,14 +17,26 @@
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
+ * Resolves the nested properties of a {@link Property.DynamicPropertiesProperty} at runtime.
+ *
  * @author Ivica Cardic
  */
 public interface PropertiesDataSource {
 
+    /**
+     * Returns the names of the properties whose values the properties function needs, so the lookup is repeated when
+     * any of them changes.
+     *
+     * @return the names of the dependent properties, or an empty list if the lookup depends on none
+     */
     List<String> getPropertiesLookupDependsOn();
 
-    Optional<TaskDispatcherDefinition.PropertiesFunction> getPropertiesFunction();
+    /**
+     * Returns the function that computes the nested properties from the current input parameters.
+     *
+     * @return the properties function
+     */
+    TaskDispatcherDefinition.PropertiesFunction getPropertiesFunction();
 }

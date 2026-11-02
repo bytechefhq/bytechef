@@ -70,11 +70,10 @@ public final class TaskDispatcherDefinition {
         this.outputResponse = OptionalUtils.mapOrElse(
             taskDispatcherDefinition.getOutputDefinition(), TaskDispatcherDefinition::toOutputResponse, null);
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
-        this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), Property::toProperty);
+        this.properties = CollectionUtils.map(taskDispatcherDefinition.getProperties(), Property::toProperty);
         this.resources = OptionalUtils.mapOrElse(taskDispatcherDefinition.getResources(), Resources::new, null);
         this.taskProperties = CollectionUtils.map(
-            OptionalUtils.orElse(taskDispatcherDefinition.getTaskProperties(), List.of()),
+            taskDispatcherDefinition.getTaskProperties(),
             valueProperty -> (Property) Property.toProperty(valueProperty));
         this.title = OptionalUtils.orElse(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getName());
         this.variablePropertiesDefined =

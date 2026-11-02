@@ -150,8 +150,7 @@ class SubflowTaskDispatcherDefinitionFactoryTest {
     }
 
     private PropertiesFunction getDynamicPropertiesFunction() {
-        List<? extends Property> properties = definition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = definition.getProperties();
 
         Property.DynamicPropertiesProperty dynamicPropertiesProperty = properties.stream()
             .filter(property -> property instanceof Property.DynamicPropertiesProperty)
@@ -159,9 +158,9 @@ class SubflowTaskDispatcherDefinitionFactoryTest {
             .findFirst()
             .orElseThrow();
 
-        return dynamicPropertiesProperty.getDynamicPropertiesDataSource()
-            .flatMap(PropertiesDataSource::getPropertiesFunction)
-            .orElseThrow();
+        PropertiesDataSource propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
+
+        return propertiesDataSource.getPropertiesFunction();
     }
 
     private OutputFunction getOutputFunction() {

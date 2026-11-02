@@ -34,69 +34,100 @@ public interface TaskDispatcherDefinition {
     int VERSION_1 = 1;
 
     /**
+     * Returns the human-readable description of the task dispatcher, explaining what it does.
      *
-     * @return
+     * @return an {@code Optional} containing the description if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getDescription();
+    default Optional<String> getDescription() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the help content, such as a description and a learn-more link, shown alongside the task dispatcher.
      *
-     * @return
+     * @return an {@code Optional} containing the help if defined, or an empty {@code Optional} otherwise
      */
-    Optional<Help> getHelp();
+    default Optional<Help> getHelp() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the icon representing the task dispatcher in the user interface, typically as SVG markup or a reference
+     * to an icon resource.
      *
-     * @return
+     * @return an {@code Optional} containing the icon if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getIcon();
+    default Optional<String> getIcon() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the unique name that identifies this task dispatcher.
      *
-     * @return
+     * @return the task dispatcher name
      */
     String getName();
 
     /**
+     * Returns the output definition, which describes the output schema or the function that computes it.
      *
-     * @return
+     * @return an {@code Optional} containing the output definition if defined, or an empty {@code Optional} otherwise
      */
-    Optional<OutputDefinition> getOutputDefinition();
+    default Optional<OutputDefinition> getOutputDefinition() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the input properties of the task dispatcher.
      *
-     * @return
+     * @return the list of input properties, or an empty list if none are defined
      */
-    Optional<List<? extends Property>> getProperties();
+    default List<? extends Property> getProperties() {
+        return List.of();
+    }
 
     /**
-     * TODO
+     * Returns the resources, such as the documentation URL, associated with the task dispatcher.
      *
-     * @return
+     * @return an {@code Optional} containing the resources if defined, or an empty {@code Optional} otherwise
      */
-    Optional<Resources> getResources();
+    default Optional<Resources> getResources() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the properties that hold the tasks the dispatcher runs, such as the iteratee of a loop or the branches of
+     * a condition.
      *
-     * @return
+     * @return the list of task properties, or an empty list if none are defined
      */
-    Optional<List<? extends Property>> getTaskProperties();
+    default List<? extends Property> getTaskProperties() {
+        return List.of();
+    }
 
     /**
+     * Returns the human-readable title of the task dispatcher displayed in the user interface.
      *
-     * @return
+     * @return an {@code Optional} containing the title if defined, or an empty {@code Optional} otherwise
      */
-    Optional<String> getTitle();
+    default Optional<String> getTitle() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the function that computes the variables the task dispatcher exposes to its child tasks.
      *
-     * @return
+     * @return an {@code Optional} containing the variable properties function if defined, or an empty {@code Optional}
+     *         otherwise
      */
-    Optional<VariablePropertiesFunction> getVariableProperties();
+    default Optional<VariablePropertiesFunction> getVariableProperties() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the version of the task dispatcher, used to distinguish successive revisions of its definition.
      *
-     * @return
+     * @return the task dispatcher version
      */
     default int getVersion() {
         return VERSION_1;

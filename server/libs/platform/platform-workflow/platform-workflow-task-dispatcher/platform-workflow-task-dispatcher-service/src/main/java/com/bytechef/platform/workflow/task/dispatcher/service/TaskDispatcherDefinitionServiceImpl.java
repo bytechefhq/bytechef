@@ -57,31 +57,35 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 
-        List<? extends Property> properties = taskDispatcherDefinition.getProperties()
-            .orElse(List.of());
+        List<? extends Property> properties = taskDispatcherDefinition.getProperties();
 
         for (Property property : properties) {
             if (property instanceof Property.DynamicPropertiesProperty dynamicPropertiesProperty &&
                 Objects.equals(property.getName(), propertyName)) {
 
-                return dynamicPropertiesProperty.getDynamicPropertiesDataSource()
-                    .flatMap(PropertiesDataSource::getPropertiesFunction)
-                    .map(propertiesFunction -> {
-                        try {
-                            return propertiesFunction.apply(inputParameters);
-                        } catch (Exception exception) {
-                            throw new ConfigurationException(
-                                exception, inputParameters,
-                                TaskDispatcherDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
-                        }
-                    })
-                    .map(resultProperties -> resultProperties.stream()
-                        .map(
-                            resultProperty -> (com.bytechef.platform.workflow.task.dispatcher.domain.Property) com.bytechef.platform.workflow.task.dispatcher.domain.Property
-                                .toProperty(
-                                    resultProperty))
-                        .toList())
-                    .orElse(List.of());
+                PropertiesDataSource propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
+
+                com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition.PropertiesFunction propertiesFunction =
+                    propertiesDataSource.getPropertiesFunction();
+
+                List<? extends Property> resultProperties;
+
+                try {
+                    resultProperties = propertiesFunction.apply(inputParameters);
+                } catch (Exception exception) {
+                    throw new ConfigurationException(
+                        exception, inputParameters, TaskDispatcherDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
+                }
+
+                if (resultProperties == null) {
+                    return List.of();
+                }
+
+                return resultProperties.stream()
+                    .map(
+                        resultProperty -> (com.bytechef.platform.workflow.task.dispatcher.domain.Property) com.bytechef.platform.workflow.task.dispatcher.domain.Property
+                            .toProperty(resultProperty))
+                    .toList();
             }
         }
 
@@ -93,8 +97,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 
-        List<? extends Property> properties = taskDispatcherDefinition.getProperties()
-            .orElse(List.of());
+        List<? extends Property> properties = taskDispatcherDefinition.getProperties();
 
         for (Property property : properties) {
             if (property instanceof Property.StringProperty stringProperty &&

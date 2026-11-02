@@ -85,10 +85,14 @@ public interface Property extends BaseProperty {
     interface ArrayProperty extends BaseArrayProperty<Property>, OptionsProperty<Object>, ValueProperty<List<?>> {
 
         /**
+         * Returns the property definitions describing the allowed types of the array's elements.
          *
-         * @return
+         * @return the list of item properties, or an empty list if the element type is unconstrained
          */
-        List<? extends Property> getItems();
+        @Override
+        default List<? extends Property> getItems() {
+            return List.of();
+        }
     }
 
     /**
@@ -108,9 +112,22 @@ public interface Property extends BaseProperty {
      */
     interface DynamicPropertiesProperty extends Property {
 
-        Optional<String> getHeader();
+        /**
+         * Returns the header text displayed above the dynamically resolved properties, when set.
+         *
+         * @return an {@link Optional} containing the header text, or an empty {@link Optional} if none is set
+         */
+        default Optional<String> getHeader() {
+            return Optional.empty();
+        }
 
-        Optional<PropertiesDataSource> getDynamicPropertiesDataSource();
+        /**
+         * Returns the data source that resolves this property's nested properties at runtime. A dynamic properties
+         * property exists only to resolve its nested properties, so the data source is required.
+         *
+         * @return the dynamic properties data source, never {@code null}
+         */
+        PropertiesDataSource getDynamicPropertiesDataSource();
     }
 
     /**
@@ -126,9 +143,11 @@ public interface Property extends BaseProperty {
     interface FileEntryProperty extends BaseFileEntryProperty<ValueProperty<?>>, ValueProperty<Map<String, ?>> {
 
         /**
+         * Returns the property definitions describing the fields of the file entry.
          *
-         * @return
+         * @return the list of properties that make up the file entry
          */
+        @Override
         List<? extends ValueProperty<?>> getProperties();
     }
 
@@ -157,16 +176,24 @@ public interface Property extends BaseProperty {
         extends BaseObjectProperty<Property>, OptionsProperty<Object>, ValueProperty<Map<String, ?>> {
 
         /**
+         * Returns the property definitions describing values allowed for keys beyond the explicitly declared ones.
          *
-         * @return
+         * @return the additional-property definitions, or an empty list if additional properties are not permitted
          */
-        List<? extends Property> getAdditionalProperties();
+        @Override
+        default List<? extends Property> getAdditionalProperties() {
+            return List.of();
+        }
 
         /**
+         * Returns the property definitions describing the object's explicitly declared fields.
          *
-         * @return
+         * @return the list of properties, or an empty list if none are declared
          */
-        List<? extends Property> getProperties();
+        @Override
+        default List<? extends Property> getProperties() {
+            return List.of();
+        }
     }
 
     /**
@@ -174,7 +201,15 @@ public interface Property extends BaseProperty {
      */
     interface StringProperty extends BaseStringProperty, OptionsProperty<String>, ValueProperty<String> {
 
-        Optional<TaskDispatcherDefinition.OptionsFunction> getOptionsFunction();
+        /**
+         * Returns the function that loads the property's options at runtime, for example based on a search term.
+         *
+         * @return an {@link Optional} containing the options function, or an empty {@link Optional} if the options are
+         *         static
+         */
+        default Optional<TaskDispatcherDefinition.OptionsFunction> getOptionsFunction() {
+            return Optional.empty();
+        }
     }
 
     /**

@@ -535,7 +535,7 @@ public final class TaskDispatcherDsl {
 
         private String description;
         private String header;
-        private List<String> propertiesLookupDependsOn;
+        private List<String> propertiesLookupDependsOn = List.of();
         private TaskDispatcherDefinition.PropertiesFunction propertiesFunction;
 
         private ModifiableDynamicPropertiesProperty(String name) {
@@ -581,12 +581,13 @@ public final class TaskDispatcherDsl {
         }
 
         @Override
-        public Optional<PropertiesDataSource> getDynamicPropertiesDataSource() {
-            if (propertiesLookupDependsOn == null) {
-                return Optional.empty();
+        public PropertiesDataSource getDynamicPropertiesDataSource() {
+            if (propertiesFunction == null) {
+                throw new IllegalStateException(
+                    "Dynamic properties property '%s' does not define a properties function".formatted(getName()));
             }
 
-            return Optional.of(new PropertiesDataSourceImpl(propertiesLookupDependsOn, propertiesFunction));
+            return new PropertiesDataSourceImpl(propertiesLookupDependsOn, propertiesFunction);
         }
     }
 
@@ -1311,9 +1312,9 @@ public final class TaskDispatcherDsl {
         private String icon;
         private final String name;
         private OutputDefinition outputDefinition;
-        private List<? extends Property> properties;
+        private List<? extends Property> properties = List.of();
         private Resources resources;
-        private List<? extends ModifiableProperty<?>> taskProperties;
+        private List<? extends ModifiableProperty<?>> taskProperties = List.of();
         private String title;
         private VariablePropertiesFunction variablePropertiesFunction;
         private int version = VERSION_1;
@@ -1391,7 +1392,9 @@ public final class TaskDispatcherDsl {
         public final <P extends ModifiableProperty<?>> ModifiableTaskDispatcherDefinition taskProperties(
             P... taskProperties) {
 
-            this.taskProperties = List.of(taskProperties);
+            if (taskProperties != null) {
+                this.taskProperties = List.of(taskProperties);
+            }
 
             return this;
         }
@@ -1442,8 +1445,8 @@ public final class TaskDispatcherDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties;
         }
 
         @Override
@@ -1452,8 +1455,8 @@ public final class TaskDispatcherDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getTaskProperties() {
-            return Optional.ofNullable(taskProperties);
+        public List<? extends Property> getTaskProperties() {
+            return taskProperties;
         }
 
         @Override
@@ -1614,8 +1617,8 @@ public final class TaskDispatcherDsl {
         }
 
         @Override
-        public Optional<TaskDispatcherDefinition.PropertiesFunction> getPropertiesFunction() {
-            return Optional.ofNullable(propertiesFunction);
+        public TaskDispatcherDefinition.PropertiesFunction getPropertiesFunction() {
+            return propertiesFunction;
         }
     }
 

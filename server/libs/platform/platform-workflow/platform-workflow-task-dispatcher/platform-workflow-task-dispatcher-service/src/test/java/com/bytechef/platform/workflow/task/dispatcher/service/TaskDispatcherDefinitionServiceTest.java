@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.task.dispatcher.service;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.exception.ConfigurationException;
@@ -68,7 +69,8 @@ class TaskDispatcherDefinitionServiceTest {
     void testExecuteDynamicPropertiesReturnsEmptyWhenNoMatchingProperty() {
         when(taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition("subflow", 1))
             .thenReturn(taskDispatcherDefinition);
-        when(taskDispatcherDefinition.getProperties()).thenReturn(Optional.of(List.of()));
+        doReturn(List.of()).when(taskDispatcherDefinition)
+            .getProperties();
 
         List<com.bytechef.platform.workflow.task.dispatcher.domain.Property> result =
             taskDispatcherDefinitionService.executeDynamicProperties(
@@ -81,7 +83,8 @@ class TaskDispatcherDefinitionServiceTest {
     void testExecuteDynamicPropertiesReturnsEmptyWhenNoProperties() {
         when(taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition("subflow", 1))
             .thenReturn(taskDispatcherDefinition);
-        when(taskDispatcherDefinition.getProperties()).thenReturn(Optional.empty());
+        doReturn(List.of()).when(taskDispatcherDefinition)
+            .getProperties();
 
         List<com.bytechef.platform.workflow.task.dispatcher.domain.Property> result =
             taskDispatcherDefinitionService.executeDynamicProperties(
@@ -95,14 +98,14 @@ class TaskDispatcherDefinitionServiceTest {
         when(taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition("subflow", 1))
             .thenReturn(taskDispatcherDefinition);
         when(dynamicPropertiesProperty.getName()).thenReturn("inputs");
-        when(taskDispatcherDefinition.getProperties()).thenReturn(
-            Optional.of(List.of(dynamicPropertiesProperty)));
+        doReturn(List.of(dynamicPropertiesProperty)).when(taskDispatcherDefinition)
+            .getProperties();
         when(dynamicPropertiesProperty.getDynamicPropertiesDataSource())
-            .thenReturn(Optional.of(propertiesDataSource));
+            .thenReturn(propertiesDataSource);
         when(propertiesDataSource.getPropertiesFunction())
-            .thenReturn(Optional.of(inputParameters -> {
+            .thenReturn(inputParameters -> {
                 throw new RuntimeException("test error");
-            }));
+            });
 
         ConfigurationException exception = assertThrows(
             ConfigurationException.class,
@@ -116,7 +119,8 @@ class TaskDispatcherDefinitionServiceTest {
     void testExecuteOptionsReturnsEmptyWhenNoMatchingProperty() {
         when(taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition("subflow", 1))
             .thenReturn(taskDispatcherDefinition);
-        when(taskDispatcherDefinition.getProperties()).thenReturn(Optional.of(List.of()));
+        doReturn(List.of()).when(taskDispatcherDefinition)
+            .getProperties();
 
         List<Option> result = taskDispatcherDefinitionService.executeOptions(
             "subflow", 1, "nonExistentProperty", "search");
@@ -129,8 +133,8 @@ class TaskDispatcherDefinitionServiceTest {
         when(taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition("subflow", 1))
             .thenReturn(taskDispatcherDefinition);
         when(stringProperty.getName()).thenReturn("workflowUuid");
-        when(taskDispatcherDefinition.getProperties()).thenReturn(
-            Optional.of(List.of(stringProperty)));
+        doReturn(List.of(stringProperty)).when(taskDispatcherDefinition)
+            .getProperties();
         when(stringProperty.getOptionsFunction())
             .thenReturn(Optional.of(search -> {
                 throw new RuntimeException("test error");

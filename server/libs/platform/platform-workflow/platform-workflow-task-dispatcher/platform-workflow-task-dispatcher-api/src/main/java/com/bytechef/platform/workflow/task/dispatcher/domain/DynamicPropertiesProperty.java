@@ -36,8 +36,7 @@ public class DynamicPropertiesProperty extends Property {
         super(property);
 
         this.header = OptionalUtils.orElse(property.getHeader(), null);
-        this.propertiesDataSource = OptionalUtils.mapOrElse(
-            property.getDynamicPropertiesDataSource(), PropertiesDataSource::new, null);
+        this.propertiesDataSource = new PropertiesDataSource(property.getDynamicPropertiesDataSource());
     }
 
     @Override
