@@ -62,7 +62,13 @@ public class MultiIssuerJwtDecoder implements JwtDecoder {
             return jwtDecoder;
         }
 
-        JwtDecoder createdJwtDecoder = mcpJwtDecoderFactory.createJwtDecoder(issuer);
+        JwtDecoder createdJwtDecoder;
+
+        try {
+            createdJwtDecoder = mcpJwtDecoderFactory.createJwtDecoder(issuer);
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            throw new BadJwtException("Unable to resolve the issuer " + issuer, exception);
+        }
 
         if (createdJwtDecoder == null) {
             throw new BadJwtException("Untrusted issuer: " + issuer);
