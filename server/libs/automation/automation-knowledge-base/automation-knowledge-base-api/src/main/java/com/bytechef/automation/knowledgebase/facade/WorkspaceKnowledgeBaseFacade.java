@@ -17,7 +17,12 @@
 package com.bytechef.automation.knowledgebase.facade;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -78,4 +83,30 @@ public interface WorkspaceKnowledgeBaseFacade {
      */
     KnowledgeBase cloneWorkspaceKnowledgeBase(
         Long knowledgeBaseId, Long workspaceId, long targetEnvironmentId, @Nullable String newName);
+
+    void deleteKnowledgeBaseDocument(long id);
+
+    void deleteKnowledgeBaseDocumentChunk(long id);
+
+    KnowledgeBase getKnowledgeBase(long id);
+
+    KnowledgeBaseDocument getKnowledgeBaseDocument(long id);
+
+    List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunks(long id);
+
+    DocumentStatusUpdate getKnowledgeBaseDocumentStatus(long id);
+
+    List<String> getKnowledgeBaseDocumentTagNames(long knowledgeBaseId);
+
+    Map<Long, List<String>> getKnowledgeBaseDocumentTagNamesByDocument(long knowledgeBaseId);
+
+    List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(long id, String query, String metadataFilters);
+
+    KnowledgeBase updateKnowledgeBase(long id, KnowledgeBase knowledgeBase);
+
+    KnowledgeBaseDocumentChunk updateKnowledgeBaseDocumentChunk(long id, String content);
+
+    void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames);
+
+    void updateKnowledgeBaseTags(long knowledgeBaseId, List<Tag> tags);
 }
