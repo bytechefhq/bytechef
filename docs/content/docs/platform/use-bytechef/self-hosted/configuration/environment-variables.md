@@ -173,8 +173,6 @@ fragment while this heading was hidden - give it back.
 
 ## Approval Configuration
 
-> **Coming soon.** Signed approval links, approval expiry, reminders and escalation, and in-place Discord and WhatsApp approvals are on the upcoming release track and are not yet available in the latest released version of ByteChef. See [Human in the Loop](/platform/automation/build/workflows/human-in-the-loop).
-
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_APPROVAL_SIGNED_TOKEN_SECRET` | Base64 secret, at least 32 bytes, that signs approval links and resume ids (sensitive). Unset derives it from the encryption key. In an Enterprise Edition distributed deployment, set the same value on every app that issues or accepts these links (worker, execution, webhook and runtime job apps): the worker, execution and webhook apps have no encryption key to derive it from | - |
