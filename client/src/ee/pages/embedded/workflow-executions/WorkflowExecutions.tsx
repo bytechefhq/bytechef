@@ -30,7 +30,6 @@ import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedd
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
-import ExecutionsTabs from '@/shared/components/executions/ExecutionsTabs';
 import FilterTitle from '@/shared/components/filters/FilterTitle';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import Footer from '@/shared/layout/Footer';
@@ -587,13 +586,11 @@ export const WorkflowExecutions = () => {
                         </Tooltip>
                     }
                     title={
-                        <div className="flex items-center gap-4">
-                            <ExecutionsTabs />
-
-                            {workflowExecutions && workflowExecutions.length > 0 && (
-                                <FilterTitle filters={activeFilters} />
-                            )}
-                        </div>
+                        workflowExecutions && workflowExecutions.length > 0 ? (
+                            <FilterTitle filters={activeFilters} />
+                        ) : (
+                            ''
+                        )
                     }
                 />
             }
