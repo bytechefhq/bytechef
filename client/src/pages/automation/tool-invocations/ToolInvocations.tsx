@@ -11,6 +11,7 @@ import {
     ToolInvocationsWorkspaceScopeI,
     useToolInvocations,
 } from '@/pages/automation/tool-invocations/hooks/useToolInvocations';
+import ExecutionsTabs from '@/shared/components/executions/ExecutionsTabs';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -139,7 +140,7 @@ export const ToolInvocations = ({
                             </Tooltip>
                         </div>
                     }
-                    title="Tool Invocations"
+                    title={<ExecutionsTabs fallback="Tool Invocations" />}
                 />
             }
             leftSidebarBody={

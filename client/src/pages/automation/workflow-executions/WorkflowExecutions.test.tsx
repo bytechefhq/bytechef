@@ -18,6 +18,7 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    EditionType: {CE: 'CE', EE: 'EE'},
     useApplicationInfoStore: (selector: (state: {application: {edition: string}}) => unknown) =>
         selector({application: {edition: 'CE'}}),
 }));
