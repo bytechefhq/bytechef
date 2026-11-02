@@ -17,9 +17,11 @@
 package com.bytechef.component.workflow.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
+import static com.bytechef.component.workflow.constant.WorkflowConstants.AI_AGENT_CALL_OUTPUT_SCHEMA;
 import static com.bytechef.component.workflow.constant.WorkflowConstants.RESPONSE;
 import static com.bytechef.platform.component.constant.WorkflowConstants.OUTPUT_SCHEMA;
 import static com.bytechef.platform.component.constant.WorkflowConstants.RESPONSE_TO_WORKFLOW_CALL;
@@ -49,5 +51,9 @@ public class WorkflowResponseToWorkflowCallAction {
                 .required(true))
         .output(WorkflowResponseUtils::actionOutput)
         .help("", "https://docs.bytechef.io/reference/components/workflow_v1#response-to-workflow-call")
+        .agentReply(
+            agentReply()
+                .message(RESPONSE + ".message")
+                .fixedParameter(OUTPUT_SCHEMA, AI_AGENT_CALL_OUTPUT_SCHEMA))
         .perform(WorkflowResponseUtils::perform);
 }

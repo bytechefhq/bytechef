@@ -18,6 +18,7 @@ package com.bytechef.platform.component;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
 import static com.bytechef.platform.component.util.ClusterElementTypeUtils.isSameClusterElementType;
 
 import com.bytechef.commons.util.CollectionUtils;
@@ -25,6 +26,7 @@ import com.bytechef.commons.util.MemoizationUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.AgentChannelDefinition;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ClusterElementContext;
@@ -62,10 +64,10 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +108,7 @@ public class ComponentDefinitionRegistry {
         new DefaultComponentHandlerLoader(), new JdbcComponentHandlerLoader(), new OpenApiComponentHandlerLoader());
 
     private final ApplicationProperties applicationProperties;
+    private final Supplier<List<com.bytechef.platform.component.domain.AgentChannelDefinition>> agentChannelDefinitionsSupplier;
     private final Supplier<List<ComponentDefinition>> allComponentDefinitionsSupplier;
     private final Supplier<Map<String, Map<Integer, ComponentDefinition>>> componentDefinitionsMapSupplier;
     private final List<ComponentHandler> componentHandlers;
@@ -132,6 +135,7 @@ public class ComponentDefinitionRegistry {
         Supplier<Optional<ComponentIndex>> componentIndexSupplier) {
 
         this.applicationProperties = applicationProperties;
+        this.agentChannelDefinitionsSupplier = MemoizationUtils.memoize(this::loadAgentChannelDefinitions);
         this.componentHandlers = componentHandlers;
         this.allComponentDefinitionsSupplier = MemoizationUtils.memoize(this::loadAllComponentDefinitions);
         this.componentDefinitionsMapSupplier = MemoizationUtils.memoize(
@@ -390,7 +394,7 @@ public class ComponentDefinitionRegistry {
         String componentName, int connectionVersion, AuthorizationType authorizationType) {
 
         return fetchConnectionDefinition(componentName, connectionVersion)
-            .flatMap(ConnectionDefinition::getAuthorizations)
+            .map(ConnectionDefinition::getAuthorizations)
             .orElse(List.of())
             .stream()
             .filter(authorization -> authorization.getType() == authorizationType)
@@ -475,11 +479,92 @@ public class ComponentDefinitionRegistry {
             this::compare);
     }
 
+    public List<com.bytechef.platform.component.domain.AgentChannelDefinition> getAgentChannelDefinitions() {
+        return agentChannelDefinitionsSupplier.get();
+    }
+
+    public Optional<com.bytechef.platform.component.domain.AgentChannelDefinition> fetchAgentChannelDefinition(
+        String name) {
+
+        return getAgentChannelDefinitions()
+            .stream()
+            .filter(agentChannelDefinition -> Objects.equals(agentChannelDefinition.getName(), name))
+            .findFirst();
+    }
+
+    private List<com.bytechef.platform.component.domain.AgentChannelDefinition> loadAgentChannelDefinitions() {
+        Map<String, com.bytechef.platform.component.domain.AgentChannelDefinition> definitionsByName =
+            new LinkedHashMap<>();
+
+        for (ComponentDefinition componentDefinition : getComponentDefinitions()) {
+            for (AgentChannelDefinition agentChannelDefinition : componentDefinition.getAgentChannels()) {
+                validateAgentChannel(componentDefinition, agentChannelDefinition);
+
+                com.bytechef.platform.component.domain.AgentChannelDefinition previous = definitionsByName.putIfAbsent(
+                    agentChannelDefinition.getName(),
+                    new com.bytechef.platform.component.domain.AgentChannelDefinition(
+                        agentChannelDefinition, componentDefinition.getName(), componentDefinition.getVersion()));
+
+                if (previous != null) {
+                    throw new IllegalStateException(
+                        "Agent channel name '%s' is declared by both component '%s' and component '%s'".formatted(
+                            agentChannelDefinition.getName(), previous.getComponentName(),
+                            componentDefinition.getName()));
+                }
+            }
+        }
+
+        return List.copyOf(definitionsByName.values());
+    }
+
+    private static void validateAgentChannel(
+        ComponentDefinition componentDefinition, AgentChannelDefinition agentChannelDefinition) {
+
+        String componentName = componentDefinition.getName();
+        String triggerName = agentChannelDefinition.getTrigger()
+            .getName();
+
+        if (componentDefinition.getTriggers()
+            .stream()
+            .noneMatch(triggerDefinition -> Objects.equals(triggerDefinition.getName(), triggerName))) {
+
+            throw new IllegalStateException(
+                "Agent channel '%s' references trigger '%s' which component '%s' does not register".formatted(
+                    agentChannelDefinition.getName(), triggerName, componentName));
+        }
+
+        agentChannelDefinition.getReplyAction()
+            .ifPresent(replyAction -> {
+                if (componentDefinition.getActions()
+                    .stream()
+                    .noneMatch(actionDefinition -> Objects.equals(actionDefinition.getName(), replyAction.getName()))) {
+
+                    throw new IllegalStateException(
+                        "Agent channel '%s' references action '%s' which component '%s' does not register".formatted(
+                            agentChannelDefinition.getName(), replyAction.getName(), componentName));
+                }
+            });
+
+        agentChannelDefinition.getApprovalChannelName()
+            .ifPresent(approvalChannelName -> {
+                if (componentDefinition.getClusterElements()
+                    .stream()
+                    .noneMatch(
+                        clusterElementDefinition -> Objects.equals(clusterElementDefinition.getName(),
+                            approvalChannelName)
+                            && Objects.equals(clusterElementDefinition.getType(), APPROVAL_CHANNELS))) {
+
+                    throw new IllegalStateException(
+                        "Agent channel '%s' references approval channel '%s' which component '%s' does not declare"
+                            .formatted(agentChannelDefinition.getName(), approvalChannelName, componentName));
+                }
+            });
+    }
+
     public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getActions()
-            .orElse(Collections.emptyList())
             .stream()
             .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
             .findFirst()
@@ -491,8 +576,7 @@ public class ComponentDefinitionRegistry {
     public List<? extends ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return componentDefinition.getActions()
-            .orElse(Collections.emptyList());
+        return componentDefinition.getActions();
     }
 
     public Property getActionProperty(
@@ -502,8 +586,7 @@ public class ComponentDefinitionRegistry {
 
         ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
 
-        List<? extends Property> properties = actionDefinition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = actionDefinition.getProperties();
 
         return getProperty(
             propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
@@ -515,7 +598,6 @@ public class ComponentDefinitionRegistry {
         ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName, connectionVersion);
 
         return connectionDefinition.getAuthorizations()
-            .orElse(List.of())
             .stream()
             .filter(authorization -> {
                 AuthorizationType curAuthorizationType = authorization.getType();
@@ -532,7 +614,6 @@ public class ComponentDefinitionRegistry {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getClusterElements()
-            .orElse(Collections.emptyList())
             .stream()
             .filter(clusterElementDefinition -> clusterElementName.equalsIgnoreCase(clusterElementDefinition.getName()))
             .findFirst()
@@ -549,7 +630,6 @@ public class ComponentDefinitionRegistry {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getClusterElements()
-            .orElse(Collections.emptyList())
             .stream()
             .filter(clusterElementDefinition -> clusterElementName.equalsIgnoreCase(clusterElementDefinition.getName()))
             .filter(clusterElementDefinition -> isSameClusterElementType(
@@ -569,10 +649,7 @@ public class ComponentDefinitionRegistry {
         ClusterElementDefinition<?> clusterElementDefinition = getClusterElementDefinition(
             componentName, componentVersion, clusterElementName);
 
-        List<? extends Property> properties = clusterElementDefinition.getProperties()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "The cluster element '%s' in component '%s' does not have any properties defined.".formatted(
-                    clusterElementName, componentName)));
+        List<? extends Property> properties = clusterElementDefinition.getProperties();
 
         return getProperty(
             propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
@@ -621,9 +698,7 @@ public class ComponentDefinitionRegistry {
 
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        List<? extends PropertyGroup> inputs = componentDefinition.getInputs()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Component '%s' v%d defines no inputs.".formatted(componentName, componentVersion)));
+        List<? extends PropertyGroup> inputs = componentDefinition.getInputs();
 
         PropertyGroup propertyGroup = CollectionUtils.getFirst(
             inputs, group -> Objects.equals(group.getName(), groupName),
@@ -672,7 +747,6 @@ public class ComponentDefinitionRegistry {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getTriggers()
-            .orElse(Collections.emptyList())
             .stream()
             .filter(triggerDefinition -> triggerName.equalsIgnoreCase(triggerDefinition.getName()))
             .findFirst()
@@ -685,8 +759,7 @@ public class ComponentDefinitionRegistry {
     public List<? extends TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return componentDefinition.getTriggers()
-            .orElse(Collections.emptyList());
+        return componentDefinition.getTriggers();
     }
 
     public Property getTriggerProperty(
@@ -696,8 +769,7 @@ public class ComponentDefinitionRegistry {
 
         TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        List<? extends Property> properties = triggerDefinition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = triggerDefinition.getProperties();
 
         return getProperty(
             propertyName, properties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
@@ -707,7 +779,7 @@ public class ComponentDefinitionRegistry {
         List<ComponentDefinition> componentDefinitions = getComponentDefinitions(name);
 
         return componentDefinitions.stream()
-            .anyMatch(curComponentDefinition -> (version == null) || (version == curComponentDefinition.getVersion()));
+            .anyMatch(componentDefinition -> version == null || version == componentDefinition.getVersion());
     }
 
     private int compare(ComponentDefinition o1, ComponentDefinition o2) {
@@ -729,8 +801,7 @@ public class ComponentDefinitionRegistry {
                     curProperty -> Objects.equals(
                         curProperty.getName(), propertyName.substring(0, propertyName.length() - 3)));
 
-                List<? extends Property> items = arrayProperty.getItems()
-                    .orElseThrow();
+                List<? extends Property> items = arrayProperty.getItems();
 
                 return items.getFirst();
             } else {
@@ -770,12 +841,10 @@ public class ComponentDefinitionRegistry {
                     String.join(".", subProperties.subList(1, subProperties.size())),
                     dynamicPropertyProperties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
             } else if (firstProperty instanceof ArrayProperty arrayProperty) {
-                List<? extends Property.ValueProperty<?>> items = arrayProperty.getItems()
-                    .orElseThrow();
+                List<? extends Property.ValueProperty<?>> items = arrayProperty.getItems();
 
                 if (items.getFirst() instanceof ObjectProperty objectProperty) {
-                    items = objectProperty.getProperties()
-                        .orElseThrow();
+                    items = objectProperty.getProperties();
                 }
 
                 return getProperty(
@@ -790,22 +859,19 @@ public class ComponentDefinitionRegistry {
 
                     if (subProperty.endsWith("]")) {
                         List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty
-                            .getProperties()
-                            .orElseThrow();
+                            .getProperties();
 
                         ArrayProperty arrayProperty = (ArrayProperty) CollectionUtils.getFirst(
                             objectPropertyProperties,
                             curProperty -> Objects.equals(
                                 curProperty.getName(), subProperty.substring(0, subProperty.length() - 3)));
 
-                        List<? extends Property> items = arrayProperty.getItems()
-                            .orElseThrow();
+                        List<? extends Property> items = arrayProperty.getItems();
 
                         objectProperty = (ObjectProperty) items.getFirst();
                     } else {
                         List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty
-                            .getProperties()
-                            .orElseThrow();
+                            .getProperties();
 
                         objectProperty = (ObjectProperty) CollectionUtils.getFirst(
                             objectPropertyProperties,
@@ -813,8 +879,7 @@ public class ComponentDefinitionRegistry {
                     }
                 }
 
-                List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty.getProperties()
-                    .orElseThrow();
+                List<? extends Property.ValueProperty<?>> objectPropertyProperties = objectProperty.getProperties();
 
                 return CollectionUtils.getFirst(
                     objectPropertyProperties,
@@ -834,16 +899,14 @@ public class ComponentDefinitionRegistry {
 
     private static void validate(List<ComponentDefinition> componentDefinitions) {
         for (ComponentDefinition componentDefinition : componentDefinitions) {
-            List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions()
-                .orElse(List.of());
+            List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
             for (ActionDefinition actionDefinition : actionDefinitions) {
                 if (log.isTraceEnabled()) {
                     log.trace("Validating %s.%s".formatted(componentDefinition.getName(), actionDefinition.getName()));
                 }
 
-                List<? extends Property> properties = actionDefinition.getProperties()
-                    .orElse(List.of());
+                List<? extends Property> properties = actionDefinition.getProperties();
 
                 PropertyUtils.checkInputProperties(properties);
                 PropertyUtils.checkOutputProperty(
@@ -852,16 +915,14 @@ public class ComponentDefinitionRegistry {
                         .orElse(null));
             }
 
-            List<? extends TriggerDefinition> triggerDefinitions = componentDefinition.getTriggers()
-                .orElse(List.of());
+            List<? extends TriggerDefinition> triggerDefinitions = componentDefinition.getTriggers();
 
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
                 if (log.isTraceEnabled()) {
                     log.trace("Validating %s.%s".formatted(componentDefinition.getName(), triggerDefinition.getName()));
                 }
 
-                List<? extends Property> properties = triggerDefinition.getProperties()
-                    .orElse(List.of());
+                List<? extends Property> properties = triggerDefinition.getProperties();
 
                 PropertyUtils.checkInputProperties(properties);
                 PropertyUtils.checkOutputProperty(

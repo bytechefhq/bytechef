@@ -18,6 +18,7 @@ apis/index.ts
 docs/ActionDefinition.md
 docs/ActionDefinitionApi.md
 docs/ActionDefinitionBasic.md
+docs/AgentChannelDefinition.md
 docs/AiProvider.md
 docs/AiProviderApi.md
 docs/ArrayProperty.md
@@ -111,6 +112,7 @@ docs/WorkflowTrigger.md
 index.ts
 models/ActionDefinition.ts
 models/ActionDefinitionBasic.ts
+models/AgentChannelDefinition.ts
 models/AiProvider.ts
 models/ArrayProperty.ts
 models/Authorization.ts

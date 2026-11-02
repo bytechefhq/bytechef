@@ -542,6 +542,134 @@ export type AuditEventTypesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AuditEventTypesQuery = { auditEventTypes: Array<string> };
 
+export type AddAiAgentChannelMutationVariables = Exact<{
+  input: Types.AddAiAgentChannelInput;
+}>;
+
+
+export type AddAiAgentChannelMutation = { addAiAgentChannel: { id: string, channelType: string, position: number, parameters: any, connectionId: string | null } };
+
+export type AddAiAgentElementMutationVariables = Exact<{
+  input: Types.AddAiAgentElementInput;
+}>;
+
+
+export type AddAiAgentElementMutation = { addAiAgentElement: { id: string, kind: string, referenceId: string | null, position: number, parameters: any, connectionId: string | null } };
+
+export type AiAgentQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiAgentQuery = { aiAgent: { id: string, name: string, title: string, description: string | null, instructions: string | null, workspaceId: string | null, projectId: string, uuid: string, projectWorkflowUuid: string, unpublishedChanges: boolean, lastPublishedVersion: number, settings: any, lastModifiedDate: string | null, draftWorkflowId: string, channels: Array<{ id: string, channelType: string, position: number, parameters: any, connectionId: string | null }>, elements: Array<{ id: string, kind: string, referenceId: string | null, position: number, parameters: any, connectionId: string | null }> } | null };
+
+export type AiAgentChannelDefinitionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AiAgentChannelDefinitionsQuery = { aiAgentChannelDefinitions: Array<{ approvalCapable: boolean, channelType: string, componentName: string, componentVersion: number, connectionRequired: boolean, description: string | null, icon: string | null, pinned: boolean, propertiesConfigurable: boolean, replyActionName: string | null, schedule: boolean, title: string, triggerName: string }> };
+
+export type AiAgentDeploymentsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiAgentDeploymentsQuery = { aiAgentDeployments: Array<{ id: string, name: string, agentId: string, agentTitle: string, projectId: string, environmentId: number, enabled: boolean, projectVersion: number, lastExecutionDate: string | null, workflows: Array<{ workflowId: string, enabled: boolean, triggers: Array<{ name: string, type: string, parameters: any, staticWebhookUrl: string | null }> }> }> };
+
+export type AiAgentVersionsQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiAgentVersionsQuery = { aiAgentVersions: Array<{ description: string | null, publishedDate: string | null, status: string, version: number }> };
+
+export type AiAgentsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiAgentsQuery = { aiAgents: Array<{ id: string, uuid: string, name: string, title: string, description: string | null, projectId: string, projectWorkflowUuid: string, unpublishedChanges: boolean, lastPublishedVersion: number, publishedDate: string | null, lastModifiedDate: string | null, elements: Array<{ id: string, kind: string }>, channels: Array<{ id: string, channelType: string, parameters: any }> }> };
+
+export type CreateAiAgentMutationVariables = Exact<{
+  input: Types.CreateAiAgentInput;
+}>;
+
+
+export type CreateAiAgentMutation = { createAiAgent: { id: string, projectId: string } };
+
+export type DeleteAiAgentMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiAgentMutation = { deleteAiAgent: boolean };
+
+export type DeleteAiAgentChannelMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiAgentChannelMutation = { deleteAiAgentChannel: boolean };
+
+export type DeleteAiAgentElementMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiAgentElementMutation = { deleteAiAgentElement: boolean };
+
+export type ExportAiAgentQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ExportAiAgentQuery = { exportAiAgent: string };
+
+export type ImportAiAgentMutationVariables = Exact<{
+  workspaceId: string | number;
+  json: string;
+  projectId?: string | number | null | undefined;
+}>;
+
+
+export type ImportAiAgentMutation = { importAiAgent: { id: string, projectId: string, title: string } };
+
+export type UpdateAiAgentMutationVariables = Exact<{
+  input: Types.UpdateAiAgentInput;
+}>;
+
+
+export type UpdateAiAgentMutation = { updateAiAgent: { id: string } };
+
+export type UpdateAiAgentChannelMutationVariables = Exact<{
+  input: Types.UpdateAiAgentChannelInput;
+}>;
+
+
+export type UpdateAiAgentChannelMutation = { updateAiAgentChannel: boolean };
+
+export type UpdateAiAgentElementMutationVariables = Exact<{
+  input: Types.UpdateAiAgentElementInput;
+}>;
+
+
+export type UpdateAiAgentElementMutation = { updateAiAgentElement: boolean };
+
+export type UpdateAiAgentSettingsMutationVariables = Exact<{
+  id: string | number;
+  settings: any;
+}>;
+
+
+export type UpdateAiAgentSettingsMutation = { updateAiAgentSettings: boolean };
+
+export type WorkspaceChatAgentsQueryVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+}>;
+
+
+export type WorkspaceChatAgentsQuery = { workspaceChatAgents: Array<{ agentName: string, agentTitle: string, aiAgentId: string, projectDeploymentId: string, workflowExecutionId: string, workflowLabel: string }> };
+
 export type ApprovalTaskQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -4548,6 +4676,488 @@ export const useAuditEventTypesQuery = <
       {
     queryKey: variables === undefined ? ['AuditEventTypes'] : ['AuditEventTypes', variables],
     queryFn: fetcher<AuditEventTypesQuery, AuditEventTypesQueryVariables>(AuditEventTypesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AddAiAgentChannelDocument = new TypedDocumentString(`
+    mutation addAiAgentChannel($input: AddAiAgentChannelInput!) {
+  addAiAgentChannel(input: $input) {
+    id
+    channelType
+    position
+    parameters
+    connectionId
+  }
+}
+    `);
+
+export const useAddAiAgentChannelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddAiAgentChannelMutation, TError, AddAiAgentChannelMutationVariables, TContext>) => {
+    
+    return useMutation<AddAiAgentChannelMutation, TError, AddAiAgentChannelMutationVariables, TContext>(
+      {
+    mutationKey: ['addAiAgentChannel'],
+    mutationFn: (variables?: AddAiAgentChannelMutationVariables) => fetcher<AddAiAgentChannelMutation, AddAiAgentChannelMutationVariables>(AddAiAgentChannelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AddAiAgentElementDocument = new TypedDocumentString(`
+    mutation addAiAgentElement($input: AddAiAgentElementInput!) {
+  addAiAgentElement(input: $input) {
+    id
+    kind
+    referenceId
+    position
+    parameters
+    connectionId
+  }
+}
+    `);
+
+export const useAddAiAgentElementMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddAiAgentElementMutation, TError, AddAiAgentElementMutationVariables, TContext>) => {
+    
+    return useMutation<AddAiAgentElementMutation, TError, AddAiAgentElementMutationVariables, TContext>(
+      {
+    mutationKey: ['addAiAgentElement'],
+    mutationFn: (variables?: AddAiAgentElementMutationVariables) => fetcher<AddAiAgentElementMutation, AddAiAgentElementMutationVariables>(AddAiAgentElementDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiAgentDocument = new TypedDocumentString(`
+    query aiAgent($id: ID!) {
+  aiAgent(id: $id) {
+    id
+    name
+    title
+    description
+    instructions
+    workspaceId
+    projectId
+    uuid
+    projectWorkflowUuid
+    unpublishedChanges
+    lastPublishedVersion
+    channels {
+      id
+      channelType
+      position
+      parameters
+      connectionId
+    }
+    elements {
+      id
+      kind
+      referenceId
+      position
+      parameters
+      connectionId
+    }
+    settings
+    lastModifiedDate
+    draftWorkflowId
+  }
+}
+    `);
+
+export const useAiAgentQuery = <
+      TData = AiAgentQuery,
+      TError = unknown
+    >(
+      variables: AiAgentQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiAgentQuery, TError, TData>(
+      {
+    queryKey: ['aiAgent', variables],
+    queryFn: fetcher<AiAgentQuery, AiAgentQueryVariables>(AiAgentDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiAgentChannelDefinitionsDocument = new TypedDocumentString(`
+    query aiAgentChannelDefinitions {
+  aiAgentChannelDefinitions {
+    approvalCapable
+    channelType
+    componentName
+    componentVersion
+    connectionRequired
+    description
+    icon
+    pinned
+    propertiesConfigurable
+    replyActionName
+    schedule
+    title
+    triggerName
+  }
+}
+    `);
+
+export const useAiAgentChannelDefinitionsQuery = <
+      TData = AiAgentChannelDefinitionsQuery,
+      TError = unknown
+    >(
+      variables?: AiAgentChannelDefinitionsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentChannelDefinitionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentChannelDefinitionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiAgentChannelDefinitionsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['aiAgentChannelDefinitions'] : ['aiAgentChannelDefinitions', variables],
+    queryFn: fetcher<AiAgentChannelDefinitionsQuery, AiAgentChannelDefinitionsQueryVariables>(AiAgentChannelDefinitionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiAgentDeploymentsDocument = new TypedDocumentString(`
+    query aiAgentDeployments($workspaceId: ID!) {
+  aiAgentDeployments(workspaceId: $workspaceId) {
+    id
+    name
+    agentId
+    agentTitle
+    projectId
+    environmentId
+    enabled
+    projectVersion
+    lastExecutionDate
+    workflows {
+      workflowId
+      enabled
+      triggers {
+        name
+        type
+        parameters
+        staticWebhookUrl
+      }
+    }
+  }
+}
+    `);
+
+export const useAiAgentDeploymentsQuery = <
+      TData = AiAgentDeploymentsQuery,
+      TError = unknown
+    >(
+      variables: AiAgentDeploymentsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentDeploymentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentDeploymentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiAgentDeploymentsQuery, TError, TData>(
+      {
+    queryKey: ['aiAgentDeployments', variables],
+    queryFn: fetcher<AiAgentDeploymentsQuery, AiAgentDeploymentsQueryVariables>(AiAgentDeploymentsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiAgentVersionsDocument = new TypedDocumentString(`
+    query aiAgentVersions($id: ID!) {
+  aiAgentVersions(id: $id) {
+    description
+    publishedDate
+    status
+    version
+  }
+}
+    `);
+
+export const useAiAgentVersionsQuery = <
+      TData = AiAgentVersionsQuery,
+      TError = unknown
+    >(
+      variables: AiAgentVersionsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentVersionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentVersionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiAgentVersionsQuery, TError, TData>(
+      {
+    queryKey: ['aiAgentVersions', variables],
+    queryFn: fetcher<AiAgentVersionsQuery, AiAgentVersionsQueryVariables>(AiAgentVersionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiAgentsDocument = new TypedDocumentString(`
+    query aiAgents($workspaceId: ID!) {
+  aiAgents(workspaceId: $workspaceId) {
+    id
+    uuid
+    name
+    title
+    description
+    projectId
+    projectWorkflowUuid
+    unpublishedChanges
+    lastPublishedVersion
+    publishedDate
+    lastModifiedDate
+    elements {
+      id
+      kind
+    }
+    channels {
+      id
+      channelType
+      parameters
+    }
+  }
+}
+    `);
+
+export const useAiAgentsQuery = <
+      TData = AiAgentsQuery,
+      TError = unknown
+    >(
+      variables: AiAgentsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAgentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiAgentsQuery, TError, TData>(
+      {
+    queryKey: ['aiAgents', variables],
+    queryFn: fetcher<AiAgentsQuery, AiAgentsQueryVariables>(AiAgentsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiAgentDocument = new TypedDocumentString(`
+    mutation createAiAgent($input: CreateAiAgentInput!) {
+  createAiAgent(input: $input) {
+    id
+    projectId
+  }
+}
+    `);
+
+export const useCreateAiAgentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiAgentMutation, TError, CreateAiAgentMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiAgentMutation, TError, CreateAiAgentMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiAgent'],
+    mutationFn: (variables?: CreateAiAgentMutationVariables) => fetcher<CreateAiAgentMutation, CreateAiAgentMutationVariables>(CreateAiAgentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiAgentDocument = new TypedDocumentString(`
+    mutation deleteAiAgent($id: ID!) {
+  deleteAiAgent(id: $id)
+}
+    `);
+
+export const useDeleteAiAgentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiAgentMutation, TError, DeleteAiAgentMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiAgentMutation, TError, DeleteAiAgentMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiAgent'],
+    mutationFn: (variables?: DeleteAiAgentMutationVariables) => fetcher<DeleteAiAgentMutation, DeleteAiAgentMutationVariables>(DeleteAiAgentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiAgentChannelDocument = new TypedDocumentString(`
+    mutation deleteAiAgentChannel($id: ID!) {
+  deleteAiAgentChannel(id: $id)
+}
+    `);
+
+export const useDeleteAiAgentChannelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiAgentChannelMutation, TError, DeleteAiAgentChannelMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiAgentChannelMutation, TError, DeleteAiAgentChannelMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiAgentChannel'],
+    mutationFn: (variables?: DeleteAiAgentChannelMutationVariables) => fetcher<DeleteAiAgentChannelMutation, DeleteAiAgentChannelMutationVariables>(DeleteAiAgentChannelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiAgentElementDocument = new TypedDocumentString(`
+    mutation deleteAiAgentElement($id: ID!) {
+  deleteAiAgentElement(id: $id)
+}
+    `);
+
+export const useDeleteAiAgentElementMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiAgentElementMutation, TError, DeleteAiAgentElementMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiAgentElementMutation, TError, DeleteAiAgentElementMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiAgentElement'],
+    mutationFn: (variables?: DeleteAiAgentElementMutationVariables) => fetcher<DeleteAiAgentElementMutation, DeleteAiAgentElementMutationVariables>(DeleteAiAgentElementDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ExportAiAgentDocument = new TypedDocumentString(`
+    query exportAiAgent($id: ID!) {
+  exportAiAgent(id: $id)
+}
+    `);
+
+export const useExportAiAgentQuery = <
+      TData = ExportAiAgentQuery,
+      TError = unknown
+    >(
+      variables: ExportAiAgentQueryVariables,
+      options?: Omit<UseQueryOptions<ExportAiAgentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ExportAiAgentQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ExportAiAgentQuery, TError, TData>(
+      {
+    queryKey: ['exportAiAgent', variables],
+    queryFn: fetcher<ExportAiAgentQuery, ExportAiAgentQueryVariables>(ExportAiAgentDocument, variables),
+    ...options
+  }
+    )};
+
+export const ImportAiAgentDocument = new TypedDocumentString(`
+    mutation importAiAgent($workspaceId: ID!, $json: String!, $projectId: ID) {
+  importAiAgent(workspaceId: $workspaceId, json: $json, projectId: $projectId) {
+    id
+    projectId
+    title
+  }
+}
+    `);
+
+export const useImportAiAgentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ImportAiAgentMutation, TError, ImportAiAgentMutationVariables, TContext>) => {
+    
+    return useMutation<ImportAiAgentMutation, TError, ImportAiAgentMutationVariables, TContext>(
+      {
+    mutationKey: ['importAiAgent'],
+    mutationFn: (variables?: ImportAiAgentMutationVariables) => fetcher<ImportAiAgentMutation, ImportAiAgentMutationVariables>(ImportAiAgentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiAgentDocument = new TypedDocumentString(`
+    mutation updateAiAgent($input: UpdateAiAgentInput!) {
+  updateAiAgent(input: $input) {
+    id
+  }
+}
+    `);
+
+export const useUpdateAiAgentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiAgentMutation, TError, UpdateAiAgentMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiAgentMutation, TError, UpdateAiAgentMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiAgent'],
+    mutationFn: (variables?: UpdateAiAgentMutationVariables) => fetcher<UpdateAiAgentMutation, UpdateAiAgentMutationVariables>(UpdateAiAgentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiAgentChannelDocument = new TypedDocumentString(`
+    mutation updateAiAgentChannel($input: UpdateAiAgentChannelInput!) {
+  updateAiAgentChannel(input: $input)
+}
+    `);
+
+export const useUpdateAiAgentChannelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiAgentChannelMutation, TError, UpdateAiAgentChannelMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiAgentChannelMutation, TError, UpdateAiAgentChannelMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiAgentChannel'],
+    mutationFn: (variables?: UpdateAiAgentChannelMutationVariables) => fetcher<UpdateAiAgentChannelMutation, UpdateAiAgentChannelMutationVariables>(UpdateAiAgentChannelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiAgentElementDocument = new TypedDocumentString(`
+    mutation updateAiAgentElement($input: UpdateAiAgentElementInput!) {
+  updateAiAgentElement(input: $input)
+}
+    `);
+
+export const useUpdateAiAgentElementMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiAgentElementMutation, TError, UpdateAiAgentElementMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiAgentElementMutation, TError, UpdateAiAgentElementMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiAgentElement'],
+    mutationFn: (variables?: UpdateAiAgentElementMutationVariables) => fetcher<UpdateAiAgentElementMutation, UpdateAiAgentElementMutationVariables>(UpdateAiAgentElementDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiAgentSettingsDocument = new TypedDocumentString(`
+    mutation updateAiAgentSettings($id: ID!, $settings: Map!) {
+  updateAiAgentSettings(id: $id, settings: $settings)
+}
+    `);
+
+export const useUpdateAiAgentSettingsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiAgentSettingsMutation, TError, UpdateAiAgentSettingsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiAgentSettingsMutation, TError, UpdateAiAgentSettingsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiAgentSettings'],
+    mutationFn: (variables?: UpdateAiAgentSettingsMutationVariables) => fetcher<UpdateAiAgentSettingsMutation, UpdateAiAgentSettingsMutationVariables>(UpdateAiAgentSettingsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WorkspaceChatAgentsDocument = new TypedDocumentString(`
+    query workspaceChatAgents($workspaceId: ID!, $environmentId: ID!) {
+  workspaceChatAgents(workspaceId: $workspaceId, environmentId: $environmentId) {
+    agentName
+    agentTitle
+    aiAgentId
+    projectDeploymentId
+    workflowExecutionId
+    workflowLabel
+  }
+}
+    `);
+
+export const useWorkspaceChatAgentsQuery = <
+      TData = WorkspaceChatAgentsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceChatAgentsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceChatAgentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceChatAgentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceChatAgentsQuery, TError, TData>(
+      {
+    queryKey: ['workspaceChatAgents', variables],
+    queryFn: fetcher<WorkspaceChatAgentsQuery, WorkspaceChatAgentsQueryVariables>(WorkspaceChatAgentsDocument, variables),
     ...options
   }
     )};

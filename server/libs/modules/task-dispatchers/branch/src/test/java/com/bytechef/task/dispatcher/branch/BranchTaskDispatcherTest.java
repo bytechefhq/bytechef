@@ -330,6 +330,7 @@ public class BranchTaskDispatcherTest {
             taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
+            .jobId(2L)
             .workflowTask(
                 new WorkflowTask(
                     Map.of(
@@ -362,5 +363,9 @@ public class BranchTaskDispatcherTest {
         TaskExecutionCompleteEvent taskExecutionCompleteEvent = taskExecutionCompleteEventArgumentCaptor.getValue();
 
         Assertions.assertNotNull(taskExecutionCompleteEvent);
+
+        TaskExecution completedTaskExecution = taskExecutionCompleteEvent.getTaskExecution();
+
+        Assertions.assertNull(completedTaskExecution.getOutput());
     }
 }

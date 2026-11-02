@@ -16,6 +16,8 @@
 
 package com.bytechef.component.workflow.trigger;
 
+import static com.bytechef.component.definition.AgentChannelDefinition.ATTACHMENTS;
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
@@ -44,5 +46,6 @@ public class WorkflowNewWorkflowCallTrigger {
                 .description("The schema definition for the input data this workflow expects from callers.")
                 .controlType(JSON_SCHEMA_BUILDER))
         .output(WorkflowResponseUtils::triggerOutput)
-        .help("", "https://docs.bytechef.io/reference/components/workflow_v1#new-workflow-call");
+        .help("", "https://docs.bytechef.io/reference/components/workflow_v1#new-workflow-call")
+        .agentRequest(agentRequest().attachments(ATTACHMENTS));
 }

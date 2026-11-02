@@ -61,7 +61,6 @@ class AiAgentUtilsApprovalGateTest {
         ClusterElementDefinition<?> clusterElementDefinition = approvalGate.clusterElementDefinition;
 
         List<String> propertyNames = clusterElementDefinition.getProperties()
-            .orElseThrow()
             .stream()
             .map(Property::getName)
             .toList();

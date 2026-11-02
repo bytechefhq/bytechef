@@ -17,6 +17,9 @@
 package com.bytechef.component.chat;
 
 import static com.bytechef.component.chat.constant.ChatConstants.CHAT;
+import static com.bytechef.component.chat.constant.ChatConstants.MODE;
+import static com.bytechef.component.chat.constant.ChatConstants.MODE_HOSTED_CHAT;
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.atlas.execution.service.JobService;
@@ -45,7 +48,13 @@ public class ChatComponentHandler implements ComponentHandler {
             .categories(ComponentCategory.HELPERS)
             .triggers(ChatNewRequestTrigger.TRIGGER_DEFINITION)
             .actions(ChatResponseToRequestAction.ACTION_DEFINITION)
-            .clusterElements(ChatApprovalChannel.of(messageBroker, jobService));
+            .clusterElements(ChatApprovalChannel.of(messageBroker, jobService))
+            .agentChannels(
+                agentChannel(
+                    CHAT, ChatNewRequestTrigger.TRIGGER_DEFINITION, ChatResponseToRequestAction.ACTION_DEFINITION)
+                        .title("Chat")
+                        .approvalChannel(CHAT)
+                        .triggerParameter(MODE, MODE_HOSTED_CHAT));
     }
 
     @Override

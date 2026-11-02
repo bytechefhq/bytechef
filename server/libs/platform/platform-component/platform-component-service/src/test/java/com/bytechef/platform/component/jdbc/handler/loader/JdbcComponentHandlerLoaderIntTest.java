@@ -88,7 +88,6 @@ class JdbcComponentHandlerLoaderIntTest {
         assertEquals(
             List.of("query", "insert", "update", "delete", "execute"),
             componentDefinition.getActions()
-                .orElseThrow()
                 .stream()
                 .map(ActionDefinition::getName)
                 .toList());
@@ -110,7 +109,6 @@ class JdbcComponentHandlerLoaderIntTest {
             .getDefinition();
 
         ActionDefinition queryActionDefinition = componentDefinition.getActions()
-            .orElseThrow()
             .stream()
             .filter(actionDefinition -> JdbcConstants.QUERY.equals(actionDefinition.getName()))
             .findFirst()

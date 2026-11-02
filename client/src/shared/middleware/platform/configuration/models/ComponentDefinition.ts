@@ -34,6 +34,13 @@ import {
     ClusterElementDefinitionBasicToJSON,
     ClusterElementDefinitionBasicToJSONTyped,
 } from './ClusterElementDefinitionBasic';
+import type { AgentChannelDefinition } from './AgentChannelDefinition';
+import {
+    AgentChannelDefinitionFromJSON,
+    AgentChannelDefinitionFromJSONTyped,
+    AgentChannelDefinitionToJSON,
+    AgentChannelDefinitionToJSONTyped,
+} from './AgentChannelDefinition';
 import type { ClusterElementType } from './ClusterElementType';
 import {
     ClusterElementTypeFromJSON,
@@ -91,6 +98,12 @@ export interface ComponentDefinition {
      * The list of all available actions the component can perform.
      */
     actions?: Array<ActionDefinitionBasic>;
+    /**
+     * The AI Agent channels this component declares.
+     * @type {Array<AgentChannelDefinition>}
+     * @memberof ComponentDefinition
+     */
+    agentChannels?: Array<AgentChannelDefinition>;
     /**
      * Is the component cluster element.
      */
@@ -191,6 +204,7 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
         
         'actionClusterElementTypes': json['actionClusterElementTypes'] == null ? undefined : json['actionClusterElementTypes'],
         'actions': json['actions'] == null ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicFromJSON)),
+        'agentChannels': json['agentChannels'] == null ? undefined : ((json['agentChannels'] as Array<any>).map(AgentChannelDefinitionFromJSON)),
         'clusterElement': json['clusterElement'],
         'clusterElementClusterElementTypes': json['clusterElementClusterElementTypes'] == null ? undefined : json['clusterElementClusterElementTypes'],
         'clusterElements': json['clusterElements'] == null ? undefined : ((json['clusterElements'] as Array<any>).map(ClusterElementDefinitionBasicFromJSON)),
@@ -225,6 +239,7 @@ export function ComponentDefinitionToJSONTyped(value?: ComponentDefinition | nul
         
         'actionClusterElementTypes': value['actionClusterElementTypes'],
         'actions': value['actions'] == null ? undefined : ((value['actions'] as Array<any>).map(ActionDefinitionBasicToJSON)),
+        'agentChannels': value['agentChannels'] == null ? undefined : ((value['agentChannels'] as Array<any>).map(AgentChannelDefinitionToJSON)),
         'clusterElement': value['clusterElement'],
         'clusterElementClusterElementTypes': value['clusterElementClusterElementTypes'],
         'clusterElements': value['clusterElements'] == null ? undefined : ((value['clusterElements'] as Array<any>).map(ClusterElementDefinitionBasicToJSON)),
