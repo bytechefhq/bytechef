@@ -24,7 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
+import org.springframework.grpc.server.security.AuthenticationProcessInterceptor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -65,6 +67,9 @@ class ConfigurationOauth2AuthorizationServerIntTest {
     private static final String REDIRECT_URI = "http://127.0.0.1/callback";
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -75,6 +80,11 @@ class ConfigurationOauth2AuthorizationServerIntTest {
 
     @Autowired
     private SessionRepository<? extends Session> sessionRepository;
+
+    @Test
+    void testGrpcServerDoesNotRequireABearerTokenFromOtherApps() {
+        assertThat(applicationContext.getBeanNamesForType(AuthenticationProcessInterceptor.class)).isEmpty();
+    }
 
     @Test
     void testClientAndKeyTablesExist() {

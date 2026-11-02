@@ -152,6 +152,7 @@ dependencies {
     runtimeOnly("com.zaxxer:HikariCP")
 
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.grpc:spring-grpc-core")
     testImplementation("org.springframework.security:spring-security-core")
     testImplementation("org.springframework.security:spring-security-saml2-service-provider")
     testImplementation("org.springframework.session:spring-session-core")
