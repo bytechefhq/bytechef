@@ -73,8 +73,7 @@ public class RetableUpdateRowAction {
                 .label("Row ID")
                 .description("ID of the row to update.")
                 .required(true),
-            dynamicProperties(ROWS_IDS)
-                .properties(RetablePropertiesUtils::createPropertiesForRowValues)
+            dynamicProperties(ROWS_IDS, RetablePropertiesUtils::createPropertiesForRowValues)
                 .propertiesLookupDependsOn(RETABLE_ID)
                 .required(false))
         .output(

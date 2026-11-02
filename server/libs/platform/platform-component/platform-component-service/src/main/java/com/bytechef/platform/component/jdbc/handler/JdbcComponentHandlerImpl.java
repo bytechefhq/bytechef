@@ -201,8 +201,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                                     .options(SqlUtils.getTypeOptions())
                                     .defaultValue("STRING")
                                     .required(true))),
-                dynamicProperties(VALUES)
-                    .properties(JdbcComponentHandlerImpl::createProperties)
+                dynamicProperties(VALUES, JdbcComponentHandlerImpl::createProperties)
                     .propertiesLookupDependsOn(COLUMNS))
             .output()
             .perform(this::performInsert),
@@ -239,8 +238,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                                     .options(SqlUtils.getTypeOptions())
                                     .defaultValue("STRING")
                                     .required(true))),
-                dynamicProperties(VALUES)
-                    .properties(JdbcComponentHandlerImpl::createProperties)
+                dynamicProperties(VALUES, JdbcComponentHandlerImpl::createProperties)
                     .propertiesLookupDependsOn(COLUMNS))
             .output()
             .perform(this::performUpdate),

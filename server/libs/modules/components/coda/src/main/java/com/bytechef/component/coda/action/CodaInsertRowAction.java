@@ -58,8 +58,7 @@ public class CodaInsertRowAction {
                 .required(true)
                 .options((OptionsFunction<String>) CodaUtils::getTableIdOptions)
                 .optionsLookupDependsOn(DOC_ID),
-            dynamicProperties(ROW_VALUES)
-                .properties(CodaPropertiesUtils::createPropertiesForRowValues)
+            dynamicProperties(ROW_VALUES, CodaPropertiesUtils::createPropertiesForRowValues)
                 .propertiesLookupDependsOn(DOC_ID, TABLE_ID)
                 .required(false))
         .output(

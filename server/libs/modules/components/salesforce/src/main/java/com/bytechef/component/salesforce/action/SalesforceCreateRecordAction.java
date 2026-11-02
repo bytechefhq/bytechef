@@ -52,9 +52,8 @@ public class SalesforceCreateRecordAction {
                 .label("Salesforce Object")
                 .options((OptionsFunction<String>) SalesforceUtils::getSalesforceObjectOptions)
                 .required(true),
-            dynamicProperties(FIELDS)
+            dynamicProperties(FIELDS, SalesforceUtils::createPropertiesForObject)
                 .propertiesLookupDependsOn(OBJECT)
-                .properties(SalesforceUtils::createPropertiesForObject)
                 .required(true),
             object(CUSTOM_FIELDS)
                 .label("Custom Fields")

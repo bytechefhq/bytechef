@@ -72,9 +72,8 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
             .type(PROCESSOR)
             .object(FieldMapperItemProcessor::new)
             .properties(
-                dynamicProperties(SCHEMAS)
-                    .header("Field Schemas")
-                    .properties(FieldMapperItemProcessor::getSchemaProperties),
+                dynamicProperties(SCHEMAS, FieldMapperItemProcessor::getSchemaProperties)
+                    .header("Field Schemas"),
                 array(MAPPINGS)
                     .label("Field Mappings")
                     .description("List of field mappings from source to destination.")

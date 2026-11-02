@@ -75,9 +75,8 @@ public class DataTableUpdateRecordAction {
                 integer(ID)
                     .label("Record ID")
                     .required(true),
-                dynamicProperties(VALUES)
+                dynamicProperties(VALUES, DataTableUtils.createDynamicProperties(dataTableService, true))
                     .propertiesLookupDependsOn(TABLE)
-                    .properties(DataTableUtils.createDynamicProperties(dataTableService, true))
                     .required(true))
             .output(this::output)
             .help("", "https://docs.bytechef.io/reference/components/data-table_v1#update-record")

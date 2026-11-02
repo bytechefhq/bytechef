@@ -55,13 +55,11 @@ public final class McpClientCallToolAction {
                             lookupDependsOnPaths, searchText, context) -> McpClientUtils.getToolOptions(
                                 connectionParameters, connectionDefinitionService, context))
                     .required(true),
-                dynamicProperties(TOOL_ARGUMENTS)
-                    .propertiesLookupDependsOn(TOOL_NAME)
-                    .properties(
-                        (ActionDefinition.PropertiesFunction) (
-                            inputParameters, connectionParameters,
-                            lookupDependsOnPaths, context) -> McpClientUtils.getToolProperties(
-                                inputParameters, connectionParameters, connectionDefinitionService, context)))
+                dynamicProperties(TOOL_ARGUMENTS, (ActionDefinition.PropertiesFunction) (
+                    inputParameters, connectionParameters,
+                    lookupDependsOnPaths, context) -> McpClientUtils.getToolProperties(
+                        inputParameters, connectionParameters, connectionDefinitionService, context))
+                            .propertiesLookupDependsOn(TOOL_NAME))
             .output()
             .help("", "https://docs.bytechef.io/reference/components/mcp-client_v1#call-tool")
             .perform(

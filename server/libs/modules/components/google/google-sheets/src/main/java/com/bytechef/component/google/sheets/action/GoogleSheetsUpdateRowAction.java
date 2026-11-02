@@ -66,9 +66,8 @@ public class GoogleSheetsUpdateRowAction {
                 .description("Whether to update the whole row or just specific columns.")
                 .defaultValue(true)
                 .required(true),
-            dynamicProperties(ROW)
+            dynamicProperties(ROW, GoogleSheetsUtils::createPropertiesToUpdateRow)
                 .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER, UPDATE_WHOLE_ROW)
-                .properties(GoogleSheetsUtils::createPropertiesToUpdateRow)
                 .required(true))
         .output()
         .perform(GoogleSheetsUpdateRowAction::perform)

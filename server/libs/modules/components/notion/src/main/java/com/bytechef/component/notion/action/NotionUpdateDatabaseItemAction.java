@@ -50,8 +50,7 @@ public class NotionUpdateDatabaseItemAction {
                 .label("Database Item ID")
                 .description("The ID of the database item to update.")
                 .required(true),
-            dynamicProperties(FIELDS)
-                .properties((PropertiesFunction) NotionUtils::createPropertiesForDatabaseItem)
+            dynamicProperties(FIELDS, (PropertiesFunction) NotionUtils::createPropertiesForDatabaseItem)
                 .propertiesLookupDependsOn(ID)
                 .required(true))
         .output()

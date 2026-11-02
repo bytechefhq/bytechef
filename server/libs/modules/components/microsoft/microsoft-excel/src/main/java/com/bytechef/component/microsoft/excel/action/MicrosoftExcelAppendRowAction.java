@@ -48,9 +48,8 @@ public class MicrosoftExcelAppendRowAction {
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
-            dynamicProperties(ROW)
+            dynamicProperties(ROW, MicrosoftExcelUtils::createPropertiesForNewRow)
                 .propertiesLookupDependsOn(IS_THE_FIRST_ROW_HEADER, WORKSHEET_NAME, WORKBOOK_ID)
-                .properties(MicrosoftExcelUtils::createPropertiesForNewRow)
                 .required(true))
         .output()
         .perform(MicrosoftExcelAppendRowAction::perform)

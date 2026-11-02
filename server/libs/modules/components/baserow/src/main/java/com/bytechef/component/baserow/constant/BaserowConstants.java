@@ -38,10 +38,10 @@ public class BaserowConstants {
     public static final String TYPE = "type";
     public static final String USER_FIELD_NAMES = "user_field_names";
 
-    public static final ModifiableDynamicPropertiesProperty FIELDS_DYNAMIC_PROPERTY = dynamicProperties(FIELDS)
-        .propertiesLookupDependsOn(TABLE_ID)
-        .properties(BaserowPropertiesUtils::createPropertiesForRow)
-        .required(true);
+    public static final ModifiableDynamicPropertiesProperty FIELDS_DYNAMIC_PROPERTY =
+        dynamicProperties(FIELDS, BaserowPropertiesUtils::createPropertiesForRow)
+            .propertiesLookupDependsOn(TABLE_ID)
+            .required(true);
 
     public static final ModifiableBooleanProperty USER_FIELD_NAMES_PROPERTY = bool(USER_FIELD_NAMES)
         .label("User Field Names")

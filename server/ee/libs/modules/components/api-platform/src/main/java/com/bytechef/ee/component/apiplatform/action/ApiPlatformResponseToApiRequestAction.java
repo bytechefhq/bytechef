@@ -71,10 +71,9 @@ public class ApiPlatformResponseToApiRequestAction {
                         option("Invalid Input Response", ResponseType.INVALID_INPUT.name()),
                         option("Forbidden Response", ResponseType.FORBIDDEN.name()))
                     .required(true),
-                dynamicProperties(RESPONSE)
+                dynamicProperties(RESPONSE, apiPlatformResponseToApiRequestAction::responseProperties)
                     .description("The properties of the response.")
                     .propertiesLookupDependsOn(RESPONSE_TYPE)
-                    .properties(apiPlatformResponseToApiRequestAction::responseProperties)
                     .required(true))
             .output(apiPlatformResponseToApiRequestAction::output)
             .perform(apiPlatformResponseToApiRequestAction::perform);

@@ -69,8 +69,7 @@ public class InfobipSendWhatsAppTemplateMessageAction {
                 .optionsLookupDependsOn(FROM)
                 .options((OptionsFunction<String>) InfobipUtils::getTemplateOptions)
                 .required(true),
-            dynamicProperties(PLACEHOLDERS)
-                .properties(InfobipUtils::createPlaceholderProperties)
+            dynamicProperties(PLACEHOLDERS, InfobipUtils::createPlaceholderProperties)
                 .propertiesLookupDependsOn(TEMPLATE_NAME))
         .output(
             outputSchema(

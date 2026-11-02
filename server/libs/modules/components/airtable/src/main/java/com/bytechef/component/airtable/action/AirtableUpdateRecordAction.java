@@ -67,8 +67,7 @@ public class AirtableUpdateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)),
-            dynamicProperties("fields")
-                .properties((ActionDefinition.PropertiesFunction) AirtableUtils::getFieldsProperties)
+            dynamicProperties("fields", (ActionDefinition.PropertiesFunction) AirtableUtils::getFieldsProperties)
                 .propertiesLookupDependsOn("baseId", "tableId")
                 .required(false)
                 .metadata(

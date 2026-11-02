@@ -51,8 +51,7 @@ public class NotionCreateDatabaseItemAction {
                 .description("The ID of the database.")
                 .options((OptionsFunction<String>) NotionUtils::getDatabaseIdOptions)
                 .required(true),
-            dynamicProperties(FIELDS)
-                .properties((PropertiesFunction) NotionUtils::createPropertiesForDatabaseItem)
+            dynamicProperties(FIELDS, (PropertiesFunction) NotionUtils::createPropertiesForDatabaseItem)
                 .propertiesLookupDependsOn(ID)
                 .required(true),
             string(CONTENT)

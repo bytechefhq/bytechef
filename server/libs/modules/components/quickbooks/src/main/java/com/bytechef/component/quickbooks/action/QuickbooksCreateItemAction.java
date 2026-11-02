@@ -71,9 +71,8 @@ public class QuickbooksCreateItemAction {
                     option("Non-inventory", NON_INVENTORY.name()))
                 .defaultValue(SERVICE.name())
                 .required(true),
-            dynamicProperties(ACCOUNT)
-                .propertiesLookupDependsOn(TYPE)
-                .properties(QuickbooksUtils::getPropertiesForItem),
+            dynamicProperties(ACCOUNT, QuickbooksUtils::getPropertiesForItem)
+                .propertiesLookupDependsOn(TYPE),
             string(EXPENSE_ACCOUNT_REF)
                 .label("Expense Account")
                 .options(QuickbooksUtils.getOptions(Entity.ACCOUNT, "Expense"))

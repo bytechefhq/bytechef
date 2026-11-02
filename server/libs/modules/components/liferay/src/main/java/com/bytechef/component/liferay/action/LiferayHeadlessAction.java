@@ -71,30 +71,28 @@ public class LiferayHeadlessAction {
                 .options((ActionDefinition.OptionsFunction<String>) LiferayOptionUtils::getEndpointsOptions)
                 .optionsLookupDependsOn(APPLICATION)
                 .required(true),
-            dynamicProperties(PROPERTIES)
-                .properties(
-                    (ActionDefinition.PropertiesFunction) (
-                        inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
+            dynamicProperties(PROPERTIES, (ActionDefinition.PropertiesFunction) (
+                inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
-                        if (!inputParameters.containsKey(APPLICATION) || !inputParameters.containsKey(ENDPOINT)) {
-                            return List.of();
-                        }
+                if (!inputParameters.containsKey(APPLICATION) || !inputParameters.containsKey(ENDPOINT)) {
+                    return List.of();
+                }
 
-                        String endpoint = inputParameters.getRequiredString(ENDPOINT);
+                String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
-                        if (endpoint.contains("batch")) {
-                            return List.of(array(BODY)
-                                .label("Body")
-                                .description("JSON structure of body.")
-                                .required(false));
-                        }
+                if (endpoint.contains("batch")) {
+                    return List.of(array(BODY)
+                        .label("Body")
+                        .description("JSON structure of body.")
+                        .required(false));
+                }
 
-                        PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
-                            inputParameters.getRequiredString(APPLICATION), endpoint,
-                            context);
+                PropertiesContainer propertiesContainer = LiferayPropertiesUtils.createPropertiesForParameters(
+                    inputParameters.getRequiredString(APPLICATION), endpoint,
+                    context);
 
-                        return propertiesContainer.properties();
-                    })
+                return propertiesContainer.properties();
+            })
                 .propertiesLookupDependsOn(APPLICATION, ENDPOINT)
                 .required(false))
         .output()

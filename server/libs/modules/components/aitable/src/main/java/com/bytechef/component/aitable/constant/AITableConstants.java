@@ -48,9 +48,9 @@ public class AITableConstants {
         .options((OptionsFunction<String>) AITableUtils::getDatasheetIdOptions)
         .required(true);
 
-    public static final ModifiableDynamicPropertiesProperty FIELDS_DYNAMIC_PROPERTY = dynamicProperties(FIELDS)
-        .propertiesLookupDependsOn(DATASHEET_ID)
-        .properties(AITableUtils::createPropertiesForRecord);
+    public static final ModifiableDynamicPropertiesProperty FIELDS_DYNAMIC_PROPERTY =
+        dynamicProperties(FIELDS, AITableUtils::createPropertiesForRecord)
+            .propertiesLookupDependsOn(DATASHEET_ID);
 
     public static final ModifiableStringProperty SPACE_ID_PROPERTY = string(SPACE_ID)
         .label("Space ID")

@@ -42,10 +42,9 @@ public class WorkflowResponseToWorkflowCallAction {
                 .placeholder("Edit Output schema")
                 .description("The schema definition for the response data sent back to the calling workflow.")
                 .controlType(JSON_SCHEMA_BUILDER),
-            dynamicProperties(RESPONSE)
+            dynamicProperties(RESPONSE, WorkflowResponseUtils::responseProperties)
                 .description("The response data to send back to the calling workflow.")
                 .propertiesLookupDependsOn(OUTPUT_SCHEMA)
-                .properties(WorkflowResponseUtils::responseProperties)
                 .required(true))
         .output(WorkflowResponseUtils::actionOutput)
         .help("", "https://docs.bytechef.io/reference/components/workflow_v1#response-to-workflow-call")
