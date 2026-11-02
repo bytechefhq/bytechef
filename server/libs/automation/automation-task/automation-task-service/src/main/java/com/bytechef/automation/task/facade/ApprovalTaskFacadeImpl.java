@@ -24,10 +24,13 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.task.audit.ApprovalTaskAuditEvents;
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.domain.PendingApproval;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -108,12 +111,19 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
     }
 
     @Override
+    @Audited(event = ApprovalTaskAuditEvents.APPROVAL_TASK_CREATED, data = {
+        @AuditData(key = "approvalTaskId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#approvalTask.name")
+    })
     @PreAuthorize("isTenantAdmin()")
     public ApprovalTask createManualApprovalTask(ApprovalTask approvalTask) {
         return approvalTaskService.create(approvalTask);
     }
 
     @Override
+    @Audited(event = ApprovalTaskAuditEvents.APPROVAL_TASK_DELETED, data = {
+        @AuditData(key = "approvalTaskId", value = "#id")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void deleteApprovalTask(long id) {
         approvalTaskService.delete(id);
@@ -187,6 +197,11 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
     }
 
     @Override
+    @Audited(event = ApprovalTaskAuditEvents.APPROVAL_TASK_UPDATED, data = {
+        @AuditData(key = "approvalTaskId", value = "#approvalTask.id"),
+        @AuditData(key = "name", value = "#approvalTask.name"),
+        @AuditData(key = "status", value = "#approvalTask.status")
+    })
     @PreAuthorize("isTenantAdmin()")
     public ApprovalTask updateApprovalTask(ApprovalTask approvalTask) {
         return approvalTaskService.update(approvalTask);
