@@ -24,6 +24,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
@@ -50,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -230,6 +232,16 @@ class A2aServerFacadeIntTest {
             a2aServerFacade.deleteA2aServer(1L);
 
             verify(a2aServerRepository).deleteById(1L);
+        }
+
+        @Test
+        void testUnauthenticatedCallerCannotListServersOrTags() {
+            assertThatExceptionOfType(AuthenticationCredentialsNotFoundException.class)
+                .isThrownBy(() -> a2aServerFacade.getWorkspaceA2aServers(1L));
+            assertThatExceptionOfType(AuthenticationCredentialsNotFoundException.class)
+                .isThrownBy(() -> a2aServerFacade.getA2aServerTags(1L));
+
+            verifyNoInteractions(permissionService);
         }
 
         private static void authenticate() {

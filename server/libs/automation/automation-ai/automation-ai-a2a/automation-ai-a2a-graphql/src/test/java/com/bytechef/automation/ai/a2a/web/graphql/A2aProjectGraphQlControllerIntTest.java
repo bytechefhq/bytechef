@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.ai.a2a.web.graphql;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -42,8 +41,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
-import org.springframework.graphql.ResponseError;
-import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -201,28 +198,6 @@ class A2aProjectGraphQlControllerIntTest {
             .valueIsNull();
 
         verifyNoInteractions(projectDeploymentService);
-    }
-
-    @Test
-    void testA2aProjectsByServerIdRequiresAuthentication() {
-        graphQlTester
-            .document("""
-                query {
-                    a2aProjectsByServerId(a2aServerId: "7") {
-                        id
-                    }
-                }
-                """)
-            .execute()
-            .errors()
-            .satisfy(errors -> assertThat(errors)
-                .singleElement()
-                .extracting(ResponseError::getErrorType)
-                .isEqualTo(ErrorType.UNAUTHORIZED))
-            .path("a2aProjectsByServerId")
-            .valueIsNull();
-
-        verifyNoInteractions(a2aProjectFacade);
     }
 
     @Test

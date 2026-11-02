@@ -101,6 +101,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -178,6 +179,18 @@ class A2aProjectFacadeIntTest {
             a2aProjectService, projectDeploymentFacade, projectDeploymentService, projectDeploymentWorkflowService,
             projectService,
             projectWorkflowService);
+    }
+
+    @Test
+    void testUnauthenticatedCallerCannotListA2aProjects() {
+        resetCollaborators();
+
+        assertThatExceptionOfType(AuthenticationCredentialsNotFoundException.class)
+            .isThrownBy(() -> a2aProjectFacade.getWorkspaceA2aProjects(1L));
+        assertThatExceptionOfType(AuthenticationCredentialsNotFoundException.class)
+            .isThrownBy(() -> a2aProjectFacade.getA2aServerA2aProjects(7L));
+
+        verifyNoInteractions(a2aProjectService, permissionService);
     }
 
     private void resetCollaborators() {

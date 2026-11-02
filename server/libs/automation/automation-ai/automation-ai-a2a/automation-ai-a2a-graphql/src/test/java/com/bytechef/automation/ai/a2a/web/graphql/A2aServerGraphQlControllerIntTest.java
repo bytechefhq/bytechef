@@ -38,7 +38,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
-import org.springframework.graphql.ResponseError;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.access.AccessDeniedException;
@@ -234,28 +233,6 @@ class A2aServerGraphQlControllerIntTest {
             .isEqualTo("5")
             .path("a2aServers[0].secretKey")
             .valueIsNull();
-    }
-
-    @Test
-    void testA2aServersRequiresAuthentication() {
-        graphQlTester
-            .document("""
-                query {
-                    a2aServers(workspaceId: "1") {
-                        id
-                    }
-                }
-                """)
-            .execute()
-            .errors()
-            .satisfy(errors -> assertThat(errors)
-                .singleElement()
-                .extracting(ResponseError::getErrorType)
-                .isEqualTo(ErrorType.UNAUTHORIZED))
-            .path("a2aServers")
-            .valueIsNull();
-
-        verifyNoInteractions(a2aServerService);
     }
 
     @Test

@@ -24,6 +24,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.a2a.config.A2aMethodSecurityIntTestConfiguration;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -119,6 +121,16 @@ class A2aProjectWorkflowFacadeIntTest {
         assertThat(enabledA2aProjectWorkflow.isEnabled()).isTrue();
 
         verify(a2aProjectWorkflowRepository, times(2)).save(enabledA2aProjectWorkflow);
+    }
+
+    @Test
+    void testUnauthenticatedCallerCannotListTheWorkflowsOfAProject() {
+        SecurityContextHolder.clearContext();
+
+        assertThatExceptionOfType(AuthenticationCredentialsNotFoundException.class)
+            .isThrownBy(() -> a2aProjectWorkflowFacade.getA2aProjectA2aProjectWorkflows(2L));
+
+        verifyNoInteractions(permissionService);
     }
 
     private static void authenticate() {
