@@ -25,6 +25,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.CredentialAuthenticationEventPublisher;
+import com.bytechef.platform.security.web.authentication.ExternalIssuerAuthentication;
 import com.bytechef.platform.security.web.authentication.PlatformUserAuthentication;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
@@ -416,7 +417,9 @@ class TenantAwareJwtAuthenticationFilterTest {
                 .getAuthentication()));
 
         assertThat(authorityNames(authentication.get())).doesNotContain("ROLE_ADMIN");
-        assertThat(authentication.get()).isNotInstanceOf(PlatformUserAuthentication.class);
+        assertThat(authentication.get())
+            .isInstanceOf(ExternalIssuerAuthentication.class)
+            .isNotInstanceOf(PlatformUserAuthentication.class);
     }
 
     @Test

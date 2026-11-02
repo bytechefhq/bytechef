@@ -232,7 +232,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
 
         JwtAuthenticationToken authentication = issuer.isSelf()
             ? new PlatformUserJwtAuthenticationToken(jwt, userDetails, authorities)
-            : new JwtAuthenticationToken(jwt, userDetails, authorities);
+            : new ExternalIssuerJwtAuthenticationToken(jwt, userDetails, authorities);
 
         if (authenticationEventPublisher != null) {
             TenantContext.runWithTenantId(
