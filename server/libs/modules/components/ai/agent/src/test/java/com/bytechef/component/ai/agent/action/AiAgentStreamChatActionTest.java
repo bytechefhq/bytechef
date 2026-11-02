@@ -32,7 +32,9 @@ import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.cr
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.findLastToolResponseMessage;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.textResponse;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toPersistedContinueParameters;
+import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toPersistedGatedToolContinueParameters;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toolCallResponse;
+import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toolExecutionRecorderObjectProvider;
 import static com.bytechef.component.definition.ActionDefinition.SseEmitterHandler.SseEmitter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -64,6 +66,8 @@ import com.bytechef.platform.component.definition.MultipleConnectionsResumePerfo
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
+import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.TenantContextThreadLocalAccessor;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -719,7 +723,7 @@ class AiAgentStreamChatActionTest {
                         prompts,
                         callNumber -> callNumber == 1 ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID) : finalAnswer()),
                     chatMemoryResult),
-                createToolCallingManager());
+                createToolCallingManager(), null);
 
             SseEmitterHandler performHandler = getPerformFunction(streamChatActionDefinition).apply(
                 createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
@@ -787,7 +791,7 @@ class AiAgentStreamChatActionTest {
                             ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID)
                             : callNumber == 2 ? suspendingToolCallResponse(SECOND_TOOL_CALL_ID) : finalAnswer()),
                     chatMemoryResult),
-                createToolCallingManager());
+                createToolCallingManager(), null);
 
             SseEmitterHandler performHandler = getPerformFunction(streamChatActionDefinition).apply(
                 createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
@@ -848,13 +852,49 @@ class AiAgentStreamChatActionTest {
                 .hasMessageContaining("failed");
         }
 
+        @Test
+        void testDeniedGatedToolResumeIsRecordedByTheToolExecutionRecorder() throws Exception {
+            List<Prompt> prompts = new CopyOnWriteArrayList<>();
+            ToolExecutionRecorder toolExecutionRecorder = mock(ToolExecutionRecorder.class);
+
+            ActionDefinition streamChatActionDefinition = AiAgentStreamChatAction.of(
+                mock(AiAgentToolFacade.class),
+                createClusterElementDefinitionService(
+                    createChatModel(
+                        prompts,
+                        callNumber -> callNumber == 1 ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID) : finalAnswer()),
+                    null),
+                createToolCallingManager(), toolExecutionRecorderObjectProvider(toolExecutionRecorder));
+
+            ActionContext.Suspend suspend = performUntilSuspended(streamChatActionDefinition);
+
+            MultipleConnectionsResumePerformFunction resumePerformFunction =
+                (MultipleConnectionsResumePerformFunction) streamChatActionDefinition.getResumePerform()
+                    .orElseThrow();
+
+            SseEmitterHandler resumeHandler = (SseEmitterHandler) resumePerformFunction.apply(
+                createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false),
+                toPersistedGatedToolContinueParameters(suspend, SUSPENDING_TOOL_NAME),
+                MockParametersFactory.create(Map.of("approved", false)), createActionContext(new AtomicReference<>()));
+
+            assertThat(driveHandlerToCompletion(resumeHandler).events()).contains(FINAL_ANSWER);
+
+            ArgumentCaptor<com.bytechef.platform.tool.execution.ToolExecutionEvent> toolExecutionEventArgumentCaptor =
+                ArgumentCaptor.forClass(com.bytechef.platform.tool.execution.ToolExecutionEvent.class);
+
+            verify(toolExecutionRecorder).record(toolExecutionEventArgumentCaptor.capture());
+
+            assertThat(toolExecutionEventArgumentCaptor.getValue()
+                .outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_DENIED);
+        }
+
         private static ActionDefinition createStreamChatActionDefinition(
             List<Prompt> prompts, Function<Integer, ChatResponse> responseFunction) throws Exception {
 
             return AiAgentStreamChatAction.of(
                 mock(AiAgentToolFacade.class),
                 createClusterElementDefinitionService(createChatModel(prompts, responseFunction), null),
-                createToolCallingManager());
+                createToolCallingManager(), null);
         }
 
         private static MultipleConnectionsStreamPerformFunction getPerformFunction(ActionDefinition actionDefinition) {
