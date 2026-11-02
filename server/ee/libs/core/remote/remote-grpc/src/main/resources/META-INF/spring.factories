@@ -1,0 +1,2 @@
+org.springframework.boot.EnvironmentPostProcessor=\
+com.bytechef.ee.remote.grpc.boot.GrpcServerSecurityEnvironmentPostProcessor
