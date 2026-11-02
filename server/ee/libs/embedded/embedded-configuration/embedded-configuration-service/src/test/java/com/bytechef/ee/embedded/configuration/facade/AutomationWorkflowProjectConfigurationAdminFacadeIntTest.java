@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
@@ -45,6 +46,7 @@ import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjec
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.Option;
@@ -91,6 +93,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -139,6 +142,8 @@ import org.springframework.test.context.event.RecordApplicationEvents;
 })
 class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
+    private static final String CONFIGURATION_NAME = "Default";
+    private static final AtomicLong CONNECTED_USER_ID_SEQUENCE = new AtomicLong(1_000_000L);
     private static final long ENVIRONMENT_ID = 0L;
 
     private static final String CHANNEL_REQUIRED_DEFINITION = """
@@ -194,6 +199,9 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     private ConnectedUserConnectionService connectedUserConnectionService;
 
     @Autowired
+    private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
+
+    @Autowired
     private ConnectionService connectionService;
 
     @Autowired
@@ -220,7 +228,8 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
         assertThatThrownBy(
             () -> automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-                projectId, ENVIRONMENT_ID, 2, true, true)).isInstanceOf(ConfigurationException.class);
+                projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true))
+                    .isInstanceOf(ConfigurationException.class);
     }
 
     @Test
@@ -229,27 +238,102 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
         assertThatThrownBy(
             () -> automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-                projectId, Environment.values().length, 1, true, true))
+                projectId, Environment.values().length, CONFIGURATION_NAME, null, 1, true, true))
                     .isInstanceOf(ConfigurationException.class);
         assertThatThrownBy(
             () -> automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-                projectId, -1, 1, true, true))
+                projectId, -1, CONFIGURATION_NAME, null, 1, true, true))
                     .isInstanceOf(ConfigurationException.class);
         assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId)).isEmpty();
     }
 
     @Test
-    void testCreateConfigurationTwiceForTheSameEnvironmentThrows() {
-        long projectId = createPublishedProject("Duplicate Environment", 1);
+    void testCreateTwoConfigurationsInOneEnvironment() {
+        long projectId = createPublishedProject("Two Configurations", 1);
 
-        automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+        long firstConfigurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Standard", null, 1, true, true);
+        long secondConfigurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, " Beta ", "metadata['beta'] == 'true'", 1, true, false);
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId))
+            .extracting(
+                AutomationWorkflowProjectConfigurationDTO::id, AutomationWorkflowProjectConfigurationDTO::environmentId,
+                AutomationWorkflowProjectConfigurationDTO::name,
+                AutomationWorkflowProjectConfigurationDTO::permissionExpression)
+            .containsExactly(
+                tuple(firstConfigurationId, ENVIRONMENT_ID, "Standard", null),
+                tuple(secondConfigurationId, ENVIRONMENT_ID, "Beta", "metadata['beta'] == 'true'"));
+    }
+
+    @Test
+    void testCreateConfigurationWithDuplicateNameThrows() {
+        long projectId = createPublishedProject("Duplicate Name", 1);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Standard", null, 1, true, true);
+        long otherConfigurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Beta", null, 1, true, true);
 
         assertThatThrownBy(
             () -> automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-                projectId, ENVIRONMENT_ID, 1, true, true))
+                projectId, ENVIRONMENT_ID, " standard ", null, 1, true, true))
+                    .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> {
+                        assertThat(configurationException.getMessage()).isEqualTo(
+                            "Project id=%s already has a configuration named 'standard' in environment id=%s"
+                                .formatted(projectId, ENVIRONMENT_ID));
+                        assertThat(configurationException.getErrorKey()).isEqualTo(
+                            AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_NAME_EXISTS.getErrorKey());
+                    });
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
+                otherConfigurationId, "STANDARD", null, 1, true, true))
                     .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
-                        configurationException.getMessage()).contains("already has a configuration"));
+                        configurationException.getErrorKey()).isEqualTo(
+                            AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_NAME_EXISTS.getErrorKey()));
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
+            configurationId, "Standard", "metadata['tier'] == 'pro'", 1, true, true);
+
+        long otherEnvironmentConfigurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID + 1, "Standard", null, 1, true, true);
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId))
+            .extracting(
+                AutomationWorkflowProjectConfigurationDTO::id, AutomationWorkflowProjectConfigurationDTO::name,
+                AutomationWorkflowProjectConfigurationDTO::permissionExpression)
+            .containsExactly(
+                tuple(configurationId, "Standard", "metadata['tier'] == 'pro'"),
+                tuple(otherConfigurationId, "Beta", null),
+                tuple(otherEnvironmentConfigurationId, "Standard", null));
+    }
+
+    @Test
+    void testGetConfigurationsReportsConnectedUserCount() {
+        long projectId = createPublishedProject("Connected User Count", 1);
+
+        long firstConfigurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Standard", null, 1, true, true);
+        long secondConfigurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Beta", null, 1, true, true);
+        long emptyConfigurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Empty", null, 1, true, true);
+
+        connectedUserProjectConfigurationService.assign(
+            CONNECTED_USER_ID_SEQUENCE.incrementAndGet(), projectId, firstConfigurationId);
+        connectedUserProjectConfigurationService.assign(
+            CONNECTED_USER_ID_SEQUENCE.incrementAndGet(), projectId, firstConfigurationId);
+        connectedUserProjectConfigurationService.assign(
+            CONNECTED_USER_ID_SEQUENCE.incrementAndGet(), projectId, secondConfigurationId);
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId))
+            .extracting(
+                AutomationWorkflowProjectConfigurationDTO::id,
+                AutomationWorkflowProjectConfigurationDTO::connectedUserCount)
+            .containsExactly(
+                tuple(firstConfigurationId, 2), tuple(secondConfigurationId, 1), tuple(emptyConfigurationId, 0));
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfiguration(firstConfigurationId)
+            .connectedUserCount()).isEqualTo(2);
     }
 
     @Test
@@ -260,7 +344,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         automationWorkflowProjectFacade.publishProject(projectId);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         List<AutomationWorkflowProjectConfigurationDTO> configurations =
             automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId);
@@ -282,7 +366,8 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
                     .getFirst()
                     .getWorkflowId());
 
-        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 2, true, true);
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, CONFIGURATION_NAME, null,
+            2, true, true);
 
         assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId)
             .getFirst()
@@ -294,7 +379,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         long projectId = createPublishedProject("Workflow Switch", 1);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         String workflowUuid = automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId)
             .getFirst()
@@ -319,7 +404,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         long projectId = createPublishedProject("Configuration Switch", 1);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         applicationEvents.clear();
 
@@ -335,8 +420,8 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
             .toList())
                 .containsExactly(
-                    new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID),
-                    new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID));
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID, configurationId),
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID, configurationId));
     }
 
     @Test
@@ -344,11 +429,11 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         long projectId = createPublishedProject("Update Unpublished Version", 1);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         assertThatThrownBy(
             () -> automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
-                configurationId, 2, true, true)).isInstanceOf(ConfigurationException.class);
+                configurationId, CONFIGURATION_NAME, null, 2, true, true)).isInstanceOf(ConfigurationException.class);
         assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
             .getProjectVersion()).isEqualTo(1);
     }
@@ -358,15 +443,17 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         long projectId = createPublishedProject("Updated Event", 2);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         applicationEvents.clear();
 
-        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 2, false, false);
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, CONFIGURATION_NAME, null,
+            2, false, false);
 
         assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
             .toList())
-                .containsExactly(new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID));
+                .containsExactly(
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID, configurationId));
 
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(configurationId);
@@ -381,14 +468,15 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         long projectId = createPublishedProject("Deleted Event", 1);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(configurationId);
 
         assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId)).isEmpty();
         assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationDeletedEvent.class)
             .toList())
-                .containsExactly(new AutomationWorkflowProjectConfigurationDeletedEvent(projectId, ENVIRONMENT_ID));
+                .containsExactly(
+                    new AutomationWorkflowProjectConfigurationDeletedEvent(projectId, ENVIRONMENT_ID, configurationId));
     }
 
     @Test
@@ -398,13 +486,14 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         String workflowUuid = addWorkflowAndPublish(projectId, "Rollback Blocked Workflow");
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 2, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true);
 
-        givenReferences(newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
+        givenReferences(configurationId,
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
 
         assertThatThrownBy(
             () -> automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
-                configurationId, 1, true, true))
+                configurationId, CONFIGURATION_NAME, null, 1, true, true))
                     .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> {
                         assertThat(configurationException.getMessage())
                             .contains("Version 1 lacks workflows connected users still use: Rollback Blocked Workflow")
@@ -425,15 +514,17 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         addWorkflowAndPublish(projectId, "Rollback Allowed Workflow");
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 2, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true);
 
         String firstWorkflowUuid = projectWorkflowService.getProjectWorkflows(projectId, 1)
             .getFirst()
             .getUuidAsString();
 
-        givenReferences(newReference(firstWorkflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
+        givenReferences(configurationId,
+            newReference(firstWorkflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
 
-        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 1, true, true);
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, CONFIGURATION_NAME, null,
+            1, true, true);
 
         assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
             .getProjectVersion()).isEqualTo(1);
@@ -446,15 +537,16 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         String workflowUuid = addWorkflowAndPublish(projectId, "Rollback Ignored Workflow");
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 2, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true);
 
         Environment otherEnvironment = Environment.values()[(int) ENVIRONMENT_ID + 1];
 
-        givenReferences(
+        givenReferences(configurationId,
             newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), true),
             newReference(workflowUuid, otherEnvironment.name(), false));
 
-        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 1, true, true);
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, CONFIGURATION_NAME, null,
+            1, true, true);
 
         assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
             .getProjectVersion()).isEqualTo(1);
@@ -467,16 +559,17 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         String workflowUuid = addWorkflowAndPublish(projectId, "Rollback Turned Off Workflow");
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 2, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true);
 
         automationWorkflowProjectConfigurationAdminFacade.enableConfigurationWorkflow(
             configurationId, workflowUuid, false);
 
-        givenReferences(newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
+        givenReferences(configurationId,
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
 
         assertThatThrownBy(
             () -> automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
-                configurationId, 1, true, true))
+                configurationId, CONFIGURATION_NAME, null, 1, true, true))
                     .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
                         configurationException.getErrorKey())
                             .isEqualTo(
@@ -493,14 +586,16 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         String workflowUuid = addWorkflowAndPublish(projectId, "Roll Forward Workflow");
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 2, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true);
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(workflowUuid);
         automationWorkflowProjectFacade.publishProject(projectId);
 
-        givenReferences(newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
+        givenReferences(configurationId,
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
 
-        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 3, true, true);
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, CONFIGURATION_NAME, null,
+            3, true, true);
 
         assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
             .getProjectVersion()).isEqualTo(3);
@@ -517,14 +612,14 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         publish(projectId);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
 
         givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of("channel", "general"));
         givenStoredInputs(102L, projectId, 1, workflowUuid, Map.of());
         givenStoredInputs(103L, projectId, 1, workflowUuid, Map.of("channel", "  "));
-        givenReferences(
+        givenReferences(configurationId,
             newReference(workflowUuid, environmentName, false, 101L),
             newReference(workflowUuid, environmentName, false, 102L),
             newReference(workflowUuid, environmentName, false, 103L));
@@ -548,10 +643,10 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         publish(projectId);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
-        givenReferences(
+        givenReferences(configurationId,
             newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false, 101L));
 
         AutomationWorkflowProjectConfigurationVersionImpactDTO versionImpact =
@@ -575,13 +670,13 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         publish(projectId);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
 
         givenStoredInputs(101L, projectId, 1, relaxedWorkflowUuid, Map.of());
         givenStoredInputs(101L, projectId, 1, unchangedWorkflowUuid, Map.of());
-        givenReferences(
+        givenReferences(configurationId,
             newReference(relaxedWorkflowUuid, environmentName, false, 101L),
             newReference(unchangedWorkflowUuid, environmentName, false, 101L));
 
@@ -608,13 +703,13 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             });
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
 
         givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
         givenStoredInputs(102L, projectId, 1, workflowUuid, Map.of());
-        givenReferences(
+        givenReferences(configurationId,
             newReference(workflowUuid, environmentName, false, 101L),
             newReference(workflowUuid, environmentName, false, 102L));
 
@@ -635,7 +730,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         publish(projectId);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
         Environment otherEnvironment = Environment.values()[(int) ENVIRONMENT_ID + 1];
@@ -643,7 +738,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
         givenStoredInputs(102L, projectId, 1, workflowUuid, Map.of());
         givenStoredInputs(103L, projectId, 1, workflowUuid, Map.of());
-        givenReferences(
+        givenReferences(configurationId,
             newReference(workflowUuid, environmentName, false, 101L),
             newReference(workflowUuid, environmentName, true, 102L),
             newReference(workflowUuid, otherEnvironment.name(), false, 103L));
@@ -665,13 +760,13 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         publish(projectId);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
 
         givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
         givenStoredInputs(102L, projectId, 1, workflowUuid, Map.of());
-        givenReferences(
+        givenReferences(configurationId,
             newReference(workflowUuid, environmentName, true, false, 101L),
             newReference(workflowUuid, environmentName, false, false, 102L));
 
@@ -692,9 +787,9 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         publish(projectId);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
-        givenReferences();
+        givenReferences(configurationId);
 
         assertThat(automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(configurationId, 2)
             .workflows()).containsExactly(
@@ -714,7 +809,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         givenSlots(new ComponentConnection("slack", 1, "postMessage1", "slack", true));
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO providableValues =
             automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
@@ -742,7 +837,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             new ComponentConnection("slack", 1, "postMessage1", "slack2", true));
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot> connectionSlots =
             automationWorkflowProjectConfigurationAdminFacade
@@ -803,7 +898,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
         try {
             long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-                projectId, ENVIRONMENT_ID, 1, true, true);
+                projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
             assertThat(
                 automationWorkflowProjectConfigurationAdminFacade
@@ -931,7 +1026,8 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
             .toList())
                 .containsExactly(
-                    new AutomationWorkflowProjectConfigurationUpdatedEvent(fixture.projectId(), ENVIRONMENT_ID));
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(
+                        fixture.projectId(), ENVIRONMENT_ID, fixture.configurationId()));
     }
 
     @Test
@@ -951,9 +1047,11 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
             .toList())
                 .containsExactly(
-                    new AutomationWorkflowProjectConfigurationUpdatedEvent(fixture.projectId(), ENVIRONMENT_ID),
                     new AutomationWorkflowProjectConfigurationUpdatedEvent(
-                        fixture.projectId(), ENVIRONMENT_ID, Map.of(fixture.workflowUuid(), Set.of("channel"))));
+                        fixture.projectId(), ENVIRONMENT_ID, fixture.configurationId()),
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(
+                        fixture.projectId(), ENVIRONMENT_ID, fixture.configurationId(),
+                        Map.of(fixture.workflowUuid(), Set.of("channel"))));
     }
 
     @Test
@@ -971,7 +1069,8 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             .toList())
                 .containsExactly(
                     new AutomationWorkflowProjectConfigurationDeletedEvent(
-                        fixture.projectId(), ENVIRONMENT_ID, Map.of(fixture.workflowUuid(), Set.of("channel"))));
+                        fixture.projectId(), ENVIRONMENT_ID, fixture.configurationId(),
+                        Map.of(fixture.workflowUuid(), Set.of("channel"))));
     }
 
     @Test
@@ -1136,7 +1235,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         givenSlots();
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         return new InputOptionsFixture(configurationId, workflowUuid);
     }
@@ -1152,7 +1251,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             .thenReturn(List.of(new ComponentConnection("slack", 1, "postMessage1", "slack", true)));
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, ENVIRONMENT_ID, 1, true, true);
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
         return new ProvidedValuesFixture(projectId, configurationId, workflowUuid);
     }
@@ -1254,7 +1353,15 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         return workflowUuid;
     }
 
-    private void givenReferences(ConnectedUserWorkflowReferenceDTO... references) {
+    private void givenReferences(long configurationId, ConnectedUserWorkflowReferenceDTO... references) {
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.getConfiguration(configurationId);
+
+        for (ConnectedUserWorkflowReferenceDTO reference : references) {
+            connectedUserProjectConfigurationService.assign(
+                reference.connectedUserId(), configuration.getProjectId(), configurationId);
+        }
+
         when(connectedUserWorkflowReferenceAdminFacade.getReferences(anySet()))
             .thenReturn(List.of(references));
     }
@@ -1275,9 +1382,12 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         String automationWorkflowUuid, String environment, boolean enabled, boolean dangling,
         Long projectDeploymentId) {
 
+        long connectedUserId = projectDeploymentId == null
+            ? CONNECTED_USER_ID_SEQUENCE.incrementAndGet() : projectDeploymentId;
+
         return new ConnectedUserWorkflowReferenceDTO(
-            automationWorkflowUuid, "user-" + UUID.randomUUID(), environment, enabled, dangling, null, null,
-            projectDeploymentId);
+            automationWorkflowUuid, connectedUserId, "user-" + UUID.randomUUID(), environment, enabled, dangling, null,
+            null, projectDeploymentId);
     }
 
     private long createPublishedProject(String name, int publishedVersionCount) {

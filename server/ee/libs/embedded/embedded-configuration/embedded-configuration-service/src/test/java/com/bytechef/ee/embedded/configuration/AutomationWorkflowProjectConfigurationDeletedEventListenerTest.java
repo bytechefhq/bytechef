@@ -34,9 +34,9 @@ class AutomationWorkflowProjectConfigurationDeletedEventListenerTest {
 
         listener.onAutomationWorkflowProjectConfigurationDeleted(
             new AutomationWorkflowProjectConfigurationDeletedEvent(
-                4004L, 2L, Map.of("workflow-uuid", Set.of("channel"))));
+                4004L, 2L, 31L, Map.of("workflow-uuid", Set.of("channel"))));
 
         verify(connectedUserReferenceRolloutManager).rollOutAndApply(
-            4004L, 2L, Map.of("workflow-uuid", Set.of("channel")));
+            4004L, 2L, 31L, Map.of("workflow-uuid", Set.of("channel")));
     }
 }

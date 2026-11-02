@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDeleteImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
 import java.util.List;
@@ -22,13 +23,22 @@ import org.jspecify.annotations.Nullable;
 public interface AutomationWorkflowProjectConfigurationAdminFacade {
 
     long createConfiguration(
-        long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible);
+        long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
+        boolean enabled, boolean automationHubVisible);
 
+    /**
+     * Deletes the configuration together with the reference workflows and reference deployments of every connected user
+     * assigned to it, and those users' assignments. Workflow copies are never touched.
+     *
+     * @param id the configuration id
+     */
     void deleteConfiguration(long id);
 
     void enableConfiguration(long id, boolean enable);
 
     void enableConfigurationWorkflow(long id, String workflowUuid, boolean enable);
+
+    AutomationWorkflowProjectConfigurationDTO getConfiguration(long id);
 
     List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId);
 
@@ -59,9 +69,19 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
             long configurationId, String workflowUuid, String inputName, String propertyName, long connectionId,
             Map<String, ?> lookupDependsOnValues, @Nullable String searchText);
 
+    /**
+     * Returns what {@link #deleteConfiguration(long)} would remove.
+     *
+     * @param id the configuration id
+     * @return the number of assigned connected users and of their reference workflows
+     */
+    AutomationWorkflowProjectConfigurationDeleteImpactDTO getDeleteImpact(long id);
+
     AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(long configurationId, int projectVersion);
 
-    void updateConfiguration(long id, int projectVersion, boolean enabled, boolean automationHubVisible);
+    void updateConfiguration(
+        long id, String name, @Nullable String permissionExpression, int projectVersion, boolean enabled,
+        boolean automationHubVisible);
 
     /**
      * Sets the connections and input values the configuration provides to every connected user of the workflow.

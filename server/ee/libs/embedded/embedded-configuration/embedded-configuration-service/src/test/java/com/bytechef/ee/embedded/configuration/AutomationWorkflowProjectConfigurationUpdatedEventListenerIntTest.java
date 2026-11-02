@@ -132,19 +132,19 @@ class AutomationWorkflowProjectConfigurationUpdatedEventListenerIntTest {
 
     @Test
     void testUpdatedEventHandsTheRolloutToTheListenerAfterCommit() {
-        applicationEventPublisher.publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4001L, 2L));
+        applicationEventPublisher.publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4001L, 2L, 31L));
 
-        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4001L, 2L, Map.of());
+        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4001L, 2L, 31L, Map.of());
     }
 
     @Test
     void testUpdatedEventHandsTheRemovedProvidedInputNamesToTheRollout() {
         applicationEventPublisher.publishEvent(
             new AutomationWorkflowProjectConfigurationUpdatedEvent(
-                4003L, 2L, Map.of("workflow-uuid", Set.of("channel"))));
+                4003L, 2L, 33L, Map.of("workflow-uuid", Set.of("channel"))));
 
         verify(connectedUserReferenceRolloutManager, timeout(5000))
-            .rollOutAndApply(4003L, 2L, Map.of("workflow-uuid", Set.of("channel")));
+            .rollOutAndApply(4003L, 2L, 33L, Map.of("workflow-uuid", Set.of("channel")));
     }
 
     @Test
@@ -156,17 +156,18 @@ class AutomationWorkflowProjectConfigurationUpdatedEventListenerIntTest {
 
             return null;
         }).when(connectedUserReferenceRolloutManager)
-            .rollOutAndApply(4002L, 2L, Map.of());
+            .rollOutAndApply(4002L, 2L, 32L, Map.of());
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(status -> {
-            applicationEventPublisher.publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4002L, 2L));
+            applicationEventPublisher
+                .publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4002L, 2L, 32L));
 
-            verify(connectedUserReferenceRolloutManager, after(500).never()).rollOutAndApply(4002L, 2L, Map.of());
+            verify(connectedUserReferenceRolloutManager, after(500).never()).rollOutAndApply(4002L, 2L, 32L, Map.of());
         });
 
-        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4002L, 2L, Map.of());
+        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4002L, 2L, 32L, Map.of());
 
         assertThat(rolloutThread.get()).isNotSameAs(Thread.currentThread());
     }

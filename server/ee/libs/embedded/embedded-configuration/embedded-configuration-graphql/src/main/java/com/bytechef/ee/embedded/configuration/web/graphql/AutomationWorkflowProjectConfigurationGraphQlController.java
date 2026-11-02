@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjec
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -84,9 +85,15 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
         @Argument String projectId, @Argument String environmentId, @Argument int projectVersion,
         @Argument boolean enabled, @Argument boolean automationHubVisible) {
 
+        long parsedEnvironmentId = Long.parseLong(environmentId);
+
+        // The schema carries no name yet, so a configuration is named after its environment.
+        String name = parsedEnvironmentId >= 0 && parsedEnvironmentId < Environment.values().length
+            ? Environment.values()[(int) parsedEnvironmentId].name() : environmentId;
+
         return String.valueOf(
             automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-                Long.parseLong(projectId), Long.parseLong(environmentId), projectVersion, enabled,
+                Long.parseLong(projectId), parsedEnvironmentId, name, null, projectVersion, enabled,
                 automationHubVisible));
     }
 
@@ -119,8 +126,15 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
         @Argument String id, @Argument int projectVersion, @Argument boolean enabled,
         @Argument boolean automationHubVisible) {
 
+        long configurationId = Long.parseLong(id);
+
+        // The schema carries no name or permission expression yet, so an update keeps the stored ones.
+        AutomationWorkflowProjectConfigurationDTO configuration =
+            automationWorkflowProjectConfigurationAdminFacade.getConfiguration(configurationId);
+
         automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
-            Long.parseLong(id), projectVersion, enabled, automationHubVisible);
+            configurationId, configuration.name(), configuration.permissionExpression(), projectVersion, enabled,
+            automationHubVisible);
 
         return true;
     }

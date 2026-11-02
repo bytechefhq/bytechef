@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 @SuppressFBWarnings("EI")
 public record AutomationWorkflowProjectConfigurationDeletedEvent(
-    long projectId, long environmentId, Map<String, Set<String>> removedProvidedInputNames) {
+    long projectId, long environmentId, long configurationId, Map<String, Set<String>> removedProvidedInputNames) {
 
     public AutomationWorkflowProjectConfigurationDeletedEvent {
         removedProvidedInputNames = removedProvidedInputNames.entrySet()
@@ -27,7 +27,8 @@ public record AutomationWorkflowProjectConfigurationDeletedEvent(
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> Set.copyOf(entry.getValue())));
     }
 
-    public AutomationWorkflowProjectConfigurationDeletedEvent(long projectId, long environmentId) {
-        this(projectId, environmentId, Map.of());
+    public AutomationWorkflowProjectConfigurationDeletedEvent(long projectId, long environmentId,
+        long configurationId) {
+        this(projectId, environmentId, configurationId, Map.of());
     }
 }

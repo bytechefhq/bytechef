@@ -147,6 +147,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class AutomationWorkflowProjectAdminFacadeAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";
+    private static final String CONFIGURATION_NAME = "Production";
     private static final String PERMISSION_EXPRESSION = "metadata['tier'] == 'pro'";
 
     @Autowired
@@ -312,7 +313,7 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
         automationWorkflowProjectFacade.publishProject(projectId);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-            projectId, 0L, 1, true, false);
+            projectId, 0L, CONFIGURATION_NAME, null, 1, true, false);
 
         assertThat(
             findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_CREATED)
@@ -321,10 +322,12 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
                     .containsEntry("configurationId", String.valueOf(configurationId))
                     .containsEntry("projectId", String.valueOf(projectId))
                     .containsEntry("environmentId", "0")
+                    .containsEntry("name", CONFIGURATION_NAME)
                     .containsEntry("projectVersion", "1")
                     .containsEntry("automationHubVisible", "false");
 
-        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 1, true, true);
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
+            configurationId, CONFIGURATION_NAME, null, 1, true, true);
 
         assertThat(
             findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_UPDATED)

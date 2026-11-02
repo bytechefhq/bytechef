@@ -20,8 +20,9 @@ import org.jspecify.annotations.Nullable;
  */
 @SuppressFBWarnings("EI")
 public record AutomationWorkflowProjectConfigurationDTO(
-    long id, long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible,
-    List<Workflow> workflows, Instant lastModifiedDate, @Nullable Instant lastExecutionDate) {
+    long id, long projectId, long environmentId, String name, @Nullable String permissionExpression,
+    int projectVersion, boolean enabled, boolean automationHubVisible, int connectedUserCount, List<Workflow> workflows,
+    Instant lastModifiedDate, @Nullable Instant lastExecutionDate) {
 
     /**
      * @version ee
