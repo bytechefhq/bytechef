@@ -193,3 +193,4 @@ components:
             - "JOB_STOPPED"
             - "JOB_APPROVAL_EXPIRING"
             - "JOB_APPROVAL_ESCALATED"
+            - "JOB_PAYMENT_REQUIRED"
