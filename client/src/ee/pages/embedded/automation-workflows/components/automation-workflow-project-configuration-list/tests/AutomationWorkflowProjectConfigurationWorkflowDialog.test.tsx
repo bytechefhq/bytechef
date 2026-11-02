@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
     componentDefinitionData: {current: undefined as unknown},
     inputOptionsData: {current: undefined as unknown},
     inputOptionsQuery: vi.fn(),
+    inputOptionsState: {current: {isError: false, isLoading: false}},
     invalidateQueries: vi.fn(),
     providableValuesData: {current: undefined as unknown},
     providableValuesQuery: vi.fn(),
@@ -22,7 +23,10 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ) => {
         mocks.inputOptionsQuery(variables, options);
 
-        return {data: options.enabled ? mocks.inputOptionsData.current : undefined, isError: false, isLoading: false};
+        return {
+            data: options.enabled ? mocks.inputOptionsData.current : undefined,
+            ...mocks.inputOptionsState.current,
+        };
     },
     useAutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery: (variables: unknown) => {
         mocks.providableValuesQuery(variables);
@@ -116,6 +120,32 @@ const slackComponentDefinition = (property: Record<string, unknown>) => ({
     inputs: [{label: 'Channel', name: 'channel', properties: [{label: 'Channel', name: 'channel', ...property}]}],
 });
 
+const slackMessageReferenceInput = {
+    ...slackChannelReferenceInput,
+    groupName: 'message',
+    label: 'Slack Message',
+    name: 'message',
+};
+
+const slackMessageComponentDefinition = {
+    inputs: [
+        {
+            label: 'Message',
+            name: 'message',
+            properties: [
+                {label: 'Text', name: 'text', type: 'STRING'},
+                {label: 'Urgent', name: 'urgent', type: 'BOOLEAN'},
+                {
+                    label: 'Thread Channel',
+                    name: 'threadChannel',
+                    optionsDataSource: {optionsLookupDependsOn: ['message.text']},
+                    type: 'STRING',
+                },
+            ],
+        },
+    ],
+};
+
 const openInputsTab = async (user: ReturnType<typeof userEvent.setup>) => {
     await user.click(screen.getByRole('tab', {name: /Inputs/}));
 };
@@ -149,6 +179,7 @@ describe('AutomationWorkflowProjectConfigurationWorkflowDialog', () => {
 
         mocks.componentDefinitionData.current = undefined;
         mocks.inputOptionsData.current = undefined;
+        mocks.inputOptionsState.current = {isError: false, isLoading: false};
     });
 
     it('fetches the providable values of the workflow when it opens', () => {
@@ -415,5 +446,166 @@ describe('AutomationWorkflowProjectConfigurationWorkflowDialog', () => {
         await openInputsTab(user);
 
         expect(screen.getByRole('combobox', {name: 'Slack Channel'})).toHaveTextContent('C404');
+    });
+
+    it('edits every member of a multi-member component input group and saves them as one map', async () => {
+        const user = userEvent.setup();
+
+        mocks.componentDefinitionData.current = slackMessageComponentDefinition;
+        mocks.inputOptionsData.current = {
+            automationWorkflowProjectConfigurationWorkflowInputOptions: [
+                {description: null, label: 'ops thread', value: 'T1'},
+            ],
+        };
+
+        renderDialog({
+            provided: {
+                connectionSlots: [],
+                inputs: [slackMessageReferenceInput],
+                providedInputs: {message: {text: 'Hi'}},
+            },
+        });
+
+        await openInputsTab(user);
+
+        expect(screen.getByRole('group', {name: 'Slack Message'})).toBeInTheDocument();
+        expect(screen.getByRole('textbox', {name: 'Text'})).toHaveValue('Hi');
+        expect(mocks.inputOptionsQuery).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+                inputName: 'message',
+                lookupDependsOnValues: {text: 'Hi'},
+                propertyName: 'threadChannel',
+            }),
+            {enabled: true}
+        );
+
+        await user.click(screen.getByRole('combobox', {name: 'Urgent'}));
+        await user.click(await screen.findByRole('option', {name: 'True'}));
+
+        await user.click(screen.getByRole('combobox', {name: 'Thread Channel'}));
+        await user.click(await screen.findByRole('option', {name: 'ops thread'}));
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(mocks.updateMutate).toHaveBeenCalledTimes(1));
+
+        expect(mocks.updateMutate.mock.calls[0][0].providedInputs).toEqual({
+            message: {text: 'Hi', threadChannel: 'T1', urgent: 'true'},
+        });
+    });
+
+    it('leaves out a multi-member component input group whose members are all empty', async () => {
+        const user = userEvent.setup();
+
+        mocks.componentDefinitionData.current = slackMessageComponentDefinition;
+
+        renderDialog({
+            provided: {
+                connectionSlots: [],
+                inputs: [slackMessageReferenceInput],
+                providedInputs: {message: {text: 'Hi'}},
+            },
+        });
+
+        await openInputsTab(user);
+
+        await user.clear(screen.getByRole('textbox', {name: 'Text'}));
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(mocks.updateMutate).toHaveBeenCalledTimes(1));
+
+        expect(mocks.updateMutate.mock.calls[0][0].providedInputs).toEqual({});
+    });
+
+    it('falls back to a text box when the component definition has no matching input group', async () => {
+        const user = userEvent.setup();
+
+        mocks.componentDefinitionData.current = {inputs: []};
+
+        renderDialog({provided: {connectionSlots: [], inputs: [slackChannelReferenceInput]}});
+
+        await openInputsTab(user);
+
+        expect(screen.getByRole('textbox', {name: 'Slack Channel'})).toHaveValue('');
+    });
+
+    it('explains why dynamic options are not shown', async () => {
+        const user = userEvent.setup();
+
+        mocks.componentDefinitionData.current = slackComponentDefinition({optionsDataSource: {}, type: 'STRING'});
+
+        const {unmount} = renderDialog({
+            provided: {connectionSlots: [], inputs: [{...slackChannelReferenceInput, optionConnections: []}]},
+        });
+
+        await openInputsTab(user);
+
+        expect(screen.getByRole('combobox', {name: 'Slack Channel'})).toHaveTextContent(
+            'Let each user fill it (no connection to load options)'
+        );
+        expect(screen.queryByRole('combobox', {name: 'Load Slack Channel options with'})).not.toBeInTheDocument();
+
+        unmount();
+
+        mocks.inputOptionsState.current = {isError: false, isLoading: true};
+
+        const {unmount: unmountLoading} = renderDialog({
+            provided: {connectionSlots: [], inputs: [slackChannelReferenceInput]},
+        });
+
+        await openInputsTab(user);
+
+        expect(screen.getByRole('combobox', {name: 'Slack Channel'})).toHaveTextContent('Loading options...');
+
+        unmountLoading();
+
+        mocks.inputOptionsState.current = {isError: true, isLoading: false};
+
+        renderDialog({provided: {connectionSlots: [], inputs: [slackChannelReferenceInput]}});
+
+        await openInputsTab(user);
+
+        expect(screen.getByRole('combobox', {name: 'Slack Channel'})).toHaveTextContent(
+            'Let each user fill it (options could not be loaded)'
+        );
+    });
+
+    it('says when the workflow has no connections or no inputs to provide', async () => {
+        const user = userEvent.setup();
+
+        renderDialog({provided: {connectionSlots: [], inputs: []}});
+
+        expect(screen.getByText('This workflow has no connections to provide.')).toBeInTheDocument();
+
+        await openInputsTab(user);
+
+        expect(screen.getByText('This workflow has no inputs to provide.')).toBeInTheDocument();
+    });
+
+    it('closes without saving when cancelled', async () => {
+        const user = userEvent.setup();
+
+        const onClose = vi.fn();
+
+        renderDialog({onClose});
+
+        await user.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(mocks.updateMutate).not.toHaveBeenCalled();
+    });
+
+    it('shows a loading state until the providable values arrive', () => {
+        mocks.providableValuesData.current = undefined;
+
+        render(
+            <AutomationWorkflowProjectConfigurationWorkflowDialog
+                configuration={configuration}
+                onClose={vi.fn()}
+                workflow={workflow}
+            />
+        );
+
+        expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
 });
