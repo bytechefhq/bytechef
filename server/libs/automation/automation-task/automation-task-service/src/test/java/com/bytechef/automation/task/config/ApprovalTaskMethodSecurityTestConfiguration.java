@@ -18,11 +18,13 @@ package com.bytechef.automation.task.config;
 
 import static org.mockito.Mockito.mock;
 
+import java.io.Serializable;
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -37,31 +39,52 @@ import org.springframework.security.core.Authentication;
 public class ApprovalTaskMethodSecurityTestConfiguration {
 
     @Bean
-    static TenantAdminCheck tenantAdminCheck() {
-        return mock(TenantAdminCheck.class);
+    static AuthorizationCheck authorizationCheck() {
+        return mock(AuthorizationCheck.class);
     }
 
     @Bean
-    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(TenantAdminCheck tenantAdminCheck) {
+    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(AuthorizationCheck authorizationCheck) {
 
-        TenantAdminMethodSecurityExpressionHandler tenantAdminMethodSecurityExpressionHandler =
-            new TenantAdminMethodSecurityExpressionHandler(tenantAdminCheck);
+        ApprovalTaskMethodSecurityExpressionHandler approvalTaskMethodSecurityExpressionHandler =
+            new ApprovalTaskMethodSecurityExpressionHandler(authorizationCheck);
 
-        return tenantAdminMethodSecurityExpressionHandler;
+        approvalTaskMethodSecurityExpressionHandler.setPermissionEvaluator(new PermissionEvaluator() {
+
+            @Override
+            public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+                return false;
+            }
+
+            @Override
+            public boolean hasPermission(
+                Authentication authentication, Serializable targetId, String targetType, Object permission) {
+
+                return authorizationCheck.hasPermission(targetId, targetType, permission);
+            }
+        });
+
+        return approvalTaskMethodSecurityExpressionHandler;
     }
 
-    public interface TenantAdminCheck {
+    public interface AuthorizationCheck {
+
+        boolean hasPermission(Serializable targetId, String targetType, Object permission);
+
+        boolean isCurrentUser(Long userId);
+
+        boolean isResourceOwner(Serializable resourceId, String resourceType);
 
         boolean isTenantAdmin();
     }
 
-    private static final class TenantAdminMethodSecurityExpressionHandler
+    private static final class ApprovalTaskMethodSecurityExpressionHandler
         extends DefaultMethodSecurityExpressionHandler {
 
-        private final TenantAdminCheck tenantAdminCheck;
+        private final AuthorizationCheck authorizationCheck;
 
-        private TenantAdminMethodSecurityExpressionHandler(TenantAdminCheck tenantAdminCheck) {
-            this.tenantAdminCheck = tenantAdminCheck;
+        private ApprovalTaskMethodSecurityExpressionHandler(AuthorizationCheck authorizationCheck) {
+            this.authorizationCheck = authorizationCheck;
         }
 
         @Override
@@ -71,40 +94,48 @@ public class ApprovalTaskMethodSecurityTestConfiguration {
             StandardEvaluationContext standardEvaluationContext =
                 (StandardEvaluationContext) super.createEvaluationContext(authentication, methodInvocation);
 
-            TenantAdminMethodSecurityExpressionRoot tenantAdminMethodSecurityExpressionRoot =
-                new TenantAdminMethodSecurityExpressionRoot(authentication, methodInvocation, tenantAdminCheck);
+            ApprovalTaskMethodSecurityExpressionRoot approvalTaskMethodSecurityExpressionRoot =
+                new ApprovalTaskMethodSecurityExpressionRoot(authentication, methodInvocation, authorizationCheck);
 
-            tenantAdminMethodSecurityExpressionRoot.setAuthorizationManagerFactory(getAuthorizationManagerFactory());
-            tenantAdminMethodSecurityExpressionRoot.setPermissionEvaluator(getPermissionEvaluator());
-            tenantAdminMethodSecurityExpressionRoot.setDefaultRolePrefix(getDefaultRolePrefix());
+            approvalTaskMethodSecurityExpressionRoot.setAuthorizationManagerFactory(getAuthorizationManagerFactory());
+            approvalTaskMethodSecurityExpressionRoot.setPermissionEvaluator(getPermissionEvaluator());
+            approvalTaskMethodSecurityExpressionRoot.setDefaultRolePrefix(getDefaultRolePrefix());
 
-            standardEvaluationContext.setRootObject(tenantAdminMethodSecurityExpressionRoot);
+            standardEvaluationContext.setRootObject(approvalTaskMethodSecurityExpressionRoot);
 
             return standardEvaluationContext;
         }
     }
 
-    public static final class TenantAdminMethodSecurityExpressionRoot
+    public static final class ApprovalTaskMethodSecurityExpressionRoot
         extends SecurityExpressionRoot<MethodInvocation> implements MethodSecurityExpressionOperations {
 
         private final Object target;
-        private final TenantAdminCheck tenantAdminCheck;
+        private final AuthorizationCheck authorizationCheck;
 
         private Object filterObject;
         private Object returnObject;
 
-        private TenantAdminMethodSecurityExpressionRoot(
+        private ApprovalTaskMethodSecurityExpressionRoot(
             Supplier<? extends Authentication> authentication, MethodInvocation methodInvocation,
-            TenantAdminCheck tenantAdminCheck) {
+            AuthorizationCheck authorizationCheck) {
 
             super(authentication, methodInvocation);
 
             this.target = methodInvocation.getThis();
-            this.tenantAdminCheck = tenantAdminCheck;
+            this.authorizationCheck = authorizationCheck;
+        }
+
+        public boolean isCurrentUser(Long userId) {
+            return authorizationCheck.isCurrentUser(userId);
+        }
+
+        public boolean isResourceOwner(Serializable resourceId, String resourceType) {
+            return authorizationCheck.isResourceOwner(resourceId, resourceType);
         }
 
         public boolean isTenantAdmin() {
-            return tenantAdminCheck.isTenantAdmin();
+            return authorizationCheck.isTenantAdmin();
         }
 
         @Override
