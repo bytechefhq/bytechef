@@ -24,6 +24,7 @@ import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWork
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.exception.ProvidedValueLockedException;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -57,6 +58,7 @@ class ConnectedUserReferenceDeploymentManager {
 
     private final AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private final ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
     private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserService connectedUserService;
     private final ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver;
@@ -71,6 +73,7 @@ class ConnectedUserReferenceDeploymentManager {
     public ConnectedUserReferenceDeploymentManager(
         AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
+        ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService,
         ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
         ConnectedUserService connectedUserService,
         ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver,
@@ -81,6 +84,7 @@ class ConnectedUserReferenceDeploymentManager {
 
         this.automationWorkflowProjectConfigurationResolver = automationWorkflowProjectConfigurationResolver;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
+        this.connectedUserProjectConfigurationService = connectedUserProjectConfigurationService;
         this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.connectedUserService = connectedUserService;
         this.connectedUserWorkflowConnectionResolver = connectedUserWorkflowConnectionResolver;
@@ -138,11 +142,11 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     /**
-     * Returns the project version of the configuration the connected user runs the project under, or empty when that
-     * configuration is missing or disabled.
+     * Returns the project version of the configuration the connected user is assigned to, or empty when the user has no
+     * assignment or the configuration is disabled.
      */
     public Optional<Integer> fetchReleasedVersion(long connectedUserId, long automationWorkflowProjectId) {
-        return resolveConfiguration(connectedUserId, automationWorkflowProjectId)
+        return fetchAssignedConfiguration(connectedUserId, automationWorkflowProjectId)
             .filter(AutomationWorkflowProjectConfiguration::isEnabled)
             .map(AutomationWorkflowProjectConfiguration::getProjectVersion);
     }
@@ -166,7 +170,7 @@ class ConnectedUserReferenceDeploymentManager {
     public boolean isAdministrativelyEnabled(
         long connectedUserId, long automationWorkflowProjectId, String automationWorkflowUuid) {
 
-        Optional<AutomationWorkflowProjectConfiguration> configurationOptional = resolveConfiguration(
+        Optional<AutomationWorkflowProjectConfiguration> configurationOptional = fetchAssignedConfiguration(
             connectedUserId, automationWorkflowProjectId);
 
         if (configurationOptional.isEmpty()) {
@@ -482,7 +486,7 @@ class ConnectedUserReferenceDeploymentManager {
     private ProvidedValues getProvidedValues(
         long connectedUserId, long automationWorkflowProjectId, String automationWorkflowUuid) {
 
-        return resolveConfiguration(connectedUserId, automationWorkflowProjectId)
+        return fetchAssignedConfiguration(connectedUserId, automationWorkflowProjectId)
             .map(configuration -> getProvidedValues(configuration, automationWorkflowUuid))
             .orElse(ProvidedValues.NONE);
     }
@@ -494,12 +498,17 @@ class ConnectedUserReferenceDeploymentManager {
             ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED);
     }
 
-    private Optional<AutomationWorkflowProjectConfiguration> resolveConfiguration(
+    /**
+     * Reads the configuration the connected user is assigned to. Every caller starts from an existing reference
+     * deployment, so a missing assignment means the project is not released to the user; it never falls back to the
+     * self-serve pick, which would move the user implicitly.
+     */
+    private Optional<AutomationWorkflowProjectConfiguration> fetchAssignedConfiguration(
         long connectedUserId, long automationWorkflowProjectId) {
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
-
-        return automationWorkflowProjectConfigurationResolver.resolve(connectedUser, automationWorkflowProjectId);
+        return connectedUserProjectConfigurationService.fetchAssignment(connectedUserId, automationWorkflowProjectId)
+            .map(assignment -> automationWorkflowProjectConfigurationService.getConfiguration(
+                assignment.getConfigurationId()));
     }
 
     private static ProvidedValues getProvidedValues(

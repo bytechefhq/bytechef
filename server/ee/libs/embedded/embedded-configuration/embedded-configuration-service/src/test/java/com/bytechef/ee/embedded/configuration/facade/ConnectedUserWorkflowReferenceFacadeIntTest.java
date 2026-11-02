@@ -412,10 +412,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         assertThat(result.getProjectDeploymentId()).isEqualTo(existingReference.getProjectDeploymentId());
         assertThat(getReference(existingReference.getId()).getVersion()).isEqualTo(existingReference.getVersion());
 
-        verifyNoInteractions(automationWorkflowProjectFacade);
-
-        verify(connectedUserService).getConnectedUser(connectedUser.getId());
-        verifyNoMoreInteractions(connectedUserService);
+        verifyNoInteractions(automationWorkflowProjectFacade, connectedUserService);
 
         verify(connectedUserReferenceDeploymentManager).getDeployment(existingReference.getProjectDeploymentId());
         verify(connectedUserReferenceDeploymentManager).fetchConnectedUserId(

@@ -66,6 +66,7 @@ import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProject
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -235,6 +236,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @Autowired
+    private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
+
+    @Autowired
     private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
 
     @Autowired
@@ -353,6 +357,40 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .getProjectVersion()).isEqualTo(2);
         assertThat(projectDeploymentService.getProjectDeployment(secondReference.getProjectDeploymentId())
             .getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testUnassignedDeploymentIsNotRolledOntoSelfServeConfiguration() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Unassigned Deployment");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration assignedConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Assigned", null, 1, true, true);
+
+        String externalUserId = createConnectedUser();
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+
+        connectedUserProjectConfigurationService.deleteByConfigurationId(assignedConfiguration.getId());
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Newer", null, 2, true, true);
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
     }
 
     @Test
@@ -1725,7 +1763,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         connectedUserReferenceRolloutManager.applyConfigurationState(
             automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
-        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
     }
 
     @Test
