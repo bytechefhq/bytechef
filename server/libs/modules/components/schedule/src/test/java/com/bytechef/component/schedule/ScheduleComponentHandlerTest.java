@@ -18,9 +18,17 @@
 
 package com.bytechef.component.schedule;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
+
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * @author Arik Cohen
@@ -28,10 +36,22 @@ import org.junit.jupiter.api.Test;
  */
 class ScheduleComponentHandlerTest {
 
+    private static final List<Option<String>> TIME_ZONE_OPTIONS = List.of(
+        option("America/New_York (GMT-05:00)", "America/New_York"),
+        option("Europe/Zagreb (GMT+01:00)", "Europe/Zagreb"),
+        option("UTC (GMT+00:00)", "UTC"));
+
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/schedule_v1.json",
-            new ScheduleComponentHandler(null).getDefinition());
+        try (MockedStatic<ScheduleUtils> scheduleUtilsMockedStatic = mockStatic(
+            ScheduleUtils.class, CALLS_REAL_METHODS)) {
+
+            scheduleUtilsMockedStatic.when(ScheduleUtils::getTimeZoneOptions)
+                .thenReturn(TIME_ZONE_OPTIONS);
+
+            JsonFileAssert.assertEquals(
+                "definition/schedule_v1.json", new ScheduleComponentHandler(null).getDefinition());
+        }
     }
 
     @Test
