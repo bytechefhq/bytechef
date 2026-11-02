@@ -19,6 +19,7 @@ package com.bytechef.server.audit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.audit.McpServerAuditMapper;
@@ -42,6 +43,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.AnnotationMetadata;
@@ -61,6 +63,7 @@ import org.springframework.expression.spel.ast.VariableReference;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
@@ -71,6 +74,7 @@ class AuditDataContractTest {
     private static final Path AUDIT_EVENTS_DOCUMENT = Path.of(
         "docs", "content", "docs", "platform", "settings", "audit-events.mdx");
     private static final String CLASS_PATTERN = "classpath*:com/bytechef/**/*.class";
+    private static final int EVENT_TYPE_COLUMN_MAX_LENGTH = 256;
     private static final String COMPONENT_PACKAGE_PATH = "/com/bytechef/component/";
     private static final String RESULT_VARIABLE = "result";
     private static final List<String> READ_METHOD_PREFIXES = List.of(
@@ -343,6 +347,96 @@ class AuditDataContractTest {
                 violations.add(
                     method.getDeclaringClass()
                         .getName() + "#" + method.getName() + " declares " + platforms.length + " platforms");
+            }
+        }
+
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    void testNoAuditedMethodIsDeclaredOnAnInterface() {
+        List<String> violations = new ArrayList<>();
+
+        for (Method method : auditedMethods) {
+            Class<?> declaringClass = method.getDeclaringClass();
+
+            if (declaringClass.isInterface()) {
+                violations.add(declaringClass.getName() + "#" + method.getName());
+            }
+        }
+
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    void testEveryAuditedMethodCanBeAdvised() {
+        List<String> violations = new ArrayList<>();
+
+        for (Method method : auditedMethods) {
+            Class<?> declaringClass = method.getDeclaringClass();
+
+            String methodName = declaringClass.getName() + "#" + method.getName();
+
+            int modifiers = method.getModifiers();
+
+            if (Modifier.isPrivate(modifiers)) {
+                violations.add(methodName + " is private");
+            }
+
+            if (Modifier.isFinal(modifiers)) {
+                violations.add(methodName + " is final");
+            }
+
+            if (Modifier.isStatic(modifiers)) {
+                violations.add(methodName + " is static");
+            }
+
+            if (Modifier.isFinal(declaringClass.getModifiers())) {
+                violations.add(methodName + " is declared in a final class");
+            }
+        }
+
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    void testEveryAuditedEventFitsTheEventTypeColumn() {
+        List<String> violations = new ArrayList<>();
+
+        for (Method method : auditedMethods) {
+            Audited audited = method.getAnnotation(Audited.class);
+
+            String event = audited.event();
+
+            if (event.isBlank() || event.length() > EVENT_TYPE_COLUMN_MAX_LENGTH) {
+                violations.add(
+                    method.getDeclaringClass()
+                        .getName() + "#" + method.getName() + " declares event '" + event + "'");
+            }
+        }
+
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    void testEveryAuditedMapperIsAConcreteComponent() {
+        List<String> violations = new ArrayList<>();
+
+        for (Method method : auditedMethods) {
+            Audited audited = method.getAnnotation(Audited.class);
+
+            Class<? extends AuditMapper> mapperClass = audited.mapper();
+
+            if (mapperClass == AuditMapper.None.class) {
+                continue;
+            }
+
+            if (mapperClass.isInterface() || Modifier.isAbstract(mapperClass.getModifiers()) ||
+                !AnnotatedElementUtils.hasAnnotation(mapperClass, Component.class)) {
+
+                violations.add(
+                    method.getDeclaringClass()
+                        .getName() + "#" + method.getName() + " names mapper " + mapperClass.getName());
             }
         }
 
