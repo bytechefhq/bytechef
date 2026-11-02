@@ -6,12 +6,15 @@ import NotificationDialog from '@/pages/settings/platform/notifications/componen
 import NotificationsTable from '@/pages/settings/platform/notifications/components/NotificationsTable';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {Link2Icon, PlusIcon} from 'lucide-react';
 import {UseFormReturn} from 'react-hook-form';
 
 import useNotifications, {NotificationFormValuesType} from './hooks/useNotifications';
 
 const Notifications = () => {
+    const isEnterpriseEdition = useApplicationInfoStore((state) => state.application?.edition === EditionType.EE);
+
     const {
         closeDeleteDialog,
         closeEditDialog,
@@ -33,7 +36,11 @@ const Notifications = () => {
             header={
                 <Header
                     centerTitle
-                    description="Send an email, Slack message, or webhook when a workflow run reaches a given status."
+                    description={
+                        isEnterpriseEdition
+                            ? 'Send an email, Slack message, or webhook when a workflow run reaches a given status.'
+                            : 'Send an email or Slack message when a workflow run reaches a given status.'
+                    }
                     position="main"
                     right={<Button icon={<PlusIcon />} label="New Notification" onClick={() => openEditDialog()} />}
                     title="Notifications"

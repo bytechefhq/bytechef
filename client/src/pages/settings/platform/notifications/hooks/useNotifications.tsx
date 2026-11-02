@@ -6,7 +6,6 @@ import {
 } from '@/shared/mutations/platform/notifications.mutations';
 import {useGetNotificationEventsQuery} from '@/shared/queries/platform/notificationEvents.queries';
 import {NotificationKeys, useGetNotificationsQuery} from '@/shared/queries/platform/notifications.queries';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {coreTableFeatures} from '@/shared/util/table-features';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
@@ -80,7 +79,6 @@ export default function useNotifications() {
     const {data: allNotificationEvents, isLoading: isNotificationEventsLoading} = useGetNotificationEventsQuery();
 
     const queryClient = useQueryClient();
-    const ff_1132 = useFeatureFlagsStore()('ff-1132');
 
     const deleteNotificationMutation = useDeleteNotificationMutation({
         onSuccess: () => {
@@ -227,7 +225,6 @@ export default function useNotifications() {
         closeEditDialog,
         columns,
         deleteNotificationMutation,
-        ff_1132,
         form,
         handleDeleteNotification,
         isDeleteDialogOpen,
