@@ -126,6 +126,9 @@ class RemoteChildJobPrincipalFactoryClientIntTest {
         Workflow parentWorkflow = automationConfigurationIntTestData.createWorkflow("Parent");
         Workflow childWorkflow = automationConfigurationIntTestData.createWorkflow("Child");
 
+        automationConfigurationIntTestData.createProjectDeploymentWorkflow(
+            projectDeployment.getId(), childWorkflow.getId(), true, Map.of(), List.of());
+
         long parentJobId = principalJobFacade.createJob(
             new JobParametersDTO(parentWorkflow.getId()), projectDeployment.getId(), PlatformType.AUTOMATION);
 
