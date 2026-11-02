@@ -467,6 +467,9 @@ Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-appro
 - **When an index is present it is authoritative**: a ServiceLoader component missing from the index is invisible (both in the list and per-name resolution). Apps that assemble their classpath differently (EE apps) must either run the generator or ship without an index — absent/corrupt index falls back transparently to full loading on first registry access
 - With an index, a by-name read loads only that component, while the no-arg `getComponentDefinitions()` and the first task/trigger handler resolution each trigger their own one-time full load (the registry loads from the index's providers; the task and trigger handler providers share a separate `ServiceLoader` sweep); stubs never reach detail/execution paths
 
+### OpenAPI Development Workflow
+- Whenever you touch an `openapi.yaml` (by any means, including scripts or `sed`), immediately run `./gradlew -p <module dir containing openapi.yaml> generateOpenAPI` — full rules in `.claude/rules/openapi.md`
+
 ### GraphQL Development Workflow
 - Add schema path to `client/codegen.ts` `schema` array
 - Create operation `.graphql` files in `client/src/graphql/<domain>/`
