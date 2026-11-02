@@ -51,9 +51,8 @@ public class MicrosoftSharePointCreateListItemAction {
                 .optionsLookupDependsOn(SITE_ID)
                 .options((OptionsFunction<String>) MicrosoftSharePointUtils::getListIdOptions)
                 .required(true),
-            dynamicProperties(COLUMNS)
-                .propertiesLookupDependsOn(SITE_ID, LIST_ID)
-                .properties(MicrosoftSharePointUtils::createPropertiesForListItem))
+            dynamicProperties(COLUMNS, MicrosoftSharePointUtils::createPropertiesForListItem)
+                .propertiesLookupDependsOn(SITE_ID, LIST_ID))
         .output()
         .perform(MicrosoftSharePointCreateListItemAction::perform)
         .help(

@@ -69,8 +69,7 @@ public class RetableInsertRowAction {
                 .optionsLookupDependsOn(PROJECT_ID)
                 .options((OptionsFunction<String>) RetableUtils::getRetableIdOptions)
                 .required(true),
-            dynamicProperties(ROWS_IDS)
-                .properties(RetablePropertiesUtils::createPropertiesForRowValues)
+            dynamicProperties(ROWS_IDS, RetablePropertiesUtils::createPropertiesForRowValues)
                 .propertiesLookupDependsOn(RETABLE_ID)
                 .required(false))
         .output(

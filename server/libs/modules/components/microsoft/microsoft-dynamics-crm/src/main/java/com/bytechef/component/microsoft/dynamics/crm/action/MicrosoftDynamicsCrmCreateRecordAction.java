@@ -45,8 +45,7 @@ public class MicrosoftDynamicsCrmCreateRecordAction {
                 .description("Select or map the entity for which you want to create the record.")
                 .options((OptionsFunction<String>) MicrosoftDynamicsCrmUtils::getEntityTypeOptions)
                 .required(true),
-            dynamicProperties(FIELDS)
-                .properties(MicrosoftDynamicsCrmUtils.getEntityFieldsProperties(true))
+            dynamicProperties(FIELDS, MicrosoftDynamicsCrmUtils.getEntityFieldsProperties(true))
                 .propertiesLookupDependsOn(ENTITY_TYPE)
                 .required(true))
         .output()

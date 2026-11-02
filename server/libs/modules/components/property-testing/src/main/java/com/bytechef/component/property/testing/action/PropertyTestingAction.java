@@ -118,9 +118,8 @@ public class PropertyTestingAction {
             string(DYNAMIC_PROPERTIES_LOOKUP)
                 .label("Dynamic Properties Lookup")
                 .description("Dynamic property will be shown when this value is set."),
-            dynamicProperties(DYNAMIC_PROPERTY)
-                .propertiesLookupDependsOn(DYNAMIC_PROPERTIES_LOOKUP)
-                .properties((PropertiesFunction) PropertyTestingAction::createDynamicParameters),
+            dynamicProperties(DYNAMIC_PROPERTY, (PropertiesFunction) PropertyTestingAction::createDynamicParameters)
+                .propertiesLookupDependsOn(DYNAMIC_PROPERTIES_LOOKUP),
             fileEntry(FILE_ENTRY)
                 .label("FileEntry Property"),
             integer(INTEGER_MAX_VALUE)

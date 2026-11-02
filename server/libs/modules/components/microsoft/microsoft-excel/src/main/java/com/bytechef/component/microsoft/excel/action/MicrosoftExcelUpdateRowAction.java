@@ -60,9 +60,8 @@ public class MicrosoftExcelUpdateRowAction {
                 .description("Whether to update the whole row or just specific columns.")
                 .defaultValue(true)
                 .required(true),
-            dynamicProperties(ROW)
+            dynamicProperties(ROW, MicrosoftExcelUtils::createPropertiesToUpdateRow)
                 .propertiesLookupDependsOn(WORKBOOK_ID, WORKSHEET_NAME, IS_THE_FIRST_ROW_HEADER, UPDATE_WHOLE_ROW)
-                .properties(MicrosoftExcelUtils::createPropertiesToUpdateRow)
                 .required(true))
         .output()
         .perform(MicrosoftExcelUpdateRowAction::perform)

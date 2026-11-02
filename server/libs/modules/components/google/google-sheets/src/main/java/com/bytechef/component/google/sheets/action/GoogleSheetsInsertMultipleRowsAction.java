@@ -58,9 +58,8 @@ public class GoogleSheetsInsertMultipleRowsAction {
             SHEET_NAME_PROPERTY,
             VALUE_INPUT_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
-            dynamicProperties(ROWS)
+            dynamicProperties(ROWS, GoogleSheetsUtils.createPropertiesForNewRows(false))
                 .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER)
-                .properties(GoogleSheetsUtils.createPropertiesForNewRows(false))
                 .required(true))
         .output()
         .perform(GoogleSheetsInsertMultipleRowsAction::perform)

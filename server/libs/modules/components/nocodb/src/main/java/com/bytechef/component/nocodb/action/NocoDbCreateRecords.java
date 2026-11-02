@@ -50,9 +50,8 @@ public class NocoDbCreateRecords {
             WORKSPACE_ID_PROPERTY,
             BASE_ID_PROPERTY,
             TABLE_ID_PROPERTY,
-            dynamicProperties(TABLE_COLUMNS)
-                .propertiesLookupDependsOn(TABLE_ID)
-                .properties(NocoDbUtils.createPropertiesForRecord(true)))
+            dynamicProperties(TABLE_COLUMNS, NocoDbUtils.createPropertiesForRecord(true))
+                .propertiesLookupDependsOn(TABLE_ID))
         .output(
             outputSchema(
                 array()

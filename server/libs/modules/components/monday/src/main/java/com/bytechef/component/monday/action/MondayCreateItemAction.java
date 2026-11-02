@@ -70,8 +70,7 @@ public class MondayCreateItemAction {
                 .label("Item Name")
                 .description("The item's name.")
                 .required(true),
-            dynamicProperties("columnValues")
-                .properties(MondayPropertiesUtils::createPropertiesForItem)
+            dynamicProperties("columnValues", MondayPropertiesUtils::createPropertiesForItem)
                 .propertiesLookupDependsOn(BOARD_ID)
                 .required(false))
         .output(

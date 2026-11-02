@@ -79,10 +79,9 @@ public class WorkflowCallWorkflowTool {
                     .description("The workflow to call when this tool is invoked.")
                     .options(getWorkflowOptionsFunction(subflowDataSource))
                     .required(true),
-                dynamicProperties(INPUTS)
+                dynamicProperties(INPUTS, getPropertiesFunction(subflowDataSource))
                     .description("The input parameters for the sub-workflow.")
-                    .propertiesLookupDependsOn(WORKFLOW_UUID)
-                    .properties(getPropertiesFunction(subflowDataSource)))
+                    .propertiesLookupDependsOn(WORKFLOW_UUID))
             .object(() -> getToolFunction(subflowResolver, subflowSyncExecutor))
             .output(getOutputFunction(subflowDataSource));
     }

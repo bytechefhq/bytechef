@@ -46,9 +46,9 @@ public class LiferayConstants {
     public static final String SERVICES = "services";
     public static final String TYPE = "type";
 
-    public static final ModifiableDynamicPropertiesProperty PARAMETERS_DYNAMIC_PROPERTY = dynamicProperties(PARAMETERS)
-        .propertiesLookupDependsOn(SERVICE)
-        .properties((PropertiesFunction) LiferayUtils::createParameters)
-        .required(true);
+    public static final ModifiableDynamicPropertiesProperty PARAMETERS_DYNAMIC_PROPERTY =
+        dynamicProperties(PARAMETERS, (PropertiesFunction) LiferayUtils::createParameters)
+            .propertiesLookupDependsOn(SERVICE)
+            .required(true);
 
 }

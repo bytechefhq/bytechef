@@ -55,9 +55,8 @@ public class GoogleSheetsInsertRowAction {
             SHEET_NAME_PROPERTY,
             VALUE_INPUT_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
-            dynamicProperties(ROW)
+            dynamicProperties(ROW, GoogleSheetsUtils.createPropertiesForNewRows(true))
                 .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER)
-                .properties(GoogleSheetsUtils.createPropertiesForNewRows(true))
                 .required(true))
         .output()
         .perform(GoogleSheetsInsertRowAction::perform)

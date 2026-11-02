@@ -74,8 +74,7 @@ public class GoogleSlidesCreatePresentationFromTemplateAction {
                         "presentation will be saved in the same folder as the template presentation.")
                 .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
                 .required(false),
-            dynamicProperties(VALUES)
-                .properties((PropertiesFunction) GoogleSlidesUtils::createPropertiesForPlaceholderVariables)
+            dynamicProperties(VALUES, (PropertiesFunction) GoogleSlidesUtils::createPropertiesForPlaceholderVariables)
                 .propertiesLookupDependsOn(FILE_ID, PLACEHOLDER_FORMAT))
         .output()
         .perform(GoogleSlidesCreatePresentationFromTemplateAction::perform)

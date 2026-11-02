@@ -48,8 +48,7 @@ public class MicrosoftDynamicsCrmUpdateRecordAction {
                 .options((OptionsFunction<String>) MicrosoftDynamicsCrmUtils::getEntityTypeOptions)
                 .required(true),
             RECORD_ID_PROPERTY,
-            dynamicProperties(FIELDS)
-                .properties(MicrosoftDynamicsCrmUtils.getEntityFieldsProperties(false))
+            dynamicProperties(FIELDS, MicrosoftDynamicsCrmUtils.getEntityFieldsProperties(false))
                 .propertiesLookupDependsOn(ENTITY_TYPE)
                 .required(true))
         .output()

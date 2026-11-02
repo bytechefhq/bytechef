@@ -56,9 +56,8 @@ public class SalesforceUpdateRecordAction {
                 .options((OptionsFunction<String>) SalesforceUtils::getRecordIdOptions)
                 .optionsLookupDependsOn(OBJECT)
                 .required(true),
-            dynamicProperties(FIELDS)
+            dynamicProperties(FIELDS, SalesforceUtils::createPropertiesForObject)
                 .propertiesLookupDependsOn(OBJECT)
-                .properties(SalesforceUtils::createPropertiesForObject)
                 .required(true),
             object(CUSTOM_FIELDS)
                 .label("Custom Fields")

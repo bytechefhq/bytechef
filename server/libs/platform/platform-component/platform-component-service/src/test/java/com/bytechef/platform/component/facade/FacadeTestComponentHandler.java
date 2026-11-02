@@ -79,8 +79,8 @@ public class FacadeTestComponentHandler implements ComponentHandler {
                 .type(PROBE)
                 .object(() -> "probe")
                 .properties(
-                    dynamicProperties("schemas")
-                        .properties((ClusterElementDefinition.PropertiesFunction) this::getProbeProperties)),
+                    dynamicProperties("schemas",
+                        (ClusterElementDefinition.PropertiesFunction) this::getProbeProperties)),
             clusterElement("source")
                 .title("Source")
                 .type(SOURCE)

@@ -74,9 +74,8 @@ public class DataTableCreateRecordsAction {
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
                     .options(DataTableUtils.getActionTableOptions(dataTableService)),
-                dynamicProperties(RECORDS)
+                dynamicProperties(RECORDS, DataTableUtils.createDynamicProperties(dataTableService, false))
                     .propertiesLookupDependsOn(TABLE)
-                    .properties(DataTableUtils.createDynamicProperties(dataTableService, false))
                     .required(true))
             .output(this::output)
             .help("", "https://docs.bytechef.io/reference/components/data-table_v1#create-records")

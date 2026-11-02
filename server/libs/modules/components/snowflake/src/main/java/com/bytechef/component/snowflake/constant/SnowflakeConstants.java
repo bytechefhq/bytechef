@@ -63,10 +63,10 @@ public class SnowflakeConstants {
         .optionsLookupDependsOn(SCHEMA, DATABASE)
         .required(true);
 
-    public static final ModifiableDynamicPropertiesProperty VALUES_DYNAMIC_PROPERTY = dynamicProperties(VALUES)
-        .propertiesLookupDependsOn(DATABASE, SCHEMA, TABLE)
-        .properties(SnowflakePropertiesUtils::createPropertiesForColumn)
-        .required(true);
+    public static final ModifiableDynamicPropertiesProperty VALUES_DYNAMIC_PROPERTY =
+        dynamicProperties(VALUES, SnowflakePropertiesUtils::createPropertiesForColumn)
+            .propertiesLookupDependsOn(DATABASE, SCHEMA, TABLE)
+            .required(true);
 
     public static final ModifiableObjectProperty SQL_STATEMENT_RESPONSE = object()
         .properties(
