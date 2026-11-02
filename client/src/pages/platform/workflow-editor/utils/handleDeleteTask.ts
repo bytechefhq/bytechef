@@ -22,6 +22,7 @@ import {resolveClusterRootId, resolveMainClusterRootName} from './resolveCluster
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 import {forEachNestedTaskGroup} from './taskTraversalUtils';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {drainPendingSaves, isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface HandleDeleteTaskProps {
@@ -49,6 +50,10 @@ export default function handleDeleteTask({
     updateWorkflowMutation,
     workflow,
 }: HandleDeleteTaskProps) {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     if (!workflow?.definition) {
         return;
     }

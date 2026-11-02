@@ -3,6 +3,7 @@ import {BranchCaseType, UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {
     drainPendingDefinitionMutation,
     hasPendingDefinition,
@@ -138,6 +139,10 @@ export default function clearAllNodePositions({
     invalidateWorkflowQueries,
     updateWorkflowMutation,
 }: ClearAllNodePositionsProps) {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const {workflow} = useWorkflowDataStore.getState();
 
     if (!workflow.definition) {
