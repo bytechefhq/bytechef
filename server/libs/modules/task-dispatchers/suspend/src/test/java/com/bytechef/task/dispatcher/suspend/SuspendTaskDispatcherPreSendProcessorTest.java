@@ -35,7 +35,7 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.JobResumeId;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -48,11 +48,11 @@ import org.junit.jupiter.api.Test;
 class SuspendTaskDispatcherPreSendProcessorTest {
 
     private final JobService jobService = mock(JobService.class);
-    private final TaskStateService taskStateService = mock(TaskStateService.class);
+    private final TaskStateFacade taskStateFacade = mock(TaskStateFacade.class);
     private final TriggerScheduler triggerScheduler = mock(TriggerScheduler.class);
 
     private final SuspendTaskDispatcherPreSendProcessor preSendProcessor =
-        new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService, triggerScheduler);
+        new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateFacade, triggerScheduler);
 
     @Test
     void testCanProcessReturnsTrueWhenJobHasResumeId() {
@@ -110,7 +110,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
 
         when(jobService.getJob(100L))
             .thenReturn(job);
-        when(taskStateService.fetchValue(any(JobResumeId.class)))
+        when(taskStateFacade.fetchValue(any(JobResumeId.class)))
             .thenReturn(Optional.of(suspend));
 
         TaskExecution result = preSendProcessor.process(taskExecution);
@@ -120,7 +120,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
             .get(MetadataConstants.SUSPEND));
 
         verify(jobService).update(any(Job.class));
-        verify(taskStateService).delete(any(JobResumeId.class));
+        verify(taskStateFacade).delete(any(JobResumeId.class));
     }
 
     @Test
@@ -149,7 +149,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
         assertNotNull(result.getMetadata()
             .get(MetadataConstants.SUSPEND));
 
-        verify(taskStateService).delete(any(JobResumeId.class));
+        verify(taskStateFacade).delete(any(JobResumeId.class));
     }
 
     @Test
@@ -163,13 +163,13 @@ class SuspendTaskDispatcherPreSendProcessorTest {
         assertNotNull(result.getMetadata()
             .get(MetadataConstants.SUSPEND));
 
-        verify(taskStateService).delete(any(JobResumeId.class));
+        verify(taskStateFacade).delete(any(JobResumeId.class));
     }
 
     @Test
     void testProcessWithoutATriggerSchedulerStillResumesTheTask() {
         SuspendTaskDispatcherPreSendProcessor preSendProcessorWithoutTriggerScheduler =
-            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService, null);
+            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateFacade, null);
 
         TaskExecution taskExecution = createSuspendedTaskExecution(new Suspend(Map.of(), Instant.now()
             .plusSeconds(3600)));
@@ -196,7 +196,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
 
         when(jobService.getJob(100L))
             .thenReturn(job);
-        when(taskStateService.fetchValue(any(JobResumeId.class)))
+        when(taskStateFacade.fetchValue(any(JobResumeId.class)))
             .thenReturn(Optional.empty());
 
         TaskExecution result = preSendProcessor.process(taskExecution);
@@ -206,7 +206,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
             .containsKey(MetadataConstants.SUSPEND));
 
         verify(jobService).update(any(Job.class));
-        verify(taskStateService).delete(any(JobResumeId.class));
+        verify(taskStateFacade).delete(any(JobResumeId.class));
         verify(triggerScheduler).cancelOneTimeTask(100L);
     }
 
@@ -231,7 +231,7 @@ class SuspendTaskDispatcherPreSendProcessorTest {
 
         when(jobService.getJob(100L))
             .thenReturn(job);
-        when(taskStateService.fetchValue(any(JobResumeId.class)))
+        when(taskStateFacade.fetchValue(any(JobResumeId.class)))
             .thenReturn(Optional.of(suspend));
 
         return taskExecution;

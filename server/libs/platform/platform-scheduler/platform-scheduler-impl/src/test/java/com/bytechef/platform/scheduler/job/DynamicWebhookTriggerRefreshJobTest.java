@@ -37,7 +37,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -69,7 +69,7 @@ public class DynamicWebhookTriggerRefreshJobTest {
     private final JobExecutionContext jobExecutionContext = mock(JobExecutionContext.class);
     private final Scheduler scheduler = mock(Scheduler.class);
     private final TriggerDefinitionFacade triggerDefinitionFacade = mock(TriggerDefinitionFacade.class);
-    private final TriggerStateService triggerStateService = mock(TriggerStateService.class);
+    private final TriggerStateFacade triggerStateFacade = mock(TriggerStateFacade.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
 
     private final WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
@@ -83,7 +83,7 @@ public class DynamicWebhookTriggerRefreshJobTest {
 
         dynamicWebhookTriggerRefreshJob.setPrincipalAccessorRegistry(jobPrincipalAccessorRegistry);
         dynamicWebhookTriggerRefreshJob.setRemoteTriggerDefinitionFacade(triggerDefinitionFacade);
-        dynamicWebhookTriggerRefreshJob.setTriggerStateService(triggerStateService);
+        dynamicWebhookTriggerRefreshJob.setTriggerStateService(triggerStateFacade);
         dynamicWebhookTriggerRefreshJob.setWorkflowService(workflowService);
 
         Workflow workflow = new Workflow(
@@ -103,7 +103,7 @@ public class DynamicWebhookTriggerRefreshJobTest {
         when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(any())).thenReturn(jobPrincipalAccessor);
         when(jobPrincipalAccessor.getWorkflowId(anyLong(), anyString())).thenReturn(WORKFLOW_ID);
         when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
-        when(triggerStateService.<WebhookEnableOutput>fetchValue(any()))
+        when(triggerStateFacade.<WebhookEnableOutput>fetchValue(any()))
             .thenReturn(Optional.of(new WebhookEnableOutput(WEBHOOK_PARAMETERS, null)));
         when(jobExecutionContext.getScheduler()).thenReturn(scheduler);
     }
@@ -138,7 +138,7 @@ public class DynamicWebhookTriggerRefreshJobTest {
 
         Assertions.assertEquals(Date.from(webhookExpirationDate), trigger.getStartTime());
 
-        verify(triggerStateService).save(any(), any());
+        verify(triggerStateFacade).save(any(), any());
     }
 
     @Test

@@ -32,7 +32,6 @@ import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.platform.workflow.execution.event.JobApprovalClosedEvent;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -79,7 +78,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     private final JobService jobService;
     private final ObjectProvider<MeterRegistry> meterRegistryObjectProvider;
     private final TaskExecutionService taskExecutionService;
-    private final TaskStateService taskStateService;
+    private final TaskStateFacade taskStateFacade;
     private final TransactionOperations transactionOperations;
 
     @Autowired
@@ -88,11 +87,11 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         ApplicationEventPublisher applicationEventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
         JobFacade jobFacade, JobService jobService, ObjectProvider<MeterRegistry> meterRegistryObjectProvider,
         PlatformTransactionManager platformTransactionManager, TaskExecutionService taskExecutionService,
-        TaskStateService taskStateService) {
+        TaskStateFacade taskStateFacade) {
 
         this(
             applicationEventPublisher, approvalTokensProvider, jobFacade, jobService, meterRegistryObjectProvider,
-            new TransactionTemplate(platformTransactionManager), taskExecutionService, taskStateService);
+            new TransactionTemplate(platformTransactionManager), taskExecutionService, taskStateFacade);
     }
 
     @SuppressFBWarnings("EI")
@@ -100,7 +99,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         ApplicationEventPublisher applicationEventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
         JobFacade jobFacade, JobService jobService, ObjectProvider<MeterRegistry> meterRegistryObjectProvider,
         TransactionOperations transactionOperations, TaskExecutionService taskExecutionService,
-        TaskStateService taskStateService) {
+        TaskStateFacade taskStateFacade) {
 
         this.applicationEventPublisher = applicationEventPublisher;
         this.approvalTokensProvider = approvalTokensProvider;
@@ -108,7 +107,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         this.jobService = jobService;
         this.meterRegistryObjectProvider = meterRegistryObjectProvider;
         this.taskExecutionService = taskExecutionService;
-        this.taskStateService = taskStateService;
+        this.taskStateFacade = taskStateFacade;
         this.transactionOperations = transactionOperations;
     }
 
@@ -130,7 +129,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
             jobService.update(job);
 
-            taskStateService.delete(jobResumeId);
+            taskStateFacade.delete(jobResumeId);
 
             applicationEventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, Job.Status.CANCELLED));
             applicationEventPublisher.publishEvent(new JobApprovalClosedEvent(jobId));
@@ -387,7 +386,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
         failSuspendedTaskExecution(job, now);
 
-        taskStateService.delete(jobResumeId);
+        taskStateFacade.delete(jobResumeId);
 
         incrementApprovalExpiredCounter(source);
 
@@ -551,7 +550,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         }
 
         Map<String, ?> formParameters = ApprovalFormParameters.get(
-            taskStateService, jobResumeId, taskExecutionOptional.get());
+            taskStateFacade, jobResumeId, taskExecutionOptional.get());
 
         ApprovalFormInputs.Resolution resolution = ApprovalFormInputs.resolve(
             formParameters.get(ApprovalFormInputs.INPUTS), resumeData, approved);

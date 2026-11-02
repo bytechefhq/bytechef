@@ -23,11 +23,12 @@ import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.workflow.execution.facade.StateValueDataStorage;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacadeImpl;
 import com.bytechef.platform.workflow.execution.repository.TaskStateRepository;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
-import com.bytechef.platform.workflow.execution.service.StateValueDataStorage;
 import com.bytechef.platform.workflow.execution.service.TaskStateServiceImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -56,7 +57,7 @@ import tools.jackson.databind.ObjectMapper;
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = TaskStateRepository.class))
 @Import({
     JacksonConfiguration.class, JobPrincipalAccessorRegistry.class, LiquibaseConfiguration.class,
-    StateValueDataStorage.class, TaskStateServiceImpl.class
+    StateValueDataStorage.class, TaskStateFacadeImpl.class, TaskStateServiceImpl.class
 })
 public class ApprovalFormFacadeIntTestConfiguration {
 

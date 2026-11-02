@@ -36,7 +36,7 @@ import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -111,7 +111,7 @@ public class PlatformCoordinatorConfiguration {
     ApprovalExpiryMonitor approvalExpiryMonitor(
         ApplicationEventPublisher eventPublisher, ObjectProvider<MeterRegistry> meterRegistryObjectProvider,
         TaskExecutionService taskExecutionService,
-        ObjectProvider<TaskStateService> taskStateServiceObjectProvider, TenantService tenantService) {
+        ObjectProvider<TaskStateFacade> taskStateServiceObjectProvider, TenantService tenantService) {
 
         return new ApprovalExpiryMonitor(
             eventPublisher, jobService, meterRegistryObjectProvider, taskExecutionService,
@@ -127,7 +127,7 @@ public class PlatformCoordinatorConfiguration {
 
     @Bean
     SuspendedTaskStateJobDeletionListener suspendedTaskStateJobDeletionListener(
-        ObjectProvider<TaskStateService> taskStateServiceObjectProvider) {
+        ObjectProvider<TaskStateFacade> taskStateServiceObjectProvider) {
 
         return new SuspendedTaskStateJobDeletionListener(taskStateServiceObjectProvider.getIfAvailable());
     }

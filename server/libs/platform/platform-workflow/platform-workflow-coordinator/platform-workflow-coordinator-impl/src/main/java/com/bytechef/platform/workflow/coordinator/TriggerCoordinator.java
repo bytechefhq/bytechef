@@ -41,8 +41,8 @@ import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDisp
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -74,7 +74,7 @@ public class TriggerCoordinator {
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerFileStorage triggerFileStorage;
     private final TriggerScheduler triggerScheduler;
-    private final TriggerStateService triggerStateService;
+    private final TriggerStateFacade triggerStateFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -84,7 +84,7 @@ public class TriggerCoordinator {
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerCompletionHandler triggerCompletionHandler,
         TriggerDispatcher triggerDispatcher, TriggerExecutionService triggerExecutionService,
         TriggerFileStorage triggerFileStorage, TriggerScheduler triggerScheduler,
-        TriggerStateService triggerStateService, WorkflowService workflowService) {
+        TriggerStateFacade triggerStateFacade, WorkflowService workflowService) {
 
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;
@@ -96,7 +96,7 @@ public class TriggerCoordinator {
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
         this.triggerScheduler = triggerScheduler;
-        this.triggerStateService = triggerStateService;
+        this.triggerStateFacade = triggerStateFacade;
         this.workflowService = workflowService;
     }
 
@@ -263,7 +263,7 @@ public class TriggerCoordinator {
                 evaluator));
 
         triggerExecution.setState(
-            triggerStateService.fetchValue(workflowExecutionId)
+            triggerStateFacade.fetchValue(workflowExecutionId)
                 .orElse(null));
 
         try {

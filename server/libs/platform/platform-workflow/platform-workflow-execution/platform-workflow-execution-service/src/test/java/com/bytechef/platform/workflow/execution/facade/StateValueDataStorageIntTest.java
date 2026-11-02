@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.execution.service;
+package com.bytechef.platform.workflow.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -37,6 +37,7 @@ import com.bytechef.platform.workflow.execution.domain.TaskState;
 import com.bytechef.platform.workflow.execution.domain.TriggerState;
 import com.bytechef.platform.workflow.execution.repository.TaskStateRepository;
 import com.bytechef.platform.workflow.execution.repository.TriggerStateRepository;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,7 +86,7 @@ class StateValueDataStorageIntTest {
     private TaskStateRepository taskStateRepository;
 
     @Autowired
-    private TaskStateService taskStateService;
+    private TaskStateFacade taskStateFacade;
 
     @Autowired
     private PlatformTransactionManager transactionManager;
@@ -94,7 +95,7 @@ class StateValueDataStorageIntTest {
     private TriggerStateRepository triggerStateRepository;
 
     @Autowired
-    private TriggerStateService triggerStateService;
+    private TriggerStateFacade triggerStateFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -113,8 +114,8 @@ class StateValueDataStorageIntTest {
 
     @AfterEach
     void afterEach() {
-        taskStateService.delete(JOB_RESUME_ID);
-        triggerStateService.delete(WORKFLOW_EXECUTION_ID);
+        taskStateFacade.delete(JOB_RESUME_ID);
+        triggerStateFacade.delete(WORKFLOW_EXECUTION_ID);
 
         taskStateRepository.deleteAll();
         triggerStateRepository.deleteAll();
@@ -122,7 +123,7 @@ class StateValueDataStorageIntTest {
 
     @Test
     void testSaveTaskStateStoresValueInDataStorage() {
-        taskStateService.save(JOB_RESUME_ID, Map.of("approved", false));
+        taskStateFacade.save(JOB_RESUME_ID, Map.of("approved", false));
 
         TaskState taskState = taskStateRepository.findByJobResumeId(JOB_RESUME_ID.toString())
             .orElseThrow();
@@ -134,50 +135,50 @@ class StateValueDataStorageIntTest {
             });
         assertThat(getTaskStateEntries()).containsOnly(Map.entry(
             ((StateValueReference) taskState.getValue()).key(), Map.of("approved", false)));
-        assertThat(taskStateService.<Map<String, Object>>fetchValue(JOB_RESUME_ID))
+        assertThat(taskStateFacade.<Map<String, Object>>fetchValue(JOB_RESUME_ID))
             .hasValue(Map.of("approved", false));
-        assertThat(taskStateService.<Map<String, Object>>fetchUnlockedValue(JOB_RESUME_ID))
+        assertThat(taskStateFacade.<Map<String, Object>>fetchUnlockedValue(JOB_RESUME_ID))
             .hasValue(Map.of("approved", false));
     }
 
     @Test
     void testFetchUnlockedTaskStateInReadOnlyTransaction() {
-        taskStateService.save(JOB_RESUME_ID, "value");
+        taskStateFacade.save(JOB_RESUME_ID, "value");
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
         transactionTemplate.setReadOnly(true);
 
         Optional<String> valueOptional = transactionTemplate.execute(
-            status -> taskStateService.fetchUnlockedValue(JOB_RESUME_ID));
+            status -> taskStateFacade.fetchUnlockedValue(JOB_RESUME_ID));
 
         assertThat(valueOptional).hasValue("value");
     }
 
     @Test
     void testSaveTaskStateOverwritesDataStorageValue() {
-        taskStateService.save(JOB_RESUME_ID, "first");
-        taskStateService.save(JOB_RESUME_ID, "second");
+        taskStateFacade.save(JOB_RESUME_ID, "first");
+        taskStateFacade.save(JOB_RESUME_ID, "second");
 
         assertThat(taskStateRepository.count()).isEqualTo(1);
         assertThat(getTaskStateEntries()).containsOnlyKeys(getTaskStateReference().key());
         assertThat(getTaskStateEntries()).containsValue("second");
-        assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("second");
+        assertThat(taskStateFacade.<String>fetchValue(JOB_RESUME_ID)).hasValue("second");
     }
 
     @Test
     void testSaveTaskStateOverwritesEntryLeftByFailedCleanup() {
-        taskStateService.save(JOB_RESUME_ID, "first");
+        taskStateFacade.save(JOB_RESUME_ID, "first");
 
         String firstKey = getTaskStateReference().key();
 
-        taskStateService.save(JOB_RESUME_ID, "second");
+        taskStateFacade.save(JOB_RESUME_ID, "second");
 
         putTaskStateEntry(firstKey, "first");
 
         assertThat(getTaskStateEntries()).hasSize(2);
 
-        taskStateService.save(JOB_RESUME_ID, "third");
+        taskStateFacade.save(JOB_RESUME_ID, "third");
 
         assertThat(getTaskStateReference().key()).isEqualTo(firstKey);
         assertThat(getTaskStateEntries()).containsOnly(Map.entry(firstKey, "third"));
@@ -185,58 +186,58 @@ class StateValueDataStorageIntTest {
 
     @Test
     void testDeleteTaskStateDeletesEntryLeftByFailedCleanup() {
-        taskStateService.save(JOB_RESUME_ID, "first");
+        taskStateFacade.save(JOB_RESUME_ID, "first");
 
         String firstKey = getTaskStateReference().key();
 
-        taskStateService.save(JOB_RESUME_ID, "second");
+        taskStateFacade.save(JOB_RESUME_ID, "second");
 
         putTaskStateEntry(firstKey, "first");
 
-        taskStateService.delete(JOB_RESUME_ID);
+        taskStateFacade.delete(JOB_RESUME_ID);
 
         assertThat(getTaskStateEntries()).isEmpty();
     }
 
     @Test
     void testRolledBackTaskStateSaveKeepsCommittedValue() {
-        taskStateService.save(JOB_RESUME_ID, "first");
+        taskStateFacade.save(JOB_RESUME_ID, "first");
 
         StateValueReference reference = getTaskStateReference();
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
         transactionTemplate.executeWithoutResult(status -> {
-            taskStateService.save(JOB_RESUME_ID, "second");
+            taskStateFacade.save(JOB_RESUME_ID, "second");
 
             status.setRollbackOnly();
         });
 
         assertThat(getTaskStateReference()).isEqualTo(reference);
         assertThat(getTaskStateEntries()).containsOnly(Map.entry(reference.key(), "first"));
-        assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("first");
+        assertThat(taskStateFacade.<String>fetchValue(JOB_RESUME_ID)).hasValue("first");
     }
 
     @Test
     void testRolledBackTaskStateDeleteKeepsValue() {
-        taskStateService.save(JOB_RESUME_ID, "value");
+        taskStateFacade.save(JOB_RESUME_ID, "value");
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
         transactionTemplate.executeWithoutResult(status -> {
-            taskStateService.delete(JOB_RESUME_ID);
+            taskStateFacade.delete(JOB_RESUME_ID);
 
             status.setRollbackOnly();
         });
 
         assertThat(taskStateRepository.count()).isEqualTo(1);
-        assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("value");
+        assertThat(taskStateFacade.<String>fetchValue(JOB_RESUME_ID)).hasValue("value");
     }
 
     @Test
     void testDeleteTaskStateDeletesDataStorageValue() {
-        taskStateService.save(JOB_RESUME_ID, "value");
+        taskStateFacade.save(JOB_RESUME_ID, "value");
 
-        taskStateService.delete(JOB_RESUME_ID);
+        taskStateFacade.delete(JOB_RESUME_ID);
 
         assertThat(taskStateRepository.count()).isZero();
         assertThat(getTaskStateEntries()).isEmpty();
@@ -246,14 +247,14 @@ class StateValueDataStorageIntTest {
     void testSaveTaskStateWithJdbcProviderKeepsValueInline() {
         setProvider(ApplicationProperties.DataStorage.Provider.JDBC);
 
-        taskStateService.save(JOB_RESUME_ID, "inline");
+        taskStateFacade.save(JOB_RESUME_ID, "inline");
 
         TaskState taskState = taskStateRepository.findByJobResumeId(JOB_RESUME_ID.toString())
             .orElseThrow();
 
         assertThat(taskState.getValue()).isEqualTo("inline");
         assertThat(getTaskStateEntries()).isEmpty();
-        assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("inline");
+        assertThat(taskStateFacade.<String>fetchValue(JOB_RESUME_ID)).hasValue("inline");
     }
 
     @Test
@@ -263,29 +264,29 @@ class StateValueDataStorageIntTest {
         when(principalJobService.fetchJobPrincipalId(99L, PlatformType.AUTOMATION)).thenReturn(Optional.empty());
         when(principalJobService.fetchJobPrincipalId(99L, PlatformType.EMBEDDED)).thenReturn(Optional.empty());
 
-        taskStateService.save(jobResumeId, "inline");
+        taskStateFacade.save(jobResumeId, "inline");
 
         TaskState taskState = taskStateRepository.findByJobResumeId(jobResumeId.toString())
             .orElseThrow();
 
         assertThat(taskState.getValue()).isEqualTo("inline");
-        assertThat(taskStateService.<String>fetchValue(jobResumeId)).hasValue("inline");
+        assertThat(taskStateFacade.<String>fetchValue(jobResumeId)).hasValue("inline");
     }
 
     @Test
     void testFetchTaskStateReadsInlineValueWrittenBeforeDataStorage() {
         taskStateRepository.save(new TaskState(JOB_RESUME_ID, "legacy"));
 
-        assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("legacy");
+        assertThat(taskStateFacade.<String>fetchValue(JOB_RESUME_ID)).hasValue("legacy");
 
-        taskStateService.delete(JOB_RESUME_ID);
+        taskStateFacade.delete(JOB_RESUME_ID);
 
         assertThat(taskStateRepository.count()).isZero();
     }
 
     @Test
     void testSaveTriggerStateStoresValueInDataStorage() {
-        triggerStateService.save(WORKFLOW_EXECUTION_ID, Map.of("cursor", "page-2"));
+        triggerStateFacade.save(WORKFLOW_EXECUTION_ID, Map.of("cursor", "page-2"));
 
         TriggerState triggerState = triggerStateRepository
             .findByWorkflowExecutionId(WORKFLOW_EXECUTION_ID.toString())
@@ -298,15 +299,15 @@ class StateValueDataStorageIntTest {
             });
         assertThat(getTriggerStateEntries()).containsOnly(Map.entry(
             ((StateValueReference) triggerState.getValue()).key(), Map.of("cursor", "page-2")));
-        assertThat(triggerStateService.<Map<String, Object>>fetchValue(WORKFLOW_EXECUTION_ID))
+        assertThat(triggerStateFacade.<Map<String, Object>>fetchValue(WORKFLOW_EXECUTION_ID))
             .hasValue(Map.of("cursor", "page-2"));
     }
 
     @Test
     void testDeleteTriggerStateDeletesDataStorageValue() {
-        triggerStateService.save(WORKFLOW_EXECUTION_ID, "value");
+        triggerStateFacade.save(WORKFLOW_EXECUTION_ID, "value");
 
-        triggerStateService.delete(WORKFLOW_EXECUTION_ID);
+        triggerStateFacade.delete(WORKFLOW_EXECUTION_ID);
 
         assertThat(triggerStateRepository.count()).isZero();
         assertThat(getTriggerStateEntries()).isEmpty();

@@ -34,8 +34,8 @@ import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDisp
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class WebhookWorkflowSyncExecutor {
     private final TriggerExecutionService triggerExecutionService;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
     private final TriggerFileStorage triggerFileStorage;
-    private final TriggerStateService triggerStateService;
+    private final TriggerStateFacade triggerStateFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -64,7 +64,7 @@ public class WebhookWorkflowSyncExecutor {
         Evaluator evaluator, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
-        TriggerFileStorage triggerFileStorage, TriggerStateService triggerStateService,
+        TriggerFileStorage triggerFileStorage, TriggerStateFacade triggerStateFacade,
         WorkflowService workflowService) {
 
         this.evaluator = evaluator;
@@ -73,7 +73,7 @@ public class WebhookWorkflowSyncExecutor {
         this.triggerExecutionService = triggerExecutionService;
         this.triggerDispatcherPreSendProcessors = triggerDispatcherPreSendProcessors;
         this.triggerFileStorage = triggerFileStorage;
-        this.triggerStateService = triggerStateService;
+        this.triggerStateFacade = triggerStateFacade;
         this.workflowService = workflowService;
     }
 
@@ -89,7 +89,7 @@ public class WebhookWorkflowSyncExecutor {
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(getInputMap(workflowExecutionId), evaluator));
 
-        Optional<Object> valueOptional = triggerStateService.fetchValue(workflowExecutionId);
+        Optional<Object> valueOptional = triggerStateFacade.fetchValue(workflowExecutionId);
 
         triggerExecution.setState(valueOptional.orElse(null));
 
@@ -118,7 +118,7 @@ public class WebhookWorkflowSyncExecutor {
         triggerExecutionService.update(triggerExecution);
 
         if (triggerExecution.getState() != null) {
-            triggerStateService.save(workflowExecutionId, triggerExecution.getState());
+            triggerStateFacade.save(workflowExecutionId, triggerExecution.getState());
         }
 
         return triggerOutput;

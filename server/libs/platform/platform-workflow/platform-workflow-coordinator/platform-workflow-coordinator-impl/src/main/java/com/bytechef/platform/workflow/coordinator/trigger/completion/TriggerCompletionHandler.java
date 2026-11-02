@@ -26,8 +26,8 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorReg
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Map;
@@ -48,19 +48,19 @@ public class TriggerCompletionHandler {
     private final PrincipalJobFacade principalJobFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerFileStorage triggerFileStorage;
-    private final TriggerStateService triggerStateService;
+    private final TriggerStateFacade triggerStateFacade;
 
     @SuppressFBWarnings("EI")
     public TriggerCompletionHandler(
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
-        TriggerStateService triggerStateService) {
+        TriggerStateFacade triggerStateFacade) {
 
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.principalJobFacade = principalJobFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
-        this.triggerStateService = triggerStateService;
+        this.triggerStateFacade = triggerStateFacade;
     }
 
     @SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public class TriggerCompletionHandler {
         }
 
         if (triggerExecution.getState() != null) {
-            triggerStateService.save(workflowExecutionId, triggerExecution.getState());
+            triggerStateFacade.save(workflowExecutionId, triggerExecution.getState());
         }
 
         Map<String, Object> inputMap = (Map<String, Object>) getInputMap(workflowExecutionId);

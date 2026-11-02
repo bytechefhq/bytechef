@@ -19,7 +19,7 @@ package com.bytechef.platform.coordinator.event.listener;
 import com.bytechef.atlas.coordinator.event.DeleteJobEvent;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -34,16 +34,16 @@ public class SuspendedTaskStateJobDeletionListener {
 
     private static final Logger log = LoggerFactory.getLogger(SuspendedTaskStateJobDeletionListener.class);
 
-    private final @Nullable TaskStateService taskStateService;
+    private final @Nullable TaskStateFacade taskStateFacade;
 
     @SuppressFBWarnings("EI2")
-    public SuspendedTaskStateJobDeletionListener(@Nullable TaskStateService taskStateService) {
-        this.taskStateService = taskStateService;
+    public SuspendedTaskStateJobDeletionListener(@Nullable TaskStateFacade taskStateFacade) {
+        this.taskStateFacade = taskStateFacade;
     }
 
     @EventListener
     public void onDeleteJob(DeleteJobEvent deleteJobEvent) {
-        if (taskStateService == null) {
+        if (taskStateFacade == null) {
             return;
         }
 
@@ -56,7 +56,7 @@ public class SuspendedTaskStateJobDeletionListener {
         }
 
         try {
-            taskStateService.delete(JobResumeId.parse(jobResumeId.toString()));
+            taskStateFacade.delete(JobResumeId.parse(jobResumeId.toString()));
         } catch (RuntimeException runtimeException) {
             log.warn("Could not delete task state for deleted job {}", deleteJobEvent.getJobId(), runtimeException);
         }

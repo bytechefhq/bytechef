@@ -46,7 +46,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.workflow.execution.JobResumeId;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
@@ -67,10 +67,10 @@ class SuspendTaskCompletionHandlerTest {
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     private final Base64FileStorageService base64FileStorageService = new Base64FileStorageService();
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(base64FileStorageService);
-    private final TaskStateService taskStateService = mock(TaskStateService.class);
+    private final TaskStateFacade taskStateFacade = mock(TaskStateFacade.class);
 
     private final SuspendTaskCompletionHandler suspendTaskCompletionHandler = new SuspendTaskCompletionHandler(
-        contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage, taskStateService);
+        contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage, taskStateFacade);
 
     static {
         ObjectMapper objectMapper = JsonMapper.builder()
@@ -152,7 +152,7 @@ class SuspendTaskCompletionHandlerTest {
 
         assertTrue(taskExecution.isHandled());
 
-        verify(taskStateService).save(any(JobResumeId.class), any(Suspend.class));
+        verify(taskStateFacade).save(any(JobResumeId.class), any(Suspend.class));
         verify(jobService).update(any(Job.class));
         verify(jobService).setStatusToStopped(100L);
 

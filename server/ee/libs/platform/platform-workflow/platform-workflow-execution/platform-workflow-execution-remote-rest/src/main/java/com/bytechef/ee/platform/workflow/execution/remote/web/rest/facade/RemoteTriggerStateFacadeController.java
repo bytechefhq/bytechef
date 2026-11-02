@@ -5,11 +5,11 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.workflow.execution.remote.web.rest.service;
+package com.bytechef.ee.platform.workflow.execution.remote.web.rest.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("/remote/trigger-state-service")
-public class RemoteTriggerStateServiceController {
+@RequestMapping("/remote/trigger-state-facade")
+public class RemoteTriggerStateFacadeController {
 
-    private final TriggerStateService triggerStateService;
+    private final TriggerStateFacade triggerStateFacade;
 
     @SuppressFBWarnings("EI")
-    public RemoteTriggerStateServiceController(TriggerStateService triggerStateService) {
-        this.triggerStateService = triggerStateService;
+    public RemoteTriggerStateFacadeController(TriggerStateFacade triggerStateFacade) {
+        this.triggerStateFacade = triggerStateFacade;
     }
 
     @RequestMapping(
@@ -43,7 +43,7 @@ public class RemoteTriggerStateServiceController {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(@PathVariable String workflowExecutionId) {
-        return triggerStateService.fetchValue(WorkflowExecutionId.parse(workflowExecutionId))
+        return triggerStateFacade.fetchValue(WorkflowExecutionId.parse(workflowExecutionId))
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity
                 .noContent()
@@ -59,7 +59,7 @@ public class RemoteTriggerStateServiceController {
     public ResponseEntity<Void> save(
         @PathVariable String workflowExecutionId, @RequestBody WebhookEnableOutput value) {
 
-        triggerStateService.save(WorkflowExecutionId.parse(workflowExecutionId), value);
+        triggerStateFacade.save(WorkflowExecutionId.parse(workflowExecutionId), value);
 
         return ResponseEntity.noContent()
             .build();

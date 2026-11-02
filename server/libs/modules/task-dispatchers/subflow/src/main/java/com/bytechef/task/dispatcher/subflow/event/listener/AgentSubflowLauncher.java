@@ -30,7 +30,7 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.JobSuspends;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.AgentSubflowLink;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
@@ -60,12 +60,12 @@ public class AgentSubflowLauncher implements ApplicationEventListener {
     private final ChildJobPrincipalFactory childJobPrincipalFactory;
     private final JobService jobService;
     private final int maxDepth;
-    private final TaskStateService taskStateService;
+    private final TaskStateFacade taskStateFacade;
 
     @SuppressFBWarnings("EI2")
     public AgentSubflowLauncher(
         ChildJobPrincipalFactory childJobPrincipalFactory, JobFacade jobFacade, JobService jobService, int maxDepth,
-        TaskStateService taskStateService) {
+        TaskStateFacade taskStateFacade) {
 
         Validate.isTrue(maxDepth >= 1, "maxDepth must be at least 1, was %d", maxDepth);
 
@@ -73,7 +73,7 @@ public class AgentSubflowLauncher implements ApplicationEventListener {
         this.childJobPrincipalFactory = childJobPrincipalFactory;
         this.jobService = jobService;
         this.maxDepth = maxDepth;
-        this.taskStateService = taskStateService;
+        this.taskStateFacade = taskStateFacade;
     }
 
     public static String tooDeepError(int maxDepth) {
@@ -229,7 +229,7 @@ public class AgentSubflowLauncher implements ApplicationEventListener {
     }
 
     private @Nullable PendingSubflowRequest fetchPendingSubflowRequest(String agentJobResumeId) {
-        Optional<Object> suspendValue = taskStateService.fetchValue(JobResumeId.parse(agentJobResumeId));
+        Optional<Object> suspendValue = taskStateFacade.fetchValue(JobResumeId.parse(agentJobResumeId));
 
         if (suspendValue.isEmpty()) {
             return null;

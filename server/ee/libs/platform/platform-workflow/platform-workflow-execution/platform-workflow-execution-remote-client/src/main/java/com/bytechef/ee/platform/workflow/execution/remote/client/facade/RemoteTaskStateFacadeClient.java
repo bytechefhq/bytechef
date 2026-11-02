@@ -5,10 +5,10 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.workflow.execution.remote.client.service;
+package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
 import com.bytechef.platform.workflow.execution.JobResumeId;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteTaskStateService implements TaskStateService {
+public class RemoteTaskStateFacadeClient implements TaskStateFacade {
 
     @Override
     public void delete(JobResumeId jobResumeId) {

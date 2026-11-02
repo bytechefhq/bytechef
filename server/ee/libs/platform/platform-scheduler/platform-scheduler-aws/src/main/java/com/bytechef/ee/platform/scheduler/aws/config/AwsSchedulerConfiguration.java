@@ -32,7 +32,7 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import io.awspring.cloud.sqs.listener.MessageListenerContainer;
@@ -130,10 +130,10 @@ public class AwsSchedulerConfiguration {
     DynamicWebhookTriggerRefreshListener dynamicWebhookListener(
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, SchedulerClient schedulerClient,
         TriggerDefinitionFacade triggerDefinitionFacade,
-        TriggerStateService triggerStateService, WorkflowService workflowService) {
+        TriggerStateFacade triggerStateFacade, WorkflowService workflowService) {
 
         return new DynamicWebhookTriggerRefreshListener(
-            jobPrincipalAccessorRegistry, schedulerClient, triggerDefinitionFacade, triggerStateService,
+            jobPrincipalAccessorRegistry, schedulerClient, triggerDefinitionFacade, triggerStateFacade,
             workflowService);
     }
 

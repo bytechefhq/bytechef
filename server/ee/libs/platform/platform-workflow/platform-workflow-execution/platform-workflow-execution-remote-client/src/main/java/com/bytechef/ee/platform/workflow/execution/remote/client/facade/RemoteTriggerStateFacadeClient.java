@@ -5,11 +5,11 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.workflow.execution.remote.client.service;
+package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,16 +20,16 @@ import org.springframework.stereotype.Component;
  *
  * @author Ivica Cardic
  */
-@Component("triggerStorageService")
-public class RemoteTriggerStateServiceClient implements TriggerStateService {
+@Component
+public class RemoteTriggerStateFacadeClient implements TriggerStateFacade {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String TRIGGER_STORAGE_SERVICE = "/remote/trigger-state-service";
+    private static final String TRIGGER_STATE_FACADE = "/remote/trigger-state-facade";
 
     private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteTriggerStateServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+    public RemoteTriggerStateFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
@@ -44,7 +44,7 @@ public class RemoteTriggerStateServiceClient implements TriggerStateService {
             loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
                     .host(EXECUTION_APP)
-                    .path(TRIGGER_STORAGE_SERVICE + "/fetch-value/{workflowExecutionId}")
+                    .path(TRIGGER_STATE_FACADE + "/fetch-value/{workflowExecutionId}")
                     .build(workflowExecutionId),
                 new ParameterizedTypeReference<T>() {}));
     }
@@ -54,7 +54,7 @@ public class RemoteTriggerStateServiceClient implements TriggerStateService {
         loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
-                .path(TRIGGER_STORAGE_SERVICE + "/save/{workflowExecutionId}")
+                .path(TRIGGER_STATE_FACADE + "/save/{workflowExecutionId}")
                 .build(workflowExecutionId),
             value);
     }

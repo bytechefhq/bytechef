@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.execution.service;
+package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import java.util.Map;
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author Ivica Cardic
  */
-public final class InMemoryTaskStateService implements TaskStateService {
+public final class InMemoryTaskStateFacade implements TaskStateFacade {
 
     private final Map<JobResumeId, Object> store = new ConcurrentHashMap<>();
 

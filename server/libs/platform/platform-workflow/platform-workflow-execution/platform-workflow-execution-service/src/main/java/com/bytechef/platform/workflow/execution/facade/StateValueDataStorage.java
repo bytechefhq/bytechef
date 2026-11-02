@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.execution.service;
+package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.PlatformType;
@@ -23,6 +23,7 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.domain.StateValueReference;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

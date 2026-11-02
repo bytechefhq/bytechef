@@ -34,7 +34,6 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.config.ApprovalFormFacadeIntTestConfiguration;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
 import com.bytechef.tenant.TenantContext;
@@ -90,7 +89,7 @@ class ApprovalFormFacadeIntTest {
     private final JobService jobService = mock(JobService.class);
     private final TaskExecution taskExecution = mock(TaskExecution.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
-    private final TaskStateService taskStateService = mock(TaskStateService.class);
+    private final TaskStateFacade taskStateFacade = mock(TaskStateFacade.class);
 
     private ApprovalFormFacade approvalFormFacade;
 
@@ -98,12 +97,12 @@ class ApprovalFormFacadeIntTest {
     private PlatformTransactionManager platformTransactionManager;
 
     @Autowired
-    private TaskStateService persistentTaskStateService;
+    private TaskStateFacade persistentTaskStateFacade;
 
     @BeforeEach
     void setUp() {
         approvalFormFacade = new ApprovalFormFacadeImpl(
-            approvalTokensProvider(), jobService, taskExecutionService, taskStateService, transactionOperations);
+            approvalTokensProvider(), jobService, taskExecutionService, taskStateFacade, transactionOperations);
     }
 
     @Test
@@ -129,7 +128,7 @@ class ApprovalFormFacadeIntTest {
     void testGetApprovalFormReadsTheSuspendStoredInTheTaskState() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
-        persistentTaskStateService.save(
+        persistentTaskStateFacade.save(
             jobResumeId,
             new Suspend(
                 Map.of(MetadataConstants.APPROVAL_FORM_PARAMETERS, Map.of("formTitle", "Refund order 42")), null));
@@ -140,7 +139,7 @@ class ApprovalFormFacadeIntTest {
             .getMetadata();
 
         ApprovalFormFacade persistentApprovalFormFacade = new ApprovalFormFacadeImpl(
-            approvalTokensProvider(), jobService, taskExecutionService, persistentTaskStateService,
+            approvalTokensProvider(), jobService, taskExecutionService, persistentTaskStateFacade,
             platformTransactionManager);
 
         Map<String, ?> approvalForm = persistentApprovalFormFacade.fetchApprovalForm(jobResumeId.toString())
@@ -148,7 +147,7 @@ class ApprovalFormFacadeIntTest {
 
         assertThat(approvalForm).isEqualTo(Map.of("formTitle", "Refund order 42"));
 
-        persistentTaskStateService.delete(jobResumeId);
+        persistentTaskStateFacade.delete(jobResumeId);
     }
 
     @Test
@@ -174,7 +173,7 @@ class ApprovalFormFacadeIntTest {
             .getParameters();
         doReturn(Map.of()).when(taskExecution)
             .getMetadata();
-        when(taskStateService.<Suspend>fetchUnlockedValue(jobResumeId)).thenReturn(
+        when(taskStateFacade.<Suspend>fetchUnlockedValue(jobResumeId)).thenReturn(
             Optional.of(
                 new Suspend(
                     Map.of(MetadataConstants.APPROVAL_FORM_PARAMETERS, Map.of("formTitle", "Refund order 42")),
@@ -196,7 +195,7 @@ class ApprovalFormFacadeIntTest {
             .getParameters();
         doReturn(Map.of()).when(taskExecution)
             .getMetadata();
-        when(taskStateService.<Suspend>fetchUnlockedValue(jobResumeId)).thenReturn(
+        when(taskStateFacade.<Suspend>fetchUnlockedValue(jobResumeId)).thenReturn(
             Optional.of(new Suspend(Map.of("formUrl", "https://example.com/resume/abc"), null)));
 
         Map<String, ?> approvalForm = approvalFormFacade.fetchApprovalForm(jobResumeId.toString())
@@ -271,7 +270,7 @@ class ApprovalFormFacadeIntTest {
             .getParameters();
         doReturn(Map.of()).when(taskExecution)
             .getMetadata();
-        when(taskStateService.<Suspend>fetchUnlockedValue(jobResumeId)).thenReturn(Optional.empty());
+        when(taskStateFacade.<Suspend>fetchUnlockedValue(jobResumeId)).thenReturn(Optional.empty());
     }
 
     private static Job stoppedJob(JobResumeId storedJobResumeId) {

@@ -25,7 +25,6 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -43,17 +42,17 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
     private final TriggerScheduler triggerScheduler;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
-    private final TriggerStateService triggerStateService;
+    private final TriggerStateFacade triggerStateFacade;
 
     @SuppressFBWarnings("EI")
     public TriggerLifecycleFacadeImpl(
         TriggerScheduler triggerScheduler, TriggerDefinitionFacade triggerDefinitionFacade,
-        TriggerDefinitionService triggerDefinitionService, TriggerStateService triggerStateService) {
+        TriggerDefinitionService triggerDefinitionService, TriggerStateFacade triggerStateFacade) {
 
         this.triggerScheduler = triggerScheduler;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
-        this.triggerStateService = triggerStateService;
+        this.triggerStateFacade = triggerStateFacade;
     }
 
     @Override
@@ -69,7 +68,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             switch (triggerDefinition.getType()) {
                 case HYBRID, DYNAMIC_WEBHOOK -> {
                     Map<String, ?> parameters = OptionalUtils.mapOrElse(
-                        triggerStateService.fetchValue(workflowExecutionId),
+                        triggerStateFacade.fetchValue(workflowExecutionId),
                         WebhookEnableOutput::parameters, Map.of());
 
                     triggerDefinitionFacade.executeWebhookDisable(
@@ -78,7 +77,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                         parameters, connectionId);
 
                     triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
-                    triggerStateService.delete(workflowExecutionId);
+                    triggerStateFacade.delete(workflowExecutionId);
                 }
                 case LISTENER -> triggerDefinitionFacade.executeListenerDisable(
                     triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
@@ -121,7 +120,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                     boolean stateSaved = false;
 
                     try {
-                        triggerStateService.save(workflowExecutionId, output);
+                        triggerStateFacade.save(workflowExecutionId, output);
 
                         stateSaved = true;
 
@@ -181,7 +180,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
         if (stateSaved) {
             try {
-                triggerStateService.delete(workflowExecutionId);
+                triggerStateFacade.delete(workflowExecutionId);
             } catch (RuntimeException exception) {
                 enableFailure.addSuppressed(exception);
             }
