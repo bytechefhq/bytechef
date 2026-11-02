@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import {EMBEDDED_INTEGRATIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
@@ -26,6 +27,12 @@ export enum Type {
     Tag,
     UnifiedAPI,
 }
+
+const INTEGRATION_STEPS = [
+    {id: 'createIntegration', label: 'Create an integration', status: 'current' as const},
+    {id: 'publishVersion', label: 'Publish a version', status: 'upcoming' as const},
+    {id: 'createInstanceConfiguration', label: 'Create an instance configuration', status: 'upcoming' as const},
+];
 
 const Integrations = () => {
     const [newlyCreatedIntegrationId, setNewlyCreatedIntegrationId] = useState<number | undefined>();
@@ -142,11 +149,13 @@ const Integrations = () => {
                                 onClick={() => setShowIntegrationDialog(true)}
                             />
                         }
-                        description="An integration connects your product to a third-party app, like Slack or HubSpot. You build its workflows here, publish a version, and your users turn it on from inside your product."
+                        description="An integration connects your product to a third-party app, like Slack or HubSpot. You build its workflows here, and your users turn it on from inside your product."
                         docsLink={{href: EMBEDDED_INTEGRATIONS_DOCUMENTATION_URL, label: 'How integrations work'}}
                         icon={<SquareIcon />}
                         title="Create your first integration"
-                    />
+                    >
+                        <JourneySteps aria-label="Getting started" steps={INTEGRATION_STEPS} />
+                    </EmptyState>
                 )}
             </PageLoader>
 

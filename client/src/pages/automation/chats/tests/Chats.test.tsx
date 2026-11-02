@@ -14,6 +14,14 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useWorkspaceChatWorkflowsQuery: hoisted.mockUseWorkspaceChatWorkflowsQuery,
 }));
 
+vi.mock('@/pages/automation/journey/useAutomationJourney', async () => {
+    const {getAutomationJourney} = await vi.importActual<
+        typeof import('@/pages/automation/journey/getAutomationJourney')
+    >('@/pages/automation/journey/getAutomationJourney');
+
+    return {useAutomationJourney: () => ({isLoading: false, journey: getAutomationJourney([], [])})};
+});
+
 vi.mock('@/shared/layout/LayoutContainer', () => ({
     default: ({
         children,
@@ -66,6 +74,9 @@ describe('Chats', () => {
         expect(screen.getByTestId('header-title')).toHaveTextContent('Chats');
         expect(screen.getByText('No chat workflows yet')).toBeInTheDocument();
         expect(screen.getByText('How chats work')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /Go to Projects/})).toBeInTheDocument();
+        expect(screen.getByText('Create a project').closest('li')).toHaveAttribute('aria-current', 'step');
+        expect(screen.getByText('Deploy and enable')).toBeInTheDocument();
     });
 
     it('keeps the sidebar and asks to pick a chat when chat workflows exist', () => {
