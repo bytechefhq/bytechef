@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.callback.ProjectCallback;
@@ -37,6 +38,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerServiceImpl;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorageImpl;
+import com.bytechef.encryption.Encryption;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -147,6 +149,11 @@ class ProjectBeforeDeleteEventListenerIntTest {
         @Bean
         CodeWorkflowFileStorage codeWorkflowFileStorage(FileStorageService fileStorageService) {
             return new CodeWorkflowFileStorageImpl(fileStorageService);
+        }
+
+        @Bean
+        Encryption encryption() {
+            return mock(Encryption.class);
         }
 
         @Bean

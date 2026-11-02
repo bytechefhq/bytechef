@@ -7,11 +7,14 @@
 
 package com.bytechef.ee.automation.configuration.config;
 
+import static org.mockito.Mockito.mock;
+
 import com.bytechef.automation.configuration.callback.ProjectCallback;
 import com.bytechef.automation.configuration.callback.ProjectWorkflowCallback;
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
 import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
@@ -25,6 +28,7 @@ import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolver;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.encryption.Encryption;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
@@ -76,6 +80,16 @@ public class WorkspacePermissionIntTestConfiguration {
 
     public static final long CUSTOM_ROLE_ID = 900L;
     public static final String CUSTOM_ROLE_SCOPE = "PROJECT_SETTINGS";
+
+    @Bean
+    ApplicationProperties applicationProperties() {
+        return new ApplicationProperties();
+    }
+
+    @Bean
+    Encryption encryption() {
+        return mock(Encryption.class);
+    }
 
     @Bean
     CustomRoleScopeResolver customRoleScopeResolver() {
