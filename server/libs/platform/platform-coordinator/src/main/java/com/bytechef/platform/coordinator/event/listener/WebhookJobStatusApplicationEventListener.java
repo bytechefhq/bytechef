@@ -24,11 +24,10 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
-import com.bytechef.platform.notification.delivery.WebhookNotificationClient.WebhookRetry;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.notification.delivery.WebhookDelivery;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +42,14 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
     private static final Logger log = LoggerFactory.getLogger(WebhookJobStatusApplicationEventListener.class);
 
     private final JobService jobService;
-    private final WebhookNotificationClient webhookNotificationClient;
+    private final WebhookDeliveryService webhookDeliveryService;
 
     @SuppressFBWarnings("EI2")
     public WebhookJobStatusApplicationEventListener(
-        JobService jobService, WebhookNotificationClient webhookNotificationClient) {
+        JobService jobService, WebhookDeliveryService webhookDeliveryService) {
 
         this.jobService = jobService;
-        this.webhookNotificationClient = webhookNotificationClient;
+        this.webhookDeliveryService = webhookDeliveryService;
     }
 
     @Override
@@ -66,37 +65,21 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
 
                     webhookEvent.put(WorkflowConstants.EVENT, jobStatusApplicationEvent);
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("Calling job status webhook {} -> {}", webhook.url(), webhookEvent);
-                    }
+                    WebhookDelivery webhookDelivery = WebhookDelivery.builder("job_status", webhook.url())
+                        .description("job " + jobId + " status webhook")
+                        .validateUrl(false)
+                        .payload(String.valueOf(jobId), JsonUtils.write(webhookEvent))
+                        .retry(JobWebhookRetries.toWebhookRetry(webhook))
+                        .build();
 
-                    webhookNotificationClient.deliverEvent(webhook.url(), webhookEvent, toWebhookRetry(webhook));
+                    webhookDeliveryService.submit(webhookDelivery);
+
+                    if (log.isDebugEnabled()) {
+                        log.debug(
+                            "Job id={} status webhook to host {} submitted", jobId, webhookDelivery.host());
+                    }
                 }
             }
         }
-    }
-
-    private static WebhookRetry toWebhookRetry(Job.Webhook webhook) {
-        Job.Retry retry = webhook.retry();
-
-        return new WebhookRetry(getMaxAttempts(retry), getInitialInterval(retry), getMultiplier(retry));
-    }
-
-    private static int getMaxAttempts(Job.Retry retry) {
-        return retry.maxAttempts() == null
-            ? 5
-            : retry.maxAttempts();
-    }
-
-    private static double getMultiplier(Job.Retry retry) {
-        return retry.multiplier() == null
-            ? 2.0
-            : retry.multiplier();
-    }
-
-    private static Duration getInitialInterval(Job.Retry retry) {
-        return retry.initialInterval() == null
-            ? Duration.of(2, ChronoUnit.SECONDS)
-            : Duration.of(retry.initialInterval(), ChronoUnit.SECONDS);
     }
 }
