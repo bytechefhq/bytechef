@@ -12,6 +12,8 @@ service JobFacadeRemoteService {
   rpc CreateJob(RemoteJobParameters) returns (IdResponse);
   rpc DeleteJob(IdRequest) returns (google.protobuf.Empty);
   rpc ResumeApproval(ResumeApprovalRequest) returns (google.protobuf.Empty);
+  rpc ResumeClaimedJob(ResumeJobRequest) returns (google.protobuf.Empty);
+  rpc ResumeJob(ResumeJobRequest) returns (google.protobuf.Empty);
   rpc StopJob(IdRequest) returns (google.protobuf.Empty);
 }
 
@@ -62,6 +64,12 @@ message ResumeApprovalRequest {
   int64 job_id = 1;
   string uuid = 2;
   bool approved = 3;
+}
+
+message ResumeJobRequest {
+  int64 job_id = 1;
+  optional int64 task_execution_id = 2;
+  bytes data = 3;
 }
 
 message IdResponse {

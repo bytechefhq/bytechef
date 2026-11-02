@@ -15,10 +15,14 @@ import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJob;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJobParameters;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteTaskExecution;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteTaskExecutions;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.ResumeJobRequest;
+import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -29,6 +33,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class AtlasExecutionProtoMapper {
 
+    private final JsonBytes jsonBytes;
     private final ProtoJsonMapper protoJsonMapper;
     private final TaskExecutionProtoMapper taskExecutionProtoMapper;
 
@@ -38,6 +43,7 @@ public class AtlasExecutionProtoMapper {
                 .addMixIn(Job.class, NoArgsCreatorMixIn.class)
                 .addMixIn(JobParametersDTO.class, NoArgsCreatorMixIn.class)
                 .build());
+        this.jsonBytes = new JsonBytes(objectMapper);
         this.taskExecutionProtoMapper = new TaskExecutionProtoMapper(objectMapper);
     }
 
@@ -47,6 +53,24 @@ public class AtlasExecutionProtoMapper {
 
     public Job toJob(RemoteJob remoteJob) {
         return protoJsonMapper.toObject(remoteJob, Job.class);
+    }
+
+    public ResumeJobRequest toResumeJobRequest(
+        long jobId, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data) {
+
+        ResumeJobRequest.Builder builder = ResumeJobRequest.newBuilder()
+            .setJobId(jobId)
+            .setData(jsonBytes.write(data));
+
+        if (taskExecutionId != null) {
+            builder.setTaskExecutionId(taskExecutionId);
+        }
+
+        return builder.build();
+    }
+
+    public @Nullable Map<String, Object> toResumeData(ResumeJobRequest resumeJobRequest) {
+        return jsonBytes.readMap(resumeJobRequest.getData());
     }
 
     public JobParametersDTO toJobParametersDTO(RemoteJobParameters remoteJobParameters) {
