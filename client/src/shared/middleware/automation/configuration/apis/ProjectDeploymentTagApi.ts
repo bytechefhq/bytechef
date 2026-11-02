@@ -29,6 +29,10 @@ export interface GetProjectDeploymentTagsRequest {
      * The id of a workspace.
      */
     id: number;
+    /**
+     * The id of an environment.
+     */
+    environmentId?: number;
 }
 
 export interface UpdateProjectDeploymentTagsRequest {
@@ -59,6 +63,10 @@ export class ProjectDeploymentTagApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

@@ -469,6 +469,25 @@ export type A2aServersQueryVariables = Exact<{
 
 export type A2aServersQuery = { a2aServers: Array<{ authenticationRequired: boolean, description: string | null, enabled: boolean, environmentId: string, id: string, lastModifiedDate: any, name: string, secretKey: string | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
+export type AddWorkspaceUserMutationVariables = Exact<{
+  workspaceId: string | number;
+  userId: string | number;
+  role?: Types.WorkspaceRole | null | undefined;
+  customRoleId?: string | number | null | undefined;
+}>;
+
+
+export type AddWorkspaceUserMutation = { addWorkspaceUser: { id: string | null, workspaceId: string, userId: string, workspaceRole: Types.WorkspaceRole | null, customRoleId: string | null, user: { email: string, firstName: string | null, lastName: string | null } | null } };
+
+export type AssignWorkspaceUserCustomRoleMutationVariables = Exact<{
+  workspaceId: string | number;
+  userId: string | number;
+  customRoleId: string | number;
+}>;
+
+
+export type AssignWorkspaceUserCustomRoleMutation = { assignWorkspaceUserCustomRole: { id: string | null, userId: string, workspaceRole: Types.WorkspaceRole | null, customRoleId: string | null } };
+
 export type AutomationGettingStartedQueryVariables = Exact<{
   workspaceId: string | number;
 }>;
@@ -483,6 +502,11 @@ export type AutomationGettingStartedCompletedQueryVariables = Exact<{
 
 export type AutomationGettingStartedCompletedQuery = { automationGettingStartedCompleted: boolean };
 
+export type BuiltInRolesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BuiltInRolesQuery = { builtInRoles: Array<{ name: string, scopes: Array<string> }> };
+
 export type CreateA2aProjectMutationVariables = Exact<{
   input: Types.CreateA2aProjectInput;
 }>;
@@ -496,6 +520,13 @@ export type CreateA2aServerMutationVariables = Exact<{
 
 
 export type CreateA2aServerMutation = { createA2aServer: { id: string } | null };
+
+export type CreateCustomRoleMutationVariables = Exact<{
+  input: Types.CreateCustomRoleInput;
+}>;
+
+
+export type CreateCustomRoleMutation = { createCustomRole: { id: string, name: string, description: string | null, scopes: Array<string> } };
 
 export type CreateMcpProjectMutationVariables = Exact<{
   input: Types.CreateMcpProjectInput;
@@ -520,6 +551,13 @@ export type CreateMcpServerMutationVariables = Exact<{
 
 export type CreateMcpServerMutation = { createWorkspaceMcpServer: { id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean } | null };
 
+export type CustomRolesQueryVariables = Exact<{
+  workspaceId?: string | number | null | undefined;
+}>;
+
+
+export type CustomRolesQuery = { customRoles: Array<{ id: string, name: string, description: string | null, scopes: Array<string> }> };
+
 export type DeleteA2aProjectMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -533,6 +571,13 @@ export type DeleteA2aServerMutationVariables = Exact<{
 
 
 export type DeleteA2aServerMutation = { deleteA2aServer: boolean | null };
+
+export type DeleteCustomRoleMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteCustomRoleMutation = { deleteCustomRole: boolean };
 
 export type DeleteMcpProjectMutationVariables = Exact<{
   id: string | number;
@@ -617,6 +662,16 @@ export type ImportWorkflowTemplateMutationVariables = Exact<{
 
 export type ImportWorkflowTemplateMutation = { importWorkflowTemplate: string };
 
+export type InviteWorkspaceUserMutationVariables = Exact<{
+  workspaceId: string | number;
+  email: string;
+  role?: Types.WorkspaceRole | null | undefined;
+  customRoleId?: string | number | null | undefined;
+}>;
+
+
+export type InviteWorkspaceUserMutation = { inviteWorkspaceUser: { id: string | null, userId: string, workspaceId: string, workspaceRole: Types.WorkspaceRole | null, customRoleId: string | null } };
+
 export type McpProjectWorkflowPropertiesQueryVariables = Exact<{
   mcpProjectWorkflowId: string | number;
 }>;
@@ -685,6 +740,11 @@ export type MyWorkspaceScopesQueryVariables = Exact<{
 
 export type MyWorkspaceScopesQuery = { myWorkspaceScopes: Array<string> };
 
+export type PermissionScopeGroupsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PermissionScopeGroupsQuery = { permissionScopeGroups: Array<{ name: string, scopes: Array<string> }> };
+
 export type PreBuiltProjectTemplatesQueryVariables = Exact<{
   query?: string | null | undefined;
   category?: string | null | undefined;
@@ -732,6 +792,34 @@ export type ProjectVersionWorkflowChangesQueryVariables = Exact<{
 
 
 export type ProjectVersionWorkflowChangesQuery = { projectVersionWorkflowChanges: { baseVersion: number | null, version: number, workflows: Array<{ workflowUuid: string, label: string | null, changeType: Types.WorkflowChangeType, changeCount: number }> } };
+
+export type RemoveWorkspaceUserMutationVariables = Exact<{
+  workspaceId: string | number;
+  userId: string | number;
+}>;
+
+
+export type RemoveWorkspaceUserMutation = { removeWorkspaceUser: boolean };
+
+export type RemoveWorkspaceUserEnvironmentRoleMutationVariables = Exact<{
+  workspaceId: string | number;
+  userId: string | number;
+  environment: Types.EnvironmentEnum;
+}>;
+
+
+export type RemoveWorkspaceUserEnvironmentRoleMutation = { removeWorkspaceUserEnvironmentRole: boolean };
+
+export type SetWorkspaceUserEnvironmentRoleMutationVariables = Exact<{
+  workspaceId: string | number;
+  userId: string | number;
+  environment: Types.EnvironmentEnum;
+  role?: Types.WorkspaceRole | null | undefined;
+  customRoleId?: string | number | null | undefined;
+}>;
+
+
+export type SetWorkspaceUserEnvironmentRoleMutation = { setWorkspaceUserEnvironmentRole: { id: string | null, userId: string, workspaceRole: Types.WorkspaceRole | null, customRoleId: string | null, environment: Types.EnvironmentEnum | null } };
 
 export type SharedProjectQueryVariables = Exact<{
   projectUuid: string;
@@ -849,6 +937,14 @@ export type UpdateConnectionCredentialsMutationVariables = Exact<{
 
 export type UpdateConnectionCredentialsMutation = { updateConnectionCredentials: boolean };
 
+export type UpdateCustomRoleMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateCustomRoleInput;
+}>;
+
+
+export type UpdateCustomRoleMutation = { updateCustomRole: { id: string, name: string, description: string | null, scopes: Array<string> } };
+
 export type UpdateMcpProjectMutationVariables = Exact<{
   id: string | number;
   input: Types.UpdateMcpProjectInput;
@@ -897,6 +993,15 @@ export type UpdateWorkspaceMcpToolEnabledMutationVariables = Exact<{
 
 export type UpdateWorkspaceMcpToolEnabledMutation = { updateWorkspaceMcpToolEnabled: { id: string, enabled: boolean } | null };
 
+export type UpdateWorkspaceUserRoleMutationVariables = Exact<{
+  workspaceId: string | number;
+  userId: string | number;
+  role: Types.WorkspaceRole;
+}>;
+
+
+export type UpdateWorkspaceUserRoleMutation = { updateWorkspaceUserRole: { id: string | null, workspaceRole: Types.WorkspaceRole | null } };
+
 export type WorkflowChatProjectDeploymentWorkflowQueryVariables = Exact<{
   id: string;
 }>;
@@ -941,6 +1046,13 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 
 
 export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, enforceToolAuthorization: boolean, authenticationRequired: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null, mcpTools: Array<{ id: string } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
+
+export type WorkspaceUsersQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceUsersQuery = { workspaceUsers: Array<{ id: string | null, workspaceId: string, userId: string, workspaceRole: Types.WorkspaceRole | null, customRoleId: string | null, inherited: boolean, createdDate: string | null, environment: Types.EnvironmentEnum | null, user: { email: string, firstName: string | null, lastName: string | null } | null }> };
 
 export type AddDataTableColumnMutationVariables = Exact<{
   input: Types.AddColumnInput;
@@ -2980,6 +3092,7 @@ export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision:
 export type InviteUserMutationVariables = Exact<{
   email: string;
   role: string;
+  workspaces?: Array<Types.WorkspaceAssignmentInput> | Types.WorkspaceAssignmentInput | null | undefined;
 }>;
 
 
@@ -4739,6 +4852,69 @@ export const useA2aServersQuery = <
   }
     )};
 
+export const AddWorkspaceUserDocument = new TypedDocumentString(`
+    mutation AddWorkspaceUser($workspaceId: ID!, $userId: ID!, $role: WorkspaceRole, $customRoleId: ID) {
+  addWorkspaceUser(
+    workspaceId: $workspaceId
+    userId: $userId
+    role: $role
+    customRoleId: $customRoleId
+  ) {
+    id
+    workspaceId
+    userId
+    workspaceRole
+    customRoleId
+    user {
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `);
+
+export const useAddWorkspaceUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddWorkspaceUserMutation, TError, AddWorkspaceUserMutationVariables, TContext>) => {
+    
+    return useMutation<AddWorkspaceUserMutation, TError, AddWorkspaceUserMutationVariables, TContext>(
+      {
+    mutationKey: ['AddWorkspaceUser'],
+    mutationFn: (variables?: AddWorkspaceUserMutationVariables) => fetcher<AddWorkspaceUserMutation, AddWorkspaceUserMutationVariables>(AddWorkspaceUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AssignWorkspaceUserCustomRoleDocument = new TypedDocumentString(`
+    mutation AssignWorkspaceUserCustomRole($workspaceId: ID!, $userId: ID!, $customRoleId: ID!) {
+  assignWorkspaceUserCustomRole(
+    workspaceId: $workspaceId
+    userId: $userId
+    customRoleId: $customRoleId
+  ) {
+    id
+    userId
+    workspaceRole
+    customRoleId
+  }
+}
+    `);
+
+export const useAssignWorkspaceUserCustomRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AssignWorkspaceUserCustomRoleMutation, TError, AssignWorkspaceUserCustomRoleMutationVariables, TContext>) => {
+    
+    return useMutation<AssignWorkspaceUserCustomRoleMutation, TError, AssignWorkspaceUserCustomRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['AssignWorkspaceUserCustomRole'],
+    mutationFn: (variables?: AssignWorkspaceUserCustomRoleMutationVariables) => fetcher<AssignWorkspaceUserCustomRoleMutation, AssignWorkspaceUserCustomRoleMutationVariables>(AssignWorkspaceUserCustomRoleDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const AutomationGettingStartedDocument = new TypedDocumentString(`
     query automationGettingStarted($workspaceId: ID!) {
   automationGettingStarted(workspaceId: $workspaceId) {
@@ -4808,6 +4984,31 @@ export const useAutomationGettingStartedCompletedQuery = <
   }
     )};
 
+export const BuiltInRolesDocument = new TypedDocumentString(`
+    query BuiltInRoles {
+  builtInRoles {
+    name
+    scopes
+  }
+}
+    `);
+
+export const useBuiltInRolesQuery = <
+      TData = BuiltInRolesQuery,
+      TError = unknown
+    >(
+      variables?: BuiltInRolesQueryVariables,
+      options?: Omit<UseQueryOptions<BuiltInRolesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<BuiltInRolesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<BuiltInRolesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['BuiltInRoles'] : ['BuiltInRoles', variables],
+    queryFn: fetcher<BuiltInRolesQuery, BuiltInRolesQueryVariables>(BuiltInRolesDocument, variables),
+    ...options
+  }
+    )};
+
 export const CreateA2aProjectDocument = new TypedDocumentString(`
     mutation createA2aProject($input: CreateA2aProjectInput!) {
   createA2aProject(input: $input) {
@@ -4846,6 +5047,30 @@ export const useCreateA2aServerMutation = <
       {
     mutationKey: ['createA2aServer'],
     mutationFn: (variables?: CreateA2aServerMutationVariables) => fetcher<CreateA2aServerMutation, CreateA2aServerMutationVariables>(CreateA2aServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateCustomRoleDocument = new TypedDocumentString(`
+    mutation CreateCustomRole($input: CreateCustomRoleInput!) {
+  createCustomRole(input: $input) {
+    id
+    name
+    description
+    scopes
+  }
+}
+    `);
+
+export const useCreateCustomRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateCustomRoleMutation, TError, CreateCustomRoleMutationVariables, TContext>) => {
+    
+    return useMutation<CreateCustomRoleMutation, TError, CreateCustomRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['CreateCustomRole'],
+    mutationFn: (variables?: CreateCustomRoleMutationVariables) => fetcher<CreateCustomRoleMutation, CreateCustomRoleMutationVariables>(CreateCustomRoleDocument, variables)(),
     ...options
   }
     )};
@@ -4922,6 +5147,33 @@ export const useCreateMcpServerMutation = <
   }
     )};
 
+export const CustomRolesDocument = new TypedDocumentString(`
+    query CustomRoles($workspaceId: ID) {
+  customRoles(workspaceId: $workspaceId) {
+    id
+    name
+    description
+    scopes
+  }
+}
+    `);
+
+export const useCustomRolesQuery = <
+      TData = CustomRolesQuery,
+      TError = unknown
+    >(
+      variables?: CustomRolesQueryVariables,
+      options?: Omit<UseQueryOptions<CustomRolesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomRolesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<CustomRolesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['CustomRoles'] : ['CustomRoles', variables],
+    queryFn: fetcher<CustomRolesQuery, CustomRolesQueryVariables>(CustomRolesDocument, variables),
+    ...options
+  }
+    )};
+
 export const DeleteA2aProjectDocument = new TypedDocumentString(`
     mutation deleteA2aProject($id: ID!) {
   deleteA2aProject(id: $id)
@@ -4956,6 +5208,25 @@ export const useDeleteA2aServerMutation = <
       {
     mutationKey: ['deleteA2aServer'],
     mutationFn: (variables?: DeleteA2aServerMutationVariables) => fetcher<DeleteA2aServerMutation, DeleteA2aServerMutationVariables>(DeleteA2aServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteCustomRoleDocument = new TypedDocumentString(`
+    mutation DeleteCustomRole($id: ID!) {
+  deleteCustomRole(id: $id)
+}
+    `);
+
+export const useDeleteCustomRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteCustomRoleMutation, TError, DeleteCustomRoleMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteCustomRoleMutation, TError, DeleteCustomRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['DeleteCustomRole'],
+    mutationFn: (variables?: DeleteCustomRoleMutationVariables) => fetcher<DeleteCustomRoleMutation, DeleteCustomRoleMutationVariables>(DeleteCustomRoleDocument, variables)(),
     ...options
   }
     )};
@@ -5173,6 +5444,36 @@ export const useImportWorkflowTemplateMutation = <
       {
     mutationKey: ['importWorkflowTemplate'],
     mutationFn: (variables?: ImportWorkflowTemplateMutationVariables) => fetcher<ImportWorkflowTemplateMutation, ImportWorkflowTemplateMutationVariables>(ImportWorkflowTemplateDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const InviteWorkspaceUserDocument = new TypedDocumentString(`
+    mutation inviteWorkspaceUser($workspaceId: ID!, $email: String!, $role: WorkspaceRole, $customRoleId: ID) {
+  inviteWorkspaceUser(
+    workspaceId: $workspaceId
+    email: $email
+    role: $role
+    customRoleId: $customRoleId
+  ) {
+    id
+    userId
+    workspaceId
+    workspaceRole
+    customRoleId
+  }
+}
+    `);
+
+export const useInviteWorkspaceUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<InviteWorkspaceUserMutation, TError, InviteWorkspaceUserMutationVariables, TContext>) => {
+    
+    return useMutation<InviteWorkspaceUserMutation, TError, InviteWorkspaceUserMutationVariables, TContext>(
+      {
+    mutationKey: ['inviteWorkspaceUser'],
+    mutationFn: (variables?: InviteWorkspaceUserMutationVariables) => fetcher<InviteWorkspaceUserMutation, InviteWorkspaceUserMutationVariables>(InviteWorkspaceUserDocument, variables)(),
     ...options
   }
     )};
@@ -5463,6 +5764,31 @@ export const useMyWorkspaceScopesQuery = <
   }
     )};
 
+export const PermissionScopeGroupsDocument = new TypedDocumentString(`
+    query PermissionScopeGroups {
+  permissionScopeGroups {
+    name
+    scopes
+  }
+}
+    `);
+
+export const usePermissionScopeGroupsQuery = <
+      TData = PermissionScopeGroupsQuery,
+      TError = unknown
+    >(
+      variables?: PermissionScopeGroupsQueryVariables,
+      options?: Omit<UseQueryOptions<PermissionScopeGroupsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PermissionScopeGroupsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<PermissionScopeGroupsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['PermissionScopeGroups'] : ['PermissionScopeGroups', variables],
+    queryFn: fetcher<PermissionScopeGroupsQuery, PermissionScopeGroupsQueryVariables>(PermissionScopeGroupsDocument, variables),
+    ...options
+  }
+    )};
+
 export const PreBuiltProjectTemplatesDocument = new TypedDocumentString(`
     query preBuiltProjectTemplates($query: String, $category: String) {
   preBuiltProjectTemplates(query: $query, category: $category) {
@@ -5702,6 +6028,79 @@ export const useProjectVersionWorkflowChangesQuery = <
       {
     queryKey: ['projectVersionWorkflowChanges', variables],
     queryFn: fetcher<ProjectVersionWorkflowChangesQuery, ProjectVersionWorkflowChangesQueryVariables>(ProjectVersionWorkflowChangesDocument, variables),
+    ...options
+  }
+    )};
+
+export const RemoveWorkspaceUserDocument = new TypedDocumentString(`
+    mutation RemoveWorkspaceUser($workspaceId: ID!, $userId: ID!) {
+  removeWorkspaceUser(workspaceId: $workspaceId, userId: $userId)
+}
+    `);
+
+export const useRemoveWorkspaceUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RemoveWorkspaceUserMutation, TError, RemoveWorkspaceUserMutationVariables, TContext>) => {
+    
+    return useMutation<RemoveWorkspaceUserMutation, TError, RemoveWorkspaceUserMutationVariables, TContext>(
+      {
+    mutationKey: ['RemoveWorkspaceUser'],
+    mutationFn: (variables?: RemoveWorkspaceUserMutationVariables) => fetcher<RemoveWorkspaceUserMutation, RemoveWorkspaceUserMutationVariables>(RemoveWorkspaceUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RemoveWorkspaceUserEnvironmentRoleDocument = new TypedDocumentString(`
+    mutation RemoveWorkspaceUserEnvironmentRole($workspaceId: ID!, $userId: ID!, $environment: EnvironmentEnum!) {
+  removeWorkspaceUserEnvironmentRole(
+    workspaceId: $workspaceId
+    userId: $userId
+    environment: $environment
+  )
+}
+    `);
+
+export const useRemoveWorkspaceUserEnvironmentRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RemoveWorkspaceUserEnvironmentRoleMutation, TError, RemoveWorkspaceUserEnvironmentRoleMutationVariables, TContext>) => {
+    
+    return useMutation<RemoveWorkspaceUserEnvironmentRoleMutation, TError, RemoveWorkspaceUserEnvironmentRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['RemoveWorkspaceUserEnvironmentRole'],
+    mutationFn: (variables?: RemoveWorkspaceUserEnvironmentRoleMutationVariables) => fetcher<RemoveWorkspaceUserEnvironmentRoleMutation, RemoveWorkspaceUserEnvironmentRoleMutationVariables>(RemoveWorkspaceUserEnvironmentRoleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetWorkspaceUserEnvironmentRoleDocument = new TypedDocumentString(`
+    mutation SetWorkspaceUserEnvironmentRole($workspaceId: ID!, $userId: ID!, $environment: EnvironmentEnum!, $role: WorkspaceRole, $customRoleId: ID) {
+  setWorkspaceUserEnvironmentRole(
+    workspaceId: $workspaceId
+    userId: $userId
+    environment: $environment
+    role: $role
+    customRoleId: $customRoleId
+  ) {
+    id
+    userId
+    workspaceRole
+    customRoleId
+    environment
+  }
+}
+    `);
+
+export const useSetWorkspaceUserEnvironmentRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetWorkspaceUserEnvironmentRoleMutation, TError, SetWorkspaceUserEnvironmentRoleMutationVariables, TContext>) => {
+    
+    return useMutation<SetWorkspaceUserEnvironmentRoleMutation, TError, SetWorkspaceUserEnvironmentRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['SetWorkspaceUserEnvironmentRole'],
+    mutationFn: (variables?: SetWorkspaceUserEnvironmentRoleMutationVariables) => fetcher<SetWorkspaceUserEnvironmentRoleMutation, SetWorkspaceUserEnvironmentRoleMutationVariables>(SetWorkspaceUserEnvironmentRoleDocument, variables)(),
     ...options
   }
     )};
@@ -6078,6 +6477,30 @@ export const useUpdateConnectionCredentialsMutation = <
   }
     )};
 
+export const UpdateCustomRoleDocument = new TypedDocumentString(`
+    mutation UpdateCustomRole($id: ID!, $input: UpdateCustomRoleInput!) {
+  updateCustomRole(id: $id, input: $input) {
+    id
+    name
+    description
+    scopes
+  }
+}
+    `);
+
+export const useUpdateCustomRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateCustomRoleMutation, TError, UpdateCustomRoleMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateCustomRoleMutation, TError, UpdateCustomRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateCustomRole'],
+    mutationFn: (variables?: UpdateCustomRoleMutationVariables) => fetcher<UpdateCustomRoleMutation, UpdateCustomRoleMutationVariables>(UpdateCustomRoleDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const UpdateMcpProjectDocument = new TypedDocumentString(`
     mutation updateMcpProject($id: ID!, $input: UpdateMcpProjectInput!) {
   updateMcpProject(id: $id, input: $input) {
@@ -6208,6 +6631,28 @@ export const useUpdateWorkspaceMcpToolEnabledMutation = <
       {
     mutationKey: ['updateWorkspaceMcpToolEnabled'],
     mutationFn: (variables?: UpdateWorkspaceMcpToolEnabledMutationVariables) => fetcher<UpdateWorkspaceMcpToolEnabledMutation, UpdateWorkspaceMcpToolEnabledMutationVariables>(UpdateWorkspaceMcpToolEnabledDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceUserRoleDocument = new TypedDocumentString(`
+    mutation UpdateWorkspaceUserRole($workspaceId: ID!, $userId: ID!, $role: WorkspaceRole!) {
+  updateWorkspaceUserRole(workspaceId: $workspaceId, userId: $userId, role: $role) {
+    id
+    workspaceRole
+  }
+}
+    `);
+
+export const useUpdateWorkspaceUserRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceUserRoleMutation, TError, UpdateWorkspaceUserRoleMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceUserRoleMutation, TError, UpdateWorkspaceUserRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateWorkspaceUserRole'],
+    mutationFn: (variables?: UpdateWorkspaceUserRoleMutationVariables) => fetcher<UpdateWorkspaceUserRoleMutation, UpdateWorkspaceUserRoleMutationVariables>(UpdateWorkspaceUserRoleDocument, variables)(),
     ...options
   }
     )};
@@ -6425,6 +6870,42 @@ export const useWorkspaceMcpServersQuery = <
       {
     queryKey: ['workspaceMcpServers', variables],
     queryFn: fetcher<WorkspaceMcpServersQuery, WorkspaceMcpServersQueryVariables>(WorkspaceMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceUsersDocument = new TypedDocumentString(`
+    query WorkspaceUsers($workspaceId: ID!) {
+  workspaceUsers(workspaceId: $workspaceId) {
+    id
+    workspaceId
+    userId
+    workspaceRole
+    customRoleId
+    inherited
+    user {
+      email
+      firstName
+      lastName
+    }
+    createdDate
+    environment
+  }
+}
+    `);
+
+export const useWorkspaceUsersQuery = <
+      TData = WorkspaceUsersQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceUsersQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceUsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceUsersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceUsersQuery, TError, TData>(
+      {
+    queryKey: ['WorkspaceUsers', variables],
+    queryFn: fetcher<WorkspaceUsersQuery, WorkspaceUsersQueryVariables>(WorkspaceUsersDocument, variables),
     ...options
   }
     )};
@@ -14017,8 +14498,8 @@ export const useIdentityProvidersQuery = <
     )};
 
 export const InviteUserDocument = new TypedDocumentString(`
-    mutation inviteUser($email: String!, $role: String!) {
-  inviteUser(email: $email, role: $role)
+    mutation inviteUser($email: String!, $role: String!, $workspaces: [WorkspaceAssignmentInput!]) {
+  inviteUser(email: $email, role: $role, workspaces: $workspaces)
 }
     `);
 
