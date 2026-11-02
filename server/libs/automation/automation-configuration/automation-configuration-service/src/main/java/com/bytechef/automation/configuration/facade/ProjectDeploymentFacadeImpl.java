@@ -419,11 +419,13 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#id, 'DEPLOYMENT_VIEW', #environmentId)")
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
-    public List<Tag> getProjectDeploymentTags(long workspaceId) {
+    public List<Tag> getProjectDeploymentTags(long id, Long environmentId) {
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            false, null, null, null, workspaceId);
+            false, environment, null, null, id);
 
         return tagService.getTags(
             projectDeployments.stream()
