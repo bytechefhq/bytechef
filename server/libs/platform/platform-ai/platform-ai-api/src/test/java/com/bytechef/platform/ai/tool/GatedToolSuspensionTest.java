@@ -54,7 +54,7 @@ class GatedToolSuspensionTest {
         assertThat(continueParameters)
             .containsEntry("formUrl", "https://example.com/form")
             .containsEntry("approvalRaisedAt", "2026-10-17T10:15:30Z")
-            .containsEntry("__bytechef_approval_resume__", true)
+            .containsEntry("__BYTECHEF_APPROVAL_RESUME__", true)
             .containsEntry(
                 "approvalFormParameters",
                 Map.of("formTitle", "Approve tool call", "formDescription", "The agent wants to call"));

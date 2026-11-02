@@ -1537,7 +1537,7 @@ class AbstractAiAgentChatActionTest {
 
         @Test
         void testASuspendedToolCallLogsItsInputs() {
-            String suspendedToolResult = "__bytechef_tool_suspended__:approval";
+            String suspendedToolResult = "__BYTECHEF_TOOL_SUSPENDED__:approval";
             ActionContextAware context = mock(ActionContextAware.class);
 
             when(context.getSuspend()).thenReturn(

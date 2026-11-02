@@ -257,7 +257,7 @@ class SuspendableToolCallingManagerTest {
                 .responses(
                     List.of(
                         new ToolResponseMessage.ToolResponse("call_a", "httpTool", createSuspendedToolResult()),
-                        new ToolResponseMessage.ToolResponse("call_b", "mcpTool", "__bytechef_tool_suspended__"),
+                        new ToolResponseMessage.ToolResponse("call_b", "mcpTool", "__BYTECHEF_TOOL_SUSPENDED__"),
                         new ToolResponseMessage.ToolResponse("call_c", "requestApproval", SUSPENDED_TOOL_RESULT)))
                 .build());
         ToolCallingManager delegate = mock(ToolCallingManager.class);

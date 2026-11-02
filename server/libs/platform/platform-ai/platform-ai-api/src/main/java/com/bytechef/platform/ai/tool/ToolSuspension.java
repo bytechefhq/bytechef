@@ -35,9 +35,9 @@ import org.jspecify.annotations.Nullable;
  */
 public final class ToolSuspension {
 
-    public static final String SUSPENDED_TOOL_RESULT = "__bytechef_suspended_tool_result__";
+    public static final String SUSPENDED_TOOL_RESULT = "__BYTECHEF_SUSPENDED_TOOL_RESULT__";
 
-    private static final String SUSPENDED_TOOL_RESULT_PREFIX = "__bytechef_tool_suspended__:";
+    private static final String SUSPENDED_TOOL_RESULT_PREFIX = "__BYTECHEF_TOOL_SUSPENDED__:";
 
     private ToolSuspension() {
     }

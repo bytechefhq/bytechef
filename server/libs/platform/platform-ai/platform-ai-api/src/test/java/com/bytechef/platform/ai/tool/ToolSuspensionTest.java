@@ -91,7 +91,7 @@ class ToolSuspensionTest {
         assertThat(ToolSuspension.isSuspendedToolResult(null, suspendedToolResult)).isFalse();
         assertThat(ToolSuspension.isSuspendedToolResult("", suspendedToolResult)).isFalse();
         assertThat(ToolSuspension.isSuspendedToolResult("{\"approved\":true}", suspendedToolResult)).isFalse();
-        assertThat(ToolSuspension.isSuspendedToolResult("__bytechef_tool_suspended__", suspendedToolResult))
+        assertThat(ToolSuspension.isSuspendedToolResult("__BYTECHEF_TOOL_SUSPENDED__", suspendedToolResult))
             .isFalse();
         assertThat(ToolSuspension.isSuspendedToolResult(suspendedToolResult, (String) null)).isFalse();
         assertThat(ToolSuspension.isSuspendedToolResult(suspendedToolResult, (Suspend) null)).isFalse();
