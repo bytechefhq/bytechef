@@ -22,6 +22,14 @@ import com.bytechef.platform.billing.config.BillingIntTestConfiguration;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,6 +92,55 @@ class PrepaidBillingSubscriptionRepositoryIntTest {
         assertThat(prepaidBillingSubscriptionRepository.incrementExtraUnitUsed(subscriptionId)).isEqualTo(0);
 
         assertThat(reload().getExtraUnitUsed()).isEqualTo(1);
+    }
+
+    @Test
+    void testConcurrentConsumptionNeverExceedsTotals() throws Exception {
+        BillingSubscription billingSubscription = reload();
+
+        billingSubscription.setPlanUnitTotal(50);
+
+        billingSubscriptionRepository.save(billingSubscription);
+
+        prepaidBillingSubscriptionRepository.addExtraUnitTotal(subscriptionId, 30);
+
+        int attempts = 200;
+        CountDownLatch startLatch = new CountDownLatch(1);
+        List<Callable<Integer>> consumptions = new ArrayList<>();
+
+        for (int index = 0; index < attempts; index++) {
+            consumptions.add(() -> {
+                startLatch.await();
+
+                if (prepaidBillingSubscriptionRepository.incrementPlanUnitUsed(subscriptionId) == 1) {
+                    return 1;
+                }
+
+                return prepaidBillingSubscriptionRepository.incrementExtraUnitUsed(subscriptionId);
+            });
+        }
+
+        int consumed = 0;
+
+        try (ExecutorService executorService = Executors.newFixedThreadPool(8)) {
+            List<Future<Integer>> futures = new ArrayList<>();
+
+            for (Callable<Integer> consumption : consumptions) {
+                futures.add(executorService.submit(consumption));
+            }
+
+            startLatch.countDown();
+
+            for (Future<Integer> future : futures) {
+                consumed += future.get(30, TimeUnit.SECONDS);
+            }
+        }
+
+        BillingSubscription consumedSubscription = reload();
+
+        assertThat(consumed).isEqualTo(80);
+        assertThat(consumedSubscription.getPlanUnitUsed()).isEqualTo(50);
+        assertThat(consumedSubscription.getExtraUnitUsed()).isEqualTo(30);
     }
 
     @Test

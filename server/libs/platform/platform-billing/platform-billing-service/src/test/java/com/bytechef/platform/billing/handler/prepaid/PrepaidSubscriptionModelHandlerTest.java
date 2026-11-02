@@ -369,6 +369,31 @@ class PrepaidSubscriptionModelHandlerTest {
     }
 
     @Test
+    void testSubscriptionUpdatedSetsCancelAtPeriodEnd() throws Exception {
+        BillingSubscription subscription = prepaidSubscription("STARTER", 5000);
+        Subscription stripeSubscription = prepaidStripeSubscription(
+            "sub_1", STARTER_PRODUCT_ID, "5000", PERIOD_START, PERIOD_END);
+
+        stripeSubscription.setCancelAtPeriodEnd(true);
+
+        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        handler.handleSubscriptionUpdated(subscription, stripeSubscription);
+
+        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
+
+        verify(billingSubscriptionService).save(captor.capture());
+
+        BillingSubscription savedSubscription = captor.getValue();
+
+        assertThat(savedSubscription.isCancelAtPeriodEnd()).isTrue();
+        assertThat(savedSubscription.getStatus()).isEqualTo(BillingSubscription.Status.ACTIVE);
+        assertThat(savedSubscription.getPlanUnitTotal()).isEqualTo(5000);
+
+        verify(prepaidBillingSubscriptionRepository, never()).resetUnitUsedForNewPeriod(anyLong());
+    }
+
+    @Test
     void testSubscriptionDeletedSetsStatusToCanceled() {
         BillingSubscription subscription = prepaidSubscription("STARTER", 5000);
 
