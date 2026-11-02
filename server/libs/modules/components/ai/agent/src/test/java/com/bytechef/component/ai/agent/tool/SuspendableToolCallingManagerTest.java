@@ -39,6 +39,7 @@ import com.bytechef.platform.component.definition.ActionContextAware.ApprovalLin
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.domain.ClusterElement;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -523,8 +524,9 @@ class SuspendableToolCallingManagerTest {
                 .build());
 
         ApprovalGateToolCallback approvalGateToolCallback = new ApprovalGateToolCallback(
-            slackToolCallback, "Outbound messages", List.of(), Map.of(), mock(ClusterElementDefinitionService.class),
-            context, null);
+            slackToolCallback,
+            new ClusterElement(null, null, Map.of(), null, "slack/v1/sendMessage", Map.of(), "slack_1"),
+            "Outbound messages", List.of(), Map.of(), mock(ClusterElementDefinitionService.class), context, null);
 
         ToolCallingManager delegate = mock(ToolCallingManager.class);
 
