@@ -1,5 +1,5 @@
 # docker/dockerfile:1
-FROM ghcr.io/graalvm/graalvm-community:25i2-25.0.4  AS bytechef-server-base
+FROM ghcr.io/graalvm/jdk-community:25i2-25.0.4  AS bytechef-server-base
 
 RUN mkdir /opt/bytechef
 RUN mkdir /opt/bytechef/server
