@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doReturn;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
@@ -31,9 +32,11 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -54,6 +57,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @author Ivica Cardic
@@ -75,6 +79,9 @@ class ProjectWorkflowFacadeAuditIntTest {
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @MockitoSpyBean
+    private PermissionService permissionService;
 
     @Autowired
     private ProjectFacade projectFacade;
@@ -189,6 +196,9 @@ class ProjectWorkflowFacadeAuditIntTest {
         String workflowId = addWorkflow();
 
         authenticate(AuthorityConstants.USER);
+
+        doReturn(false).when(permissionService)
+            .hasWorkflowScope(workflowId, "WORKFLOW_DELETE", Environment.DEVELOPMENT);
 
         assertThatThrownBy(() -> projectWorkflowFacade.deleteWorkflow(workflowId))
             .isInstanceOf(AccessDeniedException.class);

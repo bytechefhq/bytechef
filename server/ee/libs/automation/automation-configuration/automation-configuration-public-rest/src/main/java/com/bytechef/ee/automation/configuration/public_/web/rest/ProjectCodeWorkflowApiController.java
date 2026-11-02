@@ -18,6 +18,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -53,7 +54,7 @@ public class ProjectCodeWorkflowApiController implements ProjectCodeWorkflowApi 
 
         try {
             projectCodeWorkflowFacade.save(
-                workspaceId, projectFile.getBytes(),
+                Validate.notNull(workspaceId, "workspaceId"), projectFile.getBytes(),
                 Language.of(Objects.requireNonNull(projectFile.getOriginalFilename())), getEnvironment(xEnvironment),
                 enable);
         } catch (IOException e) {

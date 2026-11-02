@@ -230,13 +230,15 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE') and "
+        + "hasPermission(#workspaceId, 'Workspace', 'PROJECT_PUBLISH')")
     public void save(long workspaceId, byte[] bytes, Language language) {
         publish(workspaceId, bytes, language);
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE') and "
+        + "hasPermission(#workspaceId, 'Workspace', 'PROJECT_PUBLISH')")
     public void save(long workspaceId, byte[] bytes, Language language, Environment environment, boolean enable) {
         PublishedProject publishedProject = publish(workspaceId, bytes, language);
 
@@ -430,7 +432,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         long projectId = Objects.requireNonNull(project.getId());
 
         if (!permissionService.hasResourceScope(projectId, "Project", "WORKFLOW_EDIT") ||
-            !permissionService.hasResourceScope(projectId, "Project", "DEPLOYMENT_PUSH")) {
+            !permissionService.hasResourceScope(projectId, "Project", "PROJECT_PUBLISH")) {
 
             throw new AccessDeniedException(
                 "Not allowed to edit and publish the project named '" + project.getName() + "'");
