@@ -72,7 +72,10 @@ public class TaskStateServiceImpl implements TaskStateService {
         Optional<TaskState> taskStateOptional = taskStateRepository.findByJobResumeId(jobResumeId.toString());
 
         Object storedValue = stateValueDataStorage.write(
-            getKey(jobResumeId), value, stateValueDataStorage.fetchJobReference(jobResumeId.getJobId()));
+            getKey(jobResumeId), value, stateValueDataStorage.fetchJobLocation(jobResumeId.getJobId()),
+            taskStateOptional
+                .map(TaskState::getValue)
+                .orElse(null));
 
         taskStateOptional.ifPresentOrElse(
             taskState -> {

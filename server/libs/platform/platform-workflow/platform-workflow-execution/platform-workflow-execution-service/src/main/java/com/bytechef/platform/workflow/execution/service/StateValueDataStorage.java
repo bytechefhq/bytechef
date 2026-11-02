@@ -29,9 +29,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.Optional;
+import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * @author Ivica Cardic
@@ -62,15 +65,11 @@ public class StateValueDataStorage {
 
     void delete(Key key, @Nullable Object storedValue) {
         if (storedValue instanceof StateValueReference reference) {
-            DataStorage dataStorage = getDataStorage();
-
-            dataStorage.delete(
-                key.componentName(), key.scope(), key.scopeId(), key.key(), reference.environmentId(),
-                reference.type());
+            runAfterCompletion(() -> deleteEntry(key, reference), null);
         }
     }
 
-    Optional<StateValueReference> fetchJobReference(long jobId) {
+    Optional<Location> fetchJobLocation(long jobId) {
         if (!isEnabled()) {
             return Optional.empty();
         }
@@ -79,14 +78,14 @@ public class StateValueDataStorage {
             Optional<Long> jobPrincipalIdOptional = principalJobService.fetchJobPrincipalId(jobId, type);
 
             if (jobPrincipalIdOptional.isPresent()) {
-                return fetchReference(jobPrincipalIdOptional.get(), type);
+                return fetchLocation(jobPrincipalIdOptional.get(), type);
             }
         }
 
         return Optional.empty();
     }
 
-    Optional<StateValueReference> fetchReference(long jobPrincipalId, @Nullable PlatformType type) {
+    Optional<Location> fetchLocation(long jobPrincipalId, @Nullable PlatformType type) {
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry =
             jobPrincipalAccessorRegistryObjectProvider.getIfAvailable();
 
@@ -98,8 +97,7 @@ public class StateValueDataStorage {
             jobPrincipalAccessorRegistry.fetchJobPrincipalAccessor(type);
 
         return jobPrincipalAccessorOptional.map(
-            jobPrincipalAccessor -> new StateValueReference(
-                jobPrincipalAccessor.getEnvironmentId(jobPrincipalId), type));
+            jobPrincipalAccessor -> new Location(jobPrincipalAccessor.getEnvironmentId(jobPrincipalId), type));
     }
 
     @Nullable
@@ -108,7 +106,7 @@ public class StateValueDataStorage {
             DataStorage dataStorage = getDataStorage();
 
             Optional<Object> valueOptional = dataStorage.fetch(
-                key.componentName(), key.scope(), key.scopeId(), key.key(), reference.environmentId(),
+                key.componentName(), key.scope(), key.scopeId(), reference.key(), reference.environmentId(),
                 reference.type());
 
             return valueOptional.orElse(null);
@@ -117,19 +115,30 @@ public class StateValueDataStorage {
         return storedValue;
     }
 
-    Object write(Key key, Object value, Optional<StateValueReference> referenceOptional) {
-        if (referenceOptional.isEmpty()) {
-            return value;
+    Object write(Key key, Object value, Optional<Location> locationOptional, @Nullable Object previousStoredValue) {
+        Object storedValue = value;
+
+        if (locationOptional.isPresent()) {
+            Location location = locationOptional.get();
+            StateValueReference reference = new StateValueReference(
+                location.environmentId(), location.type(), key.key() + "_" + UUID.randomUUID());
+
+            DataStorage dataStorage = getDataStorage();
+
+            dataStorage.put(
+                key.componentName(), key.scope(), key.scopeId(), reference.key(), value, reference.environmentId(),
+                reference.type());
+
+            runAfterCompletion(null, () -> deleteEntry(key, reference));
+
+            storedValue = reference;
         }
 
-        StateValueReference reference = referenceOptional.get();
-        DataStorage dataStorage = getDataStorage();
+        if (previousStoredValue instanceof StateValueReference previousReference) {
+            runAfterCompletion(() -> deleteEntry(key, previousReference), null);
+        }
 
-        dataStorage.put(
-            key.componentName(), key.scope(), key.scopeId(), key.key(), value, reference.environmentId(),
-            reference.type());
-
-        return reference;
+        return storedValue;
     }
 
     static String toKey(String id) {
@@ -141,6 +150,14 @@ public class StateValueDataStorage {
         } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
             throw new IllegalStateException(noSuchAlgorithmException);
         }
+    }
+
+    private void deleteEntry(Key key, StateValueReference reference) {
+        DataStorage dataStorage = getDataStorage();
+
+        dataStorage.delete(
+            key.componentName(), key.scope(), key.scopeId(), reference.key(), reference.environmentId(),
+            reference.type());
     }
 
     private DataStorage getDataStorage() {
@@ -171,6 +188,31 @@ public class StateValueDataStorage {
         return provider != null && provider != ApplicationProperties.DataStorage.Provider.JDBC;
     }
 
+    private static void runAfterCompletion(@Nullable Runnable onCommit, @Nullable Runnable onRollback) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            if (onCommit != null) {
+                onCommit.run();
+            }
+
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_COMMITTED && onCommit != null) {
+                    onCommit.run();
+                } else if (status == STATUS_ROLLED_BACK && onRollback != null) {
+                    onRollback.run();
+                }
+            }
+        });
+    }
+
     record Key(String componentName, DataStorageScope scope, String scopeId, String key) {
+    }
+
+    record Location(long environmentId, PlatformType type) {
     }
 }
