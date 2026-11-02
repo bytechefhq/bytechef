@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.task.web.graphql.config;
+package com.bytechef.automation.task.config;
 
 import static org.mockito.Mockito.mock;
 
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
@@ -34,9 +33,8 @@ import org.springframework.security.core.Authentication;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan("com.bytechef.graphql.error")
 @EnableMethodSecurity
-public class ApprovalTaskGraphQlMethodSecurityTestConfiguration {
+public class ApprovalTaskMethodSecurityTestConfiguration {
 
     @Bean
     static TenantAdminCheck tenantAdminCheck() {

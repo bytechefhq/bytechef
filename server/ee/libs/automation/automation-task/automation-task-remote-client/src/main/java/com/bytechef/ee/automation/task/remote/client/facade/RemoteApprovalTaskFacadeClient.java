@@ -48,6 +48,31 @@ public class RemoteApprovalTaskFacadeClient implements ApprovalTaskFacade {
     }
 
     @Override
+    public ApprovalTask createManualApprovalTask(ApprovalTask approvalTask) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteApprovalTask(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ApprovalTask getApprovalTask(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ApprovalTask> getApprovalTasks(@Nullable Integer environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ApprovalTask> getApprovalTasks(List<Long> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<PendingApproval> getPendingApprovals(@Nullable Integer environmentId) {
         return loadBalancedRestClient.get(
             uriBuilder -> {
@@ -61,5 +86,10 @@ public class RemoteApprovalTaskFacadeClient implements ApprovalTaskFacade {
                 return uriBuilder.build();
             },
             new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public ApprovalTask updateApprovalTask(ApprovalTask approvalTask) {
+        throw new UnsupportedOperationException();
     }
 }

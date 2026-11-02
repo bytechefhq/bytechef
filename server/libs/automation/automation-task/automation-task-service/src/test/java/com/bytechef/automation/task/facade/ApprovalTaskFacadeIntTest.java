@@ -17,8 +17,10 @@
 package com.bytechef.automation.task.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -32,6 +34,8 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.task.config.ApprovalTaskMethodSecurityTestConfiguration;
+import com.bytechef.automation.task.config.ApprovalTaskMethodSecurityTestConfiguration.TenantAdminCheck;
 import com.bytechef.automation.task.config.AutomationTaskIntTestConfiguration;
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.domain.PendingApproval;
@@ -50,11 +54,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
@@ -283,5 +295,111 @@ class ApprovalTaskFacadeIntTest {
 
     private String signedToken(long jobId) {
         return approvalTokens.toSignedToken(jobResumeId(jobId), Duration.ofHours(1));
+    }
+
+    @Nested
+    @Import({
+        ApprovalTaskMethodSecurityTestConfiguration.class,
+        ApprovalTaskFacadeIntTest.MethodSecurityFacadeConfiguration.class
+    })
+    class MethodSecurity {
+
+        @Autowired
+        private ApprovalTaskFacade securedApprovalTaskFacade;
+
+        @Autowired
+        private TenantAdminCheck tenantAdminCheck;
+
+        @BeforeEach
+        void setAuthentication() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+        }
+
+        @AfterEach
+        void clearAuthentication() {
+            SecurityContextHolder.clearContext();
+
+            reset(tenantAdminCheck);
+        }
+
+        @Test
+        void testNonAdminCannotManageApprovalTasks() {
+            ApprovalTask approvalTask = approvalTaskService.create(manualApprovalTask("Review"));
+
+            long approvalTaskId = Objects.requireNonNull(approvalTask.getId());
+
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.createManualApprovalTask(manualApprovalTask("Other")));
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.deleteApprovalTask(approvalTaskId));
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.getApprovalTask(approvalTaskId));
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.getApprovalTasks((Integer) null));
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.getApprovalTasks(List.of(approvalTaskId)));
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.getPendingApprovals(null));
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.updateApprovalTask(approvalTask));
+
+            assertThat(approvalTaskService.getApprovalTasks()).singleElement()
+                .extracting(ApprovalTask::getName)
+                .isEqualTo("Review");
+        }
+
+        @Test
+        void testAdminManagesManualApprovalTasks() {
+            when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
+
+            ApprovalTask approvalTask =
+                securedApprovalTaskFacade.createManualApprovalTask(manualApprovalTask("Review"));
+
+            assertThat(securedApprovalTaskFacade.getApprovalTasks((Integer) null))
+                .extracting(ApprovalTask::getId)
+                .containsExactly(approvalTask.getId());
+
+            securedApprovalTaskFacade.deleteApprovalTask(Objects.requireNonNull(approvalTask.getId()));
+
+            assertThat(approvalTaskService.countApprovalTasks()).isZero();
+        }
+
+        @Test
+        void testRunCreatesItsApprovalTaskWithoutAnAdmin() {
+            SecurityContextHolder.clearContext();
+
+            long jobId = saveJob(Job.Status.STOPPED, null);
+
+            ApprovalTask approvalTask = securedApprovalTaskFacade.createApprovalTask(approvalTask(jobResumeId(jobId)));
+
+            assertThat(approvalTaskService.getApprovalTask(Objects.requireNonNull(approvalTask.getId())))
+                .extracting(ApprovalTask::getEnvironment)
+                .isEqualTo(Environment.DEVELOPMENT);
+        }
+
+        private static ApprovalTask manualApprovalTask(String name) {
+            ApprovalTask approvalTask = new ApprovalTask();
+
+            approvalTask.setJobResumeId("manual-" + name);
+            approvalTask.setName(name);
+
+            return approvalTask;
+        }
+    }
+
+    static class MethodSecurityFacadeConfiguration {
+
+        @Bean
+        ApprovalTaskFacade securedApprovalTaskFacade(
+            ApprovalTaskService approvalTaskService, ApprovalTokens approvalTokens, JobService jobService,
+            PrincipalJobService principalJobService, TaskExecutionService taskExecutionService) {
+
+            return new ApprovalTaskFacadeImpl(
+                approvalTaskService, approvalTokens, jobService, principalJobService,
+                mock(ProjectDeploymentService.class), PUBLIC_URL, taskExecutionService, mock(WorkflowService.class));
+        }
     }
 }

@@ -22,7 +22,7 @@ import com.bytechef.automation.task.domain.ApprovalTask.Priority;
 import com.bytechef.automation.task.domain.ApprovalTask.Status;
 import com.bytechef.automation.task.domain.ApprovalTaskStatusException;
 import com.bytechef.automation.task.domain.PendingApproval;
-import com.bytechef.automation.task.facade.ApprovalTaskApiFacade;
+import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
@@ -51,43 +51,43 @@ public class ApprovalTaskGraphQlController {
 
     private static final Logger log = LoggerFactory.getLogger(ApprovalTaskGraphQlController.class);
 
-    private final ApprovalTaskApiFacade approvalTaskApiFacade;
+    private final ApprovalTaskFacade approvalTaskFacade;
 
     @SuppressFBWarnings("EI")
-    public ApprovalTaskGraphQlController(ApprovalTaskApiFacade approvalTaskApiFacade) {
-        this.approvalTaskApiFacade = approvalTaskApiFacade;
+    public ApprovalTaskGraphQlController(ApprovalTaskFacade approvalTaskFacade) {
+        this.approvalTaskFacade = approvalTaskFacade;
     }
 
     @MutationMapping
     public ApprovalTask createApprovalTask(@Argument ApprovalTaskInput approvalTask) {
-        return approvalTaskApiFacade.createApprovalTask(toApprovalTask(approvalTask));
+        return approvalTaskFacade.createManualApprovalTask(toApprovalTask(approvalTask));
     }
 
     @MutationMapping
     public boolean deleteApprovalTask(@Argument long id) {
-        approvalTaskApiFacade.deleteApprovalTask(id);
+        approvalTaskFacade.deleteApprovalTask(id);
 
         return true;
     }
 
     @QueryMapping
     public ApprovalTask approvalTask(@Argument long id) {
-        return approvalTaskApiFacade.getApprovalTask(id);
+        return approvalTaskFacade.getApprovalTask(id);
     }
 
     @QueryMapping
     public List<ApprovalTask> approvalTasks(@Argument Integer environmentId) {
-        return approvalTaskApiFacade.getApprovalTasks(environmentId);
+        return approvalTaskFacade.getApprovalTasks(environmentId);
     }
 
     @QueryMapping
     public List<ApprovalTask> approvalTasksByIds(@Argument List<Long> ids) {
-        return approvalTaskApiFacade.getApprovalTasks(ids);
+        return approvalTaskFacade.getApprovalTasks(ids);
     }
 
     @QueryMapping
     public List<PendingApproval> pendingApprovals(@Argument Integer environmentId) {
-        return approvalTaskApiFacade.getPendingApprovals(environmentId);
+        return approvalTaskFacade.getPendingApprovals(environmentId);
     }
 
     @MutationMapping
@@ -98,7 +98,7 @@ public class ApprovalTaskGraphQlController {
 
         Set<String> providedFieldNames = approvalTaskArgument == null ? Set.of() : approvalTaskArgument.keySet();
 
-        ApprovalTask currentApprovalTask = approvalTaskApiFacade.getApprovalTask(
+        ApprovalTask currentApprovalTask = approvalTaskFacade.getApprovalTask(
             Objects.requireNonNull(approvalTask.id(), "'id' must not be null"));
 
         ApprovalTask patchedApprovalTask = ApprovalTask.builder()
@@ -121,7 +121,7 @@ public class ApprovalTaskGraphQlController {
                     ? approvalTask.version() : currentApprovalTask.getVersion())
             .build();
 
-        return approvalTaskApiFacade.updateApprovalTask(patchedApprovalTask);
+        return approvalTaskFacade.updateApprovalTask(patchedApprovalTask);
     }
 
     @GraphQlExceptionHandler
