@@ -106,7 +106,6 @@ import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.metadata.ToolMetadata;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -114,7 +113,6 @@ import tools.jackson.databind.json.JsonMapper;
 public abstract class AbstractAiAgentChatAction {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractAiAgentChatAction.class);
-    private static final JsonMapper JSON_MAPPER = new JsonMapper();
 
     private static final String APPROVED = "approved";
     private static final String TOOL_SIMULATION_UNAVAILABLE = "[tool simulation unavailable]";
@@ -333,7 +331,7 @@ public abstract class AbstractAiAgentChatAction {
                 Map<String, Object> inputs;
 
                 try {
-                    inputs = JSON_MAPPER.readValue(toolInput, new TypeReference<>() {});
+                    inputs = JsonUtils.read(toolInput, new TypeReference<>() {});
                 } catch (Exception exception) {
                     context.log(
                         log -> log.debug(

@@ -16,16 +16,17 @@
 
 package com.bytechef.ai.copilot.config;
 
+import com.bytechef.ai.copilot.tool.ask.SubAgentQuestionRenderer;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
-import com.bytechef.automation.ai.tool.SkillsTools;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.ai.tool.ReadSkillsTools;
 import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,32 +43,32 @@ import org.springframework.context.annotation.Configuration;
 public class ToolCallbackContributorConfiguration {
 
     public static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
-        "buildWorkflow", "importWorkflow", "configureClusterElement", "writeScript", "authorSkill",
-        "debugWorkflowExecution", "configureMcpServer");
+        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer");
 
-    private static final String MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME = "updateMcpProjectWorkflowParameters";
+    private static final Set<String> MCP_SERVER_TOOL_NAMES = Set.of(
+        "listMcpServers", "createMcpServer", "updateMcpServer", "createMcpProject");
 
-    private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of(
-        "listMcpServers", "createMcpServer", "listMcpProjectWorkflows");
+    private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of("listMcpServers", "createMcpServer");
 
     private static final Set<String> WORKSPACE_SCOPED_DEPLOYMENT_TOOL_NAMES = Set.of("listProjectDeployments");
 
     @Bean
     McpServerToolCallbackContributor copilotAgentToolCallbackContributor(
-        ObjectProvider<SkillsTools> skillsToolsProvider,
-        IntelligentToolCatalog intelligentToolCatalog, WorkspaceScopeResolver workspaceScopeResolver) {
+        ObjectProvider<ReadSkillsTools> readSkillsToolsProvider, IntelligentToolCatalog intelligentToolCatalog,
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
 
-            skillsToolsProvider.ifAvailable(
-                skillsTools -> toolCallbacks.addAll(List.of(ToolCallbacks.from(skillsTools))));
+            readSkillsToolsProvider.ifAvailable(
+                readSkillsTools -> toolCallbacks.addAll(List.of(ToolCallbacks.from(readSkillsTools))));
 
             toolCallbacks.addAll(
                 intelligentToolCatalog.getByNames(
                     INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, (chatClient, definition) -> chatClient,
-                    (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
-                        toolCallback, workspaceScopeResolver)));
+                    (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(toolCallback,
+                        workspaceFacade),
+                    SubAgentQuestionRenderer.PLAIN_TEXT));
 
             return toolCallbacks;
         };
@@ -76,7 +77,7 @@ public class ToolCallbackContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor mcpServerCrudMcpContributor(
         ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             McpServerToolCallbacksFactory mcpServerToolCallbacksFactory = mcpServerToolCallbacksFactoryProvider
@@ -92,13 +93,13 @@ public class ToolCallbackContributorConfiguration {
                 String name = toolCallback.getToolDefinition()
                     .name();
 
-                if (MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME.equals(name)) {
+                if (!MCP_SERVER_TOOL_NAMES.contains(name)) {
                     continue;
                 }
 
                 toolCallbacks.add(
                     WORKSPACE_SCOPED_MCP_TOOL_NAMES.contains(name)
-                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceScopeResolver)
+                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade)
                         : toolCallback);
             }
 
@@ -109,7 +110,7 @@ public class ToolCallbackContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor deploymentFlatCrudMcpContributor(
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             DeploymentToolCallbacksFactory deploymentToolCallbacksFactory = deploymentToolCallbacksFactoryProvider
@@ -127,7 +128,7 @@ public class ToolCallbackContributorConfiguration {
 
                 toolCallbacks.add(
                     WORKSPACE_SCOPED_DEPLOYMENT_TOOL_NAMES.contains(name)
-                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceScopeResolver)
+                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade)
                         : toolCallback);
             }
 
@@ -138,7 +139,7 @@ public class ToolCallbackContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor knowledgeBaseFlatCrudMcpContributor(
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
-        WorkspaceScopeResolver workspaceScopeResolver) {
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory =
@@ -152,7 +153,7 @@ public class ToolCallbackContributorConfiguration {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
 
             for (ToolCallback toolCallback : knowledgeBaseToolCallbacksFactory.writeToolCallbacks()) {
-                toolCallbacks.add(new WorkspaceScopedFlatToolCallback(toolCallback, workspaceScopeResolver));
+                toolCallbacks.add(new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade));
             }
 
             return toolCallbacks;

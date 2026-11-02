@@ -30,6 +30,8 @@ Every name below is the property path uppercased with dots **and dashes** replac
 
 > **Coming soon.** Brave Search configuration is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 
+Admins can also save this key per environment on [Settings → AI → Web Search](/platform/settings/web-search). A key saved there takes precedence, and the key below counts only while `BYTECHEF_AI_BRAVE_ENABLED` is `true`.
+
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_BRAVE_API_KEY` | Brave Search API key (sensitive) | - |
@@ -37,6 +39,8 @@ Every name below is the property path uppercased with dots **and dashes** replac
 | `BYTECHEF_AI_BRAVE_ENABLED` | Enable or disable Brave Search | `false` |
 
 ## AI Firecrawl Configuration
+
+Admins can also save this key per environment on [Settings → AI → Web Search](/platform/settings/web-search). A key saved there takes precedence, and the key below counts only while `BYTECHEF_AI_FIRECRAWL_ENABLED` is `true`.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|

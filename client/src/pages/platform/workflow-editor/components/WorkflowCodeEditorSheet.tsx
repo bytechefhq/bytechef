@@ -13,7 +13,6 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
     AlertTriangleIcon,
     ChevronDownIcon,
@@ -83,7 +82,6 @@ const WorkflowCodeEditorSheet = ({
         workflowTestExecution,
     } = useWorkflowCodeEditorSheet({invalidateWorkflowQueries, onSheetOpenClose, workflow});
 
-    const ff_4076 = useFeatureFlagsStore()('ff-4076');
     const showBottomPanel = useWorkflowEditorStore((state) => state.showBottomPanel);
 
     return (
@@ -184,7 +182,7 @@ const WorkflowCodeEditorSheet = ({
                                 )}
                             </ButtonGroup>
 
-                            {ff_4076 && copilotEnabled && (
+                            {copilotEnabled && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button

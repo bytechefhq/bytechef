@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
@@ -46,9 +47,6 @@ dependencies {
         isTransitive = false
     }
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api")) {
-        isTransitive = false
-    }
-    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api")) {
         isTransitive = false
     }
     testImplementation(project(":server:libs:config:app-config"))

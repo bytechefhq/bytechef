@@ -18,12 +18,15 @@ package com.bytechef.ai.copilot.tool;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -35,15 +38,15 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
- * Shared helper for the property-options lookup tool callbacks (action and trigger variants). Centralises three pieces
- * of logic that would otherwise be duplicated between the two callbacks:
+ * Shared helper for the property-options lookup tool callbacks (action, trigger and cluster element variants).
+ * Centralises three pieces of logic that would otherwise be duplicated between the callbacks:
  *
  * <ul>
  * <li>SecurityContext rehydration on Reactor scheduler threads, mirroring the pattern used by
  * {@link ListConnectionsForComponentToolCallback} so the wrapped facade call sees the user's login + authorities
  * instead of throwing {@code IllegalStateException} for a missing current user.</li>
  * <li>Success envelope assembly with insertion-ordered keys so the LLM consistently sees
- * {@code componentName, actionName|triggerName, propertyName, options, truncated}.</li>
+ * {@code componentName, actionName|triggerName|clusterElementName, propertyName, options, truncated}.</li>
  * <li>Structured error envelopes for the {@code connection_required}, {@code dependency_missing}, and
  * {@code no_options_for_property} cases. The generic {@code lookup_failed} envelope stays with
  * {@code ToolErrors.runtimeFailure(...)} and is intentionally not handled here.</li>
@@ -71,9 +74,9 @@ public class PropertyOptionsResolver {
 
     /**
      * Builds the success envelope returned to the LLM, including a {@code truncated} flag when the option list was
-     * capped. {@code entityKey} is {@code "actionName"} or {@code "triggerName"} depending on the caller. Each
-     * {@link Option} is rendered as a {@code {label, value}} map, preserving the runtime type of {@code value} so
-     * numeric / boolean / string options survive JSON serialization without coercion.
+     * capped. {@code entityKey} is {@code "actionName"}, {@code "triggerName"} or {@code "clusterElementName"}
+     * depending on the caller. Each {@link Option} is rendered as a {@code {label, value}} map, preserving the runtime
+     * type of {@code value} so numeric / boolean / string options survive JSON serialization without coercion.
      */
     public Map<String, Object> buildSuccessEnvelope(
         String componentName, String entityKey, String entityName, String propertyName, List<Option> options,
@@ -148,10 +151,10 @@ public class PropertyOptionsResolver {
     }
 
     /**
-     * Builds an {@code action_not_found} / {@code trigger_not_found} / {@code property_not_found} error envelope. The
-     * {@code valid} list lets the LLM self-correct by retrying with a real name instead of treating a wrong-name guess
-     * as "this entity has no options". {@code entityKey} is {@code "actionName"}, {@code "triggerName"}, or
-     * {@code "propertyName"}.
+     * Builds an {@code action_not_found} / {@code trigger_not_found} / {@code cluster_element_not_found} /
+     * {@code property_not_found} error envelope. The {@code valid} list lets the LLM self-correct by retrying with a
+     * real name instead of treating a wrong-name guess as "this entity has no options". {@code entityKey} is
+     * {@code "actionName"}, {@code "triggerName"}, {@code "clusterElementName"}, or {@code "propertyName"}.
      */
     public Map<String, Object> entityNotFoundEnvelope(
         String errorCode, String entityKey, String requested, List<String> valid) {
@@ -333,6 +336,85 @@ public class PropertyOptionsResolver {
             () -> triggerDefinitionFacade.executeOptions(
                 componentName, componentVersion, triggerName, propertyName, parameters, lookupDependsOnPaths,
                 searchText == null ? "" : searchText, connectionId));
+
+        boolean truncated = options.size() > maxOptions;
+
+        List<Option> capped = truncated ? List.copyOf(options.subList(0, maxOptions)) : options;
+
+        return new OptionsLookupResult.Success(capped, truncated);
+    }
+
+    /**
+     * Cluster element twin of {@link #resolveActionPropertyOptions}; uses {@code cluster_element_not_found} and
+     * {@code clusterElementDefinesConnection}.
+     */
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public OptionsLookupResult resolveClusterElementPropertyOptions(
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
+        @Nullable AgentToolInvocationContext invocationContext, String componentName, int componentVersion,
+        String clusterElementName, String propertyName, @Nullable Map<String, Object> inputParameters,
+        @Nullable Long connectionId, @Nullable String searchText, int maxOptions) {
+
+        List<String> validClusterElementNames = clusterElementDefinitionService
+            .getClusterElementDefinitions(componentName, componentVersion)
+            .stream()
+            .map(ClusterElementDefinition::getName)
+            .toList();
+
+        if (!validClusterElementNames.contains(clusterElementName)) {
+            return new OptionsLookupResult.Failure(
+                entityNotFoundEnvelope(
+                    "cluster_element_not_found", "clusterElementName", clusterElementName, validClusterElementNames),
+                "cluster_element_not_found");
+        }
+
+        ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService
+            .getClusterElementDefinition(componentName, componentVersion, clusterElementName);
+
+        List<String> validPropertyNames = clusterElementDefinition.getProperties()
+            .stream()
+            .map(Property::getName)
+            .toList();
+
+        if (!validPropertyNames.contains(topPropertySegment(propertyName))) {
+            return new OptionsLookupResult.Failure(
+                entityNotFoundEnvelope("property_not_found", "propertyName", propertyName, validPropertyNames),
+                "property_not_found");
+        }
+
+        if (!clusterElementDefinitionService.propertyHasOptionsDataSource(
+            componentName, componentVersion, clusterElementName, propertyName)) {
+
+            return new OptionsLookupResult.Failure(noOptionsForPropertyEnvelope(), "no_options");
+        }
+
+        List<String> lookupDependsOnPaths = clusterElementDefinitionService.getPropertyLookupDependsOn(
+            componentName, componentVersion, clusterElementName, propertyName);
+
+        Map<String, Object> parameters = inputParameters == null ? Map.of() : inputParameters;
+
+        List<String> missing = lookupDependsOnPaths.stream()
+            .filter(path -> !parameters.containsKey(path) &&
+                !parameters.containsKey(path.substring(path.lastIndexOf('.') + 1)))
+            .toList();
+
+        if (!missing.isEmpty()) {
+            return new OptionsLookupResult.Failure(dependencyMissingEnvelope(missing), "dependency_missing");
+        }
+
+        if (connectionId == null &&
+            clusterElementDefinitionService.clusterElementDefinesConnection(
+                componentName, componentVersion, clusterElementName)) {
+
+            return new OptionsLookupResult.Failure(connectionRequiredEnvelope(componentName), "connection_required");
+        }
+
+        List<Option> options = withUserSecurityContext(
+            invocationContext == null ? null : invocationContext.userId(),
+            () -> clusterElementDefinitionFacade.executeOptions(
+                componentName, componentVersion, clusterElementName, propertyName, parameters, Map.of(),
+                lookupDependsOnPaths, searchText == null ? "" : searchText, connectionId, Map.of(), Map.of()));
 
         boolean truncated = options.size() > maxOptions;
 

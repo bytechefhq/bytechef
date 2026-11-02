@@ -789,6 +789,7 @@ public class ApplicationProperties {
     public static class Ai {
 
         private AutoMemory autoMemory = new AutoMemory();
+        private Brave brave = new Brave();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
         private Hub hub = new Hub();
@@ -800,6 +801,10 @@ public class ApplicationProperties {
 
         public AutoMemory getAutoMemory() {
             return autoMemory;
+        }
+
+        public Brave getBrave() {
+            return brave;
         }
 
         public Copilot getCopilot() {
@@ -836,6 +841,10 @@ public class ApplicationProperties {
 
         public void setAutoMemory(AutoMemory autoMemory) {
             this.autoMemory = autoMemory;
+        }
+
+        public void setBrave(Brave brave) {
+            this.brave = brave;
         }
 
         public void setCopilot(Copilot copilot) {
@@ -1213,6 +1222,39 @@ public class ApplicationProperties {
             }
         }
 
+        public static class Brave {
+
+            private String apiKey;
+
+            private String baseUrl = "https://api.search.brave.com/res/v1";
+
+            private boolean enabled;
+
+            public String getApiKey() {
+                return apiKey;
+            }
+
+            public void setApiKey(String apiKey) {
+                this.apiKey = apiKey;
+            }
+
+            public String getBaseUrl() {
+                return baseUrl;
+            }
+
+            public void setBaseUrl(String baseUrl) {
+                this.baseUrl = baseUrl;
+            }
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+        }
+
         /**
          * Firecrawl web scraping service configuration.
          */
@@ -1267,7 +1309,6 @@ public class ApplicationProperties {
              * Whether knowledge base AI features are enabled
              */
             private boolean enabled;
-
             /**
              * OCR configuration
              */
@@ -1526,7 +1567,6 @@ public class ApplicationProperties {
              * Stability AI configuration
              */
             private Stability stability = new Stability();
-
             /**
              * Google Vertex AI Gemini configuration
              */
@@ -1611,7 +1651,6 @@ public class ApplicationProperties {
             public VertexGemini getVertexGemini() {
                 return vertexGemini;
             }
-
 //            public void setAmazonBedrockAnthropic2(AmazonBedrockAnthropic2 amazonBedrockAnthropic2) {
 //                this.amazonBedrockAnthropic2 = amazonBedrockAnthropic2;
 //            }

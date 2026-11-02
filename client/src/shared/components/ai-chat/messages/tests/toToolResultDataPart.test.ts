@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import {toToolResultDataPart} from '../toToolResultDataPart';
 
@@ -27,6 +27,46 @@ describe('toToolResultDataPart', () => {
                 propertyName: 'channel',
                 truncated: false,
             });
+        }
+    });
+
+    it('maps select-property-option for selectClusterElementPropertyOption', () => {
+        const result = toToolResultDataPart(
+            'selectClusterElementPropertyOption',
+            JSON.stringify({
+                awaitingAnswer: true,
+                componentName: 'knowledgeBase',
+                kind: 'select-property-option',
+                options: [{label: 'Product docs', value: 12}],
+                propertyName: 'knowledgeBaseId',
+                truncated: false,
+            })
+        );
+
+        expect(result?.ok).toBe(true);
+
+        if (result?.ok) {
+            expect(result.type).toBe('data-select-property-option');
+            expect(result.data).toEqual({
+                componentName: 'knowledgeBase',
+                kind: 'select-property-option',
+                options: [{label: 'Product docs', value: 12}],
+                propertyName: 'knowledgeBaseId',
+                truncated: false,
+            });
+        }
+    });
+
+    it('returns an error result when selectClusterElementPropertyOption returns a failure envelope', () => {
+        const result = toToolResultDataPart(
+            'selectClusterElementPropertyOption',
+            JSON.stringify({clusterElementName: 'rag', error: 'cluster_element_not_found', valid: ['vectorStore']})
+        );
+
+        expect(result?.ok).toBe(false);
+
+        if (result && !result.ok) {
+            expect(result.toolName).toBe('selectClusterElementPropertyOption');
         }
     });
 
@@ -161,5 +201,31 @@ describe('toToolResultDataPart', () => {
         expect(
             toToolResultDataPart('openFileTab', JSON.stringify({fileId: '1', name: 'f', opened: true}))
         ).toBeUndefined();
+    });
+
+    it('maps a delegate tool result whose payload kind is ask-user-question', () => {
+        const result = toToolResultDataPart(
+            'buildWorkflow',
+            JSON.stringify({
+                awaitingAnswer: true,
+                kind: 'ask-user-question',
+                questions: [{multiSelect: false, options: [], question: 'Q?'}],
+            })
+        );
+
+        expect(result).toMatchObject({ok: true, type: 'data-ask-user-question'});
+    });
+
+    it('leaves a brace-prefixed non-JSON result to the generic fallback without warning', () => {
+        const warnSpy = vi.spyOn(console, 'warn');
+
+        expect(toToolResultDataPart('someTool', '{not json')).toBeUndefined();
+        expect(warnSpy).not.toHaveBeenCalled();
+
+        warnSpy.mockRestore();
+    });
+
+    it('ignores a JSON result with an unknown kind', () => {
+        expect(toToolResultDataPart('someTool', JSON.stringify({kind: 'something-else'}))).toBeUndefined();
     });
 });

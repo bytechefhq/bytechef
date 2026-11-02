@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool.knowledgebase;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,7 +29,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -49,7 +49,6 @@ public class ListKnowledgeBasesToolCallback implements ToolCallback {
         }""";
 
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ListKnowledgeBasesToolCallback(
@@ -97,12 +96,11 @@ public class ListKnowledgeBasesToolCallback implements ToolCallback {
                     knowledgeBase.getName()))
                 .toList();
 
-            return jsonMapper.writeValueAsString(summaries);
+            return JsonUtils.write(summaries);
         } catch (JacksonException exception) {
             return toolError("Serialization error: " + exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, ListKnowledgeBasesToolCallback.class, "listKnowledgeBases", exception);
+            return ToolErrors.runtimeFailure(ListKnowledgeBasesToolCallback.class, "listKnowledgeBases", exception);
         }
     }
 
@@ -113,7 +111,7 @@ public class ListKnowledgeBasesToolCallback implements ToolCallback {
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

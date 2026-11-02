@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool.knowledgebase;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,7 +28,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -67,7 +67,6 @@ public class CloneKnowledgeBaseToolCallback implements ToolCallback {
             }""";
 
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CloneKnowledgeBaseToolCallback(WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
@@ -91,18 +90,18 @@ public class CloneKnowledgeBaseToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            CloneKnowledgeBaseInput input = jsonMapper.readValue(toolInput, CloneKnowledgeBaseInput.class);
+            CloneKnowledgeBaseInput input = JsonUtils.read(toolInput, CloneKnowledgeBaseInput.class);
 
             Long knowledgeBaseId = input.knowledgeBaseId();
 
             if (knowledgeBaseId == null) {
-                return ToolErrors.toolError(jsonMapper, "knowledgeBaseId is required");
+                return ToolErrors.toolError("knowledgeBaseId is required");
             }
 
             String targetEnvironment = input.targetEnvironment();
 
             if (targetEnvironment == null || targetEnvironment.isBlank()) {
-                return ToolErrors.toolError(jsonMapper, "targetEnvironment is required");
+                return ToolErrors.toolError("targetEnvironment is required");
             }
 
             int targetEnvironmentOrdinal;
@@ -111,10 +110,8 @@ public class CloneKnowledgeBaseToolCallback implements ToolCallback {
                 targetEnvironmentOrdinal = Environment.valueOf(targetEnvironment.toUpperCase())
                     .ordinal();
             } catch (IllegalArgumentException invalidEnv) {
-                return ToolErrors.toolError(
-                    jsonMapper,
-                    "targetEnvironment must be one of DEVELOPMENT, STAGING, PRODUCTION (got: "
-                        + targetEnvironment + ")");
+                return ToolErrors.toolError("targetEnvironment must be one of DEVELOPMENT, STAGING, PRODUCTION (got: "
+                    + targetEnvironment + ")");
             }
 
             AgentToolInvocationContext context =
@@ -123,26 +120,25 @@ public class CloneKnowledgeBaseToolCallback implements ToolCallback {
             Long workspaceId = context == null ? null : context.workspaceId();
 
             if (workspaceId == null) {
-                return ToolErrors.toolError(
-                    jsonMapper,
-                    "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
+                return ToolErrors
+                    .toolError("Workspace context unavailable — open this chat from the AI Hub of a workspace.");
             }
 
             try {
                 KnowledgeBase clone = workspaceKnowledgeBaseFacade.cloneWorkspaceKnowledgeBase(
                     knowledgeBaseId, workspaceId, targetEnvironmentOrdinal, input.newName());
 
-                return jsonMapper.writeValueAsString(
+                return JsonUtils.write(
                     new CloneKnowledgeBaseOutput(
                         clone.getId(), clone.getName(), clone.getEnvironment()
                             .name()));
             } catch (IllegalArgumentException invalid) {
-                return ToolErrors.toolError(jsonMapper, invalid.getMessage());
+                return ToolErrors.toolError(invalid.getMessage());
             }
         } catch (JacksonException exception) {
-            return ToolErrors.toolError(jsonMapper, "Invalid tool input: " + exception.getMessage());
+            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(jsonMapper, CloneKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(CloneKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
         }
     }
 

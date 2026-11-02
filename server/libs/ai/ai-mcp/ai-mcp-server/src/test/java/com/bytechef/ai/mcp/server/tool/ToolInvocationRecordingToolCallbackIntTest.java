@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -33,14 +33,11 @@ import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import com.bytechef.platform.tool.execution.config.ToolExecutionConfiguration;
-import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
@@ -67,8 +64,6 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
     })
 class ToolInvocationRecordingToolCallbackIntTest {
 
-    private static final long USER_ID = 7L;
-
     @Autowired
     private ToolExecutionEventCollector toolExecutionEventCollector;
 
@@ -76,26 +71,15 @@ class ToolInvocationRecordingToolCallbackIntTest {
     private ToolExecutionRecorder toolExecutionRecorder;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private WorkspaceFacade workspaceFacade;
-
-    @Autowired
-    private WorkspaceScopeResolver workspaceScopeResolver;
 
     @BeforeEach
     void beforeEach() {
-        reset(userService, workspaceFacade);
+        reset(workspaceFacade);
 
         toolExecutionEventCollector.reset();
 
-        User user = new User();
-
-        user.setId(USER_ID);
-
-        when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
-        when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(
+        when(workspaceFacade.getMyWorkspaces()).thenReturn(
             List.of(new Workspace(3L, "Sales"), new Workspace(4L, "Support")));
     }
 
@@ -120,13 +104,13 @@ class ToolInvocationRecordingToolCallbackIntTest {
     }
 
     @Test
-    void testRecordsOnlyWorkspaceAndRequestedEnvironment() {
-        when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(List.of(new Workspace(3L, "Sales")));
-
+    void testRecordsToolContextWorkspaceAndRequestedEnvironment() {
         ToolCallback toolCallback = recording(
             "listProjectDeployments", ToolExecutionKind.CONTRIBUTED, toolInput -> "[]");
 
-        toolCallback.call("{\"environment\":\"production\"}");
+        toolCallback.call(
+            "{\"environment\":\"production\"}",
+            new ToolContext(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 3L)));
 
         ToolExecutionEvent event = toolExecutionEventCollector.getSingleEvent();
 
@@ -137,6 +121,8 @@ class ToolInvocationRecordingToolCallbackIntTest {
 
     @Test
     void testRecordsCallWithoutWorkspaceWhenNoneCanBeResolved() {
+        when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(3L, "Sales")));
+
         ToolCallback toolCallback = recording(
             "listProjects", ToolExecutionKind.MANAGEMENT_TOOL, toolInput -> "{\"error\":\"workspace_required\"}");
 
@@ -149,12 +135,10 @@ class ToolInvocationRecordingToolCallbackIntTest {
     }
 
     @Test
-    void testRecordsCallWithoutWorkspaceWhenNoUserIsAuthenticated() {
-        when(userService.fetchCurrentUser()).thenReturn(Optional.empty());
-
+    void testRecordsCallWithoutWorkspaceWhenRequestedWorkspaceIsNotAccessible() {
         ToolCallback toolCallback = recording("listComponents", ToolExecutionKind.MANAGEMENT_TOOL, toolInput -> "[]");
 
-        toolCallback.call("");
+        toolCallback.call("{\"workspaceId\":9}");
 
         ToolExecutionEvent event = toolExecutionEventCollector.getSingleEvent();
 
@@ -214,7 +198,7 @@ class ToolInvocationRecordingToolCallbackIntTest {
         StubToolCallback delegate = new StubToolCallback("listProjects", toolInput -> "[]");
 
         ToolCallback toolCallback = new ToolInvocationRecordingToolCallback(
-            delegate, ToolExecutionKind.MANAGEMENT_TOOL, toolExecutionRecorder, workspaceScopeResolver);
+            delegate, ToolExecutionKind.MANAGEMENT_TOOL, toolExecutionRecorder, workspaceFacade);
 
         toolCallback.call("{\"workspaceId\":3}", toolContext);
 
@@ -224,7 +208,7 @@ class ToolInvocationRecordingToolCallbackIntTest {
 
     private ToolCallback recording(String toolName, ToolExecutionKind kind, Function<String, String> function) {
         return new ToolInvocationRecordingToolCallback(
-            new StubToolCallback(toolName, function), kind, toolExecutionRecorder, workspaceScopeResolver);
+            new StubToolCallback(toolName, function), kind, toolExecutionRecorder, workspaceFacade);
     }
 
     private static final class StubToolCallback implements ToolCallback {
@@ -295,18 +279,8 @@ class ToolInvocationRecordingToolCallbackIntTest {
         }
 
         @Bean
-        UserService userService() {
-            return mock(UserService.class);
-        }
-
-        @Bean
         WorkspaceFacade workspaceFacade() {
             return mock(WorkspaceFacade.class);
-        }
-
-        @Bean
-        WorkspaceScopeResolver workspaceScopeResolver(UserService userService, WorkspaceFacade workspaceFacade) {
-            return new WorkspaceScopeResolver(userService, workspaceFacade);
         }
     }
 }

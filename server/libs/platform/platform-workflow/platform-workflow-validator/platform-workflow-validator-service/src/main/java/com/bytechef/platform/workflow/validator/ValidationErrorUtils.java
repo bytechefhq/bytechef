@@ -16,6 +16,11 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 /**
  * Utility class for building validation messages with consistent formatting.
  *
@@ -24,6 +29,16 @@ package com.bytechef.platform.workflow.validator;
 class ValidationErrorUtils {
 
     private ValidationErrorUtils() {
+    }
+
+    /**
+     * Creates an error message for a value that is not one of the property's fixed options.
+     */
+    public static String invalidOptionValue(String propertyPath, String value, List<Object> optionValues) {
+        return "Property '" + propertyPath + "' has value " + value + " that is not one of the allowed options: " +
+            optionValues.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "));
     }
 
     /**
@@ -84,7 +99,27 @@ class ValidationErrorUtils {
     /**
      * Creates an undefined cluster element warning message.
      */
-    public static String undefinedClusterElement(String elementKey, String taskName) {
-        return "Cluster element '" + elementKey + "' are not defined in task " + taskName;
+    public static String unknownClusterElementType(String elementName, String elementType) {
+        return "Cluster element '" + elementName + "' has unknown type " + elementType +
+            "; the type must be componentName/vN/clusterElementName of a defined cluster element";
+    }
+
+    public static String clusterElementInWrongSlot(
+        String elementName, String elementType, String slotKey, Collection<String> slotKeys) {
+
+        return "Cluster element '" + elementName + "' of type " + elementType + " cannot be placed under '" + slotKey +
+            "'; it belongs under " + String.join(" or ", new TreeSet<>(slotKeys));
+    }
+
+    public static String undefinedClusterElementSlot(
+        String elementKey, String taskType, Collection<String> clusterElementKeys) {
+
+        return "Cluster element '" + elementKey + "' is not a slot of " + taskType + "; its slots are " +
+            String.join(", ", new TreeSet<>(clusterElementKeys));
+    }
+
+    public static String unknownNodeType(String type, boolean trigger) {
+        return "Field 'type' must name an existing " + (trigger ? "trigger" : "action or task dispatcher") + "; " +
+            type + " does not exist";
     }
 }

@@ -101,59 +101,59 @@ describe('aiChatToolCallStore', () => {
         expect(Object.keys(aiChatToolCallStore.getState().toolCalls)).toHaveLength(0);
     });
 
-    describe('cross-task cleanup', () => {
-        // The runtime provider calls resetForTask(currentId) on task switch so a stale
-        // running tool-call from the previous task does not appear in the new task's
-        // panel. These tests pin that contract — a regression that drops the resetForTask call
-        // (or makes it a no-op) would leave task A's tool-calls dangling in task B's
+    describe('cross-chat cleanup', () => {
+        // The runtime provider calls resetForChat(currentId) on chat switch so a stale
+        // running tool-call from the previous chat does not appear in the new chat's
+        // panel. These tests pin that contract — a regression that drops the resetForChat call
+        // (or makes it a no-op) would leave chat A's tool-calls dangling in chat B's
         // store, which is the exact bug the commit message says was fixed.
-        it('resetForTask drops only entries belonging to the named task', () => {
+        it('resetForChat drops only entries belonging to the named chat', () => {
             aiChatToolCallStore.getState().startToolCall('call-A1', 'research', 0, 'conv-A');
             aiChatToolCallStore.getState().startToolCall('call-A2', 'research', 0, 'conv-A');
             aiChatToolCallStore.getState().startToolCall('call-B1', 'research', 0, 'conv-B');
 
-            aiChatToolCallStore.getState().resetForTask('conv-A');
+            aiChatToolCallStore.getState().resetForChat('conv-A');
 
             const remaining = aiChatToolCallStore.getState().toolCalls;
 
             expect(aiChatToolCallStore.getState().order).toEqual(['call-B1']);
             expect(Object.keys(remaining)).toEqual(['call-B1']);
-            expect(remaining['call-B1'].taskId).toBe('conv-B');
+            expect(remaining['call-B1'].chatId).toBe('conv-B');
         });
 
-        it('resetForTask is a no-op when no entries match', () => {
+        it('resetForChat is a no-op when no entries match', () => {
             aiChatToolCallStore.getState().startToolCall('call-A1', 'research', 0, 'conv-A');
 
-            aiChatToolCallStore.getState().resetForTask('conv-other');
+            aiChatToolCallStore.getState().resetForChat('conv-other');
 
             expect(aiChatToolCallStore.getState().order).toEqual(['call-A1']);
         });
 
-        it('resetForTask with undefined performs a hard reset', () => {
-            // Mirrors the runtime provider's behavior when no task id is bound (e.g. the very
-            // first turn before a task row exists). Hard reset prevents untracked entries from
-            // lingering across tasks forever.
+        it('resetForChat with undefined performs a hard reset', () => {
+            // Mirrors the runtime provider's behavior when no chat id is bound (e.g. the very
+            // first turn before a chat row exists). Hard reset prevents untracked entries from
+            // lingering across chats forever.
             aiChatToolCallStore.getState().startToolCall('call-A1', 'research', 0, 'conv-A');
             aiChatToolCallStore.getState().startToolCall('call-untracked', 'research', 0);
 
-            aiChatToolCallStore.getState().resetForTask(undefined);
+            aiChatToolCallStore.getState().resetForChat(undefined);
 
             expect(aiChatToolCallStore.getState().order).toEqual([]);
             expect(Object.keys(aiChatToolCallStore.getState().toolCalls)).toHaveLength(0);
         });
 
-        it('resetForTask drops a still-running tool-call from the named task', () => {
+        it('resetForChat drops a still-running tool-call from the named chat', () => {
             // The exact regression the commit message calls out: when the runtime provider switches AWAY
-            // from a task mid-stream, it calls resetForTask(LEAVING_ID) to remove that
-            // task's stale running entries. Without this, those entries would linger in the store
-            // forever and bleed into any future task.
+            // from a chat mid-stream, it calls resetForChat(LEAVING_ID) to remove that
+            // chat's stale running entries. Without this, those entries would linger in the store
+            // forever and bleed into any future chat.
             aiChatToolCallStore.getState().startToolCall('call-A1', 'runChatWorkflow', 0, 'conv-A');
             aiChatToolCallStore.getState().appendProgressiveOutput('call-A1', 'Step 1: ');
 
             // Simulate the runtime provider's "leaving conv-A" cleanup.
-            aiChatToolCallStore.getState().resetForTask('conv-A');
+            aiChatToolCallStore.getState().resetForChat('conv-A');
 
-            // call-A1 should NOT remain — it would be a stale running entry attributed to a task
+            // call-A1 should NOT remain — it would be a stale running entry attributed to a chat
             // the user is no longer viewing.
             expect(aiChatToolCallStore.getState().toolCalls['call-A1']).toBeUndefined();
             expect(aiChatToolCallStore.getState().order).not.toContain('call-A1');

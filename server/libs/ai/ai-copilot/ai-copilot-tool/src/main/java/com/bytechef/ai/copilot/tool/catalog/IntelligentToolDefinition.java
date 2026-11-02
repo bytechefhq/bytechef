@@ -16,6 +16,8 @@
 
 package com.bytechef.ai.copilot.tool.catalog;
 
+import com.bytechef.ai.agent.tool.AgentType;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.tool.ToolCallback;
 
@@ -26,8 +28,16 @@ public interface IntelligentToolDefinition {
 
     String name();
 
+    AgentType agentType();
+
+    Set<IntelligentToolScope> panelScopes();
+
     @Nullable
     IntelligentToolChatClientFactory chatClientFactory(IntelligentToolVariant variant);
 
     ToolCallback create(IntelligentToolChatClientFactory chatClientFactory);
+
+    default boolean askCapable() {
+        return true;
+    }
 }

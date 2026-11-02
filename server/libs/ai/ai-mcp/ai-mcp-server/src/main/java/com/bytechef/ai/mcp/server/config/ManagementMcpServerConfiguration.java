@@ -18,27 +18,25 @@ package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.ai.mcp.server.tool.ToolInvocationRecordingToolCallback;
-import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
-import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
-import com.bytechef.automation.ai.tool.ScriptTools;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
-import com.bytechef.platform.ai.tool.ComponentTools;
-import com.bytechef.platform.ai.tool.TaskDispatcherTools;
-import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
+import com.bytechef.automation.ai.tool.WorkspaceTools;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
+import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.ai.mcp.McpToolUtils;
+import java.util.Set;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,76 +55,65 @@ import org.springframework.web.servlet.function.ServerResponse;
 @ConditionalOnProperty(name = "bytechef.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class ManagementMcpServerConfiguration {
 
-    private static final String INSTRUCTIONS =
+    static final String INSTRUCTIONS =
         """
-            ByteChef management server. Two kinds of tools: ordinary tools are deterministic CRUD — call them \
-            directly; intelligent tools (buildWorkflow, importWorkflow, configureClusterElement, \
-            writeScript, authorSkill, debugWorkflowExecution, configureMcpServer) run an inner AI agent and \
-            may take minutes — call them for judgment work, not for CRUD.
-            To build a workflow: createProject (if needed) → createProjectWorkflow → buildWorkflow with \
-            the workflowId and a plain-language instruction. To import an external workflow (n8n, Make, \
-            Zapier, Workato): createProject (if needed) → createProjectWorkflow → importWorkflow with the \
-            workflowId and the source definition — it has no project/workflow-creation tools of its own. \
-            Each intelligent-tool call is independent and re-reads current state (e.g. the workflow) rather \
-            than remembering earlier calls, so iterate by \
-            calling the tool again with the next instruction and restate any context it still needs.
-            To expose workflows over MCP: createMcpServer(name, environment, enabled?) — leave enabled unset \
-            or false, since a server with any unmapped attached workflow cannot be enabled — then \
+            ByteChef management server. Two kinds of tools: ordinary tools are deterministic CRUD; call them \
+            directly. Intelligent tools (buildWorkflow, importWorkflow, authorSkill, debugWorkflowExecution, \
+            configureMcpServer) run an inner AI agent and may take minutes; call them for judgment work, not \
+            for CRUD.
+            To build a workflow: createProject (if needed) → buildWorkflow with a plain-language instruction \
+            and the projectId for a new workflow or the workflowId for an existing one. To import an external \
+            workflow (n8n, Make, Zapier, Workato): createProject (if needed) → importWorkflow with the source \
+            definition and the projectId for a new workflow or the workflowId for an existing one. \
+            buildWorkflow and importWorkflow are the only ways to create or author workflow content: they \
+            create the workflow themselves and look up components, actions, triggers and task dispatchers \
+            themselves, so there are no separate tools for those. Each intelligent-tool call is independent \
+            and re-reads current state (e.g. the workflow) rather than remembering earlier calls, so iterate \
+            by calling the tool again with the next instruction and restate any context it still needs.
+            To find something, listProjects and listWorkflows take an optional query that matches names and \
+            descriptions; searchWorkflows without a projectId searches the workflows of every project in a \
+            workspace. getProject also reports publication state, the last version and deployments. \
+            Skills are read-only here (getAiSkills, getAiSkill, getAiSkillFilePaths, getAiSkillFileContent); \
+            author or change a skill with authorSkill.
+            To expose workflows over MCP: createMcpServer(name, environment, enabled?), leaving enabled unset \
+            or false, since a server with any unmapped attached workflow cannot be enabled; then \
             createMcpProject(mcpServerId, projectId, projectVersion, workflowIds) to attach a published \
-            project version's workflows (the server must already exist; this tool does not create one), then \
-            configureMcpServer(mcpServerId) to synthesize each attached workflow's tool mapping (tool name, \
-            tool description, fromAi(...) input expressions), then updateMcpServer(mcpServerId, enabled=true) \
-            to bring it online. That last call FAILS with a typed error naming the still-unmapped workflows \
-            if any attached workflow lacks a toolName or a required fromAi mapping — that is the enable-guard \
-            working as intended, not a bug; complete the mapping and retry. listMcpServers resolves a \
-            user-named server to its numeric id, cloneMcpProject(mcpProjectId, targetMcpServerId) duplicates \
-            an existing MCP project's exposed workflows onto another server, and \
-            listMcpProjectWorkflows(mcpServerId) shows each attached workflow's current mapping state. \
-            configureMcpServer never creates the server, attaches workflows to it, or enables it — those are \
-            the flat tools above.
-            listMcpServers, createMcpServer and listMcpProjectWorkflows additionally accept an optional \
-            workspaceId (and environment) since MCP servers are workspace-scoped: omit it when the account \
-            has exactly one \
-            workspace, otherwise retry with an explicit workspaceId from the workspace_required error's \
-            'workspaces' field.
-            The project, workflow and script tools (listProjects, searchProjects, getProject, createProject, \
-            listWorkflows, searchWorkflows, getWorkflow, createProjectWorkflow, updateWorkflow, \
-            updateScriptComponentCode, updateWorkflowRootProperties, updateClusterElementTask and the rest) \
-            likewise act within a single workspace and accept an \
-            optional workspaceId: they only list projects and workflows of that workspace and reject a project \
-            or workflow id that belongs to another one.
-            Most tools require workspace context: if a tool returns a workspace_required error, retry with one \
-            of the workspaceId values listed in its 'workspaces' field.""";
+            project version's workflows (the server must already exist); then configureMcpServer(mcpServerId) \
+            to synthesize each attached workflow's tool mapping (tool name, tool description, fromAi(...) \
+            input expressions); then updateMcpServer(mcpServerId, enabled=true) to bring it online. That last \
+            call FAILS with a typed error naming the still-unmapped workflows if any attached workflow lacks a \
+            toolName or a required fromAi mapping; that is the enable-guard working as intended, not a bug, \
+            so call configureMcpServer again and retry. listMcpServers resolves a user-named server to its \
+            numeric id. configureMcpServer never creates the server, attaches workflows to it, or enables it; \
+            those are the flat tools above.
+            Tools that work within a workspace (listProjects, createProject, searchWorkflows without a \
+            projectId, and the MCP server, deployment \
+            and knowledge-base tools) take a workspaceId, and several also take an environment (DEVELOPMENT, \
+            STAGING or PRODUCTION, default DEVELOPMENT). Call listWorkspaces first to find the workspace id. \
+            Tools that take a project or workflow id act on that object directly.""";
 
-    private final ComponentTools componentTools;
+    private static final Set<String> EXCLUDED_TOOL_NAMES = Set.of(
+        "createProjectWorkflow", "getProjectStatus", "searchProjects");
+
     private final ProjectTools projectTools;
-    private final ProjectWorkflowTools projectWorkflowTools;
-    private final TaskTools taskTools;
-    private final TaskDispatcherTools taskDispatcherTools;
-    private final ScriptTools scriptTools;
-    private final ClusterElementTools clusterElementTools;
+    private final ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools;
+    private final WorkspaceTools workspaceTools;
     private final List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors;
     private final ToolExecutionRecorder toolExecutionRecorder;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
+    private final WorkspaceFacade workspaceFacade;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ComponentTools componentTools, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools,
-        TaskTools taskTools, TaskDispatcherTools taskDispatcherTools, ScriptTools scriptTools,
-        ClusterElementTools clusterElementTools,
-        List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors,
-        ToolExecutionRecorder toolExecutionRecorder, WorkspaceScopeResolver workspaceScopeResolver) {
+        ProjectTools projectTools, ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
+        WorkspaceTools workspaceTools, List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors,
+        ToolExecutionRecorder toolExecutionRecorder, WorkspaceFacade workspaceFacade) {
 
-        this.componentTools = componentTools;
         this.projectTools = projectTools;
-        this.projectWorkflowTools = projectWorkflowTools;
-        this.taskTools = taskTools;
-        this.taskDispatcherTools = taskDispatcherTools;
-        this.scriptTools = scriptTools;
-        this.clusterElementTools = clusterElementTools;
+        this.projectWorkflowLifecycleTools = projectWorkflowLifecycleTools;
+        this.workspaceTools = workspaceTools;
         this.mcpServerToolCallbackContributors = mcpServerToolCallbackContributors;
         this.toolExecutionRecorder = toolExecutionRecorder;
-        this.workspaceScopeResolver = workspaceScopeResolver;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Bean
@@ -163,15 +150,22 @@ public class ManagementMcpServerConfiguration {
         return createMcpAsyncServer(canonicalWebMvcStreamableHttpServerTransportProvider());
     }
 
+    List<McpServerFeatures.AsyncToolSpecification> toolSpecifications() {
+        return ToolErrorReportingToolSpecifications.toAsyncToolSpecifications(
+            List.of(toolCallbackProvider().getToolCallbacks()));
+    }
+
     ToolCallbackProvider toolCallbackProvider() {
-        List<Object> tools = List.of(
-            projectTools, projectWorkflowTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
-            clusterElementTools);
+        List<Object> tools = List.of(projectTools, projectWorkflowLifecycleTools, workspaceTools);
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         for (ToolCallback toolCallback : ToolCallbacks.from(tools.toArray())) {
-            toolCallbacks.add(recording(toolCallback, ToolExecutionKind.MANAGEMENT_TOOL));
+            ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+
+            if (!EXCLUDED_TOOL_NAMES.contains(toolDefinition.name())) {
+                toolCallbacks.add(recording(toolCallback, ToolExecutionKind.MANAGEMENT_TOOL));
+            }
         }
 
         for (McpServerToolCallbackContributor contributor : mcpServerToolCallbackContributors) {
@@ -185,7 +179,7 @@ public class ManagementMcpServerConfiguration {
 
     private ToolCallback recording(ToolCallback toolCallback, ToolExecutionKind kind) {
         return new ToolInvocationRecordingToolCallback(
-            toolCallback, kind, toolExecutionRecorder, workspaceScopeResolver);
+            toolCallback, kind, toolExecutionRecorder, workspaceFacade);
     }
 
     private McpAsyncServer createMcpAsyncServer(WebMvcStreamableServerTransportProvider transportProvider) {
@@ -199,7 +193,7 @@ public class ManagementMcpServerConfiguration {
                     .prompts(true)
                     .logging()
                     .build())
-            .tools(McpToolUtils.toAsyncToolSpecifications(toolCallbackProvider().getToolCallbacks()))
+            .tools(toolSpecifications())
             .build();
     }
 }

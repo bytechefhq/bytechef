@@ -16,29 +16,28 @@
 
 package com.bytechef.automation.ai.tool;
 
-import com.bytechef.automation.ai.tool.exception.ProjectToolErrorType;
 import com.bytechef.automation.ai.tool.model.ProjectDeploymentStatusInfo;
 import com.bytechef.automation.ai.tool.model.ProjectDetailInfo;
 import com.bytechef.automation.ai.tool.model.ProjectInfo;
 import com.bytechef.automation.ai.tool.model.ProjectPublishInfo;
 import com.bytechef.automation.ai.tool.model.ProjectStatusInfo;
 import com.bytechef.automation.ai.tool.model.ProjectVersionInfo;
-import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
-import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
+import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
+import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
-import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.facade.ProjectTagFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.exception.ExecutionException;
-import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +49,8 @@ import org.springframework.stereotype.Component;
 /**
  * The ProjectTools class provides a suite of tools for managing and interacting with projects in the ByteChef platform.
  * It encompasses functionalities such as project creation, retrieval, update, deletion, publishing, and searching,
- * along with deployment status management. This class integrates with services to enable project workflows and
- * deployment configurations.
+ * along with deployment status management. It reaches the project domain through facades only, so their authorization
+ * rules apply to every call.
  *
  * @author Ivica Cardic
  */
@@ -60,123 +59,115 @@ public class ProjectTools {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectTools.class);
 
-    private final CategoryService categoryService;
-    private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectCategoryFacade projectCategoryFacade;
+    private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectFacade projectFacade;
-    private final ProjectService projectService;
+    private final ProjectTagFacade projectTagFacade;
     private final ScopedProjectGuard scopedProjectGuard;
-    private final TagService tagService;
+    private final WorkspaceFacade workspaceFacade;
 
     @SuppressFBWarnings("EI")
     public ProjectTools(
-        CategoryService categoryService, ProjectDeploymentService projectDeploymentService, ProjectFacade projectFacade,
-        ProjectService projectService, ScopedProjectGuard scopedProjectGuard, TagService tagService) {
+        ProjectCategoryFacade projectCategoryFacade, ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectFacade projectFacade, ProjectTagFacade projectTagFacade, ScopedProjectGuard scopedProjectGuard,
+        WorkspaceFacade workspaceFacade) {
 
-        this.categoryService = categoryService;
-        this.projectDeploymentService = projectDeploymentService;
+        this.projectCategoryFacade = projectCategoryFacade;
+        this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectFacade = projectFacade;
-        this.projectService = projectService;
+        this.projectTagFacade = projectTagFacade;
         this.scopedProjectGuard = scopedProjectGuard;
-        this.tagService = tagService;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Tool(
-        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status.")
+        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status. Pass a query to return only the projects whose name or description contains it. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
     public List<ProjectInfo> listProjects(
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        @ToolParam(
+            required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        @ToolParam(
+            required = false,
+            description = "Optional text to match against project names and descriptions, case-insensitively. Omit it to list every project.") @Nullable String query,
         ToolContext toolContext) {
 
-        List<Project> projects = scopedProjectGuard.getAccessibleProjects(
-            workspaceId, toolContext, ProjectToolErrorType.LIST_PROJECTS);
+        Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
+        Long resolvedWorkspaceId = scopedProjectId == null
+            ? requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.LIST_PROJECTS) : null;
 
         try {
-            List<ProjectInfo> projectInfos = projects.stream()
-                .map(ProjectTools::getProjectInfo)
-                .collect(Collectors.toList());
+            List<ProjectInfo> projectInfos = getMatchingProjects(scopedProjectId, resolvedWorkspaceId, query);
 
             if (log.isDebugEnabled()) {
-                log.debug("listProjects(): Found {} projects", projectInfos.size());
+                log.debug("listProjects({}): Found {} projects", query, projectInfos.size());
             }
 
             return projectInfos;
         } catch (Exception e) {
-            log.error("listProjects(): Failed to list projects", e);
+            log.error("listProjects({}): Failed to list projects", query, e);
 
-            throw new ExecutionException("Failed to list projects: " + e.getMessage(), e,
-                ProjectToolErrorType.LIST_PROJECTS);
+            throw new ExecutionException(
+                "Failed to list projects: " + e.getMessage(), e, ProjectErrorType.LIST_PROJECTS);
         }
     }
 
     @Tool(
-        description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
+        description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, whether it is published, the last version number, the last published date, versions, its deployments with their environments and enabled state, and metadata.")
     public ProjectDetailInfo getProject(
-        @ToolParam(description = "The ID of the project to retrieve") long projectId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
+        @ToolParam(description = "The ID of the project to retrieve") long projectId, ToolContext toolContext) {
 
-        Project project = getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.GET_PROJECT);
+        scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_VIEW, toolContext,
+            ProjectErrorType.GET_PROJECT);
 
         try {
-            List<ProjectVersion> projectVersions = projectService.getProjectVersions(projectId);
+            ProjectDTO projectDTO = projectFacade.getProject(projectId);
 
-            if (log.isDebugEnabled()) {
-                log.debug("getProject({}): Retrieved project {} with {} versions", projectId, projectId,
-                    projectVersions.size());
-            }
-
-            ProjectVersion.Status lastStatus = project.getLastStatus();
-            List<ProjectVersionInfo> projectVersionInfos = projectVersions.stream()
-                .map(pv -> {
-                    ProjectVersion.Status status = pv.getStatus();
+            List<ProjectVersionInfo> projectVersionInfos = projectDTO.projectVersions()
+                .stream()
+                .map(projectVersion -> {
+                    ProjectVersion.Status status = projectVersion.getStatus();
 
                     return new ProjectVersionInfo(
-                        pv.getVersion(), status.name(), pv.getDescription(),
-                        pv.getPublishedDate() != null ? pv.getPublishedDate() : null);
+                        projectVersion.getVersion(), status.name(), projectVersion.getDescription(),
+                        projectVersion.getPublishedDate());
                 })
-                .collect(Collectors.toList());
+                .toList();
+
+            if (log.isDebugEnabled()) {
+                log.debug(
+                    "getProject({}): Retrieved project {} with {} versions", projectId, projectId,
+                    projectVersionInfos.size());
+            }
+
+            Category category = projectDTO.category();
 
             return new ProjectDetailInfo(
-                project.getId(), project.getName(), project.getDescription(), lastStatus.name(),
-                project.getCategoryId(), project.getWorkspaceId(), project.getTagIds(),
-                projectVersionInfos, project.getCreatedDate(), project.getLastModifiedDate(),
-                project.getLastPublishedDate() != null ? project.getLastPublishedDate() : null);
+                projectDTO.id(), projectDTO.name(), projectDTO.description(), getLastStatusName(projectDTO),
+                projectDTO.lastPublishedDate() != null, projectDTO.lastProjectVersion(),
+                category == null ? null : category.getId(), projectDTO.workspaceId(), getTagIds(projectDTO.tags()),
+                projectVersionInfos, getProjectDeploymentStatusInfos(projectDTO), projectDTO.createdDate(),
+                projectDTO.lastModifiedDate(), projectDTO.lastPublishedDate());
         } catch (Exception e) {
             log.error("getProject({}): Failed to get project {}", projectId, projectId, e);
 
-            throw new ExecutionException("Failed to get project: " + e.getMessage(), e,
-                ProjectToolErrorType.GET_PROJECT);
+            throw new ExecutionException(
+                "Failed to get project: " + e.getMessage(), e, ProjectErrorType.GET_PROJECT);
         }
     }
 
     @Tool(
-        description = "Full-text search across the projects of a workspace. Returns a list of projects matching the search query in name or description.")
+        description = "Full-text search across the projects of a workspace. Returns a list of projects matching the search query in name or description. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
     public List<ProjectInfo> searchProjects(
         @ToolParam(description = "The search query to match against project names and descriptions") String query,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        @ToolParam(
+            required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        List<Project> allProjects = scopedProjectGuard.getAccessibleProjects(
-            workspaceId, toolContext, ProjectToolErrorType.SEARCH_PROJECTS);
+        Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
+        Long resolvedWorkspaceId = scopedProjectId == null
+            ? requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.SEARCH_PROJECTS) : null;
 
         try {
-            query = query.toLowerCase();
-
-            String lowerQuery = query.trim();
-
-            List<ProjectInfo> matchingProjects = allProjects.stream()
-                .filter(project -> {
-                    String name = project.getName();
-
-                    name = name != null ? name.toLowerCase() : "";
-
-                    String description = project.getDescription();
-
-                    description = description != null ? description.toLowerCase() : "";
-
-                    return name.contains(lowerQuery) || description.contains(lowerQuery);
-                })
-                .map(ProjectTools::getProjectInfo)
-                .collect(Collectors.toList());
+            List<ProjectInfo> matchingProjects = getMatchingProjects(scopedProjectId, resolvedWorkspaceId, query);
 
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -188,34 +179,22 @@ public class ProjectTools {
             log.error("searchProjects({}): Failed to search projects with query '{}'", query, query, e);
 
             throw new ExecutionException(
-                "Failed to search projects: " + e.getMessage(), e, ProjectToolErrorType.SEARCH_PROJECTS);
+                "Failed to search projects: " + e.getMessage(), e, ProjectErrorType.SEARCH_PROJECTS);
         }
     }
 
     @Tool(
         description = "Get project deployment and execution status. Returns detailed status information including deployment environments and their states.")
     public ProjectStatusInfo getProjectStatus(
-        @ToolParam(description = "The ID of the project to get status for") long projectId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
+        @ToolParam(description = "The ID of the project to get status for") long projectId, ToolContext toolContext) {
 
-        Project project =
-            getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.GET_PROJECT_STATUS);
+        scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_VIEW, toolContext,
+            ProjectErrorType.GET_PROJECT_STATUS);
 
         try {
-            List<ProjectDeployment> deployments = projectDeploymentService.getProjectDeployments(projectId);
+            ProjectDTO projectDTO = projectFacade.getProject(projectId);
 
-            List<ProjectDeploymentStatusInfo> deploymentStatuses = deployments.stream()
-                .map(deployment -> {
-                    Environment environment = deployment.getEnvironment();
-
-                    return new ProjectDeploymentStatusInfo(
-                        deployment.getId(), environment.name(), deployment.isEnabled(),
-                        projectDeploymentService.isProjectDeploymentEnabled(deployment.getId()),
-                        deployment.getCreatedDate() != null ? deployment.getCreatedDate() : null,
-                        deployment.getLastModifiedDate() != null ? deployment.getLastModifiedDate() : null);
-                })
-                .collect(Collectors.toList());
+            List<ProjectDeploymentStatusInfo> deploymentStatuses = getProjectDeploymentStatusInfos(projectDTO);
 
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -223,153 +202,128 @@ public class ProjectTools {
                     deploymentStatuses.size());
             }
 
-            ProjectVersion.Status lastStatus = project.getLastStatus();
-
             return new ProjectStatusInfo(
-                project.getId(), project.getName(), lastStatus.name(), project.isPublished(),
-                project.getLastProjectVersion(),
-                project.getLastPublishedDate() != null ? project.getLastPublishedDate() : null, deploymentStatuses);
+                projectDTO.id(), projectDTO.name(), getLastStatusName(projectDTO),
+                projectDTO.lastPublishedDate() != null,
+                projectDTO.lastProjectVersion(), projectDTO.lastPublishedDate(), deploymentStatuses);
         } catch (Exception e) {
             log.error("getProjectStatus({}): Failed to get status for project {}", projectId, projectId, e);
 
             throw new ExecutionException(
-                "Failed to get project status: " + e.getMessage(), e, ProjectToolErrorType.GET_PROJECT_STATUS);
+                "Failed to get project status: " + e.getMessage(), e, ProjectErrorType.GET_PROJECT_STATUS);
         }
     }
 
     @Tool(
-        description = "Create a new project with workflows. Returns the created project information including id, name, description, and status.")
+        description = "Create a new project. Returns the created project information including id, name, description, and status. Not available in an embedded chat confined to one project.")
     public ProjectInfo createProject(
         @ToolParam(description = "The name of the new project") String name,
         @ToolParam(required = false, description = "The description of the new project") String description,
         @ToolParam(required = false, description = "The category ID for the project") Long categoryId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        @ToolParam(
+            required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         @ToolParam(required = false, description = "The tag IDs to associate with the project") List<Long> tagIds,
         ToolContext toolContext) {
 
-        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectToolErrorType.CREATE_PROJECT);
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.CREATE_PROJECT);
 
-        long resolvedWorkspaceId = scopedProjectGuard.resolveWorkspaceId(
-            workspaceId, toolContext, ProjectToolErrorType.CREATE_PROJECT);
+        long resolvedWorkspaceId = requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.CREATE_PROJECT);
 
         try {
-            Project.Builder projectBuilder = Project.builder()
-                .name(name);
+            String trimmedDescription = description == null ? null : description.trim();
 
-            if (description != null) {
-                description = description.trim();
+            long projectId = projectFacade.createProject(
+                ProjectDTO.builder()
+                    .category(getCategory(categoryId, resolvedWorkspaceId))
+                    .description(
+                        trimmedDescription == null || trimmedDescription.isEmpty() ? null : trimmedDescription)
+                    .name(name)
+                    .tags(getTags(tagIds))
+                    .workspaceId(resolvedWorkspaceId)
+                    .build());
 
-                if (!description.isEmpty()) {
-                    projectBuilder.description(description);
-                }
-            }
-
-            if (categoryId != null) {
-                projectBuilder.categoryId(categoryId);
-            }
-
-            projectBuilder.workspaceId(resolvedWorkspaceId);
-
-            if (tagIds != null && !tagIds.isEmpty()) {
-                projectBuilder.tagIds(tagIds);
-            }
-
-            Project project = projectService.create(projectBuilder.build());
+            ProjectDTO projectDTO = projectFacade.getProject(projectId);
 
             if (log.isDebugEnabled()) {
                 log.debug(
                     "createProject({}, {}, {}, {}, {}): Created project {} with name '{}'", name, description,
-                    categoryId, workspaceId, tagIds, project.getId(), project.getName());
+                    categoryId, resolvedWorkspaceId, tagIds, projectDTO.id(), projectDTO.name());
             }
 
-            Status lastStatus = project.getLastStatus();
-
-            return new ProjectInfo(
-                project.getId(), project.getName(), project.getDescription(), lastStatus.name(),
-                project.getCreatedDate(), project.getLastModifiedDate());
+            return getProjectInfo(projectDTO);
         } catch (Exception e) {
             log.error(
                 "createProject({}, {}, {}, {}, {}): Failed to create project with name '{}'", name, description,
-                categoryId, workspaceId, tagIds, name, e);
+                categoryId, resolvedWorkspaceId, tagIds, name, e);
 
             throw new ExecutionException(
-                "Failed to create project: " + e.getMessage(), e, ProjectToolErrorType.CREATE_PROJECT);
+                "Failed to create project: " + e.getMessage(), e, ProjectErrorType.CREATE_PROJECT);
         }
     }
 
     @Tool(
-        description = "Update project settings and metadata. Returns the updated project information including id, name, description, and status.")
+        description = "Update project settings and metadata. Returns the updated project information including id, name, description, and status. Not available in an embedded chat confined to one project.")
     public ProjectInfo updateProject(
         @ToolParam(description = "The ID of the project to update") long projectId,
         @ToolParam(required = false, description = "The new name of the project") String name,
         @ToolParam(required = false, description = "The new description of the project") String description,
         @ToolParam(required = false, description = "The new category ID for the project") Long categoryId,
         @ToolParam(required = false, description = "The new tag IDs to associate with the project") List<Long> tagIds,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectToolErrorType.UPDATE_PROJECT);
-
-        Project existingProject =
-            getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.UPDATE_PROJECT);
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.UPDATE_PROJECT);
+        scopedProjectGuard.checkProjectNotHidden(projectId, toolContext, ProjectErrorType.UPDATE_PROJECT);
 
         try {
+            ProjectDTO existingProjectDTO = projectFacade.getProject(projectId);
 
-            if (name != null) {
-                name = name.trim();
-            }
-
-            existingProject.setName(name != null && !name.isEmpty() ? name : existingProject.getName());
-            existingProject.setDescription(description != null ? description : existingProject.getDescription());
-            existingProject.setCategoryId(categoryId != null ? categoryId : existingProject.getCategoryId());
-
-            if (tagIds != null) {
-                existingProject.setTagIds(tagIds);
-            }
-
-            Long existingCategoryId = existingProject.getCategoryId();
+            String trimmedName = name == null ? null : name.trim();
+            long workspaceId = Objects.requireNonNull(existingProjectDTO.workspaceId());
 
             projectFacade.updateProject(
-                new ProjectDTO(
-                    existingCategoryId == null ? null : categoryService.getCategory(existingCategoryId),
-                    existingProject, List.of(), tagService.getTags(existingProject.getTagIds())));
+                ProjectDTO.builder()
+                    .category(
+                        categoryId == null ? existingProjectDTO.category() : getCategory(categoryId, workspaceId))
+                    .description(description == null ? existingProjectDTO.description() : description)
+                    .id(existingProjectDTO.id())
+                    .name(trimmedName == null || trimmedName.isEmpty() ? existingProjectDTO.name() : trimmedName)
+                    .projectVersions(existingProjectDTO.projectVersions())
+                    .tags(tagIds == null ? existingProjectDTO.tags() : getTags(tagIds))
+                    .version(existingProjectDTO.version())
+                    .workspaceId(workspaceId)
+                    .build());
 
-            Project updatedProject = projectService.getProject(projectId);
+            ProjectDTO updatedProjectDTO = projectFacade.getProject(projectId);
 
             if (log.isDebugEnabled()) {
                 log.debug(
                     "updateProject({}, {}, {}, {}, {}): Updated project {} with name '{}'", projectId, name,
-                    description, categoryId, tagIds, updatedProject.getId(), updatedProject.getName());
+                    description, categoryId, tagIds, updatedProjectDTO.id(), updatedProjectDTO.name());
             }
 
-            Status lastStatus = updatedProject.getLastStatus();
-
-            return new ProjectInfo(
-                updatedProject.getId(), updatedProject.getName(), updatedProject.getDescription(), lastStatus.name(),
-                updatedProject.getCreatedDate(), updatedProject.getLastModifiedDate());
+            return getProjectInfo(updatedProjectDTO);
         } catch (Exception e) {
             log.error(
                 "updateProject({}, {}, {}, {}, {}): Failed to update project {}", projectId, name, description,
                 categoryId, tagIds, projectId, e);
 
             throw new ExecutionException(
-                "Failed to update project: " + e.getMessage(), e, ProjectToolErrorType.UPDATE_PROJECT);
+                "Failed to update project: " + e.getMessage(), e, ProjectErrorType.UPDATE_PROJECT);
         }
     }
 
     @Tool(
-        description = "Delete a project and all its workflows. Returns a confirmation message.")
+        description = "Delete a project and all its workflows. Returns a confirmation message. Not available in an embedded chat confined to one project.")
     public String deleteProject(
-        @ToolParam(description = "The ID of the project to delete") long projectId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
+        @ToolParam(description = "The ID of the project to delete") long projectId, ToolContext toolContext) {
 
-        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectToolErrorType.DELETE_PROJECT);
-
-        Project project = getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.DELETE_PROJECT);
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.DELETE_PROJECT);
+        scopedProjectGuard.checkProjectNotHidden(projectId, toolContext, ProjectErrorType.DELETE_PROJECT);
 
         try {
-            String projectName = project.getName();
+            ProjectDTO projectDTO = projectFacade.getProject(projectId);
+
+            String projectName = projectDTO.name();
 
             projectFacade.deleteProject(projectId);
 
@@ -383,26 +337,24 @@ public class ProjectTools {
             log.error("deleteProject({}): Failed to delete project {}", projectId, projectId, e);
 
             throw new ExecutionException(
-                "Failed to delete project: " + e.getMessage(), e, ProjectToolErrorType.DELETE_PROJECT);
+                "Failed to delete project: " + e.getMessage(), e, ProjectErrorType.DELETE_PROJECT);
         }
     }
 
     @Tool(
-        description = "Publish a project version for deployment. Returns the published project version information.")
+        description = "Publish a project version for deployment. Returns the published project version information. Not available in an embedded chat confined to one project.")
     public ProjectPublishInfo publishProject(
         @ToolParam(description = "The ID of the project to publish") long projectId,
         @ToolParam(required = false, description = "The description for this published version") String description,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
-        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectToolErrorType.PUBLISH_PROJECT);
-
-        getWorkspaceProject(projectId, workspaceId, toolContext, ProjectToolErrorType.PUBLISH_PROJECT);
+        scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.PUBLISH_PROJECT);
+        scopedProjectGuard.checkProjectNotHidden(projectId, toolContext, ProjectErrorType.PUBLISH_PROJECT);
 
         try {
             int publishedVersion = projectFacade.publishProject(projectId, description, false);
 
-            Project updatedProject = projectService.getProject(projectId);
+            ProjectDTO updatedProjectDTO = projectFacade.getProject(projectId);
 
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -411,34 +363,138 @@ public class ProjectTools {
             }
 
             return new ProjectPublishInfo(
-                updatedProject.getId(), updatedProject.getName(), publishedVersion, description,
-                updatedProject.getLastPublishedDate() != null ? updatedProject.getLastPublishedDate() : null);
+                updatedProjectDTO.id(), updatedProjectDTO.name(), publishedVersion, description,
+                updatedProjectDTO.lastPublishedDate());
         } catch (Exception e) {
             log.error("publishProject({}, {}): Failed to publish project {}", projectId, description, projectId, e);
 
             throw new ExecutionException(
-                "Failed to publish project: " + e.getMessage(), e, ProjectToolErrorType.PUBLISH_PROJECT);
+                "Failed to publish project: " + e.getMessage(), e, ProjectErrorType.PUBLISH_PROJECT);
         }
     }
 
-    private Project getWorkspaceProject(
-        long projectId, @Nullable Long workspaceId, @Nullable ToolContext toolContext,
-        ProjectToolErrorType projectToolErrorType) {
+    private long requireWorkspaceId(
+        @Nullable Long workspaceId, @Nullable ToolContext toolContext, ProjectErrorType projectErrorType) {
 
-        return scopedProjectGuard.getProject(projectId, workspaceId, toolContext, projectToolErrorType);
-    }
+        Long resolvedWorkspaceId;
 
-    private static ProjectInfo getProjectInfo(Project project) {
-        Instant lastPublishedDate = project.getLastPublishedDate();
-
-        Status lastStatus = Status.PUBLISHED;
-
-        if (lastPublishedDate == null) {
-            lastStatus = Status.DRAFT;
+        try {
+            resolvedWorkspaceId = AutomationToolInvocationContext.resolveWorkspaceId(
+                workspaceId, toolContext, workspaceFacade);
+        } catch (WorkspaceNotAccessibleException exception) {
+            throw new ExecutionException(exception.getMessage(), exception, projectErrorType);
         }
 
+        if (resolvedWorkspaceId == null) {
+            throw new ExecutionException(
+                "workspaceId is required - call listWorkspaces to find the workspace id.", projectErrorType);
+        }
+
+        return resolvedWorkspaceId;
+    }
+
+    private @Nullable Category getCategory(@Nullable Long categoryId, long workspaceId) {
+        if (categoryId == null) {
+            return null;
+        }
+
+        return projectCategoryFacade.getProjectCategories(workspaceId)
+            .stream()
+            .filter(category -> Objects.equals(category.getId(), categoryId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Category " + categoryId + " not found"));
+    }
+
+    private List<Tag> getTags(@Nullable List<Long> tagIds) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<Tag> tags = projectTagFacade.getProjectTags()
+            .stream()
+            .filter(tag -> tagIds.contains(tag.getId()))
+            .toList();
+
+        if (tags.size() != tagIds.size()) {
+            throw new IllegalArgumentException("One or more tags not found: " + tagIds);
+        }
+
+        return tags;
+    }
+
+    private List<ProjectDeploymentStatusInfo> getProjectDeploymentStatusInfos(ProjectDTO projectDTO) {
+        List<ProjectDeploymentDTO> projectDeploymentDTOs = projectDeploymentFacade.getWorkspaceProjectDeployments(
+            Objects.requireNonNull(projectDTO.workspaceId()), null, projectDTO.id(), null, false);
+
+        return projectDeploymentDTOs.stream()
+            .map(ProjectTools::getProjectDeploymentStatusInfo)
+            .toList();
+    }
+
+    private List<ProjectInfo> getMatchingProjects(
+        @Nullable Long scopedProjectId, @Nullable Long workspaceId, @Nullable String query) {
+
+        String lowerQuery = query == null ? "" : query.toLowerCase()
+            .trim();
+
+        return getAccessibleProjects(scopedProjectId, workspaceId).stream()
+            .filter(projectDTO -> lowerQuery.isEmpty() || contains(projectDTO.name(), lowerQuery) ||
+                contains(projectDTO.description(), lowerQuery))
+            .map(ProjectTools::getProjectInfo)
+            .toList();
+    }
+
+    private List<ProjectDTO> getAccessibleProjects(@Nullable Long scopedProjectId, @Nullable Long workspaceId) {
+        if (scopedProjectId != null) {
+            return List.of(projectFacade.getProject(scopedProjectId));
+        }
+
+        return projectFacade.getWorkspaceProjects(
+            null, null, false, null, null, null, Objects.requireNonNull(workspaceId));
+    }
+
+    private static boolean contains(@Nullable String value, String lowerQuery) {
+        return value != null && value.toLowerCase()
+            .contains(lowerQuery);
+    }
+
+    private static ProjectDeploymentStatusInfo getProjectDeploymentStatusInfo(
+        ProjectDeploymentDTO projectDeploymentDTO) {
+
+        Environment environment = projectDeploymentDTO.environment();
+
+        return new ProjectDeploymentStatusInfo(
+            projectDeploymentDTO.id(), environment.name(), projectDeploymentDTO.enabled(),
+            projectDeploymentDTO.enabled(), projectDeploymentDTO.createdDate(),
+            projectDeploymentDTO.lastModifiedDate());
+    }
+
+    private static ProjectInfo getProjectInfo(ProjectDTO projectDTO) {
         return new ProjectInfo(
-            project.getId(), project.getName(), project.getDescription(), lastStatus.name(),
-            project.getCreatedDate(), project.getLastModifiedDate());
+            projectDTO.id(), projectDTO.name(), projectDTO.description(), getStatusName(projectDTO),
+            projectDTO.createdDate(), projectDTO.lastModifiedDate());
+    }
+
+    private static String getLastStatusName(ProjectDTO projectDTO) {
+        ProjectVersion.Status lastStatus = projectDTO.lastStatus();
+
+        return lastStatus.name();
+    }
+
+    private static String getStatusName(ProjectDTO projectDTO) {
+        ProjectVersion.Status status = projectDTO.lastPublishedDate() == null
+            ? ProjectVersion.Status.DRAFT : ProjectVersion.Status.PUBLISHED;
+
+        return status.name();
+    }
+
+    private static List<Long> getTagIds(@Nullable List<Tag> tags) {
+        if (tags == null) {
+            return List.of();
+        }
+
+        return tags.stream()
+            .map(Tag::getId)
+            .toList();
     }
 }

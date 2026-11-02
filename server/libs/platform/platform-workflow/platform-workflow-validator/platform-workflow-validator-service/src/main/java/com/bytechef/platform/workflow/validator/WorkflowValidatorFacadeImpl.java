@@ -28,6 +28,7 @@ import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
+import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -44,6 +45,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.domain.BaseOption;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -103,6 +105,11 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             public List<String> getRequiredClusterElementTypes(String taskType) {
                 return getClusterElementTypeKeys(taskType, true);
             }
+
+            @Override
+            public Set<String> getClusterElementSlotKeys(String clusterElementType) {
+                return findClusterElementSlotKeys(clusterElementType);
+            }
         };
 
     @SuppressFBWarnings("EI2")
@@ -155,6 +162,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             createResourceReferenceProvider(resourceReferenceResolverMap, environmentId), new HashMap<>(),
             new HashMap<>(), nodeOutputMaps.outputMap(), nodeOutputMaps.variableOutputMap(), new HashMap<>(), errors,
             warnings);
+
+        WorkflowValidator.validateNodeTypesExist(workflow, this::nodeTypeExists, errors);
 
         if (workflowId != null) {
             appendMissingConnections(workflow, workflowId, environmentId, errors);
@@ -213,6 +222,33 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     @Override
     public List<String> getReservedNodeNames(String workflow) {
         return WorkflowValidator.getReservedNodeNames(workflow);
+    }
+
+    private boolean nodeTypeExists(String type, String kind) {
+        try {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+            String operation = workflowNodeType.operation();
+
+            if ("trigger".equals(kind)) {
+                if (operation == null) {
+                    return false;
+                }
+
+                triggerDefinitionService.getTriggerDefinition(
+                    workflowNodeType.name(), workflowNodeType.version(), operation);
+            } else if (operation != null) {
+                actionDefinitionService.getActionDefinition(
+                    workflowNodeType.name(), workflowNodeType.version(), operation);
+            } else {
+                taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+                    workflowNodeType.name(), workflowNodeType.version());
+            }
+
+            return true;
+        } catch (Exception exception) {
+            return false;
+        }
     }
 
     private List<PropertyInfo> getTaskProperties(String taskType, String kind) {
@@ -738,6 +774,38 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         return null;
     }
 
+    private Set<String> findClusterElementSlotKeys(String clusterElementType) {
+        WorkflowNodeType workflowNodeType;
+
+        try {
+            workflowNodeType = WorkflowNodeType.ofType(clusterElementType);
+        } catch (IllegalArgumentException exception) {
+            return Set.of();
+        }
+
+        String clusterElementName = workflowNodeType.operation();
+
+        if (clusterElementName == null) {
+            return Set.of();
+        }
+
+        ComponentDefinition componentDefinition;
+
+        try {
+            componentDefinition = componentDefinitionService.getComponentDefinition(
+                workflowNodeType.name(), workflowNodeType.version());
+        } catch (IllegalArgumentException exception) {
+            return Set.of();
+        }
+
+        return componentDefinition.getClusterElements()
+            .stream()
+            .filter(clusterElementDefinition -> clusterElementName.equals(clusterElementDefinition.getName()))
+            .map(clusterElementDefinition -> clusterElementDefinition.getType()
+                .key())
+            .collect(Collectors.toSet());
+    }
+
     static List<String> toClusterElementTypeKeys(
         List<ClusterElementDefinition.ClusterElementType> clusterElementTypes, boolean requiredOnly) {
 
@@ -839,7 +907,36 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         return new PropertyInfo(
             baseProperty.getName(), type, baseProperty.getDescription(), baseProperty.getRequired(),
             baseProperty.getExpressionEnabled(), baseProperty.getDisplayCondition(), null, nestedPropertyInfos,
-            resourceType);
+            resourceType, getFixedOptionValues(baseProperty));
+    }
+
+    @Nullable
+    private static List<Object> getFixedOptionValues(BaseProperty baseProperty) {
+        boolean optionsDataSourcePresent = baseProperty instanceof OptionsDataSourceAware optionsDataSourceAware &&
+            optionsDataSourceAware.getOptionsDataSource() != null;
+
+        List<? extends BaseOption> options = switch (baseProperty) {
+            case ArrayProperty arrayProperty -> arrayProperty.getOptions();
+            case com.bytechef.platform.component.domain.BooleanProperty booleanProperty ->
+                booleanProperty.getOptions();
+            case com.bytechef.platform.component.domain.IntegerProperty integerProperty ->
+                integerProperty.getOptions();
+            case com.bytechef.platform.component.domain.NumberProperty numberProperty -> numberProperty.getOptions();
+            case com.bytechef.platform.component.domain.StringProperty stringProperty -> stringProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty ->
+                arrayProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.BooleanProperty booleanProperty ->
+                booleanProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.IntegerProperty integerProperty ->
+                integerProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty numberProperty ->
+                numberProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty stringProperty ->
+                stringProperty.getOptions();
+            default -> List.of();
+        };
+
+        return PropertyInfo.toFixedOptionValues(options, optionsDataSourcePresent);
     }
 
     private record NodeOutputMaps(Map<String, PropertyInfo> outputMap, Map<String, PropertyInfo> variableOutputMap) {

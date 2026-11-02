@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 
 /**
- * The single project an agent run is confined to.
+ * The single project an agent run is confined to; a run is confined exactly when one is set.
  *
  * @author Ivica Cardic
  */
@@ -47,12 +47,6 @@ public final class ScopedProjectToolContext {
     }
 
     public static boolean isConfined(@Nullable ToolContext toolContext) {
-        if (fetchScopedProjectId(toolContext) != null) {
-            return true;
-        }
-
-        AgentToolInvocationContext invocationContext = AgentToolInvocationContext.fromToolContext(toolContext);
-
-        return invocationContext != null && invocationContext.skipAutomationAuthorization();
+        return fetchScopedProjectId(toolContext) != null;
     }
 }

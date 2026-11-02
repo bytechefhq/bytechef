@@ -17,38 +17,53 @@
 package com.bytechef.ai.copilot.tool;
 
 import com.bytechef.ai.agent.tool.AgentType;
+import com.bytechef.ai.copilot.util.Mode;
+import com.bytechef.ai.copilot.util.Source;
 
 /**
- * The copilot-owned agent types: the workflow-editor, code-editor and cluster-element chat flows (each with its
- * ASK/BUILD variants and a coarse fallback), plus the copilot subagents invoked as tools.
+ * The copilot-owned agent types: the chat agents registered per {@link Source} and {@link Mode} (their keys are derived
+ * from {@link Source#agentId(Mode)}, so the agent registration and the chat routing cannot drift apart), plus the
+ * copilot subagents invoked as tools (keyed by their tool name).
  *
  * @author Ivica Cardic
  */
 public enum CopilotAgentType implements AgentType {
 
-    WORKFLOW_EDITOR_ASK("workflow_editor_ask", false),
-    WORKFLOW_EDITOR_BUILD("workflow_editor_build", false),
-    WORKFLOW_EDITOR("workflow_editor", true),
-    CODE_EDITOR_ASK("code_editor_ask", false),
-    CODE_EDITOR_BUILD("code_editor_build", false),
-    CODE_EDITOR("code_editor", true),
-    CLUSTER_ELEMENT_ASK("cluster_element_ask", false),
-    CLUSTER_ELEMENT_BUILD("cluster_element_build", false),
-    CLUSTER_ELEMENT("cluster_element", true),
-    SKILLS("skills", false),
-    CONFIGURE_CLUSTER_ELEMENT("configureClusterElement", false),
-    WRITE_SCRIPT("writeScript", false),
-    BUILD_WORKFLOW("buildWorkflow", false),
-    IMPORT_WORKFLOW("importWorkflow", false),
-    DEBUG_WORKFLOW_EXECUTION("debugWorkflowExecution", false),
-    CONFIGURE_MCP_SERVER("configureMcpServer", false);
+    WORKFLOW_EDITOR_ASK(Source.WORKFLOW_EDITOR, Mode.ASK),
+    WORKFLOW_EDITOR_BUILD(Source.WORKFLOW_EDITOR, Mode.BUILD),
+    CODE_EDITOR_ASK(Source.CODE_EDITOR, Mode.ASK),
+    CODE_EDITOR_BUILD(Source.CODE_EDITOR, Mode.BUILD),
+    WORKFLOW_CODE_EDITOR_ASK(Source.WORKFLOW_CODE_EDITOR, Mode.ASK),
+    WORKFLOW_CODE_EDITOR_BUILD(Source.WORKFLOW_CODE_EDITOR, Mode.BUILD),
+    CLUSTER_ELEMENT_ASK(Source.CLUSTER_ELEMENT, Mode.ASK),
+    CLUSTER_ELEMENT_BUILD(Source.CLUSTER_ELEMENT, Mode.BUILD),
+    CONVERTER_BUILD(Source.CONVERTER, Mode.BUILD),
+    SKILLS_ASK(Source.SKILLS, Mode.ASK),
+    SKILLS_BUILD(Source.SKILLS, Mode.BUILD),
+    JSON_SCHEMA_BUILDER_ASK(Source.JSON_SCHEMA_BUILDER, Mode.ASK),
+    JSON_SCHEMA_BUILDER_BUILD(Source.JSON_SCHEMA_BUILDER, Mode.BUILD),
+    SAMPLE_OUTPUT_ASK(Source.SAMPLE_OUTPUT, Mode.ASK),
+    SAMPLE_OUTPUT_BUILD(Source.SAMPLE_OUTPUT, Mode.BUILD),
+    MCP_SERVER_BUILD(Source.MCP_SERVER, Mode.BUILD),
+    WORKFLOW_EDITOR_EMBEDDED_ASK(Source.WORKFLOW_EDITOR_EMBEDDED, Mode.ASK),
+    WORKFLOW_EDITOR_EMBEDDED_BUILD(Source.WORKFLOW_EDITOR_EMBEDDED, Mode.BUILD),
+    SKILLS("skills"),
+    CONFIGURE_CLUSTER_ELEMENT("configureClusterElement"),
+    WRITE_SCRIPT("writeScript"),
+    BUILD_WORKFLOW("buildWorkflow"),
+    IMPORT_WORKFLOW("importWorkflow"),
+    DEBUG_WORKFLOW_EXECUTION("debugWorkflowExecution"),
+    BUILD_INTEGRATION_WORKFLOW("buildIntegrationWorkflow"),
+    CONFIGURE_MCP_SERVER("configureMcpServer");
 
     private final String key;
-    private final boolean fallback;
 
-    CopilotAgentType(String key, boolean fallback) {
+    CopilotAgentType(Source source, Mode mode) {
+        this(source.agentId(mode));
+    }
+
+    CopilotAgentType(String key) {
         this.key = key;
-        this.fallback = fallback;
     }
 
     @Override
@@ -58,6 +73,6 @@ public enum CopilotAgentType implements AgentType {
 
     @Override
     public boolean isFallback() {
-        return fallback;
+        return false;
     }
 }

@@ -21,5 +21,5 @@ package com.bytechef.ai.copilot.tool.catalog;
  */
 public enum IntelligentToolVariant {
 
-    BUILD
+    ASK, BUILD
 }

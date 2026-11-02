@@ -16,6 +16,12 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.ai.mcp.dto.McpProjectWorkflowSummaryDTO;
+import java.util.List;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Facade for managing MCP Project Workflow operations that involve multiple services.
  *
@@ -29,4 +35,25 @@ public interface McpProjectWorkflowFacade {
      * @param mcpProjectWorkflowId the ID of the MCP project workflow to delete
      */
     void deleteMcpProjectWorkflow(long mcpProjectWorkflowId);
+
+    /**
+     * Returns every workflow attached to the MCP server's projects, with the tool mapping each one exposes.
+     *
+     * @param mcpServerId the ID of the MCP server
+     * @return the attached workflows
+     */
+    List<McpProjectWorkflowSummaryDTO> getMcpServerMcpProjectWorkflows(long mcpServerId);
+
+    /**
+     * Merges the given tool name, tool description and parameters into an MCP project workflow's parameters.
+     *
+     * @param mcpProjectWorkflowId the ID of the MCP project workflow to update
+     * @param toolName             the tool name, or {@code null} to keep the current one
+     * @param toolDescription      the tool description, or {@code null} to keep the current one
+     * @param parameters           the parameters to merge in, or {@code null} for none
+     * @return the updated MCP project workflow
+     */
+    McpProjectWorkflow updateMcpProjectWorkflowParameters(
+        long mcpProjectWorkflowId, @Nullable String toolName, @Nullable String toolDescription,
+        @Nullable Map<String, Object> parameters);
 }

@@ -27,17 +27,23 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.ComponentTools.ActionMinimalInfo;
 import com.bytechef.platform.ai.tool.ComponentTools.TriggerMinimalInfo;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools.TaskDispatcherMinimalInfo;
 import com.bytechef.platform.ai.tool.TaskTools.TaskMinimalInfo;
+import com.bytechef.platform.ai.tool.TaskTools.TaskValidationResult;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
+import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.ai.chat.model.ToolContext;
@@ -45,6 +51,7 @@ import org.springframework.ai.chat.model.ToolContext;
 /**
  * @author Marko Kriskovic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class TaskToolsTest {
 
     @Mock
@@ -60,6 +67,34 @@ class TaskToolsTest {
         MockitoAnnotations.openMocks(this);
 
         taskTools = new TaskTools(componentTools, taskDispatcherTools);
+    }
+
+    @Test
+    void testValidateTaskEnforcesScheduleDayOfWeekOptions() {
+        ArrayProperty dayOfWeekProperty = new ArrayProperty(
+            ComponentDsl.array("dayOfWeek")
+                .items(ComponentDsl.integer())
+                .options(
+                    List.of(
+                        ComponentDsl.option("Sunday", 1), ComponentDsl.option("Monday", 2),
+                        ComponentDsl.option("Tuesday", 3), ComponentDsl.option("Wednesday", 4),
+                        ComponentDsl.option("Thursday", 5), ComponentDsl.option("Friday", 6),
+                        ComponentDsl.option("Saturday", 7)))
+                .required(true));
+
+        when(componentTools.getProperties(eq("schedule"), eq("everyDay"), eq(1), isNull()))
+            .thenReturn(List.of(ToolUtils.convertToPropertyInfo(dayOfWeekProperty)));
+
+        TaskValidationResult invalidResult = taskTools.validateTask(
+            scheduleTask("[0, 1, 2, 3, 4, 5, 6]"), "trigger", "everyDay", "schedule", 1, null);
+
+        assertThat(invalidResult.valid()).isFalse();
+        assertThat(invalidResult.errors()).contains("dayOfWeek[0]");
+
+        TaskValidationResult validResult = taskTools.validateTask(
+            scheduleTask("[1, 2, 3, 4, 5, 6, 7]"), "trigger", "everyDay", "schedule", 1, null);
+
+        assertThat(validResult.valid()).isTrue();
     }
 
     @Test
@@ -269,5 +304,10 @@ class TaskToolsTest {
         String result = taskTools.getTaskDefinition("taskDispatcher", "condition", null, null, toolContext);
 
         assertThat(result).isEqualTo("{}");
+    }
+
+    private static String scheduleTask(String dayOfWeek) {
+        return "{\"label\": \"Every Day\", \"name\": \"trigger_1\", \"type\": \"schedule/v1/everyDay\", " +
+            "\"parameters\": {\"dayOfWeek\": " + dayOfWeek + "}}";
     }
 }

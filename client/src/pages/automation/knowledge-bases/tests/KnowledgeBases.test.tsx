@@ -330,7 +330,7 @@ describe('KnowledgeBases embedding gate', () => {
 
         expect(screen.getByRole('heading', {name: 'Turn on an embedding model'})).toBeInTheDocument();
 
-        await userEvent.click(screen.getByText('Go to AI Providers'));
+        await userEvent.click(screen.getByText('Open AI Providers'));
 
         expect(hoisted.navigate).toHaveBeenCalledWith('/automation/settings/ai-providers');
         expect(screen.queryByTestId('knowledge-base-list')).not.toBeInTheDocument();
@@ -383,7 +383,7 @@ describe('KnowledgeBases embedding gate', () => {
 
         expect(screen.getByText('Create your first knowledge base')).toBeInTheDocument();
         expect(screen.getByText('Turn on an embedding model').closest('li')).toHaveAttribute('aria-current', 'step');
-        expect(screen.getByText('Go to AI Providers')).toBeInTheDocument();
+        expect(screen.getByText('Open AI Providers')).toBeInTheDocument();
         expect(screen.queryByText('Create Knowledge Base')).not.toBeInTheDocument();
     });
 });

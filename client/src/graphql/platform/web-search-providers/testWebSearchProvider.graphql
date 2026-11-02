@@ -1,0 +1,6 @@
+mutation testWebSearchProvider($apiKey: String, $baseUrl: String, $environment: ID!, $name: String!) {
+    testWebSearchProvider(apiKey: $apiKey, baseUrl: $baseUrl, environment: $environment, name: $name) {
+        errorMessage
+        success
+    }
+}

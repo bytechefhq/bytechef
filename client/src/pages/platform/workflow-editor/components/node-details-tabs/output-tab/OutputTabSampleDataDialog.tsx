@@ -3,8 +3,13 @@ import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMai
 import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
-import {Suspense, lazy, useEffect, useState} from 'react';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {SparklesIcon} from 'lucide-react';
+import {Suspense, lazy, useCallback, useEffect, useRef, useState} from 'react';
+
+import {useSampleOutputCopilot} from './hooks/useSampleOutputCopilot';
 
 import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
@@ -17,6 +22,8 @@ interface OutputTabSampleDataDialogProps {
     onUpload: (value: string) => void;
     open: boolean;
     placeholder?: object;
+    workflowId?: string;
+    workflowNodeName?: string;
 }
 
 const OutputTabSampleDataDialog = ({
@@ -26,10 +33,39 @@ const OutputTabSampleDataDialog = ({
     onUpload,
     open,
     placeholder,
+    workflowId,
+    workflowNodeName,
 }: OutputTabSampleDataDialogProps) => {
-    const [rawValue, setRawValue] = useState<string>('');
     const [parsedValue, setParsedValue] = useState<object | undefined>();
+    const [rawValue, setRawValue] = useState<string>('');
     const [sampleFile, setSampleFile] = useState<File | null>(null);
+
+    const sampleOutputRef = useRef<object | undefined>(undefined);
+
+    const ai = useApplicationInfoStore((state) => state.ai);
+
+    const applyValue = useCallback((value: string) => {
+        setRawValue(value);
+
+        try {
+            const parsed = JSON.parse(value);
+
+            setParsedValue(parsed);
+            sampleOutputRef.current = parsed;
+        } catch {
+            setParsedValue(undefined);
+            sampleOutputRef.current = undefined;
+        }
+    }, []);
+
+    const {copilotPanelOpen, handleCopilotClose, handleCopilotOpen} = useSampleOutputCopilot({
+        onApply: applyValue,
+        sampleOutputRef,
+        workflowId,
+        workflowNodeName,
+    });
+
+    const copilotAvailable = ai.copilot.enabled && !fileUploadEnabled;
 
     const handleEditorOnChange = (editorValue: string | undefined) => {
         const placeholderElement = document.querySelector('#monaco-placeholder') as HTMLElement | null;
@@ -42,12 +78,17 @@ const OutputTabSampleDataDialog = ({
 
         if (editorValue) {
             try {
-                setParsedValue(JSON.parse(editorValue));
+                const parsed = JSON.parse(editorValue);
+
+                setParsedValue(parsed);
+                sampleOutputRef.current = parsed;
             } catch {
                 setParsedValue(undefined);
+                sampleOutputRef.current = undefined;
             }
         } else {
             setParsedValue(undefined);
+            sampleOutputRef.current = undefined;
         }
     };
 
@@ -68,6 +109,12 @@ const OutputTabSampleDataDialog = ({
             setRawValue(hasPlaceholder ? JSON.stringify(placeholder, null, SPACE) : '');
             setParsedValue(hasPlaceholder ? placeholder : undefined);
             setSampleFile(null);
+            sampleOutputRef.current = hasPlaceholder ? placeholder : undefined;
+
+            if (copilotAvailable) {
+                handleCopilotClose();
+            }
+
             onClose();
         }
     };
@@ -90,21 +137,37 @@ const OutputTabSampleDataDialog = ({
 
             setRawValue(stringified);
             setParsedValue(placeholder);
+            sampleOutputRef.current = placeholder;
         } else {
             setRawValue('');
             setParsedValue(undefined);
+            sampleOutputRef.current = undefined;
         }
     }, [placeholder]);
 
     return (
         <Dialog modal={false} onOpenChange={handleOpenChange} open={open}>
-            <DialogContent onInteractOutside={(event) => event.preventDefault()} size="lg">
+            <DialogContent
+                onInteractOutside={(event) => event.preventDefault()}
+                size={copilotAvailable && copilotPanelOpen ? 'xl' : 'lg'}
+            >
                 <DialogMain>
                     <DialogHeader
                         description={
                             fileUploadEnabled
                                 ? "Choose a file to use as this step's output. Click Upload when you're done."
-                                : "Add sample value in JSON format. Click Upload when you're done."
+                                : "Chat with the assistant or edit the JSON directly. Click Upload when you're done."
+                        }
+                        endContent={
+                            copilotAvailable && (
+                                <Button
+                                    aria-label="Copilot"
+                                    icon={<SparklesIcon className="size-4" />}
+                                    onClick={copilotPanelOpen ? handleCopilotClose : handleCopilotOpen}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            )
                         }
                         title="Upload Sample Output Data"
                     />
@@ -149,6 +212,14 @@ const OutputTabSampleDataDialog = ({
                         <Button disabled={uploadDisabled} label="Upload" onClick={handleUploadClick} type="submit" />
                     </DialogFooter>
                 </DialogMain>
+
+                {copilotAvailable && (
+                    <CopilotPanel
+                        className="h-full rounded-r-lg border-l border-stroke-neutral-primary"
+                        onClose={handleCopilotClose}
+                        open={copilotPanelOpen}
+                    />
+                )}
             </DialogContent>
         </Dialog>
     );
