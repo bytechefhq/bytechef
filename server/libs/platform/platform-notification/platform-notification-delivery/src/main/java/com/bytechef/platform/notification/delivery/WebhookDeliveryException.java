@@ -31,6 +31,12 @@ public class WebhookDeliveryException extends RuntimeException {
         this.statusCode = statusCode;
     }
 
+    public WebhookDeliveryException(String message, @Nullable Integer statusCode, @Nullable Throwable cause) {
+        super(message, cause);
+
+        this.statusCode = statusCode;
+    }
+
     public WebhookDeliveryException(String message, Throwable cause) {
         super(message, cause);
 
@@ -39,5 +45,22 @@ public class WebhookDeliveryException extends RuntimeException {
 
     public @Nullable Integer getStatusCode() {
         return statusCode;
+    }
+
+    public boolean isRetryable() {
+        return statusCode == null || statusCode >= 500 || statusCode == 429;
+    }
+
+    public boolean isEndpointUnusable() {
+        if (statusCode == null) {
+            return false;
+        }
+
+        return (statusCode >= 300 && statusCode < 400) || statusCode == 404 || statusCode == 405
+            || statusCode == 410 || statusCode == 415;
+    }
+
+    public boolean isPayloadRejected() {
+        return statusCode != null && (statusCode == 400 || statusCode == 409 || statusCode == 422);
     }
 }
