@@ -43,7 +43,7 @@ const A2aServers = () => {
         uniqueProjects,
     } = useA2aServers();
 
-    const initialLoadComplete = useInitialLoadComplete(a2aServersIsLoading);
+    const initialLoadComplete = useInitialLoadComplete(a2aServersIsLoading || tagsIsLoading);
 
     const isFirstRun = !a2aServersIsLoading && !tagsIsLoading && !a2aServersError && a2aServers.length === 0;
 

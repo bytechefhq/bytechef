@@ -61,7 +61,7 @@ const McpServers = () => {
 
     const queryClient = useQueryClient();
 
-    const initialLoadComplete = useInitialLoadComplete(mcpServersIsLoading);
+    const initialLoadComplete = useInitialLoadComplete(mcpServersIsLoading || tagsIsLoading);
 
     const isFirstRun = !mcpServersIsLoading && !tagsIsLoading && !mcpServersError && validMcpServers.length === 0;
 
