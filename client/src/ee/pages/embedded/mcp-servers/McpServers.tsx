@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-executions-sheet/IntegrationInstanceConfigurationWorkflowExecutionsSheet';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
@@ -23,6 +24,12 @@ export enum Type {
     Integration,
     Tag,
 }
+
+const MCP_SERVER_STEPS = [
+    {id: 'createMcpServer', label: 'Create an MCP server', status: 'current' as const},
+    {id: 'addTools', label: 'Add tools', status: 'upcoming' as const},
+    {id: 'connectAiAgent', label: 'Connect an AI agent', status: 'upcoming' as const},
+];
 
 const McpServers = () => {
     const {
@@ -106,7 +113,9 @@ const McpServers = () => {
                         icon={<ServerIcon />}
                         note={environmentScopeNote}
                         title="Create your first MCP server"
-                    />
+                    >
+                        <JourneySteps aria-label="Getting started" steps={MCP_SERVER_STEPS} />
+                    </EmptyState>
                 )}
             </PageLoader>
         </LayoutContainer>
