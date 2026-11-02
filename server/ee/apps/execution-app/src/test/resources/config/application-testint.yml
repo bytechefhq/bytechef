@@ -9,6 +9,10 @@ openapi:
       platform: /api/platform
 
 spring:
+  cloud:
+    aws:
+      s3:
+        enabled: false
   liquibase:
     contexts: execution
 
@@ -17,6 +21,8 @@ bytechef:
     provider: JDBC
   edition: EE
   file-storage:
+    filesystem:
+      basedir: ${java.io.tmpdir}/bytechef/file-storage
     provider: JDBC
   message-broker:
     provider: MEMORY

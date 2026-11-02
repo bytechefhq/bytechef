@@ -6,6 +6,7 @@ springBoot {
 }
 
 dependencies {
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
@@ -38,8 +39,10 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
+    implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:core:tenant:tenant-single-service"))
+    implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-service"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
@@ -48,7 +51,10 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
+    implementation(project(":server:ee:libs:core:cloud:cloud-aws"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api"))
+    implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-impl"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))

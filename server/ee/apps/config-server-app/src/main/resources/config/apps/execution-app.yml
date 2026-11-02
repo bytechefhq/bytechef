@@ -6,6 +6,10 @@ management:
           include: readinessState,db
 
 spring:
+  cloud:
+    aws:
+      s3:
+        enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: ${bytechef.datasource.url}
