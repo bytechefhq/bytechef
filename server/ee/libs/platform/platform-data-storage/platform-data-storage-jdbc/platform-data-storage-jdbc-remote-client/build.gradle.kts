@@ -10,6 +10,7 @@ dependencies {
     testImplementation("io.grpc:grpc-inprocess")
     testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
     testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-service"))

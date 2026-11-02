@@ -10,14 +10,14 @@ package com.bytechef.ee.platform.data.storage.db.remote.client.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
+import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.JdbcDataStorageRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
-import com.bytechef.platform.data.storage.jdbc.repository.converter.DataEntryValueWrapperToStringConverter;
-import com.bytechef.platform.data.storage.jdbc.repository.converter.StringToDataEntryValueWrapperConverter;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageServiceImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -288,10 +288,13 @@ class RemoteJdbcDataStorageServiceClientIntTest {
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
         static class DataStorageJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
+            @Autowired
+            private ObjectMapper objectMapper;
+
             @Override
             protected List<?> userConverters() {
                 return List.of(
-                    new DataEntryValueWrapperToStringConverter(), new StringToDataEntryValueWrapperConverter());
+                    new StringToTypedValueConverter(objectMapper), new TypedValueToStringConverter(objectMapper));
             }
         }
     }

@@ -28,7 +28,7 @@ import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacadeImpl;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.ServerInterceptors;
@@ -90,7 +90,7 @@ class RemoteTriggerLifecycleFacadeClientIntTest {
     private TriggerLifecycleFacade triggerLifecycleFacade;
 
     @MockitoBean
-    private TriggerStateService triggerStateService;
+    private TriggerStateFacade triggerStateFacade;
 
     private ManagedChannel managedChannel;
     private RemoteTriggerLifecycleFacadeClient remoteTriggerLifecycleFacadeClient;
@@ -157,7 +157,7 @@ class RemoteTriggerLifecycleFacadeClientIntTest {
             Map.of("expression", "30 9 ? * MON-FRI", "timezone", "Europe/Zagreb"), null);
 
         assertThat(scheduler.checkExists(jobKey)).isFalse();
-        verifyNoInteractions(triggerStateService);
+        verifyNoInteractions(triggerStateFacade);
     }
 
     @Test
@@ -179,7 +179,7 @@ class RemoteTriggerLifecycleFacadeClientIntTest {
             "workflow-1", WORKFLOW_EXECUTION_ID, new WorkflowNodeType("beamer", 1, "newPost"), Map.of(), null);
 
         assertThat(scheduler.checkExists(jobKey)).isFalse();
-        verifyNoInteractions(triggerStateService);
+        verifyNoInteractions(triggerStateFacade);
     }
 
     @Test
@@ -189,7 +189,7 @@ class RemoteTriggerLifecycleFacadeClientIntTest {
             Map.of("count", 5), null, "https://example.com/webhooks/abc", 7L);
 
         assertThat(scheduler.getJobGroupNames()).isEmpty();
-        verifyNoInteractions(triggerStateService);
+        verifyNoInteractions(triggerStateFacade);
     }
 
     @Test
@@ -208,7 +208,7 @@ class RemoteTriggerLifecycleFacadeClientIntTest {
             "workflow-1", WORKFLOW_EXECUTION_ID, new WorkflowNodeType("missingComponent", 1, "missingTrigger"),
             Map.of(), null);
 
-        verifyNoInteractions(triggerStateService);
+        verifyNoInteractions(triggerStateFacade);
     }
 
     @TestConfiguration
@@ -217,10 +217,10 @@ class RemoteTriggerLifecycleFacadeClientIntTest {
         @Bean
         TriggerLifecycleFacade triggerLifecycleFacade(
             TriggerScheduler triggerScheduler, TriggerDefinitionFacade triggerDefinitionFacade,
-            TriggerDefinitionService triggerDefinitionService, TriggerStateService triggerStateService) {
+            TriggerDefinitionService triggerDefinitionService, TriggerStateFacade triggerStateFacade) {
 
             return new TriggerLifecycleFacadeImpl(
-                triggerScheduler, triggerDefinitionFacade, triggerDefinitionService, triggerStateService);
+                triggerScheduler, triggerDefinitionFacade, triggerDefinitionService, triggerStateFacade);
         }
 
         @Bean
