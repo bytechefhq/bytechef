@@ -6,6 +6,7 @@ dependencies {
     implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:commons:commons-data"))
+    implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-delivery"))

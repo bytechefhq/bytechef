@@ -38,4 +38,8 @@ public class NotificationSenderRegistry {
     public NotificationSender<?> getNotificationSender(Type type) {
         return notificationSenderMap.get(type);
     }
+
+    public boolean hasNotificationSender(Type type) {
+        return notificationSenderMap.containsKey(type);
+    }
 }

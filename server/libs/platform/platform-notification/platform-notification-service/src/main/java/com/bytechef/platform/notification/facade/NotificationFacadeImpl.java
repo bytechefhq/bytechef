@@ -18,6 +18,7 @@ package com.bytechef.platform.notification.facade;
 
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.dto.NotificationDTO;
+import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationEventService;
 import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -31,13 +32,16 @@ import org.springframework.stereotype.Service;
 public class NotificationFacadeImpl implements NotificationFacade {
 
     private final NotificationEventService notificationEventService;
+    private final NotificationSenderRegistry notificationSenderRegistry;
     private final NotificationService notificationService;
 
     @SuppressFBWarnings("EI")
     public NotificationFacadeImpl(
-        NotificationEventService notificationEventService, NotificationService notificationService) {
+        NotificationEventService notificationEventService, NotificationSenderRegistry notificationSenderRegistry,
+        NotificationService notificationService) {
 
         this.notificationEventService = notificationEventService;
+        this.notificationSenderRegistry = notificationSenderRegistry;
         this.notificationService = notificationService;
     }
 
@@ -52,6 +56,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
     @Override
     public NotificationDTO createNotification(Notification notification) {
+        validateNotificationType(notification);
 
         notification = notificationService.create(notification);
 
@@ -62,10 +67,21 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
     @Override
     public NotificationDTO updateNotification(Notification notification) {
+        validateNotificationType(notification);
+
         notification = notificationService.update(notification);
 
         return new NotificationDTO(
             notification,
             notificationEventService.getNotificationEvents(notification.getNotificationEventIds()));
+    }
+
+    private void validateNotificationType(Notification notification) {
+        Notification.Type type = notification.getType();
+
+        if (!notificationSenderRegistry.hasNotificationSender(type)) {
+            throw new IllegalArgumentException(
+                "Notification type %s is not available in this edition".formatted(type));
+        }
     }
 }
