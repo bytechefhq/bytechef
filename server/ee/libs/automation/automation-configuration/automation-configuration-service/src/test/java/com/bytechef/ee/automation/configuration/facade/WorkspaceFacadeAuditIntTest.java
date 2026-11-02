@@ -13,8 +13,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditMapper;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
+import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.service.WorkspaceServiceImpl;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
@@ -71,6 +75,9 @@ class WorkspaceFacadeAuditIntTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    @Autowired
+    private WorkspaceUserRepository workspaceUserRepository;
+
     @BeforeEach
     void beforeEach() {
         SecurityContextHolder.setContext(
@@ -85,7 +92,11 @@ class WorkspaceFacadeAuditIntTest {
     void afterEach() {
         SecurityContextHolder.clearContext();
 
-        workspaceIds.forEach(workspaceRepository::deleteById);
+        for (Long workspaceId : workspaceIds) {
+            workspaceUserRepository.deleteAll(workspaceUserRepository.findAllByWorkspaceId(workspaceId));
+
+            workspaceRepository.deleteById(workspaceId);
+        }
 
         workspaceIds.clear();
 
@@ -167,6 +178,23 @@ class WorkspaceFacadeAuditIntTest {
     }
 
     @Test
+    void testDeleteWorkspaceRecordsTheRemovedMembers() {
+        Workspace workspace = saveWorkspace();
+
+        workspaceUserRepository.save(WorkspaceUser.forRole(2L, workspace.getId(), WorkspaceRole.EDITOR));
+
+        adminWorkspaceFacade.deleteWorkspace(workspace.getId());
+
+        assertThat(workspaceUserRepository.findAllByWorkspaceId(workspace.getId())).isEmpty();
+
+        assertThat(findSingleEvent(WorkspaceAuditEvents.WORKSPACE_DELETED).getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("workspaceId", String.valueOf(workspace.getId()))
+            .containsEntry("removedUserIds", "2")
+            .containsEntry("removedUserCount", "1");
+    }
+
+    @Test
     void testDeleteOfAnUnknownWorkspaceRecordsAFailure() {
         assertThatThrownBy(() -> workspaceFacade.deleteWorkspace(Long.MAX_VALUE))
             .isInstanceOf(NoSuchElementException.class);
@@ -206,8 +234,8 @@ class WorkspaceFacadeAuditIntTest {
 
     @Configuration
     @Import({
-        WorkspaceFacadeImpl.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class,
-        AuditMapperResolver.class, WorkspaceServiceImpl.class
+        AdminWorkspaceFacadeImpl.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class,
+        AuditMapperResolver.class, WorkspaceAuditMapper.class, WorkspaceServiceImpl.class
     })
     static class AuditConfiguration {
 

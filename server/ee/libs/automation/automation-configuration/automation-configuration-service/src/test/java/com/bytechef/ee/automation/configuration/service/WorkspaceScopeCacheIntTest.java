@@ -51,7 +51,7 @@ import org.springframework.transaction.support.TransactionTemplate;
     properties = {
         "bytechef.edition=ee", "spring.liquibase.contexts=mono,dev"
     })
-class WorkspaceScopeCacheServiceIntTest {
+class WorkspaceScopeCacheIntTest {
 
     private static final long USER_ID = 2L;
     private static final String WORKSPACE_SCOPES_CACHE = "workspaceScopes";
@@ -113,9 +113,9 @@ class WorkspaceScopeCacheServiceIntTest {
         workspaceUserRepository.save(
             WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.EDITOR, Environment.DEVELOPMENT));
 
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.DEVELOPMENT))
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.DEVELOPMENT))
             .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
             .isEmpty();
     }
 
@@ -126,10 +126,30 @@ class WorkspaceScopeCacheServiceIntTest {
         workspaceUserRepository.save(
             WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.ADMIN, Environment.PRODUCTION));
 
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.DEVELOPMENT))
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.DEVELOPMENT))
             .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER));
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
             .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.ADMIN));
+    }
+
+    @Test
+    void testGetWorkspaceScopesForAnEnvironmentIgnoresAnImplicitRowBesideEnvironmentRows() {
+        workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.ADMIN));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT));
+
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+            .isEmpty();
+    }
+
+    @Test
+    void testGetWorkspaceScopesIgnoresAnImplicitRowBesideEnvironmentRows() {
+        workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.ADMIN));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT));
+
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId))
+            .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER));
     }
 
     @Test
@@ -140,9 +160,9 @@ class WorkspaceScopeCacheServiceIntTest {
             WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.PRODUCTION));
 
         Set<String> developmentScopes =
-            workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.DEVELOPMENT);
+            workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.DEVELOPMENT);
         Set<String> productionScopes =
-            workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION);
+            workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION);
 
         assertThat(developmentScopes).isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
         assertThat(productionScopes).isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER));
@@ -156,18 +176,18 @@ class WorkspaceScopeCacheServiceIntTest {
 
         Set<String> viewerScopes = permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER);
 
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
             .isEqualTo(viewerScopes);
 
         changeRole(workspaceUser, WorkspaceRole.EDITOR);
 
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
             .isEqualTo(viewerScopes);
 
-        workspaceScopeCacheService.evictWorkspaceScopeCache(USER_ID, workspaceId);
+        workspaceScopeCache.evictWorkspaceScopeCache(USER_ID, workspaceId);
 
         assertThat(getCachedScopes(Environment.PRODUCTION)).isNull();
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
             .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
     }
 
@@ -182,7 +202,7 @@ class WorkspaceScopeCacheServiceIntTest {
 
         expectedScopes.addAll(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER));
 
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId)).isEqualTo(expectedScopes);
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId)).isEqualTo(expectedScopes);
     }
 
     @Test

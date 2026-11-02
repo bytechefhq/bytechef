@@ -270,6 +270,25 @@ class UserInvitationFacadeTest {
         }
     }
 
+    @Test
+    void testNotifyAddedToWorkspaceHoldsTheMailUntilTheTransactionCommits() {
+        User user = new User();
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            userInvitationFacade.notifyAddedToWorkspace(user, "Engineering");
+
+            verify(mailService, never()).sendWorkspaceMembershipEmail(user, "Engineering");
+
+            runAfterCommitCallbacks();
+
+            verify(mailService).sendWorkspaceMembershipEmail(user, "Engineering");
+        } finally {
+            TransactionSynchronizationManager.clear();
+        }
+    }
+
     private void runAfterCommitCallbacks() {
         for (TransactionSynchronization synchronization : TransactionSynchronizationManager.getSynchronizations()) {
             synchronization.afterCommit();
