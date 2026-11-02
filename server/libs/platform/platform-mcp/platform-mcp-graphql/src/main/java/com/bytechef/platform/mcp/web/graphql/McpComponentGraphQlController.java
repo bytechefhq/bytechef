@@ -39,7 +39,6 @@ import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -76,9 +75,8 @@ public class McpComponentGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("hasPermission(#id, 'McpComponent', 'MCP_VIEW')")
     public McpComponent mcpComponent(@Argument long id) {
-        McpComponent mcpComponent = mcpComponentService.getMcpComponent(id);
+        McpComponent mcpComponent = mcpServerFacade.getMcpComponent(id);
 
         checkMcpServerSharedAdministration(mcpComponent.getMcpServerId());
 
@@ -97,11 +95,10 @@ public class McpComponentGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')")
     public List<McpComponent> mcpComponentsByServerId(@Argument long mcpServerId) {
         checkMcpServerSharedAdministration(mcpServerId);
 
-        return mcpComponentService.getMcpServerMcpComponents(mcpServerId);
+        return mcpServerFacade.getMcpServerMcpComponents(mcpServerId);
     }
 
     @MutationMapping

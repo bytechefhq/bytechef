@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -91,11 +90,10 @@ public class McpToolGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_VIEW')")
     public List<McpTool> mcpToolsByComponentId(@Argument long mcpComponentId) {
         checkMcpComponentSharedAdministration(mcpComponentId);
 
-        return mcpToolService.getMcpComponentMcpTools(mcpComponentId);
+        return mcpServerFacade.getMcpComponentMcpTools(mcpComponentId);
     }
 
     @MutationMapping

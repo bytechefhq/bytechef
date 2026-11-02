@@ -133,6 +133,24 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_VIEW')")
+    public McpComponent getMcpComponent(long mcpComponentId) {
+        return mcpComponentService.getMcpComponent(mcpComponentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_VIEW')")
+    public List<McpTool> getMcpComponentMcpTools(long mcpComponentId) {
+        return mcpToolService.getMcpComponentMcpTools(mcpComponentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')")
+    public List<McpComponent> getMcpServerMcpComponents(long mcpServerId) {
+        return mcpComponentService.getMcpServerMcpComponents(mcpServerId);
+    }
+
+    @Override
     public Map<McpServer, List<McpComponent>> getMcpServerMcpComponents(List<McpServer> mcpServers) {
         List<Long> mcpServerIds = mcpServers.stream()
             .map(McpServer::getId)
