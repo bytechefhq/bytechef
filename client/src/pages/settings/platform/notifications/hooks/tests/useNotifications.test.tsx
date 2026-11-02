@@ -46,7 +46,11 @@ const baseValues = {
     notificationEventIds: ['1'],
 };
 
-function slackWebhookUrlIssues(settings: Record<string, unknown>, type: 'EMAIL' | 'SLACK' | 'WEBHOOK' = 'SLACK') {
+function settingIssues(
+    settings: Record<string, unknown>,
+    type: 'EMAIL' | 'SLACK' | 'WEBHOOK',
+    settingKey: 'slackWebhookUrl' | 'webhook'
+) {
     const result = notificationFormSchema.safeParse({...baseValues, settings, type});
 
     if (result.success) {
@@ -54,8 +58,16 @@ function slackWebhookUrlIssues(settings: Record<string, unknown>, type: 'EMAIL' 
     }
 
     return result.error.issues
-        .filter((issue) => issue.path.join('.') === 'settings.slackWebhookUrl')
+        .filter((issue) => issue.path.join('.') === `settings.${settingKey}`)
         .map((issue) => issue.message);
+}
+
+function slackWebhookUrlIssues(settings: Record<string, unknown>, type: 'EMAIL' | 'SLACK' | 'WEBHOOK' = 'SLACK') {
+    return settingIssues(settings, type, 'slackWebhookUrl');
+}
+
+function webhookUrlIssues(settings: Record<string, unknown>, type: 'EMAIL' | 'SLACK' | 'WEBHOOK' = 'WEBHOOK') {
+    return settingIssues(settings, type, 'webhook');
 }
 
 describe('useNotifications', () => {
@@ -105,6 +117,26 @@ describe('useNotifications', () => {
             expect.objectContaining({settings: {slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}})
         );
     });
+    it('saves a Webhook URL without surrounding whitespace', () => {
+        const {result} = renderHook(() => useNotifications());
+
+        act(() => {
+            result.current.form.reset({
+                name: 'Failures',
+                notificationEventIds: ['1'],
+                settings: {webhook: '  https://example.com/ingest  '},
+                type: NotificationTypeEnum.Webhook,
+            });
+        });
+
+        act(() => {
+            result.current.saveNotification();
+        });
+
+        expect(createNotificationMutate).toHaveBeenCalledWith(
+            expect.objectContaining({settings: {webhook: 'https://example.com/ingest'}})
+        );
+    });
 });
 
 describe('notificationFormSchema', () => {
@@ -130,5 +162,24 @@ describe('notificationFormSchema', () => {
     it('does not require a Slack webhook URL for other notification types', () => {
         expect(slackWebhookUrlIssues({email: 'ops@example.com'}, 'EMAIL')).toEqual([]);
         expect(slackWebhookUrlIssues({webhook: 'https://example.com/hook'}, 'WEBHOOK')).toEqual([]);
+    });
+
+    it('requires a Webhook URL for a Webhook notification', () => {
+        expect(webhookUrlIssues({})).toEqual(['Webhook URL is required.']);
+        expect(webhookUrlIssues({webhook: '   '})).toEqual(['Webhook URL is required.']);
+    });
+
+    it('rejects a Webhook URL that is not an http or https URL', () => {
+        expect(webhookUrlIssues({webhook: 'not a url'})).toEqual(['Enter a valid http or https URL.']);
+        expect(webhookUrlIssues({webhook: 'ftp://example.com/hook'})).toEqual(['Enter a valid http or https URL.']);
+    });
+
+    it('accepts a valid Webhook URL', () => {
+        expect(webhookUrlIssues({webhook: 'https://example.com/ingest'})).toEqual([]);
+    });
+
+    it('does not require a Webhook URL for other notification types', () => {
+        expect(webhookUrlIssues({email: 'ops@example.com'}, 'EMAIL')).toEqual([]);
+        expect(webhookUrlIssues({slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}, 'SLACK')).toEqual([]);
     });
 });
