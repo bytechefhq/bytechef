@@ -20,6 +20,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -86,14 +87,18 @@ class ExecutionEmbeddedAuthenticationIntTest {
 
     @Test
     void testValidApiKeyIsAccepted() throws Exception {
-        when(apiKeyService.exists(API_KEY, Environment.PRODUCTION.ordinal())).thenReturn(true);
+        ApiKey apiKey = new ApiKey();
+
+        apiKey.setId(1L);
+
+        when(apiKeyService.fetchApiKey(API_KEY, Environment.PRODUCTION.ordinal())).thenReturn(Optional.of(apiKey));
 
         assertThat(status(authorized(API_KEY))).isNotIn(401, 403);
     }
 
     @Test
     void testInvalidApiKeyIsRejected() throws Exception {
-        when(apiKeyService.exists(API_KEY, Environment.PRODUCTION.ordinal())).thenReturn(false);
+        when(apiKeyService.fetchApiKey(API_KEY, Environment.PRODUCTION.ordinal())).thenReturn(Optional.empty());
 
         assertThat(status(authorized(API_KEY))).isEqualTo(401);
     }
