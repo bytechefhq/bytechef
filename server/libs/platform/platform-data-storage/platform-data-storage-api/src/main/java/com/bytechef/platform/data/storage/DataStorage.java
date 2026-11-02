@@ -36,10 +36,6 @@ public interface DataStorage {
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type);
 
-    <T> Optional<T> fetchUnlocked(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
-        PlatformType type);
-
     <T> T get(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type);

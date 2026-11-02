@@ -38,9 +38,6 @@ public interface DataStorageRepository
     Optional<DataEntry> findByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(
         String componentName, int scope, String scopeId, String key, int environment, int type);
 
-    Optional<DataEntry> readByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(
-        String componentName, int scope, String scopeId, String key, int environment, int type);
-
     @Lock(LockMode.PESSIMISTIC_WRITE)
     List<DataEntry> findByComponentNameAndScopeAndScopeIdAndEnvironmentAndType(
         String componentName, int scope, String scopeId, int environment, int type);
