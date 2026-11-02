@@ -50,6 +50,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,27 +125,28 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
     @Audited(event = ApprovalTaskAuditEvents.APPROVAL_TASK_DELETED, data = {
         @AuditData(key = "approvalTaskId", value = "#id")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ApprovalTask', 'DEPLOYMENT_EDIT')")
     public void deleteApprovalTask(long id) {
         approvalTaskService.delete(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ApprovalTask', 'DEPLOYMENT_VIEW') or isResourceOwner(#id, 'ApprovalTask')")
     @Transactional(readOnly = true)
     public ApprovalTask getApprovalTask(long id) {
         return approvalTaskService.getApprovalTask(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PostFilter("isTenantAdmin() or (filterObject.assigneeId != null and isCurrentUser(filterObject.assigneeId))")
     @Transactional(readOnly = true)
     public List<ApprovalTask> getApprovalTasks(@Nullable Integer environmentId) {
         return approvalTaskService.getApprovalTasks(environmentId);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PostFilter("hasPermission(filterObject.id, 'ApprovalTask', 'DEPLOYMENT_VIEW') or " +
+        "isResourceOwner(filterObject.id, 'ApprovalTask')")
     @Transactional(readOnly = true)
     public List<ApprovalTask> getApprovalTasks(List<Long> ids) {
         return approvalTaskService.getApprovalTasks(ids);
@@ -202,7 +204,8 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
         @AuditData(key = "name", value = "#approvalTask.name"),
         @AuditData(key = "status", value = "#approvalTask.status")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#approvalTask.id, 'ApprovalTask', 'DEPLOYMENT_EDIT') or " +
+        "isResourceOwner(#approvalTask.id, 'ApprovalTask')")
     public ApprovalTask updateApprovalTask(ApprovalTask approvalTask) {
         return approvalTaskService.update(approvalTask);
     }
