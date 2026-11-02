@@ -86,6 +86,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         }
         """;
 
+    private final AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final AutomationWorkflowProjectService automationWorkflowProjectService;
     private final CategoryService categoryService;
@@ -108,6 +109,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectFacadeImpl(
+        AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         AutomationWorkflowProjectService automationWorkflowProjectService, CategoryService categoryService,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
@@ -121,6 +123,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
+        this.automationWorkflowProjectConfigurationResolver = automationWorkflowProjectConfigurationResolver;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.automationWorkflowProjectService = automationWorkflowProjectService;
         this.categoryService = categoryService;
@@ -362,10 +365,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         for (Project project : getAutomationWorkflowProjectProjects(automationWorkflowProjects.keySet())) {
             Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
-                automationWorkflowProjectConfigurationService.getConfigurations(
-                    project.getId(), environment.ordinal())
-                    .stream()
-                    .findFirst();
+                automationWorkflowProjectConfigurationResolver.resolve(connectedUser, project.getId());
 
             if (configurationOptional.isEmpty() || !configurationOptional.get()
                 .isEnabled()) {
