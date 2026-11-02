@@ -7,6 +7,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import useDataTableListItemDropdownMenu from '@/pages/automation/datatables/components/hooks/useDataTableListItemDropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 interface DataTableListItemDropdownMenuProps {
@@ -15,6 +17,12 @@ interface DataTableListItemDropdownMenuProps {
 }
 
 const DataTableListItemDropdownMenu = ({baseName, dataTableId}: DataTableListItemDropdownMenuProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canCreateDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_CREATE');
+    const canDeleteDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_DELETE');
+    const canEditDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_EDIT');
+
     const {handleDeleteClick, handleDuplicateClick, handleExportCsvClick, handleRenameClick} =
         useDataTableListItemDropdownMenu({
             baseName,
@@ -28,20 +36,28 @@ const DataTableListItemDropdownMenu = ({baseName, dataTableId}: DataTableListIte
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem icon={<EditIcon />} label="Rename" onClick={handleRenameClick} />
+                {canEditDataTable && (
+                    <DropdownMenuItem icon={<EditIcon />} label="Rename" onClick={handleRenameClick} />
+                )}
 
-                <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onClick={handleDuplicateClick} />
+                {canCreateDataTable && (
+                    <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onClick={handleDuplicateClick} />
+                )}
 
                 <DropdownMenuItem icon={<DownloadIcon />} label="Export CSV" onClick={handleExportCsvClick} />
 
-                <DropdownMenuSeparator />
+                {canDeleteDataTable && (
+                    <>
+                        <DropdownMenuSeparator />
 
-                <DropdownMenuItem
-                    icon={<Trash2Icon />}
-                    label="Delete"
-                    onClick={handleDeleteClick}
-                    variant="destructive"
-                />
+                        <DropdownMenuItem
+                            icon={<Trash2Icon />}
+                            label="Delete"
+                            onClick={handleDeleteClick}
+                            variant="destructive"
+                        />
+                    </>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
