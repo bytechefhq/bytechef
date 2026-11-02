@@ -19,6 +19,7 @@ import {useStoreWithEqualityFn} from 'zustand/traditional';
 
 import useClusterElementNodes from '../../cluster-element-editor/hooks/useClusterElementNodes';
 import {getNestedClusterElements, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
@@ -233,6 +234,8 @@ export default function useLayout({
         boxModeClusterRootIds,
         readOnlyWorkflow?.definition
     );
+
+    const inheritedReadOnly = useWorkflowEditorReadOnly();
 
     const cancelAnimationRef = useRef<(() => void) | null>(null);
     const layoutRetryStateRef = useRef(createLayoutRetryState());
@@ -493,7 +496,7 @@ export default function useLayout({
                 definition: readOnlyWorkflow
                     ? readOnlyWorkflow.definition
                     : useWorkflowDataStore.getState().workflow.definition,
-                readOnly: !!readOnlyWorkflow,
+                readOnly: !!readOnlyWorkflow || inheritedReadOnly,
             });
 
         const stickyNoteNodes = buildCurrentStickyNoteNodes();

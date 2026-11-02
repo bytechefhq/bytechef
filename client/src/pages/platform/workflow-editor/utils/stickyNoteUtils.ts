@@ -5,6 +5,7 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import fireWorkflowDefinitionMutation from './fireWorkflowDefinitionMutation';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {enqueuePendingSave, isWorkflowMutating} from './workflowMutationGuard';
 
 export const STICKY_NOTE_NODE_TYPE = 'stickyNote';
@@ -228,6 +229,10 @@ interface SaveStickyNotesProps {
 }
 
 export function saveStickyNotes({updateWorkflowMutation, updater}: SaveStickyNotesProps) {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const {workflow} = useWorkflowDataStore.getState();
 
     if (!workflow.definition) {
