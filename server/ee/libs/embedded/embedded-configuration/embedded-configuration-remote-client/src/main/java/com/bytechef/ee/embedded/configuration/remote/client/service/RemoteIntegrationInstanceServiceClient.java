@@ -9,8 +9,10 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -24,6 +26,16 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnEEVersion
 public class RemoteIntegrationInstanceServiceClient implements IntegrationInstanceService {
+
+    private static final String CONFIGURATION_APP = "configuration-app";
+    private static final String INTEGRATION_INSTANCE_SERVICE = "/remote/integration-instance-service";
+
+    private final LoadBalancedRestClient loadBalancedRestClient;
+
+    @SuppressFBWarnings("EI")
+    public RemoteIntegrationInstanceServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
+    }
 
     @Override
     public IntegrationInstance create(IntegrationInstance integrationInstance) {
@@ -111,7 +123,12 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
 
     @Override
     public IntegrationInstance getIntegrationInstance(long id) {
-        throw new UnsupportedOperationException();
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(CONFIGURATION_APP)
+                .path(INTEGRATION_INSTANCE_SERVICE + "/get-integration-instance/{id}")
+                .build(id),
+            IntegrationInstance.class);
     }
 
     @Override
