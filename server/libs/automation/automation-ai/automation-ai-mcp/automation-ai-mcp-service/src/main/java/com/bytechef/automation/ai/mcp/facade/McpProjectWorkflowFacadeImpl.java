@@ -16,13 +16,19 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvents;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.ai.mcp.util.McpWorkflowUtils;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,14 +44,19 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
 
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final ProjectWorkflowService projectWorkflowService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public McpProjectWorkflowFacadeImpl(
         McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.projectWorkflowService = projectWorkflowService;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -72,6 +83,27 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
         mcpProjectWorkflowService.delete(mcpProjectWorkflowId);
 
         projectDeploymentWorkflowService.delete(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_VIEW')")
+    @Transactional(readOnly = true)
+    public List<McpProjectWorkflow> getMcpProjectMcpProjectWorkflows(long mcpProjectId) {
+        return mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public List<ProjectWorkflow> getToolEligibleProjectVersionWorkflows(long projectId, int projectVersion) {
+        return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
+            .stream()
+            .filter(projectWorkflow -> {
+                Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+                return McpWorkflowUtils.getCallableTrigger(workflow) != null;
+            })
+            .toList();
     }
 
     @Override

@@ -17,14 +17,9 @@
 package com.bytechef.automation.ai.mcp.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -37,23 +32,11 @@ import com.bytechef.automation.ai.mcp.web.graphql.config.AutomationMcpGraphQlTes
 import graphql.ErrorType;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.graphql.ResponseError;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -147,7 +130,7 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             createMockMcpProjectWorkflow(1L, mcpProjectId, 123L),
             createMockMcpProjectWorkflow(2L, mcpProjectId, 456L));
 
-        when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId)).thenReturn(mockWorkflows);
+        when(mcpProjectWorkflowFacade.getMcpProjectMcpProjectWorkflows(mcpProjectId)).thenReturn(mockWorkflows);
 
         // When & Then
         this.graphQlTester
@@ -165,7 +148,7 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .entityList(Object.class)
             .hasSize(2);
 
-        verify(mcpProjectWorkflowService).getMcpProjectMcpProjectWorkflows(mcpProjectId);
+        verify(mcpProjectWorkflowFacade).getMcpProjectMcpProjectWorkflows(mcpProjectId);
     }
 
     @Test
@@ -363,67 +346,5 @@ class McpProjectWorkflowGraphQlControllerIntTest {
         workflow.setVersion(1);
 
         return workflow;
-    }
-
-    @Nested
-    @ContextConfiguration(classes = MethodSecurityConfiguration.class)
-    class MethodSecurity {
-
-        @Autowired
-        private McpProjectWorkflowGraphQlController mcpProjectWorkflowGraphQlController;
-
-        @Autowired
-        private PermissionEvaluator permissionEvaluator;
-
-        @BeforeEach
-        void setAuthentication() {
-            SecurityContextHolder.getContext()
-                .setAuthentication(
-                    new UsernamePasswordAuthenticationToken(
-                        "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
-        }
-
-        @AfterEach
-        void clearAuthentication() {
-            SecurityContextHolder.clearContext();
-
-            reset(permissionEvaluator);
-        }
-
-        @Test
-        void testByMcpProjectIdRequiresProjectViewer() {
-            assertThatThrownBy(() -> mcpProjectWorkflowGraphQlController.mcpProjectWorkflowsByMcpProjectId(7L))
-                .isInstanceOf(AccessDeniedException.class);
-
-            verify(permissionEvaluator).hasPermission(any(), eq(7L), eq("McpProject"), eq("MCP_VIEW"));
-            verifyNoInteractions(mcpProjectWorkflowService);
-        }
-
-        @Test
-        void testToolEligibleProjectVersionWorkflowsRequiresProjectWorkflowViewer() {
-            assertThatThrownBy(() -> mcpProjectWorkflowGraphQlController.toolEligibleProjectVersionWorkflows(5L, 1))
-                .isInstanceOf(AccessDeniedException.class);
-
-            verify(permissionEvaluator).hasPermission(any(), eq(5L), eq("Project"), eq("WORKFLOW_VIEW"));
-        }
-    }
-
-    @EnableMethodSecurity
-    static class MethodSecurityConfiguration {
-
-        @Bean
-        static MethodSecurityExpressionHandler
-            methodSecurityExpressionHandler(PermissionEvaluator permissionEvaluator) {
-            DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-
-            expressionHandler.setPermissionEvaluator(permissionEvaluator);
-
-            return expressionHandler;
-        }
-
-        @Bean
-        static PermissionEvaluator permissionEvaluator() {
-            return mock(PermissionEvaluator.class);
-        }
     }
 }
