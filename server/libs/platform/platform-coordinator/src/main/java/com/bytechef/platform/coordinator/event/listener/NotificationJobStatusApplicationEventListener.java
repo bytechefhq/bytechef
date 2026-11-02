@@ -76,8 +76,15 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
 
             Job.Status status = jobStatusApplicationEvent.getStatus();
 
+            // Not every job status has a notification event; throwing here would abort the remaining coordinator
+            // listeners.
             NotificationEvent.Type eventType =
-                NotificationEvent.Type.of(NotificationEvent.Source.JOB, status.toString());
+                NotificationEvent.Type.of(NotificationEvent.Source.JOB, status.toString())
+                    .orElse(null);
+
+            if (eventType == null) {
+                return;
+            }
 
             NotificationHandlerContext notificationHandlerContext = getNotificationHandlerContext(
                 eventType, job);

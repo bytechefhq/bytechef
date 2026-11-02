@@ -17,6 +17,7 @@
 package com.bytechef.platform.notification.domain;
 
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -47,14 +48,14 @@ public class NotificationEvent {
             this.value = value;
         }
 
-        public static Type of(Source source, String value) {
+        public static Optional<Type> of(Source source, String value) {
             for (Type type : values()) {
                 if (source == type.source && value.equals(type.value)) {
-                    return type;
+                    return Optional.of(type);
                 }
             }
 
-            throw new IllegalArgumentException(String.format("Invalid source %s and value %s", source, value));
+            return Optional.empty();
         }
     }
 
