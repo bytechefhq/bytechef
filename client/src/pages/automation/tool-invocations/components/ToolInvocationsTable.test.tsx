@@ -23,6 +23,7 @@ const baseLog = {
     outcome: 'SUCCESS',
     surface: 'MCP_AUTOMATION',
     toolName: 'slack_sendMessage',
+    workflowName: null,
     workspaceId: null,
 };
 
@@ -40,7 +41,9 @@ describe('ToolInvocationsTable', () => {
     it('renders an em dash when the tool name is missing', () => {
         render(<ToolInvocationsTable toolInvocationLogs={[{...baseLog, id: '2', toolName: null}]} />);
 
-        expect(screen.getByText('—')).toBeInTheDocument();
+        const toolNameCell = screen.getAllByRole('cell')[0];
+
+        expect(toolNameCell).toHaveTextContent(/^—$/);
     });
 
     it.each([
@@ -48,7 +51,6 @@ describe('ToolInvocationsTable', () => {
         ['EMBEDDED_API_TOOL', 'Embedded API (Tool)'],
         ['MCP_AUTOMATION', 'Automation MCP'],
         ['MCP_EMBEDDED', 'Embedded MCP'],
-        ['MCP_MANAGEMENT', 'Management MCP'],
         ['FUTURE_SURFACE', 'FUTURE_SURFACE'],
     ])('labels the %s surface as %s', (surface, label) => {
         render(<ToolInvocationsTable toolInvocationLogs={[{...baseLog, surface}]} />);
@@ -77,7 +79,27 @@ describe('ToolInvocationsTable', () => {
         expect(screen.queryByText('slack / sendMessage')).not.toBeInTheDocument();
     });
 
-    it('shows a dash in the component column for a workflow tool', () => {
+    it('shows the workflow name in the source column for a workflow tool', () => {
+        render(
+            <ToolInvocationsTable
+                toolInvocationLogs={[
+                    {
+                        ...baseLog,
+                        componentName: null,
+                        kind: 'WORKFLOW',
+                        operationName: null,
+                        toolName: 'send_message',
+                        workflowName: 'Send Message',
+                    },
+                ]}
+            />
+        );
+
+        expect(screen.getByText('send_message')).toBeInTheDocument();
+        expect(screen.getByText('Send Message')).toBeInTheDocument();
+    });
+
+    it('falls back to Workflow in the source column when the workflow name cannot be resolved', () => {
         render(
             <ToolInvocationsTable
                 toolInvocationLogs={[
@@ -86,8 +108,34 @@ describe('ToolInvocationsTable', () => {
             />
         );
 
-        expect(screen.getByText('runReport')).toBeInTheDocument();
-        expect(screen.getByText('—')).toBeInTheDocument();
+        expect(screen.getByText('Workflow')).toBeInTheDocument();
+    });
+
+    it('shows the MCP server name and a dash when the server is missing or unknown', () => {
+        render(
+            <ToolInvocationsTable
+                mcpServerNames={{'5': 'Sales MCP'}}
+                toolInvocationLogs={[
+                    {...baseLog, id: '1', mcpServerId: 5, toolName: 'named_server_tool'},
+                    {...baseLog, id: '2', mcpServerId: 9, toolName: 'unknown_server_tool'},
+                ]}
+            />
+        );
+
+        expect(screen.getByText('Sales MCP')).toBeInTheDocument();
+
+        const unknownServerRow = screen.getByText('unknown_server_tool').closest('tr');
+
+        expect(unknownServerRow).toHaveTextContent('—');
+    });
+
+    it('hides the surface column when showSurface is false', () => {
+        render(<ToolInvocationsTable showSurface={false} toolInvocationLogs={[baseLog]} />);
+
+        expect(screen.queryByText('Surface')).not.toBeInTheDocument();
+        expect(screen.queryByText('Automation MCP')).not.toBeInTheDocument();
+        expect(screen.getByText('Source')).toBeInTheDocument();
+        expect(screen.getByText('MCP Server')).toBeInTheDocument();
     });
 
     it('formats the created date and leaves the cell empty when it is missing', () => {

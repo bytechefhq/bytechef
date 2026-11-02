@@ -76,6 +76,7 @@ const toolInvocationLog = {
     outcome: 'SUCCESS',
     surface: 'MCP_AUTOMATION',
     toolName: 'slack_sendMessage',
+    workflowName: null,
 };
 
 const recordedToolInvocationsState = () => ({...toolInvocationsState(), toolInvocationLogs: [toolInvocationLog]});
@@ -88,30 +89,24 @@ describe('ToolInvocations', () => {
         hoisted.useToolInvocationsMock.mockReturnValue(toolInvocationsState());
     });
 
-    it('offers only the automation surfaces on the tenant-wide automation page', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
-
-        renderToolInvocations();
-
-        const itemValues = renderedItemValues();
-
-        expect(itemValues).toEqual(expect.arrayContaining(['MCP_AUTOMATION', 'MCP_MANAGEMENT']));
-        expect(itemValues).not.toContain('EMBEDDED_API_ACTION');
-        expect(itemValues).not.toContain('EMBEDDED_API_TOOL');
-        expect(itemValues).not.toContain('MCP_EMBEDDED');
-    });
-
-    it('offers the automation and management surfaces on the workspace-scoped page', () => {
+    it('shows no surface filter or column on the automation page, which has a single surface', () => {
         hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
 
         renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         const itemValues = renderedItemValues();
 
-        expect(itemValues).toEqual(expect.arrayContaining(['MCP_AUTOMATION', 'MCP_MANAGEMENT']));
-        expect(itemValues).not.toContain('EMBEDDED_API_ACTION');
-        expect(itemValues).not.toContain('EMBEDDED_API_TOOL');
-        expect(itemValues).not.toContain('MCP_EMBEDDED');
+        expect(itemValues).not.toContain('MCP_AUTOMATION');
+        expect(screen.queryByText('Surface')).not.toBeInTheDocument();
+        expect(screen.queryByText('Automation MCP')).not.toBeInTheDocument();
+    });
+
+    it('shows the name of the MCP server each invocation came through', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+
+        renderToolInvocations({mcpServerOptions: [{label: 'Sales MCP', value: '11'}]});
+
+        expect(screen.getByRole('cell', {name: 'Sales MCP'})).toBeInTheDocument();
     });
 
     it('offers only the embedded surfaces on the embedded page', () => {
@@ -125,7 +120,6 @@ describe('ToolInvocations', () => {
             expect.arrayContaining(['EMBEDDED_API_ACTION', 'EMBEDDED_API_TOOL', 'MCP_EMBEDDED'])
         );
         expect(itemValues).not.toContain('MCP_AUTOMATION');
-        expect(itemValues).not.toContain('MCP_MANAGEMENT');
     });
 
     it('offers a paused run as an outcome filter', () => {
@@ -161,7 +155,7 @@ describe('ToolInvocations', () => {
         renderToolInvocations();
 
         expect(screen.getByText('No Matching Tool Invocations')).toBeInTheDocument();
-        expect(screen.getByText('Surface')).toBeInTheDocument();
+        expect(screen.getByText('Outcome')).toBeInTheDocument();
         expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
     });
 
@@ -230,13 +224,13 @@ describe('ToolInvocations', () => {
 
         const {unmount} = renderToolInvocations({mcpServerOptions: []});
 
-        expect(screen.queryByText('MCP Server')).not.toBeInTheDocument();
+        expect(screen.queryByText('MCP Server', {selector: 'label'})).not.toBeInTheDocument();
 
         unmount();
 
         renderToolInvocations({mcpServerOptions: [{label: 'Sales tools', value: '11'}]});
 
-        expect(screen.getByText('MCP Server')).toBeInTheDocument();
+        expect(screen.getByText('MCP Server', {selector: 'label'})).toBeInTheDocument();
         expect(renderedItemValues()).toContain('11');
     });
 });

@@ -9,6 +9,14 @@ export const EmbeddedToolInvocations = () => {
 
     const {data} = useEmbeddedMcpServersQuery();
 
+    const mcpServerOptions = useMemo(
+        () =>
+            (data?.embeddedMcpServers ?? [])
+                .filter((mcpServer) => mcpServer != null)
+                .map((mcpServer) => ({label: mcpServer!.name, value: mcpServer!.id})),
+        [data]
+    );
+
     const hasMcpServer = useMemo(
         () =>
             (data?.embeddedMcpServers ?? []).some(
@@ -22,6 +30,7 @@ export const EmbeddedToolInvocations = () => {
             environmentId={currentEnvironmentId}
             firstRunEmptyState={<EmbeddedToolInvocationsEmptyState hasMcpServer={hasMcpServer} />}
             key={currentEnvironmentId}
+            mcpServerOptions={mcpServerOptions}
             type={PlatformType.Embedded}
         />
     );
