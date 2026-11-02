@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
 
-    boolean existsBySecretKeyAndEnvironment(String secretKey, int environment);
+    boolean existsBySecretKeyAndEnvironmentAndType(String secretKey, int environment, int type);
 
     Optional<ApiKey> findBySecretKey(String secretKey);
 
@@ -49,4 +49,7 @@ public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
         """)
     int updateLastUsedDate(
         @Param("id") long id, @Param("lastUsedDate") Instant lastUsedDate, @Param("staleBefore") Instant staleBefore);
+
+    @Query("SELECT * FROM api_key WHERE user_id = :userId")
+    List<ApiKey> findAllByUserId(@Param("userId") long userId);
 }

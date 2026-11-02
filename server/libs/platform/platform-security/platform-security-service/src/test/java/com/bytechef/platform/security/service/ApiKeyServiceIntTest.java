@@ -18,6 +18,7 @@ package com.bytechef.platform.security.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.config.PlatformSecurityIntTestConfiguration;
 import com.bytechef.platform.security.domain.ApiKey;
@@ -84,6 +85,18 @@ class ApiKeyServiceIntTest {
 
         assertThat(apiKeyRepository.findById(deletedApiKey.getId())).isEmpty();
         assertThat(apiKeyRepository.findById(keptApiKey.getId())).isPresent();
+    }
+
+    @Test
+    void testExistsMatchesOnlyAKeyOfTheRequestedType() {
+        ApiKey createdApiKey = apiKeyService.create(newApiKey("typed key"));
+
+        Environment environment = createdApiKey.getEnvironment();
+
+        assertThat(apiKeyService.exists(createdApiKey.getSecretKey(), environment.ordinal(), PlatformType.EMBEDDED))
+            .isFalse();
+        assertThat(apiKeyService.exists(createdApiKey.getSecretKey(), environment.ordinal(), PlatformType.AUTOMATION))
+            .isTrue();
     }
 
     @Test
