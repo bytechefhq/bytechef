@@ -37,6 +37,7 @@ message RemoteTaskDispatcherDefinition {
   optional string title = 12;
   optional bool variable_properties_defined = 13;
   optional int32 version = 14;
+  optional bool deprecated = 15;
 }
 
 message RemoteTaskDispatcherDefinitions {

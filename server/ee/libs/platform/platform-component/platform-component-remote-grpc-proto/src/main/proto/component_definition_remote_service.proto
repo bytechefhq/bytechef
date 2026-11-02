@@ -144,6 +144,7 @@ message RemoteActionDefinition {
   optional bool sse_stream_response = 15;
   optional string title = 16;
   optional bool workflow_node_description_defined = 17;
+  optional bool deprecated = 18;
 }
 
 message RemoteActionDefinitions {
