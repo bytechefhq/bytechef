@@ -18,6 +18,7 @@
 # BYTECHEF_WORKER_REPLICAS to change that.
 
 x-bytechef-environment: &bytechef-environment
+  BYTECHEF_AUDIT_ENABLED: ${BYTECHEF_AUDIT_ENABLED:-false}
   BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
   BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
   BYTECHEF_DATASOURCE_USERNAME: postgres
