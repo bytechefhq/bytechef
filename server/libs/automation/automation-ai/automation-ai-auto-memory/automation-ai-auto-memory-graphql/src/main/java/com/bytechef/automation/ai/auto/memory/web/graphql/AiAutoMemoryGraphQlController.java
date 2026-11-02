@@ -16,25 +16,15 @@
 
 package com.bytechef.automation.ai.auto.memory.web.graphql;
 
-import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.domain.Workspace;
-import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
-import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.ai.auto.memory.domain.AiAutoMemoryPrincipal;
+import com.bytechef.automation.ai.auto.memory.domain.AiAutoMemoryPrincipalKey;
+import com.bytechef.automation.ai.auto.memory.facade.AiAutoMemoryFacade;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryConcurrentModificationException;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryNotFoundException;
-import com.bytechef.platform.ai.auto.memory.AiAutoMemoryOwner;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;
-import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalCount;
-import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
-import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryType;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import graphql.ErrorClassification;
 import graphql.GraphQLError;
@@ -42,14 +32,8 @@ import graphql.GraphqlErrorBuilder;
 import graphql.language.Field;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,261 +43,66 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.graphql.execution.ErrorType;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
  * @author Ivica Cardic
  */
 @Controller
-@PreAuthorize("isAuthenticated()")
 public class AiAutoMemoryGraphQlController {
 
     private static final Logger log = LoggerFactory.getLogger(AiAutoMemoryGraphQlController.class);
 
     static final ErrorClassification CONFLICT = ErrorClassification.errorClassification("CONFLICT");
 
-    private final AiAutoMemoryService aiAutoMemoryService;
-    private final UserService userService;
-    private final WorkspaceFacade workspaceFacade;
-    private final ProjectDeploymentFacade projectDeploymentFacade;
-    private final ProjectDeploymentService projectDeploymentService;
+    private final AiAutoMemoryFacade aiAutoMemoryFacade;
 
     @SuppressFBWarnings("EI")
-    public AiAutoMemoryGraphQlController(
-        AiAutoMemoryService aiAutoMemoryService, UserService userService, WorkspaceFacade workspaceFacade,
-        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService) {
-
-        this.aiAutoMemoryService = aiAutoMemoryService;
-        this.userService = userService;
-        this.workspaceFacade = workspaceFacade;
-        this.projectDeploymentFacade = projectDeploymentFacade;
-        this.projectDeploymentService = projectDeploymentService;
+    public AiAutoMemoryGraphQlController(AiAutoMemoryFacade aiAutoMemoryFacade) {
+        this.aiAutoMemoryFacade = aiAutoMemoryFacade;
     }
 
     @QueryMapping
     public List<AiAutoMemory> aiAutoMemories(
         @Argument long workspaceId, @Argument int environment, @Argument @Nullable AiAutoMemoryType memoryType,
-        @Argument @Nullable AiAutoMemoryPrincipalInput principal) {
+        @Argument @Nullable AiAutoMemoryPrincipalKey principal) {
 
-        long userId = userService.getCurrentUser()
-            .getId();
-
-        verifyUserCanAccessWorkspace(userId, workspaceId);
-
-        if (principal == null) {
-            return listAllAddressableOwners(workspaceId, toEnvironment(environment), memoryType, userId);
-        }
-
-        ResolvedPrincipal resolvedPrincipal = resolveAddressablePrincipal(principal, userId, false);
-
-        if (resolvedPrincipal == null) {
-            return List.of();
-        }
-
-        return aiAutoMemoryService.list(
-            resolvedPrincipal.toOwner(workspaceId, toEnvironment(environment)), memoryType);
-    }
-
-    private List<AiAutoMemory> listAllAddressableOwners(
-        long workspaceId, Environment environment, @Nullable AiAutoMemoryType memoryType, long userId) {
-
-        List<ResolvedPrincipal> resolvedPrincipals = new ArrayList<>();
-
-        for (AiAutoMemoryPrincipalCount principalCount : aiAutoMemoryService.listPrincipals(workspaceId, environment)) {
-            ResolvedPrincipal resolvedPrincipal = resolvePrincipalForListing(principalCount, userId);
-
-            if (resolvedPrincipal != null) {
-                resolvedPrincipals.add(resolvedPrincipal);
-            }
-        }
-
-        DeploymentLookup deploymentLookup = lookUpDeployments(resolvedPrincipals);
-
-        Set<PrincipalKey> addressablePrincipalKeys = new HashSet<>();
-
-        for (ResolvedPrincipal resolvedPrincipal : resolvedPrincipals) {
-            if (!deploymentLookup.isEmbedded(resolvedPrincipal)) {
-                addressablePrincipalKeys
-                    .add(new PrincipalKey(resolvedPrincipal.principalType(), resolvedPrincipal.principalId()));
-            }
-        }
-
-        return aiAutoMemoryService.listAllOwners(workspaceId, environment, memoryType)
-            .stream()
-            .filter(
-                memory -> addressablePrincipalKeys
-                    .contains(new PrincipalKey(memory.getPrincipalType(), memory.getPrincipalId())))
-            .toList();
+        return aiAutoMemoryFacade.getAiAutoMemories(workspaceId, toEnvironment(environment), memoryType, principal);
     }
 
     @QueryMapping
     @Nullable
     public AiAutoMemory aiAutoMemory(
         @Argument long workspaceId, @Argument long id, @Argument int environment,
-        @Argument @Nullable AiAutoMemoryPrincipalInput principal) {
+        @Argument @Nullable AiAutoMemoryPrincipalKey principal) {
 
-        long userId = userService.getCurrentUser()
-            .getId();
+        Optional<AiAutoMemory> aiAutoMemoryOptional = aiAutoMemoryFacade.fetchAiAutoMemory(
+            workspaceId, toEnvironment(environment), id, principal);
 
-        verifyUserCanAccessWorkspace(userId, workspaceId);
-
-        ResolvedPrincipal resolvedPrincipal = resolveAddressablePrincipal(principal, userId, false);
-
-        if (resolvedPrincipal == null) {
-            return null;
-        }
-
-        Optional<AiAutoMemory> memory = aiAutoMemoryService.findById(
-            resolvedPrincipal.toOwner(workspaceId, toEnvironment(environment)), id);
-
-        return memory.orElse(null);
+        return aiAutoMemoryOptional.orElse(null);
     }
 
     @QueryMapping
     public List<AiAutoMemoryPrincipal> aiAutoMemoryPrincipals(@Argument long workspaceId, @Argument int environment) {
-        long userId = userService.getCurrentUser()
-            .getId();
-
-        verifyUserCanAccessWorkspace(userId, workspaceId);
-
-        List<AiAutoMemoryPrincipalCount> aiAutoMemoryPrincipalCounts =
-            aiAutoMemoryService.listPrincipals(workspaceId, toEnvironment(environment));
-
-        List<ResolvedPrincipalCount> resolvedPrincipalCounts = new ArrayList<>();
-
-        for (AiAutoMemoryPrincipalCount principalCount : aiAutoMemoryPrincipalCounts) {
-            ResolvedPrincipal resolvedPrincipal = resolvePrincipalForListing(principalCount, userId);
-
-            if (resolvedPrincipal != null) {
-                resolvedPrincipalCounts
-                    .add(new ResolvedPrincipalCount(resolvedPrincipal, principalCount.memoryCount()));
-            }
-        }
-
-        DeploymentLookup deploymentLookup = lookUpDeployments(
-            resolvedPrincipalCounts.stream()
-                .map(ResolvedPrincipalCount::principal)
-                .toList());
-
-        List<AiAutoMemoryPrincipal> aiAutoMemoryPrincipals = new ArrayList<>();
-
-        for (ResolvedPrincipalCount resolvedPrincipalCount : resolvedPrincipalCounts) {
-            ResolvedPrincipal resolvedPrincipal = resolvedPrincipalCount.principal();
-
-            if (deploymentLookup.isEmbedded(resolvedPrincipal)) {
-                continue;
-            }
-
-            aiAutoMemoryPrincipals.add(
-                new AiAutoMemoryPrincipal(
-                    resolvedPrincipal.principalType(), resolvedPrincipal.principalId(),
-                    resolveLabel(resolvedPrincipal, deploymentLookup.namesById()),
-                    resolvedPrincipalCount.memoryCount()));
-        }
-
-        return aiAutoMemoryPrincipals;
-    }
-
-    private DeploymentLookup lookUpDeployments(List<ResolvedPrincipal> principals) {
-        List<Long> deploymentIds = principals.stream()
-            .filter(principal -> principal.principalType() == AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT)
-            .map(ResolvedPrincipal::principalId)
-            .distinct()
-            .toList();
-
-        if (deploymentIds.isEmpty()) {
-            return new DeploymentLookup(Map.of(), Set.of());
-        }
-
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(deploymentIds);
-
-        Map<Long, String> namesById = new HashMap<>();
-
-        for (ProjectDeployment projectDeployment : projectDeployments) {
-            namesById.put(projectDeployment.getId(), projectDeployment.getName());
-        }
-
-        Set<Long> embeddedDeploymentIds = projectDeploymentFacade.getOwnedProjectDeploymentIds(
-            deploymentIds, ProjectDeploymentOwner.EMBEDDED);
-
-        return new DeploymentLookup(namesById, embeddedDeploymentIds);
-    }
-
-    private record DeploymentLookup(Map<Long, String> namesById, Set<Long> embeddedDeploymentIds) {
-
-        boolean isEmbedded(ResolvedPrincipal principal) {
-            return principal.principalType() == AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT
-                && embeddedDeploymentIds.contains(principal.principalId());
-        }
-    }
-
-    private record ResolvedPrincipalCount(ResolvedPrincipal principal, int memoryCount) {
-    }
-
-    private @Nullable ResolvedPrincipal resolvePrincipalForListing(
-        AiAutoMemoryPrincipalCount aiAutoMemoryPrincipalCount, long currentUserId) {
-
-        AiAutoMemoryPrincipalType aiAutoMemoryPrincipalType = aiAutoMemoryPrincipalCount.principalType();
-
-        if (aiAutoMemoryPrincipalType == AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE) {
-            return null;
-        }
-
-        return resolvePrincipal(
-            new AiAutoMemoryPrincipalInput(
-                aiAutoMemoryPrincipalType, aiAutoMemoryPrincipalCount.principalId()),
-            currentUserId, false);
-    }
-
-    private static String resolveLabel(ResolvedPrincipal resolvedPrincipal, Map<Long, String> deploymentNames) {
-        if (resolvedPrincipal.principalType() == AiAutoMemoryPrincipalType.USER) {
-            return "My memories";
-        }
-
-        return deploymentNames.getOrDefault(
-            resolvedPrincipal.principalId(), "Deployment " + resolvedPrincipal.principalId());
+        return aiAutoMemoryFacade.getAiAutoMemoryPrincipals(workspaceId, toEnvironment(environment));
     }
 
     @MutationMapping
     public AiAutoMemory updateAiAutoMemory(@Argument UpdateAiAutoMemoryInput input) {
-        long userId = userService.getCurrentUser()
-            .getId();
-
-        verifyUserCanAccessWorkspace(userId, input.workspaceId());
-
-        ResolvedPrincipal principal = resolveAddressablePrincipal(input.principal(), userId, true);
-
-        if (principal == null) {
-            throw new AiAutoMemoryNotFoundException("Memory not found");
-        }
-
         AiAutoMemoryPatch patch = new AiAutoMemoryPatch(
             input.title(), input.description(), input.memoryType(), input.content());
 
-        return aiAutoMemoryService.updateById(
-            principal.toOwner(input.workspaceId(), toEnvironment(input.environment())), input.id(),
-            input.expectedVersion(), patch);
+        return aiAutoMemoryFacade.updateAiAutoMemory(
+            input.workspaceId(), toEnvironment(input.environment()), input.id(), input.expectedVersion(), patch,
+            input.principal());
     }
 
     @MutationMapping
     public boolean deleteAiAutoMemory(
         @Argument long workspaceId, @Argument long id, @Argument int environment,
-        @Argument @Nullable AiAutoMemoryPrincipalInput principal) {
+        @Argument @Nullable AiAutoMemoryPrincipalKey principal) {
 
-        long userId = userService.getCurrentUser()
-            .getId();
-
-        verifyUserCanAccessWorkspace(userId, workspaceId);
-
-        ResolvedPrincipal resolvedPrincipal = resolveAddressablePrincipal(principal, userId, true);
-
-        if (resolvedPrincipal == null) {
-            throw new AiAutoMemoryNotFoundException("Memory not found");
-        }
-
-        aiAutoMemoryService.deleteById(resolvedPrincipal.toOwner(workspaceId, toEnvironment(environment)), id);
+        aiAutoMemoryFacade.deleteAiAutoMemory(workspaceId, toEnvironment(environment), id, principal);
 
         return true;
     }
@@ -394,56 +183,12 @@ public class AiAutoMemoryGraphQlController {
             .build();
     }
 
-    @Nullable
-    ResolvedPrincipal resolvePrincipal(
-        @Nullable AiAutoMemoryPrincipalInput principal, long currentUserId, boolean mutating) {
-
-        if (principal == null) {
-            return new ResolvedPrincipal(AiAutoMemoryPrincipalType.USER, currentUserId);
-        }
-
-        AiAutoMemoryPrincipalType principalType = principal.principalType();
-        long principalId = principal.principalId();
-
-        if (principalType == AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE) {
-            throw new IllegalArgumentException(
-                "INTEGRATION_INSTANCE memories are not addressable through this API: embedded integration-instance " +
-                    "rows all live in the default workspace, so workspace membership does not isolate them");
-        }
-
-        if (principalType == AiAutoMemoryPrincipalType.USER) {
-            return principalId == currentUserId ? new ResolvedPrincipal(principalType, principalId) : null;
-        }
-
-        if (principalType != AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT) {
-            return null;
-        }
-
-        if (mutating && !SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)) {
-            return null;
-        }
-
-        return new ResolvedPrincipal(principalType, principalId);
-    }
-
     private static void logRejection(DataFetchingEnvironment dataFetchingEnvironment, RuntimeException exception) {
         if (log.isDebugEnabled()) {
             Field field = dataFetchingEnvironment.getField();
 
             log.debug("Rejected auto-memory request {}", field.getName(), exception);
         }
-    }
-
-    private @Nullable ResolvedPrincipal resolveAddressablePrincipal(
-        @Nullable AiAutoMemoryPrincipalInput principal, long currentUserId, boolean mutating) {
-
-        ResolvedPrincipal resolvedPrincipal = resolvePrincipal(principal, currentUserId, mutating);
-
-        if (resolvedPrincipal == null || lookUpDeployments(List.of(resolvedPrincipal)).isEmbedded(resolvedPrincipal)) {
-            return null;
-        }
-
-        return resolvedPrincipal;
     }
 
     private static Environment toEnvironment(int environment) {
@@ -456,41 +201,9 @@ public class AiAutoMemoryGraphQlController {
         return environments[environment];
     }
 
-    private void verifyUserCanAccessWorkspace(long userId, long workspaceId) {
-        boolean isMember = workspaceFacade.getUserWorkspaces(userId)
-            .stream()
-            .map(Workspace::getId)
-            .anyMatch(id -> id != null && id == workspaceId);
-
-        if (!isMember) {
-            throw new AccessDeniedException("Workspace is not accessible to the current user");
-        }
-    }
-
-    public record AiAutoMemoryPrincipalInput(AiAutoMemoryPrincipalType principalType, long principalId) {
-
-        public AiAutoMemoryPrincipalInput {
-            Objects.requireNonNull(principalType, "principalType");
-        }
-    }
-
-    public record AiAutoMemoryPrincipal(
-        AiAutoMemoryPrincipalType principalType, long principalId, String label, int memoryCount) {
-    }
-
     public record UpdateAiAutoMemoryInput(
         long id, long workspaceId, int environment, long expectedVersion, @Nullable String title,
         @Nullable String description, @Nullable AiAutoMemoryType memoryType, @Nullable String content,
-        @Nullable AiAutoMemoryPrincipalInput principal) {
-    }
-
-    private record ResolvedPrincipal(AiAutoMemoryPrincipalType principalType, long principalId) {
-
-        AiAutoMemoryOwner toOwner(long workspaceId, Environment environment) {
-            return new AiAutoMemoryOwner(workspaceId, principalType, principalId, environment);
-        }
-    }
-
-    private record PrincipalKey(AiAutoMemoryPrincipalType principalType, long principalId) {
+        @Nullable AiAutoMemoryPrincipalKey principal) {
     }
 }
