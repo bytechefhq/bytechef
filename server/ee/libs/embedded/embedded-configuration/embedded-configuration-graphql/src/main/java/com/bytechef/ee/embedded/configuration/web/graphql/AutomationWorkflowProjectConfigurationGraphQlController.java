@@ -19,6 +19,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -57,6 +58,18 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
 
         return automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
             Long.parseLong(id), workflowUuid);
+    }
+
+    @QueryMapping
+    public List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.InputOption>
+        automationWorkflowProjectConfigurationWorkflowInputOptions(
+            @Argument String id, @Argument String workflowUuid, @Argument String inputName,
+            @Argument String propertyName, @Argument String connectionId,
+            @Argument @Nullable Map<String, Object> lookupDependsOnValues, @Argument @Nullable String searchText) {
+
+        return automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowInputOptions(
+            Long.parseLong(id), workflowUuid, inputName, propertyName, parseConnectionId(inputName, connectionId),
+            lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues, searchText);
     }
 
     @QueryMapping

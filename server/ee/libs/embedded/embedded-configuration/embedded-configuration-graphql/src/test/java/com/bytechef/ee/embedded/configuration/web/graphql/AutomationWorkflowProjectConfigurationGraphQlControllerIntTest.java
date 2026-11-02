@@ -132,6 +132,89 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
     }
 
     @Test
+    void testAutomationWorkflowProjectConfigurationWorkflowProvidableValuesReturnsTheComponentReferenceOfAnInput() {
+        when(automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(5L, "uuid-one"))
+            .thenReturn(
+                new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO(
+                    List.of(),
+                    List.of(
+                        new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                            "channel", "Slack Channel", "STRING", true, "slack", 1, "channel",
+                            List.of(
+                                new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection(
+                                    31L, "Company Slack")))),
+                    Map.of(), Map.of()));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurationWorkflowProvidableValues(id: "5", workflowUuid: "uuid-one") {
+                        inputs {
+                            name
+                            componentName
+                            componentVersion
+                            groupName
+                            optionConnections {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.inputs[0].componentName")
+            .entity(String.class)
+            .isEqualTo("slack")
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.inputs[0].componentVersion")
+            .entity(Integer.class)
+            .isEqualTo(1)
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.inputs[0].groupName")
+            .entity(String.class)
+            .isEqualTo("channel")
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.inputs[0].optionConnections[0].id")
+            .entity(String.class)
+            .isEqualTo("31")
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.inputs[0].optionConnections[0].name")
+            .entity(String.class)
+            .isEqualTo("Company Slack");
+    }
+
+    @Test
+    void testAutomationWorkflowProjectConfigurationWorkflowInputOptionsPassesTheConnectionAndDependencies() {
+        when(automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowInputOptions(
+            5L, "uuid-one", "channel", "channel", 31L, Map.of("workspace", "acme"), "gen"))
+                .thenReturn(
+                    List.of(
+                        new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.InputOption(
+                            "general", "C123", "Company-wide")));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurationWorkflowInputOptions(
+                        id: "5", workflowUuid: "uuid-one", inputName: "channel", propertyName: "channel",
+                        connectionId: "31", lookupDependsOnValues: {workspace: "acme"}, searchText: "gen"
+                    ) {
+                        label
+                        value
+                        description
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectConfigurationWorkflowInputOptions[0].label")
+            .entity(String.class)
+            .isEqualTo("general")
+            .path("automationWorkflowProjectConfigurationWorkflowInputOptions[0].value")
+            .entity(String.class)
+            .isEqualTo("C123")
+            .path("automationWorkflowProjectConfigurationWorkflowInputOptions[0].description")
+            .entity(String.class)
+            .isEqualTo("Company-wide");
+    }
+
+    @Test
     void testAutomationWorkflowProjectConfigurationWorkflowProvidableValuesReturnsSlotsInputsAndProvidedValues() {
         when(automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(5L, "uuid-one"))
             .thenReturn(
