@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -3064,10 +3065,26 @@ public class ApplicationProperties {
      */
     public static class Audit {
 
+        private static final Duration DEFAULT_CREDENTIAL_USAGE_INTERVAL = Duration.ofHours(1);
+
+        /**
+         * Minimum interval between two CREDENTIAL_USED events for the same credential (per tenant, credential type,
+         * principal, environment, API key and connected user) on each server instance; zero or a negative value records
+         * every request
+         */
+        private Duration credentialUsageInterval = DEFAULT_CREDENTIAL_USAGE_INTERVAL;
+
         /**
          * Whether principals are masked (e.g. {@code a***@example.com}) when audit events are read through the API
          */
         private boolean maskPrincipals;
+
+        /**
+         * Whether passed permission checks on methods that change something and have no event type of their own are
+         * recorded as PERMISSION_CHECK events with the result ALLOWED; @Audited methods are recorded under their own
+         * event type regardless of this setting, and passed checks on read methods never are
+         */
+        private boolean recordAllowedPermissionChecks;
 
         /**
          * Cron expression of the audit retention job, evaluated in the JVM default time zone
@@ -3079,8 +3096,16 @@ public class ApplicationProperties {
          */
         private long retentionDays;
 
+        public Duration getCredentialUsageInterval() {
+            return credentialUsageInterval;
+        }
+
         public boolean isMaskPrincipals() {
             return maskPrincipals;
+        }
+
+        public boolean isRecordAllowedPermissionChecks() {
+            return recordAllowedPermissionChecks;
         }
 
         public String getRetentionCron() {
@@ -3091,8 +3116,17 @@ public class ApplicationProperties {
             return retentionDays;
         }
 
+        public void setCredentialUsageInterval(Duration credentialUsageInterval) {
+            this.credentialUsageInterval = Objects.requireNonNullElse(
+                credentialUsageInterval, DEFAULT_CREDENTIAL_USAGE_INTERVAL);
+        }
+
         public void setMaskPrincipals(boolean maskPrincipals) {
             this.maskPrincipals = maskPrincipals;
+        }
+
+        public void setRecordAllowedPermissionChecks(boolean recordAllowedPermissionChecks) {
+            this.recordAllowedPermissionChecks = recordAllowedPermissionChecks;
         }
 
         public void setRetentionCron(String retentionCron) {

@@ -17,6 +17,8 @@
 package com.bytechef.platform.security.web.filter;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
+import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -26,8 +28,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -55,14 +62,19 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger log = LoggerFactory.getLogger(ApiKeyAuthenticationFilter.class);
+
     private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
         .getContextHolderStrategy();
     private final SecurityContextRepository securityContextRepository = new RequestAttributeSecurityContextRepository();
     private final AuthenticationSuccessHandler successHandler = new PassthroughSuccessHandler();
     private final AuthenticationFailureHandler failureHandler = new AuthenticationEntryPointFailureHandler(
         new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+    private final AuthenticationFailureHandler serviceUnavailableFailureHandler =
+        createServiceUnavailableFailureHandler();
 
     private final AuthenticationConverter authenticationConverter;
+    private final @Nullable AuthenticationEventPublisher authenticationEventPublisher;
     private final AuthenticationManager authenticationManager;
     private final RequestMatcher requestMatcher;
 
@@ -70,7 +82,16 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         RequestMatcher requestMatcher, AuthenticationConverter authenticationConverter,
         AuthenticationManager authenticationManager) {
 
+        this(requestMatcher, authenticationConverter, authenticationManager, null);
+    }
+
+    public ApiKeyAuthenticationFilter(
+        RequestMatcher requestMatcher, AuthenticationConverter authenticationConverter,
+        AuthenticationManager authenticationManager,
+        @Nullable AuthenticationEventPublisher authenticationEventPublisher) {
+
         this.authenticationConverter = authenticationConverter;
+        this.authenticationEventPublisher = authenticationEventPublisher;
         this.authenticationManager = authenticationManager;
         this.requestMatcher = new NegatedRequestMatcher(requestMatcher);
     }
@@ -81,36 +102,98 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain)
         throws ServletException, IOException {
 
+        AbstractApiKeyAuthenticationToken authentication;
+
         try {
-            AbstractApiKeyAuthenticationToken authentication =
-                (AbstractApiKeyAuthenticationToken) authenticationConverter.convert(httpServletRequest);
-
-            if (authentication == null) {
-                filterChain.doFilter(httpServletRequest, httpServletResponse);
-            } else {
-                HttpSession httpSession = httpServletRequest.getSession(false);
-
-                if (httpSession != null) {
-                    httpServletRequest.changeSessionId();
-                }
-
-                TenantContext.runWithTenantId(
-                    authentication.getTenantId(),
-                    () -> {
-                        try {
-                            Authentication authenticatedAuthentication = authenticationManager.authenticate(
-                                authentication);
-
-                            successfulAuthentication(
-                                httpServletRequest, httpServletResponse, filterChain, authenticatedAuthentication);
-                        } catch (AuthenticationException ex) {
-                            unsuccessfulAuthentication(httpServletRequest, httpServletResponse, ex);
-                        }
-                    });
+            authentication = (AbstractApiKeyAuthenticationToken) authenticationConverter.convert(httpServletRequest);
+        } catch (AuthenticationException authenticationException) {
+            if (authenticationEventPublisher != null) {
+                authenticationEventPublisher.publishAuthenticationFailure(
+                    authenticationException, new UnresolvedCredentialAuthenticationToken(httpServletRequest));
             }
-        } catch (AuthenticationException ex) {
-            unsuccessfulAuthentication(httpServletRequest, httpServletResponse, ex);
+
+            unsuccessfulAuthentication(httpServletRequest, httpServletResponse, authenticationException);
+
+            return;
+        } catch (RuntimeException runtimeException) {
+            rejectServiceUnavailable(
+                httpServletRequest, httpServletResponse,
+                new UnresolvedCredentialAuthenticationToken(httpServletRequest),
+                null, runtimeException);
+
+            return;
         }
+
+        if (authentication == null) {
+            try {
+                filterChain.doFilter(httpServletRequest, httpServletResponse);
+            } catch (AuthenticationException authenticationException) {
+                unsuccessfulAuthentication(httpServletRequest, httpServletResponse, authenticationException);
+            }
+
+            return;
+        }
+
+        HttpSession httpSession = httpServletRequest.getSession(false);
+
+        if (httpSession != null) {
+            httpServletRequest.changeSessionId();
+        }
+
+        authentication.setDetails(new TenantWebAuthenticationDetails(httpServletRequest, authentication.getTenantId()));
+
+        TenantContext.runWithTenantId(
+            authentication.getTenantId(),
+            () -> authenticate(httpServletRequest, httpServletResponse, filterChain, authentication));
+    }
+
+    private void authenticate(
+        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain,
+        AbstractApiKeyAuthenticationToken authentication) throws IOException, ServletException {
+
+        Authentication authenticatedAuthentication;
+
+        try {
+            authenticatedAuthentication = authenticationManager.authenticate(authentication);
+        } catch (AuthenticationException authenticationException) {
+            unsuccessfulAuthentication(httpServletRequest, httpServletResponse, authenticationException);
+
+            return;
+        } catch (RuntimeException runtimeException) {
+            rejectServiceUnavailable(
+                httpServletRequest, httpServletResponse, authentication, authentication.getTenantId(),
+                runtimeException);
+
+            return;
+        }
+
+        try {
+            successfulAuthentication(
+                httpServletRequest, httpServletResponse, filterChain, authenticatedAuthentication);
+        } catch (AuthenticationException authenticationException) {
+            unsuccessfulAuthentication(httpServletRequest, httpServletResponse, authenticationException);
+        }
+    }
+
+    private void rejectServiceUnavailable(
+        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication,
+        @Nullable String tenantId, RuntimeException runtimeException) throws IOException, ServletException {
+
+        log.error(
+            "Rejecting API key for a {} request: authentication failed in tenant {}", httpServletRequest.getMethod(),
+            tenantId, runtimeException);
+
+        AuthenticationServiceException authenticationServiceException = new AuthenticationServiceException(
+            "API key authentication failed", runtimeException);
+
+        if (authenticationEventPublisher != null) {
+            authenticationEventPublisher.publishAuthenticationFailure(authenticationServiceException, authentication);
+        }
+
+        securityContextHolderStrategy.clearContext();
+
+        serviceUnavailableFailureHandler.onAuthenticationFailure(
+            httpServletRequest, httpServletResponse, authenticationServiceException);
     }
 
     @Override
@@ -144,6 +227,15 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         }
 
         failureHandler.onAuthenticationFailure(request, response, failed);
+    }
+
+    private static AuthenticationFailureHandler createServiceUnavailableFailureHandler() {
+        AuthenticationEntryPointFailureHandler authenticationEntryPointFailureHandler =
+            new AuthenticationEntryPointFailureHandler(new HttpStatusEntryPoint(HttpStatus.SERVICE_UNAVAILABLE));
+
+        authenticationEntryPointFailureHandler.setRethrowAuthenticationServiceException(false);
+
+        return authenticationEntryPointFailureHandler;
     }
 
     private static class PassthroughSuccessHandler implements AuthenticationSuccessHandler {

@@ -17,6 +17,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
@@ -46,6 +47,7 @@ import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
@@ -164,6 +166,13 @@ public class IntegrationFacadeIntTest {
         assertThat(integrationDTO.integrationWorkflowIds()).hasSize(0);
         assertThat(categoryRepository.count()).isEqualTo(1);
         assertThat(tagRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testDeleteOfAnUnknownIntegrationFails() {
+        assertThatThrownBy(() -> integrationFacade.deleteIntegration(Long.MAX_VALUE))
+            .isInstanceOf(NoSuchElementException.class)
+            .hasMessage("Integration " + Long.MAX_VALUE + " not found");
     }
 
     @Test

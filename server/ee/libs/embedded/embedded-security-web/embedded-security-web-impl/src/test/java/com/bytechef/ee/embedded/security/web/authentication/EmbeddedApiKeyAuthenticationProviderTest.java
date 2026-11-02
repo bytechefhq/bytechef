@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -15,12 +16,15 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -31,6 +35,7 @@ import org.springframework.security.core.Authentication;
 class EmbeddedApiKeyAuthenticationProviderTest {
 
     private static final String EXTERNAL_USER_ID = "customer-z";
+    private static final long API_KEY_ID = 9L;
     private static final long ENVIRONMENT_ID = 2L;
 
     private ApiKeyService apiKeyService;
@@ -44,8 +49,12 @@ class EmbeddedApiKeyAuthenticationProviderTest {
 
         provider = new EmbeddedApiKeyAuthenticationProvider(apiKeyService, connectedUserService);
 
-        when(apiKeyService.exists("secret", ENVIRONMENT_ID))
-            .thenReturn(true);
+        ApiKey apiKey = new ApiKey();
+
+        apiKey.setId(API_KEY_ID);
+
+        when(apiKeyService.fetchApiKey("secret", ENVIRONMENT_ID))
+            .thenReturn(Optional.of(apiKey));
     }
 
     @Test
@@ -65,6 +74,33 @@ class EmbeddedApiKeyAuthenticationProviderTest {
         assertThat(authenticationToken.connectedUserId()).isEqualTo(42L);
         assertThat(authenticationToken.externalUserId()).isEqualTo(EXTERNAL_USER_ID);
         assertThat(authenticationToken.environmentId()).isEqualTo(ENVIRONMENT_ID);
+        assertThat(authenticationToken.getApiKeyId()).isEqualTo(API_KEY_ID);
+        assertThat(authenticationToken.getConnectedUserId()).isEqualTo(42L);
+    }
+
+    @Test
+    void testAuthenticationRejectsAnUnknownApiKey() {
+        when(apiKeyService.fetchApiKey("unknown", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> provider.authenticate(
+            new EmbeddedApiKeyAuthenticationToken(ENVIRONMENT_ID, EXTERNAL_USER_ID, "unknown", "tenant")))
+                .isInstanceOf(BadCredentialsException.class);
+
+        verify(connectedUserService, never()).fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testAuthenticationPropagatesAFailedApiKeyLookup() {
+        DataAccessResourceFailureException dataAccessResourceFailureException =
+            new DataAccessResourceFailureException("Database unavailable");
+
+        when(apiKeyService.fetchApiKey("secret", ENVIRONMENT_ID))
+            .thenThrow(dataAccessResourceFailureException);
+
+        assertThatThrownBy(() -> provider.authenticate(
+            new EmbeddedApiKeyAuthenticationToken(ENVIRONMENT_ID, EXTERNAL_USER_ID, "secret", "tenant")))
+                .isSameAs(dataAccessResourceFailureException);
     }
 
     @Test

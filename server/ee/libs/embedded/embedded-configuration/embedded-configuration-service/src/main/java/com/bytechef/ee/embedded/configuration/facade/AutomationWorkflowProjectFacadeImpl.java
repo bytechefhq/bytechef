@@ -389,7 +389,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    public void publishProject(long projectId, @Nullable String description) {
+    public int publishProject(long projectId, @Nullable String description) {
         Project project = getProjectOfAutomationWorkflowProject(projectId);
 
         int oldProjectVersion = project.getLastProjectVersion();
@@ -413,6 +413,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
             workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
         }
+
+        return newProjectVersion;
     }
 
     @Override

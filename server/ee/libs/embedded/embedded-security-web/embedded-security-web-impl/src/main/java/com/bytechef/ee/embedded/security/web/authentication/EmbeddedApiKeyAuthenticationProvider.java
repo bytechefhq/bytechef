@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.security.web.authentication;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,11 +44,15 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
             (EmbeddedApiKeyAuthenticationToken) authentication;
 
         long environmentId = embeddedApiKeyAuthenticationToken.getEnvironmentId();
+        String secretKey = embeddedApiKeyAuthenticationToken.getSecretKey();
 
-        if (embeddedApiKeyAuthenticationToken.getSecretKey() != null &&
-            !apiKeyService.exists(embeddedApiKeyAuthenticationToken.getSecretKey(), environmentId)) {
+        Long apiKeyId = null;
 
-            throw new BadCredentialsException("Invalid API key");
+        if (secretKey != null) {
+            ApiKey apiKey = apiKeyService.fetchApiKey(secretKey, environmentId)
+                .orElseThrow(() -> new BadCredentialsException("Invalid API key"));
+
+            apiKeyId = apiKey.getId();
         }
 
         String externalUserId = embeddedApiKeyAuthenticationToken.getExternalUserId();
@@ -57,7 +62,7 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
 
         return new EmbeddedApiKeyAuthenticationToken(
             environmentId, connectedUser.getId(), createSpringSecurityUser(externalUserId, connectedUser),
-            embeddedApiKeyAuthenticationToken.getSecretKey() != null);
+            secretKey != null, apiKeyId);
     }
 
     private ConnectedUser createConnectedUser(String externalUserId, long environmentId) {

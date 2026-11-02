@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -26,6 +27,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.tenant.domain.TenantKey;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -75,10 +77,29 @@ class AutomationMcpServerSecretVerifierTest {
 
     @Test
     void testUnknownServerIsRejected() {
-        when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenThrow(new IllegalArgumentException());
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(Optional.empty());
 
         assertThat(automationMcpServerSecretVerifier.verifyMcpServerSecret(automationRequest(MCP_SERVER_SECRET_KEY)))
             .contains(false);
+    }
+
+    @Test
+    void testFailedLookupPropagatesFromSecretVerification() {
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_SECRET_KEY)).thenThrow(new IllegalStateException("db down"));
+
+        assertThatThrownBy(
+            () -> automationMcpServerSecretVerifier.verifyMcpServerSecret(automationRequest(MCP_SERVER_SECRET_KEY)))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void testFailedLookupPropagatesFromDisabledCheck() {
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_SECRET_KEY)).thenThrow(new IllegalStateException("db down"));
+
+        assertThatThrownBy(
+            () -> automationMcpServerSecretVerifier.getMcpServerDisabledMessage(
+                automationRequest(MCP_SERVER_SECRET_KEY)))
+                    .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -139,7 +160,7 @@ class AutomationMcpServerSecretVerifierTest {
         when(mcpServer.getType()).thenReturn(type);
         when(mcpServer.isEnabled()).thenReturn(enabled);
         when(mcpServer.getSecretKey()).thenReturn(secretKey);
-        when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(Optional.of(mcpServer));
     }
 
     private static MockHttpServletRequest automationRequest(String mcpServerSecretKey) {

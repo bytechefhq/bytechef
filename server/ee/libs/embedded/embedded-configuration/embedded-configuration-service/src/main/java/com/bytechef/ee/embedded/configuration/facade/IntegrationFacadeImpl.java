@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
@@ -20,6 +21,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -90,6 +93,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_CREATED, data = {
+        @AuditData(key = "integrationId", value = "#result"),
+        @AuditData(key = "name", value = "#integrationDTO.name"),
+        @AuditData(key = "componentName", value = "#integrationDTO.componentName")
+    })
     @PreAuthorize("isTenantAdmin()")
     public long createIntegration(IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
@@ -113,8 +121,13 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_DELETED, data = {
+        @AuditData(key = "integrationId", value = "#id")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void deleteIntegration(long id) {
+        integrationService.getIntegration(id);
+
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(id);
 
@@ -234,8 +247,12 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_PUBLISHED, data = {
+        @AuditData(key = "integrationId", value = "#id"),
+        @AuditData(key = "integrationVersion", value = "#result")
+    })
     @PreAuthorize("isTenantAdmin()")
-    public void publishIntegration(long id, String description) {
+    public int publishIntegration(long id, String description) {
         Integration integration = integrationService.getIntegration(id);
 
         int oldIntegrationVersion = integration.getLastIntegrationVersion();
@@ -259,9 +276,15 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             workflowTestConfigurationService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
             workflowNodeTestOutputService.updateWorkflowId(oldWorkflowId, duplicatedWorkflow.getId());
         }
+
+        return newIntegrationVersion;
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_UPDATED, data = {
+        @AuditData(key = "integrationId", value = "#integrationDTO.id"),
+        @AuditData(key = "name", value = "#integrationDTO.name")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void updateIntegration(IntegrationDTO integrationDTO) {
         List<Tag> tags = CollectionUtils.isEmpty(integrationDTO.tags())

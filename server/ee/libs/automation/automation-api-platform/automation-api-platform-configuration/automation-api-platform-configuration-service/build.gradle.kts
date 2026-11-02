@@ -16,6 +16,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))

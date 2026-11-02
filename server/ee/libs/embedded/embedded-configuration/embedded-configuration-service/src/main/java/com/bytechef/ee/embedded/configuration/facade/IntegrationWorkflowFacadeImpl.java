@@ -10,6 +10,8 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationWorkflowAuditMapper;
+import com.bytechef.ee.embedded.configuration.audit.WorkflowAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
@@ -21,6 +23,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
@@ -93,6 +97,12 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @Audited(
+        event = WorkflowAuditEvents.INTEGRATION_WORKFLOW_CREATED, mapper = IntegrationWorkflowAuditMapper.class,
+        data = {
+            @AuditData(key = "integrationId", value = "#integrationId"),
+            @AuditData(key = "integrationWorkflowId", value = "#result")
+        })
     @PreAuthorize("isTenantAdmin()")
     public long addWorkflow(long integrationId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
@@ -110,6 +120,9 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @Audited(event = WorkflowAuditEvents.INTEGRATION_WORKFLOW_DELETED, data = {
+        @AuditData(key = "workflowId", value = "#workflowId")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void deleteWorkflow(String workflowId) {
         Integration integration = integrationService.getWorkflowIntegration(workflowId);
@@ -151,6 +164,10 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @Audited(event = WorkflowAuditEvents.INTEGRATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED, data = {
+        @AuditData(key = "integrationWorkflowId", value = "#integrationWorkflowId"),
+        @AuditData(key = "permissionExpression", value = "#permissionExpression")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void updatePermissionExpression(long integrationWorkflowId, String permissionExpression) {
         integrationWorkflowService.updatePermissionExpression(integrationWorkflowId, permissionExpression);

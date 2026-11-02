@@ -7,9 +7,12 @@
 
 package com.bytechef.ee.embedded.security.facade;
 
+import com.bytechef.ee.embedded.security.audit.SigningKeyAuditEvents;
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
@@ -39,6 +42,12 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     }
 
     @Override
+    @Audited(event = SigningKeyAuditEvents.SIGNING_KEY_CREATED, data = {
+        @AuditData(key = "signingKeyId", value = "#signingKey.id"),
+        @AuditData(key = "name", value = "#signingKey.name"),
+        @AuditData(key = "environment", value = "#signingKey.environment"),
+        @AuditData(key = "type", value = "#type")
+    })
     @PreAuthorize("isTenantAdmin()")
     public String create(SigningKey signingKey, PlatformType type) {
         User user = userService.getCurrentUser();
@@ -50,8 +59,13 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     }
 
     @Override
+    @Audited(event = SigningKeyAuditEvents.SIGNING_KEY_DELETED, data = {
+        @AuditData(key = "signingKeyId", value = "#id")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void delete(long id) {
+        signingKeyService.getSigningKey(id);
+
         signingKeyService.delete(id);
     }
 
@@ -68,6 +82,10 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     }
 
     @Override
+    @Audited(event = SigningKeyAuditEvents.SIGNING_KEY_UPDATED, data = {
+        @AuditData(key = "signingKeyId", value = "#signingKey.id"),
+        @AuditData(key = "name", value = "#signingKey.name")
+    })
     @PreAuthorize("isTenantAdmin()")
     public SigningKey update(SigningKey signingKey) {
         return signingKeyService.update(signingKey);

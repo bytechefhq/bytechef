@@ -65,7 +65,7 @@ class AutomationMcpServerJwtAccessFilterTest {
 
         when(mcpServer.getEnvironment()).thenReturn(Environment.PRODUCTION);
         when(mcpServer.getId()).thenReturn(MCP_SERVER_ID);
-        when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(Optional.of(mcpServer));
         when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID)).thenReturn(Optional.of(WORKSPACE_ID));
 
         Jwt jwt = Jwt.withTokenValue("token")

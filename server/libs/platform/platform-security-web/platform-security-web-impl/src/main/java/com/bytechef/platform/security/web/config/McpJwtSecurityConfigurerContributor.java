@@ -17,6 +17,7 @@
 package com.bytechef.platform.security.web.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.security.web.authentication.CredentialAuthenticationEventPublisher;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
@@ -28,8 +29,12 @@ import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
@@ -39,7 +44,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
  * @author Ivica Cardic
  */
 @Configuration
-public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerContributor {
+public class McpJwtSecurityConfigurerContributor
+    implements ApplicationEventPublisherAware, SecurityConfigurerContributor {
+
+    private static final Logger log = LoggerFactory.getLogger(McpJwtSecurityConfigurerContributor.class);
 
     private final AuthorityService authorityService;
     private final ObjectProvider<McpEndpoint> mcpEndpointProvider;
@@ -48,6 +56,7 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
     private final @Nullable String publicUrl;
     private final ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider;
     private final UserService userService;
+    private @Nullable ApplicationEventPublisher applicationEventPublisher;
     private @Nullable AuthenticationEventPublisher authenticationEventPublisher;
 
     @SuppressFBWarnings("EI2")
@@ -65,6 +74,12 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
         this.publicUrl = applicationProperties.getPublicUrl();
         this.selfIssuedTokenRevocationCheckerProvider = selfIssuedTokenRevocationCheckerProvider;
         this.userService = userService;
+    }
+
+    @Override
+    @SuppressFBWarnings("EI2")
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Autowired(required = false)
@@ -101,8 +116,13 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
                 .toList(),
             selfIssuedTokenRevocationChecker, publicUrl);
 
-        if (authenticationEventPublisher != null) {
-            tenantAwareJwtAuthenticationFilter.setAuthenticationEventPublisher(authenticationEventPublisher);
+        if (applicationEventPublisher != null) {
+            if (authenticationEventPublisher == null) {
+                log.warn("No AuthenticationEventPublisher bean; MCP JWT authentication failures are not audited");
+            }
+
+            tenantAwareJwtAuthenticationFilter.setAuthenticationEventPublisher(
+                new CredentialAuthenticationEventPublisher(applicationEventPublisher, authenticationEventPublisher));
         }
 
         return (T) new McpJwtSecurityConfigurer(tenantAwareJwtAuthenticationFilter);

@@ -12,7 +12,9 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
+import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -49,12 +51,13 @@ public class CustomAuditEventRepository implements AuditEventRepository {
     private static final String AUTHORIZATION_FAILURE = "AUTHORIZATION_FAILURE";
     private static final String DETAILS = "details";
     public static final String ANONYMOUS_USER = "anonymoususer";
+    public static final String PLATFORM_DATA_KEY = CustomAuditEventRepository.class.getName() + ".platform";
     public static final String TENANT_ID_DATA_KEY = CustomAuditEventRepository.class.getName() + ".tenantId";
 
     /**
      * Should be the same as in Liquibase migration.
      */
-    protected static final int EVENT_DATA_COLUMN_MAX_LENGTH = 255;
+    protected static final int EVENT_DATA_COLUMN_MAX_LENGTH = 256;
 
     protected static final int PRINCIPAL_COLUMN_MAX_LENGTH = 256;
 
@@ -132,6 +135,10 @@ public class CustomAuditEventRepository implements AuditEventRepository {
 
         Object eventTenantId = data.remove(TENANT_ID_DATA_KEY);
 
+        if (data.remove(PLATFORM_DATA_KEY) instanceof PlatformType platformType) {
+            persistentAuditEvent.setPlatform(platformType);
+        }
+
         Map<String, String> eventData = auditEventConverter.convertDataToStrings(data);
 
         persistentAuditEvent.setData(truncate(eventData));
@@ -176,7 +183,9 @@ public class CustomAuditEventRepository implements AuditEventRepository {
 
             String principal = event.getPrincipal();
 
-            if (Objects.equals(principal, systemUsername)) {
+            if (Objects.equals(principal, systemUsername) ||
+                Objects.equals(principal, UnresolvedCredentialAuthenticationToken.PRINCIPAL)) {
+
                 return null;
             }
 

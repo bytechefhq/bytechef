@@ -127,7 +127,7 @@ public class RemoteAutomationWorkflowProjectFacadeClient implements AutomationWo
     }
 
     @Override
-    public void publishProject(long projectId, @Nullable String description) {
+    public int publishProject(long projectId, @Nullable String description) {
         throw new UnsupportedOperationException();
     }
 

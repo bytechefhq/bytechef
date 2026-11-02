@@ -14,28 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.security.web.authentication;
-
-import org.springframework.security.core.userdetails.User;
+package com.bytechef.platform.mcp.audit;
 
 /**
  * @author Ivica Cardic
  */
-public class PlatformApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+public final class McpComponentAuditEvents {
 
-    private String secretKey;
+    public static final String MCP_COMPONENT_CREATED = "MCP_COMPONENT_CREATED";
+    public static final String MCP_COMPONENT_DELETED = "MCP_COMPONENT_DELETED";
+    public static final String MCP_COMPONENT_UPDATED = "MCP_COMPONENT_UPDATED";
 
-    public PlatformApiKeyAuthenticationToken(long environment, String secretKey, String tenantId) {
-        super(environment, tenantId);
-
-        this.secretKey = secretKey;
-    }
-
-    public PlatformApiKeyAuthenticationToken(long environment, User user) {
-        super(environment, user);
-    }
-
-    public String getSecretKey() {
-        return secretKey;
+    private McpComponentAuditEvents() {
     }
 }

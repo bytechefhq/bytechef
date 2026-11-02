@@ -36,6 +36,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -126,21 +127,56 @@ class McpProjectAuditIntTest {
 
     @Test
     void testFailedCreateThroughTheShortOverloadRecordsExactlyOneError() {
-        when(projectService.getProject(PROJECT_ID)).thenThrow(new IllegalArgumentException("Project not found"));
+        when(projectService.getProject(PROJECT_ID)).thenThrow(new NoSuchElementException("Project 3 not found"));
 
         assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(MCP_SERVER_ID, PROJECT_ID, 1, List.of("workflow1")))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(NoSuchElementException.class);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent();
 
         assertThat(persistentAuditEvent.getEventType()).isEqualTo(McpProjectAuditEvents.MCP_PROJECT_CREATED);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "ERROR")
-            .containsEntry("errorClass", IllegalArgumentException.class.getName())
+            .containsEntry("errorClass", NoSuchElementException.class.getName())
             .containsEntry("mcpServerId", "2")
             .containsEntry("projectId", "3")
             .containsEntry("projectVersion", "1")
             .doesNotContainKey("mcpProjectId");
+    }
+
+    @Test
+    void testUpdateThroughTheShortOverloadRecordsTheMcpProjectAndItsWorkflowsOnce() {
+        when(mcpProjectService.fetchMcpProject(MCP_PROJECT_ID))
+            .thenReturn(Optional.of(new McpProject(MCP_PROJECT_ID, PROJECT_DEPLOYMENT_ID, MCP_SERVER_ID)));
+
+        mcpProjectFacade.updateMcpProject(MCP_PROJECT_ID, List.of());
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(McpProjectAuditEvents.MCP_PROJECT_UPDATED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("mcpProjectId", "7")
+            .containsEntry("mcpServerId", "2")
+            .containsEntry("workflowIds", "[]")
+            .doesNotContainKey("dataError");
+    }
+
+    @Test
+    void testCloneOfAnUnknownMcpProjectRecordsTheSourceAndTheTargetServer() {
+        when(mcpProjectService.fetchMcpProject(MCP_PROJECT_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> mcpProjectFacade.cloneMcpProject(MCP_PROJECT_ID, MCP_SERVER_ID))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(McpProjectAuditEvents.MCP_PROJECT_CLONED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("sourceMcpProjectId", "7")
+            .containsEntry("mcpServerId", "2")
+            .doesNotContainKeys("mcpProjectId", "dataError");
     }
 
     private PersistentAuditEvent findSingleEvent() {

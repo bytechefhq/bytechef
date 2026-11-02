@@ -16,8 +16,10 @@
 
 package com.bytechef.platform.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
 
@@ -26,9 +28,10 @@ import org.springframework.security.core.userdetails.User;
  */
 public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenticationToken {
 
+    private @Nullable Long apiKeyId;
     private long environmentId;
-    private String tenantId;
-    private User user;
+    private @Nullable String tenantId;
+    private @Nullable User user;
 
     public AbstractApiKeyAuthenticationToken() {
         super(List.of());
@@ -41,10 +44,15 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
         this.tenantId = tenantId;
     }
 
-    @SuppressFBWarnings("EI")
     public AbstractApiKeyAuthenticationToken(long environmentId, User user) {
+        this(environmentId, user, null);
+    }
+
+    @SuppressFBWarnings("EI")
+    public AbstractApiKeyAuthenticationToken(long environmentId, User user, @Nullable Long apiKeyId) {
         super(user.getAuthorities());
 
+        this.apiKeyId = apiKeyId;
         this.environmentId = environmentId;
         this.user = user;
 
@@ -58,12 +66,33 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
     }
 
     @Override
+    public String getName() {
+        if (user == null) {
+            return UnresolvedCredentialAuthenticationToken.PRINCIPAL;
+        }
+
+        return super.getName();
+    }
+
+    @Override
     @SuppressFBWarnings("EI")
-    public Object getPrincipal() {
+    public @Nullable Object getPrincipal() {
         return user;
     }
 
-    public String getTenantId() {
+    public abstract CredentialType getCredentialType();
+
+    public abstract @Nullable PlatformType getPlatformType();
+
+    public @Nullable Long getApiKeyId() {
+        return apiKeyId;
+    }
+
+    public @Nullable Long getConnectedUserId() {
+        return null;
+    }
+
+    public @Nullable String getTenantId() {
         return tenantId;
     }
 

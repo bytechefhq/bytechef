@@ -20,6 +20,7 @@ import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.NoSuchElementException;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
@@ -109,7 +110,8 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
                 new UpdateMcpServerOutput(updated.getId(), updated.getName(), updated.isEnabled()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
-        } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
+        } catch (IllegalArgumentException | NoSuchElementException
+            | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(jsonMapper, UpdateMcpServerToolCallback.class, TOOL_NAME, exception);

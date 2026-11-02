@@ -49,15 +49,10 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
         AutomationApiKeyAuthenticationToken automationApiKeyAuthenticationToken =
             (AutomationApiKeyAuthenticationToken) authentication;
 
-        ApiKey apiKey;
-
-        try {
-            apiKey = apiKeyService.getApiKey(
-                automationApiKeyAuthenticationToken.getSecretKey(),
-                automationApiKeyAuthenticationToken.getEnvironmentId());
-        } catch (IllegalArgumentException e) {
-            throw new BadCredentialsException("Unknown API secret key", e);
-        }
+        ApiKey apiKey = apiKeyService
+            .fetchApiKey(automationApiKeyAuthenticationToken.getSecretKey(),
+                automationApiKeyAuthenticationToken.getEnvironmentId())
+            .orElseThrow(() -> new BadCredentialsException("Unknown API secret key"));
 
         Long userId = apiKey.getUserId();
 
@@ -66,12 +61,11 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
         }
 
         org.springframework.security.core.userdetails.User user = userService.fetchUser(userId)
-            .map(curUser -> createSpringSecurityUser(automationApiKeyAuthenticationToken.getSecretKey(), curUser))
-            .orElseThrow(() -> new UsernameNotFoundException(
-                "User with token " + automationApiKeyAuthenticationToken.getSecretKey()
-                    + " was not found in the database"));
+            .map(this::createSpringSecurityUser)
+            .orElseThrow(() -> new UsernameNotFoundException("User " + userId + " was not found in the database"));
 
-        return new AutomationApiKeyAuthenticationToken(automationApiKeyAuthenticationToken.getEnvironmentId(), user);
+        return new AutomationApiKeyAuthenticationToken(automationApiKeyAuthenticationToken.getEnvironmentId(), user,
+            apiKey.getId());
     }
 
     @Override
@@ -79,9 +73,9 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
         return authentication.equals(AutomationApiKeyAuthenticationToken.class);
     }
 
-    private org.springframework.security.core.userdetails.User createSpringSecurityUser(String secretKey, User user) {
+    private org.springframework.security.core.userdetails.User createSpringSecurityUser(User user) {
         if (!user.isActivated()) {
-            throw new UserNotActivatedException("User " + secretKey + " was not activated");
+            throw new UserNotActivatedException("User " + user.getLogin() + " was not activated");
         }
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()

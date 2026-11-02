@@ -16,8 +16,11 @@
 
 package com.bytechef.automation.ai.a2a.facade;
 
+import com.bytechef.automation.ai.a2a.audit.A2aAuditEvents;
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -108,6 +111,11 @@ public class A2aServerFacadeImpl implements A2aServerFacade {
     }
 
     @Override
+    @Audited(event = A2aAuditEvents.A2A_SERVER_CREATED, data = {
+        @AuditData(key = "a2aServerId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "workspaceId", value = "#workspaceId")
+    })
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'A2A_CREATE')")
     public A2aServer createA2aServer(long workspaceId, A2aServer a2aServer) {
         a2aServer.setWorkspaceId(workspaceId);
@@ -116,12 +124,22 @@ public class A2aServerFacadeImpl implements A2aServerFacade {
     }
 
     @Override
+    @Audited(event = A2aAuditEvents.A2A_SERVER_DELETED, data = {
+        @AuditData(key = "a2aServerId", value = "#id")
+    })
     @PreAuthorize("hasPermission(#id, 'A2aServer', 'A2A_EDIT')")
     public void deleteA2aServer(long id) {
+        a2aServerService.getA2aServer(id);
+
         a2aServerService.delete(id);
     }
 
     @Override
+    @Audited(event = A2aAuditEvents.A2A_SERVER_UPDATED, data = {
+        @AuditData(key = "a2aServerId", value = "#id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "enabled", value = "#result?.enabled")
+    })
     @PreAuthorize("hasPermission(#id, 'A2aServer', 'A2A_EDIT')")
     public A2aServer updateA2aServer(
         long id, @Nullable String name, @Nullable String description, @Nullable Boolean enabled,

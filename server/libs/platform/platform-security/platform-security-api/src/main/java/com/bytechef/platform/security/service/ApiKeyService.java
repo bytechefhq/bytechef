@@ -35,6 +35,8 @@ public interface ApiKeyService {
 
     Optional<ApiKey> fetchApiKey(String secretKey);
 
+    Optional<ApiKey> fetchApiKey(String secretKey, long environmentId);
+
     ApiKey getApiKey(String secretKey);
 
     ApiKey getApiKey(String secretKey, long environmentId);

@@ -47,4 +47,7 @@ dependencies {
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
     testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
+
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
 }

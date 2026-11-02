@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestConfiguration;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.security.web.authentication.CredentialAuthenticationSuccessEvent;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
@@ -61,15 +62,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.authentication.AuthenticationEventPublisher;
-import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
@@ -183,12 +182,13 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token, tenantSecretKey);
 
         assertThat(httpResponse.statusCode()).isEqualTo(200);
-        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class, token))
+        assertThat(authenticationEventRecorder.getEvents(CredentialAuthenticationSuccessEvent.class, token))
             .containsExactly("000002:admin@localhost.com");
+        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class, token)).isEmpty();
     }
 
     @Test
-    void testForgedMcpServerSecretPublishesNoSuccess() throws Exception {
+    void testForgedMcpServerSecretPublishesAFailureAndNoSuccess() throws Exception {
         String forgedMcpServerSecretKey = String.valueOf(TenantKey.of("public"));
         String forgedEndpointUrl = "http://localhost:" + port + "/api/management/" + forgedMcpServerSecretKey + "/mcp";
 
@@ -197,7 +197,9 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token, forgedMcpServerSecretKey);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
-        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class, token)).isEmpty();
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token))
+            .containsExactly("public:admin@localhost.com");
+        assertThat(authenticationEventRecorder.getEvents(CredentialAuthenticationSuccessEvent.class, token)).isEmpty();
     }
 
     @Test
@@ -217,7 +219,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
         assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token)).hasSize(1);
-        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class, token)).isEmpty();
+        assertThat(authenticationEventRecorder.getEvents(CredentialAuthenticationSuccessEvent.class, token)).isEmpty();
     }
 
     @Test
@@ -250,6 +252,8 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
             .firstValue("WWW-Authenticate")
             .orElse("")).startsWith("Bearer error=\"insufficient_scope\"")
                 .contains("scope=\"mcp:management\"");
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token))
+            .containsExactly("public:admin@localhost.com");
     }
 
     @Test
@@ -259,17 +263,8 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
-    }
-
-    @Test
-    void testForgedMcpServerSecretIsRejected() throws Exception {
-        String forgedMcpServerSecretKey = String.valueOf(TenantKey.of("public"));
-        String forgedEndpointUrl = "http://localhost:" + port + "/api/management/" + forgedMcpServerSecretKey + "/mcp";
-
-        HttpResponse<String> httpResponse = postInitialize(
-            signManagementJwt(forgedEndpointUrl), forgedMcpServerSecretKey);
-
-        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token))
+            .containsExactly("public:admin@localhost.com");
     }
 
     @Test
@@ -281,6 +276,8 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         HttpResponse<String> httpResponse = postInitialize(token);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class, token))
+            .containsExactly("public:admin@localhost.com");
     }
 
     @Test
@@ -527,29 +524,30 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     static class AuthenticationEventConfiguration {
 
         @Bean
-        AuthenticationEventPublisher authenticationEventPublisher(
-            ApplicationEventPublisher applicationEventPublisher) {
-
-            return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
-        }
-
-        @Bean
         AuthenticationEventRecorder authenticationEventRecorder() {
             return new AuthenticationEventRecorder();
         }
     }
 
-    static class AuthenticationEventRecorder implements ApplicationListener<AbstractAuthenticationEvent> {
+    static class AuthenticationEventRecorder implements ApplicationListener<ApplicationEvent> {
 
         private final List<RecordedAuthenticationEvent> recordedAuthenticationEvents = new CopyOnWriteArrayList<>();
 
         @Override
-        public void onApplicationEvent(AbstractAuthenticationEvent authenticationEvent) {
-            Authentication authentication = authenticationEvent.getAuthentication();
+        public void onApplicationEvent(ApplicationEvent applicationEvent) {
+            Authentication authentication;
+
+            if (applicationEvent instanceof AbstractAuthenticationEvent abstractAuthenticationEvent) {
+                authentication = abstractAuthenticationEvent.getAuthentication();
+            } else if (applicationEvent instanceof CredentialAuthenticationSuccessEvent credentialEvent) {
+                authentication = credentialEvent.getAuthentication();
+            } else {
+                return;
+            }
 
             recordedAuthenticationEvents.add(
                 new RecordedAuthenticationEvent(
-                    authenticationEvent, getTokenValue(authentication),
+                    applicationEvent, getTokenValue(authentication),
                     TenantContext.getCurrentTenantId() + ":" + authentication.getName()));
         }
 
@@ -557,7 +555,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
             recordedAuthenticationEvents.clear();
         }
 
-        List<String> getEvents(Class<? extends AbstractAuthenticationEvent> eventType, String token) {
+        List<String> getEvents(Class<? extends ApplicationEvent> eventType, String token) {
             return recordedAuthenticationEvents.stream()
                 .filter(recordedAuthenticationEvent -> eventType.isInstance(recordedAuthenticationEvent.event()))
                 .filter(recordedAuthenticationEvent -> token.equals(recordedAuthenticationEvent.token()))
@@ -581,6 +579,6 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     }
 
     private record RecordedAuthenticationEvent(
-        AbstractAuthenticationEvent event, @Nullable String token, String tenantPrincipal) {
+        ApplicationEvent event, @Nullable String token, String tenantPrincipal) {
     }
 }

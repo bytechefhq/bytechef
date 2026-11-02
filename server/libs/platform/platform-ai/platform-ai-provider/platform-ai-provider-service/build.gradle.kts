@@ -12,9 +12,12 @@ dependencies {
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
+    testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))

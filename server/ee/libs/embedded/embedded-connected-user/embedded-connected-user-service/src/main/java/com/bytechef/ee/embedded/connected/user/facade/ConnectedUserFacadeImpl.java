@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionSer
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.connected.user.audit.ConnectedUserAuditEvents;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserDTO;
 import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserImportResultDTO;
@@ -26,6 +27,8 @@ import com.bytechef.ee.embedded.connected.user.facade.ConnectedUserCsvParser.Par
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -96,6 +99,11 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
+    @Audited(event = ConnectedUserAuditEvents.CONNECTED_USER_CREATED, data = {
+        @AuditData(key = "connectedUserId", value = "#result?.id"),
+        @AuditData(key = "externalId", value = "#externalId"),
+        @AuditData(key = "environment", value = "#environment")
+    })
     @PreAuthorize("isTenantAdmin()")
     public ConnectedUserDTO createConnectedUser(
         String externalId, Environment environment, @Nullable String name, @Nullable String email,
@@ -108,6 +116,12 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
+    @Audited(event = ConnectedUserAuditEvents.CONNECTED_USERS_IMPORTED, data = {
+        @AuditData(key = "environment", value = "#environment"),
+        @AuditData(key = "createdCount", value = "#result?.createdCount"),
+        @AuditData(key = "skippedCount", value = "#result?.skippedCount"),
+        @AuditData(key = "rejectedCount", value = "#result?.rejectedCount")
+    })
     @PreAuthorize("isTenantAdmin()")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ConnectedUserImportResultDTO importConnectedUsers(Environment environment, InputStream csvInputStream) {
@@ -167,6 +181,10 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
+    @Audited(event = ConnectedUserAuditEvents.CONNECTED_USER_UPDATED, data = {
+        @AuditData(key = "connectedUserId", value = "#id"),
+        @AuditData(key = "externalId", value = "#result?.externalId")
+    })
     @PreAuthorize("isTenantAdmin()")
     public ConnectedUserDTO updateConnectedUser(
         long id, @Nullable String name, @Nullable String email, @Nullable Map<String, String> metadata, int version) {
@@ -177,6 +195,9 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
+    @Audited(event = ConnectedUserAuditEvents.CONNECTED_USER_DELETED, data = {
+        @AuditData(key = "connectedUserId", value = "#id")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void deleteConnectedUser(long id) {
         Set<Long> connectionIds = new LinkedHashSet<>(connectedUserConnectionService.getConnectionIds(id));
@@ -201,6 +222,10 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
+    @Audited(event = ConnectedUserAuditEvents.CONNECTED_USER_ENABLED_UPDATED, data = {
+        @AuditData(key = "connectedUserId", value = "#id"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void enableConnectedUser(long id, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService

@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.configurer;
 import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
 import com.bytechef.platform.security.web.filter.ApiKeyAuthenticationFilter;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -70,8 +71,11 @@ public class AbstractApiKeyHttpConfigurer
 
     @Override
     public void configure(HttpSecurity http) {
+        AuthenticationEventPublisher authenticationEventPublisher =
+            ApiKeyAuthenticationManagerFactory.createAuthenticationEventPublisher(http);
+
         AuthenticationManager authenticationManager = ApiKeyAuthenticationManagerFactory.create(
-            http, authenticationProvider);
+            authenticationProvider, authenticationEventPublisher);
 
         RequestMatcher requestMatcher;
 
@@ -82,7 +86,7 @@ public class AbstractApiKeyHttpConfigurer
         }
 
         ApiKeyAuthenticationFilter filter = new ApiKeyAuthenticationFilter(
-            requestMatcher, authenticationConverter, authenticationManager);
+            requestMatcher, authenticationConverter, authenticationManager, authenticationEventPublisher);
 
         http.addFilterBefore(filter, BasicAuthenticationFilter.class);
     }

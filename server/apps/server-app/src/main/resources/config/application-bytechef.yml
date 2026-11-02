@@ -103,8 +103,16 @@ bytechef:
     # separately by bytechef.worker.task.*.
     concurrency-limit: 200
   audit:
+    # Minimum interval between two CREDENTIAL_USED events for the same credential (per tenant, credential type,
+    # principal, environment, API key and connected user) on each server instance; zero or a negative value
+    # records every request (EE)
+    credential-usage-interval: 1h
     # Whether principals are masked (e.g. a***@example.com) when audit events are read through the API (EE)
     mask-principals: false
+    # Whether passed permission checks on methods that change something and have no event type of their own are
+    # recorded as PERMISSION_CHECK events with the result ALLOWED; @Audited methods are recorded under their own event
+    # type regardless of this setting, and passed checks on read methods never are (EE)
+    record-allowed-permission-checks: false
     # Cron expression of the audit retention job, evaluated in the JVM default time zone (EE)
     retention-cron: 0 0 2 * * *
     # Number of days audit events are kept; zero or a negative value disables the purge (EE)

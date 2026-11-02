@@ -16,12 +16,18 @@
 
 package com.bytechef.platform.mcp.service;
 
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.audit.McpServerAuditEvents;
+import com.bytechef.platform.mcp.audit.McpServerAuditMapper;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -49,6 +55,12 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Audited(event = McpServerAuditEvents.MCP_SERVER_CREATED, mapper = McpServerAuditMapper.class, data = {
+        @AuditData(key = "mcpServerId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "type", value = "#result?.type"),
+        @AuditData(key = "environment", value = "#result?.environment")
+    })
     public McpServer create(McpServer mcpServer) {
         checkAuthenticationRequiredForEnforcement(mcpServer);
 
@@ -64,7 +76,7 @@ public class McpServerServiceImpl implements McpServerService {
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')")
     public McpServer getMcpServer(long mcpServerId) {
         return mcpServerRepository.findById(mcpServerId)
-            .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
+            .orElseThrow(() -> new NoSuchElementException("MCP server with id " + mcpServerId + " not found"));
     }
 
     @Override
@@ -73,7 +85,7 @@ public class McpServerServiceImpl implements McpServerService {
     public String getMcpServerSecretKey(long mcpServerId) {
         return mcpServerRepository.findById(mcpServerId)
             .map(McpServer::getSecretKey)
-            .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
+            .orElseThrow(() -> new NoSuchElementException("MCP server with id " + mcpServerId + " not found"));
     }
 
     @Override
@@ -83,6 +95,18 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<McpServer> fetchMcpServer(String secretKey) {
+        return mcpServerRepository.findBySecretKey(secretKey);
+    }
+
+    @Override
+    @Audited(event = McpServerAuditEvents.MCP_SERVER_CREATED, mapper = McpServerAuditMapper.class, data = {
+        @AuditData(key = "mcpServerId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "type", value = "#result?.type"),
+        @AuditData(key = "environment", value = "#result?.environment")
+    })
     public McpServer create(String name, PlatformType type, Environment environment, Boolean enabled) {
         McpServer mcpServer;
 
@@ -105,6 +129,11 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Audited(event = McpServerAuditEvents.MCP_SERVER_UPDATED, mapper = McpServerAuditMapper.class, data = {
+        @AuditData(key = "mcpServerId", value = "#mcpServer.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "enabled", value = "#result?.enabled")
+    })
     @PreAuthorize("hasPermission(#mcpServer.id, 'McpServer', 'MCP_EDIT')")
     public McpServer update(McpServer mcpServer) {
         checkAuthenticationRequiredForEnforcement(mcpServer);
@@ -128,10 +157,15 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Audited(event = McpServerAuditEvents.MCP_SERVER_SECRET_KEY_ROTATED, mapper = McpServerAuditMapper.class, data = {
+        @AuditData(key = "mcpServerId", value = "#mcpServerId"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "type", value = "#result?.type")
+    })
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpServer rotateSecretKey(long mcpServerId) {
         McpServer mcpServer = mcpServerRepository.findById(mcpServerId)
-            .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
+            .orElseThrow(() -> new NoSuchElementException("MCP server with id " + mcpServerId + " not found"));
 
         mcpServer.setSecretKey(String.valueOf(TenantKey.of()));
 
@@ -152,12 +186,24 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Audited(event = McpServerAuditEvents.MCP_SERVER_UPDATED, mapper = McpServerAuditMapper.class, data = {
+        @AuditData(key = "mcpServerId", value = "#id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "enabled", value = "#result?.enabled")
+    })
     @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
     public McpServer update(long id, String name, Boolean enabled) {
         return update(id, name, enabled, null, null);
     }
 
     @Override
+    @Audited(event = McpServerAuditEvents.MCP_SERVER_UPDATED, mapper = McpServerAuditMapper.class, data = {
+        @AuditData(key = "mcpServerId", value = "#id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "enabled", value = "#result?.enabled"),
+        @AuditData(key = "authenticationRequired", value = "#authenticationRequired"),
+        @AuditData(key = "enforceToolAuthorization", value = "#enforceToolAuthorization")
+    })
     @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
     public McpServer update(
         long id, String name, Boolean enabled, Boolean enforceToolAuthorization, Boolean authenticationRequired) {

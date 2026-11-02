@@ -162,13 +162,8 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
             throw new BadCredentialsException("Invalid MCP server secret key");
         }
 
-        McpServer mcpServer;
-
-        try {
-            mcpServer = mcpServerService.getMcpServer(mcpServerSecretKey);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            throw new BadCredentialsException("Invalid MCP server secret key", illegalArgumentException);
-        }
+        McpServer mcpServer = mcpServerService.fetchMcpServer(mcpServerSecretKey)
+            .orElseThrow(() -> new BadCredentialsException("Invalid MCP server secret key"));
 
         if (mcpServer.getType() != PlatformType.AUTOMATION) {
             throw new BadCredentialsException("Invalid MCP server secret key");

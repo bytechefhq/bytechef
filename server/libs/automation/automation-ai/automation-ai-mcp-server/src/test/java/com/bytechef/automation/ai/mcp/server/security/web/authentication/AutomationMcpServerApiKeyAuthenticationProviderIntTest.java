@@ -203,6 +203,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderIntTest {
         when(mcpServer.isAuthenticationRequired()).thenReturn(false);
         when(mcpServer.isEnabled()).thenReturn(true);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+        when(mcpServerService.fetchMcpServer("server-secret")).thenReturn(Optional.of(mcpServer));
 
         assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
             () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(
@@ -227,6 +228,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderIntTest {
         when(mcpServer.isAuthenticationRequired()).thenReturn(false);
         when(mcpServer.isEnabled()).thenReturn(true);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+        when(mcpServerService.fetchMcpServer("server-secret")).thenReturn(Optional.of(mcpServer));
 
         Authentication authentication = automationMcpServerApiKeyAuthenticationProvider.authenticate(
             getUnauthenticatedToken());
@@ -294,6 +296,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderIntTest {
         when(mcpServer.isAuthenticationRequired()).thenReturn(false);
         when(mcpServer.isEnabled()).thenReturn(false);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+        when(mcpServerService.fetchMcpServer("server-secret")).thenReturn(Optional.of(mcpServer));
 
         assertThatExceptionOfType(McpServerDisabledException.class).isThrownBy(
             () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
@@ -321,6 +324,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderIntTest {
         when(mcpServer.isAuthenticationRequired()).thenReturn(false);
         when(mcpServer.isEnabled()).thenReturn(true);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+        when(mcpServerService.fetchMcpServer("server-secret")).thenReturn(Optional.of(mcpServer));
 
         assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
             () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
@@ -341,6 +345,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderIntTest {
         mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
 
         when(mcpServerService.getMcpServer("server-secret")).thenThrow(new IllegalStateException("database down"));
+        when(mcpServerService.fetchMcpServer("server-secret")).thenThrow(new IllegalStateException("database down"));
 
         ApiKeyAuthenticationToken unauthenticatedToken = getUnauthenticatedToken();
 
@@ -408,6 +413,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderIntTest {
         when(mcpServer.isAuthenticationRequired()).thenReturn(true);
         when(mcpServer.isEnabled()).thenReturn(true);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+        when(mcpServerService.fetchMcpServer("server-secret")).thenReturn(Optional.of(mcpServer));
         when(workspaceApiKeyService.fetchApiKeyWorkspaceId(apiKeyId)).thenReturn(Optional.of(1L));
         when(workspaceMcpServerService.fetchMcpServerWorkspaceId(9L)).thenReturn(Optional.of(1L));
         when(permissionService.getMyWorkspaceRole(1L)).thenAnswer(invocation -> SecurityUtils.fetchCurrentUserLogin()

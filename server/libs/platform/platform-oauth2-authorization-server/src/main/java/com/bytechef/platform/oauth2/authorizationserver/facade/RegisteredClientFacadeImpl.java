@@ -16,7 +16,11 @@
 
 package com.bytechef.platform.oauth2.authorizationserver.facade;
 
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.oauth2.authorizationserver.annotation.ConditionalOnOauth2AuthorizationServerEnabled;
+import com.bytechef.platform.oauth2.authorizationserver.audit.OAuth2ClientAuditEvents;
+import com.bytechef.platform.oauth2.authorizationserver.audit.OAuth2ClientAuditMapper;
 import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2AuthorizationGrant;
 import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2ConsentClient;
 import com.bytechef.platform.oauth2.authorizationserver.domain.RegisteredClientInfo;
@@ -48,9 +52,13 @@ public class RegisteredClientFacadeImpl implements RegisteredClientFacade {
     }
 
     @Override
+    @Audited(
+        event = OAuth2ClientAuditEvents.OAUTH2_CLIENT_DELETED, mapper = OAuth2ClientAuditMapper.class, data = {
+            @AuditData(key = "registeredClientId", value = "#id")
+        })
     @PreAuthorize("isTenantAdmin()")
-    public void deleteRegisteredClient(String id) {
-        registeredClientService.deleteRegisteredClient(id);
+    public boolean deleteRegisteredClient(String id) {
+        return registeredClientService.deleteRegisteredClient(id);
     }
 
     @Override
@@ -72,12 +80,19 @@ public class RegisteredClientFacadeImpl implements RegisteredClientFacade {
     }
 
     @Override
+    @Audited(event = OAuth2ClientAuditEvents.OAUTH2_CLIENT_GRANT_REVOKED, data = {
+        @AuditData(key = "registeredClientId", value = "#registeredClientId"),
+        @AuditData(key = "principalName", value = "#principalName")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void revokeRegisteredClientGrant(String registeredClientId, String principalName) {
         oAuth2AuthorizationGrantService.revokeGrant(registeredClientId, principalName);
     }
 
     @Override
+    @Audited(event = OAuth2ClientAuditEvents.OAUTH2_CLIENT_ALL_GRANTS_REVOKED, data = {
+        @AuditData(key = "registeredClientId", value = "#registeredClientId")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void revokeRegisteredClientGrants(String registeredClientId) {
         oAuth2AuthorizationGrantService.revokeGrants(registeredClientId);

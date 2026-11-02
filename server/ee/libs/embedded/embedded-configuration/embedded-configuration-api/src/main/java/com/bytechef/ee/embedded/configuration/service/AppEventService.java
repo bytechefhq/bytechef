@@ -19,7 +19,7 @@ public interface AppEventService {
 
     AppEvent create(AppEvent appEvent);
 
-    void delete(long id);
+    boolean delete(long id);
 
     AppEvent getAppEvent(long id);
 

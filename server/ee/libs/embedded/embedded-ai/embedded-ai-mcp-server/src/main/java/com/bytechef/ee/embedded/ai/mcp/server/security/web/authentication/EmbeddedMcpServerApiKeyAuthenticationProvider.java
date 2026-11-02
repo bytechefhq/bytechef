@@ -117,13 +117,8 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
             throw new BadCredentialsException("Invalid MCP server secret key");
         }
 
-        McpServer mcpServer;
-
-        try {
-            mcpServer = mcpServerService.getMcpServer(mcpServerSecretKey);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            throw new BadCredentialsException("Invalid MCP server secret key", illegalArgumentException);
-        }
+        McpServer mcpServer = mcpServerService.fetchMcpServer(mcpServerSecretKey)
+            .orElseThrow(() -> new BadCredentialsException("Invalid MCP server secret key"));
 
         if (mcpServer.getType() != PlatformType.EMBEDDED) {
             throw new BadCredentialsException("Invalid MCP server secret key");

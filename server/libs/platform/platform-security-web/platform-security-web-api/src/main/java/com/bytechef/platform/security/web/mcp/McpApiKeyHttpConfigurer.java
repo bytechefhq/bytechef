@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -77,10 +78,14 @@ public class McpApiKeyHttpConfigurer extends AbstractHttpConfigurer<McpApiKeyHtt
 
     @Override
     public void configure(HttpSecurity http) {
+        AuthenticationEventPublisher authenticationEventPublisher =
+            ApiKeyAuthenticationManagerFactory.createAuthenticationEventPublisher(http);
+
         TenantAwareApiKeyAuthenticationFilter tenantAwareApiKeyAuthenticationFilter =
             new TenantAwareApiKeyAuthenticationFilter(
                 RegexRequestMatcher.regexMatcher(pathPatternRegex), mcpServerSecretPattern, tenantlessPath,
-                ApiKeyAuthenticationManagerFactory.create(http, authenticationProvider), authenticationConverter);
+                ApiKeyAuthenticationManagerFactory.create(authenticationProvider, authenticationEventPublisher),
+                authenticationConverter, authenticationEventPublisher);
 
         http.addFilterBefore(tenantAwareApiKeyAuthenticationFilter, BasicAuthenticationFilter.class);
 

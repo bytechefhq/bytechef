@@ -23,6 +23,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,7 +100,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
     @Transactional(readOnly = true)
     public SigningKey getSigningKey(long id) {
         return signingKeyRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Signing key not found for id: " + id));
+            .orElseThrow(() -> new NoSuchElementException("Signing key not found for id: " + id));
     }
 
     @Override

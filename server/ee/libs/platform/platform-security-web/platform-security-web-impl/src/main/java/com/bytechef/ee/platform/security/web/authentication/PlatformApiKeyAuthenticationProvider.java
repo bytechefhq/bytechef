@@ -49,13 +49,8 @@ public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvi
         PlatformApiKeyAuthenticationToken platformApiKeyAuthenticationToken =
             (PlatformApiKeyAuthenticationToken) authentication;
 
-        ApiKey apiKey;
-
-        try {
-            apiKey = apiKeyService.getApiKey(platformApiKeyAuthenticationToken.getSecretKey());
-        } catch (IllegalArgumentException e) {
-            throw new BadCredentialsException("Unknown API secret key", e);
-        }
+        ApiKey apiKey = apiKeyService.fetchApiKey(platformApiKeyAuthenticationToken.getSecretKey())
+            .orElseThrow(() -> new BadCredentialsException("Unknown API secret key"));
 
         if (apiKey.getType() != null) {
             throw new BadCredentialsException("Admin API key required");
@@ -68,12 +63,11 @@ public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvi
         }
 
         org.springframework.security.core.userdetails.User user = userService.fetchUser(userId)
-            .map(curUser -> createSpringSecurityUser(platformApiKeyAuthenticationToken.getSecretKey(), curUser))
-            .orElseThrow(() -> new UsernameNotFoundException(
-                "User with token " + platformApiKeyAuthenticationToken.getSecretKey()
-                    + " was not found in the database"));
+            .map(this::createSpringSecurityUser)
+            .orElseThrow(() -> new UsernameNotFoundException("User " + userId + " was not found in the database"));
 
-        return new PlatformApiKeyAuthenticationToken(platformApiKeyAuthenticationToken.getEnvironmentId(), user);
+        return new PlatformApiKeyAuthenticationToken(platformApiKeyAuthenticationToken.getEnvironmentId(), user,
+            apiKey.getId());
     }
 
     @Override
@@ -81,9 +75,9 @@ public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvi
         return authentication.equals(PlatformApiKeyAuthenticationToken.class);
     }
 
-    private org.springframework.security.core.userdetails.User createSpringSecurityUser(String secretKey, User user) {
+    private org.springframework.security.core.userdetails.User createSpringSecurityUser(User user) {
         if (!user.isActivated()) {
-            throw new UserNotActivatedException("User " + secretKey + " was not activated");
+            throw new UserNotActivatedException("User " + user.getLogin() + " was not activated");
         }
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()

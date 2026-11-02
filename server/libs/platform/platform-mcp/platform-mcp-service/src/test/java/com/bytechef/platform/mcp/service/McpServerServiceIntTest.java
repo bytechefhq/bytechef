@@ -38,6 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
@@ -330,7 +331,7 @@ class McpServerServiceIntTest {
     @Test
     void testRotateSecretKeyRejectsUnknownServer() {
         assertThatThrownBy(() -> mcpServerService.rotateSecretKey(Long.MAX_VALUE))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(NoSuchElementException.class);
 
         assertThat(mcpServerRepository.count()).isZero();
     }
