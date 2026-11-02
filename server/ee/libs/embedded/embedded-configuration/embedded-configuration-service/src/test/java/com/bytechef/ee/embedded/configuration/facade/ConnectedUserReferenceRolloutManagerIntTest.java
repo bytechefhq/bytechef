@@ -208,6 +208,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private AutomationWorkflowProjectConfigurationAdminFacade automationWorkflowProjectConfigurationAdminFacade;
 
     @Autowired
+    private AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
+
+    @Autowired
     private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
 
     @Autowired
@@ -307,6 +310,49 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         when(embeddedPermissionEvaluator.evaluate(any(), any()))
             .thenReturn(true);
+    }
+
+    @Test
+    void testUpdatingOneConfigurationLeavesUsersOnAnotherUntouched() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Two Configurations");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration configurationA = automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "A", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration configurationB = automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "B", null, 1, true, true);
+
+        String firstExternalUserId = createConnectedUser();
+        String secondExternalUserId = createConnectedUser();
+
+        automationWorkflowProjectConfigurationResolver.assign(
+            connectedUserService.getConnectedUser(firstExternalUserId, Environment.PRODUCTION),
+            automationWorkflowProjectId, configurationA.getId());
+        automationWorkflowProjectConfigurationResolver.assign(
+            connectedUserService.getConnectedUser(secondExternalUserId, Environment.PRODUCTION),
+            automationWorkflowProjectId, configurationB.getId());
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow firstReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            firstExternalUserId, workflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            secondExternalUserId, workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        automationWorkflowProjectConfigurationService.update(
+            configurationA.getId(), configurationA.getName(), configurationA.getPermissionExpression(), 2, true, true);
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(projectDeploymentService.getProjectDeployment(firstReference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
+        assertThat(projectDeploymentService.getProjectDeployment(secondReference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
     }
 
     @Test

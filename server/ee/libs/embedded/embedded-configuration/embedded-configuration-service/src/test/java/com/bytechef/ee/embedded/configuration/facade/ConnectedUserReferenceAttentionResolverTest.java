@@ -14,9 +14,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
-import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +32,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class ConnectedUserReferenceAttentionResolverTest {
+
+    private static final long CONNECTED_USER_ID = 20L;
 
     @Mock
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
@@ -73,9 +73,8 @@ class ConnectedUserReferenceAttentionResolverTest {
             .thenReturn(Optional.of(row));
         stubAdministrativelyEnabled(true);
 
-        when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION))
-            .thenThrow(new ConfigurationException("not released",
-                ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED));
+        when(connectedUserReferenceDeploymentManager.fetchReleasedVersion(CONNECTED_USER_ID, 500L))
+            .thenReturn(Optional.empty());
 
         ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
 
@@ -96,7 +95,8 @@ class ConnectedUserReferenceAttentionResolverTest {
 
         stubAdministrativelyEnabled(true);
 
-        when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION)).thenReturn(2);
+        when(connectedUserReferenceDeploymentManager.fetchReleasedVersion(CONNECTED_USER_ID, 500L))
+            .thenReturn(Optional.of(2));
 
         ReferenceState referenceState = resolver.resolve(newReference());
 
@@ -109,7 +109,8 @@ class ConnectedUserReferenceAttentionResolverTest {
         stubReference(2);
         stubAdministrativelyEnabled(true);
 
-        when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION)).thenReturn(1);
+        when(connectedUserReferenceDeploymentManager.fetchReleasedVersion(CONNECTED_USER_ID, 500L))
+            .thenReturn(Optional.of(1));
 
         ReferenceState referenceState = resolver.resolve(newReference());
 
@@ -121,7 +122,8 @@ class ConnectedUserReferenceAttentionResolverTest {
         stubReference(1);
         stubAdministrativelyEnabled(true);
 
-        when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION)).thenReturn(1);
+        when(connectedUserReferenceDeploymentManager.fetchReleasedVersion(CONNECTED_USER_ID, 500L))
+            .thenReturn(Optional.of(1));
 
         ReferenceState referenceState = resolver.resolve(newReference());
 
@@ -144,8 +146,8 @@ class ConnectedUserReferenceAttentionResolverTest {
         stubReference(1);
         stubAdministrativelyEnabled(false);
 
-        lenient().when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION))
-            .thenReturn(2);
+        lenient().when(connectedUserReferenceDeploymentManager.fetchReleasedVersion(CONNECTED_USER_ID, 500L))
+            .thenReturn(Optional.of(2));
 
         ReferenceState referenceState = resolver.resolve(newReference());
 
@@ -154,8 +156,10 @@ class ConnectedUserReferenceAttentionResolverTest {
     }
 
     private void stubAdministrativelyEnabled(boolean administrativelyEnabled) {
+        when(connectedUserReferenceDeploymentManager.fetchConnectedUserId(900L))
+            .thenReturn(Optional.of(CONNECTED_USER_ID));
         when(connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-            500L, Environment.PRODUCTION, "automation-workflow-uuid")).thenReturn(administrativelyEnabled);
+            CONNECTED_USER_ID, 500L, "automation-workflow-uuid")).thenReturn(administrativelyEnabled);
     }
 
     private ProjectDeployment stubReference(int projectVersion) {

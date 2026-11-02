@@ -49,6 +49,12 @@ public class ConnectedUserReferenceDeploymentServiceImpl implements ConnectedUse
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ConnectedUserReferenceDeployment> fetchByProjectDeploymentId(long projectDeploymentId) {
+        return connectedUserReferenceDeploymentRepository.findByProjectDeploymentId(projectDeploymentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ConnectedUserReferenceDeployment> getConnectedUserReferenceDeployments(long connectedUserId) {
         return connectedUserReferenceDeploymentRepository.findAllByConnectedUserId(connectedUserId);
     }

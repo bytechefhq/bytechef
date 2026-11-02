@@ -11,7 +11,6 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -102,13 +101,23 @@ class ConnectedUserReferenceAttentionResolver {
         ProjectDeployment projectDeployment, String automationWorkflowUuid, Optional<String> workflowId,
         Optional<ProjectDeploymentWorkflow> row) {
 
+        Optional<Long> connectedUserIdOptional = connectedUserReferenceDeploymentManager.fetchConnectedUserId(
+            projectDeployment.getId());
+
+        if (connectedUserIdOptional.isEmpty()) {
+            return null;
+        }
+
+        long connectedUserId = connectedUserIdOptional.get();
+
         if (!connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid)) {
+            connectedUserId, projectDeployment.getProjectId(), automationWorkflowUuid)) {
 
             return TURNED_OFF_BY_ADMINISTRATOR;
         }
 
-        Optional<Integer> releasedVersion = fetchReleasedVersion(projectDeployment);
+        Optional<Integer> releasedVersion = connectedUserReferenceDeploymentManager.fetchReleasedVersion(
+            connectedUserId, projectDeployment.getProjectId());
 
         if (releasedVersion.isPresent() && projectDeployment.getProjectVersion() != releasedVersion.get()) {
             return UPDATE_PENDING;
@@ -141,16 +150,6 @@ class ConnectedUserReferenceAttentionResolver {
         }
 
         return connectedUserWorkflowValidator.getAttentionReason(workflowId.get(), projectDeployment.getEnvironment());
-    }
-
-    private Optional<Integer> fetchReleasedVersion(ProjectDeployment projectDeployment) {
-        try {
-            return Optional.of(
-                connectedUserReferenceDeploymentManager.getReleasedVersion(
-                    projectDeployment.getProjectId(), projectDeployment.getEnvironment()));
-        } catch (ConfigurationException configurationException) {
-            return Optional.empty();
-        }
     }
 
     @SuppressFBWarnings("EI")

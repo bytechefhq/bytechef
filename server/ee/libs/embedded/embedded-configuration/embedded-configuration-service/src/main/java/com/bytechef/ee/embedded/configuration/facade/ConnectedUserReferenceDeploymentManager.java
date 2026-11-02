@@ -55,6 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SkipAutomationAuthorization
 class ConnectedUserReferenceDeploymentManager {
 
+    private final AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserService connectedUserService;
@@ -68,6 +69,7 @@ class ConnectedUserReferenceDeploymentManager {
 
     @SuppressFBWarnings("EI")
     public ConnectedUserReferenceDeploymentManager(
+        AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
         ConnectedUserService connectedUserService,
@@ -77,6 +79,7 @@ class ConnectedUserReferenceDeploymentManager {
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
+        this.automationWorkflowProjectConfigurationResolver = automationWorkflowProjectConfigurationResolver;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.connectedUserService = connectedUserService;
@@ -125,21 +128,28 @@ class ConnectedUserReferenceDeploymentManager {
             .orElse(Map.of());
     }
 
-    public Optional<Integer> fetchReleasedVersion(long automationWorkflowProjectId, Environment environment) {
-        return automationWorkflowProjectConfigurationService
-            .getConfigurations(automationWorkflowProjectId, environment.ordinal())
-            .stream()
-            .findFirst()
+    /**
+     * Returns the connected user who owns the reference deployment, or empty when the deployment is not a reference
+     * deployment.
+     */
+    public Optional<Long> fetchConnectedUserId(long projectDeploymentId) {
+        return connectedUserReferenceDeploymentService.fetchByProjectDeploymentId(projectDeploymentId)
+            .map(ConnectedUserReferenceDeployment::getConnectedUserId);
+    }
+
+    /**
+     * Returns the project version of the configuration the connected user runs the project under, or empty when that
+     * configuration is missing or disabled.
+     */
+    public Optional<Integer> fetchReleasedVersion(long connectedUserId, long automationWorkflowProjectId) {
+        return resolveConfiguration(connectedUserId, automationWorkflowProjectId)
             .filter(AutomationWorkflowProjectConfiguration::isEnabled)
             .map(AutomationWorkflowProjectConfiguration::getProjectVersion);
     }
 
-    public int getReleasedVersion(long automationWorkflowProjectId, Environment environment) {
-        return fetchReleasedVersion(automationWorkflowProjectId, environment)
-            .orElseThrow(() -> new ConfigurationException(
-                "Automation workflow project id=%s is not released in the %s environment".formatted(
-                    automationWorkflowProjectId, environment),
-                ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED));
+    public int getReleasedVersion(long connectedUserId, long automationWorkflowProjectId) {
+        return fetchReleasedVersion(connectedUserId, automationWorkflowProjectId)
+            .orElseThrow(() -> newNotReleasedException(connectedUserId, automationWorkflowProjectId));
     }
 
     @Transactional
@@ -154,13 +164,10 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     public boolean isAdministrativelyEnabled(
-        long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
+        long connectedUserId, long automationWorkflowProjectId, String automationWorkflowUuid) {
 
-        Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
-            automationWorkflowProjectConfigurationService.getConfigurations(
-                automationWorkflowProjectId, environment.ordinal())
-                .stream()
-                .findFirst();
+        Optional<AutomationWorkflowProjectConfiguration> configurationOptional = resolveConfiguration(
+            connectedUserId, automationWorkflowProjectId);
 
         if (configurationOptional.isEmpty()) {
             return false;
@@ -317,9 +324,9 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     public ProvidedNames getProvidedNames(
-        long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
+        long connectedUserId, long automationWorkflowProjectId, String automationWorkflowUuid) {
 
-        return toProvidedNames(getProvidedValues(automationWorkflowProjectId, environment, automationWorkflowUuid));
+        return toProvidedNames(getProvidedValues(connectedUserId, automationWorkflowProjectId, automationWorkflowUuid));
     }
 
     public ProvidedNames getProvidedNames(
@@ -329,15 +336,20 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     public void checkProvidedValuesNotRequested(
-        long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid,
+        long connectedUserId, long automationWorkflowProjectId, String automationWorkflowUuid,
         Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> userInputs) {
 
         if (requestedConnectionIds.isEmpty() && (userInputs == null || userInputs.isEmpty())) {
             return;
         }
 
-        ProvidedNames providedNames = getProvidedNames(
-            automationWorkflowProjectId, environment, automationWorkflowUuid);
+        checkProvidedValuesNotRequested(
+            toProvidedNames(getProvidedValues(connectedUserId, automationWorkflowProjectId, automationWorkflowUuid)),
+            requestedConnectionIds, userInputs);
+    }
+
+    private static void checkProvidedValuesNotRequested(
+        ProvidedNames providedNames, Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> userInputs) {
 
         Set<String> providedComponentNames = providedNames.componentNames();
 
@@ -361,12 +373,12 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     public ReferenceResolution resolveReference(
-        long connectedUserId, long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid,
-        String workflowId, boolean enable, Map<String, Long> requestedConnectionIds,
+        long connectedUserId, long automationWorkflowProjectId, String automationWorkflowUuid, String workflowId,
+        boolean enable, Map<String, Long> requestedConnectionIds,
         List<ProjectDeploymentWorkflowConnection> currentConnections, Map<String, ?> userInputs) {
 
         ProvidedValues providedValues = getProvidedValues(
-            automationWorkflowProjectId, environment, automationWorkflowUuid);
+            connectedUserId, automationWorkflowProjectId, automationWorkflowUuid);
 
         ResolvedWorkflowConnections resolved = connectedUserWorkflowConnectionResolver.resolve(
             workflowId, connectedUserId, requestedConnectionIds, currentConnections, providedValues.connectionIds());
@@ -394,12 +406,13 @@ class ConnectedUserReferenceDeploymentManager {
                 "Automation workflow %s is not deployed in deployment id=%s".formatted(
                     automationWorkflowUuid, projectDeploymentId)));
 
-        checkProvidedValuesNotRequested(
-            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid, Map.of(),
-            userInputs);
+        ProvidedValues providedValues = fetchConnectedUserId(projectDeploymentId)
+            .map(connectedUserId -> getProvidedValues(
+                connectedUserId, projectDeployment.getProjectId(), automationWorkflowUuid))
+            .orElse(ProvidedValues.NONE);
 
-        ProvidedValues providedValues = getProvidedValues(
-            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
+        checkProvidedValuesNotRequested(toProvidedNames(providedValues), Map.of(), userInputs);
+
         Workflow workflow = workflowService.getWorkflow(row.getWorkflowId());
 
         Map<String, Object> inputs = mergeInputs(workflow, userInputs, providedValues.inputs());
@@ -427,7 +440,11 @@ class ConnectedUserReferenceDeploymentManager {
         projectDeployment.setEnvironment(environment);
         projectDeployment.setName(connectedUser.getExternalId());
         projectDeployment.setProjectId(automationWorkflowProjectId);
-        projectDeployment.setProjectVersion(getReleasedVersion(automationWorkflowProjectId, environment));
+        projectDeployment.setProjectVersion(
+            automationWorkflowProjectConfigurationResolver.resolveAndAssign(connectedUser, automationWorkflowProjectId)
+                .filter(AutomationWorkflowProjectConfiguration::isEnabled)
+                .map(AutomationWorkflowProjectConfiguration::getProjectVersion)
+                .orElseThrow(() -> newNotReleasedException(connectedUser.getId(), automationWorkflowProjectId)));
 
         long projectDeploymentId = projectDeploymentFacade.createProjectDeployment(
             projectDeployment, List.of(), List.of());
@@ -463,14 +480,26 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     private ProvidedValues getProvidedValues(
-        long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
+        long connectedUserId, long automationWorkflowProjectId, String automationWorkflowUuid) {
 
-        return automationWorkflowProjectConfigurationService
-            .getConfigurations(automationWorkflowProjectId, environment.ordinal())
-            .stream()
-            .findFirst()
+        return resolveConfiguration(connectedUserId, automationWorkflowProjectId)
             .map(configuration -> getProvidedValues(configuration, automationWorkflowUuid))
             .orElse(ProvidedValues.NONE);
+    }
+
+    private ConfigurationException newNotReleasedException(long connectedUserId, long automationWorkflowProjectId) {
+        return new ConfigurationException(
+            "Automation workflow project id=%s is not released to connected user id=%s".formatted(
+                automationWorkflowProjectId, connectedUserId),
+            ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED);
+    }
+
+    private Optional<AutomationWorkflowProjectConfiguration> resolveConfiguration(
+        long connectedUserId, long automationWorkflowProjectId) {
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        return automationWorkflowProjectConfigurationResolver.resolve(connectedUser, automationWorkflowProjectId);
     }
 
     private static ProvidedValues getProvidedValues(

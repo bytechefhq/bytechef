@@ -26,6 +26,8 @@ public interface ConnectedUserReferenceDeploymentService {
     Optional<ConnectedUserReferenceDeployment> fetchConnectedUserReferenceDeployment(
         long connectedUserId, long projectId);
 
+    Optional<ConnectedUserReferenceDeployment> fetchByProjectDeploymentId(long projectDeploymentId);
+
     List<ConnectedUserReferenceDeployment> getConnectedUserReferenceDeployments(long connectedUserId);
 
     boolean isReferenceDeployment(long projectDeploymentId);
