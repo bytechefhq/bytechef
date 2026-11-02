@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.task.domain.ApprovalTask;
@@ -28,34 +27,22 @@ import com.bytechef.automation.task.domain.ApprovalTask.Priority;
 import com.bytechef.automation.task.domain.ApprovalTask.Status;
 import com.bytechef.automation.task.domain.ApprovalTaskStatusException;
 import com.bytechef.automation.task.domain.PendingApproval;
-import com.bytechef.automation.task.facade.ApprovalTaskApiFacadeImpl;
 import com.bytechef.automation.task.facade.ApprovalTaskFacade;
-import com.bytechef.automation.task.service.ApprovalTaskService;
-import com.bytechef.automation.task.web.graphql.config.ApprovalTaskGraphQlMethodSecurityTestConfiguration;
-import com.bytechef.automation.task.web.graphql.config.ApprovalTaskGraphQlMethodSecurityTestConfiguration.TenantAdminCheck;
 import java.time.Instant;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = {
-    ApprovalTaskApiFacadeImpl.class, ApprovalTaskGraphQlController.class,
-    ApprovalTaskGraphQlMethodSecurityTestConfiguration.class
-})
+@ContextConfiguration(classes = ApprovalTaskGraphQlController.class)
 @GraphQlTest(
     controllers = ApprovalTaskGraphQlController.class,
     properties = {
@@ -77,44 +64,11 @@ class ApprovalTaskGraphQlControllerIntTest {
     @MockitoBean
     private ApprovalTaskFacade approvalTaskFacade;
 
-    @MockitoBean
-    private ApprovalTaskService approvalTaskService;
-
     @Autowired
     private GraphQlTester graphQlTester;
 
-    @Autowired
-    private TenantAdminCheck tenantAdminCheck;
-
-    @BeforeEach
-    void setAuthentication() {
-        SecurityContextHolder.getContext()
-            .setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                    "user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
-    }
-
-    @AfterEach
-    void clearAuthentication() {
-        SecurityContextHolder.clearContext();
-    }
-
     @Test
-    void testPendingApprovalsAreDeniedToANonAdmin() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(false);
-
-        graphQlTester.document(PENDING_APPROVALS_QUERY)
-            .execute()
-            .errors()
-            .satisfy(errors -> assertThat(errors).singleElement()
-                .satisfies(error -> assertThat(error.getErrorType()).isEqualTo(ErrorType.FORBIDDEN)));
-
-        verify(approvalTaskFacade, never()).getPendingApprovals(any());
-    }
-
-    @Test
-    void testPendingApprovalsAreListedForAnAdmin() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
+    void testPendingApprovalsAreListed() {
         when(approvalTaskFacade.getPendingApprovals(null)).thenReturn(
             List.of(
                 new PendingApproval(
@@ -129,7 +83,6 @@ class ApprovalTaskGraphQlControllerIntTest {
 
     @Test
     void testPendingApprovalsPassTheEnvironmentFilter() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
         when(approvalTaskFacade.getPendingApprovals(2)).thenReturn(List.of());
 
         graphQlTester.document(PENDING_APPROVALS_QUERY)
@@ -143,56 +96,24 @@ class ApprovalTaskGraphQlControllerIntTest {
     }
 
     @Test
-    void testApprovalTaskMutationsAreDeniedToANonAdmin() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(false);
+    void testCreateApprovalTaskCreatesAManualApprovalTask() {
+        when(approvalTaskFacade.createManualApprovalTask(any(ApprovalTask.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertForbidden("mutation { deleteApprovalTask(id: \"1\") }");
+        graphQlTester.document("mutation { createApprovalTask(approvalTask: {name: \"Review\"}) { name } }")
+            .execute()
+            .path("createApprovalTask.name")
+            .entity(String.class)
+            .isEqualTo("Review");
 
-        verify(approvalTaskService, never()).delete(1L);
-    }
-
-    @Test
-    void testCreateApprovalTaskIsDeniedToANonAdmin() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(false);
-
-        assertForbidden("mutation { createApprovalTask(approvalTask: {name: \"Review\"}) { id } }");
-
-        verifyNoInteractions(approvalTaskService);
-    }
-
-    @Test
-    void testUpdateApprovalTaskIsDeniedToANonAdmin() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(false);
-
-        assertForbidden("mutation { updateApprovalTask(approvalTask: {id: \"1\", name: \"Review\"}) { id } }");
-
-        verifyNoInteractions(approvalTaskService);
-    }
-
-    @Test
-    void testApprovalTaskIsDeniedToANonAdmin() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(false);
-
-        assertForbidden("query { approvalTask(id: \"1\") { id } }");
-
-        verifyNoInteractions(approvalTaskService);
-    }
-
-    @Test
-    void testApprovalTasksAreDeniedToANonAdmin() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(false);
-
-        assertForbidden("query { approvalTasks { id } }");
-
-        verifyNoInteractions(approvalTaskService);
+        verify(approvalTaskFacade, never()).createApprovalTask(any());
     }
 
     @Test
     void testUpdateApprovalTaskKeepsOmittedFields() {
         Instant dueDate = Instant.parse("2026-12-01T10:00:00Z");
 
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
-        when(approvalTaskService.getApprovalTask(1L)).thenReturn(
+        when(approvalTaskFacade.getApprovalTask(1L)).thenReturn(
             ApprovalTask.builder()
                 .id(1L)
                 .name("Review")
@@ -203,7 +124,7 @@ class ApprovalTaskGraphQlControllerIntTest {
                 .dueDate(dueDate)
                 .version(3)
                 .build());
-        when(approvalTaskService.update(any(ApprovalTask.class)))
+        when(approvalTaskFacade.updateApprovalTask(any(ApprovalTask.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
         graphQlTester.document("mutation { updateApprovalTask(approvalTask: {id: \"1\", name: \"Renamed\"}) { id } }")
@@ -214,7 +135,7 @@ class ApprovalTaskGraphQlControllerIntTest {
 
         ArgumentCaptor<ApprovalTask> approvalTaskArgumentCaptor = ArgumentCaptor.forClass(ApprovalTask.class);
 
-        verify(approvalTaskService).update(approvalTaskArgumentCaptor.capture());
+        verify(approvalTaskFacade).updateApprovalTask(approvalTaskArgumentCaptor.capture());
 
         ApprovalTask updatedApprovalTask = approvalTaskArgumentCaptor.getValue();
 
@@ -229,14 +150,13 @@ class ApprovalTaskGraphQlControllerIntTest {
 
     @Test
     void testUpdateApprovalTaskClearsAnExplicitlyNullDueDate() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
-        when(approvalTaskService.getApprovalTask(1L)).thenReturn(
+        when(approvalTaskFacade.getApprovalTask(1L)).thenReturn(
             ApprovalTask.builder()
                 .id(1L)
                 .name("Review")
                 .dueDate(Instant.parse("2026-12-01T10:00:00Z"))
                 .build());
-        when(approvalTaskService.update(any(ApprovalTask.class)))
+        when(approvalTaskFacade.updateApprovalTask(any(ApprovalTask.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
         graphQlTester.document(
@@ -248,7 +168,7 @@ class ApprovalTaskGraphQlControllerIntTest {
 
         ArgumentCaptor<ApprovalTask> approvalTaskArgumentCaptor = ArgumentCaptor.forClass(ApprovalTask.class);
 
-        verify(approvalTaskService).update(approvalTaskArgumentCaptor.capture());
+        verify(approvalTaskFacade).updateApprovalTask(approvalTaskArgumentCaptor.capture());
 
         ApprovalTask updatedApprovalTask = approvalTaskArgumentCaptor.getValue();
 
@@ -257,14 +177,13 @@ class ApprovalTaskGraphQlControllerIntTest {
 
     @Test
     void testUpdateApprovalTaskRejectedStatusChangeIsABadRequest() {
-        when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
-        when(approvalTaskService.getApprovalTask(1L)).thenReturn(
+        when(approvalTaskFacade.getApprovalTask(1L)).thenReturn(
             ApprovalTask.builder()
                 .id(1L)
                 .name("Review")
                 .status(Status.COMPLETED)
                 .build());
-        when(approvalTaskService.update(any(ApprovalTask.class))).thenThrow(
+        when(approvalTaskFacade.updateApprovalTask(any(ApprovalTask.class))).thenThrow(
             new ApprovalTaskStatusException("Cannot change approval task 1 to OPEN; it is already COMPLETED"));
 
         graphQlTester.document(
@@ -277,13 +196,5 @@ class ApprovalTaskGraphQlControllerIntTest {
                     assertThat(error.getMessage())
                         .isEqualTo("Cannot change approval task 1 to OPEN; it is already COMPLETED");
                 }));
-    }
-
-    private void assertForbidden(String document) {
-        graphQlTester.document(document)
-            .execute()
-            .errors()
-            .satisfy(errors -> assertThat(errors).singleElement()
-                .satisfies(error -> assertThat(error.getErrorType()).isEqualTo(ErrorType.FORBIDDEN)));
     }
 }

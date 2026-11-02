@@ -8,7 +8,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework:spring-webflux")
     testImplementation(project(":server:libs:automation:automation-task:automation-task-service"))
     testImplementation(project(":server:libs:core:graphql:graphql-impl"))

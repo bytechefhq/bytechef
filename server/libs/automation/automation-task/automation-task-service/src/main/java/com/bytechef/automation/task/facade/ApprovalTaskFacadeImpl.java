@@ -47,6 +47,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -107,6 +108,40 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
+    public ApprovalTask createManualApprovalTask(ApprovalTask approvalTask) {
+        return approvalTaskService.create(approvalTask);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public void deleteApprovalTask(long id) {
+        approvalTaskService.delete(id);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public ApprovalTask getApprovalTask(long id) {
+        return approvalTaskService.getApprovalTask(id);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public List<ApprovalTask> getApprovalTasks(@Nullable Integer environmentId) {
+        return approvalTaskService.getApprovalTasks(environmentId);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public List<ApprovalTask> getApprovalTasks(List<Long> ids) {
+        return approvalTaskService.getApprovalTasks(ids);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public List<PendingApproval> getPendingApprovals(@Nullable Integer environmentId) {
         List<PendingApproval> pendingApprovals = new ArrayList<>();
 
@@ -149,6 +184,12 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
                 PendingApproval::createdDate, Comparator.nullsLast(Comparator.reverseOrder())));
 
         return pendingApprovals;
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public ApprovalTask updateApprovalTask(ApprovalTask approvalTask) {
+        return approvalTaskService.update(approvalTask);
     }
 
     private String resolveWorkflowLabel(Job job) {

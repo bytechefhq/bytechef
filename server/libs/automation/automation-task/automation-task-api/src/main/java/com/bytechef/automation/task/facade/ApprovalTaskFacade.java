@@ -37,5 +37,17 @@ public interface ApprovalTaskFacade {
      */
     ApprovalTask createApprovalTask(ApprovalTask approvalTask);
 
+    ApprovalTask createManualApprovalTask(ApprovalTask approvalTask);
+
+    void deleteApprovalTask(long id);
+
+    ApprovalTask getApprovalTask(long id);
+
+    List<ApprovalTask> getApprovalTasks(@Nullable Integer environmentId);
+
+    List<ApprovalTask> getApprovalTasks(List<Long> ids);
+
     List<PendingApproval> getPendingApprovals(@Nullable Integer environmentId);
+
+    ApprovalTask updateApprovalTask(ApprovalTask approvalTask);
 }
