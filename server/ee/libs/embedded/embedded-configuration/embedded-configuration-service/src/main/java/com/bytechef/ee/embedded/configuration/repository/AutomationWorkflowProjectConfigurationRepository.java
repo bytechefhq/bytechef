@@ -22,10 +22,10 @@ import org.springframework.stereotype.Repository;
 public interface AutomationWorkflowProjectConfigurationRepository
     extends ListCrudRepository<AutomationWorkflowProjectConfiguration, Long> {
 
-    List<AutomationWorkflowProjectConfiguration> findAllByProjectId(long projectId);
+    List<AutomationWorkflowProjectConfiguration> findAllByProjectIdOrderByIdAsc(long projectId);
 
-    List<AutomationWorkflowProjectConfiguration> findAllByProjectIdIn(Set<Long> projectIds);
+    List<AutomationWorkflowProjectConfiguration> findAllByProjectIdInOrderByIdAsc(Set<Long> projectIds);
 
-    List<AutomationWorkflowProjectConfiguration> findAllByProjectIdAndEnvironmentId(
+    List<AutomationWorkflowProjectConfiguration> findAllByProjectIdAndEnvironmentIdOrderByIdAsc(
         long projectId, long environmentId);
 }

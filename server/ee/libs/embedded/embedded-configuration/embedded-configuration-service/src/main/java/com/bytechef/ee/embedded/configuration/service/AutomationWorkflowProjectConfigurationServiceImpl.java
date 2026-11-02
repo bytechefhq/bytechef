@@ -80,19 +80,19 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
     @Override
     @Transactional(readOnly = true)
     public List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId) {
-        return automationWorkflowProjectConfigurationRepository.findAllByProjectId(projectId);
+        return automationWorkflowProjectConfigurationRepository.findAllByProjectIdOrderByIdAsc(projectId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId, long environmentId) {
-        return automationWorkflowProjectConfigurationRepository.findAllByProjectIdAndEnvironmentId(
+        return automationWorkflowProjectConfigurationRepository.findAllByProjectIdAndEnvironmentIdOrderByIdAsc(
             projectId, environmentId);
     }
 
     @Override
     public List<AutomationWorkflowProjectConfiguration> getConfigurations(Set<Long> projectIds) {
-        return automationWorkflowProjectConfigurationRepository.findAllByProjectIdIn(projectIds);
+        return automationWorkflowProjectConfigurationRepository.findAllByProjectIdInOrderByIdAsc(projectIds);
     }
 
     @Override
