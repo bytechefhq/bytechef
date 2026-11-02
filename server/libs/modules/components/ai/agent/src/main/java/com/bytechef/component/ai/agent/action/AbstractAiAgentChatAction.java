@@ -48,6 +48,7 @@ import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.tool.ClusterElementCallObservingToolCallback;
 import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
 import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
+import com.bytechef.component.ai.llm.tool.GatedToolCallback;
 import com.bytechef.component.ai.llm.tool.ToolCallLoggingToolCallback;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -447,7 +448,7 @@ public abstract class AbstractAiAgentChatAction {
             if (context instanceof ActionContextAware actionContextAware &&
                 ToolSuspension.isSuspendedToolResult(toolResult, actionContextAware.getSuspend())) {
 
-                suspendUntilTheApprovedToolResumes(actionContextAware, agentToolSuspension);
+                suspendUntilTheApprovedToolResumes(actionContextAware, agentToolSuspension, gateDecision);
 
                 return null;
             }
@@ -577,7 +578,7 @@ public abstract class AbstractAiAgentChatAction {
 
                 if (gatedToolName.equals(toolDefinition.name())) {
                     gatedClusterElement = clusterElement;
-                    gatedToolCallback = DelegatingToolCallback.unwrap(toolCallback);
+                    gatedToolCallback = toolCallback;
 
                     break;
                 }
@@ -594,16 +595,24 @@ public abstract class AbstractAiAgentChatAction {
                     "approval cannot be applied.");
         }
 
+        GatedToolCallback gate = findGatedToolCallback(gatedToolCallback);
+        ToolCallback approvedToolCallback = DelegatingToolCallback.unwrap(gatedToolCallback);
+
+        String approvedToolComponentName =
+            gate == null ? gatedClusterElement.getComponentName() : gate.getGatedComponentName();
+        String approvedToolWorkflowNodeName =
+            gate == null ? gatedClusterElement.getWorkflowNodeName() : gate.getGatedWorkflowNodeName();
+
         Map<String, Map<String, String>> toolSimulations =
             (Map<String, Map<String, String>>) inputParameters.get(TOOL_SIMULATIONS);
 
         ToolCallback effectiveToolCallback = observeApprovedToolCallback(
             toolSimulations == null || toolSimulations.isEmpty()
-                ? gatedToolCallback
+                ? approvedToolCallback
                 : createSimulationAwareToolCallback(
-                    gatedToolCallback, toolSimulations,
+                    approvedToolCallback, toolSimulations,
                     resolveChatModel(inputParameters, connectionParameters, clusterElementMap, context), context),
-            gatedClusterElement, context);
+            approvedToolWorkflowNodeName, approvedToolComponentName, context);
 
         Map<String, Object> approvedResult = new HashMap<>();
 
@@ -638,8 +647,22 @@ public abstract class AbstractAiAgentChatAction {
         return JsonUtils.write(approvedResult);
     }
 
+    private static @Nullable GatedToolCallback findGatedToolCallback(ToolCallback toolCallback) {
+        ToolCallback current = toolCallback;
+
+        while (current instanceof DelegatingToolCallback delegatingToolCallback) {
+            if (current instanceof GatedToolCallback gatedToolCallback) {
+                return gatedToolCallback;
+            }
+
+            current = delegatingToolCallback.getDelegate();
+        }
+
+        return null;
+    }
+
     private static ToolCallback observeApprovedToolCallback(
-        ToolCallback toolCallback, ClusterElement clusterElement, ActionContext context) {
+        ToolCallback toolCallback, String workflowNodeName, String componentName, ActionContext context) {
 
         if (!(context instanceof ActionContextAware actionContextAware)) {
             return toolCallback;
@@ -647,21 +670,61 @@ public abstract class AbstractAiAgentChatAction {
 
         return ClusterElementCallTarget.of(context)
             .<ToolCallback>map(target -> new ClusterElementCallObservingToolCallback(
-                toolCallback, clusterElement.getWorkflowNodeName(), clusterElement.getComponentName(),
-                target.jobId(), target.taskExecutionId(), target.recorder(), actionContextAware::getSuspend))
+                toolCallback, workflowNodeName, componentName, target.jobId(), target.taskExecutionId(),
+                target.recorder(), actionContextAware::getSuspend))
             .orElse(toolCallback);
     }
 
     private static void suspendUntilTheApprovedToolResumes(
-        ActionContextAware actionContextAware, AgentToolSuspension agentToolSuspension) {
+        ActionContextAware actionContextAware, AgentToolSuspension agentToolSuspension, GateDecision gateDecision) {
 
         ActionContext.Suspend suspend = Objects.requireNonNull(actionContextAware.getSuspend());
 
         Map<String, Object> continueParameters = new HashMap<>(suspend.continueParameters());
 
-        continueParameters.put(AgentToolSuspension.CONTINUE_PARAMETER_KEY, agentToolSuspension);
+        continueParameters.put(
+            AgentToolSuspension.CONTINUE_PARAMETER_KEY,
+            recordApprovalOfSuspendedTool(actionContextAware, agentToolSuspension, gateDecision));
 
         actionContextAware.suspend(new ActionContext.Suspend(continueParameters, suspend.expiresAt()));
+    }
+
+    private static AgentToolSuspension recordApprovalOfSuspendedTool(
+        ActionContextAware actionContextAware, AgentToolSuspension agentToolSuspension, GateDecision gateDecision) {
+
+        Long jobId = actionContextAware.getJobId();
+        Long taskExecutionId = actionContextAware.getTaskExecutionId();
+
+        if (jobId == null || taskExecutionId == null) {
+            return agentToolSuspension;
+        }
+
+        ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
+
+        ClusterElementCallRef gateCallRef = getSuspendedCallRef(agentToolSuspension);
+        Optional<ClusterElementCallRef> approvedToolCallRefOptional =
+            clusterElementCallRecorder.findSuspendedCall(taskExecutionId);
+
+        if (gateCallRef != null && gateDecision instanceof GateDecision.Approved approved) {
+            clusterElementCallRecorder.callApproved(
+                jobId, taskExecutionId, gateCallRef, createApprovalDetails(approved));
+        }
+
+        if (approvedToolCallRefOptional.isEmpty()) {
+            return agentToolSuspension;
+        }
+
+        ClusterElementCallRef approvedToolCallRef = approvedToolCallRefOptional.get();
+        String gateCallId = gateCallRef == null ? null : gateCallRef.id();
+
+        if (Objects.equals(gateCallId, approvedToolCallRef.id())) {
+            return agentToolSuspension;
+        }
+
+        return new AgentToolSuspension(
+            agentToolSuspension.conversation(), agentToolSuspension.pendingToolCallId(),
+            agentToolSuspension.suspendedToolResult(), approvedToolCallRef.id(),
+            approvedToolCallRef.workflowNodeName());
     }
 
     private static ChatClient.ChatClientRequestSpec createPrompt(
