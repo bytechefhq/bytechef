@@ -2,10 +2,12 @@ import {Button} from '@/components/ui/button';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useAuditEventsQuery} from '@/shared/middleware/graphql';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useState} from 'react';
 
 import AuditEventDetailSheet from './components/AuditEventDetailSheet';
 import AuditEventsActiveFilterBadges from './components/AuditEventsActiveFilterBadges';
+import AuditEventsDisabled from './components/AuditEventsDisabled';
 import AuditEventsFilters from './components/AuditEventsFilters';
 import AuditEventsSearch from './components/AuditEventsSearch';
 import AuditEventsTable from './components/AuditEventsTable';
@@ -17,6 +19,9 @@ const PAGE_SIZE = 25;
 const AuditEvents = () => {
     const [selected, setSelected] = useState<AuditEventItemType | undefined>();
     const [sheetOpen, setSheetOpen] = useState(false);
+
+    const application = useApplicationInfoStore((state) => state.application);
+    const auditEnabled = useApplicationInfoStore((state) => state.audit.enabled);
 
     const {
         filters,
@@ -39,18 +44,34 @@ const AuditEvents = () => {
         setSearchInput,
     } = useAuditEventFilters();
 
-    const {data, isError, isLoading, refetch} = useAuditEventsQuery({
-        eventType: filters.eventType,
-        fromDate: filters.fromDate,
-        page,
-        platform: filters.platform,
-        search,
-        size: PAGE_SIZE,
-        toDate: filters.toDate,
-    });
+    const auditDisabled = application !== null && !auditEnabled;
+
+    const {data, isError, isLoading, refetch} = useAuditEventsQuery(
+        {
+            eventType: filters.eventType,
+            fromDate: filters.fromDate,
+            page,
+            platform: filters.platform,
+            search,
+            size: PAGE_SIZE,
+            toDate: filters.toDate,
+        },
+        {enabled: !auditDisabled}
+    );
 
     const content = data?.auditEvents.content || [];
     const totalPages = data?.auditEvents.totalPages || 0;
+
+    if (auditDisabled) {
+        return (
+            <LayoutContainer
+                header={<Header centerTitle position="main" title="Audit Events" />}
+                leftSidebarOpen={false}
+            >
+                <AuditEventsDisabled />
+            </LayoutContainer>
+        );
+    }
 
     return (
         <LayoutContainer

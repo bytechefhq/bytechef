@@ -1,3 +1,4 @@
+import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -26,8 +27,8 @@ vi.mock('@/shared/middleware/graphql', () => ({
         Embedded: 'EMBEDDED',
     },
     useAuditEventTypesQuery: () => hoisted.auditEventTypesQueryResult,
-    useAuditEventsQuery: (variables: Record<string, unknown>) => {
-        hoisted.useAuditEventsQueryMock(variables);
+    useAuditEventsQuery: (variables: Record<string, unknown>, options?: Record<string, unknown>) => {
+        hoisted.useAuditEventsQueryMock(variables, options);
 
         return hoisted.auditEventsQueryResult;
     },
@@ -89,6 +90,8 @@ const selectMenuItem = async (name: string | RegExp) => {
 
 describe('AuditEvents', () => {
     beforeEach(() => {
+        applicationInfoStore.setState({application: null, audit: {enabled: false}});
+
         hoisted.useAuditEventsQueryMock.mockClear();
         hoisted.refetchMock.mockClear();
         hoisted.auditEventTypesQueryResult = {
@@ -101,6 +104,28 @@ describe('AuditEvents', () => {
             isLoading: false,
             refetch: hoisted.refetchMock,
         };
+    });
+
+    it('explains how to enable audit events when they are disabled', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}, audit: {enabled: false}});
+
+        render(<AuditEvents />);
+
+        expect(screen.getByText('Audit events are disabled')).toBeInTheDocument();
+        expect(screen.getByText('BYTECHEF_AUDIT_ENABLED')).toBeInTheDocument();
+        expect(screen.queryByText('alice@example.com')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Filter options'})).not.toBeInTheDocument();
+        expect(hoisted.useAuditEventsQueryMock.mock.calls.at(-1)?.[1]).toEqual({enabled: false});
+    });
+
+    it('lists audit events when they are enabled', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}, audit: {enabled: true}});
+
+        render(<AuditEvents />);
+
+        expect(screen.queryByText('Audit events are disabled')).not.toBeInTheDocument();
+        expect(screen.getByText('alice@example.com')).toBeInTheDocument();
+        expect(hoisted.useAuditEventsQueryMock.mock.calls.at(-1)?.[1]).toEqual({enabled: true});
     });
 
     it('renders each audit event with its outcome', () => {
