@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfigu
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectConfigurationRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectConfigurationRepository.ConfigurationAssignmentCount;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ConnectedUserProjectConfigurationServiceImpl implements ConnectedUs
 
     private final ConnectedUserProjectConfigurationRepository connectedUserProjectConfigurationRepository;
 
+    @SuppressFBWarnings("EI")
     public ConnectedUserProjectConfigurationServiceImpl(
         ConnectedUserProjectConfigurationRepository connectedUserProjectConfigurationRepository) {
 
