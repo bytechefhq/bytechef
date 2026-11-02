@@ -2,7 +2,9 @@ import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import KnowledgeBaseDocumentListItemDropdownMenu from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentListItemDropdownMenu';
 import useKnowledgeBaseDocumentListItem from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItem';
 import useKnowledgeBaseDocumentListItemTagList from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItemTagList';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
 import {ChevronDownIcon} from 'lucide-react';
 
@@ -13,6 +15,8 @@ interface KnowledgeBaseDocumentListItemProps {
 }
 
 const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: KnowledgeBaseDocumentListItemProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {
         chunkCount,
         chunksCollapsibleTriggerRef,
@@ -29,6 +33,8 @@ const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: Knowledg
         remainingTags,
         tags,
     });
+
+    const canEditKnowledgeBase = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_EDIT');
 
     return (
         <div
@@ -73,6 +79,7 @@ const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: Knowledg
                                     },
                                 })}
                                 id={+document.id}
+                                readOnly={!canEditKnowledgeBase}
                                 remainingTags={convertedRemainingTags}
                                 tags={convertedTags}
                                 updateTagsMutation={updateTagsMutation}

@@ -3,6 +3,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBaseDocumentListItemDropdownMenu from '../KnowledgeBaseDocumentListItemDropdownMenu';
 
+const hoistedScope = vi.hoisted(() => ({canEditKnowledgeBase: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoistedScope.canEditKnowledgeBase,
+}));
+
 const hoisted = vi.hoisted(() => {
     return {
         handleDelete: vi.fn(),
@@ -19,6 +25,8 @@ const defaultMockReturn = {
 };
 
 beforeEach(() => {
+    hoistedScope.canEditKnowledgeBase = true;
+
     windowResizeObserver();
     hoisted.mockUseKnowledgeBaseDocumentListItemDropdownMenu.mockReturnValue({...defaultMockReturn});
 });
@@ -37,6 +45,14 @@ describe('KnowledgeBaseDocumentListItemDropdownMenu', () => {
         renderComponent();
 
         expect(screen.getByRole('button', {name: 'More Document Actions'})).toBeInTheDocument();
+    });
+
+    it('hides the dropdown trigger without KNOWLEDGE_BASE_EDIT', () => {
+        hoistedScope.canEditKnowledgeBase = false;
+
+        renderComponent();
+
+        expect(screen.queryByRole('button', {name: 'More Document Actions'})).not.toBeInTheDocument();
     });
 
     it('opens dropdown menu when clicking trigger', async () => {
