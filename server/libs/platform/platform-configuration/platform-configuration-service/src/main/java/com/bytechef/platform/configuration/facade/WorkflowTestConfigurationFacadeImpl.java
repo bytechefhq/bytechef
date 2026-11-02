@@ -24,6 +24,7 @@ import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.service.WorkflowConnectionUsageChecker;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
@@ -46,16 +47,19 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
     private final ConnectionService connectionService;
     private final ComponentConnectionFacade componentConnectionFacade;
+    private final List<WorkflowConnectionUsageChecker> workflowConnectionUsageCheckers;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowTestConfigurationFacadeImpl(
         ConnectionService connectionService, ComponentConnectionFacade componentConnectionFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        List<WorkflowConnectionUsageChecker> workflowConnectionUsageCheckers, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionService = connectionService;
         this.componentConnectionFacade = componentConnectionFacade;
+        this.workflowConnectionUsageCheckers = workflowConnectionUsageCheckers;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -96,7 +100,9 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
         Workflow workflow = workflowService.getWorkflow(workflowTestConfiguration.getWorkflowId());
 
-        validateConnections(workflowTestConfiguration.getConnections(), workflow);
+        validateConnections(
+            workflowTestConfiguration.getConnections(), workflow,
+            Objects.requireNonNullElse(workflowTestConfiguration.getEnvironmentId(), 0L));
         validateInputs(workflowTestConfiguration.getInputs(), workflow);
 
         return workflowTestConfigurationService.saveWorkflowTestConfiguration(workflowTestConfiguration);
@@ -107,6 +113,8 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         String workflowId, String workflowNodeName, String clusterElementType,
         String clusterElementWorkflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId) {
+
+        checkConnectionUsage(workflowId, connectionId, environmentId);
 
         Connection connection = connectionService.getConnection(connectionId);
 
@@ -130,7 +138,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        validateConnection(workflowNodeName, workflowConnectionKey, connectionId, workflow);
+        validateConnection(workflowNodeName, workflowConnectionKey, connectionId, workflow, environmentId);
 
         boolean workflowNodeTrigger = WorkflowTrigger.fetch(workflow, workflowNodeName)
             .isPresent();
@@ -186,19 +194,29 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
             && Objects.equals(workflowConnection.key(), connection.getWorkflowConnectionKey());
     }
 
+    private void checkConnectionUsage(String workflowId, long connectionId, long environmentId) {
+        for (WorkflowConnectionUsageChecker workflowConnectionUsageChecker : workflowConnectionUsageCheckers) {
+            workflowConnectionUsageChecker.checkConnectionUsage(workflowId, connectionId, environmentId);
+        }
+    }
+
     private void validateConnections(
-        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections, Workflow workflow) {
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections, Workflow workflow,
+        long environmentId) {
 
         for (WorkflowTestConfigurationConnection workflowTestConfigurationConnection : workflowTestConfigurationConnections) {
             validateConnection(
                 workflowTestConfigurationConnection.getWorkflowNodeName(),
                 workflowTestConfigurationConnection.getWorkflowConnectionKey(),
-                workflowTestConfigurationConnection.getConnectionId(), workflow);
+                workflowTestConfigurationConnection.getConnectionId(), workflow, environmentId);
         }
     }
 
     private void validateConnection(
-        String workflowNodeName, String workflowConnectionKey, long connectionId, Workflow workflow) {
+        String workflowNodeName, String workflowConnectionKey, long connectionId, Workflow workflow,
+        long environmentId) {
+
+        checkConnectionUsage(workflow.getId(), connectionId, environmentId);
 
         Connection connection = connectionService.getConnection(connectionId);
 
