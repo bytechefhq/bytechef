@@ -16,15 +16,16 @@
 
 package com.bytechef.platform.data.storage.file.storage.service;
 
+import com.bytechef.commons.data.jdbc.wrapper.TypedValue;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.domain.ValueWrapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -34,10 +35,12 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     public static final String DATA_ENTRIES_ROOT_DIR = "data_entries/";
 
     private final FileStorageService fileStorageService;
+    private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public FileDataStorageServiceImpl(FileStorageService fileStorageService) {
+    public FileDataStorageServiceImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
         this.fileStorageService = fileStorageService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -63,13 +66,14 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
             return Optional.empty();
         }
 
-        ValueWrapper valueWrapper = ValueWrapper.read(
+        TypedValue typedValue = TypedValue.read(
+            objectMapper,
             CompressionUtils.decompressToString(
                 fileStorageService.readFileToBytes(
                     directoryPath,
                     fileStorageService.getFileEntry(directoryPath, getFilename(componentName, scope, scopeId, key)))));
 
-        return Optional.ofNullable((T) valueWrapper.value());
+        return Optional.ofNullable((T) typedValue.value());
     }
 
     @Override
@@ -103,11 +107,11 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         String componentName, DataStorageScope scope, String scopeId, String key, Object value, long environmentId,
         PlatformType type) {
 
-        ValueWrapper valueWrapper = new ValueWrapper(value);
+        TypedValue typedValue = new TypedValue(value);
 
         fileStorageService.storeFileContent(
             getDirectoryPath(type, environmentId), getFilename(componentName, scope, scopeId, key),
-            CompressionUtils.compress(valueWrapper.write()), false);
+            CompressionUtils.compress(typedValue.write(objectMapper)), false);
     }
 
     private static String getDirectoryPath(PlatformType type, long environmentId) {

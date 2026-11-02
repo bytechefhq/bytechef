@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.data.storage.jdbc.repository.converter;
+package com.bytechef.commons.data.jdbc.converter;
 
-import com.bytechef.platform.data.storage.domain.ValueWrapper;
+import com.bytechef.commons.data.jdbc.wrapper.TypedValue;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.WritingConverter;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
-@WritingConverter
-public class DataEntryValueWrapperToStringConverter implements Converter<ValueWrapper, String> {
+public class TypedValueToStringConverter implements Converter<TypedValue, String> {
+
+    private final ObjectMapper objectMapper;
+
+    @SuppressFBWarnings("EI2")
+    public TypedValueToStringConverter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
-    public String convert(ValueWrapper valueWrapper) {
-        return valueWrapper.write();
+    public String convert(TypedValue typedValue) {
+        return typedValue.write(objectMapper);
     }
 }

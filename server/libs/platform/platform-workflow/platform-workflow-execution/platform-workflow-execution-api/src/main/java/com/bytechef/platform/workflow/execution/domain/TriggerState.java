@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.domain;
 
+import com.bytechef.commons.data.jdbc.wrapper.TypedValue;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.time.Instant;
 import java.util.Objects;
@@ -54,7 +55,7 @@ public class TriggerState {
     private Instant lastModifiedDate;
 
     @Column
-    private TriggerStateValue value;
+    private TypedValue value;
 
     @Version
     private int version;
@@ -66,7 +67,7 @@ public class TriggerState {
     }
 
     public TriggerState(WorkflowExecutionId workflowExecutionId, Object value) {
-        this.value = new TriggerStateValue(value, value.getClass());
+        this.value = new TypedValue(value);
         this.workflowExecutionId = workflowExecutionId;
     }
 
@@ -95,7 +96,7 @@ public class TriggerState {
             return null;
         }
 
-        return value.value;
+        return value.value();
     }
 
     public int getVersion() {
@@ -131,7 +132,7 @@ public class TriggerState {
     }
 
     public void setValue(Object value) {
-        this.value = new TriggerStateValue(value, value.getClass());
+        this.value = new TypedValue(value);
     }
 
     public void setVersion(int version) {
@@ -154,11 +155,5 @@ public class TriggerState {
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
             '}';
-    }
-
-    public record TriggerStateValue(Object value, String classname) {
-        public TriggerStateValue(Object value, Class<?> classValue) {
-            this(value, classValue.getName());
-        }
     }
 }

@@ -78,6 +78,8 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
+import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -100,12 +102,8 @@ import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.execution.repository.WorkflowExecutionRowRepositoryImpl;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.StringToTaskStateValueConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.StringToTriggerStateValueConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowTriggerConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.TaskStateValueToStringConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -1210,12 +1208,12 @@ class ProjectWorkflowExecutionFacadeIntTest {
                     new JobResumeIdToStringConverter(), new MapWrapperToStringConverter(objectMapper),
                     new StringToExecutionErrorConverter(objectMapper), new StringToFileEntryConverter(objectMapper),
                     new StringToJobResumeIdConverter(), new StringToMapWrapperConverter(objectMapper),
-                    new StringToTaskStateValueConverter(objectMapper),
-                    new StringToTriggerStateValueConverter(objectMapper), new StringToWebhooksConverter(objectMapper),
+                    new StringToTypedValueConverter(objectMapper),
+                    new StringToWebhooksConverter(objectMapper),
                     new StringToWorkflowExecutionIdConverter(), new StringToWorkflowTaskConverter(objectMapper),
                     new StringToWorkflowTriggerConverter(objectMapper),
-                    new TaskStateValueToStringConverter(objectMapper),
-                    new TriggerStateValueToStringConverter(objectMapper), new WebhooksToStringConverter(objectMapper),
+                    new TypedValueToStringConverter(objectMapper),
+                    new WebhooksToStringConverter(objectMapper),
                     new WorkflowExecutionIdToStringConverter(), new WorkflowTaskToStringConverter(objectMapper),
                     new WorkflowTriggerToStringConverter(objectMapper));
             }

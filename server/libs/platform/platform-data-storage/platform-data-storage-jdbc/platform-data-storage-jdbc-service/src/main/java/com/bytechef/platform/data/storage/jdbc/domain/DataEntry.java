@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.data.storage.jdbc.domain;
 
+import com.bytechef.commons.data.jdbc.wrapper.TypedValue;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.domain.ValueWrapper;
 import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -69,7 +69,7 @@ public class DataEntry {
     private String scopeId;
 
     @Column
-    private ValueWrapper value;
+    private TypedValue value;
 
     @Column
     private int type;
@@ -93,7 +93,7 @@ public class DataEntry {
         this.scope = scope.ordinal();
         this.scopeId = scopeId;
         this.type = type.ordinal();
-        this.value = new ValueWrapper(value);
+        this.value = new TypedValue(value);
     }
 
     public String getComponentName() {
@@ -175,7 +175,7 @@ public class DataEntry {
     public void setValue(Object value) {
         Assert.notNull(value, "'value' must not be null");
 
-        this.value = new ValueWrapper(value);
+        this.value = new TypedValue(value);
     }
 
     @Override

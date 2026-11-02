@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -39,17 +40,22 @@ public class FileDataStorageConfiguration {
 
     @Bean
     @ConditionalOnDataStorageProviderAws
-    DataStorage awsFileStorageDataStorageService(FileStorageServiceRegistry fileStorageServiceRegistry) {
+    DataStorage awsFileStorageDataStorageService(
+        FileStorageServiceRegistry fileStorageServiceRegistry, ObjectMapper objectMapper) {
+
         return new DataStorageImpl(
-            new FileDataStorageServiceImpl(fileStorageServiceRegistry.getFileStorageService(Provider.AWS.name())));
+            new FileDataStorageServiceImpl(
+                fileStorageServiceRegistry.getFileStorageService(Provider.AWS.name()), objectMapper));
     }
 
     @Bean
     @ConditionalOnDataStorageProviderFilesystem
-    DataStorage filesystemFileStorageDataStorageService(FileStorageServiceRegistry fileStorageServiceRegistry) {
+    DataStorage filesystemFileStorageDataStorageService(
+        FileStorageServiceRegistry fileStorageServiceRegistry, ObjectMapper objectMapper) {
+
         return new DataStorageImpl(
             new FileDataStorageServiceImpl(
-                fileStorageServiceRegistry.getFileStorageService(Provider.FILESYSTEM.name())));
+                fileStorageServiceRegistry.getFileStorageService(Provider.FILESYSTEM.name()), objectMapper));
     }
 
     private record DataStorageImpl(FileDataStorageService fileDataStorageService) implements DataStorage {

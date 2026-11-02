@@ -29,6 +29,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -49,7 +50,8 @@ public class FileDataStorageServiceTest {
             }
 
             FILE_DATA_STORAGE_SERVICE = new FileDataStorageServiceImpl(
-                new FilesystemFileStorageService(baseDir.getAbsolutePath()));
+                new FilesystemFileStorageService(baseDir.getAbsolutePath()), JsonMapper.builder()
+                    .build());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
