@@ -50,8 +50,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Component
 public class StateValueDataStorage {
 
-    static final String TASK_STATE_COMPONENT_NAME = "__task_state";
-    static final String TRIGGER_STATE_COMPONENT_NAME = "__trigger_state";
+    static final String TASK_STATE_COMPONENT_NAME = "__TASK_STATE";
+    static final String TRIGGER_STATE_COMPONENT_NAME = "__TRIGGER_STATE";
 
     private final ApplicationProperties applicationProperties;
     private final ObjectProvider<DataStorage> dataStorageObjectProvider;
