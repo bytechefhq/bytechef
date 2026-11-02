@@ -26,6 +26,7 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
+import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -40,8 +41,10 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.repository.UserRepository;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -202,6 +205,76 @@ class PermissionServiceIntTest {
                 .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeployment(developmentDeploymentId))
             .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testCanUseConnectionInWorkflowGrantsAConnectionOfTheWorkflowsWorkspaceAndEnvironment() {
+        String workflowId = createProjectWorkflow();
+
+        addMember(WorkspaceRole.VIEWER, Environment.DEVELOPMENT);
+
+        PermissionService connectionPermissionService = createConnectionPermissionService(
+            workspaceId, Environment.DEVELOPMENT);
+
+        assertThat(connectionPermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isTrue();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkflowDeniesAConnectionOfAnotherWorkspace() {
+        String workflowId = createProjectWorkflow();
+
+        addMember(WorkspaceRole.ADMIN);
+
+        PermissionService connectionPermissionService = createConnectionPermissionService(
+            workspaceId + 1, Environment.DEVELOPMENT);
+
+        assertThat(connectionPermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkflowDeniesAConnectionOfAnotherEnvironment() {
+        String workflowId = createProjectWorkflow();
+
+        addMember(WorkspaceRole.ADMIN);
+
+        PermissionService connectionPermissionService = createConnectionPermissionService(
+            workspaceId, Environment.PRODUCTION);
+
+        assertThat(connectionPermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkflowDeniesWithoutTheConnectionViewScope() {
+        String workflowId = createProjectWorkflow();
+
+        createCustomRole(WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_ID);
+
+        workspaceUserRepository.save(
+            WorkspaceUser.forCustomRole(
+                USER_ID, workspaceId, WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_ID,
+                Environment.DEVELOPMENT));
+
+        PermissionService connectionPermissionService = createConnectionPermissionService(
+            workspaceId, Environment.DEVELOPMENT);
+
+        assertThat(connectionPermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkflowGrantsATenantAdmin() {
+        String workflowId = createProjectWorkflow();
+
+        authenticate(LOGIN, AuthorityConstants.ADMIN);
+
+        PermissionService connectionPermissionService = createConnectionPermissionService(
+            workspaceId + 1, Environment.PRODUCTION);
+
+        assertThat(connectionPermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isTrue();
     }
 
     @Test
@@ -819,6 +892,36 @@ class PermissionServiceIntTest {
             WorkspaceUser.forRole(user.getId(), memberWorkspaceId, workspaceRole, environment));
 
         return login;
+    }
+
+    private PermissionService createConnectionPermissionService(
+        long connectionWorkspaceId, Environment connectionEnvironment) {
+
+        ResourceEnvironmentResolver connectionEnvironmentResolver = new ResourceEnvironmentResolver() {
+
+            @Override
+            public String resourceType() {
+                return "Connection";
+            }
+
+            @Override
+            public Optional<Environment> fetchEnvironment(Serializable id) {
+                return Optional.of(connectionEnvironment);
+            }
+        };
+
+        return new PermissionServiceImpl(
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
+            List.of(connectionEnvironmentResolver));
+    }
+
+    private void createCustomRole(long customRoleId) {
+        jdbcTemplate.update(
+            "INSERT INTO custom_role (id, name, created_date, created_by, last_modified_date, last_modified_by, " +
+                "version) VALUES (?, ?, CURRENT_TIMESTAMP, 'test', CURRENT_TIMESTAMP, 'test', 0) " +
+                "ON CONFLICT (id) DO NOTHING",
+            customRoleId, "Custom Role " + customRoleId);
     }
 
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {

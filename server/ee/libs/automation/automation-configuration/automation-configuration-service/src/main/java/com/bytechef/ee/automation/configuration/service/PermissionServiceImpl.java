@@ -48,6 +48,8 @@ public class PermissionServiceImpl implements PermissionService {
 
     private static final Logger log = LoggerFactory.getLogger(PermissionServiceImpl.class);
 
+    private static final String CONNECTION = "Connection";
+
     private final CurrentUserResolver currentUserResolver;
     private final PermissionScopeRegistry permissionScopeRegistry;
     private final ProjectRepository projectRepository;
@@ -404,6 +406,55 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         return hasWorkspaceScope(workspaceId, scope, environment);
+    }
+
+    @Override
+    public boolean canUseConnectionInWorkflow(long connectionId, String workflowId, Environment environment) {
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
+            .map(Project::getWorkspaceId)
+            .orElse(null);
+
+        if (workspaceId == null) {
+            return false;
+        }
+
+        ResourceOwnershipResolver connectionOwnershipResolver = resourceOwnershipResolvers.get(CONNECTION);
+        ResourceEnvironmentResolver connectionEnvironmentResolver = resourceEnvironmentResolvers.get(CONNECTION);
+
+        if (connectionOwnershipResolver == null || connectionEnvironmentResolver == null) {
+            return false;
+        }
+
+        OptionalLong connectionWorkspaceId = connectionOwnershipResolver.resolveOwner(connectionId)
+            .workspaceId();
+
+        if (connectionWorkspaceId.isEmpty() || connectionWorkspaceId.getAsLong() != workspaceId) {
+            return false;
+        }
+
+        Optional<Environment> connectionEnvironment;
+
+        try {
+            connectionEnvironment = connectionEnvironmentResolver.fetchEnvironment(connectionId);
+        } catch (RuntimeException exception) {
+            log.error("Denying connection id={}: resolving its environment failed", connectionId, exception);
+
+            return false;
+        }
+
+        if (connectionEnvironment.isEmpty() || connectionEnvironment.get() != environment) {
+            return false;
+        }
+
+        return checkWorkspaceScope(workspaceId, "CONNECTION_VIEW", environment);
     }
 
     @Override
