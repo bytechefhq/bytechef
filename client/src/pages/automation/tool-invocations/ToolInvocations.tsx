@@ -186,7 +186,9 @@ export const ToolInvocations = ({
         >
             <PageLoader errors={[toolInvocationLogsError]} loading={toolInvocationLogsIsLoading}>
                 {toolInvocationLogs.length > 0 ? (
-                    <ToolInvocationsTable toolInvocationLogs={toolInvocationLogs} />
+                    <div className="w-full self-start p-4 pt-0">
+                        <ToolInvocationsTable toolInvocationLogs={toolInvocationLogs} />
+                    </div>
                 ) : isFirstRun ? (
                     firstRunEmptyState
                 ) : (
