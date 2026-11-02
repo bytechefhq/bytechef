@@ -12,6 +12,8 @@ import com.bytechef.ee.platform.audit.remote.grpc.AuditEventProtoMapper;
 import com.bytechef.ee.platform.audit.remote.grpc.proto.AuditEventRemoteServiceGrpc;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
+import com.google.protobuf.Empty;
+import io.grpc.stub.StreamObserver;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -53,22 +55,44 @@ public class RemoteAuditEventRepositoryClient implements AuditEventRepository {
             data.putIfAbsent(AuditEventConverter.TENANT_ID_DATA_KEY, tenantWebAuthenticationDetails.getTenantId());
         }
 
-        AuditEventRemoteServiceGrpc.AuditEventRemoteServiceBlockingStub auditEventRemoteServiceBlockingStub =
-            AuditEventRemoteServiceGrpc.newBlockingStub(
-                grpcChannels.getChannel(RemoteAuditEventServiceClient.SERVICE_ID));
-
         try {
-            auditEventRemoteServiceBlockingStub.addAuditEvent(
-                auditEventProtoMapper.toProto(auditEvent, auditEventConverter.convertDataToStrings(data)));
+            AuditEventRemoteServiceGrpc.AuditEventRemoteServiceStub auditEventRemoteServiceStub =
+                AuditEventRemoteServiceGrpc.newStub(grpcChannels.getChannel(RemoteAuditEventServiceClient.SERVICE_ID));
+
+            auditEventRemoteServiceStub.addAuditEvent(
+                auditEventProtoMapper.toProto(auditEvent, auditEventConverter.convertDataToStrings(data)),
+                new AuditEventStreamObserver(auditEvent));
         } catch (RuntimeException exception) {
-            log.error(
-                "AUDIT PERSISTENCE FAILURE: the {} event of {} was not recorded, audit trail is incomplete",
-                auditEvent.getType(), auditEvent.getPrincipal(), exception);
+            logPersistenceFailure(auditEvent, exception);
         }
     }
 
     @Override
     public List<AuditEvent> find(String principal, Instant after, String type) {
         throw new UnsupportedOperationException();
+    }
+
+    private static void logPersistenceFailure(AuditEvent auditEvent, Throwable throwable) {
+        log.error(
+            "AUDIT PERSISTENCE FAILURE: the {} event of {} was not recorded, audit trail is incomplete",
+            auditEvent.getType(), auditEvent.getPrincipal(), throwable);
+    }
+
+    private record AuditEventStreamObserver(AuditEvent auditEvent) implements StreamObserver<Empty> {
+
+        @Override
+        public void onNext(Empty empty) {
+            log.trace("Recorded the {} event of {}", auditEvent.getType(), auditEvent.getPrincipal());
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            logPersistenceFailure(auditEvent, throwable);
+        }
+
+        @Override
+        public void onCompleted() {
+            log.trace("Completed recording the {} event of {}", auditEvent.getType(), auditEvent.getPrincipal());
+        }
     }
 }

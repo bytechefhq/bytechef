@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.audit.remote.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -18,6 +19,7 @@ import com.bytechef.ee.platform.audit.remote.grpc.AuditEventRemoteServiceGrpcSer
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import io.grpc.ManagedChannel;
@@ -25,12 +27,15 @@ import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +102,25 @@ class RemoteAuditEventRepositoryClientIntTest {
     }
 
     @Test
+    void testAddAuditEventStoresItsPlatformInThePlatformColumn() throws IOException {
+        RemoteAuditEventRepositoryClient remoteAuditEventRepositoryClient = createClient(auditEventRepository);
+
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("credentialType", "API_KEY");
+        data.put(AuditEventConverter.PLATFORM_DATA_KEY, PlatformType.AUTOMATION);
+
+        remoteAuditEventRepositoryClient
+            .add(new AuditEvent(Instant.now(), "admin@localhost.com", "CREDENTIAL_USED", data));
+
+        PersistentAuditEvent persistentAuditEvent = findAll().getFirst();
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData()).containsEntry("credentialType", "API_KEY")
+            .doesNotContainKey(AuditEventConverter.PLATFORM_DATA_KEY);
+    }
+
+    @Test
     void testAddAuditEventTruncatesLongValues() throws IOException {
         RemoteAuditEventRepositoryClient remoteAuditEventRepositoryClient = createClient(auditEventRepository);
 
@@ -106,7 +130,7 @@ class RemoteAuditEventRepositoryClientIntTest {
 
         assertThat(findAll().getFirst()
             .getData()
-            .get("message")).hasSize(255);
+            .get("message")).hasSize(256);
     }
 
     @Test
@@ -134,12 +158,43 @@ class RemoteAuditEventRepositoryClientIntTest {
                 .doesNotContainKey("details");
     }
 
+    @Test
+    void testAddReturnsWithoutWaitingForTheExecutionApp() throws IOException, InterruptedException {
+        CountDownLatch releaseCountDownLatch = new CountDownLatch(1);
+        CountDownLatch receivedCountDownLatch = new CountDownLatch(1);
+
+        RemoteAuditEventRepositoryClient remoteAuditEventRepositoryClient = createClient(
+            new HoldingAuditEventRepository(releaseCountDownLatch, receivedCountDownLatch), false);
+
+        try {
+            assertTimeoutPreemptively(
+                Duration.ofSeconds(2), () -> remoteAuditEventRepositoryClient.add(
+                    new AuditEvent(Instant.now(), "admin@localhost.com", "LOGOUT_SUCCESS", Map.of())));
+        } finally {
+            releaseCountDownLatch.countDown();
+        }
+
+        assertThat(receivedCountDownLatch.await(10, TimeUnit.SECONDS)).isTrue();
+    }
+
     private RemoteAuditEventRepositoryClient createClient(AuditEventRepository serverAuditEventRepository)
         throws IOException {
 
+        return createClient(serverAuditEventRepository, true);
+    }
+
+    private RemoteAuditEventRepositoryClient createClient(
+        AuditEventRepository serverAuditEventRepository, boolean directServerExecutor) throws IOException {
+
         String name = InProcessServerBuilder.generateName();
 
-        server = InProcessServerBuilder.forName(name)
+        InProcessServerBuilder inProcessServerBuilder = InProcessServerBuilder.forName(name);
+
+        if (directServerExecutor) {
+            inProcessServerBuilder.directExecutor();
+        }
+
+        server = inProcessServerBuilder
             .addService(
                 new AuditEventRemoteServiceGrpcServer(
                     auditEventFacade, auditEventService, serverAuditEventRepository, new AuditEventProtoMapper()))
@@ -160,6 +215,27 @@ class RemoteAuditEventRepositoryClientIntTest {
             .forEach(persistentAuditEvents::add);
 
         return persistentAuditEvents;
+    }
+
+    private record HoldingAuditEventRepository(
+        CountDownLatch releaseCountDownLatch, CountDownLatch receivedCountDownLatch) implements AuditEventRepository {
+
+        @Override
+        public void add(AuditEvent auditEvent) {
+            try {
+                if (releaseCountDownLatch.await(10, TimeUnit.SECONDS)) {
+                    receivedCountDownLatch.countDown();
+                }
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread()
+                    .interrupt();
+            }
+        }
+
+        @Override
+        public List<AuditEvent> find(String principal, Instant after, String type) {
+            return List.of();
+        }
     }
 
     private record RecordingAuditEventRepository(List<AuditEvent> auditEvents) implements AuditEventRepository {

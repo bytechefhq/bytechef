@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.audit.remote.grpc;
 
+import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.remote.grpc.proto.FetchAuditEventsRequest;
@@ -124,6 +125,16 @@ public class AuditEventProtoMapper {
 
     public AuditEvent toAuditEvent(RemoteAuditEvent remoteAuditEvent) {
         Map<String, Object> data = new HashMap<>(remoteAuditEvent.getDataMap());
+
+        if (data.remove(AuditEventConverter.PLATFORM_DATA_KEY) instanceof String platform) {
+            for (PlatformType platformType : PlatformType.values()) {
+                if (platformType.name()
+                    .equals(platform)) {
+
+                    data.put(AuditEventConverter.PLATFORM_DATA_KEY, platformType);
+                }
+            }
+        }
 
         return new AuditEvent(
             toInstant(remoteAuditEvent.getTimestamp()), remoteAuditEvent.getPrincipal(), remoteAuditEvent.getType(),
