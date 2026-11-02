@@ -23,6 +23,7 @@ import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/s
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import useWorkflowTestConfigurationConnections from '@/shared/hooks/useWorkflowTestConfigurationConnections';
 import {
     ProjectDeployment,
@@ -206,6 +207,8 @@ const ProjectDeploymentDialog = ({
 
     const {captureProjectDeploymentCreated} = useAnalytics();
 
+    const canViewConnections = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_VIEW');
+
     const form = useForm<ProjectDeployment>({
         defaultValues: {
             description: projectDeployment?.description || undefined,
@@ -239,7 +242,7 @@ const ProjectDeploymentDialog = ({
             environmentId: deploymentEnvironmentId,
             id: currentWorkspaceId!,
         },
-        !!currentWorkspaceId
+        !!currentWorkspaceId && canViewConnections
     );
 
     const watchedProjectDeploymentWorkflows = watch('projectDeploymentWorkflows');

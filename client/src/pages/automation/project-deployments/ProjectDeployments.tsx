@@ -10,6 +10,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ListGroupHeader from '@/shared/components/ListGroupHeader';
 import OpenInButton from '@/shared/components/OpenInButton';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -67,6 +68,10 @@ const ProjectDeployments = () => {
     const [searchParams] = useSearchParams();
 
     const {openProject} = useOpenInProject();
+    const canCreateDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_CREATE');
+    const canEditWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_EDIT');
+
+    const canCreateProjectDeployment = canCreateDeployment && canEditWorkflow;
 
     const projectId = searchParams.get('projectId');
     const tagId = searchParams.get('tagId');
@@ -129,7 +134,14 @@ const ProjectDeployments = () => {
         triggerDefinitions: true,
     });
 
-    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectDeploymentTagsQuery();
+    const {
+        data: tags,
+        error: tagsError,
+        isLoading: tagsIsLoading,
+    } = useGetProjectDeploymentTagsQuery({
+        environmentId: currentEnvironmentId,
+        id: currentWorkspaceId!,
+    });
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
@@ -167,16 +179,18 @@ const ProjectDeployments = () => {
                                     <TooltipContent>Refresh</TooltipContent>
                                 </Tooltip>
 
-                                <ProjectDeploymentDialog
-                                    onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
-                                    projectDeployment={
-                                        {
-                                            environmentId: currentEnvironmentId,
-                                        } as ProjectDeployment
-                                    }
-                                    redirectOnSubmit={false}
-                                    triggerNode={<Button label="New Deployment" />}
-                                />
+                                {canCreateProjectDeployment && (
+                                    <ProjectDeploymentDialog
+                                        onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
+                                        projectDeployment={
+                                            {
+                                                environmentId: currentEnvironmentId,
+                                            } as ProjectDeployment
+                                        }
+                                        redirectOnSubmit={false}
+                                        triggerNode={<Button label="New Deployment" />}
+                                    />
+                                )}
                             </div>
                         )
                     }
@@ -278,7 +292,10 @@ const ProjectDeployments = () => {
                 ) : isFiltered ? (
                     <EmptyFilterResult entityName="project deployments" entityTitle="Project Deployments" />
                 ) : (
-                    <ProjectDeploymentsEmptyState onDeploymentCreated={setNewlyCreatedDeploymentId} />
+                    <ProjectDeploymentsEmptyState
+                        canCreateDeployment={canCreateProjectDeployment}
+                        onDeploymentCreated={setNewlyCreatedDeploymentId}
+                    />
                 )}
             </PageLoader>
         </LayoutContainer>
