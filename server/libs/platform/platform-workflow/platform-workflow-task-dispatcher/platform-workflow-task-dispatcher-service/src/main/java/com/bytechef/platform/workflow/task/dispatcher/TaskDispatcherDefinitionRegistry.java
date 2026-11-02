@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.util.PropertyUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -36,7 +37,9 @@ public class TaskDispatcherDefinitionRegistry {
 
     private final List<TaskDispatcherDefinition> taskDispatcherDefinitions;
 
-    @SuppressFBWarnings("EI")
+    @SuppressFBWarnings({
+        "CT_CONSTRUCTOR_THROW", "EI"
+    })
     public TaskDispatcherDefinitionRegistry(
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
 
@@ -93,8 +96,17 @@ public class TaskDispatcherDefinitionRegistry {
 
     private void validate(List<TaskDispatcherDefinition> taskDispatcherDefinitions) {
         for (TaskDispatcherDefinition taskDispatcherDefinition : taskDispatcherDefinitions) {
-            PropertyUtils.checkInputProperties(
-                OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()));
+            PropertyUtils.checkInputProperties(taskDispatcherDefinition.getProperties());
+
+            for (Property property : taskDispatcherDefinition.getProperties()) {
+                if (property instanceof Property.DynamicPropertiesProperty dynamicPropertiesProperty) {
+                    Objects.requireNonNull(
+                        dynamicPropertiesProperty.getDynamicPropertiesDataSource(),
+                        "Dynamic properties property '%s' of task dispatcher '%s' has no data source".formatted(
+                            property.getName(), taskDispatcherDefinition.getName()));
+                }
+            }
+
             PropertyUtils.checkOutputProperty(
                 OptionalUtils.mapOrElse(taskDispatcherDefinition.getOutputDefinition(),
                     OutputDefinition::getOutputSchema, null));
