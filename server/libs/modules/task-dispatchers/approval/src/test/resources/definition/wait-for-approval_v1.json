@@ -103,9 +103,9 @@
       "approved": true
     }
   },
-  "properties": null,
+  "properties": [ ],
   "resources": null,
-  "taskProperties": null,
+  "taskProperties": [ ],
   "title": "Wait for Approval",
   "variableProperties": null,
   "version": 1

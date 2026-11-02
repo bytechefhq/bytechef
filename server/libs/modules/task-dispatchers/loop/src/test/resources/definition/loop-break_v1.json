@@ -4,9 +4,9 @@
   "icon": "path:assets/loop-break.svg",
   "name": "loopBreak",
   "outputDefinition": null,
-  "properties": null,
+  "properties": [ ],
   "resources": null,
-  "taskProperties": null,
+  "taskProperties": [ ],
   "title": "Loop Break",
   "variableProperties": null,
   "version": 1
