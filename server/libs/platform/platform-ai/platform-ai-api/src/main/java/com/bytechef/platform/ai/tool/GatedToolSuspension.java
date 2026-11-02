@@ -87,11 +87,11 @@ public record GatedToolSuspension(String toolName, String toolInput, @Nullable A
         }
 
         private static @Nullable ApprovalRequest from(Map<String, ?> continueParameters) {
+            Object formParametersValue = continueParameters.get(MetadataConstants.APPROVAL_FORM_PARAMETERS);
+
             if (!(continueParameters.get(FORM_URL) instanceof String formUrl) ||
                 !(continueParameters.get(MetadataConstants.APPROVAL_RAISED_AT) instanceof String raisedAt) ||
-                !(continueParameters
-                    .get(MetadataConstants.APPROVAL_FORM_PARAMETERS) instanceof Map<?, ?> formParameters)
-                ||
+                !(formParametersValue instanceof Map<?, ?> formParameters) ||
                 !(formParameters.get(FORM_TITLE) instanceof String formTitle) ||
                 !(formParameters.get(FORM_DESCRIPTION) instanceof String formDescription)) {
 
