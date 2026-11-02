@@ -114,6 +114,23 @@ public class FileDataStorageServiceTest {
     }
 
     @Test
+    public void testGetAllReturnsOnlyTheEntriesOfTheComponentAndScope() {
+        FILE_DATA_STORAGE_SERVICE.put(
+            "listed", DataStorageScope.WORKFLOW, "scopeId2", "first_key", "value1", 1, PlatformType.AUTOMATION);
+        FILE_DATA_STORAGE_SERVICE.put(
+            "other", DataStorageScope.WORKFLOW, "scopeId2", "key1", "value2", 1, PlatformType.AUTOMATION);
+        FILE_DATA_STORAGE_SERVICE.put(
+            "__internal_state", DataStorageScope.WORKFLOW, "scopeId2", "key1", "value3", 1, PlatformType.AUTOMATION);
+        FILE_DATA_STORAGE_SERVICE.put(
+            "listed", DataStorageScope.ACCOUNT, "scopeId2", "key1", "value4", 1, PlatformType.AUTOMATION);
+
+        Map<String, String> values = FILE_DATA_STORAGE_SERVICE.getAll(
+            "listed", DataStorageScope.WORKFLOW, "scopeId2", 1, PlatformType.AUTOMATION);
+
+        Assertions.assertEquals(Map.of("first_key", "value1"), values);
+    }
+
+    @Test
     public void testPut() {
         FILE_DATA_STORAGE_SERVICE.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);

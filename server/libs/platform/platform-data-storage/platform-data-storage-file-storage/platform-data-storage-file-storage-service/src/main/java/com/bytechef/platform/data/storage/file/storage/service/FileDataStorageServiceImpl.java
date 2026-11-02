@@ -18,6 +18,7 @@ package com.bytechef.platform.data.storage.file.storage.service;
 
 import com.bytechef.commons.data.jdbc.wrapper.TypedValue;
 import com.bytechef.commons.util.CompressionUtils;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -93,13 +94,15 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     @Override
     public <T> Map<String, T> getAll(
         String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type) {
+        String prefix = getFilename(componentName, scope, scopeId, "");
+
         return fileStorageService.getFileEntries(getDirectoryPath(type, environmentId))
             .stream()
+            .map(FileEntry::getName)
+            .filter(filename -> filename.startsWith(prefix))
+            .map(filename -> filename.substring(prefix.length()))
             .collect(
-                Collectors.toMap(
-                    fileEntry -> getKey(fileEntry.getName()),
-                    fileEntry -> get(
-                        componentName, scope, scopeId, getKey(fileEntry.getName()), environmentId, type)));
+                Collectors.toMap(key -> key, key -> get(componentName, scope, scopeId, key, environmentId, type)));
     }
 
     @Override
@@ -120,11 +123,5 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
 
     private static String getFilename(String componentName, DataStorageScope scope, String scopeId, String key) {
         return componentName + "_" + scope.ordinal() + "_" + scopeId + "_" + key;
-    }
-
-    private String getKey(String filename) {
-        String[] items = filename.split("_");
-
-        return items[3];
     }
 }

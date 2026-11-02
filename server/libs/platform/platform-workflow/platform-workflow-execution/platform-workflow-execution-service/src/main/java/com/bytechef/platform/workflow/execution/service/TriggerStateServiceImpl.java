@@ -64,25 +64,27 @@ public class TriggerStateServiceImpl implements TriggerStateService {
 
     @Override
     public void save(WorkflowExecutionId workflowExecutionId, Object value) {
+        Optional<TriggerState> triggerStateOptional = triggerStateRepository.findByWorkflowExecutionId(
+            workflowExecutionId.toString());
+
         Object storedValue = stateValueDataStorage.write(
             getKey(workflowExecutionId), value,
             stateValueDataStorage.fetchReference(
                 workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
 
-        triggerStateRepository
-            .findByWorkflowExecutionId(workflowExecutionId.toString())
-            .ifPresentOrElse(
-                triggerState -> {
-                    triggerState.setValue(storedValue);
+        triggerStateOptional.ifPresentOrElse(
+            triggerState -> {
+                triggerState.setValue(storedValue);
 
-                    triggerStateRepository.save(triggerState);
-                },
-                () -> triggerStateRepository.save(new TriggerState(workflowExecutionId, storedValue)));
+                triggerStateRepository.save(triggerState);
+            },
+            () -> triggerStateRepository.save(new TriggerState(workflowExecutionId, storedValue)));
     }
 
     private static StateValueDataStorage.Key getKey(WorkflowExecutionId workflowExecutionId) {
         return new StateValueDataStorage.Key(
             StateValueDataStorage.TRIGGER_STATE_COMPONENT_NAME, DataStorageScope.WORKFLOW,
-            workflowExecutionId.getWorkflowUuid(), workflowExecutionId.toString());
+            workflowExecutionId.getWorkflowUuid(),
+            StateValueDataStorage.toKey(workflowExecutionId.toString()));
     }
 }

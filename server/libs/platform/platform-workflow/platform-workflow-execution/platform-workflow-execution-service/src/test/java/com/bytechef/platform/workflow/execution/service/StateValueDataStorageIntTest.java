@@ -20,11 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.jdbc.config.JdbcDataStorageConfiguration;
-import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
+import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageService;
+import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageServiceImpl;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -35,6 +37,9 @@ import com.bytechef.platform.workflow.execution.domain.TaskState;
 import com.bytechef.platform.workflow.execution.domain.TriggerState;
 import com.bytechef.platform.workflow.execution.repository.TaskStateRepository;
 import com.bytechef.platform.workflow.execution.repository.TriggerStateRepository;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -42,18 +47,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
-@Import(JdbcDataStorageConfiguration.class)
-@SpringBootTest(
-    classes = PlatformWorkflowExecutionIntTestConfiguration.class,
-    properties = "bytechef.data-storage.provider=jdbc")
+@Import(StateValueDataStorageIntTest.FileDataStorageTestConfiguration.class)
+@SpringBootTest(classes = PlatformWorkflowExecutionIntTestConfiguration.class)
 class StateValueDataStorageIntTest {
 
     private static final long ENVIRONMENT_ID = 2L;
@@ -64,10 +70,10 @@ class StateValueDataStorageIntTest {
         PlatformType.AUTOMATION, JOB_PRINCIPAL_ID, "workflow-uuid", "trigger-a");
 
     @Autowired
-    private DataStorage dataStorage;
+    private ApplicationProperties applicationProperties;
 
     @Autowired
-    private DataStorageRepository dataStorageRepository;
+    private DataStorage dataStorage;
 
     @MockitoBean
     private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -82,10 +88,10 @@ class StateValueDataStorageIntTest {
     private TaskStateService taskStateService;
 
     @Autowired
-    private TriggerStateRepository triggerStateRepository;
+    private PlatformTransactionManager transactionManager;
 
     @Autowired
-    private PlatformTransactionManager transactionManager;
+    private TriggerStateRepository triggerStateRepository;
 
     @Autowired
     private TriggerStateService triggerStateService;
@@ -101,11 +107,15 @@ class StateValueDataStorageIntTest {
             .thenReturn(Optional.of(JOB_PRINCIPAL_ID));
         when(principalJobService.fetchJobPrincipalId(JOB_ID, PlatformType.EMBEDDED))
             .thenReturn(Optional.empty());
+
+        setProvider(ApplicationProperties.DataStorage.Provider.FILESYSTEM);
     }
 
     @AfterEach
     void afterEach() {
-        dataStorageRepository.deleteAll();
+        taskStateService.delete(JOB_RESUME_ID);
+        triggerStateService.delete(WORKFLOW_EXECUTION_ID);
+
         taskStateRepository.deleteAll();
         triggerStateRepository.deleteAll();
     }
@@ -119,10 +129,7 @@ class StateValueDataStorageIntTest {
 
         assertThat(taskState.getValue())
             .isEqualTo(new StateValueReference(ENVIRONMENT_ID, PlatformType.AUTOMATION));
-        assertThat(dataStorage.<Map<String, Object>>fetch(
-            StateValueDataStorage.TASK_STATE_COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION,
-            String.valueOf(JOB_ID), JOB_RESUME_ID.toString(), ENVIRONMENT_ID, PlatformType.AUTOMATION))
-                .hasValue(Map.of("approved", false));
+        assertThat(fetchTaskStateEntry()).hasValue(Map.of("approved", false));
         assertThat(taskStateService.<Map<String, Object>>fetchValue(JOB_RESUME_ID))
             .hasValue(Map.of("approved", false));
         assertThat(taskStateService.<Map<String, Object>>fetchUnlockedValue(JOB_RESUME_ID))
@@ -149,7 +156,7 @@ class StateValueDataStorageIntTest {
         taskStateService.save(JOB_RESUME_ID, "second");
 
         assertThat(taskStateRepository.count()).isEqualTo(1);
-        assertThat(dataStorageRepository.count()).isEqualTo(1);
+        assertThat(fetchTaskStateEntry()).hasValue("second");
         assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("second");
     }
 
@@ -160,7 +167,21 @@ class StateValueDataStorageIntTest {
         taskStateService.delete(JOB_RESUME_ID);
 
         assertThat(taskStateRepository.count()).isZero();
-        assertThat(dataStorageRepository.count()).isZero();
+        assertThat(fetchTaskStateEntry()).isEmpty();
+    }
+
+    @Test
+    void testSaveTaskStateWithJdbcProviderKeepsValueInline() {
+        setProvider(ApplicationProperties.DataStorage.Provider.JDBC);
+
+        taskStateService.save(JOB_RESUME_ID, "inline");
+
+        TaskState taskState = taskStateRepository.findByJobResumeId(JOB_RESUME_ID.toString())
+            .orElseThrow();
+
+        assertThat(taskState.getValue()).isEqualTo("inline");
+        assertThat(fetchTaskStateEntry()).isEmpty();
+        assertThat(taskStateService.<String>fetchValue(JOB_RESUME_ID)).hasValue("inline");
     }
 
     @Test
@@ -176,7 +197,6 @@ class StateValueDataStorageIntTest {
             .orElseThrow();
 
         assertThat(taskState.getValue()).isEqualTo("inline");
-        assertThat(dataStorageRepository.count()).isZero();
         assertThat(taskStateService.<String>fetchValue(jobResumeId)).hasValue("inline");
     }
 
@@ -201,10 +221,7 @@ class StateValueDataStorageIntTest {
 
         assertThat(triggerState.getValue())
             .isEqualTo(new StateValueReference(ENVIRONMENT_ID, PlatformType.AUTOMATION));
-        assertThat(dataStorage.<Map<String, Object>>fetch(
-            StateValueDataStorage.TRIGGER_STATE_COMPONENT_NAME, DataStorageScope.WORKFLOW, "workflow-uuid",
-            WORKFLOW_EXECUTION_ID.toString(), ENVIRONMENT_ID, PlatformType.AUTOMATION))
-                .hasValue(Map.of("cursor", "page-2"));
+        assertThat(fetchTriggerStateEntry()).hasValue(Map.of("cursor", "page-2"));
         assertThat(triggerStateService.<Map<String, Object>>fetchValue(WORKFLOW_EXECUTION_ID))
             .hasValue(Map.of("cursor", "page-2"));
     }
@@ -216,6 +233,86 @@ class StateValueDataStorageIntTest {
         triggerStateService.delete(WORKFLOW_EXECUTION_ID);
 
         assertThat(triggerStateRepository.count()).isZero();
-        assertThat(dataStorageRepository.count()).isZero();
+        assertThat(fetchTriggerStateEntry()).isEmpty();
+    }
+
+    private Optional<Object> fetchTaskStateEntry() {
+        return dataStorage.fetch(
+            StateValueDataStorage.TASK_STATE_COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION,
+            String.valueOf(JOB_ID), StateValueDataStorage.toKey(JOB_RESUME_ID.toString()), ENVIRONMENT_ID,
+            PlatformType.AUTOMATION);
+    }
+
+    private Optional<Object> fetchTriggerStateEntry() {
+        return dataStorage.fetch(
+            StateValueDataStorage.TRIGGER_STATE_COMPONENT_NAME, DataStorageScope.WORKFLOW, "workflow-uuid",
+            StateValueDataStorage.toKey(WORKFLOW_EXECUTION_ID.toString()), ENVIRONMENT_ID, PlatformType.AUTOMATION);
+    }
+
+    private void setProvider(ApplicationProperties.DataStorage.Provider provider) {
+        ApplicationProperties.DataStorage dataStorageProperties = new ApplicationProperties.DataStorage();
+
+        dataStorageProperties.setProvider(provider);
+
+        applicationProperties.setDataStorage(dataStorageProperties);
+    }
+
+    @TestConfiguration
+    static class FileDataStorageTestConfiguration {
+
+        @Bean
+        DataStorage dataStorage(ObjectMapper objectMapper) throws IOException {
+            Path baseDir = Files.createTempDirectory("state_value_data_storage");
+
+            return new FileDataStorage(
+                new FileDataStorageServiceImpl(new FilesystemFileStorageService(baseDir.toString()), objectMapper));
+        }
+    }
+
+    private record FileDataStorage(FileDataStorageService fileDataStorageService) implements DataStorage {
+
+        @Override
+        public void delete(
+            String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+            PlatformType type) {
+
+            fileDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
+        }
+
+        @Override
+        public void deleteScopeData(DataStorageScope scope, String scopeId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T> Optional<T> fetch(
+            String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+            PlatformType type) {
+
+            return fileDataStorageService.fetch(componentName, scope, scopeId, key, environmentId, type);
+        }
+
+        @Override
+        public <T> T get(
+            String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+            PlatformType type) {
+
+            return fileDataStorageService.get(componentName, scope, scopeId, key, environmentId, type);
+        }
+
+        @Override
+        public <T> Map<String, T> getAll(
+            String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type) {
+
+            return fileDataStorageService.getAll(componentName, scope, scopeId, environmentId, type);
+        }
+
+        @Override
+        public void put(
+            String componentName, DataStorageScope scope, String scopeId, String key, Object value,
+            long environmentId, PlatformType type) {
+
+            fileDataStorageService.put(componentName, scope, scopeId, key, value, environmentId, type);
+        }
     }
 }

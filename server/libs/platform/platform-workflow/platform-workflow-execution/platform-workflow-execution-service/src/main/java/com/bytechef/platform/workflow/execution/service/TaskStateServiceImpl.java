@@ -64,28 +64,29 @@ public class TaskStateServiceImpl implements TaskStateService {
     @Transactional(readOnly = true)
     public <T> Optional<T> fetchUnlockedValue(JobResumeId jobResumeId) {
         return taskStateRepository.findUnlockedByJobResumeId(jobResumeId.toString())
-            .map(taskState -> (T) stateValueDataStorage.readUnlocked(getKey(jobResumeId), taskState.getValue()));
+            .map(taskState -> (T) stateValueDataStorage.read(getKey(jobResumeId), taskState.getValue()));
     }
 
     @Override
     public void save(JobResumeId jobResumeId, Object value) {
+        Optional<TaskState> taskStateOptional = taskStateRepository.findByJobResumeId(jobResumeId.toString());
+
         Object storedValue = stateValueDataStorage.write(
             getKey(jobResumeId), value, stateValueDataStorage.fetchJobReference(jobResumeId.getJobId()));
 
-        taskStateRepository
-            .findByJobResumeId(jobResumeId.toString())
-            .ifPresentOrElse(
-                taskState -> {
-                    taskState.setValue(storedValue);
+        taskStateOptional.ifPresentOrElse(
+            taskState -> {
+                taskState.setValue(storedValue);
 
-                    taskStateRepository.save(taskState);
-                },
-                () -> taskStateRepository.save(new TaskState(jobResumeId, storedValue)));
+                taskStateRepository.save(taskState);
+            },
+            () -> taskStateRepository.save(new TaskState(jobResumeId, storedValue)));
     }
 
     private static StateValueDataStorage.Key getKey(JobResumeId jobResumeId) {
         return new StateValueDataStorage.Key(
             StateValueDataStorage.TASK_STATE_COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION,
-            String.valueOf(jobResumeId.getJobId()), jobResumeId.toString());
+            String.valueOf(jobResumeId.getJobId()),
+            StateValueDataStorage.toKey(jobResumeId.toString()));
     }
 }

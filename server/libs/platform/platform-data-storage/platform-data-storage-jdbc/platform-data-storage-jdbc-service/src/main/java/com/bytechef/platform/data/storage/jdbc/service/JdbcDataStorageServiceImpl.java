@@ -72,19 +72,6 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
 
     @Override
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
-    public <T> @NonNull Optional<T> fetchUnlocked(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
-        PlatformType type) {
-
-        return dataStorageRepository
-            .readByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(
-                componentName, scope.ordinal(), scopeId, key, (int) environmentId, type.ordinal())
-            .map(dataEntry -> (T) dataEntry.getValue());
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
     public <T> @NonNull T get(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
