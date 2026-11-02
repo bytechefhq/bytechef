@@ -387,14 +387,22 @@ Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-appro
     - Resolve collection dependencies via `context.beanProvider(Class).orderedStream().toList()` (replaces `beanFactory.getBeansOfType()`)
     - Resolve named beans via `context.bean("beanName", Class)` in supplier
     - Test `BeanRegistrar` specs by capturing `Consumer<Spec<T>>` with `ArgumentCaptor`, applying to mock `Spec`, and verifying fluent calls
-- **Four executors, no queues.** `AsyncConfiguration` defines `taskExecutor` (default `@Async`, limit
+- **Five executors, no queues.** `AsyncConfiguration` defines `taskExecutor` (default `@Async`, limit
   `bytechef.async.concurrency-limit`), `workerExecutor` (task handlers + trigger executions, limit
   `bytechef.worker.task.subscriptions.default`), `syncWorkerExecutor` (the API-Platform sync path and the editor's
-  Test button, limit `bytechef.worker.task.sync-concurrency-limit`) and `messageEventExecutor` (Spring-event→broker
-  bridge, unbounded). The sync lane is a bulkhead, not extra capacity: without it a burst of scheduled runs
-  saturates the worker lane and an interactive caller blocks on a permit while holding a request thread.
+  Test button, limit `bytechef.worker.task.sync-concurrency-limit`), `messageEventExecutor` (Spring-event→broker
+  bridge, unbounded) and `webhookDeliveryExecutor` (outbound webhook POSTs: job status and task started webhooks,
+  notification webhooks, Slack, approval reminders; unbounded). The sync lane is a bulkhead, not extra capacity:
+  without it a burst of scheduled runs saturates the worker lane and an interactive caller blocks on a permit while
+  holding a request thread.
   All are queue-less `SimpleAsyncTaskExecutor`s: a submitter waits for a permit. Anything that runs component code
-  or blocks on I/O goes on `workerExecutor`, never the default. Virtual threads change only the thread factory —
+  or blocks on I/O goes on `workerExecutor`, never the default. Work handed off by a thread that must not wait on a
+  remote endpoint goes on an unbounded lane and bounds itself inside the task, as `WebhookDeliveryService` does with
+  `bytechef.webhook-delivery.concurrency-limit` (one global permit per POST) and `max-pending-deliveries` (per
+  endpoint); each endpoint receives one delivery at a time, so a slow endpoint cannot take every permit. On shutdown
+  the executor interrupts its tasks and waits up to 10 s. On virtual threads the interrupt closes a blocked POST's
+  socket; on platform threads `SimpleClientHttpRequestFactory` does not respond to it, so a POST blocked in its read
+  (up to 30 s) is abandoned when the JVM exits. Virtual threads change only the thread factory —
   they do not lift a limit, which is why these are not `ThreadPoolTaskExecutor`s. The bridge stays unbounded
   because it only hands messages to the broker: starving it stalls every workflow, while the real work is already
   bounded at `workerExecutor` (and DB connections at Hikari's `maximum-pool-size`). Don't bound
@@ -402,7 +410,7 @@ Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-appro
   and each `JobSyncExecutor` builds a private instance whose latch waits on events from it, so a bound there can
   wedge the API-Platform sync path and the editor's Test button. Its per-route ordered executors (single thread,
   bounded queue, blocking put) are a separate, deliberate case and stay bounded. `AsyncConfigurationTest`
-  enumerates them, so it catches the decorator being dropped from `createExecutor` — a fourth executor built
+  enumerates them, so it catches the decorator being dropped from `createExecutor` — a sixth executor built
   outside that factory isn't covered; every executor must go through `createExecutor`. The one deliberate exception is
   `WorkflowSubflowSyncExecutorConfiguration`, which builds its own unbounded executor: subflows nest through a
   `SubflowTaskDispatcher`, so a parent holds a permit while its child needs one, and a shared bounded lane would
