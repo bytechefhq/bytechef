@@ -25,7 +25,7 @@ import orderExecutedTriggerFanInEdgesLast from '../edges/orderExecutedTriggerFan
 import useDisabledTaskNames from '../hooks/useDisabledTaskNames';
 import useWorkflowEditorCanvas from '../hooks/useWorkflowEditorCanvas';
 import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
-import {WorkflowEditorReadOnlyContext} from '../providers/workflowEditorReadOnlyContext';
+import {WorkflowEditorReadOnlyContext, useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import {getAxisCenteredViewport} from '../utils/axisCenteredViewportUtils';
@@ -98,6 +98,8 @@ const WorkflowEditor = ({
         }))
     );
 
+    const inheritedReadOnly = useWorkflowEditorReadOnly();
+
     const {
         edgeTypes,
         handleAddStickyNote,
@@ -129,6 +131,8 @@ const WorkflowEditor = ({
         () => orderExecutedTriggerFanInEdgesLast({disabledTaskNames, edges, nodes, workflowTestNodeStates}),
         [disabledTaskNames, edges, nodes, workflowTestNodeStates]
     );
+
+    const readOnly = !!readOnlyWorkflow || inheritedReadOnly;
 
     useEffect(() => {
         if (!fitsViewOnLoad || !nodesInitialized || !flowWidth || !flowHeight) {
@@ -171,13 +175,17 @@ const WorkflowEditor = ({
     }, [setNodesLocked]);
 
     useEffect(() => {
+        if (readOnly) {
+            return;
+        }
+
         document.addEventListener('keydown', handleTransitionDeleteKeyDown);
 
         return () => document.removeEventListener('keydown', handleTransitionDeleteKeyDown);
-    }, [handleTransitionDeleteKeyDown]);
+    }, [handleTransitionDeleteKeyDown, readOnly]);
 
     return (
-        <WorkflowEditorReadOnlyContext.Provider value={!!readOnlyWorkflow}>
+        <WorkflowEditorReadOnlyContext.Provider value={readOnly}>
             <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-background', className)}>
                 <ReactFlow
                     connectionMode={ConnectionMode.Strict}
@@ -192,16 +200,16 @@ const WorkflowEditor = ({
                     nodeTypes={nodeTypes}
                     nodes={nodes}
                     nodesConnectable={false}
-                    nodesDraggable={!readOnlyWorkflow && !nodesLocked}
-                    onConnect={handleConnect}
-                    onConnectEnd={handleConnectEnd}
-                    onDragOver={onDragOver}
-                    onDrop={onDrop}
+                    nodesDraggable={!readOnly && !nodesLocked}
+                    onConnect={readOnly ? undefined : handleConnect}
+                    onConnectEnd={readOnly ? undefined : handleConnectEnd}
+                    onDragOver={readOnly ? undefined : onDragOver}
+                    onDrop={readOnly ? undefined : onDrop}
                     onEdgesChange={onEdgesChange}
                     onNodeDragStart={handleNodeDragStart}
                     onNodeDragStop={handleNodeDragStop}
                     onNodesChange={handleNodesChange}
-                    onReconnect={handleReconnect}
+                    onReconnect={readOnly ? undefined : handleReconnect}
                     panActivationKeyCode={null}
                     panOnDrag={!preview}
                     panOnScroll={!preview}
@@ -212,17 +220,17 @@ const WorkflowEditor = ({
                 >
                     <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
 
-                    <GraphTransitionEditorLayer />
+                    {!readOnly && <GraphTransitionEditorLayer />}
 
                     <GraphConnectionLine />
 
-                    {!readOnlyWorkflow && nodes.length > 0 && <WorkflowIssuesNote fallback={<NodeActionsHint />} />}
+                    {!readOnly && nodes.length > 0 && <WorkflowIssuesNote fallback={<NodeActionsHint />} />}
 
                     {!preview && (
                         <WorkflowEditorToolbar
                             enableUndoRedo={enableUndoRedo}
-                            onAddStickyNote={readOnlyWorkflow ? undefined : handleAddStickyNote}
-                            readOnly={!!readOnlyWorkflow}
+                            onAddStickyNote={readOnly ? undefined : handleAddStickyNote}
+                            readOnly={readOnly}
                         />
                     )}
                 </ReactFlow>

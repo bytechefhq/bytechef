@@ -4,6 +4,7 @@ import {BranchCaseType, UpdateWorkflowMutationType} from '@/shared/types';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {clearTaskPositions} from './clearAllNodePositions';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {
     drainPendingDefinitionMutation,
     hasPendingDefinition,
@@ -149,6 +150,10 @@ export default function removeWorkflowNodePosition({
     nodeName,
     updateWorkflowMutation,
 }: RemoveWorkflowNodePositionProps) {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const {workflow} = useWorkflowDataStore.getState();
 
     if (!workflow.definition) {
