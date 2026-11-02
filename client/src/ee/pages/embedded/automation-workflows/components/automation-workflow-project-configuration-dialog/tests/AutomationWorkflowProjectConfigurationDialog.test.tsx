@@ -1,10 +1,12 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectConfigurationDialog from '../AutomationWorkflowProjectConfigurationDialog';
 
 const mocks = vi.hoisted(() => ({
+    configurations: {current: [] as unknown[]},
     createMutate: vi.fn(),
     impactData: {current: {automationWorkflowProjectConfigurationVersionImpact: {workflows: []}} as unknown},
     impactQuery: vi.fn(),
@@ -34,7 +36,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         return {data: options.enabled ? mocks.impactData.current : undefined};
     },
     useAutomationWorkflowProjectConfigurationsQuery: () => ({
-        data: {automationWorkflowProjectConfigurations: []},
+        data: {automationWorkflowProjectConfigurations: mocks.configurations.current},
     }),
     useAutomationWorkflowProjectVersionsQuery: () => ({
         data: {
@@ -80,19 +82,22 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
     beforeEach(() => {
         windowResizeObserver();
 
+        environmentStore.setState({currentEnvironmentId: 2});
+
         Element.prototype.hasPointerCapture = vi.fn();
         Element.prototype.releasePointerCapture = vi.fn();
         Element.prototype.scrollIntoView = vi.fn();
     });
 
     afterEach(() => {
+        mocks.configurations.current = [];
         mocks.impactData.current = {automationWorkflowProjectConfigurationVersionImpact: {workflows: []}};
 
         resetAll();
         vi.clearAllMocks();
     });
 
-    it('creates a configuration with the chosen environment and version', async () => {
+    it('creates a configuration in the current environment with the chosen version', async () => {
         const user = userEvent.setup();
 
         render(
@@ -101,8 +106,8 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             </TooltipProvider>
         );
 
-        await user.click(screen.getByRole('combobox', {name: 'Environment'}));
-        await user.click(await screen.findByRole('option', {name: 'Staging'}));
+        expect(screen.getByText('Staging')).toBeInTheDocument();
+        expect(screen.queryByRole('combobox', {name: 'Environment'})).not.toBeInTheDocument();
 
         await user.click(screen.getByRole('combobox', {name: 'Version'}));
         await user.click(await screen.findByRole('option', {name: 'V3'}));
@@ -118,6 +123,19 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             projectId: 'project-1',
             projectVersion: 3,
         });
+    });
+
+    it('does not create a second configuration in an environment that already has one', () => {
+        mocks.configurations.current = [existingConfiguration];
+
+        render(
+            <TooltipProvider>
+                <AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />
+            </TooltipProvider>
+        );
+
+        expect(screen.getByText('This project already has a configuration in Staging.')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
     });
 
     it('offers only published versions', async () => {
