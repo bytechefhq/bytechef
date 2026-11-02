@@ -70,21 +70,17 @@ public class McpServerGraphQlController {
 
     @QueryMapping
     public McpServer mcpServer(@Argument long id) {
-        return getSharedAdministrationMcpServer(id);
+        return mcpServerFacade.getMcpServer(id);
     }
 
     @MutationMapping
     public McpServer updateMcpServer(@Argument long id, @Argument McpServerUpdateInput input) {
-        getSharedAdministrationMcpServer(id);
-
-        return mcpServerService.update(
+        return mcpServerFacade.updateMcpServer(
             id, input.name(), input.enabled(), input.enforceToolAuthorization(), input.authenticationRequired());
     }
 
     @MutationMapping
     public List<Tag> updateMcpServerTags(@Argument long id, @Argument List<TagInput> tags) {
-        getSharedAdministrationMcpServer(id);
-
         List<Tag> tagList = tags.stream()
             .map(tagInput -> {
                 Tag tag = new Tag();
@@ -101,8 +97,6 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public boolean deleteMcpServer(@Argument long id) {
-        getSharedAdministrationMcpServer(id);
-
         mcpServerFacade.deleteMcpServer(id);
 
         return true;
@@ -126,19 +120,9 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public String updateMcpServerUrl(@Argument long id) {
-        getSharedAdministrationMcpServer(id);
-
-        McpServer mcpServer = mcpServerService.rotateSecretKey(id);
+        McpServer mcpServer = mcpServerFacade.rotateMcpServerSecretKey(id);
 
         return buildMcpServerUrl(mcpServer, mcpServer.getSecretKey());
-    }
-
-    private McpServer getSharedAdministrationMcpServer(long id) {
-        McpServer mcpServer = mcpServerService.getMcpServer(id);
-
-        mcpServerTypeDefinitions.checkSharedAdministration(mcpServer.getType());
-
-        return mcpServer;
     }
 
     private String getMcpServerUrl(McpServer mcpServer) {

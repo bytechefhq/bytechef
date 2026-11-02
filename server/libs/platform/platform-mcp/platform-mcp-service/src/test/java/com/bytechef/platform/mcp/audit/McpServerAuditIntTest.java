@@ -41,6 +41,7 @@ import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -284,7 +285,7 @@ class McpServerAuditIntTest {
 
     @Test
     void testDeleteRecordsThePlatformCapturedBeforeTheDelete() {
-        McpServer mcpServer = saveMcpServer(PlatformType.EMBEDDED);
+        McpServer mcpServer = saveMcpServer(PlatformType.AUTOMATION);
 
         mcpServerFacade.deleteMcpServer(mcpServer.getId());
 
@@ -293,7 +294,7 @@ class McpServerAuditIntTest {
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpServerAuditEvents.MCP_SERVER_DELETED);
 
         assertThat(persistentAuditEvent.getPrincipal()).isEqualTo(ADMIN_LOGIN);
-        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("mcpServerId", String.valueOf(mcpServer.getId()))
@@ -317,14 +318,33 @@ class McpServerAuditIntTest {
 
     @Test
     void testCreateComponentRecordsTheComponentAndThePlatformOfItsServer() {
-        McpServer mcpServer = saveMcpServer(PlatformType.EMBEDDED);
+        McpServer mcpServer = saveMcpServer(PlatformType.AUTOMATION);
 
         McpComponent mcpComponent = mcpServerFacade.create(
             new McpComponent("slack", 1, mcpServer.getId(), null), List.of());
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpComponentAuditEvents.MCP_COMPONENT_CREATED);
 
-        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("mcpComponentId", String.valueOf(mcpComponent.getId()))
+            .containsEntry("mcpServerId", String.valueOf(mcpServer.getId()))
+            .containsEntry("componentName", "slack")
+            .containsEntry("componentVersion", "1")
+            .doesNotContainKeys("dataError", "mapperError", "captureError");
+    }
+
+    @Test
+    void testCreateComponentWithoutToolsRecordsTheComponentAndThePlatformOfItsServer() {
+        McpServer mcpServer = saveMcpServer(PlatformType.AUTOMATION);
+
+        McpComponent mcpComponent = mcpServerFacade.createMcpComponent(
+            new McpComponent("slack", 1, mcpServer.getId(), null));
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpComponentAuditEvents.MCP_COMPONENT_CREATED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("mcpComponentId", String.valueOf(mcpComponent.getId()))
@@ -362,7 +382,7 @@ class McpServerAuditIntTest {
 
     @Test
     void testDeleteComponentRecordsThePlatformCapturedBeforeTheDelete() {
-        McpServer mcpServer = saveMcpServer(PlatformType.EMBEDDED);
+        McpServer mcpServer = saveMcpServer(PlatformType.AUTOMATION);
 
         McpComponent mcpComponent = mcpComponentRepository.save(
             new McpComponent("slack", 1, mcpServer.getId(), null));
@@ -375,7 +395,7 @@ class McpServerAuditIntTest {
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpComponentAuditEvents.MCP_COMPONENT_DELETED);
 
-        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("mcpComponentId", String.valueOf(mcpComponent.getId()));
@@ -397,7 +417,7 @@ class McpServerAuditIntTest {
 
     @Test
     void testCreateToolRecordsTheToolAndThePlatformOfItsServer() {
-        McpComponent mcpComponent = saveMcpComponent(PlatformType.EMBEDDED);
+        McpComponent mcpComponent = saveMcpComponent(PlatformType.AUTOMATION);
 
         McpTool mcpTool = mcpServerFacade.createMcpTool(
             new McpTool("slack_send_message", Map.of(), mcpComponent.getId()));
@@ -405,7 +425,7 @@ class McpServerAuditIntTest {
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpToolAuditEvents.MCP_TOOL_CREATED);
 
         assertThat(persistentAuditEvent.getPrincipal()).isEqualTo(ADMIN_LOGIN);
-        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("mcpToolId", String.valueOf(mcpTool.getId()))
@@ -443,7 +463,7 @@ class McpServerAuditIntTest {
 
     @Test
     void testDeleteToolRecordsTheToolAndThePlatformOfItsServer() {
-        McpComponent mcpComponent = saveMcpComponent(PlatformType.EMBEDDED);
+        McpComponent mcpComponent = saveMcpComponent(PlatformType.AUTOMATION);
 
         McpTool mcpTool = mcpServerFacade.createMcpTool(
             new McpTool("slack_send_message", Map.of(), mcpComponent.getId()));
@@ -454,7 +474,7 @@ class McpServerAuditIntTest {
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpToolAuditEvents.MCP_TOOL_DELETED);
 
-        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("mcpToolId", String.valueOf(mcpTool.getId()))
@@ -512,6 +532,27 @@ class McpServerAuditIntTest {
         @Bean
         ApplicationProperties applicationProperties() {
             return new ApplicationProperties();
+        }
+
+        @Bean
+        McpServerTypeDefinition automationMcpServerTypeDefinition() {
+            return new McpServerTypeDefinition() {
+
+                @Override
+                public PlatformType getType() {
+                    return PlatformType.AUTOMATION;
+                }
+
+                @Override
+                public boolean isSharedAdministration() {
+                    return true;
+                }
+
+                @Override
+                public String resolvePath(String secretKey) {
+                    return "/" + secretKey;
+                }
+            };
         }
     }
 }

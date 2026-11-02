@@ -17,20 +17,13 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.mcp.domain.McpServer;
-import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.security.access.AccessDeniedException;
 
 /**
- * The contributed {@link McpServerTypeDefinition}s by type. A type without a definition is neither administered through
- * the shared MCP operations nor given a URL.
- *
  * @author Ivica Cardic
  */
 final class McpServerTypeDefinitions {
@@ -40,25 +33,6 @@ final class McpServerTypeDefinitions {
     McpServerTypeDefinitions(List<McpServerTypeDefinition> mcpServerTypeDefinitions) {
         this.mcpServerTypeDefinitions = mcpServerTypeDefinitions.stream()
             .collect(Collectors.toMap(McpServerTypeDefinition::getType, Function.identity()));
-    }
-
-    void checkSharedAdministration(PlatformType type) {
-        McpServerTypeDefinition mcpServerTypeDefinition = mcpServerTypeDefinitions.get(type);
-
-        if (mcpServerTypeDefinition == null || !mcpServerTypeDefinition.isSharedAdministration()) {
-            throw new AccessDeniedException(
-                "MCP servers of type " + type + " can only be administered through their own MCP server operations");
-        }
-    }
-
-    Set<Long> getSharedAdministrationMcpServerIds(McpServerService mcpServerService) {
-        return mcpServerTypeDefinitions.values()
-            .stream()
-            .filter(McpServerTypeDefinition::isSharedAdministration)
-            .flatMap(mcpServerTypeDefinition -> mcpServerService.getMcpServers(mcpServerTypeDefinition.getType())
-                .stream())
-            .map(McpServer::getId)
-            .collect(Collectors.toSet());
     }
 
     String resolvePath(PlatformType type, String secretKey) {

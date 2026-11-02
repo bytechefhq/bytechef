@@ -22,6 +22,7 @@ import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
@@ -41,6 +42,8 @@ public interface McpServerFacade {
      */
     McpComponent create(McpComponent mcpComponent, List<McpTool> mcpTools);
 
+    McpComponent createMcpComponent(McpComponent mcpComponent);
+
     McpTool createMcpTool(McpTool mcpTool);
 
     /**
@@ -59,9 +62,15 @@ public interface McpServerFacade {
 
     void deleteMcpTool(McpTool mcpTool);
 
+    Optional<McpTool> fetchMcpTool(long mcpToolId);
+
     McpComponent getMcpComponent(long mcpComponentId);
 
     List<McpTool> getMcpComponentMcpTools(long mcpComponentId);
+
+    List<McpComponent> getMcpComponents();
+
+    McpServer getMcpServer(long mcpServerId);
 
     List<McpComponent> getMcpServerMcpComponents(long mcpServerId);
 
@@ -81,6 +90,10 @@ public interface McpServerFacade {
      */
     Map<McpServer, List<Tag>> getMcpServerTags(List<McpServer> mcpServers);
 
+    List<McpTool> getMcpTools();
+
+    McpServer rotateMcpServerSecretKey(long mcpServerId);
+
     /**
      * Updates an existing MCP component with associated tools.
      *
@@ -99,6 +112,10 @@ public interface McpServerFacade {
      * @param tags the list of tags to update
      * @return the validated and saved tags
      */
+    McpServer updateMcpServer(
+        long id, @Nullable String name, @Nullable Boolean enabled, @Nullable Boolean enforceToolAuthorization,
+        @Nullable Boolean authenticationRequired);
+
     List<Tag> updateMcpServerTags(long id, List<Tag> tags);
 
     McpTool updateMcpTool(McpTool mcpTool);
