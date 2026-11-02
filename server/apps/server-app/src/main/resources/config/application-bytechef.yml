@@ -107,6 +107,8 @@ bytechef:
     # principal, environment, API key and connected user) on each server instance; zero or a negative value
     # records every request (EE)
     credential-usage-interval: 1h
+    # Whether audit events are recorded (EE)
+    enabled: false
     # Whether principals are masked (e.g. a***@example.com) when audit events are read through the API (EE)
     mask-principals: false
     # Whether passed permission checks on methods that change something and have no event type of their own are

@@ -17,6 +17,7 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.actuate.security.AuthenticationAuditListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
@@ -31,6 +32,7 @@ import org.springframework.util.ClassUtils;
  */
 @Component
 @ConditionalOnEEVersion
+@ConditionalOnBooleanProperty("bytechef.audit.enabled")
 public class CredentialRedactingAuthenticationAuditListener extends AuthenticationAuditListener {
 
     static final String REDACTED_PRINCIPAL = "[credential]";
