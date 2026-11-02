@@ -19,6 +19,7 @@ package com.bytechef.platform.notification.handler;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.domain.Notification;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,7 +41,7 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
     }
 
     @Override
-    public void send(
+    public CompletableFuture<Void> send(
         Notification notification, EmailNotificationHandler emailNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
@@ -57,5 +58,7 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
             email, emailNotificationHandler.getSubject(notificationHandlerContext),
             emailNotificationHandler.getContent(notificationHandlerContext), false,
             emailNotificationHandler.isHtml());
+
+        return CompletableFuture.completedFuture(null);
     }
 }

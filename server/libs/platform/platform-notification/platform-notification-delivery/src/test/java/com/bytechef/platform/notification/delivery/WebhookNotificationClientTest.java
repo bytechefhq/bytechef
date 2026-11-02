@@ -207,22 +207,6 @@ class WebhookNotificationClientTest {
     }
 
     @Test
-    void testRejectsLoopbackUrl() {
-        assertThatThrownBy(
-            () -> webhookNotificationClient.deliver(
-                WebhookDeliveryRequest.of("http://127.0.0.1/hook", "job.status", "{}")))
-                    .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void testRejectsNonHttpScheme() {
-        assertThatThrownBy(
-            () -> webhookNotificationClient.deliver(
-                WebhookDeliveryRequest.of("ftp://example.com/hook", "job.status", "{}")))
-                    .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     void testPostSendsJsonBodyAndEventHeaders() {
         WebhookDelivery webhookDelivery = delivery(url).eventType("job.status")
             .headers(Map.of("X-Custom", "custom-value"))

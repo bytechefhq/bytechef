@@ -16,9 +16,14 @@
 
 package com.bytechef.platform.notification.handler;
 
-import com.bytechef.platform.notification.delivery.SlackNotificationClient;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.notification.delivery.WebhookDelivery;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
+import com.bytechef.platform.notification.delivery.WebhookRetry;
 import com.bytechef.platform.notification.domain.Notification;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,10 +32,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class SlackNotificationSender implements NotificationSender<SlackNotificationHandler> {
 
-    private final SlackNotificationClient slackNotificationClient;
+    private final WebhookDeliveryService webhookDeliveryService;
 
-    public SlackNotificationSender(SlackNotificationClient slackNotificationClient) {
-        this.slackNotificationClient = slackNotificationClient;
+    @SuppressFBWarnings("EI2")
+    public SlackNotificationSender(WebhookDeliveryService webhookDeliveryService) {
+        this.webhookDeliveryService = webhookDeliveryService;
     }
 
     @Override
@@ -39,7 +45,7 @@ public class SlackNotificationSender implements NotificationSender<SlackNotifica
     }
 
     @Override
-    public void send(
+    public CompletableFuture<Void> send(
         Notification notification, SlackNotificationHandler slackNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
@@ -52,7 +58,17 @@ public class SlackNotificationSender implements NotificationSender<SlackNotifica
                 "Notification " + notification.getId() + " has no Slack webhook URL configured");
         }
 
-        slackNotificationClient.send(
-            slackWebhookUrl.strip(), slackNotificationHandler.getText(notificationHandlerContext));
+        String text = slackNotificationHandler.getText(notificationHandlerContext);
+
+        WebhookDelivery webhookDelivery = WebhookDelivery.builder("slack", slackWebhookUrl.strip())
+            .description("notification " + notification.getId() + " '" + notification.getName() + "'")
+            .eventType("slack.message")
+            .validateUrl(true)
+            .payload(String.valueOf(notificationHandlerContext.getJobId()), JsonUtils.write(Map.of("text", text)))
+            .retry(WebhookRetry.none())
+            .build();
+
+        return webhookDeliveryService.submit(webhookDelivery)
+            .thenAccept(NotificationDeliveryOutcomes::requireAnySent);
     }
 }

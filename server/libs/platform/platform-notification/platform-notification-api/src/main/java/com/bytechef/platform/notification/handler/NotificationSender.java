@@ -17,6 +17,7 @@
 package com.bytechef.platform.notification.handler;
 
 import com.bytechef.platform.notification.domain.Notification;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Matija Petanjek
@@ -25,5 +26,6 @@ public interface NotificationSender<T extends NotificationHandler> {
 
     Notification.Type getType();
 
-    void send(Notification notification, T notificationHandler, NotificationHandlerContext notificationHandlerContext);
+    CompletableFuture<Void> send(
+        Notification notification, T notificationHandler, NotificationHandlerContext notificationHandlerContext);
 }

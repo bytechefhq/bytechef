@@ -55,6 +55,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -125,7 +126,7 @@ public class PlatformCoordinatorIntTestConfiguration {
         }
 
         @Override
-        public void send(
+        public CompletableFuture<Void> send(
             Notification notification, SlackNotificationHandler notificationHandler,
             NotificationHandlerContext notificationHandlerContext) {
 
