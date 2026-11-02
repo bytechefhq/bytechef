@@ -27,6 +27,10 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => number) =>
         selector({currentWorkspaceId: hoisted.storeState.workspaceId}),
