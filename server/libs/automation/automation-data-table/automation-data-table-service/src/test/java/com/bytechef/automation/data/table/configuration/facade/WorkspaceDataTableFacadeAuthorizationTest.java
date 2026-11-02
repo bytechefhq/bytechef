@@ -53,7 +53,7 @@ class WorkspaceDataTableFacadeAuthorizationTest {
 
     @Test
     void testDropRequiresTableEditor() {
-        assertExpression("dropTable", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+        assertExpression("dropTable", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_DELETE')");
     }
 
     @Test
