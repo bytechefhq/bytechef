@@ -130,6 +130,7 @@ class AuditDataContractTest {
         Map.entry("McpServerFacadeImpl.rotateMcpServerSecretKey", DELEGATES),
         Map.entry("McpServerFacadeImpl.updateMcpServer", DELEGATES),
         Map.entry("McpServerFacadeImpl.updateMcpServerTags", TAGS),
+        Map.entry("McpServerFacadeImpl.updateSharedMcpServerTags", TAGS),
         Map.entry("McpToolServiceImpl.create", RECORDED_BY_CALLER),
         Map.entry("McpToolServiceImpl.delete", RECORDED_BY_CALLER),
         Map.entry("McpToolServiceImpl.update", RECORDED_BY_CALLER),

@@ -46,6 +46,8 @@ public interface McpServerFacade {
 
     McpTool createMcpTool(McpTool mcpTool);
 
+    McpComponent createSharedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools);
+
     /**
      * Deletes the MCP component identified by the specified ID.
      *
@@ -61,6 +63,12 @@ public interface McpServerFacade {
     void deleteMcpServer(long mcpServerId);
 
     void deleteMcpTool(McpTool mcpTool);
+
+    void deleteSharedMcpComponent(long mcpComponentId);
+
+    void deleteSharedMcpServer(long mcpServerId);
+
+    void deleteSharedMcpTool(McpTool mcpTool);
 
     Optional<McpTool> fetchMcpTool(long mcpToolId);
 
@@ -119,4 +127,11 @@ public interface McpServerFacade {
     List<Tag> updateMcpServerTags(long id, List<Tag> tags);
 
     McpTool updateMcpTool(McpTool mcpTool);
+
+    McpComponent updateSharedMcpComponent(
+        McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools);
+
+    List<Tag> updateSharedMcpServerTags(long id, List<Tag> tags);
+
+    McpTool updateSharedMcpTool(McpTool mcpTool);
 }

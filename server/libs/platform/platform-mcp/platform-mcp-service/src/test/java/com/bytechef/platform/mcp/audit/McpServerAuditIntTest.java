@@ -285,7 +285,7 @@ class McpServerAuditIntTest {
 
     @Test
     void testDeleteRecordsThePlatformCapturedBeforeTheDelete() {
-        McpServer mcpServer = saveMcpServer(PlatformType.AUTOMATION);
+        McpServer mcpServer = saveMcpServer(PlatformType.EMBEDDED);
 
         mcpServerFacade.deleteMcpServer(mcpServer.getId());
 
@@ -294,7 +294,7 @@ class McpServerAuditIntTest {
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpServerAuditEvents.MCP_SERVER_DELETED);
 
         assertThat(persistentAuditEvent.getPrincipal()).isEqualTo(ADMIN_LOGIN);
-        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("mcpServerId", String.valueOf(mcpServer.getId()))
@@ -318,14 +318,14 @@ class McpServerAuditIntTest {
 
     @Test
     void testCreateComponentRecordsTheComponentAndThePlatformOfItsServer() {
-        McpServer mcpServer = saveMcpServer(PlatformType.AUTOMATION);
+        McpServer mcpServer = saveMcpServer(PlatformType.EMBEDDED);
 
         McpComponent mcpComponent = mcpServerFacade.create(
             new McpComponent("slack", 1, mcpServer.getId(), null), List.of());
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpComponentAuditEvents.MCP_COMPONENT_CREATED);
 
-        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("mcpComponentId", String.valueOf(mcpComponent.getId()))

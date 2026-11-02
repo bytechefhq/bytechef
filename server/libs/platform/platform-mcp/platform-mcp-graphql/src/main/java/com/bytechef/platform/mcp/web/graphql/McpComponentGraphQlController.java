@@ -102,7 +102,7 @@ public class McpComponentGraphQlController {
             .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters()))
             .toList();
 
-        return mcpServerFacade.create(mcpComponent, mcpTools);
+        return mcpServerFacade.createSharedMcpComponent(mcpComponent, mcpTools);
     }
 
     @MutationMapping
@@ -120,12 +120,12 @@ public class McpComponentGraphQlController {
             .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters(), id))
             .toList();
 
-        return mcpServerFacade.update(mcpComponent, requiredAuthorities, mcpTools);
+        return mcpServerFacade.updateSharedMcpComponent(mcpComponent, requiredAuthorities, mcpTools);
     }
 
     @MutationMapping
     public boolean deleteMcpComponent(@Argument long id) {
-        mcpServerFacade.deleteMcpComponent(id);
+        mcpServerFacade.deleteSharedMcpComponent(id);
 
         return true;
     }
