@@ -4,18 +4,37 @@ import ProjectListItem from '@/pages/automation/projects/components/project-list
 import {ProjectListItemTabType} from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
 import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
+import {fireEvent, render, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, expect, it, vi} from 'vitest';
+
+const ALL_SCOPES = [
+    'DEPLOYMENT_CREATE',
+    'PROJECT_CREATE',
+    'PROJECT_DELETE',
+    'PROJECT_PUBLISH',
+    'PROJECT_PULL',
+    'PROJECT_SETTINGS',
+    'WORKFLOW_CREATE',
+    'WORKFLOW_EDIT',
+    'WORKSPACE_MANAGE',
+];
 
 const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
 }));
 
+const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
+
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
     useNavigate: () => hoisted.navigate,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
 }));
 
 vi.mock('@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog', () => ({
@@ -71,9 +90,16 @@ const renderProjectListItem = (activeTab?: ProjectListItemTabType, projectOverri
         </MemoryRouter>
     );
 
+const openProjectActionsMenu = async () => {
+    await userEvent.click(screen.getByRole('button', {name: 'More Project Actions'}));
+};
+
 beforeEach(() => {
     hoisted.navigate.mockReset();
+    hoistedScope.grantedScopes = [...ALL_SCOPES];
     onTabChange.mockReset();
+
+    windowResizeObserver();
 });
 
 it('summarizes workflows and deployments and hides the tabs while collapsed', () => {
@@ -260,23 +286,55 @@ it('opens the deployments page in production after deploying to production', asy
     expect(onTabChange).not.toHaveBeenCalledWith('deployments', 43);
 });
 
-it('shows the published version when the draft matches it', () => {
-    renderProjectListItem(undefined, {
-        lastProjectVersion: 3,
-        lastStatus: ProjectStatus.Draft,
-        unpublishedChanges: false,
-    });
+it('shows every gated project action when all scopes are granted', async () => {
+    renderProjectListItem();
 
-    expect(screen.getByText('PUBLISHED').parentElement).toHaveTextContent('V2PUBLISHED');
+    await openProjectActionsMenu();
+
+    for (const name of ['Publish Project', 'Edit Project', 'Duplicate Project', 'Share Project', 'Delete Project']) {
+        expect(screen.getByRole('menuitem', {name})).toBeInTheDocument();
+    }
 });
 
-it('shows the draft version when the draft has unpublished changes', () => {
-    renderProjectListItem(undefined, {
-        lastProjectVersion: 3,
-        lastStatus: ProjectStatus.Draft,
-        unpublishedChanges: true,
-    });
+it('hides every gated project action when no scope is granted, leaving Export', async () => {
+    hoistedScope.grantedScopes = [];
 
-    expect(screen.getByText('DRAFT').parentElement).toHaveTextContent('V3DRAFT');
-    expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
+    renderProjectListItem();
+
+    await openProjectActionsMenu();
+
+    expect(screen.getByRole('menuitem', {name: 'Export Project'})).toBeInTheDocument();
+
+    for (const name of ['Publish Project', 'Edit Project', 'Duplicate Project', 'Share Project', 'Delete Project']) {
+        expect(screen.queryByRole('menuitem', {name})).not.toBeInTheDocument();
+    }
+});
+
+it('hides Publish and Edit when WORKFLOW_EDIT is missing even with PROJECT_PUBLISH', async () => {
+    hoistedScope.grantedScopes = ALL_SCOPES.filter((scope) => scope !== 'WORKFLOW_EDIT');
+
+    renderProjectListItem();
+
+    await openProjectActionsMenu();
+
+    expect(screen.queryByRole('menuitem', {name: 'Publish Project'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', {name: 'Edit Project'})).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitem', {name: 'Delete Project'})).toBeInTheDocument();
+});
+
+it('hides New Workflow without WORKFLOW_CREATE', () => {
+    hoistedScope.grantedScopes = ALL_SCOPES.filter((scope) => scope !== 'WORKFLOW_CREATE');
+
+    renderProjectListItem('workflows');
+
+    expect(screen.queryByLabelText('Create Workflow')).not.toBeInTheDocument();
+});
+
+it('hides deploying without DEPLOYMENT_CREATE', () => {
+    hoistedScope.grantedScopes = ALL_SCOPES.filter((scope) => scope !== 'DEPLOYMENT_CREATE');
+
+    renderProjectListItem('deployments');
+
+    expect(screen.queryByLabelText('Create Deployment')).not.toBeInTheDocument();
+    expect(screen.queryByText('Save deployment false')).not.toBeInTheDocument();
 });
