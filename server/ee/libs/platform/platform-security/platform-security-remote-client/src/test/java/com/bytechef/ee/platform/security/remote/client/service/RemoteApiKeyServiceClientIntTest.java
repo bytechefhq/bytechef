@@ -174,6 +174,17 @@ class RemoteApiKeyServiceClientIntTest {
     }
 
     @Test
+    void testFetchApiKeyBySecretKeyAndEnvironmentMatchesOnlyItsEnvironment() {
+        ApiKey apiKey = createApiKey(Environment.STAGING, PlatformType.EMBEDDED);
+
+        assertThat(remoteApiKeyServiceClient.fetchApiKey(apiKey.getSecretKey(), Environment.STAGING.ordinal()))
+            .map(ApiKey::getId)
+            .contains(apiKey.getId());
+        assertThat(remoteApiKeyServiceClient.fetchApiKey(apiKey.getSecretKey(), Environment.PRODUCTION.ordinal()))
+            .isEmpty();
+    }
+
+    @Test
     void testUnportedMethodStillThrowsUnsupported() {
         assertThatThrownBy(() -> remoteApiKeyServiceClient.delete(1L))
             .isInstanceOf(UnsupportedOperationException.class);

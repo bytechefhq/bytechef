@@ -71,6 +71,16 @@ public class RemoteApiKeyServiceClient implements ApiKeyService {
     }
 
     @Override
+    public Optional<ApiKey> fetchApiKey(String secretKey, long environmentId) {
+        return toApiKey(
+            getStub().fetchApiKeyBySecretKeyAndEnvironment(
+                FetchApiKeyBySecretKeyAndEnvironmentRequest.newBuilder()
+                    .setEnvironmentId(environmentId)
+                    .setSecretKey(secretKey)
+                    .build()));
+    }
+
+    @Override
     public Optional<ApiKey> fetchApiKey(long id) {
         throw new UnsupportedOperationException();
     }
@@ -84,12 +94,7 @@ public class RemoteApiKeyServiceClient implements ApiKeyService {
 
     @Override
     public ApiKey getApiKey(String secretKey, long environmentId) {
-        Optional<ApiKey> apiKey = toApiKey(
-            getStub().fetchApiKeyBySecretKeyAndEnvironment(
-                FetchApiKeyBySecretKeyAndEnvironmentRequest.newBuilder()
-                    .setEnvironmentId(environmentId)
-                    .setSecretKey(secretKey)
-                    .build()));
+        Optional<ApiKey> apiKey = fetchApiKey(secretKey, environmentId);
 
         return apiKey.orElseThrow(
             () -> new IllegalArgumentException("Api key not found for the specified environment."));
