@@ -61,6 +61,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 class PermissionServiceIntTest {
 
     private static final String LOGIN = "user";
+    private static final String CONNECTED_USER_EXTERNAL_ID = "external-user-1";
     private static final long USER_ID = 2L;
 
     @Autowired
@@ -424,6 +425,82 @@ class PermissionServiceIntTest {
 
         boolean granted = AutomationAuthorizationContext.callSkippingChecks(
             () -> permissionService.hasWorkflowScope("workflow-" + UUID.randomUUID(), "WORKFLOW_EDIT"));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
+    void testIsCurrentUserDeniesAConnectedUserUnderAutomationAuthorizationSkip() throws Throwable {
+        authenticate(CONNECTED_USER_EXTERNAL_ID, AuthorityConstants.USER);
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.isCurrentUser(USER_ID));
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testIsResourceOwnerDeniesAConnectedUserUnderAutomationAuthorizationSkip() throws Throwable {
+        authenticate(CONNECTED_USER_EXTERNAL_ID, AuthorityConstants.USER);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("ApiKey", ResourceOwner.ofUser(USER_ID)));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> resourcePermissionService.isResourceOwner("ApiKey", 1L));
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testHasResourceRoleDeniesAConnectedUserUnderAutomationAuthorizationSkip() throws Throwable {
+        authenticate(CONNECTED_USER_EXTERNAL_ID, AuthorityConstants.USER);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("KnowledgeBase", ResourceOwner.ofWorkspace(workspaceId)));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> resourcePermissionService.hasResourceRole(1L, "KnowledgeBase", "VIEWER"));
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceRoleDeniesAConnectedUserUnderAutomationAuthorizationSkip() throws Throwable {
+        authenticate(CONNECTED_USER_EXTERNAL_ID, AuthorityConstants.USER);
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.hasWorkspaceRole(workspaceId, "VIEWER"));
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceScopeInEveryEnvironmentDeniesAConnectedUserUnderAutomationAuthorizationSkip()
+        throws Throwable {
+
+        authenticate(CONNECTED_USER_EXTERNAL_ID, AuthorityConstants.USER);
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.hasWorkspaceScopeInEveryEnvironment(workspaceId, "WORKSPACE_MEMBER_MANAGE"));
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testTenantAdminPassesThePrivilegedChecksUnderAutomationAuthorizationSkip() throws Throwable {
+        authenticate(LOGIN, AuthorityConstants.ADMIN);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("KnowledgeBase", ResourceOwner.ofWorkspace(workspaceId)));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> resourcePermissionService.hasWorkspaceScopeInEveryEnvironment(
+                workspaceId, "WORKSPACE_MEMBER_MANAGE") &&
+                resourcePermissionService.hasWorkspaceRole(workspaceId, "ADMIN") &&
+                resourcePermissionService.hasResourceRole(1L, "KnowledgeBase", "ADMIN") &&
+                resourcePermissionService.isResourceOwner("KnowledgeBase", 1L) &&
+                resourcePermissionService.isCurrentUser(USER_ID));
 
         assertThat(granted).isTrue();
     }
