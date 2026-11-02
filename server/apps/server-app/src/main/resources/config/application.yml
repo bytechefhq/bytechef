@@ -48,6 +48,8 @@ info:
     customerPortalUrl: ${billing.stripe.customer-portal-url:}
   application:
     edition: ${bytechef.edition:}
+  audit:
+    enabled: ${bytechef.audit.enabled:false}
   docs:
     changelogUrl: ${docs.changelog-url:}
     communitySupportUrl: ${docs.community-support-url:}

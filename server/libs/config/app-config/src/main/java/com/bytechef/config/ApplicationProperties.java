@@ -3075,6 +3075,12 @@ public class ApplicationProperties {
         private Duration credentialUsageInterval = DEFAULT_CREDENTIAL_USAGE_INTERVAL;
 
         /**
+         * Whether audit events are recorded; when disabled no audit event is written, while events recorded earlier
+         * stay readable and are still purged by the retention job
+         */
+        private boolean enabled;
+
+        /**
          * Whether principals are masked (e.g. {@code a***@example.com}) when audit events are read through the API
          */
         private boolean maskPrincipals;
@@ -3100,6 +3106,10 @@ public class ApplicationProperties {
             return credentialUsageInterval;
         }
 
+        public boolean isEnabled() {
+            return enabled;
+        }
+
         public boolean isMaskPrincipals() {
             return maskPrincipals;
         }
@@ -3119,6 +3129,10 @@ public class ApplicationProperties {
         public void setCredentialUsageInterval(Duration credentialUsageInterval) {
             this.credentialUsageInterval = Objects.requireNonNullElse(
                 credentialUsageInterval, DEFAULT_CREDENTIAL_USAGE_INTERVAL);
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
 
         public void setMaskPrincipals(boolean maskPrincipals) {

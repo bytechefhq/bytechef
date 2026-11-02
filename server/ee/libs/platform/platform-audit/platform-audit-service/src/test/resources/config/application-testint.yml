@@ -4,3 +4,5 @@ spring:
 
 bytechef:
   edition: ee
+  audit:
+    enabled: true

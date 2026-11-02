@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.core.Ordered;
 import org.springframework.security.authorization.method.AuthorizationInterceptorsOrder;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Aspect
 @Component
 @ConditionalOnEEVersion
+@ConditionalOnBooleanProperty("bytechef.audit.enabled")
 public class AuditCaptureAspect implements Ordered {
 
     private static final Logger log = LoggerFactory.getLogger(AuditCaptureAspect.class);
