@@ -85,6 +85,17 @@ describe('PrepaidBilling', () => {
         expect(screen.getByRole('button', {name: 'Buy extra units'})).toBeDisabled();
     });
 
+    it('disables the buy button when an active subscription is cancelled at period end', () => {
+        hoisted.useGetCurrentSubscriptionQuery.mockReturnValue({
+            data: {...activeSubscription, cancelAtPeriodEnd: true},
+            error: null,
+        });
+
+        render(<PrepaidBilling />);
+
+        expect(screen.getByRole('button', {name: 'Buy extra units'})).toBeDisabled();
+    });
+
     it('shows the package banner and refetches after package success, then clears it', async () => {
         vi.useFakeTimers();
 
