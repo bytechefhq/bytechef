@@ -588,6 +588,9 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
+        connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
             .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
             .stream()
@@ -609,6 +612,9 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
         publishAndPinProject(automationWorkflowProjectId);
+
+        connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
