@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.audit.remote.client;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -41,6 +42,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
@@ -79,6 +81,9 @@ class RemoteAuditEventServiceClientIntTest {
 
     @Autowired
     private PlatformTransactionManager platformTransactionManager;
+
+    @Autowired
+    private ObjectProvider<PlatformTransactionManager> transactionManagerProvider;
 
     private ManagedChannel managedChannel;
     private RemoteAuditEventServiceClient remoteAuditEventServiceClient;
@@ -178,7 +183,9 @@ class RemoteAuditEventServiceClientIntTest {
         AspectJProxyFactory aspectJProxyFactory = new AspectJProxyFactory(new ProjectOperations());
 
         aspectJProxyFactory.addAspect(
-            new AuditAspect(remoteAuditEventServiceClient, new AuditMapperResolver(staticListableBeanFactory)));
+            new AuditAspect(
+                new ApplicationProperties(), remoteAuditEventServiceClient,
+                new AuditMapperResolver(staticListableBeanFactory), transactionManagerProvider));
 
         ProjectOperations projectOperations = aspectJProxyFactory.getProxy();
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);

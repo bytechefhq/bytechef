@@ -6,4 +6,4 @@ bytechef:
 
 spring:
   liquibase:
-    contexts: configuration
+    contexts: configuration,execution
