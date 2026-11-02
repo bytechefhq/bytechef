@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.task.monitor;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.task.domain.ApprovalTask;
@@ -28,6 +29,7 @@ import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Optional;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnCoordinator
 @ConditionalOnProperty(
     name = "bytechef.automation.approval-task.reconciliation.enabled", havingValue = "true", matchIfMissing = true)
 public class ApprovalTaskReconciliationMonitor {
@@ -62,6 +65,7 @@ public class ApprovalTaskReconciliationMonitor {
     }
 
     @Scheduled(initialDelayString = "PT7M", fixedDelayString = "PT15M")
+    @SchedulerLock(name = "approvalTaskReconciliationMonitor", lockAtLeastFor = "PT5M", lockAtMostFor = "PT1H")
     public void reconcileApprovalTasks() {
         for (String tenantId : tenantService.getTenantIds()) {
             try {
