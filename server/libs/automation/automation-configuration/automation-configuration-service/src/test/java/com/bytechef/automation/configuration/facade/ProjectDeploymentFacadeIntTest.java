@@ -496,7 +496,7 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.updateProjectDeploymentTags(
             otherProjectDeploymentDTO.id(), List.of(new Tag("deployment-tag-z")));
 
-        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(workspace.getId());
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(workspace.getId(), null);
 
         assertThat(tags)
             .extracting(Tag::getName)
@@ -517,10 +517,10 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.updateProjectDeploymentTags(
             otherProjectDeploymentDTO.id(), List.of(new Tag("other-workspace-deployment-tag")));
 
-        assertThat(projectDeploymentFacade.getProjectDeploymentTags(workspace.getId()))
+        assertThat(projectDeploymentFacade.getProjectDeploymentTags(workspace.getId(), null))
             .extracting(Tag::getName)
             .containsExactly("workspace-deployment-tag");
-        assertThat(projectDeploymentFacade.getProjectDeploymentTags(otherWorkspace.getId()))
+        assertThat(projectDeploymentFacade.getProjectDeploymentTags(otherWorkspace.getId(), null))
             .extracting(Tag::getName)
             .containsExactly("other-workspace-deployment-tag");
     }
