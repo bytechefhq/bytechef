@@ -116,4 +116,9 @@ public class ConnectedUserProjectServiceImpl implements ConnectedUserProjectServ
         return OptionalUtils.get(
             connectUserProjectRepository.findConnectedUserIdForUpdate(externalUserId, environment.ordinal()));
     }
+
+    @Override
+    public ConnectedUserProject lockConnectedUserProject(long connectedUserProjectId) {
+        return OptionalUtils.get(connectUserProjectRepository.findByIdForUpdate(connectedUserProjectId));
+    }
 }

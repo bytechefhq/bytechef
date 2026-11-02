@@ -88,4 +88,9 @@ public class RemoteConnectedUserProjectServiceClient implements ConnectedUserPro
     public long lockConnectedUser(String externalUserId, Environment environment) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public ConnectedUserProject lockConnectedUserProject(long connectedUserProjectId) {
+        throw new UnsupportedOperationException();
+    }
 }

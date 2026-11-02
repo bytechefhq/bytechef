@@ -54,4 +54,10 @@ public interface ConnectedUserProjectService {
      * @return the connected user's id
      */
     long lockConnectedUser(String externalUserId, Environment environment);
+
+    /**
+     * Locks the connected user project's row until the current transaction ends. Callers that also lock the connected
+     * user take this lock first, so the order is always connected user project, then connected user.
+     */
+    ConnectedUserProject lockConnectedUserProject(long connectedUserProjectId);
 }

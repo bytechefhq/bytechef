@@ -25,9 +25,9 @@ import com.bytechef.ee.embedded.configuration.exception.MissingConnectionExcepti
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
-import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
@@ -56,7 +56,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
     private final AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
-    private final ConnectUserProjectRepository connectUserProjectRepository;
+    private final ConnectedUserProjectService connectedUserProjectService;
     private final ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager;
     private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
@@ -69,7 +69,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
-        ConnectUserProjectRepository connectUserProjectRepository,
+        ConnectedUserProjectService connectedUserProjectService,
         ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager,
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
@@ -79,7 +79,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         this.automationWorkflowProjectConfigurationResolver = automationWorkflowProjectConfigurationResolver;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
-        this.connectUserProjectRepository = connectUserProjectRepository;
+        this.connectedUserProjectService = connectedUserProjectService;
         this.connectedUserProjectWorkflowManager = connectedUserProjectWorkflowManager;
         this.connectedUserProjectWorkflowRepository = connectedUserProjectWorkflowRepository;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
@@ -368,8 +368,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager
             .getOrCreateConnectedUserProject(externalUserId, environment);
 
-        return connectUserProjectRepository.findByIdForUpdate(connectedUserProject.getId())
-            .orElseThrow();
+        return connectedUserProjectService.lockConnectedUserProject(connectedUserProject.getId());
     }
 
     private boolean isRowEnabled(ConnectedUserProjectWorkflow reference) {
