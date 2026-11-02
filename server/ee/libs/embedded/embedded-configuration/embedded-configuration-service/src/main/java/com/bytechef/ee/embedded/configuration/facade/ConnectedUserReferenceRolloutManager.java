@@ -13,15 +13,12 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
-import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,7 +58,6 @@ public class ConnectedUserReferenceRolloutManager {
         "Not in the version released to this environment";
 
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
-    private final ConnectedUserProjectService connectedUserProjectService;
     private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
     private final ProjectDeploymentService projectDeploymentService;
@@ -72,14 +68,12 @@ public class ConnectedUserReferenceRolloutManager {
     @SuppressFBWarnings("EI")
     public ConnectedUserReferenceRolloutManager(
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
-        ConnectedUserProjectService connectedUserProjectService,
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         PlatformTransactionManager platformTransactionManager, ProjectDeploymentService projectDeploymentService,
         ProjectWorkflowService projectWorkflowService) {
 
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
-        this.connectedUserProjectService = connectedUserProjectService;
         this.connectedUserProjectWorkflowRepository = connectedUserProjectWorkflowRepository;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
         this.projectDeploymentService = projectDeploymentService;
@@ -132,13 +126,17 @@ public class ConnectedUserReferenceRolloutManager {
         }
 
         for (ProjectDeployment projectDeployment : projectDeployments) {
-            if (projectDeployment.getEnvironmentId() != environmentId ||
-                !connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeployment.getId())) {
-
+            if (projectDeployment.getEnvironmentId() != environmentId) {
                 continue;
             }
 
-            applyConfigurationState(projectDeployment, removedProvidedInputNames);
+            Optional<Long> connectedUserIdOptional = fetchConnectedUserId(projectDeployment);
+
+            if (connectedUserIdOptional.isEmpty()) {
+                continue;
+            }
+
+            applyConfigurationState(projectDeployment, connectedUserIdOptional.get(), removedProvidedInputNames);
         }
     }
 
@@ -149,24 +147,9 @@ public class ConnectedUserReferenceRolloutManager {
     private void rollOut(
         long automationWorkflowProjectId, long environmentId, Map<String, Set<String>> removedProvidedInputNames) {
 
-        int releasedVersion;
         List<ProjectDeployment> projectDeployments;
 
         try {
-            Environment environment = Environment.values()[(int) environmentId];
-
-            Optional<Integer> fetchedReleasedVersion = connectedUserReferenceDeploymentManager.fetchReleasedVersion(
-                automationWorkflowProjectId, environment);
-
-            if (fetchedReleasedVersion.isEmpty()) {
-                log.debug(
-                    "Automation workflow project id={} is not released in environment id={}; nothing to roll out",
-                    automationWorkflowProjectId, environmentId);
-
-                return;
-            }
-
-            releasedVersion = fetchedReleasedVersion.get();
             projectDeployments = projectDeploymentService.getAllProjectDeployments(automationWorkflowProjectId);
         } catch (RuntimeException exception) {
             log.error("Rolling out automation workflow project id={} failed", automationWorkflowProjectId, exception);
@@ -175,16 +158,13 @@ public class ConnectedUserReferenceRolloutManager {
         }
 
         for (ProjectDeployment projectDeployment : projectDeployments) {
-            if (projectDeployment.getEnvironmentId() != environmentId ||
-                projectDeployment.getProjectVersion() == releasedVersion) {
-
+            if (projectDeployment.getEnvironmentId() != environmentId) {
                 continue;
             }
 
             try {
                 requiresNewTransactionTemplate.executeWithoutResult(
-                    status -> rollOutDeploymentWithReferences(
-                        projectDeployment, releasedVersion, removedProvidedInputNames));
+                    status -> rollOutDeploymentIfBehind(projectDeployment, removedProvidedInputNames));
             } catch (RuntimeException exception) {
                 logRolloutFailure(automationWorkflowProjectId, projectDeployment.getId(), exception);
             }
@@ -242,14 +222,51 @@ public class ConnectedUserReferenceRolloutManager {
         ProjectDeployment projectDeployment = connectedUserReferenceDeploymentManager.getDeployment(
             projectDeploymentId);
 
-        Optional<Integer> releasedVersion = connectedUserReferenceDeploymentManager.fetchReleasedVersion(
-            projectDeployment.getProjectId(), projectDeployment.getEnvironment());
+        return rollOutDeploymentIfBehind(projectDeployment, Map.of());
+    }
 
-        if (releasedVersion.isEmpty() || projectDeployment.getProjectVersion() == releasedVersion.get()) {
+    private boolean rollOutDeploymentIfBehind(
+        ProjectDeployment projectDeployment, Map<String, Set<String>> removedProvidedInputNames) {
+
+        Optional<Long> connectedUserIdOptional = fetchConnectedUserId(projectDeployment);
+
+        if (connectedUserIdOptional.isEmpty()) {
             return false;
         }
 
-        return rollOutDeploymentWithReferences(projectDeployment, releasedVersion.get());
+        long connectedUserId = connectedUserIdOptional.get();
+
+        Optional<Integer> releasedVersion = connectedUserReferenceDeploymentManager.fetchReleasedVersion(
+            connectedUserId, projectDeployment.getProjectId());
+
+        if (releasedVersion.isEmpty()) {
+            log.debug(
+                "Automation workflow project id={} is not released to connected user id={}; nothing to roll out to " +
+                    "deployment id={}",
+                projectDeployment.getProjectId(), connectedUserId, projectDeployment.getId());
+
+            return false;
+        }
+
+        if (projectDeployment.getProjectVersion() == releasedVersion.get()) {
+            return false;
+        }
+
+        return rollOutDeploymentWithReferences(
+            projectDeployment, connectedUserId, releasedVersion.get(), removedProvidedInputNames);
+    }
+
+    private Optional<Long> fetchConnectedUserId(ProjectDeployment projectDeployment) {
+        Optional<Long> connectedUserIdOptional = connectedUserReferenceDeploymentManager.fetchConnectedUserId(
+            projectDeployment.getId());
+
+        if (connectedUserIdOptional.isEmpty()) {
+            log.debug(
+                "Deployment id={} of automation workflow project id={} has no connected user; skipping it",
+                projectDeployment.getId(), projectDeployment.getProjectId());
+        }
+
+        return connectedUserIdOptional;
     }
 
     private void runRolloutPass(
@@ -291,7 +308,7 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     private void applyConfigurationState(
-        ProjectDeployment projectDeployment, Map<String, Set<String>> removedProvidedInputNames) {
+        ProjectDeployment projectDeployment, long connectedUserId, Map<String, Set<String>> removedProvidedInputNames) {
 
         long projectDeploymentId = projectDeployment.getId();
 
@@ -313,7 +330,8 @@ public class ConnectedUserReferenceRolloutManager {
 
             try {
                 requiresNewTransactionTemplate.executeWithoutResult(
-                    status -> applyConfigurationState(projectDeployment, reference, removedProvidedInputNames));
+                    status -> applyConfigurationState(
+                        projectDeployment, connectedUserId, reference, removedProvidedInputNames));
             } catch (RuntimeException exception) {
                 log.error(
                     "Applying the configuration state to reference id={} of deployment id={} failed",
@@ -323,7 +341,7 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     private void applyConfigurationState(
-        ProjectDeployment projectDeployment, ConnectedUserProjectWorkflow reference,
+        ProjectDeployment projectDeployment, long connectedUserId, ConnectedUserProjectWorkflow reference,
         Map<String, Set<String>> removedProvidedInputNames) {
 
         long projectDeploymentId = projectDeployment.getId();
@@ -338,7 +356,7 @@ public class ConnectedUserReferenceRolloutManager {
         }
 
         if (!reference.isEnabled() || !connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid)) {
+            connectedUserId, projectDeployment.getProjectId(), automationWorkflowUuid)) {
 
             connectedUserReferenceDeploymentManager.setRowEnabled(projectDeploymentId, row.get(), false);
 
@@ -349,7 +367,7 @@ public class ConnectedUserReferenceRolloutManager {
         }
 
         RowSpec rowSpec = resolveRowSpec(
-            reference, projectDeployment, projectDeployment.getProjectVersion(), removedInputNames);
+            reference, projectDeployment, connectedUserId, projectDeployment.getProjectVersion(), removedInputNames);
 
         connectedUserReferenceDeploymentManager.putWorkflow(projectDeploymentId, automationWorkflowUuid, rowSpec);
     }
@@ -390,18 +408,11 @@ public class ConnectedUserReferenceRolloutManager {
             exception);
     }
 
-    private boolean rollOutDeploymentWithReferences(ProjectDeployment projectDeployment, int releasedVersion) {
-        return rollOutDeploymentWithReferences(projectDeployment, releasedVersion, Map.of());
-    }
-
     private boolean rollOutDeploymentWithReferences(
-        ProjectDeployment projectDeployment, int releasedVersion, Map<String, Set<String>> removedProvidedInputNames) {
+        ProjectDeployment projectDeployment, long connectedUserId, int releasedVersion,
+        Map<String, Set<String>> removedProvidedInputNames) {
 
         long projectDeploymentId = projectDeployment.getId();
-
-        if (!connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeploymentId)) {
-            return false;
-        }
 
         List<ConnectedUserProjectWorkflow> references = getReferences(projectDeploymentId);
 
@@ -411,14 +422,14 @@ public class ConnectedUserReferenceRolloutManager {
             return true;
         }
 
-        rollOutDeployment(projectDeployment, releasedVersion, references, removedProvidedInputNames);
+        rollOutDeployment(projectDeployment, connectedUserId, releasedVersion, references, removedProvidedInputNames);
 
         return true;
     }
 
     private void rollOutDeployment(
-        ProjectDeployment projectDeployment, int releasedVersion, List<ConnectedUserProjectWorkflow> references,
-        Map<String, Set<String>> removedProvidedInputNames) {
+        ProjectDeployment projectDeployment, long connectedUserId, int releasedVersion,
+        List<ConnectedUserProjectWorkflow> references, Map<String, Set<String>> removedProvidedInputNames) {
 
         long automationWorkflowProjectId = projectDeployment.getProjectId();
         long projectDeploymentId = projectDeployment.getId();
@@ -441,11 +452,11 @@ public class ConnectedUserReferenceRolloutManager {
             }
 
             RowSpec rowSpec = resolveRowSpec(
-                reference, projectDeployment, releasedVersion,
+                reference, projectDeployment, connectedUserId, releasedVersion,
                 removedProvidedInputNames.getOrDefault(automationWorkflowUuid, Set.of()));
 
             boolean rowEnabled = rowSpec.enabled() && connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-                automationWorkflowProjectId, projectDeployment.getEnvironment(), automationWorkflowUuid);
+                connectedUserId, automationWorkflowProjectId, automationWorkflowUuid);
 
             rowSpecsByAutomationWorkflowUuid.put(
                 automationWorkflowUuid, new RowSpec(rowSpec.resolved(), rowEnabled, rowSpec.inputs()));
@@ -462,14 +473,12 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     private RowSpec resolveRowSpec(
-        ConnectedUserProjectWorkflow reference, ProjectDeployment projectDeployment, int projectVersion,
-        Set<String> removedInputNames) {
+        ConnectedUserProjectWorkflow reference, ProjectDeployment projectDeployment, long connectedUserId,
+        int projectVersion, Set<String> removedInputNames) {
 
         long automationWorkflowProjectId = projectDeployment.getProjectId();
         String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
 
-        ConnectedUserProject connectedUserProject = connectedUserProjectService.getConnectedUserProject(
-            reference.getConnectedUserProjectId());
         Optional<ProjectDeploymentWorkflow> currentRow = connectedUserReferenceDeploymentManager.fetchRow(
             projectDeployment.getId(), automationWorkflowUuid);
 
@@ -485,8 +494,8 @@ public class ConnectedUserReferenceRolloutManager {
         }
 
         ReferenceResolution referenceResolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserProject.getConnectedUserId(), automationWorkflowProjectId, projectDeployment.getEnvironment(),
-            automationWorkflowUuid, workflowId, reference.isEnabled(), Map.of(),
+            connectedUserId, automationWorkflowProjectId, automationWorkflowUuid, workflowId, reference.isEnabled(),
+            Map.of(),
             currentRow.map(ProjectDeploymentWorkflow::getConnections)
                 .orElse(List.of()),
             userInputs);

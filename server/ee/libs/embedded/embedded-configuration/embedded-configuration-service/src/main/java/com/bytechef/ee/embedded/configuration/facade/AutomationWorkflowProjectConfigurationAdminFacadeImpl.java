@@ -29,6 +29,7 @@ import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectCon
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
@@ -82,6 +83,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
+    private final ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
     private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
     private final ConnectionService connectionService;
@@ -97,6 +99,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         ComponentDefinitionFacade componentDefinitionFacade, ComponentDefinitionService componentDefinitionService,
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
+        ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
         ConnectionService connectionService, JobService jobService, ProjectService projectService,
@@ -108,6 +111,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         this.componentDefinitionFacade = componentDefinitionFacade;
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
+        this.connectedUserProjectConfigurationService = connectedUserProjectConfigurationService;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
         this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
         this.connectionService = connectionService;
@@ -175,6 +179,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
                     String.valueOf(configurationWorkflow.getWorkflowUuid()), workflowProvidedInputNames);
             }
         }
+
+        connectedUserProjectConfigurationService.deleteByConfigurationId(id);
 
         automationWorkflowProjectConfigurationService.delete(id);
 

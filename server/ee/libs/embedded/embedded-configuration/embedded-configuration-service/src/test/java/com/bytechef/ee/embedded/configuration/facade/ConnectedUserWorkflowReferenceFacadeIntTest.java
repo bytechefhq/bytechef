@@ -61,9 +61,11 @@ import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWor
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -210,6 +212,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Autowired
     private ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver;
+
+    @Autowired
+    private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
 
     @Autowired
     private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
@@ -407,11 +412,16 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         assertThat(result.getProjectDeploymentId()).isEqualTo(existingReference.getProjectDeploymentId());
         assertThat(getReference(existingReference.getId()).getVersion()).isEqualTo(existingReference.getVersion());
 
-        verifyNoInteractions(automationWorkflowProjectFacade, connectedUserService);
+        verifyNoInteractions(automationWorkflowProjectFacade);
+
+        verify(connectedUserService).getConnectedUser(connectedUser.getId());
+        verifyNoMoreInteractions(connectedUserService);
 
         verify(connectedUserReferenceDeploymentManager).getDeployment(existingReference.getProjectDeploymentId());
-        verify(connectedUserReferenceDeploymentManager).fetchReleasedVersion(automationWorkflowProjectId,
-            Environment.PRODUCTION);
+        verify(connectedUserReferenceDeploymentManager).fetchConnectedUserId(
+            existingReference.getProjectDeploymentId());
+        verify(connectedUserReferenceDeploymentManager).fetchReleasedVersion(
+            connectedUser.getId(), automationWorkflowProjectId);
         verifyNoMoreInteractions(connectedUserReferenceDeploymentManager);
     }
 
@@ -1208,6 +1218,42 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                             .getErrorKey()));
 
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
+        assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+    }
+
+    @Test
+    void testProvisionReferenceFailsWithoutQualifyingConfiguration() {
+        EmbeddedPermissionEvaluator realEmbeddedPermissionEvaluator = new EmbeddedPermissionEvaluator(
+            SpelEvaluator.create());
+
+        when(embeddedPermissionEvaluator.evaluate(any(), any()))
+            .thenAnswer(invocation -> realEmbeddedPermissionEvaluator.evaluate(
+                invocation.getArgument(0), invocation.getArgument(1)));
+
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Beta Only");
+
+        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "Beta", "metadata['beta'] == 'true'", 1,
+            true, true);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(connectedUser);
+
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION))
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                    configurationException.getErrorKey())
+                        .isEqualTo(ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED
+                            .getErrorKey()));
+
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(
+            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
             connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
     }

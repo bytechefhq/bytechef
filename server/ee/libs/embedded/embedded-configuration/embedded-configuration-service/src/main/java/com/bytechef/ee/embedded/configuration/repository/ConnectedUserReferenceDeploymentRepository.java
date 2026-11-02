@@ -26,5 +26,7 @@ public interface ConnectedUserReferenceDeploymentRepository
 
     List<ConnectedUserReferenceDeployment> findAllByConnectedUserId(long connectedUserId);
 
+    Optional<ConnectedUserReferenceDeployment> findByProjectDeploymentId(long projectDeploymentId);
+
     Optional<ConnectedUserReferenceDeployment> findByConnectedUserIdAndProjectId(long connectedUserId, long projectId);
 }

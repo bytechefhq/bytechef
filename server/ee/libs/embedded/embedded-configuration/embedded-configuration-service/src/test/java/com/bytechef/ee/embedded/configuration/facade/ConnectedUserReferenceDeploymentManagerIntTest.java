@@ -45,6 +45,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
@@ -54,6 +55,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeplo
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -208,6 +210,9 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
 
     @Autowired
+    private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
+
+    @Autowired
     private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
 
     @Autowired
@@ -270,7 +275,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowId = createDraftWorkflow("Resolve Complete", SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserId, UNCONFIGURED_PROJECT_ID, Environment.PRODUCTION, UNCONFIGURED_WORKFLOW_UUID, workflowId,
+            connectedUserId, UNCONFIGURED_PROJECT_ID, UNCONFIGURED_WORKFLOW_UUID, workflowId,
             true, Map.of(), List.of(), Map.of("channel", "general"));
 
         RowSpec rowSpec = resolution.rowSpec();
@@ -288,7 +293,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowId = createDraftWorkflow("Resolve Not Asked", SLACK_WORKFLOW_DEFINITION);
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserId, UNCONFIGURED_PROJECT_ID, Environment.PRODUCTION, UNCONFIGURED_WORKFLOW_UUID, workflowId,
+            connectedUserId, UNCONFIGURED_PROJECT_ID, UNCONFIGURED_WORKFLOW_UUID, workflowId,
             false, Map.of(), List.of(), Map.of());
 
         assertThat(resolution.rowSpec()
@@ -305,7 +310,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
             .thenReturn(List.of());
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserId, UNCONFIGURED_PROJECT_ID, Environment.PRODUCTION, UNCONFIGURED_WORKFLOW_UUID, workflowId,
+            connectedUserId, UNCONFIGURED_PROJECT_ID, UNCONFIGURED_WORKFLOW_UUID, workflowId,
             true, Map.of(), List.of(), Map.of());
 
         assertThat(resolution.rowSpec()
@@ -318,7 +323,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowId = createDraftWorkflow("Resolve Missing Input", SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserId, UNCONFIGURED_PROJECT_ID, Environment.PRODUCTION, UNCONFIGURED_WORKFLOW_UUID, workflowId,
+            connectedUserId, UNCONFIGURED_PROJECT_ID, UNCONFIGURED_WORKFLOW_UUID, workflowId,
             true, Map.of(), List.of(), Map.of());
 
         assertThat(resolution.rowSpec()
@@ -386,6 +391,38 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
             developmentConnectedUser.getId(), automationWorkflowProjectId))
                 .map(ConnectedUserReferenceDeployment::getProjectDeploymentId)
                 .contains(developmentDeploymentId);
+    }
+
+    @Test
+    void testFirstActivationAssignsSelfServeConfiguration() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Self Serve Assignment");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "Newest", null, 2, true, true);
+        automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "Oldest", null, 1, true, true);
+
+        AutomationWorkflowProjectConfiguration selfServeConfiguration = automationWorkflowProjectConfigurationService
+            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .stream()
+            .filter(configuration -> configuration.getProjectVersion() == 2)
+            .findFirst()
+            .orElseThrow();
+
+        long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+
+        assertThat(
+            connectedUserProjectConfigurationService.fetchAssignment(connectedUserId, automationWorkflowProjectId))
+                .map(ConnectedUserProjectConfiguration::getConfigurationId)
+                .contains(selfServeConfiguration.getId());
+        assertThat(projectDeploymentService.getProjectDeployment(projectDeploymentId)
+            .getProjectVersion()).isEqualTo(2);
     }
 
     @Test
@@ -536,7 +573,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         assertThatThrownBy(
             () -> connectedUserReferenceDeploymentManager.getReleasedVersion(
-                automationWorkflowProjectId, Environment.PRODUCTION))
+                connectedUserId, automationWorkflowProjectId))
                     .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
                         configurationException.getErrorKey())
                             .isEqualTo(ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED
@@ -561,7 +598,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         assertThatThrownBy(
             () -> connectedUserReferenceDeploymentManager.getReleasedVersion(
-                automationWorkflowProjectId, Environment.PRODUCTION))
+                connectedUserId, automationWorkflowProjectId))
                     .isInstanceOf(ConfigurationException.class);
     }
 
@@ -576,7 +613,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
         assertThat(connectedUserReferenceDeploymentManager.getReleasedVersion(
-            automationWorkflowProjectId, Environment.PRODUCTION)).isEqualTo(1);
+            connectedUserId, automationWorkflowProjectId)).isEqualTo(1);
     }
 
     @Test

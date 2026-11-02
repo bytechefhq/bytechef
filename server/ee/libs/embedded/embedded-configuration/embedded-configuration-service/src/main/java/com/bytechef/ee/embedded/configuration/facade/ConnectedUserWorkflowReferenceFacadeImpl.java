@@ -53,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 @SkipAutomationAuthorization
 public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWorkflowReferenceFacade {
+    private final AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
     private final ConnectUserProjectRepository connectUserProjectRepository;
@@ -65,6 +66,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
 
     @SuppressFBWarnings("EI")
     public ConnectedUserWorkflowReferenceFacadeImpl(
+        AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         ConnectUserProjectRepository connectUserProjectRepository,
@@ -74,6 +76,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService, ProjectWorkflowService projectWorkflowService) {
 
+        this.automationWorkflowProjectConfigurationResolver = automationWorkflowProjectConfigurationResolver;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
         this.connectUserProjectRepository = connectUserProjectRepository;
@@ -181,7 +184,8 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             return reference;
         }
 
-        checkWorkflowTemplateReleased(automationWorkflowUuid, environment);
+        checkWorkflowTemplateReleased(
+            connectedUserService.getConnectedUser(externalUserId, environment), automationWorkflowUuid);
 
         AutomationWorkflowProjectDTO automationWorkflowProject = getVisibleAutomationWorkflowProject(
             externalUserId, automationWorkflowUuid, environment);
@@ -235,8 +239,8 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
 
         connectedUserReferenceDeploymentManager.checkProvidedValuesNotRequested(
-            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid,
-            requestedConnectionIds, inputs);
+            connectedUser.getId(), projectDeployment.getProjectId(), automationWorkflowUuid, requestedConnectionIds,
+            inputs);
 
         String workflowId = connectedUserReferenceDeploymentManager.getWorkflowId(
             projectDeployment.getProjectId(), projectVersion, automationWorkflowUuid);
@@ -253,15 +257,15 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             : inputs;
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUser.getId(), projectDeployment.getProjectId(), projectDeployment.getEnvironment(),
-            automationWorkflowUuid, workflowId, enable, requestedConnectionIds, currentConnections, currentInputs);
+            connectedUser.getId(), projectDeployment.getProjectId(), automationWorkflowUuid, workflowId, enable,
+            requestedConnectionIds, currentConnections, currentInputs);
 
         RowSpec resolvedRowSpec = resolution.rowSpec();
 
         boolean requestedEnabled = resolvedRowSpec.enabled();
         boolean rowEnabled = requestedEnabled &&
             connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-                projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
+                connectedUser.getId(), projectDeployment.getProjectId(), automationWorkflowUuid);
 
         RowSpec rowSpec = new RowSpec(resolvedRowSpec.resolved(), rowEnabled, resolvedRowSpec.inputs());
 
@@ -299,7 +303,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             .orElseThrow();
     }
 
-    private void checkWorkflowTemplateReleased(String automationWorkflowUuid, Environment environment) {
+    private void checkWorkflowTemplateReleased(ConnectedUser connectedUser, String automationWorkflowUuid) {
         Optional<AutomationWorkflowProjectDTO> publishedProject = automationWorkflowProjectFacade
             .getPublishedProjects()
             .stream()
@@ -311,13 +315,10 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             return;
         }
 
+        AutomationWorkflowProjectDTO project = publishedProject.get();
+
         Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
-            automationWorkflowProjectConfigurationService.getConfigurations(
-                publishedProject.get()
-                    .id(),
-                environment.ordinal())
-                .stream()
-                .findFirst();
+            automationWorkflowProjectConfigurationResolver.resolve(connectedUser, project.id());
 
         boolean released = false;
 
