@@ -1136,13 +1136,26 @@ export type AutomationWorkflowProjectConfigurationVersionImpactQueryVariables = 
 
 export type AutomationWorkflowProjectConfigurationVersionImpactQuery = { automationWorkflowProjectConfigurationVersionImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }> } };
 
+export type AutomationWorkflowProjectConfigurationWorkflowInputOptionsQueryVariables = Exact<{
+  id: string | number;
+  workflowUuid: string | number;
+  inputName: string;
+  propertyName: string;
+  connectionId: string | number;
+  lookupDependsOnValues?: any;
+  searchText?: string | null | undefined;
+}>;
+
+
+export type AutomationWorkflowProjectConfigurationWorkflowInputOptionsQuery = { automationWorkflowProjectConfigurationWorkflowInputOptions: Array<{ label: string | null, value: string, description: string | null }> };
+
 export type AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQueryVariables = Exact<{
   id: string | number;
   workflowUuid: string | number;
 }>;
 
 
-export type AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery = { automationWorkflowProjectConfigurationWorkflowProvidableValues: { providedConnections: any, providedInputs: any, connectionSlots: Array<{ componentName: string, title: string, required: boolean, providableConnections: Array<{ id: string, name: string }> }>, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }> } };
+export type AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery = { automationWorkflowProjectConfigurationWorkflowProvidableValues: { providedConnections: any, providedInputs: any, connectionSlots: Array<{ componentName: string, title: string, required: boolean, providableConnections: Array<{ id: string, name: string }> }>, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean, componentName: string | null, componentVersion: number | null, groupName: string | null, optionConnections: Array<{ id: string, name: string }> }> } };
 
 export type AutomationWorkflowProjectConfigurationsQueryVariables = Exact<{
   projectId: string | number;
@@ -6425,6 +6438,40 @@ export const useAutomationWorkflowProjectConfigurationVersionImpactQuery = <
   }
     )};
 
+export const AutomationWorkflowProjectConfigurationWorkflowInputOptionsDocument = new TypedDocumentString(`
+    query automationWorkflowProjectConfigurationWorkflowInputOptions($id: ID!, $workflowUuid: ID!, $inputName: String!, $propertyName: String!, $connectionId: ID!, $lookupDependsOnValues: Map, $searchText: String) {
+  automationWorkflowProjectConfigurationWorkflowInputOptions(
+    id: $id
+    workflowUuid: $workflowUuid
+    inputName: $inputName
+    propertyName: $propertyName
+    connectionId: $connectionId
+    lookupDependsOnValues: $lookupDependsOnValues
+    searchText: $searchText
+  ) {
+    label
+    value
+    description
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectConfigurationWorkflowInputOptionsQuery = <
+      TData = AutomationWorkflowProjectConfigurationWorkflowInputOptionsQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectConfigurationWorkflowInputOptionsQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectConfigurationWorkflowInputOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectConfigurationWorkflowInputOptionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectConfigurationWorkflowInputOptionsQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectConfigurationWorkflowInputOptions', variables],
+    queryFn: fetcher<AutomationWorkflowProjectConfigurationWorkflowInputOptionsQuery, AutomationWorkflowProjectConfigurationWorkflowInputOptionsQueryVariables>(AutomationWorkflowProjectConfigurationWorkflowInputOptionsDocument, variables),
+    ...options
+  }
+    )};
+
 export const AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDocument = new TypedDocumentString(`
     query automationWorkflowProjectConfigurationWorkflowProvidableValues($id: ID!, $workflowUuid: ID!) {
   automationWorkflowProjectConfigurationWorkflowProvidableValues(
@@ -6445,6 +6492,13 @@ export const AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDocum
       label
       type
       required
+      componentName
+      componentVersion
+      groupName
+      optionConnections {
+        id
+        name
+      }
     }
     providedConnections
     providedInputs

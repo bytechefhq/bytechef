@@ -584,10 +584,21 @@ export type AutomationWorkflowProjectConfigurationConnectionSlot = {
 
 export type AutomationWorkflowProjectConfigurationInput = {
   __typename?: 'AutomationWorkflowProjectConfigurationInput';
+  componentName?: Maybe<Scalars['String']['output']>;
+  componentVersion?: Maybe<Scalars['Int']['output']>;
+  groupName?: Maybe<Scalars['String']['output']>;
   label?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  optionConnections: Array<AutomationWorkflowProjectConfigurationProvidableConnection>;
   required: Scalars['Boolean']['output'];
   type?: Maybe<Scalars['String']['output']>;
+};
+
+export type AutomationWorkflowProjectConfigurationInputOption = {
+  __typename?: 'AutomationWorkflowProjectConfigurationInputOption';
+  description?: Maybe<Scalars['String']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  value: Scalars['String']['output'];
 };
 
 export type AutomationWorkflowProjectConfigurationProvidableConnection = {
@@ -3269,6 +3280,7 @@ export type Query = {
   automationSearch: Array<SearchResult>;
   automationWorkflowProjectCategories: Array<AutomationWorkflowProjectCategory>;
   automationWorkflowProjectConfigurationVersionImpact: AutomationWorkflowProjectConfigurationVersionImpact;
+  automationWorkflowProjectConfigurationWorkflowInputOptions: Array<AutomationWorkflowProjectConfigurationInputOption>;
   automationWorkflowProjectConfigurationWorkflowProvidableValues: AutomationWorkflowProjectConfigurationWorkflowProvidableValues;
   automationWorkflowProjectConfigurations: Array<AutomationWorkflowProjectConfiguration>;
   automationWorkflowProjectTags: Array<AutomationWorkflowProjectTag>;
@@ -3596,6 +3608,17 @@ export type QueryAutomationSearchArgs = {
 export type QueryAutomationWorkflowProjectConfigurationVersionImpactArgs = {
   id: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectConfigurationWorkflowInputOptionsArgs = {
+  connectionId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+  inputName: Scalars['String']['input'];
+  lookupDependsOnValues?: InputMaybe<Scalars['Map']['input']>;
+  propertyName: Scalars['String']['input'];
+  searchText?: InputMaybe<Scalars['String']['input']>;
+  workflowUuid: Scalars['ID']['input'];
 };
 
 
