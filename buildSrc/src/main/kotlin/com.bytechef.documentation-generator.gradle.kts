@@ -616,7 +616,7 @@ $mdxContent
         var description: String? = null
         var icon: String? = null
         var name: String? = null
-        var tags: String? = null
+        var tags: Array<String>? = null
         var title: String? = null
         var triggers: Array<Trigger>? = null
         var version: Int? = null
