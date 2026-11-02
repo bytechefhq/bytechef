@@ -43,9 +43,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -173,6 +176,7 @@ class StateValueDataStorageIntTest {
 
     @Test
     void testSaveTaskStateOverwritesEntryLeftByFailedCleanup() {
+        taskStateFacade.save(JOB_RESUME_ID, "initial");
         taskStateFacade.save(JOB_RESUME_ID, "first");
 
         String firstKey = getTaskStateReference().key();
@@ -191,6 +195,7 @@ class StateValueDataStorageIntTest {
 
     @Test
     void testDeleteTaskStateDeletesEntryLeftByFailedCleanup() {
+        taskStateFacade.save(JOB_RESUME_ID, "initial");
         taskStateFacade.save(JOB_RESUME_ID, "first");
 
         String firstKey = getTaskStateReference().key();
@@ -224,6 +229,7 @@ class StateValueDataStorageIntTest {
 
     @Test
     void testCommittedTaskStateCleanupKeepsSlotReusedByLaterSave() {
+        taskStateFacade.save(JOB_RESUME_ID, "initial");
         taskStateFacade.save(JOB_RESUME_ID, "first");
 
         String firstKey = getTaskStateReference().key();
@@ -242,6 +248,7 @@ class StateValueDataStorageIntTest {
 
     @Test
     void testRolledBackTaskStateCleanupKeepsSlotReusedByLaterSave() {
+        taskStateFacade.save(JOB_RESUME_ID, "initial");
         taskStateFacade.save(JOB_RESUME_ID, "first");
 
         String firstKey = getTaskStateReference().key();
@@ -260,6 +267,49 @@ class StateValueDataStorageIntTest {
         assertThat(thirdKey).isNotEqualTo(firstKey);
         assertThat(getTaskStateEntries()).containsOnly(Map.entry(thirdKey, "third"));
         assertThat(taskStateFacade.<String>fetchValue(JOB_RESUME_ID)).hasValue("third");
+    }
+
+    @Test
+    void testRolledBackConcurrentFirstTaskStateSaveKeepsCommittedValue() throws Exception {
+        CountDownLatch firstSavedLatch = new CountDownLatch(1);
+        CountDownLatch secondSavedLatch = new CountDownLatch(1);
+        CountDownLatch firstCommittedLatch = new CountDownLatch(1);
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
+            Future<?> firstFuture = executorService.submit(() -> {
+                transactionTemplate.executeWithoutResult(status -> {
+                    taskStateFacade.save(JOB_RESUME_ID, "first");
+
+                    firstSavedLatch.countDown();
+
+                    awaitLatch(secondSavedLatch);
+                });
+
+                firstCommittedLatch.countDown();
+            });
+
+            Future<?> secondFuture = executorService.submit(() -> {
+                awaitLatch(firstSavedLatch);
+
+                transactionTemplate.executeWithoutResult(status -> {
+                    taskStateFacade.save(JOB_RESUME_ID, "second");
+
+                    secondSavedLatch.countDown();
+
+                    awaitLatch(firstCommittedLatch);
+
+                    status.setRollbackOnly();
+                });
+            });
+
+            firstFuture.get();
+            secondFuture.get();
+        }
+
+        assertThat(taskStateRepository.count()).isEqualTo(1);
+        assertThat(getTaskStateEntries()).containsOnly(Map.entry(getTaskStateReference().key(), "first"));
+        assertThat(taskStateFacade.<String>fetchValue(JOB_RESUME_ID)).hasValue("first");
     }
 
     @Test
@@ -363,6 +413,19 @@ class StateValueDataStorageIntTest {
             .orElseThrow();
 
         return (StateValueReference) taskState.getValue();
+    }
+
+    private static void awaitLatch(CountDownLatch countDownLatch) {
+        try {
+            if (!countDownLatch.await(30, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("Timed out waiting for the other transaction");
+            }
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
+
+            throw new IllegalStateException(interruptedException);
+        }
     }
 
     private void saveTaskStateAfterCompletion(String value) {

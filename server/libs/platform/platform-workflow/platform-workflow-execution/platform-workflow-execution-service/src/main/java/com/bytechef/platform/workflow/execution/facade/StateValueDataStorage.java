@@ -29,7 +29,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
@@ -77,8 +81,12 @@ public class StateValueDataStorage {
     void delete(Key key, @Nullable Object storedValue, Supplier<Optional<Object>> lockedStoredValueSupplier) {
         if (storedValue instanceof StateValueReference reference) {
             runAfterCompletion(
-                () -> deleteStaleEntries(
-                    key, reference, lockedStoredValueSupplier, getSlotKey(key, 0), getSlotKey(key, 1)),
+                () -> {
+                    Set<String> storageKeys = new LinkedHashSet<>(
+                        List.of(getSlotKey(key, 0), getSlotKey(key, 1), reference.key()));
+
+                    deleteStaleEntries(key, reference, lockedStoredValueSupplier, storageKeys.toArray(String[]::new));
+                },
                 null);
         }
     }
@@ -135,7 +143,7 @@ public class StateValueDataStorage {
         if (locationOptional.isPresent()) {
             Location location = locationOptional.get();
             StateValueReference reference = new StateValueReference(
-                location.environmentId(), location.type(), getNextSlotKey(key, previousStoredValue));
+                location.environmentId(), location.type(), getNextStorageKey(key, previousStoredValue));
 
             DataStorage dataStorage = getDataStorage();
 
@@ -197,7 +205,11 @@ public class StateValueDataStorage {
         });
     }
 
-    private static String getNextSlotKey(Key key, @Nullable Object previousStoredValue) {
+    private static String getNextStorageKey(Key key, @Nullable Object previousStoredValue) {
+        if (previousStoredValue == null) {
+            return key.key() + "_" + UUID.randomUUID();
+        }
+
         if (previousStoredValue instanceof StateValueReference previousReference) {
             String previousKey = previousReference.key();
 
