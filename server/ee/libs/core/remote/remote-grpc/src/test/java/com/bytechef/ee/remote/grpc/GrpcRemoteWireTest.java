@@ -20,7 +20,13 @@ import com.bytechef.ee.remote.grpc.interceptor.TenantContextClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
+import com.bytechef.platform.security.web.authentication.ExternalIssuerAuthentication;
 import com.bytechef.platform.security.web.authentication.PlatformUserAuthentication;
+import io.grpc.ForwardingServerCallListener;
+import io.grpc.Metadata;
+import io.grpc.ServerCall;
+import io.grpc.ServerCallHandler;
+import io.grpc.ServerInterceptor;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.health.v1.HealthCheckRequest;
@@ -28,11 +34,14 @@ import io.grpc.health.v1.HealthCheckResponse;
 import io.grpc.health.v1.HealthGrpc;
 import io.grpc.protobuf.services.HealthStatusManager;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -111,6 +120,70 @@ class GrpcRemoteWireTest {
     }
 
     @Test
+    void testExternalIssuerOauthTokenBindsItsSubjectAndAuthorities() throws Exception {
+        List<GrantedAuthority> authorities = List.of(
+            new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("SCOPE_mcp:automation"));
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new ExternalIssuerJwtAuthenticationToken(
+                    jwt(), new User("okta|42", "", authorities), authorities));
+
+        try (InProcessGrpc inProcessGrpc = startEcho("secret", new UserContextServerInterceptor())) {
+            assertThat(EchoService.echoUser(inProcessGrpc.channel()))
+                .isEqualTo("okta|42|true|ROLE_ADMIN,SCOPE_mcp:automation");
+        }
+    }
+
+    @Test
+    void testExternalIssuerPrincipalStaysAnExternalIssuerPrincipalOnTheServer() throws Exception {
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new ExternalIssuerJwtAuthenticationToken(
+                    jwt(), new User("okta|42", "", authorities), authorities));
+
+        AtomicReference<Authentication> serverAuthentication = new AtomicReference<>();
+
+        ServerInterceptor authenticationCapturingServerInterceptor = new ServerInterceptor() {
+
+            @Override
+            public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
+                ServerCall<ReqT, RespT> serverCall, Metadata metadata,
+                ServerCallHandler<ReqT, RespT> serverCallHandler) {
+
+                return new ForwardingServerCallListener.SimpleForwardingServerCallListener<>(
+                    serverCallHandler.startCall(serverCall, metadata)) {
+
+                    @Override
+                    public void onHalfClose() {
+                        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+                        serverAuthentication.set(securityContext.getAuthentication());
+
+                        super.onHalfClose();
+                    }
+                };
+            }
+        };
+
+        try (InProcessGrpc inProcessGrpc = new InProcessGrpc(
+            new EchoService(),
+            List.of(
+                authenticationCapturingServerInterceptor, new UserContextServerInterceptor(),
+                new ServiceTokenServerInterceptor("secret")),
+            List.of(new UserContextClientInterceptor(), new ServiceTokenClientInterceptor("secret")))) {
+
+            EchoService.echoUser(inProcessGrpc.channel());
+        }
+
+        assertThat(serverAuthentication.get())
+            .isInstanceOf(ExternalIssuerAuthentication.class)
+            .isNotInstanceOf(PlatformUserAuthentication.class);
+    }
+
+    @Test
     void testWrongTokenIsRejectedBeforeTheUserIsRead() throws Exception {
         SecurityContextHolder.getContext()
             .setAuthentication(
@@ -126,6 +199,14 @@ class GrpcRemoteWireTest {
         }
 
         verify(userContextServerInterceptor, never()).interceptCall(any(), any(), any());
+    }
+
+    private static class ExternalIssuerJwtAuthenticationToken extends JwtAuthenticationToken
+        implements ExternalIssuerAuthentication {
+
+        ExternalIssuerJwtAuthenticationToken(Jwt jwt, User user, List<GrantedAuthority> authorities) {
+            super(jwt, user, authorities);
+        }
     }
 
     private static class PlatformUserJwtAuthenticationToken extends JwtAuthenticationToken
