@@ -97,6 +97,21 @@ class PrepaidBillingSubscriptionRepositoryIntTest {
     }
 
     @Test
+    void testResetUnitUsedForNewPeriodKeepsOnlyUnusedExtraUnits() {
+        prepaidBillingSubscriptionRepository.incrementPlanUnitUsed(subscriptionId);
+        prepaidBillingSubscriptionRepository.addExtraUnitTotal(subscriptionId, 3);
+        prepaidBillingSubscriptionRepository.incrementExtraUnitUsed(subscriptionId);
+
+        prepaidBillingSubscriptionRepository.resetUnitUsedForNewPeriod(subscriptionId);
+
+        BillingSubscription billingSubscription = reload();
+
+        assertThat(billingSubscription.getPlanUnitUsed()).isEqualTo(0);
+        assertThat(billingSubscription.getExtraUnitTotal()).isEqualTo(2);
+        assertThat(billingSubscription.getExtraUnitUsed()).isEqualTo(0);
+    }
+
+    @Test
     void testSaveDoesNotOverwriteExtraUnitTotal() {
         BillingSubscription staleBillingSubscription = reload();
 

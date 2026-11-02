@@ -252,7 +252,7 @@ class PrepaidSubscriptionModelHandlerTest {
     }
 
     @Test
-    void testSubscriptionUpdatedPeriodChangeResetsPlanUnitUsed() throws Exception {
+    void testSubscriptionUpdatedPeriodChangeResetsUnitUsed() throws Exception {
         BillingSubscription subscription = prepaidSubscription("STARTER", 1000);
 
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -273,7 +273,7 @@ class PrepaidSubscriptionModelHandlerTest {
         assertThat(savedSubscription.getCurrentPeriodStart()).isEqualTo(Instant.ofEpochSecond(NEXT_PERIOD_START));
         assertThat(savedSubscription.getCurrentPeriodEnd()).isEqualTo(Instant.ofEpochSecond(NEXT_PERIOD_END));
 
-        verify(prepaidBillingSubscriptionRepository).resetPlanUnitUsed(SUBSCRIPTION_ROW_ID);
+        verify(prepaidBillingSubscriptionRepository).resetUnitUsedForNewPeriod(SUBSCRIPTION_ROW_ID);
     }
 
     @Test
@@ -296,7 +296,7 @@ class PrepaidSubscriptionModelHandlerTest {
         assertThat(subscription.getCurrentPeriodEnd()).isEqualTo(Instant.ofEpochSecond(PERIOD_END));
 
         verify(billingSubscriptionService, never()).save(any());
-        verify(prepaidBillingSubscriptionRepository, never()).resetPlanUnitUsed(anyLong());
+        verify(prepaidBillingSubscriptionRepository, never()).resetUnitUsedForNewPeriod(anyLong());
     }
 
     @Test
@@ -345,7 +345,7 @@ class PrepaidSubscriptionModelHandlerTest {
         assertThat(savedSubscription.getPlanUnitTotal()).isEqualTo(15000);
         assertThat(savedSubscription.getCurrentPeriodStart()).isEqualTo(Instant.ofEpochSecond(PERIOD_START));
 
-        verify(prepaidBillingSubscriptionRepository, never()).resetPlanUnitUsed(anyLong());
+        verify(prepaidBillingSubscriptionRepository, never()).resetUnitUsedForNewPeriod(anyLong());
     }
 
     @Test
@@ -365,7 +365,7 @@ class PrepaidSubscriptionModelHandlerTest {
         assertThat(captor.getValue()
             .getPlanUnitTotal()).isEqualTo(5000);
 
-        verify(prepaidBillingSubscriptionRepository, never()).resetPlanUnitUsed(anyLong());
+        verify(prepaidBillingSubscriptionRepository, never()).resetUnitUsedForNewPeriod(anyLong());
     }
 
     @Test

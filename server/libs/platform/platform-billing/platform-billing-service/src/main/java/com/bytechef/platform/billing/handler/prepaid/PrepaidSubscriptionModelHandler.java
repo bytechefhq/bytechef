@@ -246,7 +246,7 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
         Instant storedPeriodStart = subscription.getCurrentPeriodStart();
 
         // Stripe does not guarantee webhook order: an event for an older period must not roll the period back, or the
-        // next current-period event would reset plan_unit_used a second time.
+        // next current-period event would reset the unit usage a second time.
         if (storedPeriodStart != null && newPeriodStart.isBefore(storedPeriodStart)) {
             log.info(
                 "Ignoring stale subscription update for subscription {}: period start {} is before stored {}",
@@ -285,7 +285,7 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
         BillingSubscription savedSubscription = billingSubscriptionService.save(subscription);
 
         if (periodChanged) {
-            prepaidBillingSubscriptionRepository.resetPlanUnitUsed(savedSubscription.getId());
+            prepaidBillingSubscriptionRepository.resetUnitUsedForNewPeriod(savedSubscription.getId());
         }
 
         return savedSubscription;
