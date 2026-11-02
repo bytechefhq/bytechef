@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.notification.handler;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -51,6 +52,15 @@ class EmailNotificationSenderTest {
             notificationHandlerContext);
 
         verify(mailService).sendEmail("approver@example.com", "Subject", "Content", false, true);
+    }
+
+    @Test
+    void testSendReturnsACompletedFuture() {
+        assertThat(
+            emailNotificationSender.send(
+                createNotification(Map.of("email", "approver@example.com")), emailNotificationHandler,
+                notificationHandlerContext))
+                    .isCompleted();
     }
 
     @Test

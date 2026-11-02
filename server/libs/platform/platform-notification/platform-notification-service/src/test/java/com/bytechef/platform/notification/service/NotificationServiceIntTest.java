@@ -35,7 +35,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 /**
  * @author Matija Petanjek
  */
-@SpringBootTest(classes = PlatformNotificationIntTestConfiguration.class)
+@SpringBootTest(
+    classes = PlatformNotificationIntTestConfiguration.class,
+    properties = {
+        "bytechef.webhook-delivery.concurrency-limit=1", "bytechef.webhook-delivery.max-pending-deliveries=1"
+    })
 public class NotificationServiceIntTest {
 
     @MockitoBean

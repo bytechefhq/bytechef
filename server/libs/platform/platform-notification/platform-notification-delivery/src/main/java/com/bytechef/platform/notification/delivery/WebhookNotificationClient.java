@@ -16,8 +16,6 @@
 
 package com.bytechef.platform.notification.delivery;
 
-import com.bytechef.commons.util.UrlValidationException;
-import com.bytechef.commons.util.UrlValidatorUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.HexFormat;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -94,45 +91,6 @@ public class WebhookNotificationClient {
         public static WebhookRetry none() {
             return new WebhookRetry(0, Duration.ofSeconds(2), 2.0);
         }
-    }
-
-    public void deliver(WebhookDeliveryRequest webhookDeliveryRequest) {
-        deliver(webhookDeliveryRequest, WebhookRetry.none());
-    }
-
-    public void deliver(WebhookDeliveryRequest webhookDeliveryRequest, WebhookRetry webhookRetry) {
-        String url = webhookDeliveryRequest.url();
-
-        try {
-            UrlValidatorUtils.validate(url, Set.of());
-        } catch (UrlValidationException urlValidationException) {
-            throw new IllegalArgumentException(urlValidationException.getMessage(), urlValidationException);
-        }
-
-        long timestamp = System.currentTimeMillis();
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set("X-ByteChef-Event", webhookDeliveryRequest.eventType());
-        httpHeaders.set("X-ByteChef-Timestamp", String.valueOf(timestamp));
-        httpHeaders.set("X-ByteChef-Delivery", String.valueOf(UUID.randomUUID()));
-
-        Map<String, String> headers = webhookDeliveryRequest.headers();
-
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            httpHeaders.set(header.getKey(), header.getValue());
-        }
-
-        String secret = webhookDeliveryRequest.secret();
-
-        if (secret != null && !secret.isBlank()) {
-            httpHeaders.set(
-                "X-ByteChef-Signature",
-                "t=" + timestamp + ",v1=" + sign(secret, timestamp + "." + webhookDeliveryRequest.payloadJson()));
-        }
-
-        postWithRetry(url, new HttpEntity<>(webhookDeliveryRequest.payloadJson(), httpHeaders), webhookRetry);
     }
 
     public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {

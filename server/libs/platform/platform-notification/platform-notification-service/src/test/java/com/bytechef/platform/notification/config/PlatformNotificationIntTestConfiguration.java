@@ -19,6 +19,7 @@ package com.bytechef.platform.notification.config;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -29,12 +30,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
@@ -57,8 +61,14 @@ import tools.jackson.databind.ObjectMapper;
 })
 @EnableAutoConfiguration
 @EnableCaching
+@EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
 public class PlatformNotificationIntTestConfiguration {
+
+    @Bean
+    AsyncTaskExecutor webhookDeliveryExecutor() {
+        return new SimpleAsyncTaskExecutor();
+    }
 
     @Bean
     EncryptionKey encryptionKey() {

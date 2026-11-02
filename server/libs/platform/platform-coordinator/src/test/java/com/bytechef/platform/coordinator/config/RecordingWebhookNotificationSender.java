@@ -21,6 +21,7 @@ import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.NotificationSender;
 import com.bytechef.platform.notification.handler.WebhookNotificationHandler;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -40,7 +41,7 @@ public class RecordingWebhookNotificationSender implements NotificationSender<We
     }
 
     @Override
-    public void send(
+    public CompletableFuture<Void> send(
         Notification notification, WebhookNotificationHandler notificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
@@ -55,6 +56,8 @@ public class RecordingWebhookNotificationSender implements NotificationSender<We
         notificationHandler.getPayload(notificationHandlerContext);
 
         deliveredNotificationHandlerContexts.add(notificationHandlerContext);
+
+        return CompletableFuture.completedFuture(null);
     }
 
     public List<String> getAttemptedNotificationNames() {

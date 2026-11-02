@@ -18,52 +18,87 @@ package com.bytechef.platform.notification.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.notification.delivery.WebhookDelivery;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryException;
-import com.bytechef.platform.notification.delivery.WebhookDeliveryRequest;
-import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.PayloadResult;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.Status;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.domain.Notification;
+import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentCaptor;
-import org.springframework.scheduling.annotation.Async;
 
 /**
  * @author Ivica Cardic
  */
+@Timeout(5)
 class WebhookNotificationSenderTest {
 
     private final NotificationHandlerContext notificationHandlerContext =
         new NotificationHandlerContext.Builder().build();
-    private final WebhookNotificationClient webhookNotificationClient = mock(WebhookNotificationClient.class);
+    private final WebhookDeliveryService webhookDeliveryService = mock(WebhookDeliveryService.class);
     private final WebhookNotificationHandler webhookNotificationHandler = mock(WebhookNotificationHandler.class);
     private final WebhookNotificationSender webhookNotificationSender = new WebhookNotificationSender(
-        webhookNotificationClient);
+        webhookDeliveryService);
 
     @Test
-    void testSendDeliversPayloadWithSecret() {
+    void testSendSubmitsSignedDeliveryWithoutRetry() {
         when(webhookNotificationHandler.getPayload(notificationHandlerContext)).thenReturn("{\"a\":1}");
+        when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
 
-        webhookNotificationSender.send(
+        CompletableFuture<Void> future = webhookNotificationSender.send(
             createNotification(Map.of("webhook", "https://example.com/hook", "webhookSecret", "secret")),
             webhookNotificationHandler, notificationHandlerContext);
 
-        ArgumentCaptor<WebhookDeliveryRequest> webhookDeliveryRequestArgumentCaptor =
-            ArgumentCaptor.forClass(WebhookDeliveryRequest.class);
+        ArgumentCaptor<WebhookDelivery> webhookDeliveryArgumentCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
 
-        verify(webhookNotificationClient).deliver(webhookDeliveryRequestArgumentCaptor.capture());
+        verify(webhookDeliveryService).submit(webhookDeliveryArgumentCaptor.capture());
 
-        WebhookDeliveryRequest webhookDeliveryRequest = webhookDeliveryRequestArgumentCaptor.getValue();
+        WebhookDelivery webhookDelivery = webhookDeliveryArgumentCaptor.getValue();
 
-        assertThat(webhookDeliveryRequest.url()).isEqualTo("https://example.com/hook");
-        assertThat(webhookDeliveryRequest.payloadJson()).isEqualTo("{\"a\":1}");
-        assertThat(webhookDeliveryRequest.secret()).isEqualTo("secret");
+        assertThat(webhookDelivery.source()).isEqualTo("notification");
+        assertThat(webhookDelivery.description()).isEqualTo("notification 1 'Alerts'");
+        assertThat(webhookDelivery.url()).isEqualTo("https://example.com/hook");
+        assertThat(webhookDelivery.secret()).isEqualTo("secret");
+        assertThat(webhookDelivery.eventType()).isEqualTo("job.status");
+        assertThat(webhookDelivery.validateUrl()).isTrue();
+        assertThat(webhookDelivery.payloads()).hasSize(1);
+        assertThat(webhookDelivery.payloads()
+            .getFirst()
+            .json()).isEqualTo("{\"a\":1}");
+        assertThat(webhookDelivery.retry()
+            .maxRetries()).isZero();
+        assertThat(future).isCompleted();
+    }
+
+    @Test
+    void testSendFutureFailsWhenNothingWasSent() {
+        when(webhookNotificationHandler.getPayload(notificationHandlerContext)).thenReturn("{}");
+        when(webhookDeliveryService.submit(any()))
+            .thenReturn(
+                CompletableFuture.completedFuture(
+                    new WebhookDeliveryOutcome(
+                        List.of(new PayloadResult("1", Status.FAILED)), null, "boom", "boom")));
+
+        CompletableFuture<Void> future = webhookNotificationSender.send(
+            createNotification(Map.of("webhook", "https://example.com/hook")), webhookNotificationHandler,
+            notificationHandlerContext);
+
+        assertThat(future).isCompletedExceptionally();
+        assertThatThrownBy(future::join)
+            .hasCauseInstanceOf(WebhookDeliveryException.class);
     }
 
     @Test
@@ -74,7 +109,7 @@ class WebhookNotificationSenderTest {
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("no webhook URL");
 
-        verify(webhookNotificationClient, never()).deliver(any());
+        verify(webhookDeliveryService, never()).submit(any());
     }
 
     @Test
@@ -84,38 +119,32 @@ class WebhookNotificationSenderTest {
                 createNotification(Map.of("webhook", "")), webhookNotificationHandler, notificationHandlerContext))
                     .isInstanceOf(IllegalStateException.class);
 
-        verify(webhookNotificationClient, never()).deliver(any());
+        verify(webhookDeliveryService, never()).submit(any());
     }
 
     @Test
-    void testSendPropagatesDeliveryFailure() {
+    void testSendReturnsTheDeliveryFutureWithoutBlocking() {
         when(webhookNotificationHandler.getPayload(notificationHandlerContext)).thenReturn("{}");
+        when(webhookDeliveryService.submit(any())).thenReturn(new CompletableFuture<>());
 
-        doThrow(new WebhookDeliveryException("boom", 500))
-            .when(webhookNotificationClient)
-            .deliver(any());
-
-        assertThatThrownBy(
+        CompletableFuture<Void> future = assertTimeoutPreemptively(
+            Duration.ofSeconds(1),
             () -> webhookNotificationSender.send(
                 createNotification(Map.of("webhook", "https://example.com/hook")), webhookNotificationHandler,
-                notificationHandlerContext))
-                    .isInstanceOf(WebhookDeliveryException.class);
+                notificationHandlerContext));
+
+        assertThat(future).isNotDone();
     }
 
-    @Test
-    void testSendIsSynchronous() throws NoSuchMethodException {
-        assertThat(
-            WebhookNotificationSender.class
-                .getMethod(
-                    "send", Notification.class, WebhookNotificationHandler.class, NotificationHandlerContext.class)
-                .isAnnotationPresent(Async.class))
-                    .isFalse();
+    private static WebhookDeliveryOutcome sentOutcome() {
+        return new WebhookDeliveryOutcome(List.of(new PayloadResult("1", Status.SENT)), null, null, null);
     }
 
     private static Notification createNotification(Map<String, Object> settings) {
         Notification notification = new Notification();
 
         notification.setId(1L);
+        notification.setName("Alerts");
         notification.setType(Notification.Type.WEBHOOK);
         notification.setSettings(settings);
 

@@ -18,29 +18,43 @@ package com.bytechef.platform.notification.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.notification.delivery.SlackNotificationClient;
+import com.bytechef.platform.notification.delivery.WebhookDelivery;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryException;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.PayloadResult;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.Status;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.domain.Notification;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
+@Timeout(5)
 class SlackNotificationSenderTest {
 
-    private final SlackNotificationClient slackNotificationClient = mock(SlackNotificationClient.class);
+    private final NotificationHandlerContext notificationHandlerContext =
+        new NotificationHandlerContext.Builder().build();
     private final SlackNotificationHandler slackNotificationHandler = mock(SlackNotificationHandler.class);
+    private final WebhookDeliveryService webhookDeliveryService = mock(WebhookDeliveryService.class);
     private final SlackNotificationSender slackNotificationSender = new SlackNotificationSender(
-        slackNotificationClient);
+        webhookDeliveryService);
 
     @Test
     void testGetType() {
@@ -48,72 +62,106 @@ class SlackNotificationSenderTest {
     }
 
     @Test
-    void testSendPostsHandlerTextToConfiguredWebhookUrl() {
-        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder().build();
-
+    void testSendSubmitsTextPayloadToConfiguredWebhookUrl() {
         when(slackNotificationHandler.getText(notificationHandlerContext)).thenReturn("Approval pending");
+        when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
 
-        slackNotificationSender.send(
+        CompletableFuture<Void> future = slackNotificationSender.send(
             createNotification(Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X")),
             slackNotificationHandler, notificationHandlerContext);
 
-        verify(slackNotificationClient).send("https://hooks.slack.com/services/T/B/X", "Approval pending");
+        WebhookDelivery webhookDelivery = captureDelivery();
+
+        assertThat(webhookDelivery.source()).isEqualTo("slack");
+        assertThat(webhookDelivery.url()).isEqualTo("https://hooks.slack.com/services/T/B/X");
+        assertThat(webhookDelivery.eventType()).isEqualTo("slack.message");
+        assertThat(webhookDelivery.secret()).isNull();
+        assertThat(webhookDelivery.validateUrl()).isTrue();
+        assertThat(webhookDelivery.payloads()).hasSize(1);
+        assertThat(webhookDelivery.payloads()
+            .getFirst()
+            .json()).isEqualTo("{\"text\":\"Approval pending\"}");
+        assertThat(webhookDelivery.retry()
+            .maxRetries()).isZero();
+        assertThat(future).isCompleted();
     }
 
     @Test
     void testSendStripsSurroundingWhitespaceFromWebhookUrl() {
-        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder().build();
-
         when(slackNotificationHandler.getText(notificationHandlerContext)).thenReturn("Approval pending");
+        when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
 
         slackNotificationSender.send(
             createNotification(Map.of("slackWebhookUrl", "  https://hooks.slack.com/services/T/B/X \n")),
             slackNotificationHandler, notificationHandlerContext);
 
-        verify(slackNotificationClient).send("https://hooks.slack.com/services/T/B/X", "Approval pending");
+        assertThat(captureDelivery().url()).isEqualTo("https://hooks.slack.com/services/T/B/X");
+    }
+
+    @Test
+    void testSendFutureFailsWhenNothingWasSent() {
+        when(slackNotificationHandler.getText(notificationHandlerContext)).thenReturn("Approval pending");
+        when(webhookDeliveryService.submit(any()))
+            .thenReturn(
+                CompletableFuture.completedFuture(
+                    new WebhookDeliveryOutcome(
+                        List.of(new PayloadResult("1", Status.DROPPED)), null, null, null)));
+
+        CompletableFuture<Void> future = slackNotificationSender.send(
+            createNotification(Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X")),
+            slackNotificationHandler, notificationHandlerContext);
+
+        assertThat(future).isCompletedExceptionally();
+        assertThatThrownBy(future::join)
+            .hasCauseInstanceOf(WebhookDeliveryException.class);
+    }
+
+    @Test
+    void testSendReturnsTheDeliveryFutureWithoutBlocking() {
+        when(slackNotificationHandler.getText(notificationHandlerContext)).thenReturn("Approval pending");
+        when(webhookDeliveryService.submit(any())).thenReturn(new CompletableFuture<>());
+
+        CompletableFuture<Void> future = assertTimeoutPreemptively(
+            Duration.ofSeconds(1),
+            () -> slackNotificationSender.send(
+                createNotification(Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X")),
+                slackNotificationHandler, notificationHandlerContext));
+
+        assertThat(future).isNotDone();
     }
 
     @Test
     void testSendThrowsWhenWebhookUrlMissing() {
-        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder().build();
-
         assertThatThrownBy(
             () -> slackNotificationSender.send(
                 createNotification(Map.of()), slackNotificationHandler, notificationHandlerContext))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("no Slack webhook URL");
 
-        verify(slackNotificationClient, never()).send(anyString(), anyString());
+        verify(webhookDeliveryService, never()).submit(any());
     }
 
     @Test
     void testSendThrowsWhenWebhookUrlBlank() {
-        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder().build();
-
         assertThatThrownBy(
             () -> slackNotificationSender.send(
                 createNotification(Map.of("slackWebhookUrl", "  ")), slackNotificationHandler,
                 notificationHandlerContext))
                     .isInstanceOf(IllegalStateException.class);
 
-        verify(slackNotificationClient, never()).send(anyString(), anyString());
+        verify(webhookDeliveryService, never()).submit(any());
     }
 
-    @Test
-    void testSendPropagatesDeliveryFailure() {
-        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder().build();
+    private WebhookDelivery captureDelivery() {
+        ArgumentCaptor<WebhookDelivery> webhookDeliveryArgumentCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
 
-        when(slackNotificationHandler.getText(any())).thenReturn("Approval pending");
+        verify(webhookDeliveryService).submit(webhookDeliveryArgumentCaptor.capture());
 
-        doThrow(new WebhookDeliveryException("boom", 500))
-            .when(slackNotificationClient)
-            .send(anyString(), anyString());
+        return webhookDeliveryArgumentCaptor.getValue();
+    }
 
-        assertThatThrownBy(
-            () -> slackNotificationSender.send(
-                createNotification(Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X")),
-                slackNotificationHandler, notificationHandlerContext))
-                    .isInstanceOf(WebhookDeliveryException.class);
+    private static WebhookDeliveryOutcome sentOutcome() {
+        return new WebhookDeliveryOutcome(List.of(new PayloadResult("1", Status.SENT)), null, null, null);
     }
 
     private static Notification createNotification(Map<String, Object> settings) {

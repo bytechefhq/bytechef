@@ -17,10 +17,13 @@
 package com.bytechef.platform.notification.handler;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.notification.delivery.WebhookDeliveryRequest;
-import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
+import com.bytechef.platform.notification.delivery.WebhookDelivery;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
+import com.bytechef.platform.notification.delivery.WebhookRetry;
 import com.bytechef.platform.notification.domain.Notification;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,10 +34,11 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class WebhookNotificationSender implements NotificationSender<WebhookNotificationHandler> {
 
-    private final WebhookNotificationClient webhookNotificationClient;
+    private final WebhookDeliveryService webhookDeliveryService;
 
-    public WebhookNotificationSender(WebhookNotificationClient webhookNotificationClient) {
-        this.webhookNotificationClient = webhookNotificationClient;
+    @SuppressFBWarnings("EI2")
+    public WebhookNotificationSender(WebhookDeliveryService webhookDeliveryService) {
+        this.webhookDeliveryService = webhookDeliveryService;
     }
 
     @Override
@@ -43,7 +47,7 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
     }
 
     @Override
-    public void send(
+    public CompletableFuture<Void> send(
         Notification notification, WebhookNotificationHandler webhookNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
@@ -56,11 +60,18 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
                 "Notification " + notification.getId() + " has no webhook URL configured");
         }
 
-        String secret = (String) settings.get("webhookSecret");
+        WebhookDelivery webhookDelivery = WebhookDelivery.builder("notification", url)
+            .description("notification " + notification.getId() + " '" + notification.getName() + "'")
+            .eventType("job.status")
+            .secret((String) settings.get("webhookSecret"))
+            .validateUrl(true)
+            .payload(
+                String.valueOf(notificationHandlerContext.getJobId()),
+                webhookNotificationHandler.getPayload(notificationHandlerContext))
+            .retry(WebhookRetry.none())
+            .build();
 
-        webhookNotificationClient.deliver(
-            new WebhookDeliveryRequest(
-                url, "job.status", webhookNotificationHandler.getPayload(notificationHandlerContext), Map.of(),
-                secret));
+        return webhookDeliveryService.submit(webhookDelivery)
+            .thenAccept(NotificationDeliveryOutcomes::requireAnySent);
     }
 }

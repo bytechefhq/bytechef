@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-notification:platform-notification-delivery"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
+    testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
