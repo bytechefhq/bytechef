@@ -53,6 +53,47 @@ class TypedValueTest {
     }
 
     @Test
+    void testWriteAndReadKeepArrays() {
+        TypedValue stringArray = TypedValue.read(
+            objectMapper, new TypedValue(new String[] {
+                "a", "b"
+            }).write(objectMapper));
+        TypedValue intArray = TypedValue.read(objectMapper, new TypedValue(new int[] {
+            1, 2
+        }).write(objectMapper));
+        TypedValue nestedArray = TypedValue.read(
+            objectMapper, new TypedValue(new Long[][] {
+                {
+                    1L
+                }, {
+                    2L, 3L
+                }
+            }).write(objectMapper));
+
+        assertThat(stringArray.value()).isEqualTo(new String[] {
+            "a", "b"
+        });
+        assertThat(intArray.value()).isEqualTo(new int[] {
+            1, 2
+        });
+        assertThat(nestedArray.value()).isEqualTo(new Long[][] {
+            {
+                1L
+            }, {
+                2L, 3L
+            }
+        });
+    }
+
+    @Test
+    void testReadRejectsAnArrayOfAClassOutsideTheAllowedPackages() {
+        assertThatThrownBy(
+            () -> TypedValue.read(objectMapper, "{\"value\":[],\"classname\":\"[Lorg.example.Payload;\"}"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("org.example.Payload");
+    }
+
+    @Test
     void testReadRejectsAClassOutsideTheAllowedPackages() {
         assertThatThrownBy(
             () -> TypedValue.read(objectMapper, "{\"value\":\"x\",\"classname\":\"org.example.Payload\"}"))
