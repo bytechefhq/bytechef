@@ -39,6 +39,7 @@ query WorkspaceToolInvocationLogs(
             integrationInstanceId
             mcpServerId
             jobId
+            workflowName
             outcome
             errorType
             errorMessage
