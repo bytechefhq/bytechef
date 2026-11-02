@@ -14,37 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.execution.repository.converter;
+package com.bytechef.commons.data.jdbc.converter;
 
-import com.bytechef.platform.workflow.execution.domain.TaskState;
+import com.bytechef.commons.data.jdbc.wrapper.TypedValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.WritingConverter;
 import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
-@WritingConverter
-public class TaskStateValueToStringConverter implements Converter<TaskState.TaskStateValue, String> {
+public class StringToTypedValueConverter implements Converter<String, TypedValue> {
 
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public TaskStateValueToStringConverter(ObjectMapper objectMapper) {
+    public StringToTypedValueConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public String convert(TaskState.TaskStateValue value) {
-        return write(objectMapper, value);
-    }
-
-    private String write(ObjectMapper objectMapper, Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public TypedValue convert(String json) {
+        return TypedValue.read(objectMapper, json);
     }
 }

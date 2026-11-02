@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.domain;
 
+import com.bytechef.commons.data.jdbc.wrapper.TypedValue;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import java.time.Instant;
 import java.util.Objects;
@@ -54,7 +55,7 @@ public class TaskState {
     private Instant lastModifiedDate;
 
     @Column
-    private TaskStateValue value;
+    private TypedValue value;
 
     @Version
     private int version;
@@ -66,7 +67,7 @@ public class TaskState {
     }
 
     public TaskState(JobResumeId jobResumeId, Object value) {
-        this.value = new TaskStateValue(value, value.getClass());
+        this.value = new TypedValue(value);
         this.jobResumeId = jobResumeId;
     }
 
@@ -95,7 +96,7 @@ public class TaskState {
             return null;
         }
 
-        return value.value;
+        return value.value();
     }
 
     public int getVersion() {
@@ -131,7 +132,7 @@ public class TaskState {
     }
 
     public void setValue(Object value) {
-        this.value = new TaskStateValue(value, value.getClass());
+        this.value = new TypedValue(value);
     }
 
     public void setVersion(int version) {
@@ -154,11 +155,5 @@ public class TaskState {
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
             '}';
-    }
-
-    public record TaskStateValue(Object value, String classname) {
-        public TaskStateValue(Object value, Class<?> classValue) {
-            this(value, classValue.getName());
-        }
     }
 }

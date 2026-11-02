@@ -16,13 +16,13 @@
 
 package com.bytechef.platform.workflow.execution.config;
 
+import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
+import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.execution.repository.TaskStateRepository;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.StringToTaskStateValueConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.TaskStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.service.TaskStateServiceImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -67,7 +67,7 @@ public class ApprovalFormFacadeIntTestConfiguration {
         protected List<?> userConverters() {
             return List.of(
                 new JobResumeIdToStringConverter(), new StringToJobResumeIdConverter(),
-                new StringToTaskStateValueConverter(objectMapper), new TaskStateValueToStringConverter(objectMapper));
+                new StringToTypedValueConverter(objectMapper), new TypedValueToStringConverter(objectMapper));
         }
     }
 }

@@ -32,17 +32,13 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
+import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.encryption.Encryption;
-import com.bytechef.platform.data.storage.jdbc.repository.converter.DataEntryValueWrapperToStringConverter;
-import com.bytechef.platform.data.storage.jdbc.repository.converter.StringToDataEntryValueWrapperConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.StringToTaskStateValueConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.StringToTriggerStateValueConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowTriggerConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.TaskStateValueToStringConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
@@ -159,7 +155,6 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     protected List<?> userConverters() {
         // TODO Use JsonUtils directly
         return Arrays.asList(
-            new DataEntryValueWrapperToStringConverter(),
             new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new ExecutionErrorToStringConverter(objectMapper),
@@ -170,19 +165,16 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new JobResumeIdToStringConverter(),
             new PGObjectToListDoubleConverter(),
             new PGobjectToMapConverter(objectMapper),
-            new StringToDataEntryValueWrapperConverter(),
             new StringToExecutionErrorConverter(objectMapper),
             new StringToFileEntryConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
             new StringToJobResumeIdConverter(),
-            new StringToTriggerStateValueConverter(objectMapper),
-            new StringToTaskStateValueConverter(objectMapper),
+            new StringToTypedValueConverter(objectMapper),
             new StringToWebhooksConverter(objectMapper),
             new StringToWorkflowExecutionIdConverter(),
             new StringToWorkflowTaskConverter(objectMapper),
             new StringToWorkflowTriggerConverter(objectMapper),
-            new TriggerStateValueToStringConverter(objectMapper),
-            new TaskStateValueToStringConverter(objectMapper),
+            new TypedValueToStringConverter(objectMapper),
             new WebhooksToStringConverter(objectMapper),
             new WorkflowExecutionIdToStringConverter(),
             new WorkflowTaskToStringConverter(objectMapper),

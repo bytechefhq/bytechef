@@ -17,14 +17,12 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
+import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.StringToTaskStateValueConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.StringToTriggerStateValueConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowTriggerConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.TaskStateValueToStringConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -61,14 +59,12 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new StringToFileEntryConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
             new StringToJobResumeIdConverter(),
-            new StringToTriggerStateValueConverter(objectMapper),
-            new StringToTaskStateValueConverter(objectMapper),
+            new StringToTypedValueConverter(objectMapper),
             new StringToWebhooksConverter(objectMapper),
             new StringToWorkflowExecutionIdConverter(),
             new StringToWorkflowTaskConverter(objectMapper),
             new StringToWorkflowTriggerConverter(objectMapper),
-            new TriggerStateValueToStringConverter(objectMapper),
-            new TaskStateValueToStringConverter(objectMapper),
+            new TypedValueToStringConverter(objectMapper),
             new WebhooksToStringConverter(objectMapper),
             new WorkflowExecutionIdToStringConverter(),
             new WorkflowTaskToStringConverter(objectMapper),

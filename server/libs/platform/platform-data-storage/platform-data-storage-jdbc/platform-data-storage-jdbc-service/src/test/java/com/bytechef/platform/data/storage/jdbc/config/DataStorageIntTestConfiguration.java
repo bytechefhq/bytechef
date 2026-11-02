@@ -16,15 +16,17 @@
 
 package com.bytechef.platform.data.storage.jdbc.config;
 
+import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
+import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
-import com.bytechef.platform.data.storage.jdbc.repository.converter.DataEntryValueWrapperToStringConverter;
-import com.bytechef.platform.data.storage.jdbc.repository.converter.StringToDataEntryValueWrapperConverter;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
@@ -37,9 +39,17 @@ public class DataStorageIntTestConfiguration {
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class DataStorageIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
+        private final ObjectMapper objectMapper;
+
+        @SuppressFBWarnings("EI2")
+        public DataStorageIntTestJdbcConfiguration(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
+
         @Override
         protected List<?> userConverters() {
-            return List.of(new DataEntryValueWrapperToStringConverter(), new StringToDataEntryValueWrapperConverter());
+            return List.of(new StringToTypedValueConverter(objectMapper),
+                new TypedValueToStringConverter(objectMapper));
         }
     }
 }
