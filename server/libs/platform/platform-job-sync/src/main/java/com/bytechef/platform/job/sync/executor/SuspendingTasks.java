@@ -38,10 +38,12 @@ public final class SuspendingTasks {
     public static boolean isSuspending(WorkflowTask workflowTask) {
         String type = workflowTask.getType();
 
-        if (type != null && SUSPENDING_TASK_TYPE_PREFIXES.stream()
-            .anyMatch(type::startsWith)) {
-
-            return true;
+        if (type != null) {
+            for (String suspendingTaskTypePrefix : SUSPENDING_TASK_TYPE_PREFIXES) {
+                if (type.startsWith(suspendingTaskTypePrefix)) {
+                    return true;
+                }
+            }
         }
 
         Map<String, ?> extensions = workflowTask.getExtensions();
