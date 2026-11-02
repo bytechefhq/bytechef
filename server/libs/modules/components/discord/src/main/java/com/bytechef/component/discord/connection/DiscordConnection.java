@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.discord.constant.DiscordConstants.PUBLIC_KEY;
 
 import com.bytechef.component.definition.ComponentDsl;
 
@@ -37,7 +38,16 @@ public class DiscordConnection {
             .properties(
                 string(TOKEN)
                     .label("Bot Token")
-                    .required(true)));
+                    .required(true),
+                string(PUBLIC_KEY)
+                    .label("Application Public Key")
+                    .description(
+                        "The Discord app's public key. When set, field-less approval requests use in-place " +
+                            "Approve/Discard interaction buttons resolved through the app's Interactions Endpoint " +
+                            "URL (<public-url>/discord/interactivity), verified by the Ed25519 request signature. " +
+                            "Also set bytechef.webhook.discord.public-key to the same value. Leave empty to deliver " +
+                            "approval links to the hosted form.")
+                    .required(false)));
 
     private DiscordConnection() {
     }
