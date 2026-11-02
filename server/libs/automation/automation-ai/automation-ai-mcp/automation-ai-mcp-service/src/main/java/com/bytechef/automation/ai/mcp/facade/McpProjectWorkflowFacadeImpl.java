@@ -16,9 +16,12 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvents;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -46,6 +49,20 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
     }
 
     @Override
+    @Audited(event = McpProjectAuditEvents.MCP_PROJECT_WORKFLOW_CREATED, data = {
+        @AuditData(key = "mcpProjectWorkflowId", value = "#result?.id"),
+        @AuditData(key = "mcpProjectId", value = "#mcpProjectId"),
+        @AuditData(key = "projectDeploymentWorkflowId", value = "#projectDeploymentWorkflowId")
+    })
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
+    public McpProjectWorkflow createMcpProjectWorkflow(long mcpProjectId, long projectDeploymentWorkflowId) {
+        return mcpProjectWorkflowService.create(mcpProjectId, projectDeploymentWorkflowId);
+    }
+
+    @Override
+    @Audited(event = McpProjectAuditEvents.MCP_PROJECT_WORKFLOW_DELETED, data = {
+        @AuditData(key = "mcpProjectWorkflowId", value = "#mcpProjectWorkflowId")
+    })
     @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_EDIT')")
     public void deleteMcpProjectWorkflow(long mcpProjectWorkflowId) {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.fetchMcpProjectWorkflow(mcpProjectWorkflowId)
@@ -55,5 +72,16 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
         mcpProjectWorkflowService.delete(mcpProjectWorkflowId);
 
         projectDeploymentWorkflowService.delete(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+    }
+
+    @Override
+    @Audited(event = McpProjectAuditEvents.MCP_PROJECT_WORKFLOW_ENABLED_UPDATED, data = {
+        @AuditData(key = "mcpProjectWorkflowId", value = "#mcpProjectWorkflowId"),
+        @AuditData(key = "mcpProjectId", value = "#result?.mcpProjectId"),
+        @AuditData(key = "enabled", value = "#enabled")
+    })
+    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_EDIT')")
+    public McpProjectWorkflow updateMcpProjectWorkflowEnabled(long mcpProjectWorkflowId, boolean enabled) {
+        return mcpProjectWorkflowService.updateEnabled(mcpProjectWorkflowId, enabled);
     }
 }

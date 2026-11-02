@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.mcp.web.graphql.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
@@ -38,7 +39,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    ApplicationProperties.class, McpProjectFacade.class, McpProjectService.class,
+    ApplicationProperties.class, McpProjectFacade.class, McpProjectService.class, McpProjectWorkflowFacade.class,
     McpProjectWorkflowService.class, ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class,
     ProjectService.class, ProjectWorkflowService.class, WorkflowService.class, WorkspaceMcpServerFacade.class
 })

@@ -207,7 +207,7 @@ class McpProjectWorkflowGraphQlControllerIntTest {
         // Given
         McpProjectWorkflow mockWorkflow = createMockMcpProjectWorkflow(1L, 1L, 123L);
 
-        when(mcpProjectWorkflowService.create(anyLong(), anyLong())).thenReturn(mockWorkflow);
+        when(mcpProjectWorkflowFacade.createMcpProjectWorkflow(anyLong(), anyLong())).thenReturn(mockWorkflow);
 
         // When & Then
         this.graphQlTester
@@ -231,7 +231,7 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .entity(Long.class)
             .isEqualTo(1L);
 
-        verify(mcpProjectWorkflowService).create(1L, 123L);
+        verify(mcpProjectWorkflowFacade).createMcpProjectWorkflow(1L, 123L);
     }
 
     @Test
@@ -274,7 +274,7 @@ class McpProjectWorkflowGraphQlControllerIntTest {
 
         disabledWorkflow.setEnabled(false);
 
-        when(mcpProjectWorkflowService.updateEnabled(workflowId, false)).thenReturn(disabledWorkflow);
+        when(mcpProjectWorkflowFacade.updateMcpProjectWorkflowEnabled(workflowId, false)).thenReturn(disabledWorkflow);
 
         this.graphQlTester
             .document("""
@@ -295,7 +295,7 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(false);
 
-        verify(mcpProjectWorkflowService).updateEnabled(workflowId, false);
+        verify(mcpProjectWorkflowFacade).updateMcpProjectWorkflowEnabled(workflowId, false);
     }
 
     @Test
@@ -322,7 +322,7 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(mcpProjectWorkflowService, never()).updateEnabled(anyLong(), anyBoolean());
+        verify(mcpProjectWorkflowFacade, never()).updateMcpProjectWorkflowEnabled(anyLong(), anyBoolean());
     }
 
     @Test

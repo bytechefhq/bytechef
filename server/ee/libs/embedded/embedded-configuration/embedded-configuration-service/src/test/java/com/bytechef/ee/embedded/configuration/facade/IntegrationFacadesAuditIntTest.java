@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +56,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +157,9 @@ class IntegrationFacadesAuditIntTest {
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @Autowired
+    private PrincipalJobFacade principalJobFacade;
 
     @Autowired
     private WorkflowService workflowService;
@@ -494,6 +500,56 @@ class IntegrationFacadesAuditIntTest {
                             String.valueOf(integrationInstanceConfiguration.getId()))
                         .containsEntry("workflowId", workflowId)
                         .containsEntry("enabled", "false");
+        }
+
+        @Test
+        void testRunningAConfigurationWorkflowRecordsThePrincipalAndTheJob() {
+            IntegrationInstanceConfiguration integrationInstanceConfiguration =
+                createIntegrationInstanceConfiguration();
+
+            String workflowId = String.valueOf(UUID.randomUUID());
+
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                new IntegrationInstanceConfigurationWorkflow();
+
+            integrationInstanceConfigurationWorkflow.setEnabled(true);
+            integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+                integrationInstanceConfiguration.getId());
+            integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
+
+            integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+
+            when(principalJobFacade.createJob(
+                any(), eq(integrationInstanceConfiguration.getId()), eq(PlatformType.EMBEDDED)))
+                    .thenReturn(42L);
+
+            integrationInstanceConfigurationFacade.createIntegrationInstanceConfigurationWorkflowJob(
+                integrationInstanceConfiguration.getId(), workflowId);
+
+            assertThat(
+                findSingleEvent(IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_RUN).getData())
+                    .containsEntry("result", "SUCCESS")
+                    .containsEntry(
+                        "integrationInstanceConfigurationId",
+                        String.valueOf(integrationInstanceConfiguration.getId()))
+                    .containsEntry("workflowId", workflowId)
+                    .containsEntry("jobId", "42");
+        }
+
+        @Test
+        void testRunningAWorkflowOfAnUnknownConfigurationRecordsAFailure() {
+            assertThatThrownBy(
+                () -> integrationInstanceConfigurationFacade.createIntegrationInstanceConfigurationWorkflowJob(
+                    Long.MAX_VALUE, "missing"))
+                        .isInstanceOf(NoSuchElementException.class);
+
+            assertThat(
+                findSingleEvent(IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_RUN).getData())
+                    .containsEntry("result", "ERROR")
+                    .containsEntry("errorClass", NoSuchElementException.class.getName())
+                    .containsEntry("integrationInstanceConfigurationId", String.valueOf(Long.MAX_VALUE))
+                    .containsEntry("workflowId", "missing")
+                    .doesNotContainKey("jobId");
         }
 
         @Test

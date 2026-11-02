@@ -24,6 +24,7 @@ import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditMapper;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerToolDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerWorkflowDTO;
@@ -631,6 +632,33 @@ public class ConnectedUserMcpServerFacadeIntTest {
             .containsEntry("connectedUserId", String.valueOf(connectedUserId))
             .containsEntry("mcpServerId", String.valueOf(toolsMcpServer.getId()))
             .containsEntry("enabled", "false");
+    }
+
+    @Test
+    public void testEnableMcpToolRecordsTheToolAndTheNewState() {
+        List<McpIntegrationInstanceTool> mcpIntegrationInstanceTools =
+            mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId);
+
+        McpIntegrationInstanceTool mcpIntegrationInstanceTool = mcpIntegrationInstanceTools.getFirst();
+
+        connectedUserMcpServerFacade.enableMcpTool(mcpIntegrationInstanceTool.getId(), false);
+
+        assertThat(findSingleEventData(ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_TOOL_ENABLED_UPDATED))
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("mcpIntegrationInstanceToolId", String.valueOf(mcpIntegrationInstanceTool.getId()))
+            .containsEntry("enabled", "false");
+    }
+
+    @Test
+    public void testEnableOfAnUnknownMcpToolRecordsAFailure() {
+        assertThatThrownBy(() -> connectedUserMcpServerFacade.enableMcpTool(Long.MAX_VALUE, true))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(findSingleEventData(ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_TOOL_ENABLED_UPDATED))
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", IllegalArgumentException.class.getName())
+            .containsEntry("mcpIntegrationInstanceToolId", String.valueOf(Long.MAX_VALUE))
+            .containsEntry("enabled", "true");
     }
 
     private Map<String, String> findSingleEventData(String eventType) {

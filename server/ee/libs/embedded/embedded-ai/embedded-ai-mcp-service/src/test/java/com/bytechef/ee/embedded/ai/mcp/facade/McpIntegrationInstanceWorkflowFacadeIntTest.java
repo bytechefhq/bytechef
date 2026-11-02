@@ -14,6 +14,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceAuditEvents;
+import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
@@ -32,6 +34,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -116,6 +119,9 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
 
     @Autowired
     private McpToolRepository mcpToolRepository;
+
+    @Autowired
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     private long foreignIntegrationInstanceId;
     private long integrationInstanceConfigurationWorkflowId;
@@ -210,6 +216,8 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
                 new EmbeddedApiKeyAuthenticationToken(
                     Environment.DEVELOPMENT.ordinal(), ownConnectedUserId,
                     new User(OWN_EXTERNAL_USER_ID, "", List.of()), false));
+
+        persistenceAuditEventRepository.deleteAll();
     }
 
     @AfterEach
@@ -232,6 +240,7 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
         mcpToolRepository.deleteAll();
         mcpComponentRepository.deleteAll();
         mcpServerRepository.deleteAll();
+        persistenceAuditEventRepository.deleteAll();
     }
 
     @Test
@@ -243,6 +252,13 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
         verifyNoInteractions(integrationInstanceWorkflowService, integrationWorkflowService);
 
         assertThat(getIntegrationInstanceWorkflow(foreignIntegrationInstanceId).isEnabled()).isFalse();
+        assertThat(
+            findSingleEventData(McpIntegrationInstanceAuditEvents.MCP_INTEGRATION_INSTANCE_WORKFLOW_ENABLED_UPDATED))
+                .containsEntry("result", "ERROR")
+                .containsEntry("errorClass", EmbeddedIntegrationNotVisibleException.class.getName())
+                .containsEntry("integrationInstanceId", String.valueOf(foreignIntegrationInstanceId))
+                .containsEntry("workflowUuid", WORKFLOW_UUID)
+                .containsEntry("enabled", "true");
     }
 
     @Test
@@ -257,6 +273,12 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
         verify(integrationInstanceWorkflowService).updateEnabled(integrationInstanceWorkflow.getId(), true);
 
         assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).isEnabled()).isTrue();
+        assertThat(
+            findSingleEventData(McpIntegrationInstanceAuditEvents.MCP_INTEGRATION_INSTANCE_WORKFLOW_ENABLED_UPDATED))
+                .containsEntry("result", "SUCCESS")
+                .containsEntry("integrationInstanceId", String.valueOf(integrationInstanceId))
+                .containsEntry("workflowUuid", WORKFLOW_UUID)
+                .containsEntry("enabled", "true");
     }
 
     @Test
@@ -292,6 +314,10 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
         return integrationInstanceWorkflowService
             .fetchIntegrationInstanceWorkflow(integrationInstanceId, integrationInstanceConfigurationWorkflowId)
             .orElseThrow();
+    }
+
+    private Map<String, String> findSingleEventData(String eventType) {
+        return EmbeddedMcpAuditIntTestConfiguration.findSingleEventData(persistenceAuditEventRepository, eventType);
     }
 
     private long insert(String sql, Object... arguments) {
@@ -342,7 +368,8 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
         IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolFacadeImpl.class,
-        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class
+        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class,
+        EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class FacadeIntTestConfiguration {
 

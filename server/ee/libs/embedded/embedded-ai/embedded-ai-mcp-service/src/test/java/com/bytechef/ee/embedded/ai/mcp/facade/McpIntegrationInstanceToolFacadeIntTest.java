@@ -17,6 +17,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceAuditEvents;
+import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
@@ -36,6 +38,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -125,6 +128,9 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
     @Autowired
     private McpToolRepository mcpToolRepository;
+
+    @Autowired
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     private long foreignIntegrationInstanceId;
     private long integrationId;
@@ -228,6 +234,8 @@ class McpIntegrationInstanceToolFacadeIntTest {
                 new EmbeddedApiKeyAuthenticationToken(
                     Environment.DEVELOPMENT.ordinal(), ownConnectedUserId,
                     new User(OWN_EXTERNAL_USER_ID, "", List.of()), false));
+
+        persistenceAuditEventRepository.deleteAll();
     }
 
     @AfterEach
@@ -250,6 +258,7 @@ class McpIntegrationInstanceToolFacadeIntTest {
         mcpToolRepository.deleteAll();
         mcpComponentRepository.deleteAll();
         mcpServerRepository.deleteAll();
+        persistenceAuditEventRepository.deleteAll();
     }
 
     @Test
@@ -260,6 +269,12 @@ class McpIntegrationInstanceToolFacadeIntTest {
         verifyNoInteractions(mcpIntegrationInstanceToolService);
 
         assertThat(countMcpIntegrationInstanceTools()).isZero();
+        assertThat(findSingleEventData(McpIntegrationInstanceAuditEvents.MCP_INTEGRATION_INSTANCE_TOOL_ENABLED_UPDATED))
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", EmbeddedIntegrationNotVisibleException.class.getName())
+            .containsEntry("integrationInstanceId", String.valueOf(foreignIntegrationInstanceId))
+            .containsEntry("mcpToolId", String.valueOf(mcpToolId))
+            .containsEntry("enabled", "true");
     }
 
     @Test
@@ -274,6 +289,11 @@ class McpIntegrationInstanceToolFacadeIntTest {
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
             .containsExactly(tuple(mcpToolId, true));
+        assertThat(findSingleEventData(McpIntegrationInstanceAuditEvents.MCP_INTEGRATION_INSTANCE_TOOL_ENABLED_UPDATED))
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("integrationInstanceId", String.valueOf(integrationInstanceId))
+            .containsEntry("mcpToolId", String.valueOf(mcpToolId))
+            .containsEntry("enabled", "true");
     }
 
     @Test
@@ -378,6 +398,10 @@ class McpIntegrationInstanceToolFacadeIntTest {
         });
     }
 
+    private Map<String, String> findSingleEventData(String eventType) {
+        return EmbeddedMcpAuditIntTestConfiguration.findSingleEventData(persistenceAuditEventRepository, eventType);
+    }
+
     private int countMcpIntegrationInstanceTools() {
         Integer count =
             jdbcTemplate.queryForObject("SELECT COUNT(*) FROM mcp_integration_instance_tool", Integer.class);
@@ -433,7 +457,8 @@ class McpIntegrationInstanceToolFacadeIntTest {
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
         IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolFacadeImpl.class,
-        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class
+        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class,
+        EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class FacadeIntTestConfiguration {
 
