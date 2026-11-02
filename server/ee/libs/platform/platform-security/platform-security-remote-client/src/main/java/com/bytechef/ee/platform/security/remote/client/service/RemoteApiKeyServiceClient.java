@@ -13,6 +13,7 @@ import com.bytechef.ee.platform.security.remote.grpc.proto.ExistsRequest;
 import com.bytechef.ee.platform.security.remote.grpc.proto.FetchApiKeyBySecretKeyAndEnvironmentRequest;
 import com.bytechef.ee.platform.security.remote.grpc.proto.FetchApiKeyBySecretKeyRequest;
 import com.bytechef.ee.platform.security.remote.grpc.proto.FetchApiKeyResponse;
+import com.bytechef.ee.platform.security.remote.grpc.proto.UpdateLastUsedDateRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
@@ -71,6 +72,16 @@ public class RemoteApiKeyServiceClient implements ApiKeyService {
     }
 
     @Override
+    public Optional<ApiKey> fetchApiKey(String secretKey, long environmentId) {
+        return toApiKey(
+            getStub().fetchApiKeyBySecretKeyAndEnvironment(
+                FetchApiKeyBySecretKeyAndEnvironmentRequest.newBuilder()
+                    .setEnvironmentId(environmentId)
+                    .setSecretKey(secretKey)
+                    .build()));
+    }
+
+    @Override
     public Optional<ApiKey> fetchApiKey(long id) {
         throw new UnsupportedOperationException();
     }
@@ -84,12 +95,7 @@ public class RemoteApiKeyServiceClient implements ApiKeyService {
 
     @Override
     public ApiKey getApiKey(String secretKey, long environmentId) {
-        Optional<ApiKey> apiKey = toApiKey(
-            getStub().fetchApiKeyBySecretKeyAndEnvironment(
-                FetchApiKeyBySecretKeyAndEnvironmentRequest.newBuilder()
-                    .setEnvironmentId(environmentId)
-                    .setSecretKey(secretKey)
-                    .build()));
+        Optional<ApiKey> apiKey = fetchApiKey(secretKey, environmentId);
 
         return apiKey.orElseThrow(
             () -> new IllegalArgumentException("Api key not found for the specified environment."));
@@ -112,7 +118,10 @@ public class RemoteApiKeyServiceClient implements ApiKeyService {
 
     @Override
     public void updateLastUsedDate(long id) {
-        throw new UnsupportedOperationException();
+        getStub().updateLastUsedDate(
+            UpdateLastUsedDateRequest.newBuilder()
+                .setId(id)
+                .build());
     }
 
     private ApiKeyRemoteServiceGrpc.ApiKeyRemoteServiceBlockingStub getStub() {
