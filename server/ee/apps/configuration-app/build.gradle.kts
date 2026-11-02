@@ -78,6 +78,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-notification:platform-notification-rest"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-service"))
     implementation(project(":server:ee:libs:platform:platform-notification:platform-notification-remote-grpc"))
+    implementation(project(":server:libs:platform:platform-oauth2-authorization-server"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
     implementation(project(":server:libs:platform:platform-security:platform-security-graphql"))
@@ -92,6 +93,7 @@ dependencies {
 
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-single-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
@@ -109,6 +111,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-remote-client"))
     implementation(project(":server:ee:libs:config:session-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
+    implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
