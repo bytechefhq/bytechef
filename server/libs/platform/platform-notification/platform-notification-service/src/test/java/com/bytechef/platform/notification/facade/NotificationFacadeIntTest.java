@@ -132,5 +132,58 @@ public class NotificationFacadeIntTest {
             assertThat(notificationDTO.type()).isEqualTo(Notification.Type.WEBHOOK);
             assertThat(notificationRepository.count()).isEqualTo(1);
         }
+
+        @Test
+        public void testCreateWebhookNotificationWithoutUrlIsRejected() {
+            Notification notification = createNotification(Notification.Type.WEBHOOK, Map.of());
+
+            assertThatThrownBy(() -> notificationFacade.createNotification(notification))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Webhook URL is required");
+
+            assertThat(notificationRepository.count()).isZero();
+        }
+
+        @Test
+        public void testCreateWebhookNotificationWithBlankUrlIsRejected() {
+            Notification notification = createNotification(Notification.Type.WEBHOOK, Map.of("webhook", "  "));
+
+            assertThatThrownBy(() -> notificationFacade.createNotification(notification))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Webhook URL is required");
+
+            assertThat(notificationRepository.count()).isZero();
+        }
+
+        @Test
+        public void testCreateWebhookNotificationWithNonHttpUrlIsRejected() {
+            Notification notification = createNotification(
+                Notification.Type.WEBHOOK, Map.of("webhook", "ftp://example.com/hook"));
+
+            assertThatThrownBy(() -> notificationFacade.createNotification(notification))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Webhook URL must be an http or https URL");
+
+            assertThat(notificationRepository.count()).isZero();
+        }
+
+        @Test
+        public void testUpdateWebhookNotificationToEmptyUrlIsRejected() {
+            NotificationDTO notificationDTO = notificationFacade.createNotification(
+                createNotification(Notification.Type.WEBHOOK, Map.of("webhook", "https://example.com/hook")));
+
+            Notification notification = createNotification(Notification.Type.WEBHOOK, Map.of("webhook", ""));
+
+            notification.setId(notificationDTO.id());
+
+            assertThatThrownBy(() -> notificationFacade.updateNotification(notification))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Webhook URL is required");
+
+            Notification storedNotification = notificationRepository.findById(notificationDTO.id())
+                .orElseThrow();
+
+            assertThat(storedNotification.getSettings()).containsEntry("webhook", "https://example.com/hook");
+        }
     }
 }

@@ -22,7 +22,10 @@ import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationEventService;
 import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 /**
@@ -56,7 +59,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
     @Override
     public NotificationDTO createNotification(Notification notification) {
-        validateNotificationType(notification);
+        validateNotification(notification);
 
         notification = notificationService.create(notification);
 
@@ -67,7 +70,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
     @Override
     public NotificationDTO updateNotification(Notification notification) {
-        validateNotificationType(notification);
+        validateNotification(notification);
 
         notification = notificationService.update(notification);
 
@@ -76,12 +79,40 @@ public class NotificationFacadeImpl implements NotificationFacade {
             notificationEventService.getNotificationEvents(notification.getNotificationEventIds()));
     }
 
-    private void validateNotificationType(Notification notification) {
+    private static boolean isHttpUrl(String value) {
+        try {
+            URI uri = new URI(value.strip());
+
+            String scheme = uri.getScheme();
+
+            return uri.getHost() != null && ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme));
+        } catch (URISyntaxException uriSyntaxException) {
+            return false;
+        }
+    }
+
+    private void validateNotification(Notification notification) {
         Notification.Type type = notification.getType();
 
         if (!notificationSenderRegistry.hasNotificationSender(type)) {
             throw new IllegalArgumentException(
                 "Notification type %s is not available in this edition".formatted(type));
+        }
+
+        if (type == Notification.Type.WEBHOOK) {
+            validateWebhookUrl(notification.getSettings());
+        }
+    }
+
+    private static void validateWebhookUrl(Map<String, Object> settings) {
+        Object webhookUrl = settings == null ? null : settings.get("webhook");
+
+        if (!(webhookUrl instanceof String webhookUrlString) || webhookUrlString.isBlank()) {
+            throw new IllegalArgumentException("Webhook URL is required");
+        }
+
+        if (!isHttpUrl(webhookUrlString)) {
+            throw new IllegalArgumentException("Webhook URL must be an http or https URL");
         }
     }
 }
