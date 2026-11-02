@@ -42,11 +42,14 @@ import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.agent.tool.ConversationState;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsApprovalGate;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
 import com.bytechef.component.ai.llm.advisor.JsonSchemaValidationAdvisor;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -66,6 +69,7 @@ import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementFailureAttributingAdvisor;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.SessionConversationHistoryReader;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -2029,6 +2033,33 @@ class AbstractAiAgentChatActionTest {
                         .build());
             lenient().when(aiAgentToolFacade.getFunctionToolCallback(any(), anyMap(), isNull(), any()))
                 .thenReturn(toolCallback);
+        }
+
+        @Test
+        void testApprovedToolNestedUnderAnApprovalGateRunsTheUnwrappedTool() throws Exception {
+            AiAgentUtilsApprovalGate aiAgentUtilsApprovalGate = new AiAgentUtilsApprovalGate(
+                new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService),
+                clusterElementDefinitionService, null);
+
+            ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> approvalGateDefinition =
+                aiAgentUtilsApprovalGate.clusterElementDefinition;
+
+            when(clusterElementDefinitionService.getClusterElement("aiAgentUtils", 1, "approvalGate"))
+                .thenReturn(approvalGateDefinition.getElement());
+            when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class))).thenReturn("message sent: ts=1721");
+
+            String resumeData = action.resolveGatedToolResumeData(
+                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME), data(true, null), Map.of(),
+                GATED_EXTENSIONS, context);
+
+            verify(toolCallback).call(eq(GATED_TOOL_INPUT), any(ToolContext.class));
+            verify(clusterElementDefinitionService, never()).executeApprovalChannel(
+                anyString(), anyInt(), anyString(), anyMap(), anyString(), any(), any());
+            verify(context, never()).suspend(any());
+
+            assertThat(resumeData)
+                .contains("approvedByReviewer")
+                .contains("message sent: ts=1721");
         }
 
         @Test
