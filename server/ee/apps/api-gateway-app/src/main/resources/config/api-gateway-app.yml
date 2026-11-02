@@ -44,6 +44,10 @@ spring:
               uri: lb://webhook-app
               predicates:
                 - Path=/webhooks/**,/approvals/**,/callback/**,/job/resume/**,/file-entries/**,/api/embedded/v1/app-events/**,/api/embedded/v1/workflows/**,/api/embedded/v1/*/app-events/**,/api/embedded/v1/*/workflows/**
+            - id: configuration-oauth2
+              uri: lb://configuration-app
+              predicates:
+                - Path=/oauth2/authorize,/oauth2/token,/oauth2/jwks,/oauth2/revoke,/oauth2/introspect,/oauth2/register,/oauth2/par,/.well-known/oauth-authorization-server/**,/.well-known/openid-configuration,/.well-known/oauth-protected-resource/**
             - id: configuration-app
               uri: lb://configuration-app
               predicates:
