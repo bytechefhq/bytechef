@@ -17,5 +17,6 @@ dependencies {
     testImplementation(project(":server:libs:modules:components:schedule"))
     testImplementation(project(":server:libs:modules:components:webhook"))
     testImplementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
+    testImplementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-api"))
     testImplementation(project(":server:libs:test:test-support"))
 }

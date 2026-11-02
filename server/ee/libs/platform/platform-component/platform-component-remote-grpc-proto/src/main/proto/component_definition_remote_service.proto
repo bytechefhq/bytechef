@@ -62,6 +62,7 @@ service TriggerDefinitionFacadeRemoteService {
   rpc ExecuteTrigger(TriggerExecuteTriggerRequest) returns (RemoteTriggerOutput);
   rpc ExecuteWebhookDisable(TriggerExecuteWebhookDisableRequest) returns (google.protobuf.Empty);
   rpc ExecuteWebhookEnable(TriggerExecuteWebhookEnableRequest) returns (WebhookEnableOutputResult);
+  rpc ExecuteWebhookResponse(TriggerExecuteWebhookResponseRequest) returns (WebhookResponseResult);
   rpc ExecuteWebhookValidate(TriggerExecuteWebhookValidateRequest) returns (RemoteWebhookValidateResponse);
   rpc ExecuteWebhookValidateOnEnable(TriggerExecuteWebhookValidateRequest) returns (RemoteWebhookValidateResponse);
 }
@@ -116,6 +117,7 @@ message RemoteComponentDefinition {
   optional int32 triggers_count = 21;
   optional string unified_api_category = 22;
   optional int32 version = 23;
+  optional bool deprecated = 24;
 }
 
 message ComponentDefinitionResult {
@@ -144,6 +146,7 @@ message RemoteActionDefinition {
   optional bool sse_stream_response = 15;
   optional string title = 16;
   optional bool workflow_node_description_defined = 17;
+  optional bool deprecated = 18;
 }
 
 message RemoteActionDefinitions {
@@ -170,6 +173,7 @@ message RemoteTriggerDefinition {
   optional bool workflow_sync_execution = 17;
   optional bool workflow_sync_on_enable_validation = 18;
   optional bool workflow_sync_validation = 19;
+  optional bool webhook_response = 20;
 }
 
 message RemoteTriggerDefinitions {
@@ -255,6 +259,7 @@ message RemoteOutputResponse {
   optional RemoteProperty output_schema = 1;
   optional bytes sample_output = 2;
   optional bytes placeholder = 3;
+  optional bool sample_output_generated = 4;
 }
 
 message RemoteWebhookTriggerFlags {
@@ -262,6 +267,7 @@ message RemoteWebhookTriggerFlags {
   bool workflow_sync_execution = 2;
   bool workflow_sync_validation = 3;
   bool workflow_sync_on_enable_validation = 4;
+  bool webhook_response = 5;
 }
 
 message RemoteTriggerOutput {
@@ -442,6 +448,7 @@ message ActionExecuteOptionsRequest {
   map<string, int64> connection_ids = 9;
   optional bytes extensions = 10;
   bool multiple_connections = 11;
+  optional string workflow_id = 12;
 }
 
 message ActionExecuteOutputRequest {
@@ -450,6 +457,7 @@ message ActionExecuteOutputRequest {
   string action_name = 3;
   bytes input_parameters = 4;
   map<string, int64> connection_ids = 5;
+  optional string workflow_id = 6;
 }
 
 message ActionExecutePerformRequest {
@@ -480,6 +488,7 @@ message TriggerExecuteDynamicPropertiesRequest {
   bytes input_parameters = 5;
   repeated string lookup_depends_on_paths = 6;
   optional int64 connection_id = 7;
+  optional string workflow_id = 8;
 }
 
 message TriggerExecuteDynamicWebhookRefreshRequest {
@@ -508,6 +517,7 @@ message TriggerExecuteOptionsRequest {
   repeated string lookup_depends_on_paths = 6;
   optional string search_text = 7;
   optional int64 connection_id = 8;
+  optional string workflow_id = 9;
 }
 
 message TriggerExecuteOutputRequest {
@@ -516,6 +526,7 @@ message TriggerExecuteOutputRequest {
   string trigger_name = 3;
   bytes input_parameters = 4;
   optional int64 connection_id = 5;
+  optional string workflow_id = 6;
 }
 
 message TriggerExecuteTriggerRequest {
@@ -542,6 +553,17 @@ message TriggerExecuteWebhookDisableRequest {
   optional string workflow_execution_id = 5;
   bytes output_parameters = 6;
   optional int64 connection_id = 7;
+}
+
+message TriggerExecuteWebhookResponseRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  bytes input_parameters = 4;
+}
+
+message WebhookResponseResult {
+  optional bytes webhook_response = 1;
 }
 
 message TriggerExecuteWebhookEnableRequest {

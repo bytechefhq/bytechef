@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -183,7 +184,8 @@ class ComponentProtoMapperTest {
         }
 
         ComponentHandler aiAgentComponentHandler = new AiAgentComponentHandler(
-            mock(AiAgentToolFacade.class), mock(ClusterElementDefinitionService.class), mock(ToolCallingManager.class));
+            mock(AiAgentToolFacade.class), mock(ClusterElementDefinitionService.class), mock(ToolCallingManager.class),
+            mock(ObjectProvider.class));
         ComponentHandler scheduleComponentHandler = new ScheduleComponentHandler(mock(TriggerScheduler.class));
 
         componentDefinitions.add(new ComponentDefinition(aiAgentComponentHandler.getDefinition()));
