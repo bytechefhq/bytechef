@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -159,6 +160,20 @@ final class MultiIssuerJwtDecoderTest {
         multiIssuerJwtDecoder.decode(token);
 
         assertThat(jwtDecoderFactory.createdDecoderCount).isEqualTo(1);
+    }
+
+    @Test
+    void testRejectsTokenFromATrustedIssuerWhoseMetadataCannotBeResolved() {
+        String unreachableIssuer = "http://127.0.0.1:1";
+
+        MultiIssuerJwtDecoder multiIssuerJwtDecoder = new MultiIssuerJwtDecoder(
+            new IssuerLocationMcpJwtDecoderFactory(Set.of(unreachableIssuer)));
+
+        String token = signToken(unreachableIssuer, keyPairA);
+
+        assertThatExceptionOfType(BadJwtException.class)
+            .isThrownBy(() -> multiIssuerJwtDecoder.decode(token))
+            .withMessageContaining(unreachableIssuer);
     }
 
     private JwtDecoder perIssuerDecoder(String issuer) {
