@@ -39,6 +39,16 @@ import org.springframework.util.unit.DataSize;
 @Component
 public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
 
+    private static final Map<String, ?> RETRY_SERVICE_CONFIG = Map.of(
+        "methodConfig", List.of(
+            Map.of(
+                "name", List.of(Map.of()),
+                "retryPolicy", Map.of(
+                    "maxAttempts", 5.0,
+                    "initialBackoff", "0.5s",
+                    "maxBackoff", "4s",
+                    "backoffMultiplier", 2.0,
+                    "retryableStatusCodes", List.of("UNAVAILABLE")))));
     private static final Duration SHUTDOWN_GRACE_PERIOD = Duration.ofSeconds(10);
 
     private final Duration deadline;
@@ -148,6 +158,7 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
     private ManagedChannel createManagedChannel(String target, @Nullable String authority) {
         ManagedChannelBuilder<?> managedChannelBuilder = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")
+            .defaultServiceConfig(RETRY_SERVICE_CONFIG)
             .intercept(
                 new TenantContextClientInterceptor(), new UserContextClientInterceptor(remotePrincipalCodecs),
                 new ServiceTokenClientInterceptor(serviceToken));
