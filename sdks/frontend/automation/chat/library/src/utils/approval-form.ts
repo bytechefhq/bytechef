@@ -35,6 +35,10 @@ export interface ApprovalFormInputI {
 
 export type ApprovalFormValuesType = Record<string, unknown>;
 
+const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+$/;
+
 const UNSUPPORTED_FIELD_TYPES: number[] = [ApprovalFieldType.CUSTOM_HTML, ApprovalFieldType.FILE_INPUT];
 
 const pad = (value: number) => String(value).padStart(2, '0');
@@ -51,12 +55,22 @@ export function isMultipleSelect(input: ApprovalFormInputI): boolean {
     return input.fieldType === ApprovalFieldType.SELECT && !!input.multipleChoice;
 }
 
+function isDateField(fieldType: number | undefined): boolean {
+    return fieldType === ApprovalFieldType.DATE_PICKER || fieldType === ApprovalFieldType.DATETIME_PICKER;
+}
+
 function toDateInputValue(value: unknown, withTime: boolean): string {
     if (typeof value !== 'string' || value.trim() === '') {
         return '';
     }
 
-    const date = new Date(value);
+    const trimmedValue = value.trim();
+
+    if (DATE_ONLY_PATTERN.test(trimmedValue)) {
+        return withTime ? `${trimmedValue}T00:00` : trimmedValue;
+    }
+
+    const date = new Date(trimmedValue);
 
     if (Number.isNaN(date.getTime())) {
         return '';
@@ -81,7 +95,7 @@ export function getApprovalFormDefaultValues(inputs: ApprovalFormInputI[]): Appr
             values[fieldName] = defaultValue === true || defaultValue === 'true';
         } else if (isMultipleSelect(input)) {
             values[fieldName] = Array.isArray(defaultValue) ? defaultValue.map(String) : [];
-        } else if (fieldType === ApprovalFieldType.DATE_PICKER || fieldType === ApprovalFieldType.DATETIME_PICKER) {
+        } else if (isDateField(fieldType)) {
             values[fieldName] = toDateInputValue(defaultValue, fieldType === ApprovalFieldType.DATETIME_PICKER);
         } else {
             values[fieldName] = defaultValue == null ? '' : String(defaultValue);
@@ -134,10 +148,14 @@ export function validateApprovalForm(
             return;
         }
 
-        if (fieldType === ApprovalFieldType.NUMBER_INPUT && typeof value === 'string' && value.trim() !== '') {
-            if (Number.isNaN(Number(value.trim()))) {
-                errors[fieldName] = 'Enter a number';
-            }
+        if (typeof value !== 'string' || value.trim() === '') {
+            return;
+        }
+
+        if (fieldType === ApprovalFieldType.NUMBER_INPUT && Number.isNaN(Number(value.trim()))) {
+            errors[fieldName] = 'Enter a number';
+        } else if (fieldType === ApprovalFieldType.EMAIL_INPUT && !EMAIL_PATTERN.test(value.trim())) {
+            errors[fieldName] = 'Enter an email address';
         }
     });
 
@@ -162,14 +180,21 @@ function toIsoDate(value: string, withTime: boolean): string | undefined {
 
 export function toApprovalFormData(
     inputs: ApprovalFormInputI[],
-    values: ApprovalFormValuesType
+    values: ApprovalFormValuesType,
+    editedFieldNames: ReadonlySet<string> = new Set()
 ): ApprovalFormValuesType {
     const data: ApprovalFormValuesType = {};
 
     inputs.forEach((input) => {
-        const {fieldName, fieldType} = input;
+        const {defaultValue, fieldName, fieldType} = input;
 
         if (!fieldName || !(fieldName in values)) {
+            return;
+        }
+
+        if (isDateField(fieldType) && !editedFieldNames.has(fieldName) && !isEmpty(defaultValue)) {
+            data[fieldName] = defaultValue;
+
             return;
         }
 
@@ -187,7 +212,7 @@ export function toApprovalFormData(
             if (trimmedValue !== '' && !Number.isNaN(Number(trimmedValue))) {
                 data[fieldName] = Number(trimmedValue);
             }
-        } else if (fieldType === ApprovalFieldType.DATE_PICKER || fieldType === ApprovalFieldType.DATETIME_PICKER) {
+        } else if (isDateField(fieldType)) {
             const isoDate =
                 trimmedValue === ''
                     ? undefined

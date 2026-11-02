@@ -27,6 +27,17 @@ export interface ApprovalRequestEventI {
     resumeUrl?: string;
 }
 
+export class ApprovalResumeError extends Error {
+    readonly userMessage: string | null;
+
+    constructor(status: number, userMessage: string | null) {
+        super(`Resume request was not accepted (status ${status})`);
+
+        this.name = 'ApprovalResumeError';
+        this.userMessage = userMessage;
+    }
+}
+
 const EVENT_STREAM_CONTENT_TYPE = 'text/event-stream';
 const JSON_CONTENT_TYPE = 'application/json';
 
@@ -88,6 +99,36 @@ export function isEventStreamResponse(response: Response): boolean {
     const contentType = response.headers.get('content-type') ?? '';
 
     return contentType.includes(EVENT_STREAM_CONTENT_TYPE);
+}
+
+export async function toApprovalResumeError(response: Response): Promise<ApprovalResumeError> {
+    const {status} = response;
+
+    if (status === 400) {
+        const problemDetail = (await response.json().catch(() => null)) as {detail?: unknown} | null;
+
+        return new ApprovalResumeError(
+            status,
+            typeof problemDetail?.detail === 'string' && problemDetail.detail ? problemDetail.detail : null
+        );
+    }
+
+    if (status === 409) {
+        return new ApprovalResumeError(status, 'Still preparing — try again in a moment.');
+    }
+
+    if (status === 410) {
+        return new ApprovalResumeError(
+            status,
+            'This approval has expired or was already resolved, and can no longer be submitted.'
+        );
+    }
+
+    if (status === 422) {
+        return new ApprovalResumeError(status, 'The workflow failed, so this decision can no longer be applied.');
+    }
+
+    return new ApprovalResumeError(status, null);
 }
 
 export function isAcceptedResumeResponse(response: Response): boolean {
