@@ -59,7 +59,12 @@ const AutomationWorkflowProjectList = ({
 }: AutomationWorkflowProjectListProps) => {
     const [activeTabs, setActiveTabs] = useState<Record<string, AutomationWorkflowProjectListItemTabType>>({});
     const [configurationDialog, setConfigurationDialog] = useState<
-        {configuration?: AutomationWorkflowProjectConfigurationType; project: AutomationWorkflowProjectType} | undefined
+        | {
+              configuration?: AutomationWorkflowProjectConfigurationType;
+              project: AutomationWorkflowProjectType;
+              updateProjectVersion?: boolean;
+          }
+        | undefined
     >();
     const [openProjectIds, setOpenProjectIds] = useState<Set<string>>(new Set());
 
@@ -165,6 +170,9 @@ const AutomationWorkflowProjectList = ({
                                 <AutomationWorkflowProjectConfigurationList
                                     onCreate={() => setConfigurationDialog({project})}
                                     onEdit={(configuration) => setConfigurationDialog({configuration, project})}
+                                    onUpdateVersion={(configuration) =>
+                                        setConfigurationDialog({configuration, project, updateProjectVersion: true})
+                                    }
                                     project={project}
                                 />
                             }
@@ -190,6 +198,7 @@ const AutomationWorkflowProjectList = ({
                     configuration={configurationDialog.configuration}
                     onClose={() => setConfigurationDialog(undefined)}
                     project={configurationDialog.project}
+                    updateProjectVersion={configurationDialog.updateProjectVersion}
                 />
             )}
         </div>

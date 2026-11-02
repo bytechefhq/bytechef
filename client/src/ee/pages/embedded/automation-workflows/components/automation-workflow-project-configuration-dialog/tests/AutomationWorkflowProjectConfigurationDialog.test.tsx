@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -94,7 +95,11 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
     it('creates a configuration with the chosen environment and version', async () => {
         const user = userEvent.setup();
 
-        render(<AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />);
+        render(
+            <TooltipProvider>
+                <AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />
+            </TooltipProvider>
+        );
 
         await user.click(screen.getByRole('combobox', {name: 'Environment'}));
         await user.click(await screen.findByRole('option', {name: 'Staging'}));
@@ -118,7 +123,11 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
     it('offers only published versions', async () => {
         const user = userEvent.setup();
 
-        render(<AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />);
+        render(
+            <TooltipProvider>
+                <AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />
+            </TooltipProvider>
+        );
 
         await user.click(screen.getByRole('combobox', {name: 'Version'}));
 
@@ -127,7 +136,25 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
         expect(screen.queryByRole('option', {name: 'V2'})).not.toBeInTheDocument();
     });
 
-    it('edits an existing configuration with the environment fixed', async () => {
+    it('explains the Automation Hub switch in a tooltip instead of inline text', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <TooltipProvider>
+                <AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />
+            </TooltipProvider>
+        );
+
+        expect(screen.queryByText('Turn off for flows you only activate through the API.')).not.toBeInTheDocument();
+
+        await user.hover(screen.getByLabelText('About Show in Automation Hub'));
+
+        expect(await screen.findByRole('tooltip')).toHaveTextContent(
+            'Turn off for flows you only activate through the API.'
+        );
+    });
+
+    it('edits an existing configuration without offering the environment or version', async () => {
         const user = userEvent.setup();
 
         const onClose = vi.fn();
@@ -135,24 +162,21 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
         mocks.updateMutate.mockImplementation((_variables, options: {onSuccess: () => void}) => options.onSuccess());
 
         render(
-            <AutomationWorkflowProjectConfigurationDialog
-                configuration={existingConfiguration}
-                onClose={onClose}
-                project={project}
-            />
+            <TooltipProvider>
+                <AutomationWorkflowProjectConfigurationDialog
+                    configuration={existingConfiguration}
+                    onClose={onClose}
+                    project={project}
+                />
+            </TooltipProvider>
         );
 
         expect(screen.getByText('Edit Configuration')).toBeInTheDocument();
+        expect(screen.getByText('Staging')).toBeInTheDocument();
+        expect(screen.queryByRole('combobox', {name: 'Environment'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('combobox', {name: 'Version'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('switch', {name: 'Enabled'})).not.toBeInTheDocument();
 
-        const environmentSelect = screen.getByRole('combobox', {name: 'Environment'});
-
-        expect(environmentSelect).toBeDisabled();
-        expect(environmentSelect).toHaveTextContent('Staging');
-
-        await user.click(screen.getByRole('combobox', {name: 'Version'}));
-        await user.click(await screen.findByRole('option', {name: 'V1'}));
-
-        await user.click(screen.getByRole('switch', {name: 'Enabled'}));
         await user.click(screen.getByRole('switch', {name: 'Show in Automation Hub'}));
 
         await user.click(screen.getByRole('button', {name: 'Save'}));
@@ -161,13 +185,46 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
 
         expect(mocks.updateMutate.mock.calls[0][0]).toEqual({
             automationHubVisible: false,
-            enabled: false,
+            enabled: true,
             id: 'configuration-1',
-            projectVersion: 1,
+            projectVersion: 3,
         });
         expect(mocks.createMutate).not.toHaveBeenCalled();
 
         await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    });
+
+    it('upgrades the version starting from the latest published one, keeping the other settings', async () => {
+        const user = userEvent.setup();
+
+        mocks.updateMutate.mockImplementation((_variables, options: {onSuccess: () => void}) => options.onSuccess());
+
+        render(
+            <TooltipProvider>
+                <AutomationWorkflowProjectConfigurationDialog
+                    configuration={{...existingConfiguration, automationHubVisible: false, projectVersion: 1}}
+                    onClose={vi.fn()}
+                    project={project}
+                    updateProjectVersion
+                />
+            </TooltipProvider>
+        );
+
+        expect(screen.getByText('Upgrade Project Version')).toBeInTheDocument();
+        expect(screen.getByText('Staging')).toBeInTheDocument();
+        expect(screen.getByRole('combobox', {name: 'Version'})).toHaveTextContent('V3');
+        expect(screen.queryByRole('switch', {name: 'Show in Automation Hub'})).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(mocks.updateMutate).toHaveBeenCalledTimes(1));
+
+        expect(mocks.updateMutate.mock.calls[0][0]).toEqual({
+            automationHubVisible: false,
+            enabled: true,
+            id: 'configuration-1',
+            projectVersion: 3,
+        });
     });
 
     it('warns that moving to an older version disconnects automations it lacks', async () => {
@@ -186,11 +243,14 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
         };
 
         render(
-            <AutomationWorkflowProjectConfigurationDialog
-                configuration={configuration}
-                onClose={vi.fn()}
-                project={project}
-            />
+            <TooltipProvider>
+                <AutomationWorkflowProjectConfigurationDialog
+                    configuration={configuration}
+                    onClose={vi.fn()}
+                    project={project}
+                    updateProjectVersion
+                />
+            </TooltipProvider>
         );
 
         const warningText = 'Versions that lack workflows connected users still use cannot be saved.';
@@ -222,11 +282,14 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             };
 
             render(
-                <AutomationWorkflowProjectConfigurationDialog
-                    configuration={{...existingConfiguration, projectVersion: 1}}
-                    onClose={vi.fn()}
-                    project={project}
-                />
+                <TooltipProvider>
+                    <AutomationWorkflowProjectConfigurationDialog
+                        configuration={{...existingConfiguration, projectVersion: 1}}
+                        onClose={vi.fn()}
+                        project={project}
+                        updateProjectVersion
+                    />
+                </TooltipProvider>
             );
 
             await user.click(screen.getByRole('combobox', {name: 'Version'}));
@@ -253,11 +316,14 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             const user = userEvent.setup();
 
             render(
-                <AutomationWorkflowProjectConfigurationDialog
-                    configuration={{...existingConfiguration, projectVersion: 1}}
-                    onClose={vi.fn()}
-                    project={project}
-                />
+                <TooltipProvider>
+                    <AutomationWorkflowProjectConfigurationDialog
+                        configuration={{...existingConfiguration, projectVersion: 1}}
+                        onClose={vi.fn()}
+                        project={project}
+                        updateProjectVersion
+                    />
+                </TooltipProvider>
             );
 
             await user.click(screen.getByRole('combobox', {name: 'Version'}));
@@ -271,7 +337,11 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
                 automationWorkflowProjectConfigurationVersionImpact: {workflows: impactWorkflows},
             };
 
-            render(<AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />);
+            render(
+                <TooltipProvider>
+                    <AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />
+                </TooltipProvider>
+            );
 
             expect(screen.queryByText(/will pause/)).not.toBeInTheDocument();
             expect(mocks.impactQuery).toHaveBeenCalledWith(expect.anything(), {enabled: false});
@@ -281,11 +351,14 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             const user = userEvent.setup();
 
             render(
-                <AutomationWorkflowProjectConfigurationDialog
-                    configuration={existingConfiguration}
-                    onClose={vi.fn()}
-                    project={project}
-                />
+                <TooltipProvider>
+                    <AutomationWorkflowProjectConfigurationDialog
+                        configuration={existingConfiguration}
+                        onClose={vi.fn()}
+                        project={project}
+                        updateProjectVersion
+                    />
+                </TooltipProvider>
             );
 
             expect(mocks.impactQuery).toHaveBeenCalled();

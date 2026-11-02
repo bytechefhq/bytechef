@@ -74,6 +74,7 @@ const renderList = (onEdit = vi.fn(), projectOverrides: Partial<typeof project> 
             <AutomationWorkflowProjectConfigurationList
                 onCreate={onCreate}
                 onEdit={onEdit}
+                onUpdateVersion={vi.fn()}
                 project={{...project, ...projectOverrides}}
             />
         </TooltipProvider>
