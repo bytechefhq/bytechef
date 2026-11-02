@@ -61,7 +61,7 @@ const AutomationWorkflowProjectConfigurationList = ({
     }
 
     return (
-        <div className="flex flex-col gap-2 px-3">
+        <div className="flex flex-col gap-2">
             {configurations.map((configuration) => (
                 <AutomationWorkflowProjectConfigurationListItem
                     configuration={configuration}
