@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
@@ -102,6 +103,11 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,6 +155,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class ConnectedUserProjectFacadeIntTest {
 
     private static final String HIDDEN_PERMISSION_EXPRESSION = "connectedUser.metadata.plan == 'hidden'";
+
+    private static final int CONCURRENT_ROUND_COUNT = 20;
 
     private static final String BROKEN_COPY_WORKFLOW_DEFINITION = """
         {"label":"Broken leads","inputs":[],"triggers":[],"tasks":[]}
@@ -758,6 +766,52 @@ class ConnectedUserProjectFacadeIntTest {
     }
 
     @Test
+    void testConcurrentCopyAndProvisionForOneUserDoNotDeadlock() throws Exception {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Concurrent Copy And Provision");
+
+        String copiedWorkflowTemplateUuid = addAutomationWorkflow(
+            automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String referencedWorkflowTemplateUuid = addAutomationWorkflow(
+            automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        for (int round = 0; round < CONCURRENT_ROUND_COUNT; round++) {
+            String roundExternalUserId = createConnectedUser();
+
+            connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
+                roundExternalUserId, Environment.PRODUCTION);
+
+            CountDownLatch startLatch = new CountDownLatch(1);
+            ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+            try {
+                Future<?> copyFuture = executorService.submit(() -> {
+                    awaitLatch(startLatch);
+
+                    return connectedUserProjectFacade.copyWorkflowTemplate(
+                        roundExternalUserId, copiedWorkflowTemplateUuid, Environment.PRODUCTION);
+                });
+                Future<?> provisionFuture = executorService.submit(() -> {
+                    awaitLatch(startLatch);
+
+                    return connectedUserWorkflowReferenceFacade.getOrCreateReference(
+                        roundExternalUserId, referencedWorkflowTemplateUuid, Environment.PRODUCTION);
+                });
+
+                startLatch.countDown();
+
+                assertThatCode(() -> copyFuture.get(60, TimeUnit.SECONDS)).doesNotThrowAnyException();
+                assertThatCode(() -> provisionFuture.get(60, TimeUnit.SECONDS)).doesNotThrowAnyException();
+            } finally {
+                startLatch.countDown();
+
+                executorService.shutdownNow();
+            }
+        }
+    }
+
+    @Test
     void testCopyWorkflowTemplateTwiceIsRefusedWithTheUuidOfTheExistingCopy() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Copy Twice");
 
@@ -981,6 +1035,19 @@ class ConnectedUserProjectFacadeIntTest {
             "Not a published automation workflow template: " + hiddenWorkflowUuid);
         assertThat(unknownThrowable).hasMessage(
             "Not a published automation workflow template: " + unknownWorkflowUuid);
+    }
+
+    private static void awaitLatch(CountDownLatch countDownLatch) {
+        try {
+            if (!countDownLatch.await(60, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("Timed out waiting for the start signal");
+            }
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
+
+            throw new IllegalStateException(interruptedException);
+        }
     }
 
     private String addAutomationWorkflow(long automationWorkflowProjectId, String definition) {

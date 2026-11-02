@@ -220,6 +220,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
+        connectUserProjectService.lockConnectedUserProject(connectedUserProject.getId());
+
         connectedUserProjectWorkflowService
             .fetchCopiedConnectedUserProjectWorkflow(connectedUserProject.getId(), workflowUuid)
             .ifPresent(connectedUserProjectWorkflow -> {
