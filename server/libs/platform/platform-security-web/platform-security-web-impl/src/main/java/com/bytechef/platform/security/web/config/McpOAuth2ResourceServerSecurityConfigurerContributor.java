@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
+import com.bytechef.platform.security.web.mcp.SelfIssuedJwtDecoder;
 import com.bytechef.platform.security.web.mcp.oauth2.IssuerLocationMcpJwtDecoderFactory;
 import com.bytechef.platform.security.web.mcp.oauth2.McpBearerTokenResolver;
 import com.bytechef.platform.security.web.mcp.oauth2.McpEndpointRequestMatcher;
@@ -71,10 +72,13 @@ public class McpOAuth2ResourceServerSecurityConfigurerContributor implements Sec
     public McpOAuth2ResourceServerSecurityConfigurerContributor(
         ObjectProvider<McpEndpoint> mcpEndpointProvider,
         ObjectProvider<McpJwtDecoderFactory> mcpJwtDecoderFactoryProvider,
+        ObjectProvider<SelfIssuedJwtDecoder> selfIssuedJwtDecoderProvider,
         McpResourceServerProperties mcpResourceServerProperties, ApplicationProperties applicationProperties) {
 
         this.mcpJwtDecoderFactory = mcpJwtDecoderFactoryProvider.getIfAvailable(
-            () -> new IssuerLocationMcpJwtDecoderFactory(trustedIssuerUris(mcpResourceServerProperties)));
+            () -> new IssuerLocationMcpJwtDecoderFactory(
+                trustedIssuerUris(mcpResourceServerProperties), selfIssuerUris(mcpResourceServerProperties),
+                toJwtDecoder(selfIssuedJwtDecoderProvider.getIfAvailable())));
         this.mcpEndpointProvider = mcpEndpointProvider;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
         this.publicUrl = applicationProperties.getPublicUrl();
@@ -155,6 +159,23 @@ public class McpOAuth2ResourceServerSecurityConfigurerContributor implements Sec
     private static List<String> trustedIssuerUris(McpResourceServerProperties mcpResourceServerProperties) {
         return mcpResourceServerProperties.getIssuers()
             .stream()
+            .map(Issuer::getUri)
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    private static @Nullable JwtDecoder toJwtDecoder(@Nullable SelfIssuedJwtDecoder selfIssuedJwtDecoder) {
+        if (selfIssuedJwtDecoder == null) {
+            return null;
+        }
+
+        return selfIssuedJwtDecoder::decode;
+    }
+
+    private static List<String> selfIssuerUris(McpResourceServerProperties mcpResourceServerProperties) {
+        return mcpResourceServerProperties.getIssuers()
+            .stream()
+            .filter(Issuer::isSelf)
             .map(Issuer::getUri)
             .filter(Objects::nonNull)
             .toList();

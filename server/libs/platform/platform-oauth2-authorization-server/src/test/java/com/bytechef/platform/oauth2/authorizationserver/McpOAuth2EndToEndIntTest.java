@@ -36,6 +36,7 @@ import com.bytechef.platform.security.web.config.McpOAuth2ResourceServerSecurity
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
+import com.bytechef.platform.security.web.mcp.SelfIssuedJwtDecoder;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.security.web.mcp.TestMcpEndpoint;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
@@ -119,6 +120,7 @@ class McpOAuth2EndToEndIntTest {
     private static final String CODE_VERIFIER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01";
     private static final int PORT = TestSocketUtils.findAvailableTcpPort();
     private static final String BASE_URL = "http://localhost:" + PORT;
+    private static final String PUBLIC_URL = "https://bytechef.example.invalid";
     private static final String REDIRECT_URI = "http://127.0.0.1/callback";
     private static final String REGISTERED_CLIENT_ID = "mcp-registered-client";
     private static final String SCOPE = "mcp:management";
@@ -144,8 +146,8 @@ class McpOAuth2EndToEndIntTest {
     @DynamicPropertySource
     static void dynamicProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {
         dynamicPropertyRegistry.add("server.port", () -> PORT);
-        dynamicPropertyRegistry.add("bytechef.public-url", () -> BASE_URL);
-        dynamicPropertyRegistry.add("bytechef.oauth2.resource-server.issuers[0].uri", () -> BASE_URL);
+        dynamicPropertyRegistry.add("bytechef.public-url", () -> PUBLIC_URL);
+        dynamicPropertyRegistry.add("bytechef.oauth2.resource-server.issuers[0].uri", () -> PUBLIC_URL);
         dynamicPropertyRegistry.add("bytechef.oauth2.resource-server.issuers[0].self", () -> true);
         dynamicPropertyRegistry.add(
             "bytechef.oauth2.resource-server.issuers[0].tenant-claim", () -> "tenant_id");
@@ -233,7 +235,7 @@ class McpOAuth2EndToEndIntTest {
 
         assertThat(sessionTenantResponse.statusCode()).isEqualTo(204);
 
-        String resource = URLEncoder.encode(BASE_URL + CANONICAL_MCP_PATH, StandardCharsets.UTF_8);
+        String resource = URLEncoder.encode(PUBLIC_URL + CANONICAL_MCP_PATH, StandardCharsets.UTF_8);
 
         String authorizeQuery = "response_type=code" +
             "&client_id=" + CLIENT_ID +
@@ -402,11 +404,13 @@ class McpOAuth2EndToEndIntTest {
         McpOAuth2ResourceServerSecurityConfigurerContributor mcpOAuth2ResourceServerSecurityConfigurerContributor(
             ObjectProvider<McpEndpoint> mcpEndpointProvider,
             ObjectProvider<McpJwtDecoderFactory> mcpJwtDecoderFactoryProvider,
+            ObjectProvider<SelfIssuedJwtDecoder> selfIssuedJwtDecoderProvider,
             McpResourceServerProperties mcpResourceServerProperties) {
 
             return new McpOAuth2ResourceServerSecurityConfigurerContributor(
-                mcpEndpointProvider, mcpJwtDecoderFactoryProvider, mcpResourceServerProperties,
-                new ApplicationProperties());
+                mcpEndpointProvider, mcpJwtDecoderFactoryProvider, selfIssuedJwtDecoderProvider,
+                mcpResourceServerProperties,
+                createApplicationProperties());
         }
 
         @Bean
@@ -418,7 +422,8 @@ class McpOAuth2EndToEndIntTest {
 
             return new McpJwtSecurityConfigurerContributor(
                 mcpResourceServerProperties, userService, mock(AuthorityService.class), mcpEndpointProvider,
-                mcpServerSecretVerifierProvider, selfIssuedTokenRevocationCheckerProvider, new ApplicationProperties());
+                mcpServerSecretVerifierProvider, selfIssuedTokenRevocationCheckerProvider,
+                createApplicationProperties());
         }
 
         @Bean
@@ -447,6 +452,14 @@ class McpOAuth2EndToEndIntTest {
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new SessionTenantTestFilter(), AuthorizationFilter.class)
                 .build();
+        }
+
+        private static ApplicationProperties createApplicationProperties() {
+            ApplicationProperties applicationProperties = new ApplicationProperties();
+
+            applicationProperties.setPublicUrl(PUBLIC_URL);
+
+            return applicationProperties;
         }
 
         @Bean

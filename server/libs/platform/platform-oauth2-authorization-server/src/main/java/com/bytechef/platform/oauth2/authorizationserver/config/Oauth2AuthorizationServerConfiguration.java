@@ -37,6 +37,7 @@ import com.bytechef.platform.oauth2.authorizationserver.tenant.TenantRoutingOAut
 import com.bytechef.platform.oauth2.authorizationserver.token.McpResourceAudienceTokenCustomizer;
 import com.bytechef.platform.oauth2.authorizationserver.web.LoginRedirectAuthenticationEntryPoint;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
+import com.bytechef.platform.security.web.mcp.SelfIssuedJwtDecoder;
 import com.bytechef.tenant.TenantContext;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -63,6 +64,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
@@ -215,6 +218,22 @@ public class Oauth2AuthorizationServerConfiguration {
     @Bean
     JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+    }
+
+    @Bean
+    SelfIssuedJwtDecoder selfIssuedJwtDecoder(
+        AuthorizationServerSettings authorizationServerSettings, JWKSource<SecurityContext> jwkSource) {
+
+        NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withJwkSource(jwkSource)
+            .build();
+
+        String issuer = authorizationServerSettings.getIssuer();
+
+        if (issuer != null) {
+            nimbusJwtDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));
+        }
+
+        return nimbusJwtDecoder::decode;
     }
 
     @Bean
