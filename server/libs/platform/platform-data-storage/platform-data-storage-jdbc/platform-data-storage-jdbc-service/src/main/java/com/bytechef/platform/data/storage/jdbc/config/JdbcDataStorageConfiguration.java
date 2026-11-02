@@ -63,6 +63,14 @@ public class JdbcDataStorageConfiguration {
         }
 
         @Override
+        public <T> Optional<T> fetchUnlocked(
+            String componentName, DataStorageScope scope, String scopeId,
+            String key, long environmentId, PlatformType type) {
+
+            return jdbcDataStorageService.fetchUnlocked(componentName, scope, scopeId, key, environmentId, type);
+        }
+
+        @Override
         public <T> T get(
             String componentName, DataStorageScope scope, String scopeId,
             String key, long environmentId, PlatformType type) {

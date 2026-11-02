@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.service;
 
+import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.domain.TaskState;
 import com.bytechef.platform.workflow.execution.repository.TaskStateRepository;
@@ -31,10 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TaskStateServiceImpl implements TaskStateService {
 
+    private final StateValueDataStorage stateValueDataStorage;
     private final TaskStateRepository taskStateRepository;
 
     @SuppressFBWarnings("EI")
-    public TaskStateServiceImpl(TaskStateRepository taskStateRepository) {
+    TaskStateServiceImpl(StateValueDataStorage stateValueDataStorage, TaskStateRepository taskStateRepository) {
+        this.stateValueDataStorage = stateValueDataStorage;
         this.taskStateRepository = taskStateRepository;
     }
 
@@ -42,14 +45,18 @@ public class TaskStateServiceImpl implements TaskStateService {
     public void delete(JobResumeId jobResumeId) {
         taskStateRepository
             .findByJobResumeId(jobResumeId.toString())
-            .ifPresent(taskStateRepository::delete);
+            .ifPresent(taskState -> {
+                stateValueDataStorage.delete(getKey(jobResumeId), taskState.getValue());
+
+                taskStateRepository.delete(taskState);
+            });
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<T> fetchValue(JobResumeId jobResumeId) {
         return taskStateRepository.findByJobResumeId(jobResumeId.toString())
-            .map(taskState -> (T) taskState.getValue());
+            .map(taskState -> (T) stateValueDataStorage.read(getKey(jobResumeId), taskState.getValue()));
     }
 
     @Override
@@ -57,19 +64,28 @@ public class TaskStateServiceImpl implements TaskStateService {
     @Transactional(readOnly = true)
     public <T> Optional<T> fetchUnlockedValue(JobResumeId jobResumeId) {
         return taskStateRepository.findUnlockedByJobResumeId(jobResumeId.toString())
-            .map(taskState -> (T) taskState.getValue());
+            .map(taskState -> (T) stateValueDataStorage.readUnlocked(getKey(jobResumeId), taskState.getValue()));
     }
 
     @Override
     public void save(JobResumeId jobResumeId, Object value) {
+        Object storedValue = stateValueDataStorage.write(
+            getKey(jobResumeId), value, stateValueDataStorage.fetchJobReference(jobResumeId.getJobId()));
+
         taskStateRepository
             .findByJobResumeId(jobResumeId.toString())
             .ifPresentOrElse(
                 taskState -> {
-                    taskState.setValue(value);
+                    taskState.setValue(storedValue);
 
                     taskStateRepository.save(taskState);
                 },
-                () -> taskStateRepository.save(new TaskState(jobResumeId, value)));
+                () -> taskStateRepository.save(new TaskState(jobResumeId, storedValue)));
+    }
+
+    private static StateValueDataStorage.Key getKey(JobResumeId jobResumeId) {
+        return new StateValueDataStorage.Key(
+            StateValueDataStorage.TASK_STATE_COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION,
+            String.valueOf(jobResumeId.getJobId()), jobResumeId.toString());
     }
 }
