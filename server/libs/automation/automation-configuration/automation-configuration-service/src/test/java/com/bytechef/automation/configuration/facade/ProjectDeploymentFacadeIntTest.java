@@ -404,7 +404,7 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.updateProjectDeploymentTags(
             otherProjectDeploymentDTO.id(), List.of(new Tag("deployment-tag-z")));
 
-        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags();
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(workspace.getId(), null);
 
         assertThat(tags)
             .extracting(Tag::getName)

@@ -28,6 +28,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectTagFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
@@ -35,8 +36,6 @@ import com.bytechef.automation.configuration.web.rest.config.AutomationConfigura
 import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,12 +64,12 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 class ConnectionTagApiControllerIntTest {
 
     @Autowired
-    private ConnectionFacade connectionFacade;
-
-    @Autowired
     private MockMvc mockMvc;
 
     private WebTestClient webTestClient;
+
+    @Autowired
+    private WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -80,12 +79,12 @@ class ConnectionTagApiControllerIntTest {
 
     @Test
     void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(PlatformType.AUTOMATION))
+        when(workspaceConnectionFacade.getConnectionTags(7L, null))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         webTestClient
             .get()
-            .uri("/internal/connections/tags")
+            .uri("/internal/workspaces/7/connection-tags")
             .exchange()
             .expectStatus()
             .isOk()
@@ -101,7 +100,7 @@ class ConnectionTagApiControllerIntTest {
             .jsonPath("$[1].name")
             .isEqualTo("tag2");
 
-        verify(connectionFacade).getConnectionTags(PlatformType.AUTOMATION);
+        verify(workspaceConnectionFacade).getConnectionTags(7L, null);
     }
 
     @Test
@@ -121,7 +120,7 @@ class ConnectionTagApiControllerIntTest {
 
         ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
-        verify(connectionFacade).update(eq(5L), tagsArgumentCaptor.capture());
+        verify(workspaceConnectionFacade).updateTags(eq(5L), tagsArgumentCaptor.capture());
 
         assertThat(tagsArgumentCaptor.getValue())
             .extracting(Tag::getId, Tag::getName)
