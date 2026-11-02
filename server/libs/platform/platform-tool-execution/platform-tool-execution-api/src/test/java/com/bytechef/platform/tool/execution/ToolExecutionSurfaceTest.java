@@ -32,6 +32,6 @@ class ToolExecutionSurfaceTest {
             .map(Enum::name)
             .toList())
                 .containsExactly(
-                    "MCP_AUTOMATION", "MCP_EMBEDDED", "MCP_MANAGEMENT", "EMBEDDED_API_ACTION", "EMBEDDED_API_TOOL");
+                    "MCP_AUTOMATION", "MCP_EMBEDDED", "EMBEDDED_API_ACTION", "EMBEDDED_API_TOOL");
     }
 }

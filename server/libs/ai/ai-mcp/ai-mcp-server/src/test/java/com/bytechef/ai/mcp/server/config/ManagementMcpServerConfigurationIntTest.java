@@ -25,11 +25,9 @@ import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import java.util.Arrays;
 import java.util.List;
@@ -60,8 +58,6 @@ class ManagementMcpServerConfigurationIntTest {
         .withBean(TaskDispatcherTools.class, () -> mock(TaskDispatcherTools.class))
         .withBean(ScriptTools.class, () -> mock(ScriptTools.class))
         .withBean(ClusterElementTools.class, () -> mock(ClusterElementTools.class))
-        .withBean(ToolExecutionRecorder.class, () -> mock(ToolExecutionRecorder.class))
-        .withBean(WorkspaceScopeResolver.class, () -> mock(WorkspaceScopeResolver.class))
         .withUserConfiguration(ManagementMcpServerConfiguration.class);
 
     @Test
