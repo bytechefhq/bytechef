@@ -32,6 +32,7 @@ jobs:
         with:
           distribution: 'graalvm-community'
           java-version: '25'
+          version: '25.2.4'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
@@ -91,6 +92,7 @@ jobs:
       with:
         distribution: 'graalvm-community'
         java-version: '25'
+        version: '25.2.4'
         github-token: ${{ secrets.GITHUB_TOKEN }}
     - name: Cache SonarCloud packages
       uses: actions/cache@v4
