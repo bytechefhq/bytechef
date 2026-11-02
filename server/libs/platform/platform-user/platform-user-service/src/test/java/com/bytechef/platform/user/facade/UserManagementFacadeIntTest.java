@@ -19,6 +19,8 @@ package com.bytechef.platform.user.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,10 +33,12 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidEmailException;
+import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.facade.UserManagementFacade.UserWithAuthorities;
 import com.bytechef.platform.user.facade.UserManagementFacade.UsersWithAuthorities;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.UserRepository;
+import com.bytechef.platform.user.service.ApiKeyRevoker;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
 import java.util.Optional;
@@ -73,6 +77,9 @@ class UserManagementFacadeIntTest {
     private AuthorityRepository authorityRepository;
 
     @MockitoBean
+    private ApiKeyRevoker apiKeyRevoker;
+
+    @MockitoBean
     private MailService mailService;
 
     @MockitoBean
@@ -98,7 +105,7 @@ class UserManagementFacadeIntTest {
 
     @Test
     void testInviteUserRegistersAnInvitedUser() {
-        userManagementFacade.inviteUser("newuser@example.com", AuthorityConstants.USER);
+        userManagementFacade.inviteUser("newuser@example.com", AuthorityConstants.USER, List.of());
 
         User user = userRepository.findByEmailIgnoreCase("newuser@example.com")
             .orElseThrow();
@@ -109,7 +116,7 @@ class UserManagementFacadeIntTest {
 
     @Test
     void testInviteUserUsesLowerCasedEmailAsLogin() {
-        userManagementFacade.inviteUser("Jane.Doe@Example.com", AuthorityConstants.USER);
+        userManagementFacade.inviteUser("Jane.Doe@Example.com", AuthorityConstants.USER, List.of());
 
         User user = userRepository.findByEmailIgnoreCase("jane.doe@example.com")
             .orElseThrow();
@@ -122,7 +129,7 @@ class UserManagementFacadeIntTest {
     void testInviteUserWithEmailLongerThanTheLoginLimitDoesNotRegister() {
         String email = "firstname.middlename.lastname.department@subdomain.example.com";
 
-        assertThatThrownBy(() -> userManagementFacade.inviteUser(email, AuthorityConstants.USER))
+        assertThatThrownBy(() -> userManagementFacade.inviteUser(email, AuthorityConstants.USER, List.of()))
             .isInstanceOf(InvalidEmailException.class);
 
         assertThat(userRepository.findByEmailIgnoreCase(email)).isEmpty();
@@ -134,8 +141,9 @@ class UserManagementFacadeIntTest {
     void testInviteUserWithExistingEmailThrows() {
         User existingUser = saveUser("existing", "existing@example.com");
 
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("existing@example.com", AuthorityConstants.USER))
-            .isInstanceOf(EmailAlreadyUsedException.class);
+        assertThatThrownBy(
+            () -> userManagementFacade.inviteUser("existing@example.com", AuthorityConstants.USER, List.of()))
+                .isInstanceOf(EmailAlreadyUsedException.class);
 
         assertThat(userRepository.findByEmailIgnoreCase("existing@example.com"))
             .map(User::getId)
@@ -149,10 +157,37 @@ class UserManagementFacadeIntTest {
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(tenantService.tenantIdsByUserEmailExist("taken@example.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("taken@example.com", AuthorityConstants.USER))
-            .isInstanceOf(EmailAlreadyUsedException.class);
+        assertThatThrownBy(
+            () -> userManagementFacade.inviteUser("taken@example.com", AuthorityConstants.USER, List.of()))
+                .isInstanceOf(EmailAlreadyUsedException.class);
 
         assertThat(userRepository.findByEmailIgnoreCase("taken@example.com")).isEmpty();
+    }
+
+    @Test
+    void testDeleteUserRevokesTheApiKeysBeforeRemovingTheAccount() {
+        User user = saveUser("departing", "departing@example.com");
+
+        doAnswer(invocation -> {
+            assertThat(userRepository.findByLogin("departing")).isPresent();
+
+            return null;
+        }).when(apiKeyRevoker)
+            .revokeAll(user.getId());
+
+        userManagementFacade.deleteUser("departing");
+
+        verify(apiKeyRevoker).revokeAll(user.getId());
+
+        assertThat(userRepository.findByLogin("departing")).isEmpty();
+    }
+
+    @Test
+    void testDeleteUserOfAnUnknownLoginRevokesNothing() {
+        assertThatThrownBy(() -> userManagementFacade.deleteUser("ghost"))
+            .isInstanceOf(UserNotFoundException.class);
+
+        verify(apiKeyRevoker, never()).revokeAll(anyLong());
     }
 
     @Test
@@ -178,14 +213,14 @@ class UserManagementFacadeIntTest {
         authenticateAs(AuthorityConstants.USER);
 
         assertThatThrownBy(
-            () -> userManagementFacade.inviteUser("invited@example.com", AuthorityConstants.USER))
+            () -> userManagementFacade.inviteUser("invited@example.com", AuthorityConstants.USER, List.of()))
                 .isInstanceOf(AuthorizationDeniedException.class);
 
         assertThat(userRepository.findByEmailIgnoreCase("invited@example.com")).isEmpty();
 
         authenticateAs(AuthorityConstants.ADMIN);
 
-        userManagementFacade.inviteUser("invited@example.com", AuthorityConstants.USER);
+        userManagementFacade.inviteUser("invited@example.com", AuthorityConstants.USER, List.of());
 
         assertThat(userRepository.findByEmailIgnoreCase("invited@example.com")).isPresent();
     }
