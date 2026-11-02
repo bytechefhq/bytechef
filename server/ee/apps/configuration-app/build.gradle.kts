@@ -104,7 +104,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-public-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-grpc"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
-    implementation(project(":server:ee:libs:automation:automation-task:automation-task-remote-rest"))
+    implementation(project(":server:ee:libs:automation:automation-task:automation-task-remote-grpc"))
     implementation(project(":server:ee:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-remote-client"))
     implementation(project(":server:ee:libs:config:microservice-config"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-grpc"))

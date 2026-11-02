@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package bytechef.automation.task.remote.v1;
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.automation.task.remote.grpc.proto";
+
+service ApprovalTaskFacadeRemoteService {
+  rpc CreateApprovalTask(ApprovalTaskMessage) returns (ApprovalTaskMessage);
+  rpc GetPendingApprovals(PendingApprovalsRequest) returns (PendingApprovalsResponse);
+}
+
+message ApprovalTaskMessage {
+  bytes approval_task = 1;
+}
+
+message PendingApprovalsRequest {
+  optional int32 environment_id = 1;
+}
+
+message PendingApprovalsResponse {
+  bytes pending_approvals = 1;
+}
