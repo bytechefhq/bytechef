@@ -176,6 +176,68 @@ describe('useWorkflowInputs', () => {
         expect(sentDefinition().inputs.map((input: WorkflowInput) => input.name)).toEqual(['city', 'region']);
     });
 
+    it('opens New Input with an empty form after an input was edited', () => {
+        setDefinition([{label: 'City', name: 'city', required: true, type: 'string'} as WorkflowInput]);
+
+        const {result} = renderInputs();
+
+        act(() => {
+            result.current.openEditDialog(0);
+        });
+
+        expect(result.current.form.getValues('name')).toBe('city');
+
+        act(() => {
+            result.current.closeEditDialog();
+        });
+
+        act(() => {
+            result.current.openEditDialog();
+        });
+
+        expect(result.current.currentInputIndex).toBe(-1);
+        expect(result.current.form.getValues()).toEqual({
+            label: '',
+            name: '',
+            required: false,
+            testValue: '',
+            type: undefined,
+        });
+    });
+
+    it('stores a component reference as the flat fields the workflow definition accepts', () => {
+        const definitionInput = {
+            componentName: 'slack',
+            componentVersion: 1,
+            groupName: 'channel',
+            label: 'Slack Channel',
+            name: 'channel',
+            required: true,
+            type: 'string',
+        };
+
+        setDefinition([definitionInput as WorkflowInput]);
+
+        const {result} = renderInputs();
+
+        act(() => {
+            result.current.openEditDialog(0);
+        });
+
+        act(() => {
+            result.current.saveWorkflowInput({
+                componentReference: {componentName: 'slack', componentVersion: 1, groupName: 'channel'},
+                label: 'Channel',
+                name: 'channel',
+                required: true,
+                testValue: 'general',
+                type: 'string',
+            });
+        });
+
+        expect(sentDefinition().inputs).toEqual([{...definitionInput, label: 'Channel'}]);
+    });
+
     it('stores the test value and refocuses the name field once the save lands', () => {
         vi.useFakeTimers();
 

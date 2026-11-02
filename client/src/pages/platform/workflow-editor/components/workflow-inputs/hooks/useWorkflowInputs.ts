@@ -12,6 +12,28 @@ import {useShallow} from 'zustand/react/shallow';
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
 import saveWorkflowDefinitionUpdate from '../../../utils/saveWorkflowDefinitionUpdate';
 
+const EMPTY_WORKFLOW_INPUT: WorkflowInputType = {
+    label: '',
+    name: '',
+    required: false,
+    testValue: '',
+    type: undefined,
+};
+
+/**
+ * The REST model groups an input's component reference under componentReference, while the workflow definition
+ * stores componentName, componentVersion and groupName as flat fields and rejects componentReference.
+ */
+function toDefinitionInput(input: WorkflowInput): WorkflowInput {
+    const {componentReference, ...inputFields} = input;
+
+    if (!componentReference) {
+        return inputFields;
+    }
+
+    return {...inputFields, ...componentReference} as WorkflowInput;
+}
+
 interface UseWorkflowInputsProps {
     invalidateWorkflowQueries: () => void;
     workflowTestConfiguration?: WorkflowTestConfiguration;
@@ -71,6 +93,8 @@ export default function useWorkflowInputs({
 
         if (index === undefined) {
             setCurrentInputIndex(-1);
+
+            form.reset(EMPTY_WORKFLOW_INPUT);
 
             return;
         } else {
@@ -134,10 +158,14 @@ export default function useWorkflowInputs({
         return `${baseInputName}_${maxExistingNumber + 1}`;
     }
 
-    function saveWorkflowInput(input: WorkflowInputType) {
+    function saveWorkflowInput(formInput: WorkflowInputType) {
         const {getValues} = form;
 
-        delete input['testValue'];
+        const inputFields: WorkflowInputType = {...formInput};
+
+        delete inputFields.testValue;
+
+        const input = toDefinitionInput(inputFields);
 
         const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
@@ -174,13 +202,7 @@ export default function useWorkflowInputs({
                     workflowId: workflow.id!,
                 });
 
-                form.reset({
-                    label: '',
-                    name: '',
-                    required: false,
-                    testValue: '',
-                    type: undefined,
-                });
+                form.reset(EMPTY_WORKFLOW_INPUT);
 
                 setTimeout(() => {
                     const nameInput = document.querySelector('input[name="name"]') as HTMLInputElement;
