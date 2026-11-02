@@ -26,7 +26,7 @@ export default function useDataTableListItemTagList({tableId}: UseDataTableListI
             }
         },
         onMutate: async (variables: UpdateDataTableTagsMutationVariables) => {
-            await queryClient.cancelQueries({queryKey: ['dataTableTagsByTable']});
+            await queryClient.cancelQueries({queryKey: tagsByTableQueryKey});
 
             const previous = queryClient.getQueryData<{dataTableTagsByTable: DataTableTagsByTableEntryType[]}>(
                 tagsByTableQueryKey
