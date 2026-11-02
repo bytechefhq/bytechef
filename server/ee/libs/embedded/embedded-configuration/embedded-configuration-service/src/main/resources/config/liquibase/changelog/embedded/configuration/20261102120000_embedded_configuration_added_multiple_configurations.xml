@@ -149,29 +149,31 @@
     <changeSet id="20261102120000-7" author="Ivica Cardic">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="connected_user"/>
+            <tableExists tableName="project_workflow"/>
         </preConditions>
 
         <sql>
             INSERT INTO connected_user_project_configuration
                 (connected_user_id, project_id, automation_workflow_project_configuration_id, created_date,
                  last_modified_date, version)
-            SELECT DISTINCT connected_user_project.connected_user_id, automation_project_workflow.project_id,
+            SELECT DISTINCT connected_user_project.connected_user_id, source_workflow.project_id,
                 configuration.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0
             FROM connected_user_project_workflow project_workflow
             JOIN connected_user_project connected_user_project
                 ON connected_user_project.id = project_workflow.connected_user_project_id
             JOIN connected_user connected_user ON connected_user.id = connected_user_project.connected_user_id
-            JOIN automation_workflow_project_workflow automation_project_workflow
-                ON CAST(automation_project_workflow.workflow_uuid AS VARCHAR(36)) =
-                    project_workflow.copied_from_workflow_uuid
+            JOIN project_workflow source_workflow
+                ON CAST(source_workflow.uuid AS VARCHAR(36)) = project_workflow.copied_from_workflow_uuid
+            JOIN automation_workflow_project automation_project
+                ON automation_project.project_id = source_workflow.project_id
             JOIN automation_workflow_project_configuration configuration
-                ON configuration.project_id = automation_project_workflow.project_id
+                ON configuration.project_id = source_workflow.project_id
                 AND configuration.environment_id = connected_user.environment
             WHERE project_workflow.copied_from_workflow_uuid IS NOT NULL
                 AND NOT EXISTS (
                     SELECT 1 FROM connected_user_reference_deployment reference_deployment
                     WHERE reference_deployment.connected_user_id = connected_user_project.connected_user_id
-                        AND reference_deployment.project_id = automation_project_workflow.project_id)
+                        AND reference_deployment.project_id = source_workflow.project_id)
             ON CONFLICT DO NOTHING
         </sql>
 
