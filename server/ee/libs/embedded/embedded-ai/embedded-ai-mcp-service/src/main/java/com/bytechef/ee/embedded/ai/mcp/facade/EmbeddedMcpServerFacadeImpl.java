@@ -26,7 +26,6 @@ import com.bytechef.platform.mcp.audit.McpToolAuditEvents;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
-import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -57,7 +56,6 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     private final McpComponentService mcpComponentService;
     private final McpIntegrationComponentService mcpIntegrationComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
-    private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
     private final McpToolService mcpToolService;
     private final TagService tagService;
@@ -68,8 +66,8 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, McpComponentService mcpComponentService,
         McpIntegrationComponentService mcpIntegrationComponentService,
-        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerFacade mcpServerFacade,
-        McpServerService mcpServerService, McpToolService mcpToolService, TagService tagService) {
+        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
+        McpToolService mcpToolService, TagService tagService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -77,7 +75,6 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         this.mcpComponentService = mcpComponentService;
         this.mcpIntegrationComponentService = mcpIntegrationComponentService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
-        this.mcpServerFacade = mcpServerFacade;
         this.mcpServerService = mcpServerService;
         this.mcpToolService = mcpToolService;
         this.tagService = tagService;
@@ -91,7 +88,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         getEmbeddedMcpServer(mcpComponent.getMcpServerId());
         checkIntegrationComponent(integrationId, mcpComponent.getComponentName());
 
-        McpComponent createdMcpComponent = mcpServerFacade.create(mcpComponent, mcpTools);
+        McpComponent createdMcpComponent = mcpComponentService.create(mcpComponent, mcpTools);
 
         mcpIntegrationComponentService.create(createdMcpComponent.getId(), integrationId);
 
@@ -109,7 +106,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     public void deleteEmbeddedMcpComponent(long mcpComponentId) {
         checkEmbeddedMcpComponent(mcpComponentId);
 
-        mcpServerFacade.deleteMcpComponent(mcpComponentId);
+        mcpComponentService.delete(mcpComponentId);
     }
 
     @Override
@@ -123,7 +120,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
             }
         }
 
-        mcpServerFacade.deleteMcpServer(mcpServerId);
+        mcpServerService.delete(mcpServerId);
     }
 
     @Override
@@ -131,7 +128,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     public void deleteEmbeddedMcpTool(long mcpToolId) {
         McpTool mcpTool = getEmbeddedMcpTool(mcpToolId);
 
-        mcpServerFacade.deleteMcpTool(mcpTool);
+        mcpToolService.delete(mcpTool);
     }
 
     @Override
@@ -240,7 +237,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
             mcpIntegrationComponentService.create(mcpComponent.getId(), integrationId);
         }
 
-        return mcpServerFacade.update(mcpComponent, requiredAuthorities, mcpTools);
+        return mcpComponentService.update(mcpComponent, requiredAuthorities, mcpTools);
     }
 
     @Override
@@ -281,7 +278,11 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     public List<Tag> updateEmbeddedMcpServerTags(long mcpServerId, List<Tag> tags) {
         getEmbeddedMcpServer(mcpServerId);
 
-        return mcpServerFacade.updateMcpServerTags(mcpServerId, tags);
+        List<Tag> savedTags = CollectionUtils.isEmpty(tags) ? List.of() : tagService.save(tags);
+
+        mcpServerService.updateTags(mcpServerId, CollectionUtils.map(savedTags, Tag::getId));
+
+        return savedTags;
     }
 
     @Override
@@ -290,7 +291,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         getEmbeddedMcpTool(mcpTool.getId());
         checkEmbeddedMcpComponent(mcpTool.getMcpComponentId());
 
-        return mcpServerFacade.updateMcpTool(mcpTool);
+        return mcpToolService.update(mcpTool);
     }
 
     @Override

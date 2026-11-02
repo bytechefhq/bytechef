@@ -29,7 +29,6 @@ import com.bytechef.platform.mcp.audit.McpToolAuditEvents;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
-import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -55,7 +54,6 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     private final McpComponentService mcpComponentService;
     private final McpProjectFacade mcpProjectFacade;
     private final McpProjectService mcpProjectService;
-    private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
     private final McpToolService mcpToolService;
     private final TagService tagService;
@@ -64,13 +62,12 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     @SuppressFBWarnings("EI")
     public WorkspaceMcpServerFacadeImpl(
         McpComponentService mcpComponentService, McpProjectFacade mcpProjectFacade,
-        McpProjectService mcpProjectService, McpServerFacade mcpServerFacade, McpServerService mcpServerService,
-        McpToolService mcpToolService, TagService tagService, WorkspaceMcpServerService workspaceMcpServerService) {
+        McpProjectService mcpProjectService, McpServerService mcpServerService, McpToolService mcpToolService,
+        TagService tagService, WorkspaceMcpServerService workspaceMcpServerService) {
 
         this.mcpComponentService = mcpComponentService;
         this.mcpProjectFacade = mcpProjectFacade;
         this.mcpProjectService = mcpProjectService;
-        this.mcpServerFacade = mcpServerFacade;
         this.mcpServerService = mcpServerService;
         this.mcpToolService = mcpToolService;
         this.tagService = tagService;
@@ -177,7 +174,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
             mcpProjectFacade.deleteMcpProject(mcpProject.getId());
         }
 
-        mcpServerFacade.deleteMcpServer(mcpServerId);
+        mcpServerService.delete(mcpServerId);
     }
 
     private McpTool getAutomationMcpTool(long mcpToolId) {

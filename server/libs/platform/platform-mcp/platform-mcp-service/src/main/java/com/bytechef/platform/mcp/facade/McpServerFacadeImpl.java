@@ -17,14 +17,7 @@
 package com.bytechef.platform.mcp.facade;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.audit.AuditData;
-import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.mcp.audit.McpComponentAuditEvents;
-import com.bytechef.platform.mcp.audit.McpComponentAuditMapper;
-import com.bytechef.platform.mcp.audit.McpServerAuditEvents;
-import com.bytechef.platform.mcp.audit.McpServerAuditMapper;
-import com.bytechef.platform.mcp.audit.McpToolAuditEvents;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -36,7 +29,6 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -75,37 +67,14 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
-    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_CREATED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpComponentId", value = "#result?.id"),
-        @AuditData(key = "mcpServerId", value = "#mcpComponent.mcpServerId"),
-        @AuditData(key = "componentName", value = "#mcpComponent.componentName"),
-        @AuditData(key = "componentVersion", value = "#mcpComponent.componentVersion")
-    })
     @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent, List<McpTool> mcpTools) {
-        return doCreate(mcpComponent, mcpTools);
-    }
-
-    @Override
-    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_CREATED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpComponentId", value = "#result?.id"),
-        @AuditData(key = "mcpServerId", value = "#mcpComponent.mcpServerId"),
-        @AuditData(key = "componentName", value = "#mcpComponent.componentName"),
-        @AuditData(key = "componentVersion", value = "#mcpComponent.componentVersion")
-    })
-    @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
-    public McpComponent createSharedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools) {
         checkMcpServerSharedAdministration(mcpComponent.getMcpServerId());
 
-        return doCreate(mcpComponent, mcpTools);
+        return mcpComponentService.create(mcpComponent, mcpTools);
     }
 
     @Override
-    @Audited(event = McpToolAuditEvents.MCP_TOOL_CREATED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpToolId", value = "#result?.id"),
-        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
-        @AuditData(key = "name", value = "#mcpTool.name")
-    })
     @PreAuthorize("hasPermission(#mcpTool.mcpComponentId, 'McpComponent', 'MCP_EDIT')")
     public McpTool createMcpTool(McpTool mcpTool) {
         checkMcpComponentSharedAdministration(mcpTool.getMcpComponentId());
@@ -114,12 +83,6 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
-    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_CREATED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpComponentId", value = "#result?.id"),
-        @AuditData(key = "mcpServerId", value = "#mcpComponent.mcpServerId"),
-        @AuditData(key = "componentName", value = "#mcpComponent.componentName"),
-        @AuditData(key = "componentVersion", value = "#mcpComponent.componentVersion")
-    })
     @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent createMcpComponent(McpComponent mcpComponent) {
         checkMcpServerSharedAdministration(mcpComponent.getMcpServerId());
@@ -128,43 +91,19 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
-    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_DELETED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpComponentId", value = "#mcpComponentId")
-    })
     @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_EDIT')")
     public void deleteMcpComponent(long mcpComponentId) {
-        doDeleteMcpComponent(mcpComponentId);
-    }
-
-    @Override
-    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_DELETED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpComponentId", value = "#mcpComponentId")
-    })
-    @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_EDIT')")
-    public void deleteSharedMcpComponent(long mcpComponentId) {
         checkMcpComponentSharedAdministration(mcpComponentId);
 
-        doDeleteMcpComponent(mcpComponentId);
+        mcpComponentService.delete(mcpComponentId);
     }
 
     @Override
-    @Audited(event = McpServerAuditEvents.MCP_SERVER_DELETED, mapper = McpServerAuditMapper.class, data = {
-        @AuditData(key = "mcpServerId", value = "#mcpServerId")
-    })
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public void deleteMcpServer(long mcpServerId) {
-        doDeleteMcpServer(mcpServerId);
-    }
-
-    @Override
-    @Audited(event = McpServerAuditEvents.MCP_SERVER_DELETED, mapper = McpServerAuditMapper.class, data = {
-        @AuditData(key = "mcpServerId", value = "#mcpServerId")
-    })
-    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
-    public void deleteSharedMcpServer(long mcpServerId) {
         checkMcpServerSharedAdministration(mcpServerId);
 
-        doDeleteMcpServer(mcpServerId);
+        mcpServerService.delete(mcpServerId);
     }
 
     @Override
@@ -286,55 +225,20 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
-    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_UPDATED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpComponentId", value = "#mcpComponent.id"),
-        @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
-        @AuditData(key = "componentName", value = "#result?.componentName"),
-        @AuditData(key = "componentVersion", value = "#result?.componentVersion")
-    })
     @PreAuthorize("hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')")
     public McpComponent update(
         McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools) {
-        return doUpdate(mcpComponent, requiredAuthorities, mcpTools);
-    }
-
-    @Override
-    @Audited(event = McpComponentAuditEvents.MCP_COMPONENT_UPDATED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpComponentId", value = "#mcpComponent.id"),
-        @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
-        @AuditData(key = "componentName", value = "#result?.componentName"),
-        @AuditData(key = "componentVersion", value = "#result?.componentVersion")
-    })
-    @PreAuthorize("hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')")
-    public McpComponent updateSharedMcpComponent(
-        McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools) {
         checkMcpComponentSharedAdministration(Objects.requireNonNull(mcpComponent.getId()));
 
-        return doUpdate(mcpComponent, requiredAuthorities, mcpTools);
+        return mcpComponentService.update(mcpComponent, requiredAuthorities, mcpTools);
     }
 
     @Override
-    @Audited(event = McpToolAuditEvents.MCP_TOOL_DELETED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpToolId", value = "#mcpTool.id"),
-        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
-        @AuditData(key = "name", value = "#mcpTool.name")
-    })
     @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')")
     public void deleteMcpTool(McpTool mcpTool) {
-        doDeleteMcpTool(mcpTool);
-    }
-
-    @Override
-    @Audited(event = McpToolAuditEvents.MCP_TOOL_DELETED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpToolId", value = "#mcpTool.id"),
-        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
-        @AuditData(key = "name", value = "#mcpTool.name")
-    })
-    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')")
-    public void deleteSharedMcpTool(McpTool mcpTool) {
         checkMcpComponentSharedAdministration(mcpTool.getMcpComponentId());
 
-        doDeleteMcpTool(mcpTool);
+        mcpToolService.delete(mcpTool);
     }
 
     @Override
@@ -351,36 +255,18 @@ public class McpServerFacadeImpl implements McpServerFacade {
     @Override
     @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
     public List<Tag> updateMcpServerTags(long id, List<Tag> tags) {
-        return doUpdateMcpServerTags(id, tags);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
-    public List<Tag> updateSharedMcpServerTags(long id, List<Tag> tags) {
         checkMcpServerSharedAdministration(id);
 
-        return doUpdateMcpServerTags(id, tags);
+        List<Tag> validatedTags = checkTags(tags);
+
+        mcpServerService.updateTags(id, CollectionUtils.map(validatedTags, Tag::getId));
+
+        return validatedTags;
     }
 
     @Override
-    @Audited(event = McpToolAuditEvents.MCP_TOOL_UPDATED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpToolId", value = "#mcpTool.id"),
-        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
-        @AuditData(key = "name", value = "#mcpTool.name")
-    })
     @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')")
     public McpTool updateMcpTool(McpTool mcpTool) {
-        return doUpdateMcpTool(mcpTool);
-    }
-
-    @Override
-    @Audited(event = McpToolAuditEvents.MCP_TOOL_UPDATED, mapper = McpComponentAuditMapper.class, data = {
-        @AuditData(key = "mcpToolId", value = "#mcpTool.id"),
-        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
-        @AuditData(key = "name", value = "#mcpTool.name")
-    })
-    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')")
-    public McpTool updateSharedMcpTool(McpTool mcpTool) {
         long mcpToolId = Objects.requireNonNull(mcpTool.getId());
 
         Optional<McpTool> currentMcpToolOptional = mcpToolService.fetchMcpTool(mcpToolId);
@@ -391,88 +277,6 @@ public class McpServerFacadeImpl implements McpServerFacade {
         checkMcpComponentSharedAdministration(currentMcpTool.getMcpComponentId());
         checkMcpComponentSharedAdministration(mcpTool.getMcpComponentId());
 
-        return doUpdateMcpTool(mcpTool);
-    }
-
-    private McpComponent doCreate(McpComponent mcpComponent, List<McpTool> mcpTools) {
-        McpComponent savedComponent = mcpComponentService.create(mcpComponent);
-
-        if (mcpTools != null && !mcpTools.isEmpty()) {
-            for (McpTool mcpTool : mcpTools) {
-                McpTool toolToCreate = new McpTool(mcpTool.getName(), mcpTool.getParameters(), savedComponent.getId());
-
-                mcpToolService.create(toolToCreate);
-            }
-        }
-
-        return savedComponent;
-    }
-
-    private void doDeleteMcpComponent(long mcpComponentId) {
-        mcpComponentService.getMcpComponent(mcpComponentId);
-
-        for (McpTool mcpTool : mcpToolService.getMcpComponentMcpTools(mcpComponentId)) {
-            mcpToolService.delete(mcpTool);
-        }
-
-        mcpComponentService.delete(mcpComponentId);
-    }
-
-    private void doDeleteMcpServer(long mcpServerId) {
-        mcpServerService.getMcpServer(mcpServerId);
-
-        for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
-            mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
-                .forEach(mcpToolService::delete);
-
-            mcpComponentService.delete(mcpComponent.getId());
-        }
-
-        mcpServerService.delete(mcpServerId);
-    }
-
-    private void doDeleteMcpTool(McpTool mcpTool) {
-        mcpToolService.delete(mcpTool);
-    }
-
-    private McpComponent doUpdate(
-        McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools) {
-
-        McpComponent updatedComponent = mcpComponentService.update(mcpComponent, requiredAuthorities);
-
-        List<McpTool> currentMcpTools = mcpToolService.getMcpComponentMcpTools(updatedComponent.getId());
-
-        Map<String, Boolean> enabledByToolName = new HashMap<>();
-
-        for (McpTool currentMcpTool : currentMcpTools) {
-            enabledByToolName.put(currentMcpTool.getName(), currentMcpTool.isEnabled());
-
-            mcpToolService.delete(currentMcpTool);
-        }
-
-        if (mcpTools != null && !mcpTools.isEmpty()) {
-            for (McpTool mcpTool : mcpTools) {
-                McpTool toolToCreate =
-                    new McpTool(mcpTool.getName(), mcpTool.getParameters(), updatedComponent.getId());
-
-                toolToCreate.setEnabled(enabledByToolName.getOrDefault(mcpTool.getName(), true));
-
-                mcpToolService.create(toolToCreate);
-            }
-        }
-
-        return updatedComponent;
-    }
-
-    private List<Tag> doUpdateMcpServerTags(long id, List<Tag> tags) {
-        List<Tag> validatedTags = checkTags(tags);
-
-        mcpServerService.updateTags(id, CollectionUtils.map(validatedTags, Tag::getId));
-
-        return validatedTags;
-    }
-
-    private McpTool doUpdateMcpTool(McpTool mcpTool) {
         return mcpToolService.update(mcpTool);
     }
 

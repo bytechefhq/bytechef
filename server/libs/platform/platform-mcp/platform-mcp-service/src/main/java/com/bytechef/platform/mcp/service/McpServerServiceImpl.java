@@ -22,8 +22,11 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.audit.McpServerAuditEvents;
 import com.bytechef.platform.mcp.audit.McpServerAuditMapper;
+import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -42,16 +45,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class McpServerServiceImpl implements McpServerService {
 
+    private final McpComponentRepository mcpComponentRepository;
     private final List<McpServerEnablementValidator> mcpServerEnablementValidators;
     private final McpServerRepository mcpServerRepository;
+    private final McpToolRepository mcpToolRepository;
 
     public McpServerServiceImpl(
+        McpComponentRepository mcpComponentRepository,
         ObjectProvider<McpServerEnablementValidator> mcpServerEnablementValidatorProvider,
-        McpServerRepository mcpServerRepository) {
+        McpServerRepository mcpServerRepository, McpToolRepository mcpToolRepository) {
 
+        this.mcpComponentRepository = mcpComponentRepository;
         this.mcpServerEnablementValidators = mcpServerEnablementValidatorProvider.orderedStream()
             .toList();
         this.mcpServerRepository = mcpServerRepository;
+        this.mcpToolRepository = mcpToolRepository;
     }
 
     @Override
@@ -68,8 +76,20 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Audited(event = McpServerAuditEvents.MCP_SERVER_DELETED, mapper = McpServerAuditMapper.class, data = {
+        @AuditData(key = "mcpServerId", value = "#mcpServerId")
+    })
     public void delete(long mcpServerId) {
-        mcpServerRepository.deleteById(mcpServerId);
+        McpServer mcpServer = mcpServerRepository.findById(mcpServerId)
+            .orElseThrow(() -> new NoSuchElementException("MCP server with id " + mcpServerId + " not found"));
+
+        for (McpComponent mcpComponent : mcpComponentRepository.findAllByMcpServerId(mcpServerId)) {
+            mcpToolRepository.deleteAll(mcpToolRepository.findAllByMcpComponentId(mcpComponent.getId()));
+
+            mcpComponentRepository.delete(mcpComponent);
+        }
+
+        mcpServerRepository.delete(mcpServer);
     }
 
     @Override

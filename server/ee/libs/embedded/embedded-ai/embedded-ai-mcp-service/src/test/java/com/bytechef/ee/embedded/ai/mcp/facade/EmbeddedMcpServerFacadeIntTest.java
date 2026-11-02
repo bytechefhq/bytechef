@@ -35,7 +35,6 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
-import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -115,9 +114,6 @@ class EmbeddedMcpServerFacadeIntTest {
 
     @MockitoBean
     private McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
-
-    @MockitoBean
-    private McpServerFacade mcpServerFacade;
 
     @MockitoBean
     private McpServerService mcpServerService;
@@ -222,7 +218,7 @@ class EmbeddedMcpServerFacadeIntTest {
             verifyNoInteractions(
                 componentDefinitionService, integrationInstanceConfigurationService, integrationService,
                 mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceToolService,
-                mcpServerFacade, mcpServerService, mcpToolService, tagService);
+                mcpServerService, mcpToolService, tagService);
         }
     }
 
@@ -240,7 +236,7 @@ class EmbeddedMcpServerFacadeIntTest {
             McpComponent createdMcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID);
             List<McpTool> mcpTools = List.of(new McpTool("tool", Map.of()));
 
-            when(mcpServerFacade.create(mcpComponent, mcpTools)).thenReturn(createdMcpComponent);
+            when(mcpComponentService.create(mcpComponent, mcpTools)).thenReturn(createdMcpComponent);
 
             assertThat(embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, INTEGRATION_ID, mcpTools))
                 .isSameAs(createdMcpComponent);
@@ -257,7 +253,7 @@ class EmbeddedMcpServerFacadeIntTest {
                     mcpComponent, OTHER_COMPONENT_INTEGRATION_ID, List.of()))
                         .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).create(any(), any());
+            verify(mcpComponentService, never()).create(any(), any());
             verify(mcpIntegrationComponentService, never()).create(anyLong(), anyLong());
         }
 
@@ -306,21 +302,21 @@ class EmbeddedMcpServerFacadeIntTest {
         void testDeleteEmbeddedMcpComponent() {
             embeddedMcpServerFacade.deleteEmbeddedMcpComponent(EMBEDDED_MCP_COMPONENT_ID);
 
-            verify(mcpServerFacade).deleteMcpComponent(EMBEDDED_MCP_COMPONENT_ID);
+            verify(mcpComponentService).delete(EMBEDDED_MCP_COMPONENT_ID);
         }
 
         @Test
         void testDeleteEmbeddedMcpServer() {
             embeddedMcpServerFacade.deleteEmbeddedMcpServer(EMBEDDED_MCP_SERVER_ID);
 
-            verify(mcpServerFacade).deleteMcpServer(EMBEDDED_MCP_SERVER_ID);
+            verify(mcpServerService).delete(EMBEDDED_MCP_SERVER_ID);
         }
 
         @Test
         void testDeleteEmbeddedMcpTool() {
             embeddedMcpServerFacade.deleteEmbeddedMcpTool(EMBEDDED_MCP_TOOL_ID);
 
-            verify(mcpServerFacade).deleteMcpTool(any(McpTool.class));
+            verify(mcpToolService).delete(any(McpTool.class));
         }
 
         @Test
@@ -351,7 +347,7 @@ class EmbeddedMcpServerFacadeIntTest {
 
             when(mcpIntegrationComponentService.fetchMcpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID))
                 .thenReturn(Optional.of(new McpIntegrationComponent(EMBEDDED_MCP_COMPONENT_ID, INTEGRATION_ID)));
-            when(mcpServerFacade.update(mcpComponent, null, mcpTools)).thenReturn(mcpComponent);
+            when(mcpComponentService.update(mcpComponent, null, mcpTools)).thenReturn(mcpComponent);
 
             assertThat(embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, null, mcpTools))
                 .isSameAs(mcpComponent);
@@ -369,7 +365,7 @@ class EmbeddedMcpServerFacadeIntTest {
             embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, INTEGRATION_ID, null, List.of());
 
             verify(mcpIntegrationComponentService).create(EMBEDDED_MCP_COMPONENT_ID, INTEGRATION_ID);
-            verify(mcpServerFacade).update(mcpComponent, null, List.of());
+            verify(mcpComponentService).update(mcpComponent, null, List.of());
         }
 
         @Test
@@ -393,7 +389,7 @@ class EmbeddedMcpServerFacadeIntTest {
                         .hasMessageContaining("is already bound to integration");
 
             verify(mcpIntegrationComponentService, never()).update(anyLong(), anyLong());
-            verify(mcpServerFacade, never()).update(any(), any(), any());
+            verify(mcpComponentService, never()).update(any(), any(), any());
         }
 
         @Test
@@ -410,7 +406,7 @@ class EmbeddedMcpServerFacadeIntTest {
                     List.of(
                         createIntegration(INTEGRATION_ID, "component"),
                         createIntegration(SIBLING_INTEGRATION_ID, "component")));
-            when(mcpServerFacade.update(mcpComponent, null, mcpTools)).thenReturn(mcpComponent);
+            when(mcpComponentService.update(mcpComponent, null, mcpTools)).thenReturn(mcpComponent);
 
             assertThat(
                 embeddedMcpServerFacade.updateEmbeddedMcpComponent(
@@ -435,7 +431,7 @@ class EmbeddedMcpServerFacadeIntTest {
                         .hasMessageContaining("is not built on component");
 
             verify(mcpIntegrationComponentService, never()).update(anyLong(), anyLong());
-            verify(mcpServerFacade, never()).update(any(), any(), any());
+            verify(mcpComponentService, never()).update(any(), any(), any());
         }
 
         @Test
@@ -451,7 +447,7 @@ class EmbeddedMcpServerFacadeIntTest {
                 () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, null, List.of()))
                     .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).update(any(), any(), any());
+            verify(mcpComponentService, never()).update(any(), any(), any());
         }
 
         @Test
@@ -498,17 +494,21 @@ class EmbeddedMcpServerFacadeIntTest {
         void testUpdateEmbeddedMcpServerTags() {
             List<Tag> tags = List.of(new Tag("tag"));
 
-            when(mcpServerFacade.updateMcpServerTags(EMBEDDED_MCP_SERVER_ID, tags)).thenReturn(tags);
+            Tag savedTag = new Tag(5L, "tag");
+
+            when(tagService.save(tags)).thenReturn(List.of(savedTag));
 
             assertThat(embeddedMcpServerFacade.updateEmbeddedMcpServerTags(EMBEDDED_MCP_SERVER_ID, tags))
-                .isSameAs(tags);
+                .containsExactly(savedTag);
+
+            verify(mcpServerService).updateTags(EMBEDDED_MCP_SERVER_ID, List.of(5L));
         }
 
         @Test
         void testUpdateEmbeddedMcpTool() {
             McpTool mcpTool = createMcpTool(EMBEDDED_MCP_TOOL_ID, EMBEDDED_MCP_COMPONENT_ID);
 
-            when(mcpServerFacade.updateMcpTool(mcpTool)).thenReturn(mcpTool);
+            when(mcpToolService.update(mcpTool)).thenReturn(mcpTool);
 
             assertThat(embeddedMcpServerFacade.updateEmbeddedMcpTool(mcpTool)).isSameAs(mcpTool);
         }
@@ -537,7 +537,7 @@ class EmbeddedMcpServerFacadeIntTest {
                 () -> embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, INTEGRATION_ID, List.of()))
                     .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).create(any(), any());
+            verify(mcpComponentService, never()).create(any(), any());
         }
 
         @Test
@@ -545,7 +545,7 @@ class EmbeddedMcpServerFacadeIntTest {
             assertThatThrownBy(() -> embeddedMcpServerFacade.deleteEmbeddedMcpComponent(AUTOMATION_MCP_COMPONENT_ID))
                 .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).deleteMcpComponent(anyLong());
+            verify(mcpComponentService, never()).delete(anyLong());
         }
 
         @Test
@@ -553,7 +553,7 @@ class EmbeddedMcpServerFacadeIntTest {
             assertThatThrownBy(() -> embeddedMcpServerFacade.deleteEmbeddedMcpServer(AUTOMATION_MCP_SERVER_ID))
                 .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).deleteMcpServer(anyLong());
+            verify(mcpServerService, never()).delete(anyLong());
         }
 
         @Test
@@ -561,7 +561,7 @@ class EmbeddedMcpServerFacadeIntTest {
             assertThatThrownBy(() -> embeddedMcpServerFacade.deleteEmbeddedMcpTool(AUTOMATION_MCP_TOOL_ID))
                 .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).deleteMcpTool(any());
+            verify(mcpToolService, never()).delete(any());
         }
 
         @Test
@@ -590,7 +590,7 @@ class EmbeddedMcpServerFacadeIntTest {
                 () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(mcpComponent, null, null, List.of()))
                     .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).update(any(), any(), any());
+            verify(mcpComponentService, never()).update(any(), any(), any());
         }
 
         @Test
@@ -618,7 +618,7 @@ class EmbeddedMcpServerFacadeIntTest {
                 () -> embeddedMcpServerFacade.updateEmbeddedMcpServerTags(AUTOMATION_MCP_SERVER_ID, List.of()))
                     .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).updateMcpServerTags(anyLong(), any());
+            verify(mcpServerService, never()).updateTags(anyLong(), any());
         }
 
         @Test
@@ -628,7 +628,7 @@ class EmbeddedMcpServerFacadeIntTest {
             assertThatThrownBy(() -> embeddedMcpServerFacade.updateEmbeddedMcpTool(mcpTool))
                 .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpServerFacade, never()).updateMcpTool(any());
+            verify(mcpToolService, never()).update(any());
         }
 
         @Test

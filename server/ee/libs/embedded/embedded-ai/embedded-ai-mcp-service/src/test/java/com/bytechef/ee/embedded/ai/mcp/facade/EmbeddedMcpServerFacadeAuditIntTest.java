@@ -27,7 +27,6 @@ import com.bytechef.platform.mcp.audit.McpToolAuditEvents;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
-import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -56,7 +55,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     ComponentDefinitionService.class, IntegrationInstanceConfigurationService.class, IntegrationService.class,
     McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceToolService.class,
-    McpServerFacade.class, McpServerService.class, McpToolService.class, PermissionService.class, TagService.class
+    McpServerService.class, McpToolService.class, PermissionService.class, TagService.class
 })
 class EmbeddedMcpServerFacadeAuditIntTest {
 

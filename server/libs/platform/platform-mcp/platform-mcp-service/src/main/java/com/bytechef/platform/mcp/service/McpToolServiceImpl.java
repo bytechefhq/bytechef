@@ -17,6 +17,10 @@
 package com.bytechef.platform.mcp.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.mcp.audit.McpComponentAuditMapper;
+import com.bytechef.platform.mcp.audit.McpToolAuditEvents;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
 import java.util.List;
@@ -39,12 +43,22 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
+    @Audited(event = McpToolAuditEvents.MCP_TOOL_CREATED, mapper = McpComponentAuditMapper.class, data = {
+        @AuditData(key = "mcpToolId", value = "#result?.id"),
+        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
+        @AuditData(key = "name", value = "#mcpTool.name")
+    })
     @PreAuthorize("hasPermission(#mcpTool.mcpComponentId, 'McpComponent', 'MCP_EDIT')")
     public McpTool create(McpTool mcpTool) {
         return mcpToolRepository.save(mcpTool);
     }
 
     @Override
+    @Audited(event = McpToolAuditEvents.MCP_TOOL_UPDATED, mapper = McpComponentAuditMapper.class, data = {
+        @AuditData(key = "mcpToolId", value = "#mcpTool.id"),
+        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
+        @AuditData(key = "name", value = "#mcpTool.name")
+    })
     @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT') and " +
         "hasPermission(#mcpTool.mcpComponentId, 'McpComponent', 'MCP_EDIT')")
     public McpTool update(McpTool mcpTool) {
@@ -68,6 +82,11 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
+    @Audited(event = McpToolAuditEvents.MCP_TOOL_DELETED, mapper = McpComponentAuditMapper.class, data = {
+        @AuditData(key = "mcpToolId", value = "#mcpTool.id"),
+        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
+        @AuditData(key = "name", value = "#mcpTool.name")
+    })
     @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')")
     public void delete(McpTool mcpTool) {
         mcpToolRepository.delete(mcpTool);
