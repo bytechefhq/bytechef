@@ -29,6 +29,7 @@ service PrincipalJobFacadeRemoteService {
   rpc CreateChildJob(CreateChildJobRequest) returns (bytechef.atlas.execution.remote.v1.IdResponse);
   rpc CreateJob(CreatePrincipalJobRequest) returns (bytechef.atlas.execution.remote.v1.IdResponse);
   rpc CreatePrincipalLinkedJob(CreatePrincipalLinkedJobRequest) returns (bytechef.atlas.execution.remote.v1.IdResponse);
+  rpc CreatePrincipalLinkedJobForPrincipal(CreatePrincipalJobRequest) returns (bytechef.atlas.execution.remote.v1.IdResponse);
   rpc CreateSyncJob(CreatePrincipalJobRequest) returns (bytechef.atlas.execution.remote.v1.RemoteJob);
 }
 

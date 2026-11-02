@@ -95,12 +95,10 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     public long createPrincipalLinkedJob(
         JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType platformType) {
 
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(PRINCIPAL_JOB_FACADE + "/create-principal-linked-job-for-principal")
-                .build(),
-            new CreateJobRequest(jobParametersDTO, jobPrincipalId, platformType), Long.class);
+        IdResponse idResponse = getStub().createPrincipalLinkedJobForPrincipal(
+            toCreatePrincipalJobRequest(jobParametersDTO, jobPrincipalId, platformType));
+
+        return idResponse.getId();
     }
 
     private PrincipalJobFacadeRemoteServiceGrpc.PrincipalJobFacadeRemoteServiceBlockingStub getStub() {
