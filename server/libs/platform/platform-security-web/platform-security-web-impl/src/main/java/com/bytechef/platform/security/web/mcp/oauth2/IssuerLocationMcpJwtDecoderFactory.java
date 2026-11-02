@@ -27,9 +27,20 @@ import org.springframework.security.oauth2.jwt.JwtDecoders;
  */
 public class IssuerLocationMcpJwtDecoderFactory implements McpJwtDecoderFactory {
 
+    private final @Nullable JwtDecoder selfIssuedJwtDecoder;
+    private final Set<String> selfIssuerUris;
     private final Set<String> trustedIssuerUris;
 
     public IssuerLocationMcpJwtDecoderFactory(Collection<String> trustedIssuerUris) {
+        this(trustedIssuerUris, Set.of(), null);
+    }
+
+    public IssuerLocationMcpJwtDecoderFactory(
+        Collection<String> trustedIssuerUris, Collection<String> selfIssuerUris,
+        @Nullable JwtDecoder selfIssuedJwtDecoder) {
+
+        this.selfIssuedJwtDecoder = selfIssuedJwtDecoder;
+        this.selfIssuerUris = Set.copyOf(selfIssuerUris);
         this.trustedIssuerUris = Set.copyOf(trustedIssuerUris);
     }
 
@@ -38,6 +49,10 @@ public class IssuerLocationMcpJwtDecoderFactory implements McpJwtDecoderFactory 
     public JwtDecoder createJwtDecoder(String issuer) {
         if (!isTrustedIssuer(issuer)) {
             return null;
+        }
+
+        if (selfIssuedJwtDecoder != null && selfIssuerUris.contains(issuer)) {
+            return selfIssuedJwtDecoder;
         }
 
         return JwtDecoders.fromIssuerLocation(issuer);
