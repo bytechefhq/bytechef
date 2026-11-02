@@ -32,27 +32,25 @@ import org.junit.jupiter.api.Test;
  */
 class ComponentDslTest {
 
+    private static final PropertiesFunction PROPERTIES_FUNCTION =
+        (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> List.of();
+
     @Test
     void testDynamicPropertiesDataSourceCarriesPropertiesFunction() {
-        PropertiesFunction propertiesFunction =
-            (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> List.of();
-
-        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty = dynamicProperties("inputs")
-            .propertiesLookupDependsOn("workflowUuid")
-            .properties(propertiesFunction);
+        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty =
+            dynamicProperties("inputs", PROPERTIES_FUNCTION)
+                .propertiesLookupDependsOn("workflowUuid");
 
         PropertiesDataSource<?> propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
 
-        assertSame(propertiesFunction, propertiesDataSource.getProperties());
+        assertSame(PROPERTIES_FUNCTION, propertiesDataSource.getProperties());
         assertEquals(List.of("workflowUuid"), propertiesDataSource.getPropertiesLookupDependsOn());
     }
 
     @Test
     void testDynamicPropertiesDataSourceWithoutLookupDependenciesHasEmptyDependencies() {
-        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty = dynamicProperties("inputs")
-            .properties(
-                (PropertiesFunction) (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> List
-                    .of());
+        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty =
+            dynamicProperties("inputs", PROPERTIES_FUNCTION);
 
         PropertiesDataSource<?> propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
 
@@ -60,7 +58,29 @@ class ComponentDslTest {
     }
 
     @Test
-    void testDynamicPropertiesDataSourceRequiresPropertiesFunction() {
+    void testDynamicPropertiesRejectsNullPropertiesFunction() {
+        NullPointerException exception = assertThrows(
+            NullPointerException.class,
+            () -> dynamicProperties("inputs", (PropertiesFunction) null));
+
+        assertTrue(exception.getMessage()
+            .contains("propertiesFunction"));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void testDeprecatedDynamicPropertiesKeepsPropertiesSetter() {
+        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty = dynamicProperties("inputs")
+            .properties(PROPERTIES_FUNCTION);
+
+        PropertiesDataSource<?> propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
+
+        assertSame(PROPERTIES_FUNCTION, propertiesDataSource.getProperties());
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void testDeprecatedDynamicPropertiesWithoutPropertiesFunctionFailsOnRead() {
         ModifiableDynamicPropertiesProperty dynamicPropertiesProperty = dynamicProperties("inputs")
             .propertiesLookupDependsOn("workflowUuid");
 

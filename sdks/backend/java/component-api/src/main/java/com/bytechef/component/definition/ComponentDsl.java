@@ -109,8 +109,35 @@ public final class ComponentDsl {
         return new ModifiableDateTimeProperty(name);
     }
 
+    /**
+     * Creates a dynamic properties property without its properties function.
+     *
+     * @deprecated a dynamic properties property requires a properties function; use
+     *             {@link #dynamicProperties(String, ActionDefinition.PropertiesFunction)},
+     *             {@link #dynamicProperties(String, PropertiesFunction)} or
+     *             {@link #dynamicProperties(String, ClusterElementDefinition.PropertiesFunction)} instead
+     */
+    @Deprecated
     public static ModifiableDynamicPropertiesProperty dynamicProperties(String name) {
         return new ModifiableDynamicPropertiesProperty(name);
+    }
+
+    public static ModifiableDynamicPropertiesProperty dynamicProperties(
+        String name, ActionDefinition.PropertiesFunction propertiesFunction) {
+
+        return new ModifiableDynamicPropertiesProperty(name, propertiesFunction);
+    }
+
+    public static ModifiableDynamicPropertiesProperty dynamicProperties(
+        String name, PropertiesFunction propertiesFunction) {
+
+        return new ModifiableDynamicPropertiesProperty(name, propertiesFunction);
+    }
+
+    public static ModifiableDynamicPropertiesProperty dynamicProperties(
+        String name, ClusterElementDefinition.PropertiesFunction propertiesFunction) {
+
+        return new ModifiableDynamicPropertiesProperty(name, propertiesFunction);
     }
 
     public static ModifiableFileEntryProperty fileEntry() {
@@ -2304,8 +2331,20 @@ public final class ComponentDsl {
         private List<String> propertiesLookupDependsOn = List.of();
         private PropertiesDataSource.BasePropertiesFunction propertiesFunction;
 
+        /**
+         * @deprecated use {@code ComponentDsl.dynamicProperties(String, ...)} with a properties function instead
+         */
+        @Deprecated
         public ModifiableDynamicPropertiesProperty(String name) {
             super(name, Type.DYNAMIC_PROPERTIES);
+        }
+
+        private ModifiableDynamicPropertiesProperty(
+            String name, PropertiesDataSource.BasePropertiesFunction propertiesFunction) {
+
+            super(name, Type.DYNAMIC_PROPERTIES);
+
+            this.propertiesFunction = Objects.requireNonNull(propertiesFunction, "propertiesFunction");
         }
 
         public ModifiableDynamicPropertiesProperty propertiesLookupDependsOn(String... propertiesLookupDependsOn) {
@@ -2322,18 +2361,30 @@ public final class ComponentDsl {
             return this;
         }
 
+        /**
+         * @deprecated pass the properties function to {@code ComponentDsl.dynamicProperties(String, ...)} instead
+         */
+        @Deprecated
         public ModifiableDynamicPropertiesProperty properties(ActionDefinition.PropertiesFunction propertiesFunction) {
             this.propertiesFunction = propertiesFunction;
 
             return this;
         }
 
+        /**
+         * @deprecated pass the properties function to {@code ComponentDsl.dynamicProperties(String, ...)} instead
+         */
+        @Deprecated
         public ModifiableDynamicPropertiesProperty properties(PropertiesFunction propertiesFunction) {
             this.propertiesFunction = propertiesFunction;
 
             return this;
         }
 
+        /**
+         * @deprecated pass the properties function to {@code ComponentDsl.dynamicProperties(String, ...)} instead
+         */
+        @Deprecated
         public ModifiableDynamicPropertiesProperty properties(
             ClusterElementDefinition.PropertiesFunction propertiesFunction) {
 
