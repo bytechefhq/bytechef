@@ -22,6 +22,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -52,7 +53,7 @@ public class ProjectAuditIntTestConfiguration {
 
     @Bean
     AuditEventService auditEventService(PersistenceAuditEventRepository persistenceAuditEventRepository) {
-        return new AuditEventService(persistenceAuditEventRepository);
+        return new AuditEventServiceImpl(persistenceAuditEventRepository);
     }
 
     @Bean

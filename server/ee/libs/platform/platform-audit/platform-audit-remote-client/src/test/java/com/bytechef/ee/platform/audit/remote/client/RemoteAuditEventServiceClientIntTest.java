@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.audit.remote.client;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -178,7 +179,9 @@ class RemoteAuditEventServiceClientIntTest {
         AspectJProxyFactory aspectJProxyFactory = new AspectJProxyFactory(new ProjectOperations());
 
         aspectJProxyFactory.addAspect(
-            new AuditAspect(remoteAuditEventServiceClient, new AuditMapperResolver(staticListableBeanFactory)));
+            new AuditAspect(
+                new ApplicationProperties(), remoteAuditEventServiceClient,
+                new AuditMapperResolver(staticListableBeanFactory)));
 
         ProjectOperations projectOperations = aspectJProxyFactory.getProxy();
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
