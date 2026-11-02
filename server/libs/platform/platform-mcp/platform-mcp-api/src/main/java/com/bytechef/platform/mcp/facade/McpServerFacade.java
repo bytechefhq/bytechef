@@ -59,6 +59,12 @@ public interface McpServerFacade {
 
     void deleteMcpTool(McpTool mcpTool);
 
+    McpComponent getMcpComponent(long mcpComponentId);
+
+    List<McpTool> getMcpComponentMcpTools(long mcpComponentId);
+
+    List<McpComponent> getMcpServerMcpComponents(long mcpServerId);
+
     /**
      * Gets MCP components for multiple MCP servers in batch.
      *

@@ -353,6 +353,30 @@ class McpServerFacadeIntTest {
         }
 
         @Test
+        void testGetMcpComponentRequiresComponentViewer() {
+            assertThatThrownBy(() -> securedMcpServerFacade.getMcpComponent(7L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(7L), eq("McpComponent"), eq("MCP_VIEW"));
+        }
+
+        @Test
+        void testGetMcpComponentMcpToolsRequiresComponentViewer() {
+            assertThatThrownBy(() -> securedMcpServerFacade.getMcpComponentMcpTools(5L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(5L), eq("McpComponent"), eq("MCP_VIEW"));
+        }
+
+        @Test
+        void testGetMcpServerMcpComponentsRequiresServerViewer() {
+            assertThatThrownBy(() -> securedMcpServerFacade.getMcpServerMcpComponents(3L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_VIEW"));
+        }
+
+        @Test
         void testDeleteMcpComponentRequiresEditor() {
             assertThatThrownBy(() -> securedMcpServerFacade.deleteMcpComponent(4L))
                 .isInstanceOf(AccessDeniedException.class);

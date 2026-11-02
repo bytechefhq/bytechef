@@ -17,13 +17,11 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -37,11 +35,9 @@ import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationSharedMocks;
-import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlMethodSecurityTestConfiguration;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -50,11 +46,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -105,7 +96,7 @@ public class McpComponentGraphQlControllerIntTest {
         // Given
         McpComponent mockComponent = createMockMcpComponent(1L, "test-component", 1);
 
-        when(mcpComponentService.getMcpComponent(1L)).thenReturn(mockComponent);
+        when(mcpServerFacade.getMcpComponent(1L)).thenReturn(mockComponent);
 
         // When & Then
         this.graphQlTester
@@ -163,7 +154,7 @@ public class McpComponentGraphQlControllerIntTest {
             createMockMcpComponent(1L, "server-component1", 1),
             createMockMcpComponent(2L, "server-component2", 1));
 
-        when(mcpComponentService.getMcpServerMcpComponents(1L)).thenReturn(mockComponents);
+        when(mcpServerFacade.getMcpServerMcpComponents(1L)).thenReturn(mockComponents);
 
         // When & Then
         this.graphQlTester
@@ -319,6 +310,7 @@ public class McpComponentGraphQlControllerIntTest {
             embeddedMcpComponent.setId(2L);
 
             when(mcpComponentService.getMcpComponent(2L)).thenReturn(embeddedMcpComponent);
+            when(mcpServerFacade.getMcpComponent(2L)).thenReturn(embeddedMcpComponent);
             when(mcpServerService.getMcpServer(EMBEDDED_MCP_SERVER_ID)).thenReturn(
                 createMcpServer(PlatformType.EMBEDDED));
         }
@@ -344,7 +336,7 @@ public class McpComponentGraphQlControllerIntTest {
                 }
                 """);
 
-            verify(mcpComponentService, never()).getMcpServerMcpComponents(anyLong());
+            verify(mcpServerFacade, never()).getMcpServerMcpComponents(anyLong());
         }
 
         @Test
@@ -447,59 +439,5 @@ public class McpComponentGraphQlControllerIntTest {
         component.setVersion(1);
 
         return component;
-    }
-
-    @Nested
-    @ContextConfiguration(classes = McpGraphQlMethodSecurityTestConfiguration.class)
-    class MethodSecurity {
-
-        @Autowired
-        private PermissionEvaluator permissionEvaluator;
-
-        @Autowired
-        private McpComponentGraphQlController mcpComponentGraphQlController;
-
-        @BeforeEach
-        void setAuthentication() {
-            SecurityContextHolder.getContext()
-                .setAuthentication(
-                    new UsernamePasswordAuthenticationToken(
-                        "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
-        }
-
-        @AfterEach
-        void clearAuthentication() {
-            SecurityContextHolder.clearContext();
-
-            reset(permissionEvaluator);
-        }
-
-        @Test
-        void testMcpComponentDeniedWithoutComponentViewPermission() {
-            assertThatThrownBy(() -> mcpComponentGraphQlController.mcpComponent(7L))
-                .isInstanceOf(AccessDeniedException.class);
-
-            verify(permissionEvaluator).hasPermission(any(), eq(7L), eq("McpComponent"), eq("MCP_VIEW"));
-            verifyNoInteractions(mcpComponentService);
-        }
-
-        @Test
-        void testMcpComponentsByServerIdDeniedWithoutServerViewPermission() {
-            assertThatThrownBy(() -> mcpComponentGraphQlController.mcpComponentsByServerId(3L))
-                .isInstanceOf(AccessDeniedException.class);
-
-            verify(permissionEvaluator).hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_VIEW"));
-            verifyNoInteractions(mcpComponentService);
-        }
-
-        @Test
-        void testMcpComponentsByServerIdAllowedWithServerViewPermission() {
-            when(permissionEvaluator.hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_VIEW")))
-                .thenReturn(true);
-
-            mcpComponentGraphQlController.mcpComponentsByServerId(3L);
-
-            verify(mcpComponentService).getMcpServerMcpComponents(3L);
-        }
     }
 }
