@@ -3,4 +3,6 @@ spring:
     contexts: mono
 
 bytechef:
+  audit:
+    enabled: true
   edition: ee

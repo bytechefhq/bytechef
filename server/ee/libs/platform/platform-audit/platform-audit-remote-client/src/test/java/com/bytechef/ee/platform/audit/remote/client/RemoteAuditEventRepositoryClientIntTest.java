@@ -18,6 +18,7 @@ import com.bytechef.ee.platform.audit.remote.grpc.AuditEventRemoteServiceGrpcSer
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import io.grpc.ManagedChannel;
@@ -97,6 +98,25 @@ class RemoteAuditEventRepositoryClientIntTest {
     }
 
     @Test
+    void testAddAuditEventStoresItsPlatformInThePlatformColumn() throws IOException {
+        RemoteAuditEventRepositoryClient remoteAuditEventRepositoryClient = createClient(auditEventRepository);
+
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("credentialType", "API_KEY");
+        data.put(AuditEventConverter.PLATFORM_DATA_KEY, PlatformType.AUTOMATION);
+
+        remoteAuditEventRepositoryClient
+            .add(new AuditEvent(Instant.now(), "admin@localhost.com", "CREDENTIAL_USED", data));
+
+        PersistentAuditEvent persistentAuditEvent = findAll().getFirst();
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData()).containsEntry("credentialType", "API_KEY")
+            .doesNotContainKey(AuditEventConverter.PLATFORM_DATA_KEY);
+    }
+
+    @Test
     void testAddAuditEventTruncatesLongValues() throws IOException {
         RemoteAuditEventRepositoryClient remoteAuditEventRepositoryClient = createClient(auditEventRepository);
 
@@ -106,7 +126,7 @@ class RemoteAuditEventRepositoryClientIntTest {
 
         assertThat(findAll().getFirst()
             .getData()
-            .get("message")).hasSize(255);
+            .get("message")).hasSize(256);
     }
 
     @Test
