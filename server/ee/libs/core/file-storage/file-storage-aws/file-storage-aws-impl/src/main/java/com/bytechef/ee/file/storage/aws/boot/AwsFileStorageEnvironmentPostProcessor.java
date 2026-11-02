@@ -17,6 +17,7 @@
 package com.bytechef.ee.file.storage.aws.boot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -29,12 +30,17 @@ import org.springframework.core.env.MutablePropertySources;
  */
 public class AwsFileStorageEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
+    private static final List<String> S3_PROVIDER_PROPERTY_NAMES = List.of(
+        "bytechef.ai.auto-memory.provider", "bytechef.data-storage.provider", "bytechef.file-storage.provider");
+
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if ("aws".equalsIgnoreCase(environment.getProperty("bytechef.file-storage.provider", String.class))) {
-            source.put("spring.cloud.aws.s3.enabled", true);
+        for (String providerPropertyName : S3_PROVIDER_PROPERTY_NAMES) {
+            if ("aws".equalsIgnoreCase(environment.getProperty(providerPropertyName, String.class))) {
+                source.put("spring.cloud.aws.s3.enabled", true);
+            }
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource(
