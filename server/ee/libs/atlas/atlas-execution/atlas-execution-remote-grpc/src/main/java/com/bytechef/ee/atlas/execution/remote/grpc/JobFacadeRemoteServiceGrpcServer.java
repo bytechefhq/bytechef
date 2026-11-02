@@ -13,6 +13,7 @@ import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobFacadeRemoteServiceGrpc;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJobParameters;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.ResumeApprovalRequest;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.ResumeJobRequest;
 import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
@@ -53,6 +54,29 @@ public class JobFacadeRemoteServiceGrpcServer extends JobFacadeRemoteServiceGrpc
     @Override
     public void resumeApproval(ResumeApprovalRequest request, StreamObserver<Empty> responseObserver) {
         jobFacade.resumeApproval(request.getJobId(), request.getUuid(), request.getApproved());
+
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void resumeClaimedJob(ResumeJobRequest request, StreamObserver<Empty> responseObserver) {
+        jobFacade.resumeClaimedJob(
+            request.getJobId(), request.hasTaskExecutionId() ? request.getTaskExecutionId() : null,
+            atlasExecutionProtoMapper.toResumeData(request));
+
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void resumeJob(ResumeJobRequest request, StreamObserver<Empty> responseObserver) {
+        if (request.hasTaskExecutionId()) {
+            jobFacade.resumeJob(
+                request.getJobId(), request.getTaskExecutionId(), atlasExecutionProtoMapper.toResumeData(request));
+        } else {
+            jobFacade.resumeJob(request.getJobId());
+        }
 
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();

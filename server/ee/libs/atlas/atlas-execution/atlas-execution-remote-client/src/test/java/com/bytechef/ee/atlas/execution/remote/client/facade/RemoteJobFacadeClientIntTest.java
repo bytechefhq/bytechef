@@ -14,6 +14,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.repository.jdbc.JdbcWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
@@ -224,6 +225,70 @@ class RemoteJobFacadeClientIntTest {
         assertThat(applicationEvents.stream(StopJobEvent.class))
             .extracting(StopJobEvent::getJobId)
             .containsExactly(jobId);
+    }
+
+    @Test
+    void testResumeJobRestartsTheStoppedJob() {
+        long jobId = saveJob(Job.Status.STOPPED, null);
+
+        remoteJobFacadeClient.resumeJob(jobId);
+
+        assertThat(jobService.getJob(jobId)
+            .getStatus()).isEqualTo(Job.Status.STARTED);
+        assertThat(applicationEvents.stream(ResumeJobEvent.class))
+            .singleElement()
+            .satisfies(resumeJobEvent -> {
+                assertThat(resumeJobEvent.getJobId()).isEqualTo(jobId);
+                assertThat(resumeJobEvent.isStarted()).isTrue();
+                assertThat(resumeJobEvent.getTaskExecutionId()).isNull();
+            });
+    }
+
+    @Test
+    void testResumeJobOfATaskExecutionPassesItsData() {
+        long jobId = saveJob(Job.Status.STOPPED, null);
+
+        remoteJobFacadeClient.resumeJob(jobId, 7L, Map.of("approved", true, "note", "ok"));
+
+        assertThat(applicationEvents.stream(ResumeJobEvent.class))
+            .singleElement()
+            .satisfies(resumeJobEvent -> {
+                assertThat(resumeJobEvent.getJobId()).isEqualTo(jobId);
+                assertThat(resumeJobEvent.isStarted()).isFalse();
+                assertThat(resumeJobEvent.getTaskExecutionId()).isEqualTo(7L);
+                assertThat(resumeJobEvent.getData()).isEqualTo(Map.of("approved", true, "note", "ok"));
+            });
+    }
+
+    @Test
+    void testResumeClaimedJobPublishesAStartedResumeWithItsData() {
+        long jobId = saveJob(Job.Status.STARTED, null);
+
+        remoteJobFacadeClient.resumeClaimedJob(jobId, 9L, Map.of("outcome", "done"));
+
+        assertThat(applicationEvents.stream(ResumeJobEvent.class))
+            .singleElement()
+            .satisfies(resumeJobEvent -> {
+                assertThat(resumeJobEvent.getJobId()).isEqualTo(jobId);
+                assertThat(resumeJobEvent.isStarted()).isTrue();
+                assertThat(resumeJobEvent.getTaskExecutionId()).isEqualTo(9L);
+                assertThat(resumeJobEvent.getData()).isEqualTo(Map.of("outcome", "done"));
+            });
+    }
+
+    @Test
+    void testResumeClaimedJobWithoutATaskExecutionHasNoData() {
+        long jobId = saveJob(Job.Status.STARTED, null);
+
+        remoteJobFacadeClient.resumeClaimedJob(jobId, null, null);
+
+        assertThat(applicationEvents.stream(ResumeJobEvent.class))
+            .singleElement()
+            .satisfies(resumeJobEvent -> {
+                assertThat(resumeJobEvent.isStarted()).isTrue();
+                assertThat(resumeJobEvent.getTaskExecutionId()).isNull();
+                assertThat(resumeJobEvent.getData()).isNull();
+            });
     }
 
     @Test
