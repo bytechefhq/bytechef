@@ -23,6 +23,7 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentReposit
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
@@ -34,6 +35,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
@@ -53,6 +55,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -965,9 +968,11 @@ class PermissionServiceIntTest {
         };
 
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
             workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
-            List.of(connectionEnvironmentResolver));
+            List.of(connectionEnvironmentResolver),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
     }
 
     private void createCustomRole(long customRoleId) {
@@ -981,7 +986,9 @@ class PermissionServiceIntTest {
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectService, workspaceScopeCache,
-            workspaceUserRepository, List.of(resourceOwnershipResolver), List.of());
+            workspaceUserRepository, List.of(resourceOwnershipResolver), List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
     }
 
     private ProjectDeployment renamedDeployment(long projectDeploymentId) {

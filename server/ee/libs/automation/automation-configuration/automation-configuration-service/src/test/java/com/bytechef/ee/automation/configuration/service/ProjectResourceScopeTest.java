@@ -13,14 +13,17 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * {@code 'Project'} is the most-used resource token in the tree — every project read, export, publish and delete names
@@ -41,14 +44,14 @@ class ProjectResourceScopeTest {
     private final CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
     private final PermissionScopeRegistry permissionScopeRegistry = mock(PermissionScopeRegistry.class);
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
-    private final WorkspaceScopeCacheService workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+    private final WorkspaceScopeCache workspaceScopeCache = mock(WorkspaceScopeCache.class);
     private final WorkspaceUserRepository workspaceUserRepository = mock(WorkspaceUserRepository.class);
 
     @Test
     void testProjectScopeIsGrantedFromTheRoleHeldInTheOwningWorkspace() {
         givenProjectOwnedByWorkspace();
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
 
         assertThat(service().hasResourceScope(PROJECT_ID, "Project", "WORKFLOW_VIEW")).isTrue();
@@ -58,7 +61,7 @@ class ProjectResourceScopeTest {
     void testProjectScopeIsRefusedForANonMemberOfTheOwningWorkspace() {
         givenProjectOwnedByWorkspace();
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID)).thenReturn(Set.of());
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID)).thenReturn(Set.of());
 
         assertThat(service().hasResourceScope(PROJECT_ID, "Project", "WORKFLOW_VIEW")).isFalse();
     }
@@ -67,7 +70,7 @@ class ProjectResourceScopeTest {
     void testProjectScopeIsRefusedForAnUnknownProject() {
         when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(USER_ID));
         when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.empty());
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
 
         // Fails closed on the resolver's unknown(): a deleted project must not inherit the caller's scopes in some
@@ -84,7 +87,7 @@ class ProjectResourceScopeTest {
     void testProjectScopeIsRefusedForEveryoneWithoutTheOwnershipResolver() {
         givenProjectOwnedByWorkspace();
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
 
         PermissionServiceImpl serviceWithoutResolver = service(List.of());
@@ -107,8 +110,10 @@ class ProjectResourceScopeTest {
 
     private PermissionServiceImpl service(List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, resourceOwnershipResolvers, List.of());
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
+            workspaceUserRepository, resourceOwnershipResolvers, List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
     }
 
     private List<ResourceOwnershipResolver> ownershipResolvers() {

@@ -140,7 +140,12 @@ class AutomationMethodSecurityConfigurationIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            return mock(PermissionService.class);
+            PermissionService permissionService = mock(PermissionService.class);
+
+            when(permissionService.isAuthorizationSkipped())
+                .thenAnswer(invocation -> AutomationAuthorizationContext.isSkipChecks());
+
+            return permissionService;
         }
     }
 
