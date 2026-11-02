@@ -18,6 +18,10 @@ const {deleteDialogState, dropdownMenuHookMock, mutateMock, setShowDeleteDialogM
     })
 );
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('./hooks/useMcpProjectComponentToolDropdownMenu', () => ({
     default: (props: unknown) => {
         dropdownMenuHookMock(props);

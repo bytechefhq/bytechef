@@ -8,6 +8,10 @@ const hoisted = vi.hoisted(() => ({
     componentDefinition: undefined as Record<string, unknown> | undefined,
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) => scope === 'MCP_EDIT',
+}));
+
 vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
     useGetComponentDefinitionQuery: () => ({data: hoisted.componentDefinition}),
 }));
