@@ -2,6 +2,7 @@ import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {Skeleton} from '@/components/ui/skeleton';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ControllerRenderProps} from 'react-hook-form';
 
 interface ProjectDeploymentDialogBasicStepTagsSelectProps {
@@ -15,7 +16,9 @@ const ProjectDeploymentDialogBasicStepTagsSelect = ({
     onCreateOption,
     projectDeployment,
 }: ProjectDeploymentDialogBasicStepTagsSelectProps) => {
-    const {data: tags} = useGetProjectDeploymentTagsQuery();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const {data: tags} = useGetProjectDeploymentTagsQuery(currentEnvironmentId);
 
     const tagNames = projectDeployment?.tags?.map((tag) => tag.name);
 

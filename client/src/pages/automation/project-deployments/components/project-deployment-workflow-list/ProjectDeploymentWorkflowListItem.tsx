@@ -8,9 +8,11 @@ import {getPageUrl} from '@/pages/automation/project-deployments/components/proj
 import {canRunWorkflowManually} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/workflowActionSlot-utils';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import OpenInButton from '@/shared/components/OpenInButton';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
@@ -68,6 +70,7 @@ const ProjectDeploymentWorkflowListItem = ({
 }: ProjectDeploymentWorkflowListItemProps) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const openProjectDeploymentWorkflowSheet = useProjectDeploymentWorkflowSheetStore(
         (state) => state.openProjectDeploymentWorkflowSheet
     );
@@ -76,6 +79,8 @@ const ProjectDeploymentWorkflowListItem = ({
     );
 
     const {openProjectWorkflow} = useOpenInProject();
+
+    const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -263,7 +268,7 @@ const ProjectDeploymentWorkflowListItem = ({
                     <div className="flex items-center gap-x-1">
                         {showRunSlot && (
                             <div className="size-9 shrink-0">
-                                {canRunWorkflowManually(workflow) && (
+                                {canEditDeployment && canRunWorkflowManually(workflow) && (
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button
@@ -365,8 +370,9 @@ const ProjectDeploymentWorkflowListItem = ({
                         )}
 
                         <Switch
+                            aria-label="Enable Deployment Workflow"
                             checked={enabled}
-                            disabled={enableProjectDeploymentWorkflowMutation.isPending}
+                            disabled={!canEditDeployment || enableProjectDeploymentWorkflowMutation.isPending}
                             onCheckedChange={(value) =>
                                 handleEnableProjectDeploymentWorkflow({
                                     projectDeploymentId,
