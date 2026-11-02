@@ -226,12 +226,10 @@ public class ComponentInitOpenApiGenerator {
         Object dynamicProperties = extensionMap.get("x-dynamic-properties");
 
         if (dynamicProperties.equals(true)) {
-            builder.add("dynamicProperties($S)", propertyName);
-
             builder.add(
-                ".properties(($T.PropertiesFunction)$T::get" + buildOptionsFunctionsName(propertyName) +
+                "dynamicProperties($S, ($T.PropertiesFunction)$T::get" + buildOptionsFunctionsName(propertyName) +
                     "Properties)",
-                ClassName.get("com.bytechef.component.definition", "ActionDefinition"),
+                propertyName, ClassName.get("com.bytechef.component.definition", "ActionDefinition"),
                 ClassName.get(
                     "com.bytechef.component." + StringUtils.replaceChars(componentName, "-_", ".") + ".util",
                     getComponentClassName(componentName) + "Utils"));
