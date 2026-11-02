@@ -448,6 +448,7 @@ export enum ApprovalTaskPriority {
 
 export enum ApprovalTaskStatus {
   Completed = 'COMPLETED',
+  Expired = 'EXPIRED',
   InProgress = 'IN_PROGRESS',
   Open = 'OPEN'
 }
@@ -583,10 +584,21 @@ export type AutomationWorkflowProjectConfigurationConnectionSlot = {
 
 export type AutomationWorkflowProjectConfigurationInput = {
   __typename?: 'AutomationWorkflowProjectConfigurationInput';
+  componentName?: Maybe<Scalars['String']['output']>;
+  componentVersion?: Maybe<Scalars['Int']['output']>;
+  groupName?: Maybe<Scalars['String']['output']>;
   label?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  optionConnections: Array<AutomationWorkflowProjectConfigurationProvidableConnection>;
   required: Scalars['Boolean']['output'];
   type?: Maybe<Scalars['String']['output']>;
+};
+
+export type AutomationWorkflowProjectConfigurationInputOption = {
+  __typename?: 'AutomationWorkflowProjectConfigurationInputOption';
+  description?: Maybe<Scalars['String']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  value: Scalars['String']['output'];
 };
 
 export type AutomationWorkflowProjectConfigurationProvidableConnection = {
@@ -3008,6 +3020,15 @@ export enum ParameterType {
   String = 'STRING'
 }
 
+export type PendingApproval = {
+  __typename?: 'PendingApproval';
+  createdDate?: Maybe<Scalars['String']['output']>;
+  expiresAt?: Maybe<Scalars['String']['output']>;
+  formUrl?: Maybe<Scalars['String']['output']>;
+  jobId: Scalars['ID']['output'];
+  workflowLabel: Scalars['String']['output'];
+};
+
 export enum PlatformType {
   Automation = 'AUTOMATION',
   Embedded = 'EMBEDDED'
@@ -3259,6 +3280,7 @@ export type Query = {
   automationSearch: Array<SearchResult>;
   automationWorkflowProjectCategories: Array<AutomationWorkflowProjectCategory>;
   automationWorkflowProjectConfigurationVersionImpact: AutomationWorkflowProjectConfigurationVersionImpact;
+  automationWorkflowProjectConfigurationWorkflowInputOptions: Array<AutomationWorkflowProjectConfigurationInputOption>;
   automationWorkflowProjectConfigurationWorkflowProvidableValues: AutomationWorkflowProjectConfigurationWorkflowProvidableValues;
   automationWorkflowProjectConfigurations: Array<AutomationWorkflowProjectConfiguration>;
   automationWorkflowProjectTags: Array<AutomationWorkflowProjectTag>;
@@ -3353,6 +3375,7 @@ export type Query = {
   myWorkspaceRole?: Maybe<Scalars['String']['output']>;
   myWorkspaceScopes: Array<Scalars['String']['output']>;
   oauth2ConsentClient?: Maybe<OAuth2ConsentClient>;
+  pendingApprovals?: Maybe<Array<Maybe<PendingApproval>>>;
   preBuiltProjectTemplates: Array<ProjectTemplate>;
   preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
   project?: Maybe<Project>;
@@ -3585,6 +3608,17 @@ export type QueryAutomationSearchArgs = {
 export type QueryAutomationWorkflowProjectConfigurationVersionImpactArgs = {
   id: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectConfigurationWorkflowInputOptionsArgs = {
+  connectionId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+  inputName: Scalars['String']['input'];
+  lookupDependsOnValues?: InputMaybe<Scalars['Map']['input']>;
+  propertyName: Scalars['String']['input'];
+  searchText?: InputMaybe<Scalars['String']['input']>;
+  workflowUuid: Scalars['ID']['input'];
 };
 
 
@@ -4025,6 +4059,11 @@ export type QueryMyWorkspaceScopesArgs = {
 
 export type QueryOauth2ConsentClientArgs = {
   clientId: Scalars['String']['input'];
+};
+
+
+export type QueryPendingApprovalsArgs = {
+  environmentId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
