@@ -170,7 +170,7 @@ public class AuditAspect {
                             pendingAuditEvents.add(persistentAuditEvent);
 
                             if (auditOutcome == AuditOutcome.SUCCESS) {
-                                if (!outermost) {
+                                if (!outermost || !auditEventService.savesWithinTheCallerTransaction()) {
                                     markRolledBackWhenTheTransactionRollsBack(persistentAuditEvent);
                                 }
 
@@ -356,7 +356,9 @@ public class AuditAspect {
             return;
         }
 
-        if (saveAuditEvents(auditEvents) && TransactionSynchronizationManager.isSynchronizationActive()) {
+        if (saveAuditEvents(auditEvents) && auditEventService.savesWithinTheCallerTransaction() &&
+            TransactionSynchronizationManager.isSynchronizationActive()) {
+
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
                 @Override
