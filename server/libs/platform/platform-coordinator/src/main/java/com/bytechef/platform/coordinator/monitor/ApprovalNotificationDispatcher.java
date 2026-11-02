@@ -24,7 +24,12 @@ import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSender;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,14 +61,17 @@ final class ApprovalNotificationDispatcher {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    Result dispatch(NotificationEvent.Type eventType, NotificationHandlerContext notificationHandlerContext) {
+    Result dispatch(
+        NotificationEvent.Type eventType, NotificationHandlerContext notificationHandlerContext,
+        long deliveryDeadlineNanos) {
+
         List<Notification> notifications = notificationService.getNotifications(eventType);
 
         if (notifications.isEmpty()) {
             return Result.NONE_CONFIGURED;
         }
 
-        int failedCount = 0;
+        List<CompletableFuture<Void>> deliveryFutures = new ArrayList<>();
 
         for (Notification notification : notifications) {
             NotificationSender notificationSender = notificationSenderRegistry.getNotificationSender(
@@ -73,8 +81,6 @@ final class ApprovalNotificationDispatcher {
                 eventType, notification.getType());
 
             if (notificationSender == null || notificationHandler == null) {
-                failedCount++;
-
                 log.warn(
                     "No {} found for notification {} of type {} and event type {}; counting it as failed",
                     notificationSender == null ? "sender" : "handler", notification.getId(), notification.getType(),
@@ -84,16 +90,63 @@ final class ApprovalNotificationDispatcher {
             }
 
             try {
-                notificationSender.send(notification, notificationHandler, notificationHandlerContext);
+                deliveryFutures.add(
+                    notificationSender.send(notification, notificationHandler, notificationHandlerContext));
             } catch (RuntimeException runtimeException) {
-                failedCount++;
-
                 log.warn(
                     "Could not send notification {} for event type {} of job {}", notification.getId(), eventType,
                     notificationHandlerContext.getJobId(), runtimeException);
             }
         }
 
-        return failedCount < notifications.size() ? Result.DELIVERED : Result.FAILED;
+        if (!deliveryFutures.isEmpty()
+            && !awaitDeliveries(deliveryFutures, notificationHandlerContext, deliveryDeadlineNanos)) {
+            return Result.FAILED;
+        }
+
+        boolean delivered = false;
+
+        for (CompletableFuture<Void> deliveryFuture : deliveryFutures) {
+            if (deliveryFuture.isDone() && !deliveryFuture.isCompletedExceptionally()) {
+                delivered = true;
+
+                break;
+            }
+        }
+
+        return delivered ? Result.DELIVERED : Result.FAILED;
+    }
+
+    private boolean awaitDeliveries(
+        List<CompletableFuture<Void>> deliveryFutures, NotificationHandlerContext notificationHandlerContext,
+        long deliveryDeadlineNanos) {
+
+        try {
+            CompletableFuture<Void> allDeliveries = CompletableFuture.allOf(
+                deliveryFutures.toArray(new CompletableFuture[0]));
+
+            long remainingWaitNanos = Math.max(0, deliveryDeadlineNanos - System.nanoTime());
+
+            allDeliveries.get(remainingWaitNanos, TimeUnit.NANOSECONDS);
+        } catch (TimeoutException timeoutException) {
+            long pendingCount = deliveryFutures.stream()
+                .filter(deliveryFuture -> !deliveryFuture.isDone())
+                .count();
+
+            log.warn(
+                "Timed out waiting for notification deliveries of job {}; {} channel(s) still pending",
+                notificationHandlerContext.getJobId(), pendingCount);
+        } catch (ExecutionException executionException) {
+            log.debug(
+                "At least one notification delivery of job {} failed", notificationHandlerContext.getJobId(),
+                executionException);
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
+
+            return false;
+        }
+
+        return true;
     }
 }
