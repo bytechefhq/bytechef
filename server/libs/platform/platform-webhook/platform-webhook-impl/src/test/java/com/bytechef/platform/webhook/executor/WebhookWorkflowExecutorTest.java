@@ -262,6 +262,28 @@ public class WebhookWorkflowExecutorTest {
         }
 
         @Test
+        void testExecuteSyncRejectsWorkflowWithApprovalGateBeforeRunning() {
+            givenWorkflow(
+                new WorkflowTask(
+                    Map.of(
+                        "name", "agent", "type", "aiAgent/v1/chat",
+                        "clusterElements", Map.of(
+                            "tools", List.of(
+                                Map.of(
+                                    "name", "gate", "type", "aiAgentUtils/v1/approvalGate",
+                                    "clusterElements", Map.of(
+                                        "tools", List.of(
+                                            Map.of("name", "send", "type", "gmail/v1/sendEmail")))))))));
+
+            assertThatThrownBy(() -> webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessage(WebhookWorkflowExecutorImpl.suspendingTaskMessage("agent", "aiAgent/v1/chat"));
+
+            verify(webhookWorkflowSyncExecutor, never()).execute(any(), any());
+            verify(jobSyncExecutor, never()).execute(any(), any(), anyBoolean(), any(), any());
+        }
+
+        @Test
         void testHasSuspendingTaskDetectsTopLevelApprovalStep() {
             givenWorkflow(workflowTask("approve", "approval/v1/requestApproval"));
 
@@ -269,7 +291,26 @@ public class WebhookWorkflowExecutorTest {
         }
 
         @Test
-        void testHasSuspendingTaskIgnoresAiAgentWithTools() {
+        void testHasSuspendingTaskDetectsApprovalGateToolOfAiAgent() {
+            givenWorkflow(
+                new WorkflowTask(
+                    Map.of(
+                        "name", "agent", "type", "aiAgent/v1/chat",
+                        "clusterElements", Map.of(
+                            "model", Map.of("name", "model", "type", "openAi/v1/model"),
+                            "tools", List.of(
+                                Map.of("name", "search", "type", "googleSearch/v1/search"),
+                                Map.of(
+                                    "name", "gate", "type", "aiAgentUtils/v1/approvalGate",
+                                    "clusterElements", Map.of(
+                                        "tools", List.of(
+                                            Map.of("name", "send", "type", "gmail/v1/sendEmail")))))))));
+
+            assertThat(webhookWorkflowExecutor.hasSuspendingTask(workflowExecutionId)).isTrue();
+        }
+
+        @Test
+        void testHasSuspendingTaskIgnoresAiAgentWithoutApprovalGate() {
             givenWorkflow(
                 new WorkflowTask(
                     Map.of(
