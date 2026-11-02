@@ -22,6 +22,7 @@ import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
 import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.repository.TaskStateRepository;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
@@ -54,7 +55,8 @@ import tools.jackson.databind.ObjectMapper;
     basePackageClasses = TaskStateRepository.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = TaskStateRepository.class))
 @Import({
-    JacksonConfiguration.class, LiquibaseConfiguration.class, StateValueDataStorage.class, TaskStateServiceImpl.class
+    JacksonConfiguration.class, JobPrincipalAccessorRegistry.class, LiquibaseConfiguration.class,
+    StateValueDataStorage.class, TaskStateServiceImpl.class
 })
 public class ApprovalFormFacadeIntTestConfiguration {
 
