@@ -100,7 +100,9 @@ public class WorkerApplicationIntTest {
             "bytechef.platform.connection.remote.v1.ConnectionRemoteService",
             "bytechef.platform.workflow.task.dispatcher.remote.v1.TaskDispatcherDefinitionRemoteService",
             "bytechef.platform.scheduler.remote.v1.TriggerSchedulerRemoteService",
-            "bytechef.platform.codeworkflow.configuration.remote.v1.CodeWorkflowContainerRemoteService");
+            "bytechef.platform.codeworkflow.configuration.remote.v1.CodeWorkflowContainerRemoteService",
+            "bytechef.platform.ai.skill.remote.v1.AiSkillFacadeRemoteService",
+            "bytechef.automation.task.remote.v1.ApprovalTaskFacadeRemoteService");
     }
 
     @Test

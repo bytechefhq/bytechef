@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.skill.remote.grpc;
 
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.ObjectMapper;
@@ -18,6 +19,7 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnClass(name = "com.bytechef.platform.ai.skill.facade.AiSkillFacadeImpl")
 public class AiSkillGrpcServerConfiguration {
 
     @Bean
