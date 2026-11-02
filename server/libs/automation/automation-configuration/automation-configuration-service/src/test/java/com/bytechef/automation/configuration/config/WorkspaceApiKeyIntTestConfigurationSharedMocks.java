@@ -24,6 +24,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
@@ -65,8 +66,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
     ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class, EnvironmentService.class,
     GitHubProxyClient.class, JobFacade.class, JobService.class, PrincipalJobFacade.class, PrincipalJobService.class,
     TaskExecutionService.class, TriggerDefinitionService.class, TriggerExecutionService.class,
-    TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class, WorkflowNodeParameterFacade.class,
-    WorkflowNodeTestOutputService.class, WorkflowTemplateProxyClient.class
+    TriggerLifecycleFacade.class, UserService.class, WebhookTriggerTestFacade.class, WorkflowCacheManager.class,
+    WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTemplateProxyClient.class
 })
 @MockitoSpyBean(types = PermissionService.class)
 public @interface WorkspaceApiKeyIntTestConfigurationSharedMocks {

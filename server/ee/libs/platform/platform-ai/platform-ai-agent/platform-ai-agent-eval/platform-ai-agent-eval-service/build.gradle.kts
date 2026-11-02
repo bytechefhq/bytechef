@@ -14,4 +14,5 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.security:spring-security-core")
 }
