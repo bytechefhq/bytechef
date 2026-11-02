@@ -41,6 +41,7 @@ import {ProjectTagKeys} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -110,6 +111,7 @@ const ProjectListItem = ({
     });
     const [searchParams] = useSearchParams();
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {
@@ -127,6 +129,7 @@ const ProjectListItem = ({
 
     const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
         {
+            environmentId: currentEnvironmentId,
             id: currentWorkspaceId ?? 0,
             projectId: project.id ?? 0,
         },
