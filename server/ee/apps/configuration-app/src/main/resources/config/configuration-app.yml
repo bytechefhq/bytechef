@@ -7,7 +7,7 @@ management:
 
 spring:
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration
+    exclude: org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration,org.springframework.boot.grpc.server.autoconfigure.security.GrpcServerOAuth2ResourceServerAutoConfiguration
   graphql:
     schema:
       locations: classpath*:graphql/**/
