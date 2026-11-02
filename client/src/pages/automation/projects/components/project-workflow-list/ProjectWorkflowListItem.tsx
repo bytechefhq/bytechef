@@ -1,11 +1,14 @@
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowListRowDropdownMenu from '@/shared/components/workflow/WorkflowListRowDropdownMenu';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
@@ -76,11 +79,18 @@ const ProjectWorkflowListItem = ({
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showWorkflowShareDialog, setShowWorkflowShareDialog] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
 
     const [searchParams] = useSearchParams();
 
     const navigate = useNavigate();
+    const canCreateWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_DELETE', DEVELOPMENT_ENVIRONMENT);
+    const canEditWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
+    const canViewWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_VIEW', DEVELOPMENT_ENVIRONMENT);
+
+    const canDuplicateWorkflow = canCreateWorkflow && canViewWorkflow;
 
     const queryClient = useQueryClient();
 
@@ -211,12 +221,12 @@ const ProjectWorkflowListItem = ({
                 ) : (
                     <WorkflowListRowDropdownMenu
                         exportUrl={`/api/automation/internal/workflows/${workflow.id}/export`}
-                        onDeleteClick={() => setShowDeleteDialog(true)}
-                        onEditClick={() => setShowEditDialog(true)}
+                        onDeleteClick={canDeleteWorkflow ? () => setShowDeleteDialog(true) : undefined}
+                        onEditClick={canEditWorkflow ? () => setShowEditDialog(true) : undefined}
                         workflowLabel={workflow.label}
                         workflowUuid={workflow.workflowUuid}
                     >
-                        {project && workflow && (
+                        {canDuplicateWorkflow && project && workflow && (
                             <DropdownMenuItem
                                 icon={<CopyIcon />}
                                 label="Duplicate"
@@ -229,11 +239,13 @@ const ProjectWorkflowListItem = ({
                             />
                         )}
 
-                        <DropdownMenuItem
-                            icon={<Share2Icon />}
-                            label="Share"
-                            onClick={() => setShowWorkflowShareDialog(true)}
-                        />
+                        {canEditWorkflow && (
+                            <DropdownMenuItem
+                                icon={<Share2Icon />}
+                                label="Share"
+                                onClick={() => setShowWorkflowShareDialog(true)}
+                            />
+                        )}
 
                         {templatesSubmissionForm && (
                             <DropdownMenuItem

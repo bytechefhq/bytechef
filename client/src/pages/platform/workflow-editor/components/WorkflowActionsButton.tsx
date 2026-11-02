@@ -10,6 +10,7 @@ interface WorkflowActionsButtonProps {
     leadingAction?: ReactNode;
     onRunClick: () => void;
     onStopClick: () => void;
+    readOnly?: boolean;
     runDisabled: boolean;
     workflowIsRunning: boolean;
 }
@@ -19,64 +20,71 @@ const WorkflowActionsButton = ({
     leadingAction,
     onRunClick,
     onStopClick,
+    readOnly = false,
     runDisabled,
     workflowIsRunning,
-}: WorkflowActionsButtonProps) => (
-    <Tooltip>
-        <TooltipTrigger asChild>
-            <div className="mx-2 flex items-center">
-                {leadingAction && !workflowIsRunning ? (
-                    <ButtonGroup>
-                        {leadingAction}
+}: WorkflowActionsButtonProps) => {
+    if (readOnly && !workflowIsRunning) {
+        return null;
+    }
 
-                        <ButtonGroupSeparator className="bg-stroke-brand-secondary" />
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <div className="mx-2 flex items-center">
+                    {leadingAction && !workflowIsRunning ? (
+                        <ButtonGroup>
+                            {leadingAction}
 
-                        <Button
-                            className="w-20 rounded-l-none"
-                            disabled={runDisabled}
-                            icon={chatTrigger ? <MessageCircleMoreIcon /> : <PlayIcon />}
-                            label={chatTrigger ? 'Chat' : 'Test'}
-                            onClick={() => onRunClick()}
-                        />
-                    </ButtonGroup>
-                ) : (
-                    <div className="w-20">
-                        {workflowIsRunning ? (
+                            <ButtonGroupSeparator className="bg-stroke-brand-secondary" />
+
                             <Button
-                                className="w-full"
-                                icon={<SquareIcon />}
-                                label="Stop"
-                                onClick={onStopClick}
-                                variant="destructive"
-                            />
-                        ) : (
-                            <Button
-                                className="w-full"
+                                className="w-20 rounded-l-none"
                                 disabled={runDisabled}
                                 icon={chatTrigger ? <MessageCircleMoreIcon /> : <PlayIcon />}
                                 label={chatTrigger ? 'Chat' : 'Test'}
                                 onClick={() => onRunClick()}
                             />
-                        )}
-                    </div>
+                        </ButtonGroup>
+                    ) : (
+                        <div className="w-20">
+                            {workflowIsRunning ? (
+                                <Button
+                                    className="w-full"
+                                    icon={<SquareIcon />}
+                                    label="Stop"
+                                    onClick={onStopClick}
+                                    variant="destructive"
+                                />
+                            ) : (
+                                <Button
+                                    className="w-full"
+                                    disabled={runDisabled}
+                                    icon={chatTrigger ? <MessageCircleMoreIcon /> : <PlayIcon />}
+                                    label={chatTrigger ? 'Chat' : 'Test'}
+                                    onClick={() => onRunClick()}
+                                />
+                            )}
+                        </div>
+                    )}
+                </div>
+            </TooltipTrigger>
+
+            <TooltipContent className="mr-2 max-w-xs px-2">
+                {!runDisabled ? (
+                    <>
+                        {workflowIsRunning && 'Stop the current workflow'}
+
+                        {!workflowIsRunning && chatTrigger && 'Start the chat'}
+
+                        {!workflowIsRunning && !chatTrigger && 'Run the current workflow'}
+                    </>
+                ) : (
+                    <RunDisabledReasons />
                 )}
-            </div>
-        </TooltipTrigger>
-
-        <TooltipContent className="mr-2 max-w-xs px-2">
-            {!runDisabled ? (
-                <>
-                    {workflowIsRunning && 'Stop the current workflow'}
-
-                    {!workflowIsRunning && chatTrigger && 'Start the chat'}
-
-                    {!workflowIsRunning && !chatTrigger && 'Run the current workflow'}
-                </>
-            ) : (
-                <RunDisabledReasons />
-            )}
-        </TooltipContent>
-    </Tooltip>
-);
+            </TooltipContent>
+        </Tooltip>
+    );
+};
 
 export default WorkflowActionsButton;

@@ -18,6 +18,7 @@ const formSchema = z.object({
 
 interface PublishPopoverProps {
     disabled?: boolean;
+    disabledTooltip?: string;
     isPending: boolean;
     onOpenChange?: (open: boolean) => void;
     onPublishSubmit: ({description, onSuccess}: {description?: string; onSuccess: () => void}) => void;
@@ -30,6 +31,7 @@ interface PublishPopoverProps {
 
 const PublishPopover = ({
     disabled,
+    disabledTooltip,
     isPending,
     onOpenChange,
     onPublishSubmit,
@@ -87,7 +89,7 @@ const PublishPopover = ({
                     </span>
                 </TooltipTrigger>
 
-                <TooltipContent>No changes to publish</TooltipContent>
+                <TooltipContent>{disabledTooltip || 'No changes to publish'}</TooltipContent>
             </Tooltip>
         );
     }
