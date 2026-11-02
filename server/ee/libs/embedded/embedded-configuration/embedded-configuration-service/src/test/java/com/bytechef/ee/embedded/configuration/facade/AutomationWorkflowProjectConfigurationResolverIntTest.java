@@ -9,8 +9,6 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
@@ -29,6 +27,7 @@ import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectC
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -73,10 +72,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -88,7 +88,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(
     classes = {
         AutomationWorkflowProjectFacadeIntTestConfiguration.class,
-        ConnectedUserReferenceRolloutManagerIntTest.ConnectedUserServiceConfiguration.class
+        ConnectedUserReferenceRolloutManagerIntTest.ConnectedUserServiceConfiguration.class,
+        AutomationWorkflowProjectConfigurationResolverIntTest.EmbeddedPermissionEvaluatorTestConfiguration.class
     },
     properties = {
         "bytechef.edition=EE",
@@ -102,7 +103,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class,
     ClusterElementDefinitionService.class, ComponentConnectionFacade.class, ComponentDefinitionService.class,
     ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionLifecycleFacade.class,
-    ConnectionService.class, EmbeddedPermissionEvaluator.class, EnvironmentService.class, GitHubProxyClient.class,
+    ConnectionService.class, EnvironmentService.class, GitHubProxyClient.class,
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
@@ -120,7 +121,7 @@ class AutomationWorkflowProjectConfigurationResolverIntTest {
         {"label":"Post","triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
-    private static final String BETA_EXPRESSION = "metadata['beta'] == true";
+    private static final String BETA_EXPRESSION = "metadata['beta'] == 'true'";
     private static final int ROUND_COUNT = 20;
     private static final int PRODUCTION_ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
 
@@ -141,26 +142,6 @@ class AutomationWorkflowProjectConfigurationResolverIntTest {
 
     @Autowired
     private ConnectedUserService connectedUserService;
-
-    @Autowired
-    private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
-
-    @BeforeEach
-    void setUp() {
-        when(embeddedPermissionEvaluator.evaluate(any(), any()))
-            .thenAnswer(invocation -> {
-                String permissionExpression = invocation.getArgument(0);
-                ConnectedUser connectedUser = invocation.getArgument(1);
-
-                if (permissionExpression == null || permissionExpression.isBlank()) {
-                    return true;
-                }
-
-                return BETA_EXPRESSION.equals(permissionExpression) &&
-                    "true".equals(connectedUser.getMetadata()
-                        .get("beta"));
-            });
-    }
 
     @Test
     void testSelfServePicksHighestEnabledVersion() {
@@ -363,5 +344,14 @@ class AutomationWorkflowProjectConfigurationResolverIntTest {
         }
 
         return projectId;
+    }
+
+    @Configuration
+    static class EmbeddedPermissionEvaluatorTestConfiguration {
+
+        @Bean
+        EmbeddedPermissionEvaluator embeddedPermissionEvaluator() {
+            return new EmbeddedPermissionEvaluator(SpelEvaluator.create());
+        }
     }
 }
