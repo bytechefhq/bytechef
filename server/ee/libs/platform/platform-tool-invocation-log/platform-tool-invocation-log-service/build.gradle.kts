@@ -6,6 +6,8 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-core")
     implementation("org.slf4j:slf4j-api")
+    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))

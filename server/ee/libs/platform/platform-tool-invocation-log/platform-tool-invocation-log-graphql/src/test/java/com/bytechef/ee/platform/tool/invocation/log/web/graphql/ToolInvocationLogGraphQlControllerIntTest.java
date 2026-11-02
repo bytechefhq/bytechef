@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
 import com.bytechef.ee.platform.tool.invocation.log.facade.ToolInvocationLogFacade;
+import com.bytechef.ee.platform.tool.invocation.log.facade.dto.ToolInvocationLogDTO;
 import com.bytechef.ee.platform.tool.invocation.log.web.graphql.config.ToolInvocationLogGraphQlTestConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;
@@ -69,7 +70,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
                 eq(PlatformType.AUTOMATION), eq(7L), eq(2L), eq(ToolExecutionSurface.MCP_AUTOMATION), isNull(), eq(5L),
                 isNull(), isNull(),
                 isNull(), isNull(), eq(0)))
-                    .thenReturn(new PageImpl<>(List.of(toolInvocationLog()), PageRequest.of(0, 50), 1));
+                    .thenReturn(new PageImpl<>(List.of(toolInvocationLogDTO()), PageRequest.of(0, 50), 1));
 
         graphQlTester
             .document("""
@@ -84,6 +85,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
                             outcome
                             mcpServerId
                             workspaceId
+                            workflowName
                             createdDate
                         }
                         totalElements
@@ -100,6 +102,9 @@ class ToolInvocationLogGraphQlControllerIntTest {
             .path("workspaceToolInvocationLogs.content[0].workspaceId")
             .entity(Long.class)
             .isEqualTo(7L)
+            .path("workspaceToolInvocationLogs.content[0].workflowName")
+            .entity(String.class)
+            .isEqualTo("Send Message")
             .path("workspaceToolInvocationLogs.content[0].createdDate")
             .entity(Long.class)
             .isEqualTo(1_000L)
@@ -143,7 +148,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
                 eq(PlatformType.AUTOMATION), eq(2L), eq(ToolExecutionSurface.MCP_AUTOMATION), isNull(), isNull(),
                 isNull(), isNull(), isNull(),
                 isNull(), eq(0)))
-                    .thenReturn(new PageImpl<>(List.of(toolInvocationLog()), PageRequest.of(0, 50), 1));
+                    .thenReturn(new PageImpl<>(List.of(toolInvocationLogDTO()), PageRequest.of(0, 50), 1));
 
         graphQlTester
             .document("""
@@ -174,12 +179,13 @@ class ToolInvocationLogGraphQlControllerIntTest {
         assertThat(guardedMethods).isEmpty();
     }
 
-    private static ToolInvocationLog toolInvocationLog() {
+    private static ToolInvocationLogDTO toolInvocationLogDTO() {
         ToolInvocationLog toolInvocationLog = new ToolInvocationLog();
 
         toolInvocationLog.setId(1L);
         toolInvocationLog.setSurface(ToolExecutionSurface.MCP_AUTOMATION);
-        toolInvocationLog.setKind(ToolExecutionKind.COMPONENT);
+        toolInvocationLog.setKind(ToolExecutionKind.WORKFLOW);
+        toolInvocationLog.setJobId(11L);
         toolInvocationLog.setOutcome(ToolExecutionOutcome.SUCCESS);
         toolInvocationLog.setDurationMs(42);
         toolInvocationLog.setMcpServerId(5L);
@@ -187,6 +193,6 @@ class ToolInvocationLogGraphQlControllerIntTest {
         toolInvocationLog.setEnvironment(2);
         toolInvocationLog.setCreatedDate(Instant.ofEpochMilli(1_000L));
 
-        return toolInvocationLog;
+        return new ToolInvocationLogDTO(toolInvocationLog, "Send Message");
     }
 }

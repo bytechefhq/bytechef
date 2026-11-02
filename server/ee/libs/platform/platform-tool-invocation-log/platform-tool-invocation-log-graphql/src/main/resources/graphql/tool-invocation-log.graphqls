@@ -42,6 +42,7 @@ type ToolInvocationLogType {
     integrationInstanceId: Long
     mcpServerId: Long
     jobId: Long
+    workflowName: String
     outcome: String!
     errorType: String
     errorMessage: String
