@@ -64,6 +64,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -116,21 +117,21 @@ public final class DataTableUtils {
 
             DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, DEVELOPMENT.ordinal());
 
-            List<String> columnNames = new ArrayList<>();
-
-            columnNames.add("id");
+            List<Option<String>> columnNames = new ArrayList<>();
 
             if (dataTableInfo != null && dataTableInfo.columns() != null) {
                 for (ColumnSpec columnSpec : dataTableInfo.columns()) {
-                    columnNames.add(columnSpec.name());
+                    if (Objects.nonNull(searchText) && !Strings.CI.contains(columnSpec.name(), searchText)) {
+                        continue;
+                    }
+
+                    columnNames.add(option(columnSpec.name(), columnSpec.name()));
                 }
             }
 
-            return columnNames.stream()
-                .filter(columnName -> searchText == null || columnName.toLowerCase(Locale.ROOT)
-                    .contains(searchText.toLowerCase(Locale.ROOT)))
-                .<Option<String>>map(columnName -> option(columnName, columnName))
-                .toList();
+            // handle id column
+
+            return columnNames;
         };
     }
 
