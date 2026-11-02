@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261102120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="automation_workflow_project_configuration" columnName="name"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="automation_workflow_project_configuration">
+            <column name="name" type="varchar(256)"/>
+        </addColumn>
+
+        <sql>
+            UPDATE automation_workflow_project_configuration
+            SET name = CASE environment_id WHEN 0 THEN 'DEVELOPMENT' WHEN 1 THEN 'STAGING' WHEN 2 THEN 'PRODUCTION' END
+        </sql>
+
+        <addNotNullConstraint tableName="automation_workflow_project_configuration" columnName="name"
+                              columnDataType="varchar(256)"/>
+
+        <rollback>
+            <dropColumn tableName="automation_workflow_project_configuration" columnName="name"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261102120000-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="automation_workflow_project_configuration" columnName="permission_expression"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="automation_workflow_project_configuration">
+            <column name="permission_expression" type="text"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="automation_workflow_project_configuration" columnName="permission_expression"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261102120000-3" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="integration_instance_configuration" columnName="permission_expression"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="integration_instance_configuration">
+            <column name="permission_expression" type="text"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="integration_instance_configuration" columnName="permission_expression"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261102120000-4" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="connected_user_project_configuration"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="connected_user_project_configuration">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connected_user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="automation_workflow_project_configuration_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="version" type="integer" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="connected_user_project_configuration" baseColumnNames="project_id"
+                                 constraintName="fk_connected_user_project_configuration_project"
+                                 referencedTableName="project" referencedColumnNames="id" onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="connected_user_project_configuration"
+                                 baseColumnNames="automation_workflow_project_configuration_id"
+                                 constraintName="fk_connected_user_project_configuration_configuration"
+                                 referencedTableName="automation_workflow_project_configuration"
+                                 referencedColumnNames="id"/>
+
+        <addUniqueConstraint tableName="connected_user_project_configuration"
+                             columnNames="connected_user_id, project_id"
+                             constraintName="uk_connected_user_project_configuration_connected_user_project"/>
+
+        <createIndex tableName="connected_user_project_configuration"
+                     indexName="idx_connected_user_project_configuration_configuration_id">
+            <column name="automation_workflow_project_configuration_id"/>
+        </createIndex>
+
+        <rollback>
+            <dropTable tableName="connected_user_project_configuration"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261102120000-5" author="Ivica Cardic" contextFilter="mono">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="connected_user_project_configuration"
+                                            foreignKeyName="fk_connected_user_project_configuration_connected_user"/>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="connected_user_project_configuration"
+                                 baseColumnNames="connected_user_id"
+                                 constraintName="fk_connected_user_project_configuration_connected_user"
+                                 referencedTableName="connected_user" referencedColumnNames="id" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20261102120000-6" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="connected_user"/>
+        </preConditions>
+
+        <sql>
+            INSERT INTO connected_user_project_configuration
+                (connected_user_id, project_id, automation_workflow_project_configuration_id, created_date,
+                 last_modified_date, version)
+            SELECT DISTINCT reference_deployment.connected_user_id, reference_deployment.project_id,
+                configuration.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0
+            FROM connected_user_reference_deployment reference_deployment
+            JOIN connected_user connected_user ON connected_user.id = reference_deployment.connected_user_id
+            JOIN automation_workflow_project_configuration configuration
+                ON configuration.project_id = reference_deployment.project_id
+                AND configuration.environment_id = connected_user.environment
+            ON CONFLICT DO NOTHING
+        </sql>
+
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="20261102120000-7" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="connected_user"/>
+        </preConditions>
+
+        <sql>
+            INSERT INTO connected_user_project_configuration
+                (connected_user_id, project_id, automation_workflow_project_configuration_id, created_date,
+                 last_modified_date, version)
+            SELECT DISTINCT connected_user_project.connected_user_id, automation_project_workflow.project_id,
+                configuration.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0
+            FROM connected_user_project_workflow project_workflow
+            JOIN connected_user_project connected_user_project
+                ON connected_user_project.id = project_workflow.connected_user_project_id
+            JOIN connected_user connected_user ON connected_user.id = connected_user_project.connected_user_id
+            JOIN automation_workflow_project_workflow automation_project_workflow
+                ON CAST(automation_project_workflow.workflow_uuid AS VARCHAR(36)) =
+                    project_workflow.copied_from_workflow_uuid
+            JOIN automation_workflow_project_configuration configuration
+                ON configuration.project_id = automation_project_workflow.project_id
+                AND configuration.environment_id = connected_user.environment
+            WHERE project_workflow.copied_from_workflow_uuid IS NOT NULL
+                AND NOT EXISTS (
+                    SELECT 1 FROM connected_user_reference_deployment reference_deployment
+                    WHERE reference_deployment.connected_user_id = connected_user_project.connected_user_id
+                        AND reference_deployment.project_id = automation_project_workflow.project_id)
+            ON CONFLICT DO NOTHING
+        </sql>
+
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="20261102120000-8" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <uniqueConstraintExists tableName="automation_workflow_project_configuration"
+                                    constraintName="uk_automation_workflow_project_configuration_project_environment"/>
+        </preConditions>
+
+        <dropUniqueConstraint tableName="automation_workflow_project_configuration"
+                              constraintName="uk_automation_workflow_project_configuration_project_environment"/>
+
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="20261102120000-9" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="automation_workflow_project_configuration"
+                             indexName="uk_automation_workflow_project_configuration_name"/>
+            </not>
+        </preConditions>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_automation_workflow_project_configuration_name
+            ON automation_workflow_project_configuration (project_id, environment_id, lower(trim(name)))
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX uk_automation_workflow_project_configuration_name</sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
