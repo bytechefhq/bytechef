@@ -28,6 +28,7 @@ import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
@@ -130,6 +131,14 @@ public class ConfigurationApplicationIntTest {
             .getName()).isEqualTo(
                 "com.bytechef.ee.automation.workflow.execution.remote.client.facade."
                     + "RemoteProjectWorkflowExecutionFacadeClient");
+    }
+
+    @Test
+    void testAiSkillsAreServedToOtherApps() {
+        assertThat(applicationContext.containsBean("aiSkillFacadeRemoteServiceGrpcServer")).isTrue();
+        assertThat(applicationContext.getBean(AiSkillFacade.class)
+            .getClass()
+            .getName()).doesNotContain("Remote");
     }
 
     @Test

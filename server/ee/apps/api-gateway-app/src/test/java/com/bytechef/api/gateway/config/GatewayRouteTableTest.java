@@ -117,6 +117,7 @@ class GatewayRouteTableTest {
         "/file-entries/abc/content, webhook-app",
         "/icons/slack.svg, configuration-app",
         "/graphql, configuration-app",
+        "/api/ai/agent-skills/1/download, configuration-app",
         "/oauth2/authorize, configuration-oauth2",
         "/oauth2/token, configuration-oauth2",
         "/oauth2/jwks, configuration-oauth2",
