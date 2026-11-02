@@ -215,6 +215,18 @@ public interface PermissionService {
     boolean hasWorkflowScopeIfProjectWorkflow(String workflowId, String scope, Environment environment);
 
     /**
+     * Returns whether the current user may bind the connection to the workflow in the environment: the connection must
+     * belong to the workspace that owns the workflow's project and live in that environment, and the user must hold
+     * {@code CONNECTION_VIEW} there. A tenant administrator is not subject to the check.
+     *
+     * @param connectionId the connection being bound
+     * @param workflowId   the workflow the connection is bound to
+     * @param environment  the environment the binding applies to
+     * @return {@code true} if the binding is allowed
+     */
+    boolean canUseConnectionInWorkflow(long connectionId, String workflowId, Environment environment);
+
+    /**
      * Returns the scope names the current user holds in the workspace (all registered scopes for a tenant admin).
      *
      * @param workspaceId the workspace whose scope grants are returned
