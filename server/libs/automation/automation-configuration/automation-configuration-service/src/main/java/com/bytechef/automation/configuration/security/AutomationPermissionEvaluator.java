@@ -42,7 +42,7 @@ public class AutomationPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
         }
 
@@ -65,10 +65,14 @@ public class AutomationPermissionEvaluator implements PermissionEvaluator {
     public boolean hasPermission(
         Authentication authentication, Serializable targetId, String targetType, Object permission) {
 
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
         }
 
         return permissionService.hasResourceScope(targetId, targetType, String.valueOf(permission));
+    }
+
+    private boolean isAuthorizationSkipped() {
+        return AutomationAuthorizationContext.isSkipChecks() && permissionService.isAuthorizationSkipped();
     }
 }
