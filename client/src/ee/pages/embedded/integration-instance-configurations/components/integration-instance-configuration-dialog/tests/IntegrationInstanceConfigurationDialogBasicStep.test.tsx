@@ -3,9 +3,11 @@ import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {mockScrollIntoView, render, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {useForm, useWatch} from 'react-hook-form';
-import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationInstanceConfigurationDialogBasicStep from '../IntegrationInstanceConfigurationDialogBasicStep';
+
+const environmentState = vi.hoisted(() => ({currentEnvironmentId: 1}));
 
 vi.mock(
     '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect',
@@ -27,7 +29,7 @@ vi.mock('@/ee/pages/embedded/integration-instance-configurations/stores/useWorkf
 }));
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
-    useEnvironmentStore: (selector: (state: Record<string, unknown>) => unknown) => selector({currentEnvironmentId: 1}),
+    useEnvironmentStore: (selector: (state: Record<string, unknown>) => unknown) => selector(environmentState),
 }));
 
 vi.mock('@/shared/components/EnvironmentBadge', () => ({
@@ -86,6 +88,24 @@ beforeEach(() => {
 });
 
 describe('IntegrationInstanceConfigurationDialogBasicStep', () => {
+    afterEach(() => {
+        environmentState.currentEnvironmentId = 1;
+    });
+
+    it('should offer tags outside the development environment', () => {
+        render(<BasicStepHarness />);
+
+        expect(screen.getByText('Tags')).toBeInTheDocument();
+    });
+
+    it('should hide tags in the development environment', () => {
+        environmentState.currentEnvironmentId = 0;
+
+        render(<BasicStepHarness />);
+
+        expect(screen.queryByText('Tags')).not.toBeInTheDocument();
+    });
+
     describe('authorization select', () => {
         it('should list the connection authorizations by title, falling back to the type', async () => {
             render(<BasicStepHarness authorizations={authorizations} curIntegrationId={2} />);

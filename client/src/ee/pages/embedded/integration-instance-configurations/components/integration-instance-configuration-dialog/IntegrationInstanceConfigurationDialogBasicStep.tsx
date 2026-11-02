@@ -9,6 +9,7 @@ import IntegrationInstanceConfigurationDialogBasicStepTagsSelect from '@/ee/page
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {Authorization} from '@/shared/middleware/platform/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Dispatch, SetStateAction} from 'react';
@@ -214,7 +215,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                 />
             )}
 
-            {!updateIntegrationVersion && (
+            {!updateIntegrationVersion && currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT && (
                 <FormField
                     control={control}
                     name="tags"

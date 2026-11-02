@@ -3,9 +3,11 @@ import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {describe, expect, it, vi} from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectDeploymentDialogBasicStep from './ProjectDeploymentDialogBasicStep';
+
+const environmentState = vi.hoisted(() => ({currentEnvironmentId: 1}));
 
 const projects = [
     {id: 1, name: 'Learn ByteChef by doing'},
@@ -26,8 +28,7 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 }));
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
-    useEnvironmentStore: (selector: (state: {currentEnvironmentId: number}) => unknown) =>
-        selector({currentEnvironmentId: 1}),
+    useEnvironmentStore: (selector: (state: {currentEnvironmentId: number}) => unknown) => selector(environmentState),
 }));
 
 vi.mock('@/shared/components/EnvironmentBadge', () => ({
@@ -75,8 +76,8 @@ vi.mock(
     })
 );
 
-const BasicStepHarness = () => {
-    const form = useForm<ProjectDeployment>({defaultValues: {name: ''}});
+const BasicStepHarness = ({defaultValues = {name: ''}}: {defaultValues?: Partial<ProjectDeployment>}) => {
+    const form = useForm<ProjectDeployment>({defaultValues});
 
     return (
         <Form {...form}>
@@ -158,6 +159,30 @@ const TabsHarness = ({projectDeployments}: {projectDeployments: ProjectDeploymen
 };
 
 describe('ProjectDeploymentDialogBasicStep', () => {
+    afterEach(() => {
+        environmentState.currentEnvironmentId = 1;
+    });
+
+    it('should offer tags outside the development environment', () => {
+        render(<BasicStepHarness />);
+
+        expect(screen.getByText('Tags')).toBeInTheDocument();
+    });
+
+    it('should hide tags in the development environment', () => {
+        environmentState.currentEnvironmentId = 0;
+
+        render(<BasicStepHarness />);
+
+        expect(screen.queryByText('Tags')).not.toBeInTheDocument();
+    });
+
+    it("should hide tags when the deployment's own environment is development", () => {
+        render(<BasicStepHarness defaultValues={{environmentId: 0, name: ''}} />);
+
+        expect(screen.queryByText('Tags')).not.toBeInTheDocument();
+    });
+
     it('should preselect the deployment of a project that has only one', () => {
         const onDeploymentSelect = vi.fn();
         const projectDeployment = {environmentId: 1, id: 7, name: 'Production', projectId: 1, projectVersion: 3};
