@@ -12,10 +12,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.awaitility.Awaitility.await;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.jdbc.JdbcJobRepository;
+import com.bytechef.atlas.execution.repository.jdbc.JdbcTaskExecutionRepository;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.ee.platform.workflow.execution.remote.client.config.PlatformWorkflowExecutionRemoteClientIntTestConfiguration;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.JobResumeFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.PlatformWorkflowExecutionProtoMapper;
@@ -70,14 +74,13 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootTest(
     classes = PlatformWorkflowExecutionRemoteClientIntTestConfiguration.class,
     properties = {
+        "bytechef.approval.signed-token.clock-skew=PT60S", "bytechef.approval.signed-token.default-ttl=P30D",
         "bytechef.approval.signed-token.secret=Ynl0ZWNoZWYtYXBwcm92YWwtdG9rZW4tdGVzdC1zZWNyZXQh",
         "bytechef.workflow.repository.jdbc.enabled=true", "spring.quartz.auto-startup=false"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @RecordApplicationEvents
 class RemoteJobResumeFacadeClientIntTest {
-
-    private static final long TASK_EXECUTION_RESUME_ID = 4_242L;
 
     @Autowired
     private ApplicationEvents applicationEvents;
@@ -93,6 +96,12 @@ class RemoteJobResumeFacadeClientIntTest {
 
     @Autowired
     private JobService jobService;
+
+    @Autowired
+    private JdbcTaskExecutionRepository taskExecutionRepository;
+
+    @Autowired
+    private TaskExecutionService taskExecutionService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -136,6 +145,7 @@ class RemoteJobResumeFacadeClientIntTest {
         resumeExecutorService.shutdownNow();
         concurrentResumeExecutorService.shutdownNow();
 
+        taskExecutionRepository.deleteAll();
         jobRepository.deleteAll();
     }
 
@@ -159,7 +169,8 @@ class RemoteJobResumeFacadeClientIntTest {
         assertThat(resumeJobEvents.getFirst()
             .getJobId()).isEqualTo(jobResumeId.getJobId());
         assertThat(resumeJobEvents.getFirst()
-            .getTaskExecutionId()).isEqualTo(TASK_EXECUTION_RESUME_ID);
+            .getTaskExecutionId())
+                .isEqualTo(((Number) job.getMetadata(MetadataConstants.TASK_EXECUTION_RESUME_ID)).longValue());
         assertThat(resumeJobEvents.getFirst()
             .getData()).isEqualTo(Map.of("approved", true));
         assertThat(applicationEvents.stream(JobResumedEvent.class))
@@ -365,7 +376,7 @@ class RemoteJobResumeFacadeClientIntTest {
         Map<String, Object> metadata = new HashMap<>();
 
         metadata.put(MetadataConstants.JOB_RESUME_ID, jobResumeId.toString());
-        metadata.put(MetadataConstants.TASK_EXECUTION_RESUME_ID, TASK_EXECUTION_RESUME_ID);
+        metadata.put(MetadataConstants.TASK_EXECUTION_RESUME_ID, saveSuspendedTaskExecutionId(jobResumeId.getJobId()));
 
         if (streaming) {
             metadata.put(MetadataConstants.STREAMING_RESUME, true);
@@ -376,6 +387,20 @@ class RemoteJobResumeFacadeClientIntTest {
         jobService.update(job);
 
         return jobResumeId;
+    }
+
+    private long saveSuspendedTaskExecutionId(long jobId) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .jobId(jobId)
+            .status(TaskExecution.Status.STARTED)
+            .workflowTask(new WorkflowTask(Map.of("name", "approval", "type", "approval/v1/request")))
+            .build();
+
+        taskExecution.setTaskNumber(1);
+
+        TaskExecution createdTaskExecution = taskExecutionService.create(taskExecution);
+
+        return Objects.requireNonNull(createdTaskExecution.getId());
     }
 
     private long saveJobId(Job.Status status) {
