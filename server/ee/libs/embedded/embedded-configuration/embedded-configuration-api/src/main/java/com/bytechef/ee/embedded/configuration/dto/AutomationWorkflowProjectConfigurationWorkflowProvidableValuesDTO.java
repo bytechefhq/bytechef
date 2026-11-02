@@ -29,6 +29,24 @@ public record AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO(
     public record ProvidableConnection(long id, String name) {
     }
 
-    public record Input(String name, @Nullable String label, @Nullable String type, boolean required) {
+    /**
+     * An input an administrator can provide.
+     *
+     * @param componentName     the referenced component when the input is a component input group reference
+     * @param componentVersion  the referenced component version
+     * @param groupName         the referenced component input group
+     * @param optionConnections the administrator's connections of the referenced component, used to load the input's
+     *                          options
+     */
+    public record Input(
+        String name, @Nullable String label, @Nullable String type, boolean required, @Nullable String componentName,
+        @Nullable Integer componentVersion, @Nullable String groupName, List<ProvidableConnection> optionConnections) {
+
+        public Input(String name, @Nullable String label, @Nullable String type, boolean required) {
+            this(name, label, type, required, null, null, null, List.of());
+        }
+    }
+
+    public record InputOption(@Nullable String label, String value, @Nullable String description) {
     }
 }

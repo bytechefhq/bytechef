@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfi
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -40,6 +41,23 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
      */
     AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO getConfigurationWorkflowProvidableValues(
         long configurationId, String workflowUuid);
+
+    /**
+     * Loads the options of a component-referencing input of a workflow, using one of the administrator's connections.
+     *
+     * @param configurationId       the configuration id
+     * @param workflowUuid          the workflow uuid
+     * @param inputName             the workflow input name
+     * @param propertyName          the property of the referenced component input group
+     * @param connectionId          the administrator's connection of the referenced component
+     * @param lookupDependsOnValues the values of the group's other properties the options depend on
+     * @param searchText            the optional search text
+     * @return the options
+     */
+    List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.InputOption>
+        getConfigurationWorkflowInputOptions(
+            long configurationId, String workflowUuid, String inputName, String propertyName, long connectionId,
+            Map<String, ?> lookupDependsOnValues, @Nullable String searchText);
 
     AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(long configurationId, int projectVersion);
 

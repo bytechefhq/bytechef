@@ -44,6 +44,16 @@ type AutomationWorkflowProjectConfigurationInput {
     label: String
     type: String
     required: Boolean!
+    componentName: String
+    componentVersion: Int
+    groupName: String
+    optionConnections: [AutomationWorkflowProjectConfigurationProvidableConnection!]!
+}
+
+type AutomationWorkflowProjectConfigurationInputOption {
+    label: String
+    value: String!
+    description: String
 }
 
 type AutomationWorkflowProjectConfigurationVersionImpact {
@@ -61,6 +71,7 @@ type AutomationWorkflowProjectConfigurationVersionImpactWorkflow {
 extend type Query {
     automationWorkflowProjectConfigurations(projectId: ID!): [AutomationWorkflowProjectConfiguration!]!
     automationWorkflowProjectConfigurationWorkflowProvidableValues(id: ID!, workflowUuid: ID!): AutomationWorkflowProjectConfigurationWorkflowProvidableValues!
+    automationWorkflowProjectConfigurationWorkflowInputOptions(id: ID!, workflowUuid: ID!, inputName: String!, propertyName: String!, connectionId: ID!, lookupDependsOnValues: Map, searchText: String): [AutomationWorkflowProjectConfigurationInputOption!]!
     automationWorkflowProjectConfigurationVersionImpact(id: ID!, projectVersion: Int!): AutomationWorkflowProjectConfigurationVersionImpact!
 }
 

@@ -34,9 +34,12 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -55,6 +58,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -75,6 +79,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
@@ -90,7 +95,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     public AutomationWorkflowProjectConfigurationAdminFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
-        ComponentDefinitionService componentDefinitionService,
+        ComponentDefinitionFacade componentDefinitionFacade, ComponentDefinitionService componentDefinitionService,
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
@@ -100,6 +105,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         this.applicationEventPublisher = applicationEventPublisher;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
+        this.componentDefinitionFacade = componentDefinitionFacade;
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
@@ -220,11 +226,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(configurationId);
 
-        ProjectWorkflow projectWorkflow = projectWorkflowService
-            .fetchProjectWorkflow(configuration.getProjectId(), configuration.getProjectVersion(), workflowUuid)
-            .orElseThrow(() -> newInvalidProvidedValueException(
-                "Workflow uuid=%s is not part of version %d".formatted(
-                    workflowUuid, configuration.getProjectVersion())));
+        ProjectWorkflow projectWorkflow = getProjectWorkflow(configuration, workflowUuid);
 
         String workflowId = projectWorkflow.getWorkflowId();
 
@@ -232,13 +234,52 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             configuration.fetchWorkflow(projectWorkflow.getUuid());
 
         return new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO(
-            toConnectionSlotDTOs(configuration, workflowId), toInputDTOs(workflowService.getWorkflow(workflowId)),
+            toConnectionSlotDTOs(configuration, workflowId),
+            toInputDTOs(configuration, workflowService.getWorkflow(workflowId)),
             configurationWorkflowOptional
                 .map(AutomationWorkflowProjectConfigurationWorkflow::getProvidedConnections)
                 .orElse(Map.of()),
             configurationWorkflowOptional
                 .map(AutomationWorkflowProjectConfigurationWorkflow::getProvidedInputs)
                 .orElse(Map.of()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.InputOption>
+        getConfigurationWorkflowInputOptions(
+            long configurationId, String workflowUuid, String inputName, String propertyName, long connectionId,
+            Map<String, ?> lookupDependsOnValues, @Nullable String searchText) {
+
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.getConfiguration(configurationId);
+
+        ProjectWorkflow projectWorkflow = getProjectWorkflow(configuration, workflowUuid);
+
+        Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+        WorkflowInput.ComponentInputReference componentInputReference = WorkflowInput.of(workflow)
+            .stream()
+            .filter(workflowInput -> Objects.equals(workflowInput.getName(), inputName))
+            .findFirst()
+            .map(AutomationWorkflowProjectConfigurationAdminFacadeImpl::getComponentInputReference)
+            .orElseThrow(() -> newInvalidProvidedValueException(
+                "Input %s of workflow uuid=%s does not reference a component input".formatted(
+                    inputName, workflowUuid)));
+
+        validateAdministratorConnection(configuration, componentInputReference.componentName(), connectionId);
+
+        Map<String, ?> dependsOnValues = lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues;
+
+        List<Option> options = componentDefinitionFacade.executeWorkflowInputOptions(
+            componentInputReference.componentName(), componentInputReference.componentVersion(),
+            componentInputReference.groupName(), propertyName, dependsOnValues,
+            List.copyOf(dependsOnValues.keySet()), searchText, connectionId);
+
+        return options.stream()
+            .map(option -> new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.InputOption(
+                option.getLabel(), String.valueOf(option.getValue()), option.getDescription()))
+            .toList();
     }
 
     @Override
@@ -426,13 +467,50 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .toList();
     }
 
-    private static List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input>
-        toInputDTOs(Workflow workflow) {
-        return workflow.getInputs()
-            .stream()
-            .map(input -> new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                input.name(), input.label(), input.type(), input.required()))
-            .toList();
+    private List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input> toInputDTOs(
+        AutomationWorkflowProjectConfiguration configuration, Workflow workflow) {
+
+        Map<String, List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection>> optionConnectionsByComponentName =
+            new HashMap<>();
+
+        List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input> inputs = new ArrayList<>();
+
+        for (WorkflowInput workflowInput : WorkflowInput.of(workflow)) {
+            WorkflowInput.ComponentInputReference componentInputReference = getComponentInputReference(workflowInput);
+
+            if (componentInputReference == null) {
+                inputs.add(
+                    new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                        workflowInput.getName(), workflowInput.getLabel(), workflowInput.getType(),
+                        workflowInput.isRequired()));
+
+                continue;
+            }
+
+            String componentName = componentInputReference.componentName();
+
+            List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection> optionConnections =
+                optionConnectionsByComponentName.computeIfAbsent(
+                    componentName, curComponentName -> getProvidableConnections(configuration, curComponentName));
+
+            inputs.add(
+                new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                    workflowInput.getName(), workflowInput.getLabel(), workflowInput.getType(),
+                    workflowInput.isRequired(), componentName, componentInputReference.componentVersion(),
+                    componentInputReference.groupName(), optionConnections));
+        }
+
+        return inputs;
+    }
+
+    private static WorkflowInput.@Nullable ComponentInputReference getComponentInputReference(
+        WorkflowInput workflowInput) {
+
+        try {
+            return workflowInput.getComponentInputReference();
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return null;
+        }
     }
 
     private static Set<String> getProvidedInputNames(Map<String, ?> providedInputs) {
@@ -684,34 +762,50 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
                     "Component %s has no connection id".formatted(componentName));
             }
 
-            Connection connection = connectionService.fetchConnection(connectionId)
-                .orElseThrow(() -> newInvalidProvidedValueException(
-                    "Connection id=%s for component %s does not exist".formatted(connectionId, componentName)));
+            validateAdministratorConnection(configuration, componentName, connectionId);
+        }
+    }
 
-            if (!Objects.equals(connection.getComponentName(), componentName)) {
-                throw newInvalidProvidedValueException(
-                    "Connection id=%s belongs to component %s, not %s".formatted(
-                        connectionId, connection.getComponentName(), componentName));
-            }
+    private ProjectWorkflow getProjectWorkflow(
+        AutomationWorkflowProjectConfiguration configuration, String workflowUuid) {
 
-            if (connection.getEnvironmentId() != configuration.getEnvironmentId()) {
-                throw newInvalidProvidedValueException(
-                    "Connection id=%s for component %s belongs to environment id=%s, not id=%s".formatted(
-                        connectionId, componentName, connection.getEnvironmentId(),
-                        configuration.getEnvironmentId()));
-            }
+        return projectWorkflowService
+            .fetchProjectWorkflow(configuration.getProjectId(), configuration.getProjectVersion(), workflowUuid)
+            .orElseThrow(() -> newInvalidProvidedValueException(
+                "Workflow uuid=%s is not part of version %d".formatted(
+                    workflowUuid, configuration.getProjectVersion())));
+    }
 
-            if (connection.getType() != PlatformType.EMBEDDED) {
-                throw newInvalidProvidedValueException(
-                    "Connection id=%s for component %s is not an embedded connection".formatted(
-                        connectionId, componentName));
-            }
+    private void validateAdministratorConnection(
+        AutomationWorkflowProjectConfiguration configuration, String componentName, long connectionId) {
 
-            if (connectedUserConnectionMembership.isOwnedByConnectedUser(connectionId)) {
-                throw newInvalidProvidedValueException(
-                    "Connection id=%s for component %s belongs to a connected user".formatted(
-                        connectionId, componentName));
-            }
+        Connection connection = connectionService.fetchConnection(connectionId)
+            .orElseThrow(() -> newInvalidProvidedValueException(
+                "Connection id=%s for component %s does not exist".formatted(connectionId, componentName)));
+
+        if (!Objects.equals(connection.getComponentName(), componentName)) {
+            throw newInvalidProvidedValueException(
+                "Connection id=%s belongs to component %s, not %s".formatted(
+                    connectionId, connection.getComponentName(), componentName));
+        }
+
+        if (connection.getEnvironmentId() != configuration.getEnvironmentId()) {
+            throw newInvalidProvidedValueException(
+                "Connection id=%s for component %s belongs to environment id=%s, not id=%s".formatted(
+                    connectionId, componentName, connection.getEnvironmentId(),
+                    configuration.getEnvironmentId()));
+        }
+
+        if (connection.getType() != PlatformType.EMBEDDED) {
+            throw newInvalidProvidedValueException(
+                "Connection id=%s for component %s is not an embedded connection".formatted(
+                    connectionId, componentName));
+        }
+
+        if (connectedUserConnectionMembership.isOwnedByConnectedUser(connectionId)) {
+            throw newInvalidProvidedValueException(
+                "Connection id=%s for component %s belongs to a connected user".formatted(
+                    connectionId, componentName));
         }
     }
 
