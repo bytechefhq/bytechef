@@ -20,16 +20,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * What a tool invocation ran.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T09:08:13.694310+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-02T21:09:06.459171+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public enum ToolInvocationKindModel {
   
   COMPONENT("COMPONENT"),
   
-  WORKFLOW("WORKFLOW"),
-  
-  CONTRIBUTED("CONTRIBUTED"),
-  
-  MANAGEMENT_TOOL("MANAGEMENT_TOOL");
+  WORKFLOW("WORKFLOW");
 
   private final String value;
 
