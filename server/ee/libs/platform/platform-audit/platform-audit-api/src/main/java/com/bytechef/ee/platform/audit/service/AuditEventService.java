@@ -28,5 +28,9 @@ public interface AuditEventService {
 
     void saveAll(List<PersistentAuditEvent> persistentAuditEvents);
 
+    default boolean savesWithinTheCallerTransaction() {
+        return true;
+    }
+
     void updateJobCreatedPlatform(long jobId, PlatformType platform, LocalDateTime since);
 }
