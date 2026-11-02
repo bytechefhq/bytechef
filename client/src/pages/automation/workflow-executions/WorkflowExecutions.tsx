@@ -161,7 +161,6 @@ export const WorkflowExecutions = () => {
             }
             header={
                 <Header
-                    centerTitle
                     className="3xl:w-full"
                     position="main"
                     right={
