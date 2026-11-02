@@ -1,3 +1,5 @@
+import type {ApprovalFormInputI} from '@/utils/approval-form';
+
 export interface AskUserQuestionOptionI {
     description: string;
     label: string;
@@ -20,7 +22,7 @@ export interface ApprovalRequestEventI {
     formDescription?: string;
     formTitle?: string;
     formUrl?: string;
-    inputs?: unknown[];
+    inputs?: ApprovalFormInputI[];
     resumeId: string;
     resumeUrl?: string;
 }

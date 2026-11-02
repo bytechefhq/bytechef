@@ -100,13 +100,30 @@ describe('AutomationChatProvider approvals', () => {
         expect(useChatStore.getState().pendingApproval?.resumeUrl).toBe('https://api.example.com/job/resume/abc');
     });
 
-    it('shows the approval as a message with the form link when it has inputs', () => {
+    it('keeps the form inputs on the pending approval so the card renders them', () => {
+        renderProvider();
+
+        const inputs = [{fieldName: 'amount', fieldType: 9}];
+
+        dispatchApprovalRequest({formTitle: 'Approve refund', inputs, resumeId: 'abc'});
+
+        expect(useChatStore.getState().pendingApproval).toEqual({
+            expiresAt: undefined,
+            formDescription: undefined,
+            formTitle: 'Approve refund',
+            inputs,
+            resumeUrl: 'https://bytechef.example.com/job/resume/abc',
+        });
+        expect(useChatStore.getState().messages).toEqual([]);
+    });
+
+    it('shows the approval as a message with the form link when a field cannot be rendered in the chat', () => {
         renderProvider();
 
         dispatchApprovalRequest({
             formTitle: 'Approve refund',
             formUrl: 'https://bytechef.example.com/resume/abc',
-            inputs: [{name: 'amount'}],
+            inputs: [{fieldName: 'receipt', fieldType: 4}],
             resumeId: 'abc',
         });
 

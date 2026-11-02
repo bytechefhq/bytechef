@@ -1,10 +1,12 @@
 import {ThreadMessageLike} from '@assistant-ui/react';
 import {create} from 'zustand';
+import type {ApprovalFormInputI} from '@/utils/approval-form';
 
 export interface PendingApprovalI {
     expiresAt?: string;
     formDescription?: string;
     formTitle?: string;
+    inputs?: ApprovalFormInputI[];
     resumeUrl: string;
 }
 

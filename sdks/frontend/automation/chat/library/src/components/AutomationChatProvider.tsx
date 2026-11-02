@@ -18,6 +18,7 @@ import {ApprovalResolutionContext} from '@/components/approvalResolutionContext'
 import {useSSE} from '@/hooks/useSSE';
 import {extractStreamChunk} from '@/utils/stream-utils';
 import {drainSseResponse} from '@/utils/sse-parser';
+import {canRenderApprovalFormInChat} from '@/utils/approval-form';
 import {
     ApprovalRequestEventI,
     AskUserQuestionEventI,
@@ -160,14 +161,15 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
 
             const event = data as ApprovalRequestEventI;
 
-            const hasInputs = Array.isArray(event.inputs) && event.inputs.length > 0;
+            const inputs = Array.isArray(event.inputs) ? event.inputs : [];
             const approvalResumeUrl = getApprovalResumeUrl(event, webhookUrl);
 
-            if (!hasInputs && approvalResumeUrl) {
+            if (approvalResumeUrl && canRenderApprovalFormInChat(inputs)) {
                 useChatStore.getState().setPendingApproval({
                     expiresAt: event.expiresAt,
                     formDescription: event.formDescription,
                     formTitle: event.formTitle,
+                    inputs: inputs.length > 0 ? inputs : undefined,
                     resumeUrl: approvalResumeUrl,
                 });
             } else {
