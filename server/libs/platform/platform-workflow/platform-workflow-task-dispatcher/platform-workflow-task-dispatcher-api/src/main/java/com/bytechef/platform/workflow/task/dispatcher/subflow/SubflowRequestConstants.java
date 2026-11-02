@@ -23,15 +23,15 @@ import java.util.List;
  */
 public final class SubflowRequestConstants {
 
-    public static final String PENDING_SUBFLOW = "__bytechef_pending_subflow__";
+    public static final String PENDING_SUBFLOW = "__BYTECHEF_PENDING_SUBFLOW__";
 
-    public static final String AGENT_JOB_ID = "__bytechef_agent_job_id__";
+    public static final String AGENT_JOB_ID = "__BYTECHEF_AGENT_JOB_ID__";
 
-    public static final String AGENT_JOB_RESUME_ID = "__bytechef_agent_job_resume_id__";
+    public static final String AGENT_JOB_RESUME_ID = "__BYTECHEF_AGENT_JOB_RESUME_ID__";
 
-    public static final String LAUNCHED_SUBFLOW_RESUME_ID = "__bytechef_launched_subflow_resume_id__";
+    public static final String LAUNCHED_SUBFLOW_RESUME_ID = "__BYTECHEF_LAUNCHED_SUBFLOW_RESUME_ID__";
 
-    public static final String SUBFLOW_DEPTH = "__bytechef_subflow_depth__";
+    public static final String SUBFLOW_DEPTH = "__BYTECHEF_SUBFLOW_DEPTH__";
 
     public static final List<String> AGENT_LINK_KEYS = List.of(
         AGENT_JOB_ID, AGENT_JOB_RESUME_ID, LAUNCHED_SUBFLOW_RESUME_ID);

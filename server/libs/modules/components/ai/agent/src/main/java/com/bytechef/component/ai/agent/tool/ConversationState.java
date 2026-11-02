@@ -47,7 +47,7 @@ public record ConversationState(@Nullable Integer version, List<Entry> messages)
 
     private static final Logger log = LoggerFactory.getLogger(ConversationState.class);
 
-    private static final String BYTES_KEY = "__bytechef_bytes__";
+    private static final String BYTES_KEY = "__BYTECHEF_BYTES__";
 
     public ConversationState {
         if (version == null) {

@@ -34,7 +34,7 @@ public record AgentToolSuspension(
     ConversationState conversation, String pendingToolCallId, String suspendedToolResult,
     @Nullable String suspendedClusterElementCallId, @Nullable String suspendedClusterElementWorkflowNodeName) {
 
-    public static final String CONTINUE_PARAMETER_KEY = "__bytechef_agent_tool_suspension__";
+    public static final String CONTINUE_PARAMETER_KEY = "__BYTECHEF_AGENT_TOOL_SUSPENSION__";
 
     public AgentToolSuspension {
         Objects.requireNonNull(conversation, "The stored agent tool suspension has no conversation");

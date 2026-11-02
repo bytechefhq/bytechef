@@ -23,7 +23,7 @@ public class MetadataConstants {
 
     public static final String APPROVAL_FORM_PARAMETERS = "approvalFormParameters";
     public static final String APPROVAL_RAISED_AT = "approvalRaisedAt";
-    public static final String APPROVAL_RESUME = "__bytechef_approval_resume__";
+    public static final String APPROVAL_RESUME = "__BYTECHEF_APPROVAL_RESUME__";
     public static final String CALLABLE_RESPONSE = "__callableResponse";
     public static final String CANCELLED_JOB_RESUME_ID = "cancelledJobResumeId";
     public static final String CONNECTION_IDS = "connectionIds";
@@ -38,12 +38,12 @@ public class MetadataConstants {
     public static final String JOB_RESUME_ID = "jobResumeId";
     public static final String LAST_RESUMED_TASK_EXECUTION_ID = "lastResumedTaskExecutionId";
     public static final String RESUME_DATA = "__resumeData";
-    public static final String STREAMING_RESUME = "__bytechef_streaming_resume__";
+    public static final String STREAMING_RESUME = "__BYTECHEF_STREAMING_RESUME__";
 
-    public static final String STREAMED_EXECUTION = "__bytechef_streamed_execution__";
-    public static final String SUBFLOW_RESUME = "__bytechef_subflow_resume__";
+    public static final String STREAMED_EXECUTION = "__BYTECHEF_STREAMED_EXECUTION__";
+    public static final String SUBFLOW_RESUME = "__BYTECHEF_SUBFLOW_RESUME__";
     public static final String SUSPEND = "suspend";
-    public static final String SYNC_EXECUTION = "__bytechef_sync_execution__";
+    public static final String SYNC_EXECUTION = "__BYTECHEF_SYNC_EXECUTION__";
     public static final String TASK_EXECUTION_RESUME_ID = "taskExecutionResumeId";
     public static final String TYPE = "type";
     public static final String WORKFLOW_ID = "workflowId";
