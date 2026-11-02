@@ -1008,7 +1008,8 @@ class Oauth2AuthorizationServerConfigurationIntTest {
     @SpringBootTest(
         classes = Consent.ConsentTestConfiguration.class,
         properties = {
-            "bytechef.oauth2.authorization-server.enabled=true", "bytechef.edition=ee", "spring.liquibase.contexts=mono"
+            "bytechef.oauth2.authorization-server.enabled=true", "bytechef.edition=ee",
+            "bytechef.public-url=https://bytechef.example.test/", "spring.liquibase.contexts=mono"
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
     @Import({
@@ -1078,7 +1079,7 @@ class Oauth2AuthorizationServerConfigurationIntTest {
 
                 String location = requestConsentPage(httpClient, sessionCookie);
 
-                assertThat(location).contains("/oauth2/consent?");
+                assertThat(location).startsWith("https://bytechef.example.test/oauth2/consent?");
                 assertThat(extractQueryParameter(location, "client_id")).isEqualTo(CLIENT_ID);
                 assertThat(extractQueryParameter(location, "scope"))
                     .isEqualTo(AUTOMATION_SCOPE + " " + MANAGEMENT_SCOPE);
