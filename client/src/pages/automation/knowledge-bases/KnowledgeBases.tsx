@@ -11,6 +11,7 @@ import useKnowledgeBases from '@/pages/automation/knowledge-bases/components/hoo
 import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import StorageUsageBanner from '@/shared/components/StorageUsageBanner';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -18,7 +19,7 @@ import {useKnowledgeBaseStorageUsageQuery} from '@/shared/middleware/graphql';
 import {DatabaseIcon} from 'lucide-react';
 
 const KnowledgeBases = () => {
-    const currentWorkspaceId = String(useWorkspaceStore((state) => state.currentWorkspaceId));
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {allTags, error, filteredKnowledgeBases, isLoading, knowledgeBases, tagId, tagsByKnowledgeBaseData} =
         useKnowledgeBases();
@@ -28,6 +29,7 @@ const KnowledgeBases = () => {
     const {data: storageUsageData} = useKnowledgeBaseStorageUsageQuery();
 
     const initialLoadComplete = useInitialLoadComplete(isLoading || embeddingActiveLoading);
+    const canCreateKnowledgeBase = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_CREATE');
 
     const showKnowledgeBases = embeddingActive && knowledgeBases.length > 0;
 
@@ -46,10 +48,11 @@ const KnowledgeBases = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        showKnowledgeBases && (
+                        showKnowledgeBases &&
+                        canCreateKnowledgeBase && (
                             <CreateKnowledgeBaseDialog
                                 trigger={<Button>New Knowledge Base</Button>}
-                                workspaceId={currentWorkspaceId}
+                                workspaceId={String(currentWorkspaceId)}
                             />
                         )
                     }
@@ -72,7 +75,11 @@ const KnowledgeBases = () => {
         >
             <PageLoader errors={[error]} loading={isLoading || embeddingActiveLoading}>
                 {isFirstRun ? (
-                    <KnowledgeBasesEmptyState embeddingActive={embeddingActive} workspaceId={currentWorkspaceId} />
+                    <KnowledgeBasesEmptyState
+                        canCreateKnowledgeBase={canCreateKnowledgeBase}
+                        embeddingActive={embeddingActive}
+                        workspaceId={String(currentWorkspaceId)}
+                    />
                 ) : !embeddingActive ? (
                     <KnowledgeBaseEmbeddingInactiveEmptyState />
                 ) : (

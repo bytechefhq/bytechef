@@ -2,6 +2,8 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import KnowledgeBaseSearchInterface from '@/pages/automation/knowledge-base/components/KnowledgeBaseSearchInterface';
 import UploadKnowledgeBaseDocumentDialog from '@/pages/automation/knowledge-base/components/UploadKnowledgeBaseDocumentDialog';
 import KnowledgeBaseDocumentList from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentList';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
 import {FileTextIcon, SearchIcon} from 'lucide-react';
 
@@ -11,6 +13,10 @@ interface KnowledgeBaseTabsProps {
 }
 
 const KnowledgeBaseTabs = ({documents, knowledgeBaseId}: KnowledgeBaseTabsProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditKnowledgeBase = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_EDIT');
+
     return (
         <Tabs className="flex-1" defaultValue="documents">
             <div className="mb-4 flex items-center justify-between">
@@ -26,7 +32,7 @@ const KnowledgeBaseTabs = ({documents, knowledgeBaseId}: KnowledgeBaseTabsProps)
                     </TabsTrigger>
                 </TabsList>
 
-                <UploadKnowledgeBaseDocumentDialog knowledgeBaseId={knowledgeBaseId} />
+                {canEditKnowledgeBase && <UploadKnowledgeBaseDocumentDialog knowledgeBaseId={knowledgeBaseId} />}
             </div>
 
             <TabsContent className="flex-1" value="documents">
