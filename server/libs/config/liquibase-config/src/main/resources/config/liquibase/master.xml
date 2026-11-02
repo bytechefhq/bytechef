@@ -70,5 +70,5 @@
     <includeAll path="classpath:config/liquibase/changelog/quartz/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler" />
 
     <!-- scheduler lock -->
-    <includeAll path="classpath:config/liquibase/changelog/scheduler/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler" />
+    <includeAll path="classpath:config/liquibase/changelog/scheduler/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler or configuration" />
 </databaseChangeLog>
