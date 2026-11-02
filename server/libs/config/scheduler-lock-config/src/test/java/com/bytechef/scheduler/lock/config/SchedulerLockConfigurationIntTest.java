@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.scheduler.config;
+package com.bytechef.scheduler.lock.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
