@@ -3,6 +3,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBaseDocumentChunkListSelectionBar from '../KnowledgeBaseDocumentChunkListSelectionBar';
 
+const hoistedScope = vi.hoisted(() => ({canEditKnowledgeBase: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoistedScope.canEditKnowledgeBase,
+}));
+
 const hoisted = vi.hoisted(() => {
     return {
         handleClearSelection: vi.fn(),
@@ -23,6 +29,8 @@ const defaultMockReturn = {
 };
 
 beforeEach(() => {
+    hoistedScope.canEditKnowledgeBase = true;
+
     windowResizeObserver();
     hoisted.mockUseKnowledgeBaseDocumentChunkListSelectionBar.mockReturnValue({...defaultMockReturn});
 });
@@ -81,6 +89,15 @@ describe('KnowledgeBaseDocumentChunkListSelectionBar', () => {
         renderComponent();
 
         expect(screen.getByRole('button', {name: /Delete Selected/})).toBeInTheDocument();
+    });
+
+    it('hides Delete Selected button without KNOWLEDGE_BASE_EDIT', () => {
+        hoistedScope.canEditKnowledgeBase = false;
+
+        renderComponent();
+
+        expect(screen.queryByRole('button', {name: /Delete Selected/})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Clear Selection'})).toBeInTheDocument();
     });
 
     it('renders Clear Selection button', () => {
