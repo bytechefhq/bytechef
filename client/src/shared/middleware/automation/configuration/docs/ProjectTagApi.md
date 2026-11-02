@@ -4,7 +4,7 @@ All URIs are relative to */api/automation/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**getProjectTags**](ProjectTagApi.md#getprojecttags) | **GET** /workspaces/{id}/project-tags | Get project tags for a workspace. |
+| [**getProjectTags**](ProjectTagApi.md#getprojecttags) | **GET** /workspaces/{id}/project-tags | Get project tags. |
 | [**updateProjectTags**](ProjectTagApi.md#updateprojecttags) | **PUT** /projects/{id}/tags | Updates tags of an existing project. |
 
 

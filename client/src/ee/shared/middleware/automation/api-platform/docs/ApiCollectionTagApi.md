@@ -4,18 +4,18 @@ All URIs are relative to */api/automation/api-platform/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**getApiCollectionTags**](ApiCollectionTagApi.md#getapicollectiontags) | **GET** /api-collections/tags | Get API collection tags |
+| [**getApiCollectionTags**](ApiCollectionTagApi.md#getapicollectiontags) | **GET** /workspaces/{id}/api-collection-tags | Get API collection tags |
 | [**updateApiCollectionTags**](ApiCollectionTagApi.md#updateapicollectiontags) | **PUT** /api-collections/{id}/tags | Updates tags of an existing API collection |
 
 
 
 ## getApiCollectionTags
 
-> Array&lt;Tag&gt; getApiCollectionTags()
+> Array&lt;Tag&gt; getApiCollectionTags(id)
 
 Get API collection tags
 
-Get API collection tags.
+Get API collection tags for a workspace.
 
 ### Example
 
@@ -30,8 +30,13 @@ async function example() {
   console.log("🚀 Testing  SDK...");
   const api = new ApiCollectionTagApi();
 
+  const body = {
+    // number | The id of a workspace.
+    id: 789,
+  } satisfies GetApiCollectionTagsRequest;
+
   try {
-    const data = await api.getApiCollectionTags();
+    const data = await api.getApiCollectionTags(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -44,7 +49,10 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a workspace. | [Defaults to `undefined`] |
 
 ### Return type
 

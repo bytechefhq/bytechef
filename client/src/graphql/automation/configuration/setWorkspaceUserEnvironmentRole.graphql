@@ -1,0 +1,21 @@
+mutation SetWorkspaceUserEnvironmentRole(
+    $workspaceId: ID!
+    $userId: ID!
+    $environment: EnvironmentEnum!
+    $role: WorkspaceRole
+    $customRoleId: ID
+) {
+    setWorkspaceUserEnvironmentRole(
+        workspaceId: $workspaceId
+        userId: $userId
+        environment: $environment
+        role: $role
+        customRoleId: $customRoleId
+    ) {
+        id
+        userId
+        workspaceRole
+        customRoleId
+        environment
+    }
+}
