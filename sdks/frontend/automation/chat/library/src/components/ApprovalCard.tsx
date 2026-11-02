@@ -9,7 +9,7 @@ import {
     validateApprovalForm,
 } from '@/utils/approval-form';
 import type {ApprovalFormValuesType} from '@/utils/approval-form';
-import {isAcceptedResumeResponse} from '@/utils/approval-utils';
+import {ApprovalResumeError, isAcceptedResumeResponse, toApprovalResumeError} from '@/utils/approval-utils';
 import {Button} from './ui/button';
 
 export const ApprovalCard: FC = () => {
@@ -31,6 +31,7 @@ const ApprovalCardContent: FC<{pendingApproval: PendingApprovalI}> = ({pendingAp
     const inputs = pendingApproval.inputs ?? [];
 
     const [comment, setComment] = useState('');
+    const [editedFieldNames, setEditedFieldNames] = useState<ReadonlySet<string>>(() => new Set());
     const [error, setError] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [submitting, setSubmitting] = useState(false);
@@ -53,7 +54,7 @@ const ApprovalCardContent: FC<{pendingApproval: PendingApprovalI}> = ({pendingAp
         setSubmitting(true);
         setError(null);
 
-        const body: Record<string, unknown> = {...toApprovalFormData(inputs, values), approved};
+        const body: Record<string, unknown> = {...toApprovalFormData(inputs, values, editedFieldNames), approved};
         const trimmedComment = comment.trim();
 
         if (trimmedComment && showCommentField) {
@@ -76,7 +77,7 @@ const ApprovalCardContent: FC<{pendingApproval: PendingApprovalI}> = ({pendingAp
             });
 
             if (!isAcceptedResumeResponse(response)) {
-                throw new Error(`Resume request was not accepted (status ${response.status})`);
+                throw await toApprovalResumeError(response);
             }
 
             setPendingApproval(null);
@@ -88,7 +89,9 @@ const ApprovalCardContent: FC<{pendingApproval: PendingApprovalI}> = ({pendingAp
         } catch (resolveError) {
             console.error('Failed to resolve approval:', resolveError);
 
-            setError('Failed to submit your decision. Please try again.');
+            const userMessage = resolveError instanceof ApprovalResumeError ? resolveError.userMessage : null;
+
+            setError(userMessage ?? 'Failed to submit your decision. Please try again.');
         } finally {
             setSubmitting(false);
         }
@@ -117,7 +120,10 @@ const ApprovalCardContent: FC<{pendingApproval: PendingApprovalI}> = ({pendingAp
                         error={fieldErrors[fieldName]}
                         input={input}
                         key={fieldName}
-                        onChange={(value) => setValues((currentValues) => ({...currentValues, [fieldName]: value}))}
+                        onChange={(value) => {
+                            setValues((currentValues) => ({...currentValues, [fieldName]: value}));
+                            setEditedFieldNames((currentFieldNames) => new Set(currentFieldNames).add(fieldName));
+                        }}
                         value={values[fieldName]}
                     />
                 );

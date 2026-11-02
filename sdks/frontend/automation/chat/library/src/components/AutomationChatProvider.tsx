@@ -26,6 +26,7 @@ import {
     formatAskUserQuestion,
     getApprovalResumeUrl,
     isAcceptedResumeResponse,
+    toApprovalResumeError,
     isEventStreamResponse,
 } from '@/utils/approval-utils';
 import {AutomationChatContext} from '@/hooks/useAutomationChatConfig';
@@ -203,7 +204,7 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
             });
 
             if (!isAcceptedResumeResponse(response)) {
-                throw new Error(`Resume request was not accepted (status ${response.status})`);
+                throw await toApprovalResumeError(response);
             }
 
             const resolvedTitle = pendingApproval.formTitle || 'Approval requested';

@@ -134,6 +134,67 @@ describe('ApprovalCard with form inputs', () => {
         });
     });
 
+    it('does not submit an approval with an invalid email address', () => {
+        useChatStore.setState({
+            pendingApproval: {
+                ...FORM_APPROVAL,
+                inputs: [{fieldLabel: 'Approver', fieldName: 'approver', fieldType: 8}],
+            },
+        });
+
+        render(<ApprovalCard />);
+
+        fireEvent.change(screen.getByLabelText(/Approver/), {target: {value: 'not an email'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Approve'}));
+
+        expect(screen.getByText('Enter an email address')).toBeInTheDocument();
+        expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('shows the field error the server returns', async () => {
+        fetchSpy.mockResolvedValue(
+            new Response(JSON.stringify({detail: "'Amount' must be at most 100"}), {
+                headers: {'Content-Type': 'application/problem+json'},
+                status: 400,
+            })
+        );
+
+        render(<ApprovalCard />);
+
+        fireEvent.change(screen.getByLabelText(/Amount/), {target: {value: '250'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Approve'}));
+
+        expect(await screen.findByRole('alert')).toHaveTextContent("'Amount' must be at most 100");
+        expect(useChatStore.getState().pendingApproval).not.toBeNull();
+    });
+
+    it('posts an untouched date default exactly as defined', async () => {
+        useChatStore.setState({
+            pendingApproval: {
+                ...FORM_APPROVAL,
+                inputs: [
+                    {
+                        defaultValue: '2026-11-02T09:30:45Z',
+                        fieldLabel: 'Start',
+                        fieldName: 'startAt',
+                        fieldType: 3,
+                    },
+                ],
+            },
+        });
+
+        render(<ApprovalCard />);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Approve'}));
+
+        await waitFor(() => expect(useChatStore.getState().pendingApproval).toBeNull());
+
+        expect(JSON.parse(fetchSpy.mock.calls[0][1]!.body as string)).toEqual({
+            approved: true,
+            startAt: '2026-11-02T09:30:45Z',
+        });
+    });
+
     it('hides the comment box when the form defines its own comment field', () => {
         useChatStore.setState({
             pendingApproval: {

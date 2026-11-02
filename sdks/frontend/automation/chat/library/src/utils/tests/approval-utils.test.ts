@@ -1,11 +1,13 @@
 import {describe, expect, it} from 'vitest';
 
 import {
+    ApprovalResumeError,
     formatApprovalRequest,
     formatAskUserQuestion,
     getApprovalResumeUrl,
     isAcceptedResumeResponse,
     isEventStreamResponse,
+    toApprovalResumeError,
 } from '@/utils/approval-utils';
 
 describe('getApprovalResumeUrl', () => {
@@ -135,5 +137,40 @@ describe('formatAskUserQuestion', () => {
                 ],
             })
         ).toBe('**Color**: Which color?\n  1. **Blue** — A calm color\n  2. **Red** — A warm color\n\nAnything else?');
+    });
+});
+
+describe('toApprovalResumeError', () => {
+    it('uses the problem detail of a 400 response', async () => {
+        const response = new Response(JSON.stringify({detail: "'Approver' must be an email address"}), {
+            headers: {'Content-Type': 'application/problem+json'},
+            status: 400,
+        });
+
+        const error = await toApprovalResumeError(response);
+
+        expect(error).toBeInstanceOf(ApprovalResumeError);
+        expect(error.userMessage).toBe("'Approver' must be an email address");
+        expect(error.message).toContain('status 400');
+    });
+
+    it('has no user message for a 400 response without a problem detail', async () => {
+        const error = await toApprovalResumeError(new Response('<html></html>', {status: 400}));
+
+        expect(error.userMessage).toBeNull();
+    });
+
+    it('explains expired, not yet suspended and failed runs', async () => {
+        expect((await toApprovalResumeError(new Response(null, {status: 410}))).userMessage).toContain('expired');
+        expect((await toApprovalResumeError(new Response(null, {status: 409}))).userMessage).toContain(
+            'Still preparing'
+        );
+        expect((await toApprovalResumeError(new Response(null, {status: 422}))).userMessage).toContain(
+            'workflow failed'
+        );
+    });
+
+    it('has no user message for other statuses', async () => {
+        expect((await toApprovalResumeError(new Response(null, {status: 500}))).userMessage).toBeNull();
     });
 });
