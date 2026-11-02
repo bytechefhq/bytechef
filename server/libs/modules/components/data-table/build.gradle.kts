@@ -2,6 +2,7 @@ version="1.0"
 
 dependencies {
     implementation("org.springframework:spring-context")
+    implementation("org.apache.commons:commons-lang3")
     implementation(project(":sdks:backend:java:component-api"))
     implementation(project(":server:libs:platform:platform-data-table:platform-data-table-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
