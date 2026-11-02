@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.ai.auto.memory.facade;
 
+import com.bytechef.automation.ai.auto.memory.audit.AiAutoMemoryAuditEvents;
 import com.bytechef.automation.ai.auto.memory.domain.AiAutoMemoryPrincipal;
 import com.bytechef.automation.ai.auto.memory.domain.AiAutoMemoryPrincipalKey;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
@@ -32,6 +33,8 @@ import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalCount;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryType;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -75,6 +78,13 @@ public class AiAutoMemoryFacadeImpl implements AiAutoMemoryFacade {
     }
 
     @Override
+    @Audited(event = AiAutoMemoryAuditEvents.AI_AUTO_MEMORY_DELETED, data = {
+        @AuditData(key = "aiAutoMemoryId", value = "#id"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "environment", value = "#environment"),
+        @AuditData(key = "principalType", value = "#principalKey?.principalType"),
+        @AuditData(key = "principalId", value = "#principalKey?.principalId")
+    })
     @PreAuthorize("isAuthenticated()")
     public void deleteAiAutoMemory(
         long workspaceId, Environment environment, long id, @Nullable AiAutoMemoryPrincipalKey principalKey) {
@@ -176,6 +186,13 @@ public class AiAutoMemoryFacadeImpl implements AiAutoMemoryFacade {
     }
 
     @Override
+    @Audited(event = AiAutoMemoryAuditEvents.AI_AUTO_MEMORY_UPDATED, data = {
+        @AuditData(key = "aiAutoMemoryId", value = "#id"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "environment", value = "#environment"),
+        @AuditData(key = "principalType", value = "#principalKey?.principalType"),
+        @AuditData(key = "principalId", value = "#principalKey?.principalId")
+    })
     @PreAuthorize("isAuthenticated()")
     public AiAutoMemory updateAiAutoMemory(
         long workspaceId, Environment environment, long id, long expectedVersion, AiAutoMemoryPatch patch,
