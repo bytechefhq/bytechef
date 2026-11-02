@@ -27,6 +27,9 @@ export interface ApplicationInfoI {
     application: {
         edition: EditionType;
     } | null;
+    audit: {
+        enabled: boolean;
+    };
     billing: {
         customerPortalUrl: string | undefined;
         enabled: boolean;
@@ -101,6 +104,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     },
                 },
                 application: null,
+                audit: {
+                    enabled: false,
+                },
                 billing: {
                     customerPortalUrl: undefined,
                     enabled: false,
@@ -144,6 +150,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 postHog: json.analytics.postHog,
                             },
                             application: json.application,
+                            audit: {
+                                enabled: json.audit?.enabled === 'true',
+                            },
                             billing: {
                                 customerPortalUrl: json.billing?.customerPortalUrl || undefined,
                                 enabled: json.billing?.enabled === 'true',
