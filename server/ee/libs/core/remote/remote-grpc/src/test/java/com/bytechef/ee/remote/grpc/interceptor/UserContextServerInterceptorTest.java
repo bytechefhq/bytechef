@@ -13,6 +13,8 @@ import com.bytechef.ee.remote.grpc.EchoService;
 import com.bytechef.ee.remote.grpc.InProcessGrpc;
 import com.bytechef.ee.remote.grpc.security.RemoteApiKeyAuthenticationToken;
 import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -135,11 +137,36 @@ class UserContextServerInterceptorTest {
         SecurityContextHolder.getContext()
             .setAuthentication(
                 new RemoteApiKeyAuthenticationToken(
-                    1L, new User("api@localhost.com", "", List.of(new SimpleGrantedAuthority("ROLE_USER")))));
+                    1L, new User("api@localhost.com", "", List.of(new SimpleGrantedAuthority("ROLE_USER"))),
+                    CredentialType.AUTOMATION_API_KEY, PlatformType.AUTOMATION));
 
         try (InProcessGrpc inProcessGrpc = start()) {
             assertThat(EchoService.echoPrincipal(inProcessGrpc.channel()))
-                .isEqualTo("api-key|api@localhost.com|1|ROLE_USER");
+                .isEqualTo("api-key|api@localhost.com|1|AUTOMATION_API_KEY|AUTOMATION|ROLE_USER");
+        }
+    }
+
+    @Test
+    void testApiKeyUserWithoutAPlatformKeepsItsCredentialType() throws Exception {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new RemoteApiKeyAuthenticationToken(
+                    1L, new User("api@localhost.com", "", List.of()), CredentialType.PLATFORM_API_KEY, null));
+
+        try (InProcessGrpc inProcessGrpc = start()) {
+            assertThat(EchoService.echoPrincipal(inProcessGrpc.channel()))
+                .isEqualTo("api-key|api@localhost.com|1|PLATFORM_API_KEY|null|");
+        }
+    }
+
+    @Test
+    void testApiKeyUserWithoutACredentialTypeBindsNoIdentity() throws Exception {
+        try (InProcessGrpc inProcessGrpc = start(metadata -> {
+            metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, "api-key");
+            metadata.put(GrpcMetadataKeys.USER_LOGIN, "admin@localhost.com".getBytes(StandardCharsets.UTF_8));
+            metadata.put(GrpcMetadataKeys.ENVIRONMENT_ID, "1");
+        })) {
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
         }
     }
 

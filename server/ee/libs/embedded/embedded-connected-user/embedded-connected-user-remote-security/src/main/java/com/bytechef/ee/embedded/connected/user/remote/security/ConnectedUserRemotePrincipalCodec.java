@@ -9,7 +9,9 @@ package com.bytechef.ee.embedded.connected.user.remote.security;
 
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.ee.remote.grpc.interceptor.GrpcMetadataKeys;
+import com.bytechef.ee.remote.grpc.security.RemoteCredentialMetadata;
 import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import io.grpc.Metadata;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -66,16 +68,18 @@ public class ConnectedUserRemotePrincipalCodec implements RemotePrincipalCodec {
     public @Nullable Authentication decode(String login, Metadata metadata) {
         String apiKeyAuthenticated = metadata.get(API_KEY_AUTHENTICATED);
         Long connectedUserId = parseLong(metadata.get(CONNECTED_USER_ID));
+        CredentialType credentialType = RemoteCredentialMetadata.getCredentialType(metadata);
         Long environmentId = parseLong(metadata.get(GrpcMetadataKeys.ENVIRONMENT_ID));
 
-        if (connectedUserId == null || environmentId == null ||
+        if (connectedUserId == null || credentialType == null || environmentId == null ||
             !("true".equals(apiKeyAuthenticated) || "false".equals(apiKeyAuthenticated))) {
 
             return null;
         }
 
         return new RemoteConnectedUserAuthenticationToken(
-            environmentId, connectedUserId, new User(login, "", List.of()), Boolean.parseBoolean(apiKeyAuthenticated));
+            environmentId, connectedUserId, new User(login, "", List.of()), Boolean.parseBoolean(apiKeyAuthenticated),
+            credentialType, RemoteCredentialMetadata.getPlatformType(metadata));
     }
 
     private static @Nullable Long parseLong(@Nullable String value) {

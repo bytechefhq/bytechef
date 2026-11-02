@@ -8,8 +8,10 @@
 package com.bytechef.ee.remote.grpc.interceptor;
 
 import com.bytechef.ee.remote.grpc.security.RemoteApiKeyAuthenticationToken;
+import com.bytechef.ee.remote.grpc.security.RemoteCredentialMetadata;
 import com.bytechef.ee.remote.grpc.security.RemoteExternalIssuerAuthenticationToken;
 import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import io.grpc.ForwardingServerCallListener;
 import io.grpc.Metadata;
 import io.grpc.ServerCall;
@@ -119,13 +121,16 @@ public class UserContextServerInterceptor implements ServerInterceptor {
     private static Authentication toApiKeyAuthentication(
         String login, List<GrantedAuthority> authorities, Metadata metadata) {
 
+        CredentialType credentialType = RemoteCredentialMetadata.getCredentialType(metadata);
         Long environmentId = parseLong(metadata.get(GrpcMetadataKeys.ENVIRONMENT_ID));
 
-        if (environmentId == null) {
+        if (credentialType == null || environmentId == null) {
             return null;
         }
 
-        return new RemoteApiKeyAuthenticationToken(environmentId, new User(login, "", authorities));
+        return new RemoteApiKeyAuthenticationToken(
+            environmentId, new User(login, "", authorities), credentialType,
+            RemoteCredentialMetadata.getPlatformType(metadata));
     }
 
     private static Long parseLong(String value) {
