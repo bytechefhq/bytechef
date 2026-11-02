@@ -24,11 +24,13 @@ import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.notification.delivery.WebhookDelivery;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Arik Cohen
@@ -40,12 +42,14 @@ public class WebhookTaskStartedApplicationEventListener implements ApplicationEv
     private static final Logger log = LoggerFactory.getLogger(WebhookTaskStartedApplicationEventListener.class);
 
     private final JobService jobService;
-
-    private final RestTemplate rest = new RestTemplate();
+    private final WebhookDeliveryService webhookDeliveryService;
 
     @SuppressFBWarnings("EI2")
-    public WebhookTaskStartedApplicationEventListener(JobService jobService) {
+    public WebhookTaskStartedApplicationEventListener(
+        JobService jobService, WebhookDeliveryService webhookDeliveryService) {
+
         this.jobService = jobService;
+        this.webhookDeliveryService = webhookDeliveryService;
     }
 
     @Override
@@ -67,10 +71,20 @@ public class WebhookTaskStartedApplicationEventListener implements ApplicationEv
 
                     webhookEvent.put(WorkflowConstants.EVENT, taskStartedApplicationEvent);
 
-                    rest.postForObject(webhook.url(), webhookEvent, String.class);
+                    WebhookDelivery webhookDelivery = WebhookDelivery.builder("job_status", webhook.url())
+                        .description("job " + jobId + " task started webhook")
+                        .validateUrl(false)
+                        .payload(
+                            jobId + "/" + taskStartedApplicationEvent.getTaskExecutionId(),
+                            JsonUtils.write(webhookEvent))
+                        .retry(JobWebhookRetries.toWebhookRetry(webhook))
+                        .build();
+
+                    webhookDeliveryService.submit(webhookDelivery);
 
                     if (log.isDebugEnabled()) {
-                        log.debug("Webhook url={}, type='{}' called", webhook.url(), webhook.type());
+                        log.debug(
+                            "Job id={} task started webhook to host {} submitted", jobId, webhookDelivery.host());
                     }
                 }
             }

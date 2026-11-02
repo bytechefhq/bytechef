@@ -21,15 +21,11 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.core.retry.RetryException;
-import org.springframework.core.retry.RetryPolicy;
-import org.springframework.core.retry.RetryTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -84,13 +80,6 @@ public class WebhookNotificationClient {
                     clientHttpResponse.getHeaders(), null, null);
             }
         });
-    }
-
-    public record WebhookRetry(int maxRetries, Duration initialInterval, double multiplier) {
-
-        public static WebhookRetry none() {
-            return new WebhookRetry(0, Duration.ofSeconds(2), 2.0);
-        }
     }
 
     public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
@@ -159,45 +148,6 @@ public class WebhookNotificationClient {
         }
 
         return uri;
-    }
-
-    public void deliverEvent(String url, Object payload, WebhookRetry webhookRetry) {
-        postWithRetry(url, new HttpEntity<>(payload), webhookRetry);
-    }
-
-    private void postWithRetry(String url, HttpEntity<?> httpEntity, WebhookRetry webhookRetry) {
-        try {
-            if (webhookRetry.maxRetries() <= 0) {
-                exchange(url, httpEntity);
-            } else {
-                RetryTemplate retryTemplate = new RetryTemplate(
-                    RetryPolicy.builder()
-                        .maxRetries(webhookRetry.maxRetries())
-                        .delay(webhookRetry.initialInterval())
-                        .multiplier(webhookRetry.multiplier())
-                        .build());
-
-                retryTemplate.execute(() -> {
-                    exchange(url, httpEntity);
-
-                    return null;
-                });
-            }
-        } catch (RetryException retryException) {
-            throw new WebhookDeliveryException("Webhook delivery to " + url + " failed after retries", retryException);
-        } catch (RestClientResponseException restClientResponseException) {
-            throw new WebhookDeliveryException(
-                "Webhook delivery to " + url + " returned HTTP " + restClientResponseException.getStatusCode()
-                    .value(),
-                restClientResponseException.getStatusCode()
-                    .value());
-        } catch (RestClientException restClientException) {
-            throw new WebhookDeliveryException("Failed to deliver webhook to " + url, restClientException);
-        }
-    }
-
-    private void exchange(String url, HttpEntity<?> httpEntity) {
-        restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
     }
 
     static String sign(String secret, String signedContent) {

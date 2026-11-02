@@ -32,7 +32,7 @@ import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
 import com.bytechef.platform.coordinator.monitor.ApprovalExpiryMonitor;
 import com.bytechef.platform.coordinator.monitor.ApprovalNotificationMonitor;
 import com.bytechef.platform.data.storage.DataStorage;
-import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
@@ -86,14 +86,16 @@ public class PlatformCoordinatorConfiguration {
 
     @Bean
     WebhookJobStatusApplicationEventListener webhookJobStatusApplicationEventListener(
-        WebhookNotificationClient webhookNotificationClient) {
+        WebhookDeliveryService webhookDeliveryService) {
 
-        return new WebhookJobStatusApplicationEventListener(jobService, webhookNotificationClient);
+        return new WebhookJobStatusApplicationEventListener(jobService, webhookDeliveryService);
     }
 
     @Bean
-    WebhookTaskStartedApplicationEventListener taskStartedWebhookEventListener() {
-        return new WebhookTaskStartedApplicationEventListener(jobService);
+    WebhookTaskStartedApplicationEventListener taskStartedWebhookEventListener(
+        WebhookDeliveryService webhookDeliveryService) {
+
+        return new WebhookTaskStartedApplicationEventListener(jobService, webhookDeliveryService);
     }
 
     @Bean
