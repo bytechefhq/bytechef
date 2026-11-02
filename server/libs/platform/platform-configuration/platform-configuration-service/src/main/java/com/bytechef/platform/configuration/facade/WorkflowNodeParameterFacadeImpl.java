@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -107,6 +108,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, long environmentId) {
@@ -156,6 +159,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ParameterResultDTO deleteWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath,
         long environmentId) {
@@ -332,6 +337,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ParameterResultDTO updateClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
@@ -384,6 +391,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ParameterResultDTO updateWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,
         boolean includeInMetadata, long environmentId) {
