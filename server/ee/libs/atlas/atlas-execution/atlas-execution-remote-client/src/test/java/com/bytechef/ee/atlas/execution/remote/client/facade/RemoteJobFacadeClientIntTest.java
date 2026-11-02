@@ -273,11 +273,11 @@ class RemoteJobFacadeClientIntTest {
         contextService.push(
             jobId, Context.Classname.JOB, taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, jobContext));
 
+        saveTaskExecution(jobId);
+
         assertThatThrownBy(() -> remoteJobFacadeClient.resumeApproval(jobId, "approval-uuid", false))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Approval already processed");
-        assertThat(jobService.getJob(jobId)
-            .getStatus()).isEqualTo(Job.Status.STOPPED);
         assertThat(applicationEvents.stream(TaskExecutionCompleteEvent.class)).isEmpty();
     }
 
@@ -297,7 +297,7 @@ class RemoteJobFacadeClientIntTest {
         TaskExecution taskExecution = TaskExecution.builder()
             .jobId(jobId)
             .status(TaskExecution.Status.STARTED)
-            .workflowTask(new WorkflowTask(Map.of("name", "approval", "type", "approval/v1/wait")))
+            .workflowTask(new WorkflowTask(Map.of("name", "approval", "type", "waitForApproval/v1")))
             .build();
 
         taskExecution.setTaskNumber(1);

@@ -71,7 +71,8 @@ import tools.jackson.databind.ObjectMapper;
 })
 @TestPropertySource(
     properties = {
-        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration",
+        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration,"
+            + "com.bytechef.scheduler.lock.config.SchedulerLockAutoConfiguration",
         "spring.quartz.auto-startup=false"
     })
 class RemoteTriggerLifecycleFacadeClientIntTest {
