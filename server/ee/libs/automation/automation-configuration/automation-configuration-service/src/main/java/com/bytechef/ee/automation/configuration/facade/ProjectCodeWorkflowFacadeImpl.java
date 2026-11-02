@@ -226,13 +226,17 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE') and "
+        + "hasPermission(#workspaceId, 'Workspace', 'PROJECT_PUBLISH')")
     public void save(long workspaceId, byte[] bytes, Language language) {
         publish(workspaceId, bytes, language);
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE') and "
+        + "hasPermission(#workspaceId, 'Workspace', 'PROJECT_PUBLISH') and "
+        + "(!#enable or (hasWorkspaceScopeInEnvironment(#workspaceId, 'DEPLOYMENT_CREATE', #environment) and "
+        + "hasWorkspaceScopeInEnvironment(#workspaceId, 'DEPLOYMENT_EDIT', #environment)))")
     public void save(long workspaceId, byte[] bytes, Language language, Environment environment, boolean enable) {
         PublishedProject publishedProject = publish(workspaceId, bytes, language);
 
