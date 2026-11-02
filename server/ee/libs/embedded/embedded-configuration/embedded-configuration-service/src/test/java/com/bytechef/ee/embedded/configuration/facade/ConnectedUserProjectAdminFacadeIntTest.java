@@ -281,7 +281,9 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .workflowUuid();
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(projectId, Environment.PRODUCTION.ordinal())
+            .getConfigurations(projectId, Environment.PRODUCTION.ordinal())
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationAdminFacade.enableConfigurationWorkflow(
@@ -394,7 +396,9 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .workflowUuid();
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(projectId, Environment.PRODUCTION.ordinal())
+            .getConfigurations(projectId, Environment.PRODUCTION.ordinal())
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationAdminFacade.enableConfigurationWorkflow(

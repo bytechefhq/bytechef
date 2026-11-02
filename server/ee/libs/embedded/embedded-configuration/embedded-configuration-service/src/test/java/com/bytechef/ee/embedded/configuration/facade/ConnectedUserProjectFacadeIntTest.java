@@ -553,7 +553,9 @@ class ConnectedUserProjectFacadeIntTest {
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);
@@ -768,7 +770,9 @@ class ConnectedUserProjectFacadeIntTest {
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);

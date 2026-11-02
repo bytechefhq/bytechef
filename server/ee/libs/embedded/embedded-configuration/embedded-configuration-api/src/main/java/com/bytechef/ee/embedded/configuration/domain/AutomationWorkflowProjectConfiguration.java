@@ -61,6 +61,12 @@ public class AutomationWorkflowProjectConfiguration {
     @LastModifiedDate
     private Instant lastModifiedDate;
 
+    @Column
+    private String name;
+
+    @Column("permission_expression")
+    private String permissionExpression;
+
     @Column("project_id")
     private AggregateReference<Project, Long> projectId;
 
@@ -77,10 +83,13 @@ public class AutomationWorkflowProjectConfiguration {
     }
 
     public AutomationWorkflowProjectConfiguration(
-        long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible) {
+        long projectId, long environmentId, String name, String permissionExpression, int projectVersion,
+        boolean enabled, boolean automationHubVisible) {
 
         this.projectId = AggregateReference.to(projectId);
         this.environmentId = environmentId;
+        this.name = name;
+        this.permissionExpression = permissionExpression;
         this.projectVersion = projectVersion;
         this.enabled = enabled;
         this.automationHubVisible = automationHubVisible;
@@ -116,6 +125,14 @@ public class AutomationWorkflowProjectConfiguration {
         return lastModifiedDate;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getPermissionExpression() {
+        return permissionExpression;
+    }
+
     public Long getProjectId() {
         return projectId.getId();
     }
@@ -148,6 +165,14 @@ public class AutomationWorkflowProjectConfiguration {
         this.enabled = enabled;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPermissionExpression(String permissionExpression) {
+        this.permissionExpression = permissionExpression;
+    }
+
     public void setProjectVersion(int projectVersion) {
         this.projectVersion = projectVersion;
     }
@@ -174,6 +199,7 @@ public class AutomationWorkflowProjectConfiguration {
             "id=" + id +
             ", projectId=" + projectId +
             ", environmentId=" + environmentId +
+            ", name='" + name + '\'' +
             ", projectVersion=" + projectVersion +
             ", enabled=" + enabled +
             ", automationHubVisible=" + automationHubVisible +

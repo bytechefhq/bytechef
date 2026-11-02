@@ -74,6 +74,9 @@ public class IntegrationInstanceConfiguration {
     @Column
     private String name;
 
+    @Column("permission_expression")
+    private String permissionExpression;
+
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -152,6 +155,10 @@ public class IntegrationInstanceConfiguration {
         return integrationVersion;
     }
 
+    public String getPermissionExpression() {
+        return permissionExpression;
+    }
+
     public String getName() {
         return name;
     }
@@ -202,6 +209,10 @@ public class IntegrationInstanceConfiguration {
 
     public void setIntegrationVersion(Integer integrationVersion) {
         this.integrationVersion = integrationVersion;
+    }
+
+    public void setPermissionExpression(String permissionExpression) {
+        this.permissionExpression = permissionExpression;
     }
 
     public void setName(String name) {

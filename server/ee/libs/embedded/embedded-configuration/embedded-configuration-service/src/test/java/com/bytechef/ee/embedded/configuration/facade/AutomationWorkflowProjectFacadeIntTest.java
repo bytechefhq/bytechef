@@ -978,8 +978,8 @@ class AutomationWorkflowProjectFacadeIntTest {
     private AutomationWorkflowProjectConfiguration createConfiguration(
         long projectId, int projectVersion, boolean enabled, boolean automationHubVisible) {
 
-        return automationWorkflowProjectConfigurationService.create(
-            projectId, Environment.PRODUCTION.ordinal(), projectVersion, enabled, automationHubVisible);
+        return automationWorkflowProjectConfigurationService.create(projectId, Environment.PRODUCTION.ordinal(),
+            "Default", null, projectVersion, enabled, automationHubVisible);
     }
 
     private void createEnabledConfiguration(long projectId, int projectVersion) {

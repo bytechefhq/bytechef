@@ -10,9 +10,9 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -22,15 +22,16 @@ import java.util.UUID;
 public interface AutomationWorkflowProjectConfigurationService {
 
     AutomationWorkflowProjectConfiguration create(
-        long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible);
+        long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
+        boolean enabled, boolean automationHubVisible);
 
     void delete(long id);
-
-    Optional<AutomationWorkflowProjectConfiguration> fetchConfiguration(long projectId, long environmentId);
 
     AutomationWorkflowProjectConfiguration getConfiguration(long id);
 
     List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId);
+
+    List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId, long environmentId);
 
     List<AutomationWorkflowProjectConfiguration> getConfigurations(Set<Long> projectIds);
 
@@ -45,7 +46,8 @@ public interface AutomationWorkflowProjectConfigurationService {
     boolean isWorkflowEnabled(AutomationWorkflowProjectConfiguration configuration, UUID workflowUuid);
 
     AutomationWorkflowProjectConfiguration update(
-        long id, int projectVersion, boolean enabled, boolean automationHubVisible);
+        long id, String name, @Nullable String permissionExpression, int projectVersion, boolean enabled,
+        boolean automationHubVisible);
 
     AutomationWorkflowProjectConfiguration updateEnabled(long id, boolean enabled);
 

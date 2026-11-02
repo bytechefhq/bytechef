@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -55,23 +56,17 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
 
     @Override
     public AutomationWorkflowProjectConfiguration create(
-        long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible) {
+        long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
+        boolean enabled, boolean automationHubVisible) {
 
         return automationWorkflowProjectConfigurationRepository.save(
             new AutomationWorkflowProjectConfiguration(
-                projectId, environmentId, projectVersion, enabled, automationHubVisible));
+                projectId, environmentId, name, permissionExpression, projectVersion, enabled, automationHubVisible));
     }
 
     @Override
     public void delete(long id) {
         automationWorkflowProjectConfigurationRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<AutomationWorkflowProjectConfiguration> fetchConfiguration(long projectId, long environmentId) {
-        return automationWorkflowProjectConfigurationRepository.findByProjectIdAndEnvironmentId(
-            projectId, environmentId);
     }
 
     @Override
@@ -86,6 +81,13 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
     @Transactional(readOnly = true)
     public List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId) {
         return automationWorkflowProjectConfigurationRepository.findAllByProjectId(projectId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId, long environmentId) {
+        return automationWorkflowProjectConfigurationRepository.findAllByProjectIdAndEnvironmentId(
+            projectId, environmentId);
     }
 
     @Override
@@ -107,10 +109,13 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
 
     @Override
     public AutomationWorkflowProjectConfiguration update(
-        long id, int projectVersion, boolean enabled, boolean automationHubVisible) {
+        long id, String name, @Nullable String permissionExpression, int projectVersion, boolean enabled,
+        boolean automationHubVisible) {
 
         AutomationWorkflowProjectConfiguration configuration = getConfiguration(id);
 
+        configuration.setName(name);
+        configuration.setPermissionExpression(permissionExpression);
         configuration.setProjectVersion(projectVersion);
         configuration.setEnabled(enabled);
         configuration.setAutomationHubVisible(automationHubVisible);

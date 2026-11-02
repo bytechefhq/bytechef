@@ -41,17 +41,20 @@ public final class AutomationWorkflowProjectConfigurationTestSupport {
             .orElseThrow();
 
         Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
-            automationWorkflowProjectConfigurationService.fetchConfiguration(
-                projectId, Environment.PRODUCTION.ordinal());
+            automationWorkflowProjectConfigurationService.getConfigurations(
+                projectId, Environment.PRODUCTION.ordinal())
+                .stream()
+                .findFirst();
 
         if (configurationOptional.isPresent()) {
+            AutomationWorkflowProjectConfiguration existingConfiguration = configurationOptional.get();
+
             automationWorkflowProjectConfigurationService.update(
-                configurationOptional.get()
-                    .getId(),
-                publishedVersion, true, true);
+                existingConfiguration.getId(), existingConfiguration.getName(),
+                existingConfiguration.getPermissionExpression(), publishedVersion, true, true);
         } else {
-            automationWorkflowProjectConfigurationService.create(
-                projectId, Environment.PRODUCTION.ordinal(), publishedVersion, true, true);
+            automationWorkflowProjectConfigurationService.create(projectId, Environment.PRODUCTION.ordinal(), "Default",
+                null, publishedVersion, true, true);
         }
     }
 }

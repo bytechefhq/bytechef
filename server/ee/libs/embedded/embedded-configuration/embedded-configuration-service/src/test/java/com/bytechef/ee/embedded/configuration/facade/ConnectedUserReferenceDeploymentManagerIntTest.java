@@ -356,8 +356,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
-        automationWorkflowProjectConfigurationService.create(
-            automationWorkflowProjectId, Environment.DEVELOPMENT.ordinal(), 1, true, true);
+        automationWorkflowProjectConfigurationService.create(automationWorkflowProjectId,
+            Environment.DEVELOPMENT.ordinal(), "Default", null, 1, true, true);
 
         ConnectedUser developmentConnectedUser = connectedUserService.createConnectedUser(
             externalUserId, Environment.DEVELOPMENT);
@@ -552,7 +552,9 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         publishAndPinProject(automationWorkflowProjectId);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);
