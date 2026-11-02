@@ -33,7 +33,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.JobSuspends;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,19 +55,19 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
-    private final TaskStateService taskStateService;
+    private final TaskStateFacade taskStateFacade;
 
     @SuppressFBWarnings("EI")
     public SuspendTaskCompletionHandler(
         ContextService contextService, ApplicationEventPublisher eventPublisher, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, TaskStateService taskStateService) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, TaskStateFacade taskStateFacade) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
-        this.taskStateService = taskStateService;
+        this.taskStateFacade = taskStateFacade;
     }
 
     @Override
@@ -119,7 +119,7 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
 
         JobResumeId jobResumeId = JobResumeId.parse(jobResumeIdString);
 
-        taskStateService.save(jobResumeId, suspend);
+        taskStateFacade.save(jobResumeId, suspend);
 
         Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
 

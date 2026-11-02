@@ -23,7 +23,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import java.time.Instant;
@@ -39,20 +39,20 @@ public class DynamicWebhookTriggerRefreshListener {
 
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerDefinitionFacade remoteTriggerDefinitionFacade;
-    private final TriggerStateService triggerStateService;
+    private final TriggerStateFacade triggerStateFacade;
     private final WorkflowService workflowService;
     private final SchedulerClient schedulerClient;
 
     @SuppressFBWarnings("EI")
     public DynamicWebhookTriggerRefreshListener(
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, SchedulerClient schedulerClient,
-        TriggerDefinitionFacade remoteTriggerDefinitionFacade, TriggerStateService triggerStateService,
+        TriggerDefinitionFacade remoteTriggerDefinitionFacade, TriggerStateFacade triggerStateFacade,
         WorkflowService workflowService) {
 
         this.schedulerClient = schedulerClient;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.remoteTriggerDefinitionFacade = remoteTriggerDefinitionFacade;
-        this.triggerStateService = triggerStateService;
+        this.triggerStateFacade = triggerStateFacade;
         this.workflowService = workflowService;
     }
 
@@ -95,7 +95,7 @@ public class DynamicWebhookTriggerRefreshListener {
 
     private Instant refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId, Long connectionId) {
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
-        WebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
+        WebhookEnableOutput output = OptionalUtils.get(triggerStateFacade.fetchValue(workflowExecutionId));
         Instant webhookExpirationDate = null;
 
         output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(
@@ -103,7 +103,7 @@ public class DynamicWebhookTriggerRefreshListener {
             workflowNodeType.operation(), output.parameters(), connectionId);
 
         if (output != null) {
-            triggerStateService.save(workflowExecutionId, output);
+            triggerStateFacade.save(workflowExecutionId, output);
 
             webhookExpirationDate = output.webhookExpirationDate();
         }

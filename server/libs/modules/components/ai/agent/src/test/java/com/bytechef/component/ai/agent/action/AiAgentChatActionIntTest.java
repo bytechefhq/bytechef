@@ -75,11 +75,11 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.ApprovalFormFacadeImpl;
+import com.bytechef.platform.workflow.execution.facade.InMemoryTaskStateFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacadeImpl;
-import com.bytechef.platform.workflow.execution.service.InMemoryTaskStateService;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcherPreSendProcessor;
 import com.bytechef.task.dispatcher.suspend.completion.SuspendTaskCompletionHandler;
@@ -175,7 +175,7 @@ class AiAgentChatActionIntTest {
     private JobResumeFacade jobResumeFacade;
     private TaskExecutionService taskExecutionService;
     private TaskFileStorage taskFileStorage;
-    private TaskStateService taskStateService;
+    private TaskStateFacade taskStateFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -192,7 +192,7 @@ class AiAgentChatActionIntTest {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
-        taskStateService = new InMemoryTaskStateService();
+        taskStateFacade = new InMemoryTaskStateFacade();
         Evaluator evaluator = SpelEvaluator.create();
 
         jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
@@ -204,7 +204,7 @@ class AiAgentChatActionIntTest {
         eventPublisher = createEventPublisher(asyncMessageBroker);
 
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors = List.of(
-            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService, null),
+            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateFacade, null),
             new ModelConnectionTaskDispatcherPreSendProcessor());
 
         jobSyncExecutor = new JobSyncExecutor(
@@ -212,7 +212,7 @@ class AiAgentChatActionIntTest {
             List.of(
                 (taskCompletionHandler, taskDispatcher) -> new SuspendTaskCompletionHandler(
                     contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage,
-                    taskStateService)),
+                    taskStateFacade)),
             List.of(), taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor,
             taskHandlerMap::get, taskFileStorage, -1, workflowService);
 
@@ -252,7 +252,7 @@ class AiAgentChatActionIntTest {
             new JobFacadeImpl(
                 eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService),
             jobService, meterRegistryBeanFactory.getBeanProvider(MeterRegistry.class),
-            TransactionOperations.withoutTransaction(), taskExecutionService, taskStateService);
+            TransactionOperations.withoutTransaction(), taskExecutionService, taskStateFacade);
     }
 
     @Test
@@ -312,7 +312,7 @@ class AiAgentChatActionIntTest {
 
         ApprovalFormFacadeImpl approvalFormFacade = new ApprovalFormFacadeImpl(
             new StaticListableBeanFactory().getBeanProvider(ApprovalTokens.class), jobService, taskExecutionService,
-            taskStateService, TransactionOperations.withoutTransaction());
+            taskStateFacade, TransactionOperations.withoutTransaction());
 
         Map<String, ?> approvalForm = approvalFormFacade.fetchApprovalForm(getJobResumeId(suspendedJob))
             .orElseThrow();

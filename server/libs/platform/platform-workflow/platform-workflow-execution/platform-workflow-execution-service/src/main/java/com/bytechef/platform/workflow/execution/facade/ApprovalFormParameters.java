@@ -20,7 +20,6 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,14 +34,14 @@ final class ApprovalFormParameters {
     private ApprovalFormParameters() {
     }
 
-    static Map<String, ?> get(TaskStateService taskStateService, JobResumeId jobResumeId, TaskExecution taskExecution) {
-        return get(taskStateService.fetchValue(jobResumeId), taskExecution);
+    static Map<String, ?> get(TaskStateFacade taskStateFacade, JobResumeId jobResumeId, TaskExecution taskExecution) {
+        return get(taskStateFacade.fetchValue(jobResumeId), taskExecution);
     }
 
     static Map<String, ?> getUnlocked(
-        TaskStateService taskStateService, JobResumeId jobResumeId, TaskExecution taskExecution) {
+        TaskStateFacade taskStateFacade, JobResumeId jobResumeId, TaskExecution taskExecution) {
 
-        return get(taskStateService.fetchUnlockedValue(jobResumeId), taskExecution);
+        return get(taskStateFacade.fetchUnlockedValue(jobResumeId), taskExecution);
     }
 
     @SuppressWarnings("unchecked")

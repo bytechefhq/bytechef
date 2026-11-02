@@ -36,8 +36,8 @@ import com.bytechef.platform.workflow.coordinator.trigger.completion.TriggerComp
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import com.bytechef.tenant.TenantContext;
 import java.time.Instant;
 import java.util.List;
@@ -82,7 +82,7 @@ class TriggerCoordinatorTest {
     private TriggerScheduler triggerScheduler;
 
     @Mock
-    private TriggerStateService triggerStateService;
+    private TriggerStateFacade triggerStateFacade;
 
     @Mock
     private WebhookRequest webhookRequest;
@@ -97,7 +97,7 @@ class TriggerCoordinatorTest {
         triggerCoordinator = new TriggerCoordinator(
             List.of(), List.of(), evaluator, eventPublisher, jobPrincipalAccessorRegistry,
             triggerCompletionHandler, triggerDispatcher, triggerExecutionService,
-            triggerFileStorage, triggerScheduler, triggerStateService, workflowService);
+            triggerFileStorage, triggerScheduler, triggerStateFacade, workflowService);
     }
 
     @Test

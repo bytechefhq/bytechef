@@ -34,8 +34,8 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,7 +77,7 @@ class TriggerCompletionHandlerTest {
     private TriggerFileStorage triggerFileStorage;
 
     @Mock
-    private TriggerStateService triggerStateService;
+    private TriggerStateFacade triggerStateFacade;
 
     private TriggerCompletionHandler triggerCompletionHandler;
 
@@ -85,7 +85,7 @@ class TriggerCompletionHandlerTest {
     void setUp() {
         triggerCompletionHandler = new TriggerCompletionHandler(
             jobPrincipalAccessorRegistry, principalJobFacade, triggerExecutionService, triggerFileStorage,
-            triggerStateService);
+            triggerStateFacade);
 
         when(triggerExecution.getId()).thenReturn(1L);
         when(triggerExecution.getWorkflowExecutionId()).thenReturn(WORKFLOW_EXECUTION_ID);

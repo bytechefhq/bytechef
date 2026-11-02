@@ -22,7 +22,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.platform.scheduler.TriggerScheduler;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcherPreSendProcessor;
 import com.bytechef.task.dispatcher.suspend.completion.SuspendTaskCompletionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,26 +43,26 @@ public class SuspendTaskDispatcherConfiguration {
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
-    private final TaskStateService taskStateService;
+    private final TaskStateFacade taskStateFacade;
 
     @SuppressFBWarnings("EI")
     public SuspendTaskDispatcherConfiguration(
         ContextService contextService, ApplicationEventPublisher eventPublisher, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, TaskStateService taskStateService) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, TaskStateFacade taskStateFacade) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
-        this.taskStateService = taskStateService;
+        this.taskStateFacade = taskStateFacade;
     }
 
     @Bean("suspendTaskCompletionHandlerFactory")
     @Order(1)
     TaskCompletionHandlerFactory suspendTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new SuspendTaskCompletionHandler(
-            contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage, taskStateService);
+            contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage, taskStateFacade);
     }
 
     @Bean
@@ -70,6 +70,6 @@ public class SuspendTaskDispatcherConfiguration {
         ObjectProvider<TriggerScheduler> triggerSchedulerProvider) {
 
         return new SuspendTaskDispatcherPreSendProcessor(
-            jobService, taskStateService, triggerSchedulerProvider.getIfAvailable());
+            jobService, taskStateFacade, triggerSchedulerProvider.getIfAvailable());
     }
 }

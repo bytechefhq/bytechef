@@ -29,7 +29,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Date;
@@ -50,7 +50,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
     private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private TriggerDefinitionFacade remoteTriggerDefinitionFacade;
-    private TriggerStateService triggerStateService;
+    private TriggerStateFacade triggerStateFacade;
     private WorkflowService workflowService;
 
     @Override
@@ -92,8 +92,8 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
     @Autowired
     @SuppressFBWarnings("EI")
-    public void setTriggerStateService(TriggerStateService triggerStateService) {
-        this.triggerStateService = triggerStateService;
+    public void setTriggerStateService(TriggerStateFacade triggerStateFacade) {
+        this.triggerStateFacade = triggerStateFacade;
     }
 
     @Autowired
@@ -118,7 +118,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
     private Instant refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId, Long connectionId) {
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
-        WebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
+        WebhookEnableOutput output = OptionalUtils.get(triggerStateFacade.fetchValue(workflowExecutionId));
         Instant webhookExpirationDate = null;
 
         output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(
@@ -126,7 +126,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
             workflowNodeType.operation(), output.parameters(), connectionId);
 
         if (output != null) {
-            triggerStateService.save(workflowExecutionId, output);
+            triggerStateFacade.save(workflowExecutionId, output);
 
             webhookExpirationDate = output.webhookExpirationDate();
         }

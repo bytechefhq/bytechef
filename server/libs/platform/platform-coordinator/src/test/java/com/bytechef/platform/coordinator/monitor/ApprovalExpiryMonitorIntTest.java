@@ -39,7 +39,7 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.coordinator.config.PlatformCoordinatorIntTestConfiguration;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobApprovalClosedEvent;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.tenant.service.TenantService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
@@ -96,7 +96,7 @@ class ApprovalExpiryMonitorIntTest {
     private TaskExecutionService taskExecutionService;
 
     @MockitoBean
-    private TaskStateService taskStateService;
+    private TaskStateFacade taskStateFacade;
 
     @Autowired
     private TenantService tenantService;
@@ -119,7 +119,7 @@ class ApprovalExpiryMonitorIntTest {
 
         approvalExpiryMonitor = new ApprovalExpiryMonitor(
             applicationEventPublisher, jobService, meterRegistryObjectProvider, taskExecutionService,
-            taskStateService, tenantService);
+            taskStateFacade, tenantService);
     }
 
     @Test
@@ -139,7 +139,7 @@ class ApprovalExpiryMonitorIntTest {
             .isEqualTo(job.getMetadata(MetadataConstants.JOB_RESUME_ID));
         assertThat(taskExecution.getStatus()).isEqualTo(TaskExecution.Status.FAILED);
 
-        verify(taskStateService).delete(any(JobResumeId.class));
+        verify(taskStateFacade).delete(any(JobResumeId.class));
 
         assertThat(applicationEvents.stream(JobStatusApplicationEvent.class))
             .singleElement()
@@ -272,7 +272,7 @@ class ApprovalExpiryMonitorIntTest {
         assertThat(taskExecution.getStatus()).isNotEqualTo(TaskExecution.Status.FAILED);
         assertThat(applicationEvents.stream()).noneMatch(JobStatusApplicationEvent.class::isInstance);
 
-        verify(taskStateService, never()).delete(any());
+        verify(taskStateFacade, never()).delete(any());
     }
 
     @Test

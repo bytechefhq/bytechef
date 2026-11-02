@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.workflow.execution.service;
 
-import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerState;
 import com.bytechef.platform.workflow.execution.repository.TriggerStateRepository;
@@ -32,14 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TriggerStateServiceImpl implements TriggerStateService {
 
-    private final StateValueDataStorage stateValueDataStorage;
     private final TriggerStateRepository triggerStateRepository;
 
     @SuppressFBWarnings("EI")
-    TriggerStateServiceImpl(
-        StateValueDataStorage stateValueDataStorage, TriggerStateRepository triggerStateRepository) {
-
-        this.stateValueDataStorage = stateValueDataStorage;
+    public TriggerStateServiceImpl(TriggerStateRepository triggerStateRepository) {
         this.triggerStateRepository = triggerStateRepository;
     }
 
@@ -47,47 +42,27 @@ public class TriggerStateServiceImpl implements TriggerStateService {
     public void delete(WorkflowExecutionId workflowExecutionId) {
         triggerStateRepository
             .findByWorkflowExecutionId(workflowExecutionId.toString())
-            .ifPresent(triggerState -> {
-                stateValueDataStorage.delete(getKey(workflowExecutionId), triggerState.getValue());
-
-                triggerStateRepository.delete(triggerState);
-            });
+            .ifPresent(triggerStateRepository::delete);
     }
 
     @Override
     @SuppressWarnings("unchecked")
+    @Transactional
     public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
         return triggerStateRepository.findByWorkflowExecutionId(workflowExecutionId.toString())
-            .map(triggerState -> (T) stateValueDataStorage.read(
-                getKey(workflowExecutionId), triggerState.getValue()));
+            .map(triggerLifecycle -> (T) triggerLifecycle.getValue());
     }
 
     @Override
     public void save(WorkflowExecutionId workflowExecutionId, Object value) {
-        Optional<TriggerState> triggerStateOptional = triggerStateRepository.findByWorkflowExecutionId(
-            workflowExecutionId.toString());
+        triggerStateRepository
+            .findByWorkflowExecutionId(workflowExecutionId.toString())
+            .ifPresentOrElse(
+                triggerState -> {
+                    triggerState.setValue(value);
 
-        Object storedValue = stateValueDataStorage.write(
-            getKey(workflowExecutionId), value,
-            stateValueDataStorage.fetchLocation(
-                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()),
-            triggerStateOptional
-                .map(TriggerState::getValue)
-                .orElse(null));
-
-        triggerStateOptional.ifPresentOrElse(
-            triggerState -> {
-                triggerState.setValue(storedValue);
-
-                triggerStateRepository.save(triggerState);
-            },
-            () -> triggerStateRepository.save(new TriggerState(workflowExecutionId, storedValue)));
-    }
-
-    private static StateValueDataStorage.Key getKey(WorkflowExecutionId workflowExecutionId) {
-        return new StateValueDataStorage.Key(
-            StateValueDataStorage.TRIGGER_STATE_COMPONENT_NAME, DataStorageScope.WORKFLOW,
-            workflowExecutionId.getWorkflowUuid(),
-            StateValueDataStorage.toKey(workflowExecutionId.toString()));
+                    triggerStateRepository.save(triggerState);
+                },
+                () -> triggerStateRepository.save(new TriggerState(workflowExecutionId, value)));
     }
 }

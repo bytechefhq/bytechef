@@ -31,6 +31,9 @@ import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.workflow.execution.facade.StateValueDataStorage;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacadeImpl;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacadeImpl;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowExecutionIdConverter;
@@ -62,7 +65,8 @@ import tools.jackson.databind.ObjectMapper;
 @EnableAutoConfiguration
 @Import({
     JacksonConfiguration.class, JobPrincipalAccessorRegistry.class, LiquibaseConfiguration.class,
-    PostgreSQLContainerConfiguration.class
+    PostgreSQLContainerConfiguration.class, StateValueDataStorage.class, TaskStateFacadeImpl.class,
+    TriggerStateFacadeImpl.class
 })
 @Configuration
 public class PlatformWorkflowExecutionIntTestConfiguration {

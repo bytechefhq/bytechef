@@ -24,7 +24,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
@@ -74,14 +74,14 @@ public class SubflowTaskDispatcherConfiguration {
         @Bean
         AgentSubflowLauncher agentSubflowLauncher(
             ApplicationProperties applicationProperties, ChildJobPrincipalFactory childJobPrincipalFactory,
-            JobFacade jobFacade, JobService jobService, TaskStateService taskStateService) {
+            JobFacade jobFacade, JobService jobService, TaskStateFacade taskStateFacade) {
 
             ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
             ApplicationProperties.Workflow.Execution execution = workflow.getExecution();
             ApplicationProperties.Workflow.Execution.Agent agent = execution.getAgent();
 
             return new AgentSubflowLauncher(
-                childJobPrincipalFactory, jobFacade, jobService, agent.getMaxSubflowDepth(), taskStateService);
+                childJobPrincipalFactory, jobFacade, jobService, agent.getMaxSubflowDepth(), taskStateFacade);
         }
 
         @Bean

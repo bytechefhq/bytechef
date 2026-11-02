@@ -41,7 +41,6 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.config.PlatformWorkflowExecutionIntTestConfiguration;
 import com.bytechef.platform.workflow.execution.domain.TriggerState;
 import com.bytechef.platform.workflow.execution.repository.TriggerStateRepository;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -81,7 +80,7 @@ class TriggerLifecycleFacadeIntTest {
     private TriggerStateRepository triggerStateRepository;
 
     @Autowired
-    private TriggerStateService triggerStateService;
+    private TriggerStateFacade triggerStateFacade;
 
     @AfterEach
     void afterEach() {
@@ -128,13 +127,13 @@ class TriggerLifecycleFacadeIntTest {
             Map.of("webhookId", "hook-1"), 7L);
         verify(triggerScheduler).cancelDynamicWebhookTriggerRefresh(WORKFLOW_EXECUTION_ID.toString());
 
-        assertThat(triggerStateService.fetchValue(WORKFLOW_EXECUTION_ID)).isEmpty();
+        assertThat(triggerStateFacade.fetchValue(WORKFLOW_EXECUTION_ID)).isEmpty();
         assertThat(triggerStateRepository.count()).isZero();
     }
 
     @Test
     void testExecuteTriggerEnableKeepsTheEarlierStateWhenSavingTheNewStateFails() {
-        triggerStateService.save(
+        triggerStateFacade.save(
             WORKFLOW_EXECUTION_ID, new WebhookEnableOutput(Map.of("webhookId", "hook-1"), null));
 
         WebhookEnableOutput webhookEnableOutput = new WebhookEnableOutput(Map.of("webhookId", "hook-2"), null);
@@ -145,7 +144,7 @@ class TriggerLifecycleFacadeIntTest {
 
         assertThatThrownBy(this::executeTriggerEnable).isSameAs(saveFailure);
 
-        Optional<WebhookEnableOutput> storedOutput = triggerStateService.fetchValue(WORKFLOW_EXECUTION_ID);
+        Optional<WebhookEnableOutput> storedOutput = triggerStateFacade.fetchValue(WORKFLOW_EXECUTION_ID);
 
         assertThat(storedOutput).hasValue(new WebhookEnableOutput(Map.of("webhookId", "hook-1"), null));
     }
@@ -211,7 +210,7 @@ class TriggerLifecycleFacadeIntTest {
 
         executeTriggerEnable();
 
-        Optional<WebhookEnableOutput> storedOutput = triggerStateService.fetchValue(WORKFLOW_EXECUTION_ID);
+        Optional<WebhookEnableOutput> storedOutput = triggerStateFacade.fetchValue(WORKFLOW_EXECUTION_ID);
 
         assertThat(storedOutput).hasValue(webhookEnableOutput);
 
@@ -221,7 +220,7 @@ class TriggerLifecycleFacadeIntTest {
 
     @Test
     void testPerformTriggerDisable() {
-        triggerStateService.save(
+        triggerStateFacade.save(
             WORKFLOW_EXECUTION_ID, new WebhookEnableOutput(Map.of("webhookId", "hook-1"), null));
 
         mockTriggerDefinition(TriggerType.DYNAMIC_WEBHOOK);

@@ -45,7 +45,7 @@ import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacadeImpl;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -485,7 +485,7 @@ class ApprovalControllerIntTest {
 
             return new JobResumeFacadeImpl(
                 applicationEventPublisher, approvalTokensProvider, jobFacade, jobService, meterRegistryObjectProvider,
-                TransactionOperations.withoutTransaction(), taskExecutionService, mock(TaskStateService.class));
+                TransactionOperations.withoutTransaction(), taskExecutionService, mock(TaskStateFacade.class));
         }
     }
 }

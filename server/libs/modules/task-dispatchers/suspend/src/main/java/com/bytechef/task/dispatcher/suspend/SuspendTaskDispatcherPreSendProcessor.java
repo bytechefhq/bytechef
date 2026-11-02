@@ -24,7 +24,7 @@ import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.JobResumeId;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,15 +45,15 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
     private static final Logger log = LoggerFactory.getLogger(SuspendTaskDispatcherPreSendProcessor.class);
 
     private final JobService jobService;
-    private final TaskStateService taskStateService;
+    private final TaskStateFacade taskStateFacade;
     private final @Nullable TriggerScheduler triggerScheduler;
 
     @SuppressFBWarnings("EI")
     public SuspendTaskDispatcherPreSendProcessor(
-        JobService jobService, TaskStateService taskStateService, @Nullable TriggerScheduler triggerScheduler) {
+        JobService jobService, TaskStateFacade taskStateFacade, @Nullable TriggerScheduler triggerScheduler) {
 
         this.jobService = jobService;
-        this.taskStateService = taskStateService;
+        this.taskStateFacade = taskStateFacade;
         this.triggerScheduler = triggerScheduler;
     }
 
@@ -72,7 +72,7 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
 
         JobResumeId jobResumeId = JobResumeId.parse(jobResumeIdString);
 
-        Optional<Suspend> suspendOptional = taskStateService.fetchValue(jobResumeId);
+        Optional<Suspend> suspendOptional = taskStateFacade.fetchValue(jobResumeId);
 
         if (suspendOptional.isPresent()) {
             Suspend suspend = suspendOptional.get();
@@ -105,7 +105,7 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
 
         jobService.update(job);
 
-        taskStateService.delete(jobResumeId);
+        taskStateFacade.delete(jobResumeId);
 
         return taskExecution;
     }

@@ -26,7 +26,7 @@ import com.bytechef.atlas.coordinator.event.DeleteJobEvent;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -40,24 +40,24 @@ class SuspendedTaskStateJobDeletionListenerTest {
 
     @Test
     void testDeletesTaskStateWhenJobResumeIdPresent() {
-        TaskStateService taskStateService = mock(TaskStateService.class);
+        TaskStateFacade taskStateFacade = mock(TaskStateFacade.class);
 
-        SuspendedTaskStateJobDeletionListener listener = new SuspendedTaskStateJobDeletionListener(taskStateService);
+        SuspendedTaskStateJobDeletionListener listener = new SuspendedTaskStateJobDeletionListener(taskStateFacade);
 
         listener.onDeleteJob(new DeleteJobEvent(42L, Map.of(MetadataConstants.JOB_RESUME_ID, JOB_RESUME_ID)));
 
-        verify(taskStateService).delete(JobResumeId.parse(JOB_RESUME_ID));
+        verify(taskStateFacade).delete(JobResumeId.parse(JOB_RESUME_ID));
     }
 
     @Test
     void testNoOpWhenJobResumeIdAbsent() {
-        TaskStateService taskStateService = mock(TaskStateService.class);
+        TaskStateFacade taskStateFacade = mock(TaskStateFacade.class);
 
-        SuspendedTaskStateJobDeletionListener listener = new SuspendedTaskStateJobDeletionListener(taskStateService);
+        SuspendedTaskStateJobDeletionListener listener = new SuspendedTaskStateJobDeletionListener(taskStateFacade);
 
         listener.onDeleteJob(new DeleteJobEvent(42L, Map.of()));
 
-        verify(taskStateService, never()).delete(any());
+        verify(taskStateFacade, never()).delete(any());
     }
 
     @Test
@@ -69,12 +69,12 @@ class SuspendedTaskStateJobDeletionListenerTest {
 
     @Test
     void testSwallowsDeletionFailureSoJobDeletionProceeds() {
-        TaskStateService taskStateService = mock(TaskStateService.class);
+        TaskStateFacade taskStateFacade = mock(TaskStateFacade.class);
 
-        doThrow(new RuntimeException("db down")).when(taskStateService)
+        doThrow(new RuntimeException("db down")).when(taskStateFacade)
             .delete(any());
 
-        SuspendedTaskStateJobDeletionListener listener = new SuspendedTaskStateJobDeletionListener(taskStateService);
+        SuspendedTaskStateJobDeletionListener listener = new SuspendedTaskStateJobDeletionListener(taskStateFacade);
 
         listener.onDeleteJob(new DeleteJobEvent(42L, Map.of(MetadataConstants.JOB_RESUME_ID, JOB_RESUME_ID)));
     }

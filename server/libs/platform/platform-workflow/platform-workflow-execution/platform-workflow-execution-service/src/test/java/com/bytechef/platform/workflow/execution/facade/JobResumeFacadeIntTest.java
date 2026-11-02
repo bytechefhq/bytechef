@@ -51,7 +51,6 @@ import com.bytechef.platform.workflow.execution.config.PlatformWorkflowExecution
 import com.bytechef.platform.workflow.execution.event.JobApprovalClosedEvent;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
 import com.bytechef.tenant.TenantContext;
@@ -157,7 +156,7 @@ class JobResumeFacadeIntTest {
     private TaskFileStorage taskFileStorage;
 
     @Autowired
-    private TaskStateService taskStateService;
+    private TaskStateFacade taskStateFacade;
 
     @MockitoBean
     private WorkflowService workflowService;
@@ -820,7 +819,7 @@ class JobResumeFacadeIntTest {
 
         String jobResumeId = getStoredJobResumeId(jobId);
 
-        taskStateService.save(JobResumeId.parse(jobResumeId), new Suspend(Map.of(), null));
+        taskStateFacade.save(JobResumeId.parse(jobResumeId), new Suspend(Map.of(), null));
 
         JobResumeOutcome outcome = meteredJobResumeFacade.resumeExpiredJob(jobResumeId);
 
@@ -837,7 +836,7 @@ class JobResumeFacadeIntTest {
         assertThat(job.getMetadata(MetadataConstants.CONSUMED_JOB_RESUME_ID)).isEqualTo(jobResumeId);
         assertThat(job.getMetadata(MetadataConstants.EXPIRED_JOB_RESUME_ID)).isEqualTo(jobResumeId);
         assertThat(getStoredTaskExecutionStatus(jobId)).isEqualTo(TaskExecution.Status.FAILED);
-        assertThat(taskStateService.fetchUnlockedValue(JobResumeId.parse(jobResumeId))).isEmpty();
+        assertThat(taskStateFacade.fetchUnlockedValue(JobResumeId.parse(jobResumeId))).isEmpty();
         assertThat(getJobApprovalClosedEvents()).containsExactly(new JobApprovalClosedEvent(jobId));
         assertThat(getJobStatusApplicationEventStatuses()).containsExactly(Job.Status.FAILED);
 
@@ -870,7 +869,7 @@ class JobResumeFacadeIntTest {
 
         String jobResumeId = getStoredJobResumeId(jobId);
 
-        taskStateService.save(JobResumeId.parse(jobResumeId), new Suspend(Map.of(), null));
+        taskStateFacade.save(JobResumeId.parse(jobResumeId), new Suspend(Map.of(), null));
 
         assertThat(jobResumeFacade.cancelApproval(jobId)).isTrue();
 
@@ -879,7 +878,7 @@ class JobResumeFacadeIntTest {
         assertThat(job.getStatus()).isEqualTo(Job.Status.CANCELLED);
         assertThat(job.getEndDate()).isNotNull();
         assertThat(job.getMetadata(MetadataConstants.CANCELLED_JOB_RESUME_ID)).isEqualTo(jobResumeId);
-        assertThat(taskStateService.fetchUnlockedValue(JobResumeId.parse(jobResumeId))).isEmpty();
+        assertThat(taskStateFacade.fetchUnlockedValue(JobResumeId.parse(jobResumeId))).isEmpty();
         assertThat(getJobApprovalClosedEvents()).containsExactly(new JobApprovalClosedEvent(jobId));
         assertThat(getJobStatusApplicationEventStatuses()).containsExactly(Job.Status.CANCELLED);
 
@@ -1032,7 +1031,7 @@ class JobResumeFacadeIntTest {
 
         String jobResumeId = getStoredJobResumeId(jobId);
 
-        taskStateService.save(JobResumeId.parse(jobResumeId), new Suspend(Map.of(), null));
+        taskStateFacade.save(JobResumeId.parse(jobResumeId), new Suspend(Map.of(), null));
 
         String signedToken = approvalTokens.toSignedToken(jobResumeId, Duration.ofHours(1));
 
@@ -1049,7 +1048,7 @@ class JobResumeFacadeIntTest {
             "The pending approval expired at 2026-10-17T11:00:00Z without being resolved");
         assertThat(job.getMetadata(MetadataConstants.EXPIRED_JOB_RESUME_ID)).isEqualTo(jobResumeId);
         assertThat(getStoredTaskExecutionStatus(jobId)).isEqualTo(TaskExecution.Status.FAILED);
-        assertThat(taskStateService.fetchUnlockedValue(JobResumeId.parse(jobResumeId))).isEmpty();
+        assertThat(taskStateFacade.fetchUnlockedValue(JobResumeId.parse(jobResumeId))).isEmpty();
         assertThat(getJobApprovalClosedEvents()).containsExactly(new JobApprovalClosedEvent(jobId));
         assertThat(getJobStatusApplicationEventStatuses()).containsExactly(Job.Status.FAILED);
 
@@ -1304,7 +1303,7 @@ class JobResumeFacadeIntTest {
                 MetadataConstants.APPROVAL_FORM_PARAMETERS,
                 Map.of("inputs", List.of(Map.of("fieldName", "reason", "fieldType", 6, "required", true))));
 
-            taskStateService.save(
+            taskStateFacade.save(
                 JobResumeId.parse(getStoredJobResumeId(jobId)), new Suspend(continueParameters, null));
 
             String signedToken = signedToken(jobId);
@@ -1378,7 +1377,7 @@ class JobResumeFacadeIntTest {
 
         return new JobResumeFacadeImpl(
             applicationEventPublisher, approvalTokensProvider, jobFacade, jobService, meterRegistryProvider,
-            transactionOperations, taskExecutionService, taskStateService);
+            transactionOperations, taskExecutionService, taskStateFacade);
     }
 
     private static String encodeToken(String tenantId, long jobId, UUID uuid) {

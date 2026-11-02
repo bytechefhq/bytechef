@@ -28,7 +28,7 @@ import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.platform.workflow.execution.event.JobApprovalClosedEvent;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -61,7 +61,7 @@ public class ApprovalExpiryMonitor {
     private final ObjectProvider<MeterRegistry> meterRegistryObjectProvider;
     private final AtomicLong pendingApprovalCount = new AtomicLong();
     private final TaskExecutionService taskExecutionService;
-    private final @Nullable TaskStateService taskStateService;
+    private final @Nullable TaskStateFacade taskStateFacade;
     private final TenantService tenantService;
 
     private boolean gaugeRegistered;
@@ -70,13 +70,13 @@ public class ApprovalExpiryMonitor {
     public ApprovalExpiryMonitor(
         ApplicationEventPublisher eventPublisher, JobService jobService,
         ObjectProvider<MeterRegistry> meterRegistryObjectProvider, TaskExecutionService taskExecutionService,
-        @Nullable TaskStateService taskStateService, TenantService tenantService) {
+        @Nullable TaskStateFacade taskStateFacade, TenantService tenantService) {
 
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;
         this.meterRegistryObjectProvider = meterRegistryObjectProvider;
         this.taskExecutionService = taskExecutionService;
-        this.taskStateService = taskStateService;
+        this.taskStateFacade = taskStateFacade;
         this.tenantService = tenantService;
     }
 
@@ -222,7 +222,7 @@ public class ApprovalExpiryMonitor {
     }
 
     private void deleteTaskState(Job job) {
-        if (taskStateService == null) {
+        if (taskStateFacade == null) {
             return;
         }
 
@@ -233,7 +233,7 @@ public class ApprovalExpiryMonitor {
         }
 
         try {
-            taskStateService.delete(JobResumeId.parse(jobResumeId.toString()));
+            taskStateFacade.delete(JobResumeId.parse(jobResumeId.toString()));
         } catch (RuntimeException runtimeException) {
             log.warn("Could not delete task state for expired job {}", job.getId(), runtimeException);
         }

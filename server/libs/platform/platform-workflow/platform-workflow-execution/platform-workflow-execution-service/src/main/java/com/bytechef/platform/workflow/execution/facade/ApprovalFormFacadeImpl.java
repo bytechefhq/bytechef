@@ -23,7 +23,6 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -49,31 +48,31 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
     private final ObjectProvider<ApprovalTokens> approvalTokensProvider;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
-    private final TaskStateService taskStateService;
+    private final TaskStateFacade taskStateFacade;
     private final TransactionOperations transactionOperations;
 
     @Autowired
     @SuppressFBWarnings("EI")
     public ApprovalFormFacadeImpl(
         ObjectProvider<ApprovalTokens> approvalTokensProvider, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskStateService taskStateService,
+        TaskExecutionService taskExecutionService, TaskStateFacade taskStateFacade,
         PlatformTransactionManager platformTransactionManager) {
 
         this(
-            approvalTokensProvider, jobService, taskExecutionService, taskStateService,
+            approvalTokensProvider, jobService, taskExecutionService, taskStateFacade,
             createReadOnlyTransactionTemplate(platformTransactionManager));
     }
 
     @SuppressFBWarnings("EI")
     public ApprovalFormFacadeImpl(
         ObjectProvider<ApprovalTokens> approvalTokensProvider, JobService jobService,
-        TaskExecutionService taskExecutionService, TaskStateService taskStateService,
+        TaskExecutionService taskExecutionService, TaskStateFacade taskStateFacade,
         TransactionOperations transactionOperations) {
 
         this.approvalTokensProvider = approvalTokensProvider;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
-        this.taskStateService = taskStateService;
+        this.taskStateFacade = taskStateFacade;
         this.transactionOperations = transactionOperations;
     }
 
@@ -111,7 +110,7 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
             MapUtils.getLong(jobMetadata, MetadataConstants.TASK_EXECUTION_RESUME_ID));
 
         Map<String, Object> approvalForm = new HashMap<>(
-            ApprovalFormParameters.getUnlocked(taskStateService, jobResumeId, taskExecution));
+            ApprovalFormParameters.getUnlocked(taskStateFacade, jobResumeId, taskExecution));
 
         Map<String, ?> taskExecutionMetadata = taskExecution.getMetadata();
 

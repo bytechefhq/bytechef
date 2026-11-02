@@ -73,8 +73,8 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
-import com.bytechef.platform.workflow.execution.service.InMemoryTaskStateService;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.platform.workflow.execution.facade.InMemoryTaskStateFacade;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
@@ -422,7 +422,7 @@ class AgentSubflowLauncherIntTest {
             messageBroker = new AsyncMessageBroker(environment);
 
             ApplicationEventPublisher eventPublisher = createEventPublisher(messageBroker);
-            TaskStateService taskStateService = new InMemoryTaskStateService();
+            TaskStateFacade taskStateFacade = new InMemoryTaskStateFacade();
 
             jobFacade = new JobFacadeImpl(
                 eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
@@ -461,7 +461,7 @@ class AgentSubflowLauncherIntTest {
                     new ControlTaskDispatcher(eventPublisher),
                     new DefaultTaskDispatcher(
                         eventPublisher,
-                        List.of(new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService, null)))));
+                        List.of(new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateFacade, null)))));
 
             JobExecutor jobExecutor = new JobExecutor(
                 contextService, SpelEvaluator.create(), eventPublisher, jobService, taskDispatcherChain,
@@ -473,13 +473,13 @@ class AgentSubflowLauncherIntTest {
                 List.of(
                     new SuspendTaskCompletionHandler(
                         contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage,
-                        taskStateService),
+                        taskStateFacade),
                     new DefaultTaskCompletionHandler(
                         contextService, jobExecutor, jobService, taskExecutionService, taskFileStorage,
                         workflowService)));
 
             List<ApplicationEventListener> applicationEventListeners = List.of(
-                new AgentSubflowLauncher(childJobPrincipalFactory, jobFacade, jobService, MAX_DEPTH, taskStateService),
+                new AgentSubflowLauncher(childJobPrincipalFactory, jobFacade, jobService, MAX_DEPTH, taskStateFacade),
                 new AgentSubflowResumeListener(jobFacade, jobService, taskExecutionService, taskFileStorage),
                 new SubflowJobStatusEventListener(
                     SpelEvaluator.create(), eventPublisher, jobService, taskExecutionService, taskFileStorage),
