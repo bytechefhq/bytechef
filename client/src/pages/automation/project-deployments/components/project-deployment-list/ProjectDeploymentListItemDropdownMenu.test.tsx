@@ -3,6 +3,10 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectDeploymentListItemDropdownMenu from './ProjectDeploymentListItemDropdownMenu';
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 const handlers = {
     onChangeProjectVersionClick: vi.fn(),
     onDeleteClick: vi.fn(),

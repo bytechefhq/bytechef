@@ -25,11 +25,20 @@ const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
 }));
 
+const hoistedQueries = vi.hoisted(() => ({
+    useGetWorkspaceProjectDeploymentsQuery: vi.fn(() => ({data: [], isFetching: false, refetch: vi.fn()})),
+}));
+
 const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
     useNavigate: () => hoisted.navigate,
+}));
+
+vi.mock('@/shared/queries/automation/projectDeployments.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/projectDeployments.queries')>()),
+    useGetWorkspaceProjectDeploymentsQuery: hoistedQueries.useGetWorkspaceProjectDeploymentsQuery,
 }));
 
 vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
@@ -286,6 +295,27 @@ it('opens the deployments page in production after deploying to production', asy
     expect(onTabChange).not.toHaveBeenCalledWith('deployments', 43);
 });
 
+it('shows the published version when the draft matches it', () => {
+    renderProjectListItem(undefined, {
+        lastProjectVersion: 3,
+        lastStatus: ProjectStatus.Draft,
+        unpublishedChanges: false,
+    });
+
+    expect(screen.getByText('PUBLISHED').parentElement).toHaveTextContent('V2PUBLISHED');
+});
+
+it('shows the draft version when the draft has unpublished changes', () => {
+    renderProjectListItem(undefined, {
+        lastProjectVersion: 3,
+        lastStatus: ProjectStatus.Draft,
+        unpublishedChanges: true,
+    });
+
+    expect(screen.getByText('DRAFT').parentElement).toHaveTextContent('V3DRAFT');
+    expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
+});
+
 it('shows every gated project action when all scopes are granted', async () => {
     renderProjectListItem();
 
@@ -337,4 +367,15 @@ it('hides deploying without DEPLOYMENT_CREATE', () => {
 
     expect(screen.queryByLabelText('Create Deployment')).not.toBeInTheDocument();
     expect(screen.queryByText('Save deployment false')).not.toBeInTheDocument();
+});
+
+it('looks up the project deployments of the current environment', () => {
+    environmentStore.setState({currentEnvironmentId: 2});
+
+    renderProjectListItem();
+
+    expect(hoistedQueries.useGetWorkspaceProjectDeploymentsQuery).toHaveBeenCalledWith(
+        expect.objectContaining({environmentId: 2, projectId: 7}),
+        false
+    );
 });

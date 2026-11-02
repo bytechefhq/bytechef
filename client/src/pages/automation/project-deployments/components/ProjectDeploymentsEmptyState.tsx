@@ -17,6 +17,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Layers3Icon, SendIcon} from 'lucide-react';
 
 interface ProjectDeploymentsEmptyStateProps {
+    canCreateDeployment: boolean;
     onDeploymentCreated: (deploymentId: number) => void;
 }
 
@@ -27,7 +28,10 @@ const getPublishDescription = (nextProject?: Project) =>
  * Points an empty Deployments page at the next step the user can finish. The deployment dialog only lists published
  * versions, so it is offered only once one exists; earlier stages send the user to their projects instead.
  */
-const ProjectDeploymentsEmptyState = ({onDeploymentCreated}: ProjectDeploymentsEmptyStateProps) => {
+const ProjectDeploymentsEmptyState = ({
+    canCreateDeployment,
+    onDeploymentCreated,
+}: ProjectDeploymentsEmptyStateProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {captureEmptyStateAction} = useAnalytics();
@@ -89,14 +93,16 @@ const ProjectDeploymentsEmptyState = ({onDeploymentCreated}: ProjectDeploymentsE
         <EmptyState
             {...sharedProps}
             actions={
-                <ProjectDeploymentDialog
-                    onSuccess={onDeploymentCreated}
-                    projectDeployment={{environmentId: currentEnvironmentId} as ProjectDeployment}
-                    redirectOnSubmit={false}
-                    triggerNode={
-                        <Button label="Create Deployment" onClick={() => captureAction('create_deployment')} />
-                    }
-                />
+                canCreateDeployment && (
+                    <ProjectDeploymentDialog
+                        onSuccess={onDeploymentCreated}
+                        projectDeployment={{environmentId: currentEnvironmentId} as ProjectDeployment}
+                        redirectOnSubmit={false}
+                        triggerNode={
+                            <Button label="Create Deployment" onClick={() => captureAction('create_deployment')} />
+                        }
+                    />
+                )
             }
             description="A deployment runs a published version of a project. Choose the version, pick which workflows to enable, and connect their accounts."
             icon={<Layers3Icon />}
