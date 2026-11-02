@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
@@ -64,5 +65,27 @@ class McpProjectWorkflowFacadeIntTest {
 
         assertThatThrownBy(() -> mcpProjectWorkflowFacade.deleteMcpProjectWorkflow(8L))
             .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testListingTheWorkflowsOfAnMcpProjectRequiresAViewer() {
+        when(permissionEvaluator.hasPermission(any(), eq(7L), eq("McpProject"), eq("MCP_VIEW")))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> mcpProjectWorkflowFacade.getMcpProjectMcpProjectWorkflows(7L))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionEvaluator).hasPermission(any(), eq(7L), eq("McpProject"), eq("MCP_VIEW"));
+    }
+
+    @Test
+    void testListingToolEligibleWorkflowsRequiresAProjectWorkflowViewer() {
+        when(permissionEvaluator.hasPermission(any(), eq(5L), eq("Project"), eq("WORKFLOW_VIEW")))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> mcpProjectWorkflowFacade.getToolEligibleProjectVersionWorkflows(5L, 1))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionEvaluator).hasPermission(any(), eq(5L), eq("Project"), eq("WORKFLOW_VIEW"));
     }
 }

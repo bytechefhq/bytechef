@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvents;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
@@ -23,6 +24,7 @@ import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -70,6 +72,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     McpComponentService.class, McpProjectFacade.class, McpProjectService.class, McpProjectWorkflowService.class,
     McpServerFacade.class, McpServerService.class, McpToolService.class, ProjectDeploymentWorkflowService.class,
+    ProjectWorkflowService.class, WorkflowService.class,
     TagService.class, WorkspaceMcpServerService.class
 })
 class McpProjectWorkflowAuditIntTest {

@@ -26,7 +26,6 @@ import com.bytechef.automation.ai.mcp.util.McpWorkflowUtils;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
@@ -44,7 +43,6 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -59,19 +57,17 @@ public class McpProjectWorkflowGraphQlController {
     private final McpProjectWorkflowFacade mcpProjectWorkflowFacade;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
-    private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
 
     McpProjectWorkflowGraphQlController(
         McpProjectWorkflowFacade mcpProjectWorkflowFacade,
         McpProjectWorkflowService mcpProjectWorkflowService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
+        WorkflowService workflowService) {
 
         this.mcpProjectWorkflowFacade = mcpProjectWorkflowFacade;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
-        this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
     }
 
@@ -82,23 +78,15 @@ public class McpProjectWorkflowGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_VIEW')")
     public List<McpProjectWorkflow> mcpProjectWorkflowsByMcpProjectId(@Argument long mcpProjectId) {
-        return mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId);
+        return mcpProjectWorkflowFacade.getMcpProjectMcpProjectWorkflows(mcpProjectId);
     }
 
     @QueryMapping
-    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
     public List<ProjectWorkflow> toolEligibleProjectVersionWorkflows(
         @Argument long projectId, @Argument int projectVersion) {
-        return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
-            .stream()
-            .filter(projectWorkflow -> {
-                Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
-                return McpWorkflowUtils.getCallableTrigger(workflow) != null;
-            })
-            .toList();
+        return mcpProjectWorkflowFacade.getToolEligibleProjectVersionWorkflows(projectId, projectVersion);
     }
 
     @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
