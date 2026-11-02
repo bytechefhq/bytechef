@@ -115,6 +115,68 @@ class AsyncConfigurationTest {
     }
 
     @Test
+    void testWebhookDeliveryExecutorIsUnbounded() {
+        SimpleAsyncTaskExecutor webhookDeliveryExecutor =
+            (SimpleAsyncTaskExecutor) asyncConfiguration.webhookDeliveryExecutor();
+
+        assertFalse(webhookDeliveryExecutor.isThrottleActive());
+    }
+
+    @Test
+    @Timeout(15)
+    void testClosingWebhookDeliveryExecutorInterruptsDeliveriesAndWaitsForThemToFinish() throws Exception {
+        SimpleAsyncTaskExecutor webhookDeliveryExecutor =
+            (SimpleAsyncTaskExecutor) asyncConfiguration.webhookDeliveryExecutor();
+
+        CountDownLatch startedLatch = new CountDownLatch(1);
+        CountDownLatch finishedLatch = new CountDownLatch(1);
+        CompletableFuture<Boolean> interrupted = new CompletableFuture<>();
+
+        webhookDeliveryExecutor.execute(() -> {
+            startedLatch.countDown();
+
+            try {
+                Thread.sleep(60_000);
+
+                interrupted.complete(false);
+            } catch (InterruptedException interruptedException) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException sleepInterruptedException) {
+                    Thread.currentThread()
+                        .interrupt();
+                }
+
+                interrupted.complete(true);
+            } finally {
+                finishedLatch.countDown();
+            }
+        });
+
+        assertTrue(startedLatch.await(5, TimeUnit.SECONDS));
+
+        webhookDeliveryExecutor.close();
+
+        assertEquals(0, finishedLatch.getCount(), "close must wait for the interrupted delivery to finish");
+        assertTrue(interrupted.get(1, TimeUnit.SECONDS));
+    }
+
+    @Test
+    @Timeout(30)
+    void testSaturatedWorkerExecutorDoesNotBlockWebhookDeliveryFromAWorkerThread() throws Exception {
+        environment.setProperty("bytechef.worker.task.subscriptions.default", "1");
+
+        TaskExecutor workerExecutor = asyncConfiguration.workerExecutor();
+        TaskExecutor webhookDeliveryExecutor = asyncConfiguration.webhookDeliveryExecutor();
+
+        CompletableFuture<Boolean> deliveryRan = new CompletableFuture<>();
+
+        workerExecutor.execute(() -> webhookDeliveryExecutor.execute(() -> deliveryRan.complete(true)));
+
+        assertTrue(deliveryRan.get(5, TimeUnit.SECONDS));
+    }
+
+    @Test
     void testMessageEventExecutorIsUnbounded() {
         SimpleAsyncTaskExecutor messageEventExecutor =
             (SimpleAsyncTaskExecutor) asyncConfiguration.messageEventExecutor();
@@ -218,7 +280,8 @@ class AsyncConfigurationTest {
     void testEveryExecutorPropagatesTenantId() throws Exception {
         List<TaskExecutor> executors = List.of(
             asyncConfiguration.getAsyncExecutor(), asyncConfiguration.messageEventExecutor(),
-            asyncConfiguration.syncWorkerExecutor(), asyncConfiguration.workerExecutor());
+            asyncConfiguration.syncWorkerExecutor(), asyncConfiguration.webhookDeliveryExecutor(),
+            asyncConfiguration.workerExecutor());
 
         for (TaskExecutor executor : executors) {
             CompletableFuture<String> tenantIdSeenByTask = new CompletableFuture<>();
@@ -247,7 +310,8 @@ class AsyncConfigurationTest {
 
         List<TaskExecutor> executors = List.of(
             recordingAsyncConfiguration.getAsyncExecutor(), recordingAsyncConfiguration.messageEventExecutor(),
-            recordingAsyncConfiguration.syncWorkerExecutor(), recordingAsyncConfiguration.workerExecutor());
+            recordingAsyncConfiguration.syncWorkerExecutor(), recordingAsyncConfiguration.webhookDeliveryExecutor(),
+            recordingAsyncConfiguration.workerExecutor());
 
         for (TaskExecutor executor : executors) {
             CompletableFuture<Boolean> taskRan = new CompletableFuture<>();
@@ -257,7 +321,7 @@ class AsyncConfigurationTest {
             assertTrue(taskRan.get(5, TimeUnit.SECONDS));
         }
 
-        assertEquals(4, recordingContextPropagatingTaskDecorator.decorateCount.get());
+        assertEquals(5, recordingContextPropagatingTaskDecorator.decorateCount.get());
     }
 
     @Test

@@ -9,6 +9,9 @@ bytechef:
     provider: JDBC
   message-broker:
     provider: MEMORY
+  webhook-delivery:
+    concurrency-limit: 10
+    max-pending-deliveries: 1000
   workflow:
     execution:
       agent:
