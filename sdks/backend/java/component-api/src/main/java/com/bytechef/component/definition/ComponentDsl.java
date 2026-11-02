@@ -2350,7 +2350,8 @@ public final class ComponentDsl {
         @Override
         public PropertiesDataSource<?> getDynamicPropertiesDataSource() {
             if (propertiesFunction == null) {
-                return null;
+                throw new IllegalStateException(
+                    "Dynamic properties property '%s' does not define a properties function".formatted(getName()));
             }
 
             return new PropertiesDataSourceImpl(propertiesLookupDependsOn, propertiesFunction);
