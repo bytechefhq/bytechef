@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.platform.audit.listener;
 
-import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.util.AuditPlatformUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;

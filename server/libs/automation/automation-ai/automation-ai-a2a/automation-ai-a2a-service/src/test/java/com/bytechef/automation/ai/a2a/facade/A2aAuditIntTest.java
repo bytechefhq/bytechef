@@ -46,6 +46,7 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -421,7 +422,7 @@ class A2aAuditIntTest {
 
         @Bean
         AuditEventService auditEventService(PersistenceAuditEventRepository persistenceAuditEventRepository) {
-            return new AuditEventService(persistenceAuditEventRepository);
+            return new AuditEventServiceImpl(persistenceAuditEventRepository);
         }
 
         @Bean
