@@ -1,4 +1,5 @@
 import {useCreateApprovalTaskMutation, useUsersQuery} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useCallback, useMemo, useState} from 'react';
 
 import {useApprovalTasksStore} from '../../stores/useApprovalTasksStore';
@@ -46,6 +47,8 @@ export function useApprovalTaskCreateDialog(): UseApprovalTaskCreateDialogReturn
     const [errors, setErrors] = useState<Partial<NewApprovalTaskFormI>>({});
 
     const addApprovalTask = useApprovalTasksStore((state) => state.addApprovalTask);
+
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {data: usersData} = useUsersQuery();
 
@@ -157,6 +160,7 @@ export function useApprovalTaskCreateDialog(): UseApprovalTaskCreateDialogReturn
                 approvalTask: {
                     assigneeId: form.assigneeId || null,
                     description: form.description,
+                    environmentId: currentEnvironmentId,
                     name: form.title,
                     priority: toServerPriority(form.priority),
                     status: toServerStatus(form.status),
@@ -165,7 +169,7 @@ export function useApprovalTaskCreateDialog(): UseApprovalTaskCreateDialogReturn
 
             handleCloseDialog();
         }
-    }, [form, isFormValid, addApprovalTask, createApprovalTaskMutation, handleCloseDialog]);
+    }, [form, isFormValid, addApprovalTask, createApprovalTaskMutation, currentEnvironmentId, handleCloseDialog]);
 
     return {
         availableAssigneeOptions,
