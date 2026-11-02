@@ -192,6 +192,19 @@ fragment while this heading was hidden - give it back.
 <!-- Commented out until this ships; tracked in .agents/coming-soon-inventory.md (Context Store).
 When restoring: automation/data/context-store.md linked to #context-store-configuration and lost
 the fragment while this heading was hidden - give it back.
+## Audit Configuration
+
+Audit events are an Enterprise Edition feature, see [Audit Events](/platform/settings/audit-events).
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AUDIT_ENABLED` | Record audit events. When off, nothing is written and **Settings → Audit Events** explains how to turn recording on; entries recorded earlier are still listed and purged by the retention job | `false` |
+| `BYTECHEF_AUDIT_CREDENTIAL_USAGE_INTERVAL` | Minimum time between two `CREDENTIAL_USED` entries for the same credential on each server instance. Zero or a negative value records every request | `1h` |
+| `BYTECHEF_AUDIT_MASK_PRINCIPALS` | Mask principals (e.g. `a***@example.com`) when entries are read through the API. The stored entries are unchanged | `false` |
+| `BYTECHEF_AUDIT_RECORD_ALLOWED_PERMISSION_CHECKS` | Also record passed permission checks on calls that change something and have no event type of their own | `false` |
+| `BYTECHEF_AUDIT_RETENTION_CRON` | When the purge of old entries runs, as a cron expression in the JVM time zone | `0 0 2 * * *` |
+| `BYTECHEF_AUDIT_RETENTION_DAYS` | Age in days at which an entry is purged. Zero or a negative value disables the purge | `365` |
+
 ## Context Store Configuration
 
 > **Coming soon.** The Context Store is on the upcoming release track and is not yet available in the latest released version of ByteChef.
