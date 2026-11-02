@@ -7,8 +7,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import McpServers from '../McpServers';
 
-vi.mock('../hooks/useMcpServers', () => ({
-    default: () => ({
+const hoisted = vi.hoisted(() => ({
+    mcpServersState: {
         allComponentNames: [],
         componentDefinitions: [],
         componentDefinitionsIsLoading: false,
@@ -22,7 +22,11 @@ vi.mock('../hooks/useMcpServers', () => ({
         tagsIsLoading: false,
         uniqueProjects: [],
         validMcpServers: [],
-    }),
+    } as Record<string, unknown>,
+}));
+
+vi.mock('../hooks/useMcpServers', () => ({
+    default: () => hoisted.mcpServersState,
 }));
 
 vi.mock('@/shared/layout/LayoutContainer', () => ({
@@ -75,6 +79,8 @@ const renderMcpServers = () => {
 describe('McpServers', () => {
     beforeEach(() => {
         useCopilotPostTurnRegistry.setState({callbacks: {}});
+        hoisted.mcpServersState.mcpServersIsLoading = false;
+        hoisted.mcpServersState.tagsIsLoading = false;
     });
 
     it('should refresh the MCP server queries after a copilot turn for the MCP server source', () => {
@@ -114,5 +120,13 @@ describe('McpServers', () => {
         expect(screen.getByText('Create your first MCP server')).toBeInTheDocument();
         expect(screen.getByText('Create an MCP server').closest('li')).toHaveAttribute('aria-current', 'step');
         expect(screen.getByText('How MCP servers work')).toBeInTheDocument();
+    });
+
+    it('should keep the sidebar hidden while the tags are still loading on an empty page', () => {
+        hoisted.mcpServersState.tagsIsLoading = true;
+
+        renderMcpServers();
+
+        expect(screen.getByTestId('layout-container')).toHaveAttribute('data-left-sidebar-hidden', 'true');
     });
 });

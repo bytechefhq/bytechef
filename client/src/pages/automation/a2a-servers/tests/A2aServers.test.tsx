@@ -97,4 +97,12 @@ describe('A2aServers', () => {
         expect(screen.getByText('No Matching A2A Servers')).toBeInTheDocument();
         expect(screen.queryByText('Create your first A2A server')).not.toBeInTheDocument();
     });
+
+    it('keeps the sidebar hidden while the tags are still loading on an empty page', () => {
+        hoisted.mockUseA2aServers.mockReturnValue(a2aServersState({tagsIsLoading: true}));
+
+        render(<A2aServers />);
+
+        expect(screen.getByTestId('layout-container')).toHaveAttribute('data-left-sidebar-hidden', 'true');
+    });
 });
