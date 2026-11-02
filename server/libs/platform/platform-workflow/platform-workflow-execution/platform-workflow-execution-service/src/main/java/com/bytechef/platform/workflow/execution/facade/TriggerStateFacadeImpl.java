@@ -45,7 +45,9 @@ public class TriggerStateFacadeImpl implements TriggerStateFacade {
         Optional<Object> storedValueOptional = triggerStateService.fetchValue(workflowExecutionId);
 
         if (storedValueOptional.isPresent()) {
-            stateValueDataStorage.delete(getKey(workflowExecutionId), storedValueOptional.get());
+            stateValueDataStorage.delete(
+                getKey(workflowExecutionId), storedValueOptional.get(),
+                () -> triggerStateService.fetchValue(workflowExecutionId));
 
             triggerStateService.delete(workflowExecutionId);
         }
@@ -68,7 +70,7 @@ public class TriggerStateFacadeImpl implements TriggerStateFacade {
             getKey(workflowExecutionId), value,
             stateValueDataStorage.fetchLocation(
                 workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()),
-            previousStoredValueOptional.orElse(null));
+            previousStoredValueOptional.orElse(null), () -> triggerStateService.fetchValue(workflowExecutionId));
 
         triggerStateService.save(workflowExecutionId, storedValue);
     }

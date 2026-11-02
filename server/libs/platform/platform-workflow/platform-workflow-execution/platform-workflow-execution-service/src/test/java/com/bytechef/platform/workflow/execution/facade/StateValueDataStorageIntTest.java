@@ -43,6 +43,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +56,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import tools.jackson.databind.ObjectMapper;
 
@@ -218,6 +223,46 @@ class StateValueDataStorageIntTest {
     }
 
     @Test
+    void testCommittedTaskStateCleanupKeepsSlotReusedByLaterSave() {
+        taskStateFacade.save(JOB_RESUME_ID, "first");
+
+        String firstKey = getTaskStateReference().key();
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        transactionTemplate.executeWithoutResult(status -> {
+            saveTaskStateAfterCompletion("third");
+
+            taskStateFacade.save(JOB_RESUME_ID, "second");
+        });
+
+        assertThat(getTaskStateReference().key()).isEqualTo(firstKey);
+        assertThat(getTaskStateEntries()).containsOnly(Map.entry(firstKey, "third"));
+        assertThat(taskStateFacade.<String>fetchValue(JOB_RESUME_ID)).hasValue("third");
+    }
+
+    @Test
+    void testRolledBackTaskStateCleanupKeepsSlotReusedByLaterSave() {
+        taskStateFacade.save(JOB_RESUME_ID, "first");
+
+        String firstKey = getTaskStateReference().key();
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        transactionTemplate.executeWithoutResult(status -> {
+            saveTaskStateAfterCompletion("third");
+
+            taskStateFacade.save(JOB_RESUME_ID, "second");
+
+            status.setRollbackOnly();
+        });
+
+        String thirdKey = getTaskStateReference().key();
+
+        assertThat(thirdKey).isNotEqualTo(firstKey);
+        assertThat(getTaskStateEntries()).containsOnly(Map.entry(thirdKey, "third"));
+        assertThat(taskStateFacade.<String>fetchValue(JOB_RESUME_ID)).hasValue("third");
+    }
+
+    @Test
     void testRolledBackTaskStateDeleteKeepsValue() {
         taskStateFacade.save(JOB_RESUME_ID, "value");
 
@@ -318,6 +363,21 @@ class StateValueDataStorageIntTest {
             .orElseThrow();
 
         return (StateValueReference) taskState.getValue();
+    }
+
+    private void saveTaskStateAfterCompletion(String value) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCompletion(int status) {
+                try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
+                    executorService.submit(() -> taskStateFacade.save(JOB_RESUME_ID, value))
+                        .get();
+                } catch (ExecutionException | InterruptedException exception) {
+                    throw new IllegalStateException(exception);
+                }
+            }
+        });
     }
 
     private Map<String, Object> getTaskStateEntries() {

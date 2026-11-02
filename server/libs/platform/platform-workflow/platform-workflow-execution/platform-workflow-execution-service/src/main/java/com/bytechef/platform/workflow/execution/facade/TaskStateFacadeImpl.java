@@ -45,7 +45,8 @@ public class TaskStateFacadeImpl implements TaskStateFacade {
         Optional<Object> storedValueOptional = taskStateService.fetchValue(jobResumeId);
 
         if (storedValueOptional.isPresent()) {
-            stateValueDataStorage.delete(getKey(jobResumeId), storedValueOptional.get());
+            stateValueDataStorage.delete(
+                getKey(jobResumeId), storedValueOptional.get(), () -> taskStateService.fetchValue(jobResumeId));
 
             taskStateService.delete(jobResumeId);
         }
@@ -74,7 +75,7 @@ public class TaskStateFacadeImpl implements TaskStateFacade {
 
         Object storedValue = stateValueDataStorage.write(
             getKey(jobResumeId), value, stateValueDataStorage.fetchJobLocation(jobResumeId.getJobId()),
-            previousStoredValueOptional.orElse(null));
+            previousStoredValueOptional.orElse(null), () -> taskStateService.fetchValue(jobResumeId));
 
         taskStateService.save(jobResumeId, storedValue);
     }
