@@ -15,6 +15,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-core")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     testImplementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-service"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))

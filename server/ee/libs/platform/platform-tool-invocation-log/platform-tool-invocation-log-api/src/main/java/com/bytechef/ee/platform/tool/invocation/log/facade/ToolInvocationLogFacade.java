@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.tool.invocation.log.facade;
 
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.facade.dto.ToolInvocationLogDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
@@ -22,13 +22,13 @@ import org.springframework.data.domain.Page;
  */
 public interface ToolInvocationLogFacade {
 
-    Page<ToolInvocationLog> getToolInvocationLogs(
+    Page<ToolInvocationLogDTO> getToolInvocationLogs(
         PlatformType type, @Nullable Long environmentId, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome,
         @Nullable Long mcpServerId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber);
 
-    Page<ToolInvocationLog> getWorkspaceToolInvocationLogs(
+    Page<ToolInvocationLogDTO> getWorkspaceToolInvocationLogs(
         PlatformType type, long workspaceId, long environmentId, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,

@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.tool.invocation.log.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
 import com.bytechef.ee.platform.tool.invocation.log.facade.ToolInvocationLogFacade;
+import com.bytechef.ee.platform.tool.invocation.log.facade.dto.ToolInvocationLogDTO;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
@@ -68,7 +69,7 @@ public class ToolInvocationLogGraphQlController {
                 integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
     }
 
-    private static ToolInvocationLogPage toPage(Page<ToolInvocationLog> toolInvocationLogPage) {
+    private static ToolInvocationLogPage toPage(Page<ToolInvocationLogDTO> toolInvocationLogPage) {
         List<ToolInvocationLogItem> content = toolInvocationLogPage.getContent()
             .stream()
             .map(ToolInvocationLogGraphQlController::toItem)
@@ -91,7 +92,8 @@ public class ToolInvocationLogGraphQlController {
         return epochMillis == null ? null : Instant.ofEpochMilli(epochMillis);
     }
 
-    private static ToolInvocationLogItem toItem(ToolInvocationLog toolInvocationLog) {
+    private static ToolInvocationLogItem toItem(ToolInvocationLogDTO toolInvocationLogDTO) {
+        ToolInvocationLog toolInvocationLog = toolInvocationLogDTO.toolInvocationLog();
         Instant createdDate = toolInvocationLog.getCreatedDate();
 
         return new ToolInvocationLogItem(
@@ -105,7 +107,7 @@ public class ToolInvocationLogGraphQlController {
             toolInvocationLog.getConnectionId(), toolInvocationLog.getEnvironment(),
             toolInvocationLog.getWorkspaceId(), toolInvocationLog.getExternalUserId(),
             toolInvocationLog.getConnectedUserId(), toolInvocationLog.getIntegrationInstanceId(),
-            toolInvocationLog.getMcpServerId(), toolInvocationLog.getJobId(),
+            toolInvocationLog.getMcpServerId(), toolInvocationLog.getJobId(), toolInvocationLogDTO.workflowName(),
             toolInvocationLog.getOutcome()
                 .name(),
             toolInvocationLog.getErrorType(), toolInvocationLog.getErrorMessage(),
@@ -116,8 +118,8 @@ public class ToolInvocationLogGraphQlController {
     record ToolInvocationLogItem(
         Long id, String surface, String kind, String toolName, String componentName, Integer componentVersion,
         String operationName, Long connectionId, Integer environment, Long workspaceId, String externalUserId,
-        Long connectedUserId, Long integrationInstanceId, Long mcpServerId, Long jobId, String outcome,
-        String errorType, String errorMessage, int durationMs, Long createdDate) {
+        Long connectedUserId, Long integrationInstanceId, Long mcpServerId, Long jobId, String workflowName,
+        String outcome, String errorType, String errorMessage, int durationMs, Long createdDate) {
     }
 
     record ToolInvocationLogPage(

@@ -7,6 +7,10 @@
 
 package com.bytechef.ee.platform.tool.invocation.log.config;
 
+import static org.mockito.Mockito.mock;
+
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.tenant.single.SingleTenantService;
@@ -16,6 +20,7 @@ import java.util.List;
 import org.springframework.boot.autoconfigure.AutoConfigurationExcludeFilter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +42,16 @@ import org.springframework.context.annotation.Import;
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
 public class ToolInvocationLogIntTestConfiguration {
+
+    @Bean
+    JobService jobService() {
+        return mock(JobService.class);
+    }
+
+    @Bean
+    WorkflowService workflowService() {
+        return mock(WorkflowService.class);
+    }
 
     @Configuration
     public static class ToolInvocationLogIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {

@@ -9,20 +9,27 @@ package com.bytechef.ee.platform.tool.invocation.log.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
+import com.bytechef.ee.platform.tool.invocation.log.facade.dto.ToolInvocationLogDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +56,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class ToolInvocationLogFacadeIntTest {
 
     @Autowired
+    private JobService jobService;
+
+    @Autowired
     private PermissionService permissionService;
 
     @Autowired
@@ -57,9 +67,12 @@ class ToolInvocationLogFacadeIntTest {
     @Autowired
     private ToolInvocationLogService toolInvocationLogService;
 
+    @Autowired
+    private WorkflowService workflowService;
+
     @BeforeEach
     void beforeEach() {
-        reset(permissionService, toolInvocationLogService);
+        reset(jobService, permissionService, toolInvocationLogService, workflowService);
 
         authenticate(
             new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
@@ -81,7 +94,7 @@ class ToolInvocationLogFacadeIntTest {
 
         assertThat(toolInvocationLogFacade.getToolInvocationLogs(PlatformType.AUTOMATION, null, null, null, null, 3L,
             null, null, null, 0))
-                .isSameAs(page);
+                .isEmpty();
     }
 
     @Test
@@ -97,7 +110,49 @@ class ToolInvocationLogFacadeIntTest {
         assertThat(
             toolInvocationLogFacade.getToolInvocationLogs(
                 PlatformType.AUTOMATION, 2L, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null, null, 0))
-                    .isSameAs(page);
+                    .isEmpty();
+    }
+
+    @Test
+    void testTenantQueryResolvesTheWorkflowNameOfEachInvocationFromItsJob() {
+        ToolInvocationLog workflowToolInvocationLog = new ToolInvocationLog();
+
+        workflowToolInvocationLog.setJobId(11L);
+
+        ToolInvocationLog purgedJobToolInvocationLog = new ToolInvocationLog();
+
+        purgedJobToolInvocationLog.setJobId(12L);
+
+        ToolInvocationLog componentToolInvocationLog = new ToolInvocationLog();
+
+        Job job = new Job();
+
+        job.setId(11L);
+        job.setWorkflowId("workflow-1");
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getLabel()).thenReturn("Send Message");
+
+        when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(
+            toolInvocationLogService.getToolInvocationLogs(
+                PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, 0))
+                    .thenReturn(
+                        new PageImpl<>(
+                            List.of(
+                                workflowToolInvocationLog, purgedJobToolInvocationLog, componentToolInvocationLog)));
+        when(jobService.getJobs(List.of(11L, 12L))).thenReturn(List.of(job));
+        when(workflowService.fetchWorkflow("workflow-1")).thenReturn(Optional.of(workflow));
+
+        Page<ToolInvocationLogDTO> toolInvocationLogDTOPage = toolInvocationLogFacade.getToolInvocationLogs(
+            PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, 0);
+
+        assertThat(toolInvocationLogDTOPage.getContent())
+            .extracting(ToolInvocationLogDTO::toolInvocationLog, ToolInvocationLogDTO::workflowName)
+            .containsExactly(
+                tuple(workflowToolInvocationLog, "Send Message"), tuple(purgedJobToolInvocationLog, null),
+                tuple(componentToolInvocationLog, null));
     }
 
     @Test
@@ -142,7 +197,7 @@ class ToolInvocationLogFacadeIntTest {
             toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
                 PlatformType.AUTOMATION, 7L, 2L, ToolExecutionSurface.MCP_AUTOMATION, null, 5L, null, null, null, null,
                 1))
-                    .isSameAs(page);
+                    .isEmpty();
     }
 
     @Test
@@ -185,6 +240,11 @@ class ToolInvocationLogFacadeIntTest {
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     static class Config {
 
+        @Bean
+        JobService jobService() {
+            return mock(JobService.class);
+        }
+
         @Bean("permissionService")
         PermissionService permissionService() {
             return mock(PermissionService.class);
@@ -196,8 +256,16 @@ class ToolInvocationLogFacadeIntTest {
         }
 
         @Bean
-        ToolInvocationLogFacade toolInvocationLogFacade(ToolInvocationLogService toolInvocationLogService) {
-            return new ToolInvocationLogFacadeImpl(toolInvocationLogService);
+        ToolInvocationLogFacade toolInvocationLogFacade(
+            JobService jobService, ToolInvocationLogService toolInvocationLogService,
+            WorkflowService workflowService) {
+
+            return new ToolInvocationLogFacadeImpl(jobService, toolInvocationLogService, workflowService);
+        }
+
+        @Bean
+        WorkflowService workflowService() {
+            return mock(WorkflowService.class);
         }
     }
 }
