@@ -8,6 +8,7 @@
 package com.bytechef.ee.remote.grpc.interceptor;
 
 import com.bytechef.ee.remote.grpc.security.RemoteApiKeyAuthenticationToken;
+import com.bytechef.ee.remote.grpc.security.RemoteExternalIssuerAuthenticationToken;
 import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
 import io.grpc.ForwardingServerCallListener;
 import io.grpc.Metadata;
@@ -99,6 +100,8 @@ public class UserContextServerInterceptor implements ServerInterceptor {
         return switch (principalKind) {
             case PrincipalKind.USER -> UsernamePasswordAuthenticationToken.authenticated(login, null, authorities);
             case PrincipalKind.API_KEY -> toApiKeyAuthentication(login, authorities, metadata);
+            case PrincipalKind.EXTERNAL_ISSUER ->
+                new RemoteExternalIssuerAuthenticationToken(new User(login, "", authorities), authorities);
             default -> decode(principalKind, login, metadata);
         };
     }
