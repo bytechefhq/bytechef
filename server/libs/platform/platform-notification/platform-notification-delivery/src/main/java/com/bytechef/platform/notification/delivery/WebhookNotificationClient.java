@@ -18,6 +18,8 @@ package com.bytechef.platform.notification.delivery;
 
 import com.bytechef.commons.util.UrlValidationException;
 import com.bytechef.commons.util.UrlValidatorUtils;
+import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -34,11 +36,16 @@ import org.springframework.core.retry.RetryTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriTemplateHandler;
 
 /**
  * @author Ivica Cardic
@@ -59,6 +66,27 @@ public class WebhookNotificationClient {
         requestFactory.setReadTimeout(READ_TIMEOUT_MILLIS);
 
         this.restTemplate = new RestTemplate(requestFactory);
+
+        this.restTemplate.setErrorHandler(new ResponseErrorHandler() {
+
+            @Override
+            public boolean hasError(ClientHttpResponse clientHttpResponse) throws IOException {
+                HttpStatusCode statusCode = clientHttpResponse.getStatusCode();
+
+                return !statusCode.is2xxSuccessful();
+            }
+
+            @Override
+            public void handleError(URI requestUri, HttpMethod httpMethod, ClientHttpResponse clientHttpResponse)
+                throws IOException {
+
+                HttpStatusCode statusCode = clientHttpResponse.getStatusCode();
+
+                throw new RestClientResponseException(
+                    "HTTP " + statusCode.value(), statusCode, clientHttpResponse.getStatusText(),
+                    clientHttpResponse.getHeaders(), null, null);
+            }
+        });
     }
 
     public record WebhookRetry(int maxRetries, Duration initialInterval, double multiplier) {
@@ -104,14 +132,82 @@ public class WebhookNotificationClient {
                 "t=" + timestamp + ",v1=" + sign(secret, timestamp + "." + webhookDeliveryRequest.payloadJson()));
         }
 
-        post(url, new HttpEntity<>(webhookDeliveryRequest.payloadJson(), httpHeaders), webhookRetry);
+        postWithRetry(url, new HttpEntity<>(webhookDeliveryRequest.payloadJson(), httpHeaders), webhookRetry);
+    }
+
+    public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
+        URI uri = toUri(restTemplate, webhookDelivery.url());
+        String host = uri.getHost();
+        String payloadJson = webhookPayload.json();
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        long timestamp = System.currentTimeMillis();
+
+        if (webhookDelivery.eventType() != null) {
+            httpHeaders.set("X-ByteChef-Event", webhookDelivery.eventType());
+            httpHeaders.set("X-ByteChef-Timestamp", String.valueOf(timestamp));
+            httpHeaders.set("X-ByteChef-Delivery", String.valueOf(UUID.randomUUID()));
+        }
+
+        for (Map.Entry<String, String> header : webhookDelivery.headers()
+            .entrySet()) {
+
+            httpHeaders.set(header.getKey(), header.getValue());
+        }
+
+        String secret = webhookDelivery.secret();
+
+        if (secret != null && !secret.isBlank()) {
+            httpHeaders.set(
+                "X-ByteChef-Signature", "t=" + timestamp + ",v1=" + sign(secret, timestamp + "." + payloadJson));
+        }
+
+        try {
+            restTemplate.exchange(uri, HttpMethod.POST, new HttpEntity<>(payloadJson, httpHeaders), String.class);
+        } catch (RestClientResponseException restClientResponseException) {
+            int statusCode = restClientResponseException.getStatusCode()
+                .value();
+
+            throw new WebhookDeliveryException(
+                "Webhook delivery to " + host + " returned HTTP " + statusCode, statusCode,
+                restClientResponseException);
+        } catch (RestClientException restClientException) {
+            throw new WebhookDeliveryException("Failed to deliver webhook to " + host, null, restClientException);
+        }
+    }
+
+    private static URI toUri(RestTemplate restTemplate, String url) {
+        UriTemplateHandler uriTemplateHandler = restTemplate.getUriTemplateHandler();
+
+        URI uri;
+
+        try {
+            uri = uriTemplateHandler.expand(url);
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            throw new InvalidWebhookUrlException("Webhook URL is not a valid URI", exception);
+        }
+
+        String scheme = uri.getScheme();
+
+        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+            throw new InvalidWebhookUrlException("Webhook URL must use http or https", null);
+        }
+
+        if (uri.getHost() == null) {
+            throw new InvalidWebhookUrlException("Webhook URL has no host", null);
+        }
+
+        return uri;
     }
 
     public void deliverEvent(String url, Object payload, WebhookRetry webhookRetry) {
-        post(url, new HttpEntity<>(payload), webhookRetry);
+        postWithRetry(url, new HttpEntity<>(payload), webhookRetry);
     }
 
-    private void post(String url, HttpEntity<?> httpEntity, WebhookRetry webhookRetry) {
+    private void postWithRetry(String url, HttpEntity<?> httpEntity, WebhookRetry webhookRetry) {
         try {
             if (webhookRetry.maxRetries() <= 0) {
                 exchange(url, httpEntity);
@@ -137,7 +233,7 @@ public class WebhookNotificationClient {
                     .value(),
                 restClientResponseException.getStatusCode()
                     .value());
-        } catch (org.springframework.web.client.RestClientException restClientException) {
+        } catch (RestClientException restClientException) {
             throw new WebhookDeliveryException("Failed to deliver webhook to " + url, restClientException);
         }
     }
