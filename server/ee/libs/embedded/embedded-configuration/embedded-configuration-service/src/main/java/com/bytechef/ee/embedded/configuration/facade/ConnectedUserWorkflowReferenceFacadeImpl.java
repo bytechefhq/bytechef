@@ -312,10 +312,12 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         }
 
         Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
-            automationWorkflowProjectConfigurationService.fetchConfiguration(
+            automationWorkflowProjectConfigurationService.getConfigurations(
                 publishedProject.get()
                     .id(),
-                environment.ordinal());
+                environment.ordinal())
+                .stream()
+                .findFirst();
 
         boolean released = false;
 

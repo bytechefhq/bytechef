@@ -766,7 +766,9 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .id();
 
         Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
-            automationWorkflowProjectConfigurationService.fetchConfiguration(projectId, environment.ordinal());
+            automationWorkflowProjectConfigurationService.getConfigurations(projectId, environment.ordinal())
+                .stream()
+                .findFirst();
 
         boolean released = false;
 

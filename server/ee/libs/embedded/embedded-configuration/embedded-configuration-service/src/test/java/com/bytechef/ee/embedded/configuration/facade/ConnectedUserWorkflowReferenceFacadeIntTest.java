@@ -363,8 +363,8 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
-        automationWorkflowProjectConfigurationService.create(
-            automationWorkflowProjectId, Environment.DEVELOPMENT.ordinal(), 1, true, true);
+        automationWorkflowProjectConfigurationService.create(automationWorkflowProjectId,
+            Environment.DEVELOPMENT.ordinal(), "Default", null, 1, true, true);
 
         String externalUserId = newExternalUserId();
 
@@ -554,11 +554,13 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         publishAndPinProject(automationWorkflowProjectId);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .stream()
+            .findFirst()
             .orElseThrow();
 
-        automationWorkflowProjectConfigurationService.update(
-            configuration.getId(), configuration.getProjectVersion(), true, false);
+        automationWorkflowProjectConfigurationService.update(configuration.getId(), configuration.getName(),
+            configuration.getPermissionExpression(), configuration.getProjectVersion(), true, false);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -603,7 +605,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
             connectedUser.getExternalId(), workflowUuid, false, Environment.PRODUCTION);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);
@@ -1434,7 +1438,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         Map<String, Object> providedInputs) {
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(

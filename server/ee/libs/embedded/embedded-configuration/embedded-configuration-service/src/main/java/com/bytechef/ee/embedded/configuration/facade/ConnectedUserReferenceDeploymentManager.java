@@ -127,7 +127,9 @@ class ConnectedUserReferenceDeploymentManager {
 
     public Optional<Integer> fetchReleasedVersion(long automationWorkflowProjectId, Environment environment) {
         return automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, environment.ordinal())
+            .getConfigurations(automationWorkflowProjectId, environment.ordinal())
+            .stream()
+            .findFirst()
             .filter(AutomationWorkflowProjectConfiguration::isEnabled)
             .map(AutomationWorkflowProjectConfiguration::getProjectVersion);
     }
@@ -155,8 +157,10 @@ class ConnectedUserReferenceDeploymentManager {
         long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
 
         Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
-            automationWorkflowProjectConfigurationService.fetchConfiguration(
-                automationWorkflowProjectId, environment.ordinal());
+            automationWorkflowProjectConfigurationService.getConfigurations(
+                automationWorkflowProjectId, environment.ordinal())
+                .stream()
+                .findFirst();
 
         if (configurationOptional.isEmpty()) {
             return false;
@@ -462,7 +466,9 @@ class ConnectedUserReferenceDeploymentManager {
         long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
 
         return automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, environment.ordinal())
+            .getConfigurations(automationWorkflowProjectId, environment.ordinal())
+            .stream()
+            .findFirst()
             .map(configuration -> getProvidedValues(configuration, automationWorkflowUuid))
             .orElse(ProvidedValues.NONE);
     }

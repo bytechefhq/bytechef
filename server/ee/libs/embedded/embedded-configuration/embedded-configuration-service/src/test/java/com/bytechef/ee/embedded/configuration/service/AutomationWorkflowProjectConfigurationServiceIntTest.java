@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigura
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -62,19 +63,24 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         long projectId = insertProject(insertWorkspace());
 
         AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 2, false, true);
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 2, false,
+                true);
 
         assertThat(configuration.getId()).isNotNull();
-        assertThat(automationWorkflowProjectConfigurationService.fetchConfiguration(projectId, ENVIRONMENT_ID))
-            .hasValueSatisfying(fetchedConfiguration -> {
-                assertThat(fetchedConfiguration.getId()).isEqualTo(configuration.getId());
-                assertThat(fetchedConfiguration.getProjectId()).isEqualTo(projectId);
-                assertThat(fetchedConfiguration.getEnvironmentId()).isEqualTo(ENVIRONMENT_ID);
-                assertThat(fetchedConfiguration.getProjectVersion()).isEqualTo(2);
-                assertThat(fetchedConfiguration.isEnabled()).isFalse();
-                assertThat(fetchedConfiguration.isAutomationHubVisible()).isTrue();
-            });
-        assertThat(automationWorkflowProjectConfigurationService.fetchConfiguration(projectId, 1L)).isEmpty();
+        assertThat(automationWorkflowProjectConfigurationService.getConfigurations(projectId, ENVIRONMENT_ID)
+            .stream()
+            .findFirst())
+                .hasValueSatisfying(fetchedConfiguration -> {
+                    assertThat(fetchedConfiguration.getId()).isEqualTo(configuration.getId());
+                    assertThat(fetchedConfiguration.getProjectId()).isEqualTo(projectId);
+                    assertThat(fetchedConfiguration.getEnvironmentId()).isEqualTo(ENVIRONMENT_ID);
+                    assertThat(fetchedConfiguration.getProjectVersion()).isEqualTo(2);
+                    assertThat(fetchedConfiguration.isEnabled()).isFalse();
+                    assertThat(fetchedConfiguration.isAutomationHubVisible()).isTrue();
+                });
+        assertThat(automationWorkflowProjectConfigurationService.getConfigurations(projectId, 1L)
+            .stream()
+            .findFirst()).isEmpty();
         assertThat(automationWorkflowProjectConfigurationService.getConfigurations(projectId)).hasSize(1);
     }
 
@@ -82,11 +88,41 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
     void testCreateTwiceForTheSameEnvironmentThrows() {
         long projectId = insertProject(insertWorkspace());
 
-        automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+        automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, true, true);
 
         assertThatThrownBy(
-            () -> automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true))
-                .isInstanceOf(DataIntegrityViolationException.class);
+            () -> automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1,
+                true, true))
+                    .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void testTwoConfigurationsInOneEnvironment() {
+        long projectId = insertProject(insertWorkspace());
+
+        automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, true, true);
+        automationWorkflowProjectConfigurationService.create(
+            projectId, ENVIRONMENT_ID, "Beta", "hasRole('beta')", 1, true, true);
+
+        List<AutomationWorkflowProjectConfiguration> configurations =
+            automationWorkflowProjectConfigurationService.getConfigurations(projectId, ENVIRONMENT_ID);
+
+        assertThat(configurations).extracting(AutomationWorkflowProjectConfiguration::getName)
+            .containsExactlyInAnyOrder("Default", "Beta");
+        assertThat(configurations).extracting(AutomationWorkflowProjectConfiguration::getPermissionExpression)
+            .containsExactlyInAnyOrder(null, "hasRole('beta')");
+    }
+
+    @Test
+    void testDuplicateNameIsRejectedIgnoringCase() {
+        long projectId = insertProject(insertWorkspace());
+
+        automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Beta", null, 1, true, true);
+
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationService.create(
+                projectId, ENVIRONMENT_ID, " beta ", null, 1, true, true))
+                    .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
@@ -127,7 +163,8 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         long projectId = insertProject(insertWorkspace());
 
         AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, true,
+                true);
 
         assertThat(automationWorkflowProjectConfigurationService.isWorkflowEnabled(configuration, UUID.randomUUID()))
             .isTrue();
@@ -139,7 +176,8 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         UUID workflowUuid = UUID.randomUUID();
 
         AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, true,
+                true);
 
         configuration = automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
             configuration.getId(), workflowUuid, false);
@@ -168,7 +206,8 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         UUID workflowUuid = UUID.randomUUID();
 
         AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, true,
+                true);
 
         automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
             configuration.getId(), workflowUuid, Map.of("openai", 42L),
@@ -203,7 +242,8 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         UUID workflowUuid = UUID.randomUUID();
 
         AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, true,
+                true);
 
         automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
             configuration.getId(), workflowUuid, Map.of("openai", 42L), Map.of("channel", "general"));
@@ -225,7 +265,8 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         UUID workflowUuid = UUID.randomUUID();
 
         AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, true,
+                true);
 
         automationWorkflowProjectConfigurationService.updateWorkflowEnabled(configuration.getId(), workflowUuid, false);
 
@@ -247,9 +288,11 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         long projectId = insertProject(insertWorkspace());
 
         AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, false, true);
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, false,
+                true);
 
-        configuration = automationWorkflowProjectConfigurationService.update(configuration.getId(), 3, true, false);
+        configuration = automationWorkflowProjectConfigurationService.update(configuration.getId(),
+            configuration.getName(), configuration.getPermissionExpression(), 3, true, false);
 
         assertThat(configuration.getProjectVersion()).isEqualTo(3);
         assertThat(configuration.isEnabled()).isTrue();
@@ -266,7 +309,8 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         long projectId = insertProject(insertWorkspace());
 
         AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, true,
+                true);
 
         automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
             configuration.getId(), UUID.randomUUID(), false);
@@ -276,8 +320,10 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         automationWorkflowProjectConfigurationService.delete(configuration.getId());
 
         assertThat(countWorkflowRows()).isZero();
-        assertThat(automationWorkflowProjectConfigurationService.fetchConfiguration(projectId, ENVIRONMENT_ID))
-            .isEmpty();
+        assertThat(automationWorkflowProjectConfigurationService.getConfigurations(projectId, ENVIRONMENT_ID)
+            .stream()
+            .findFirst())
+                .isEmpty();
     }
 
     private int countAdvisoryLocksHeldByThisSession() {

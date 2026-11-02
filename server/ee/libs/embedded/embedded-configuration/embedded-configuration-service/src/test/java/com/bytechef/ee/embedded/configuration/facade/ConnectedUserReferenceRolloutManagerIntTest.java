@@ -859,8 +859,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
-        automationWorkflowProjectConfigurationService.create(
-            automationWorkflowProjectId, Environment.DEVELOPMENT.ordinal(), 1, true, true);
+        automationWorkflowProjectConfigurationService.create(automationWorkflowProjectId,
+            Environment.DEVELOPMENT.ordinal(), "Default", null, 1, true, true);
 
         String developmentExternalUserId = "rollout-user-" + UUID.randomUUID();
 
@@ -878,10 +878,13 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
 
         AutomationWorkflowProjectConfiguration developmentConfiguration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, Environment.DEVELOPMENT.ordinal())
+            .getConfigurations(automationWorkflowProjectId, Environment.DEVELOPMENT.ordinal())
+            .stream()
+            .findFirst()
             .orElseThrow();
 
-        automationWorkflowProjectConfigurationService.update(developmentConfiguration.getId(), 2, true, true);
+        automationWorkflowProjectConfigurationService.update(developmentConfiguration.getId(),
+            developmentConfiguration.getName(), developmentConfiguration.getPermissionExpression(), 2, true, true);
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
@@ -965,7 +968,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .getConfigurations(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         CountDownLatch startLatch = new CountDownLatch(1);
@@ -1622,7 +1627,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             EXTERNAL_USER_ID, secondUuid, Environment.PRODUCTION);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .getConfigurations(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
@@ -1649,7 +1656,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .getConfigurations(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(configuration.getId());
@@ -1664,8 +1673,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .orElseThrow()
             .isEnabled()).isTrue();
 
-        automationWorkflowProjectConfigurationService.create(
-            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, 1, true, true);
+        automationWorkflowProjectConfigurationService.create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID,
+            "Default", null, 1, true, true);
 
         connectedUserReferenceRolloutManager.applyConfigurationState(
             automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
@@ -2086,7 +2095,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .getConfigurations(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
@@ -2333,7 +2344,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#administrator"));
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .getConfigurations(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(configuration.getId());
@@ -2381,7 +2394,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         provideValuesAndRollOut(automationWorkflowProjectId, workflowUuid, providedConnections, providedInputs);
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .getConfigurations(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
@@ -2658,7 +2673,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         Map<String, Object> providedInputs) {
 
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .getConfigurations(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
@@ -2727,7 +2744,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     private void setProductionConfigurationEnabled(long automationWorkflowProjectId, boolean enabled) {
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .getConfigurations(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
             .orElseThrow();
 
         automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), enabled);
@@ -2884,10 +2903,13 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     private void updateProductionConfigurationVersion(long automationWorkflowProjectId, int projectVersion) {
         AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .getConfigurations(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
             .orElseThrow();
 
-        automationWorkflowProjectConfigurationService.update(configuration.getId(), projectVersion, true, true);
+        automationWorkflowProjectConfigurationService.update(configuration.getId(), configuration.getName(),
+            configuration.getPermissionExpression(), projectVersion, true, true);
     }
 
     private void publishAndPinProject(long projectId) {

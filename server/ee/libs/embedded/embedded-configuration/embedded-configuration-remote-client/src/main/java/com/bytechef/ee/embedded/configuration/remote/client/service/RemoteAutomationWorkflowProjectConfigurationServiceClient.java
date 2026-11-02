@@ -12,9 +12,9 @@ import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectC
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,7 +29,8 @@ public class RemoteAutomationWorkflowProjectConfigurationServiceClient
 
     @Override
     public AutomationWorkflowProjectConfiguration create(
-        long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible) {
+        long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
+        boolean enabled, boolean automationHubVisible) {
 
         throw new UnsupportedOperationException();
     }
@@ -40,17 +41,17 @@ public class RemoteAutomationWorkflowProjectConfigurationServiceClient
     }
 
     @Override
-    public Optional<AutomationWorkflowProjectConfiguration> fetchConfiguration(long projectId, long environmentId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public AutomationWorkflowProjectConfiguration getConfiguration(long id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
@@ -71,7 +72,8 @@ public class RemoteAutomationWorkflowProjectConfigurationServiceClient
 
     @Override
     public AutomationWorkflowProjectConfiguration update(
-        long id, int projectVersion, boolean enabled, boolean automationHubVisible) {
+        long id, String name, @Nullable String permissionExpression, int projectVersion, boolean enabled,
+        boolean automationHubVisible) {
 
         throw new UnsupportedOperationException();
     }

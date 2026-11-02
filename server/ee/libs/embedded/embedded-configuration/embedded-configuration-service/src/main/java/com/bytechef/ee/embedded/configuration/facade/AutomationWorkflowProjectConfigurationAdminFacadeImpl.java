@@ -134,7 +134,9 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         validatePublishedProjectVersion(projectId, projectVersion);
 
         Optional<AutomationWorkflowProjectConfiguration> existingConfigurationOptional =
-            automationWorkflowProjectConfigurationService.fetchConfiguration(projectId, environmentId);
+            automationWorkflowProjectConfigurationService.getConfigurations(projectId, environmentId)
+                .stream()
+                .findFirst();
 
         if (existingConfigurationOptional.isPresent()) {
             throw newConfigurationAlreadyExistsException(projectId, environmentId);
@@ -144,7 +146,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         try {
             configuration = automationWorkflowProjectConfigurationService.create(
-                projectId, environmentId, projectVersion, enabled, automationHubVisible);
+                projectId, environmentId, Environment.values()[(int) environmentId].name(), null, projectVersion,
+                enabled, automationHubVisible);
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw newConfigurationAlreadyExistsException(projectId, environmentId);
         }
@@ -369,7 +372,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         }
 
         configuration = automationWorkflowProjectConfigurationService.update(
-            id, projectVersion, enabled, automationHubVisible);
+            id, configuration.getName(), configuration.getPermissionExpression(), projectVersion, enabled,
+            automationHubVisible);
 
         publishUpdatedEvent(configuration.getProjectId(), configuration.getEnvironmentId());
     }

@@ -362,8 +362,10 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         for (Project project : getAutomationWorkflowProjectProjects(automationWorkflowProjects.keySet())) {
             Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
-                automationWorkflowProjectConfigurationService.fetchConfiguration(
-                    project.getId(), environment.ordinal());
+                automationWorkflowProjectConfigurationService.getConfigurations(
+                    project.getId(), environment.ordinal())
+                    .stream()
+                    .findFirst();
 
             if (configurationOptional.isEmpty() || !configurationOptional.get()
                 .isEnabled()) {
