@@ -38,6 +38,7 @@ import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerReference;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -72,6 +73,7 @@ import com.bytechef.platform.workflow.execution.service.WorkflowExecutionRowServ
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,6 +95,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,6 +117,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     private final WorkflowExecutionRowService workflowExecutionRowService;
     private final JobService jobService;
     private final LazyTaskExecutionTreeBuilder lazyTaskExecutionTreeBuilder;
+    private final PermissionService permissionService;
     private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
     private final ProjectDeploymentService projectDeploymentService;
@@ -133,7 +138,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         ObjectProvider<ConnectedUserWorkflowCopyResolver> connectedUserWorkflowCopyResolverProvider,
         ContextService contextService, Evaluator evaluator,
         EnvironmentService environmentService, WorkflowExecutionRowService workflowExecutionRowService,
-        JobService jobService,
+        JobService jobService, PermissionService permissionService,
         PrincipalJobService principalJobService,
         ProjectFacade projectFacade, ProjectDeploymentService projectDeploymentService,
         ProjectOwnershipService projectOwnershipService, ProjectService projectService,
@@ -150,6 +155,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         this.environmentService = environmentService;
         this.workflowExecutionRowService = workflowExecutionRowService;
         this.jobService = jobService;
+        this.permissionService = permissionService;
         this.principalJobService = principalJobService;
         this.projectFacade = projectFacade;
         this.projectDeploymentService = projectDeploymentService;
@@ -169,6 +175,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
     public WorkflowExecutionDTO getWorkflowExecution(long id, boolean lazy) {
         Job job = jobService.getJob(id);
 
@@ -215,6 +222,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#triggerExecutionId, 'TriggerExecution', 'EXECUTION_VIEW')")
     public WorkflowExecutionDTO getTriggerExecutionWorkflowExecution(long triggerExecutionId) {
         TriggerExecution triggerExecution = triggerExecutionService.getTriggerExecution(triggerExecutionId);
 
@@ -231,6 +239,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
     public TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId) {
         TaskExecution taskExecution = getRequestedTaskExecution(taskExecutionId);
 
@@ -287,6 +296,16 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             .orElseThrow(() -> new NoSuchElementException("Task execution " + taskExecutionId + " not found"));
     }
 
+    /**
+     * Denies unless the caller holds {@code scope} for the resource. Throwing rather than returning a narrowed result
+     * on purpose: the caller named this resource, so an empty page would read as "no runs" and hide the refusal.
+     */
+    private void requireResourceScope(Serializable id, String resourceType, String scope) {
+        if (!permissionService.hasResourceScope(id, resourceType, scope)) {
+            throw new AccessDeniedException("%s id=%s".formatted(resourceType, id));
+        }
+    }
+
     private void validateTaskExecutionBelongsToJob(long id, TaskExecution taskExecution, long taskExecutionId) {
         long currentJobId = Objects.requireNonNull(taskExecution.getJobId());
         Set<Long> visitedJobIds = new HashSet<>();
@@ -313,6 +332,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)")
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, WorkflowExecutionSource workflowExecutionSource, Status jobStatus,
         Instant jobStartDate, Instant jobEndDate, Long projectId, Long projectDeploymentId, Long connectedUserId,
@@ -371,13 +391,28 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         List<ProjectDeployment> embeddedProjectDeployments = null;
         List<String> workflowIds = new ArrayList<>();
 
+        // The gate above answers "may this caller list executions in this workspace and environment", which is the
+        // whole question only for the unnarrowed listing. Each narrowing argument names a resource that the caller
+        // might not reach, and the gate cannot see it, so each is checked here against the same scope. Without this a
+        // member holding EXECUTION_VIEW anywhere in the workspace could name any project, deployment or workflow in
+        // it and read back that one's runs.
         if (workflowId != null) {
+            // hasWorkflowScope rather than a 'Workflow' resource check: no ownership resolver registers that token on
+            // this branch, and hasResourceScope denies outright for an unregistered type -- which would turn every
+            // by-workflow listing into a 403 rather than a narrowing. This method resolves workflow -> project ->
+            // workspace itself and asks the same question.
+            if (!permissionService.hasWorkflowScope(workflowId, "EXECUTION_VIEW")) {
+                throw new AccessDeniedException("Workflow id=%s".formatted(workflowId));
+            }
+
             workflowIds.addAll(getWorkflowVersionWorkflowIds(workflowId, projectVersion));
 
             if (Boolean.TRUE.equals(embedded)) {
                 workflowIds.addAll(getWorkflowCopyWorkflowIds(workflowId));
             }
         } else if (projectId != null) {
+            requireResourceScope(projectId, "Project", "EXECUTION_VIEW");
+
             workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
         } else {
             Set<String> workspaceWorkflowIds = new LinkedHashSet<>(
@@ -516,6 +551,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         @Nullable List<ProjectDeployment> embeddedProjectDeployments) {
 
         if (projectDeploymentId != null) {
+            requireResourceScope(projectDeploymentId, "ProjectDeployment", "EXECUTION_VIEW");
+
             return List.of(projectDeploymentId);
         }
 
