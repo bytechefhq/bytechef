@@ -144,7 +144,8 @@ public class AiAgentUtilsApprovalGate {
             for (ToolCallback toolCallback : elementToolCallbacks) {
                 toolCallbacks.add(
                     new ApprovalGateToolCallback(
-                        toolCallback, gateName, approvalChannelClusterElements, componentConnections,
+                        toolCallback, toolClusterElement, gateName, approvalChannelClusterElements,
+                        componentConnections,
                         clusterElementDefinitionService, context, approvalExpiry));
             }
         }

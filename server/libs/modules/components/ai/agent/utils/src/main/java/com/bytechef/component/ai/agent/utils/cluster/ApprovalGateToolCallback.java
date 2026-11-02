@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.approval.ApprovalChannelFunction
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.RESUME_URL;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.SHORT_RESUME_ID;
 
-import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
+import com.bytechef.component.ai.llm.tool.GatedToolCallback;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.ai.tool.GatedToolSuspension;
 import com.bytechef.platform.ai.tool.GatedToolSuspension.ApprovalRequest;
@@ -50,7 +50,7 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 /**
  * @author Ivica Cardic
  */
-public class ApprovalGateToolCallback implements DelegatingToolCallback {
+public class ApprovalGateToolCallback implements GatedToolCallback {
 
     private static final Logger log = LoggerFactory.getLogger(ApprovalGateToolCallback.class);
 
@@ -64,6 +64,8 @@ public class ApprovalGateToolCallback implements DelegatingToolCallback {
 
     private final ToolCallback delegate;
     private final @Nullable String gateName;
+    private final String gatedComponentName;
+    private final String gatedWorkflowNodeName;
 
     private final List<ClusterElement> approvalChannelClusterElements;
     private final Map<String, ComponentConnection> componentConnections;
@@ -74,13 +76,15 @@ public class ApprovalGateToolCallback implements DelegatingToolCallback {
     private final Duration approvalExpiry;
 
     public ApprovalGateToolCallback(
-        ToolCallback delegate, @Nullable String gateName, List<ClusterElement> approvalChannelClusterElements,
-        Map<String, ComponentConnection> componentConnections,
+        ToolCallback delegate, ClusterElement gatedClusterElement, @Nullable String gateName,
+        List<ClusterElement> approvalChannelClusterElements, Map<String, ComponentConnection> componentConnections,
         ClusterElementDefinitionService clusterElementDefinitionService, ActionContextAware actionContext,
         @Nullable Duration approvalExpiry) {
 
         this.delegate = delegate;
         this.gateName = gateName;
+        this.gatedComponentName = gatedClusterElement.getComponentName();
+        this.gatedWorkflowNodeName = gatedClusterElement.getWorkflowNodeName();
         this.approvalChannelClusterElements = List.copyOf(approvalChannelClusterElements);
         this.componentConnections = Map.copyOf(componentConnections);
         this.clusterElementDefinitionService = clusterElementDefinitionService;
@@ -96,6 +100,16 @@ public class ApprovalGateToolCallback implements DelegatingToolCallback {
     @Override
     public ToolCallback getDelegate() {
         return delegate;
+    }
+
+    @Override
+    public String getGatedComponentName() {
+        return gatedComponentName;
+    }
+
+    @Override
+    public String getGatedWorkflowNodeName() {
+        return gatedWorkflowNodeName;
     }
 
     @Override

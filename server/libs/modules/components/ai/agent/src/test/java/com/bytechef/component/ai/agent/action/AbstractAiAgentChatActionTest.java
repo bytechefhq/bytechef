@@ -2131,15 +2131,8 @@ class AbstractAiAgentChatActionTest {
 
         @Test
         void testApprovedToolNestedUnderAnApprovalGateRunsTheUnwrappedTool() throws Exception {
-            AiAgentUtilsApprovalGate aiAgentUtilsApprovalGate = new AiAgentUtilsApprovalGate(
-                new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService),
-                clusterElementDefinitionService);
+            stubApprovalGate();
 
-            ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> approvalGateDefinition =
-                aiAgentUtilsApprovalGate.clusterElementDefinition;
-
-            when(clusterElementDefinitionService.getClusterElement("aiAgentUtils", 1, "approvalGate"))
-                .thenReturn(approvalGateDefinition.getElement());
             when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class))).thenReturn("message sent: ts=1721");
 
             String resumeData = action.resolveGatedToolResumeData(
@@ -2217,9 +2210,118 @@ class AbstractAiAgentChatActionTest {
             Map<String, Object> suspendedContinueParameters = new HashMap<>(suspend.continueParameters());
 
             assertThat(suspendedContinueParameters)
-                .containsEntry(AgentToolSuspension.CONTINUE_PARAMETER_KEY, agentToolSuspension)
                 .containsEntry("childJobId", 42L)
                 .containsEntry(ToolSuspension.SUSPENDED_TOOL_RESULT, childSuspendedToolResult);
+            assertThat(suspendedContinueParameters.get(AgentToolSuspension.CONTINUE_PARAMETER_KEY))
+                .usingRecursiveComparison()
+                .ignoringFields("suspendedClusterElementCallId", "suspendedClusterElementWorkflowNodeName")
+                .isEqualTo(agentToolSuspension);
+        }
+
+        @Test
+        void testApprovedToolNestedUnderAnApprovalGateIsRecordedUnderItsOwnNode() throws Exception {
+            stubApprovalGate();
+
+            when(context.getJobId()).thenReturn(TOOL_CALL_JOB_ID);
+            when(context.getTaskExecutionId()).thenReturn(TOOL_CALL_TASK_EXECUTION_ID);
+            when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class))).thenReturn("message sent: ts=1721");
+
+            List<ClusterElementCallRecord> records;
+
+            try {
+                action.resolveGatedToolResumeData(
+                    NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME), data(true, null), Map.of(),
+                    GATED_EXTENSIONS, context, new ClusterElementCallRef("gate-call", "approvalGate_1"));
+            } finally {
+                records = ClusterElementCallRecorder.getInstance()
+                    .drain(TOOL_CALL_TASK_EXECUTION_ID)
+                    .records();
+            }
+
+            assertThat(records).hasSize(1);
+
+            ClusterElementCallRecord callRecord = records.getFirst();
+
+            assertThat(callRecord.parentId()).isEqualTo("gate-call");
+            assertThat(callRecord.workflowNodeName()).isEqualTo("slack_1");
+            assertThat(callRecord.componentName()).isEqualTo("slack");
+            assertThat(callRecord.status()).isEqualTo(ClusterElementCallRecord.Status.COMPLETED);
+        }
+
+        @Test
+        void testResumingAnApprovedToolThatSuspendsRecordsTheApprovalAndResumesTheToolCall() throws Exception {
+            stubApprovalGate();
+
+            String gateSuspendedToolResult = "__BYTECHEF_TOOL_SUSPENDED__:gate";
+            String childSuspendedToolResult = "__BYTECHEF_TOOL_SUSPENDED__:child";
+
+            AgentToolSuspension agentToolSuspension = new AgentToolSuspension(
+                ConversationState.from(
+                    List.of(
+                        new UserMessage("send the message"),
+                        ToolResponseMessage.builder()
+                            .responses(
+                                List.of(
+                                    new ToolResponseMessage.ToolResponse(
+                                        "call_1", GATED_TOOL_NAME, gateSuspendedToolResult)))
+                            .build())),
+                "call_1", gateSuspendedToolResult, "gate-call", "approvalGate_1");
+
+            when(context.getJobId()).thenReturn(TOOL_CALL_JOB_ID);
+            when(context.getTaskExecutionId()).thenReturn(TOOL_CALL_TASK_EXECUTION_ID);
+            when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class))).thenReturn(childSuspendedToolResult);
+            when(context.getSuspend()).thenReturn(
+                new ActionContext.Suspend(
+                    Map.of(ToolSuspension.SUSPENDED_TOOL_RESULT, childSuspendedToolResult, "childJobId", 42L),
+                    null));
+
+            Map<String, Object> continueParameters = new HashMap<>();
+
+            continueParameters.put(AgentToolSuspension.CONTINUE_PARAMETER_KEY, agentToolSuspension);
+            continueParameters.put(ToolSuspendConstants.GATED_TOOL_NAME, GATED_TOOL_NAME);
+            continueParameters.put(ToolSuspendConstants.GATED_TOOL_INPUT, GATED_TOOL_INPUT);
+
+            List<ClusterElementCallRecord> records;
+
+            try {
+                action.buildResumedRequestSpec(
+                    NO_SIMULATION_INPUT, Map.of(), GATED_EXTENSIONS, ParametersFactory.create(continueParameters),
+                    ParametersFactory.create(Map.of("approved", true, "comment", "ship it")), null,
+                    (ActionContext) context);
+            } finally {
+                records = ClusterElementCallRecorder.getInstance()
+                    .drain(TOOL_CALL_TASK_EXECUTION_ID)
+                    .records();
+            }
+
+            ArgumentCaptor<ActionContext.Suspend> suspendCaptor = ArgumentCaptor.forClass(ActionContext.Suspend.class);
+
+            verify(context).suspend(suspendCaptor.capture());
+
+            ActionContext.Suspend suspend = suspendCaptor.getValue();
+
+            Map<String, ?> suspendedContinueParameters = suspend.continueParameters();
+
+            AgentToolSuspension resumedAgentToolSuspension =
+                (AgentToolSuspension) suspendedContinueParameters.get(AgentToolSuspension.CONTINUE_PARAMETER_KEY);
+
+            assertThat(records).hasSize(2);
+
+            ClusterElementCallRecord gateRecord = findRecord(records, "gate-call");
+
+            assertThat(gateRecord.status()).isEqualTo(ClusterElementCallRecord.Status.APPROVED);
+            assertThat(gateRecord.output()).contains("\"comment\":\"ship it\"");
+
+            ClusterElementCallRecord toolRecord = records.get(records.indexOf(gateRecord) == 0 ? 1 : 0);
+
+            assertThat(toolRecord.parentId()).isEqualTo("gate-call");
+            assertThat(toolRecord.workflowNodeName()).isEqualTo("slack_1");
+            assertThat(toolRecord.status()).isEqualTo(ClusterElementCallRecord.Status.SUSPENDED);
+
+            assertThat(resumedAgentToolSuspension.pendingToolCallId()).isEqualTo("call_1");
+            assertThat(resumedAgentToolSuspension.suspendedToolResult()).isEqualTo(gateSuspendedToolResult);
+            assertThat(resumedAgentToolSuspension.suspendedClusterElementCallId()).isEqualTo(toolRecord.id());
+            assertThat(resumedAgentToolSuspension.suspendedClusterElementWorkflowNodeName()).isEqualTo("slack_1");
         }
 
         @Test
@@ -2362,6 +2464,28 @@ class AbstractAiAgentChatActionTest {
                 .contains("approvedByReviewer")
                 .contains("connection refused")
                 .doesNotContain("\"result\"");
+        }
+
+        private void stubApprovalGate() {
+            AiAgentUtilsApprovalGate aiAgentUtilsApprovalGate = new AiAgentUtilsApprovalGate(
+                new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService),
+                clusterElementDefinitionService);
+
+            ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> approvalGateDefinition =
+                aiAgentUtilsApprovalGate.clusterElementDefinition;
+
+            when(clusterElementDefinitionService.getClusterElement("aiAgentUtils", 1, "approvalGate"))
+                .thenReturn(approvalGateDefinition.getElement());
+        }
+
+        private static ClusterElementCallRecord findRecord(List<ClusterElementCallRecord> records, String id) {
+            for (ClusterElementCallRecord record : records) {
+                if (id.equals(record.id())) {
+                    return record;
+                }
+            }
+
+            throw new AssertionError("No call record with id " + id);
         }
 
         private static GatedToolSuspension continueParameters(String gatedToolName) {

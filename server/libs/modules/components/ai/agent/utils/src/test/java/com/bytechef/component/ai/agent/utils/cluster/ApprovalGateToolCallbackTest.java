@@ -57,6 +57,9 @@ import org.springframework.ai.tool.definition.DefaultToolDefinition;
  */
 class ApprovalGateToolCallbackTest {
 
+    private static final ClusterElement GATED_TOOL_CLUSTER_ELEMENT = new ClusterElement(
+        null, null, Map.of(), null, "slack/v1/sendMessage", Map.of(), "slack_2");
+
     private static final ApprovalLinks APPROVAL_LINKS = new ApprovalLinks(
         "https://example.com", "abc123", "https://example.com/job/resume/abc123", "https://example.com/resume/abc123");
 
@@ -93,7 +96,8 @@ class ApprovalGateToolCallbackTest {
         when(actionContext.isEditorEnvironment()).thenReturn(false);
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, null, List.of(), Map.of(), clusterElementDefinitionService, actionContext, null);
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, null, List.of(), Map.of(), clusterElementDefinitionService,
+            actionContext, null);
 
         String result = gate.call("{\"channel\": \"#general\"}", null);
 
@@ -130,7 +134,8 @@ class ApprovalGateToolCallbackTest {
         when(actionContext.isEditorEnvironment()).thenReturn(true);
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, null, List.of(), Map.of(), clusterElementDefinitionService, actionContext, null);
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, null, List.of(), Map.of(), clusterElementDefinitionService,
+            actionContext, null);
 
         String result = gate.call("{}", null);
 
@@ -148,7 +153,8 @@ class ApprovalGateToolCallbackTest {
         when(actionContext.isEditorEnvironment()).thenReturn(false);
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, null, List.of(), Map.of(), clusterElementDefinitionService, actionContext, null);
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, null, List.of(), Map.of(), clusterElementDefinitionService,
+            actionContext, null);
 
         assertThatThrownBy(() -> gate.call("{}", null)).isInstanceOf(ToolSuspensionException.class);
 
@@ -170,7 +176,8 @@ class ApprovalGateToolCallbackTest {
                 null, null, Map.of(), null, "approvalTask/v1/approvalTask", Map.of(), "approvalTask_1"));
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, null, approvalChannels, Map.of(), clusterElementDefinitionService, actionContext, null);
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, null, approvalChannels, Map.of(), clusterElementDefinitionService,
+            actionContext, null);
 
         String result = gate.call("{}", null);
 
@@ -194,7 +201,8 @@ class ApprovalGateToolCallbackTest {
             new ClusterElement(null, null, Map.of(), null, "discord/v1/approvalChannel", Map.of(), "discord_1"));
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, null, approvalChannels, Map.of(), clusterElementDefinitionService, actionContext, null);
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, null, approvalChannels, Map.of(), clusterElementDefinitionService,
+            actionContext, null);
 
         assertThatThrownBy(() -> gate.call("{}", null))
             .isInstanceOf(ToolSuspensionException.class)
@@ -213,7 +221,8 @@ class ApprovalGateToolCallbackTest {
         when(actionContext.isEditorEnvironment()).thenReturn(false);
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, null, List.of(), Map.of(), clusterElementDefinitionService, actionContext,
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, null, List.of(), Map.of(), clusterElementDefinitionService,
+            actionContext,
             Duration.ofHours(4));
 
         gate.call("{}", null);
@@ -234,7 +243,8 @@ class ApprovalGateToolCallbackTest {
         when(actionContext.isEditorEnvironment()).thenReturn(false);
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, null, List.of(), Map.of(), clusterElementDefinitionService, actionContext, null);
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, null, List.of(), Map.of(), clusterElementDefinitionService,
+            actionContext, null);
 
         gate.call("{}", null);
 
@@ -258,7 +268,8 @@ class ApprovalGateToolCallbackTest {
         when(actionContext.isEditorEnvironment()).thenReturn(false);
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, "Outbound messages", List.of(), Map.of(), clusterElementDefinitionService, actionContext,
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, "Outbound messages", List.of(), Map.of(),
+            clusterElementDefinitionService, actionContext,
             null);
 
         gate.call("{}", null);
@@ -287,7 +298,8 @@ class ApprovalGateToolCallbackTest {
             new ClusterElement(null, null, Map.of(), null, "slack/v1/approvalChannel", channelParameters, "slack_1"));
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, null, approvalChannels, Map.of(), clusterElementDefinitionService, actionContext, null);
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, null, approvalChannels, Map.of(), clusterElementDefinitionService,
+            actionContext, null);
 
         gate.call("{}", null);
 
@@ -339,7 +351,8 @@ class ApprovalGateToolCallbackTest {
                 null, null, Map.of(), null, "telegram/v1/approvalChannel", channelParameters, "telegram_1"));
 
         ApprovalGateToolCallback gate = new ApprovalGateToolCallback(
-            delegate, null, approvalChannels, Map.of(), clusterElementDefinitionService, actionContext, null);
+            delegate, GATED_TOOL_CLUSTER_ELEMENT, null, approvalChannels, Map.of(), clusterElementDefinitionService,
+            actionContext, null);
 
         gate.call("{}", null);
 
