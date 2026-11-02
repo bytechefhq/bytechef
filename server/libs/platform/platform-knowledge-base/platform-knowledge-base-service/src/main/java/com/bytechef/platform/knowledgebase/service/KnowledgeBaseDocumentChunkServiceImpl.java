@@ -42,6 +42,12 @@ public class KnowledgeBaseDocumentChunkServiceImpl implements KnowledgeBaseDocum
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<KnowledgeBaseDocumentChunk> fetchKnowledgeBaseDocumentChunk(long id) {
+        return knowledgeBaseDocumentChunkRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public KnowledgeBaseDocumentChunk getKnowledgeBaseDocumentChunk(Long id) {
         return knowledgeBaseDocumentChunkRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("KnowledgeBase document chunk not found: " + id));

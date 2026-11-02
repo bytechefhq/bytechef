@@ -23,9 +23,7 @@ import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,22 +41,17 @@ class KnowledgeBaseGraphQlController {
     private final EmbeddingProviderStatusProvider embeddingProviderStatusProvider;
     private final EnvironmentService environmentService;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
-    private final KnowledgeBaseFacade knowledgeBaseFacade;
-    private final KnowledgeBaseService knowledgeBaseService;
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
 
     @SuppressFBWarnings("EI")
     KnowledgeBaseGraphQlController(
         EmbeddingProviderStatusProvider embeddingProviderStatusProvider,
         EnvironmentService environmentService, KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseFacade knowledgeBaseFacade, KnowledgeBaseService knowledgeBaseService,
         WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
 
         this.embeddingProviderStatusProvider = embeddingProviderStatusProvider;
         this.environmentService = environmentService;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
-        this.knowledgeBaseFacade = knowledgeBaseFacade;
-        this.knowledgeBaseService = knowledgeBaseService;
         this.workspaceKnowledgeBaseFacade = workspaceKnowledgeBaseFacade;
     }
 
@@ -75,15 +68,15 @@ class KnowledgeBaseGraphQlController {
     }
 
     @QueryMapping
-    KnowledgeBase knowledgeBase(@Argument Long id) {
-        return knowledgeBaseService.getKnowledgeBase(id);
+    public KnowledgeBase knowledgeBase(@Argument Long id) {
+        return workspaceKnowledgeBaseFacade.getKnowledgeBase(id);
     }
 
     @QueryMapping
-    List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
+    public List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
         @Argument Long id, @Argument String query, @Argument String metadataFilters) {
 
-        return knowledgeBaseFacade.searchKnowledgeBase(id, query, metadataFilters);
+        return workspaceKnowledgeBaseFacade.searchKnowledgeBase(id, query, metadataFilters);
     }
 
     @MutationMapping
@@ -96,8 +89,8 @@ class KnowledgeBaseGraphQlController {
     }
 
     @MutationMapping
-    KnowledgeBase updateKnowledgeBase(@Argument Long id, @Argument KnowledgeBase knowledgeBase) {
-        return knowledgeBaseService.updateKnowledgeBase(id, knowledgeBase);
+    public KnowledgeBase updateKnowledgeBase(@Argument Long id, @Argument KnowledgeBase knowledgeBase) {
+        return workspaceKnowledgeBaseFacade.updateKnowledgeBase(id, knowledgeBase);
     }
 
     @MutationMapping

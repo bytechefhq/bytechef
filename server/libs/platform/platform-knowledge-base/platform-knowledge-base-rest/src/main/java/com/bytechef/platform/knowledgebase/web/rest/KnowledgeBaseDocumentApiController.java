@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,7 +48,8 @@ class KnowledgeBaseDocumentApiController {
     }
 
     @PostMapping("/{id}/documents")
-    ResponseEntity<KnowledgeBaseDocument> uploadDocument(
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
+    public ResponseEntity<KnowledgeBaseDocument> uploadDocument(
         @PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
 
         return ResponseEntity.ok(

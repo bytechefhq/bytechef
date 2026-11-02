@@ -16,10 +16,15 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
+import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseTagFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -36,21 +41,34 @@ import org.springframework.stereotype.Controller;
 public class KnowledgeBaseTagGraphQlController {
 
     private final KnowledgeBaseTagFacade knowledgeBaseTagFacade;
+    private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseTagGraphQlController(KnowledgeBaseTagFacade knowledgeBaseTagFacade) {
+    public KnowledgeBaseTagGraphQlController(
+        KnowledgeBaseTagFacade knowledgeBaseTagFacade, WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
+
         this.knowledgeBaseTagFacade = knowledgeBaseTagFacade;
+        this.workspaceKnowledgeBaseFacade = workspaceKnowledgeBaseFacade;
     }
 
     @QueryMapping
-    public List<Tag> knowledgeBaseTags() {
-        return knowledgeBaseTagFacade.getAllTags();
+    public List<Tag> knowledgeBaseTags(@Argument Long environmentId, @Argument Long workspaceId) {
+        Map<Long, List<Tag>> tagsByKnowledgeBaseId = getTagsByKnowledgeBaseId(environmentId, workspaceId);
+
+        return tagsByKnowledgeBaseId.values()
+            .stream()
+            .flatMap(List::stream)
+            .distinct()
+            .toList();
     }
 
     @QueryMapping
-    public List<KnowledgeBaseTagsEntry> knowledgeBaseTagsByKnowledgeBase() {
-        return knowledgeBaseTagFacade.getTagsByKnowledgeBaseId()
-            .entrySet()
+    public List<KnowledgeBaseTagsEntry> knowledgeBaseTagsByKnowledgeBase(
+        @Argument Long environmentId, @Argument Long workspaceId) {
+
+        Map<Long, List<Tag>> tagsByKnowledgeBaseId = getTagsByKnowledgeBaseId(environmentId, workspaceId);
+
+        return tagsByKnowledgeBaseId.entrySet()
             .stream()
             .map(entry -> new KnowledgeBaseTagsEntry(entry.getKey(), entry.getValue()))
             .toList();
@@ -73,9 +91,28 @@ public class KnowledgeBaseTagGraphQlController {
             })
             .collect(Collectors.toList());
 
-        knowledgeBaseTagFacade.updateTags(input.knowledgeBaseId(), tags);
+        workspaceKnowledgeBaseFacade.updateKnowledgeBaseTags(input.knowledgeBaseId(), tags);
 
         return true;
+    }
+
+    private Map<Long, List<Tag>> getTagsByKnowledgeBaseId(Long environmentId, Long workspaceId) {
+        Set<Long> knowledgeBaseIds = workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBases(workspaceId, environmentId)
+            .stream()
+            .map(KnowledgeBase::getId)
+            .collect(Collectors.toSet());
+
+        Map<Long, List<Tag>> tagsByKnowledgeBaseId = new LinkedHashMap<>();
+
+        for (Map.Entry<Long, List<Tag>> entry : knowledgeBaseTagFacade.getTagsByKnowledgeBaseId()
+            .entrySet()) {
+
+            if (knowledgeBaseIds.contains(entry.getKey())) {
+                tagsByKnowledgeBaseId.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return tagsByKnowledgeBaseId;
     }
 
     public record KnowledgeBaseTagsEntry(Long knowledgeBaseId, List<Tag> tags) {
