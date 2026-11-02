@@ -279,6 +279,8 @@ class RemoteJobFacadeClientIntTest {
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Approval already processed");
         assertThat(applicationEvents.stream(TaskExecutionCompleteEvent.class)).isEmpty();
+        assertThat(jobService.getJob(jobId)
+            .getStatus()).isEqualTo(Job.Status.STOPPED);
     }
 
     private long saveJob(Job.Status status, Long parentTaskExecutionId) {
