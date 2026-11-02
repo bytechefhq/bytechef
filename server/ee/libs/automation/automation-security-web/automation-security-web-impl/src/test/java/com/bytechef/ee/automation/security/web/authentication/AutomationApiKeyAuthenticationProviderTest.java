@@ -11,16 +11,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -72,6 +78,8 @@ class AutomationApiKeyAuthenticationProviderTest {
     private static AutomationApiKeyAuthenticationProvider newProvider(boolean activated, boolean userExists) {
         ApiKey apiKey = mock(ApiKey.class);
 
+        when(apiKey.getType()).thenReturn(PlatformType.AUTOMATION);
+
         when(apiKey.getId()).thenReturn(7L);
         when(apiKey.getUserId()).thenReturn(1L);
 
@@ -91,5 +99,80 @@ class AutomationApiKeyAuthenticationProviderTest {
         when(userService.fetchUser(anyLong())).thenReturn(userExists ? Optional.of(user) : Optional.empty());
 
         return new AutomationApiKeyAuthenticationProvider(apiKeyService, mock(AuthorityService.class), userService);
+    }
+
+    @Nested
+    @SuppressFBWarnings("HARD_CODE_PASSWORD")
+    class PlatformTypeEnforcement {
+
+        private static final long ENVIRONMENT_ID = 1L;
+        private static final String TYPED_SECRET_KEY = "secret-key";
+        private static final long USER_ID = 7L;
+
+        private ApiKeyService apiKeyService;
+        private AutomationApiKeyAuthenticationProvider automationApiKeyAuthenticationProvider;
+        private UserService userService;
+
+        @BeforeEach
+        void setUp() {
+            apiKeyService = mock(ApiKeyService.class);
+            userService = mock(UserService.class);
+
+            automationApiKeyAuthenticationProvider =
+                new AutomationApiKeyAuthenticationProvider(apiKeyService, mock(AuthorityService.class), userService);
+        }
+
+        @Test
+        void testRejectsAPlatformKey() {
+            when(apiKeyService.fetchApiKey(TYPED_SECRET_KEY, ENVIRONMENT_ID))
+                .thenReturn(Optional.of(createApiKey(null)));
+
+            assertThatThrownBy(() -> automationApiKeyAuthenticationProvider
+                .authenticate(new AutomationApiKeyAuthenticationToken(ENVIRONMENT_ID, TYPED_SECRET_KEY, "tenant")))
+                    .isInstanceOf(BadCredentialsException.class);
+
+            verify(userService, never()).fetchUser(anyLong());
+        }
+
+        @Test
+        void testRejectsAnEmbeddedKey() {
+            when(apiKeyService.fetchApiKey(TYPED_SECRET_KEY, ENVIRONMENT_ID))
+                .thenReturn(Optional.of(createApiKey(PlatformType.EMBEDDED)));
+
+            assertThatThrownBy(() -> automationApiKeyAuthenticationProvider
+                .authenticate(new AutomationApiKeyAuthenticationToken(ENVIRONMENT_ID, TYPED_SECRET_KEY, "tenant")))
+                    .isInstanceOf(BadCredentialsException.class);
+
+            verify(userService, never()).fetchUser(anyLong());
+        }
+
+        @Test
+        void testAcceptsAnAutomationKey() {
+            User user = mock(User.class);
+
+            when(user.getAuthorityIds()).thenReturn(List.of());
+            when(user.getLogin()).thenReturn("login");
+            when(user.getPassword()).thenReturn("password");
+            when(user.isActivated()).thenReturn(true);
+            when(apiKeyService.fetchApiKey(TYPED_SECRET_KEY, ENVIRONMENT_ID))
+                .thenReturn(Optional.of(createApiKey(PlatformType.AUTOMATION)));
+            when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(user));
+
+            Authentication authentication = automationApiKeyAuthenticationProvider.authenticate(
+                new AutomationApiKeyAuthenticationToken(ENVIRONMENT_ID, TYPED_SECRET_KEY, "tenant"));
+
+            assertThat(authentication.getName()).isEqualTo("login");
+        }
+
+        private static ApiKey createApiKey(PlatformType type) {
+            ApiKey apiKey = new ApiKey();
+
+            apiKey.setName("key");
+            apiKey.setSecretKey(TYPED_SECRET_KEY);
+            apiKey.setType(type);
+            apiKey.setUserId(USER_ID);
+
+            return apiKey;
+        }
     }
 }

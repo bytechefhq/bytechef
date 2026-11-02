@@ -35,7 +35,6 @@ public class DeploymentPermissionScopeProvider implements PermissionScopeProvide
             new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_VIEW, WorkspaceRole.VIEWER),
             new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_CREATE, WorkspaceRole.EDITOR),
             new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_EDIT, WorkspaceRole.EDITOR),
-            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_DELETE, WorkspaceRole.ADMIN),
-            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_PUSH, WorkspaceRole.EDITOR));
+            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_DELETE, WorkspaceRole.ADMIN));
     }
 }

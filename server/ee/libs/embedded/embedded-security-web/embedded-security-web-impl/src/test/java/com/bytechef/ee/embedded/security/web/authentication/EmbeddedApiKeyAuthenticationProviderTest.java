@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import java.util.Map;
@@ -52,6 +53,7 @@ class EmbeddedApiKeyAuthenticationProviderTest {
         ApiKey apiKey = new ApiKey();
 
         apiKey.setId(API_KEY_ID);
+        apiKey.setType(PlatformType.EMBEDDED);
 
         when(apiKeyService.fetchApiKey("secret", ENVIRONMENT_ID))
             .thenReturn(Optional.of(apiKey));
@@ -85,6 +87,23 @@ class EmbeddedApiKeyAuthenticationProviderTest {
 
         assertThatThrownBy(() -> provider.authenticate(
             new EmbeddedApiKeyAuthenticationToken(ENVIRONMENT_ID, EXTERNAL_USER_ID, "unknown", "tenant")))
+                .isInstanceOf(BadCredentialsException.class);
+
+        verify(connectedUserService, never()).fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testRejectsAKeyOfAnotherType() {
+        ApiKey automationApiKey = new ApiKey();
+
+        automationApiKey.setId(API_KEY_ID);
+        automationApiKey.setType(PlatformType.AUTOMATION);
+
+        when(apiKeyService.fetchApiKey("secret", ENVIRONMENT_ID))
+            .thenReturn(Optional.of(automationApiKey));
+
+        assertThatThrownBy(() -> provider.authenticate(
+            new EmbeddedApiKeyAuthenticationToken(ENVIRONMENT_ID, EXTERNAL_USER_ID, "secret", "tenant")))
                 .isInstanceOf(BadCredentialsException.class);
 
         verify(connectedUserService, never()).fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID);

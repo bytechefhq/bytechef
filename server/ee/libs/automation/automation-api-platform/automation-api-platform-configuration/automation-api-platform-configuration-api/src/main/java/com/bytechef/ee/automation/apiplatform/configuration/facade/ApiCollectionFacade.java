@@ -26,11 +26,13 @@ public interface ApiCollectionFacade {
 
     void deleteApiCollection(long id);
 
+    void deleteApiCollectionEndpoint(long id);
+
     ApiCollectionDTO getApiCollection(long id);
 
     List<ApiCollectionDTO> getApiCollections(long workspaceId, Long environmentId, Long projectId, Long tagId);
 
-    List<Tag> getApiCollectionTags();
+    List<Tag> getApiCollectionTags(long workspaceId);
 
     String getOpenApiSpecification(long id);
 
