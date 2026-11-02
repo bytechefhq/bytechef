@@ -261,7 +261,7 @@ components:
           type: "string"
           format: "date-time"
         status:
-          description: "FAILED if any call failed; BLOCKED or WITHHELD once a guardrail reported it; otherwise the state of the latest call."
+          description: "FAILED if any call failed; BLOCKED or WITHHELD once a guardrail reported it; DENIED once a reviewer denied an approval-gated tool call; otherwise the state of the latest call."
           type: "string"
           enum:
             - "STARTED"
@@ -270,6 +270,7 @@ components:
             - "BLOCKED"
             - "REDACTED"
             - "WITHHELD"
+            - "DENIED"
     ClusterElementCallRecord:
       description: "One call a task made to one of its cluster elements, such as an AI agent's tool or sub-agent."
       type: "object"
@@ -294,7 +295,7 @@ components:
           description: "The input of the call, capped in length."
           type: "string"
         output:
-          description: "The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason)."
+          description: "The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason). For a DENIED outcome, the reviewer's reason. For an APPROVED approval-gate call, the reviewer (approvedBy) and their comment."
           type: "string"
         parentId:
           description: "The identifier of the call this call is nested under, such as a sub-agent call."
@@ -314,6 +315,8 @@ components:
             - "BLOCKED"
             - "REDACTED"
             - "WITHHELD"
+            - "DENIED"
+            - "APPROVED"
         toolName:
           description: "The name of the tool that was called."
           type: "string"

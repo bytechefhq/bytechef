@@ -34,7 +34,6 @@ import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsTo
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -60,20 +59,15 @@ public class AiAgentUtilsApprovalGate {
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ClusterElementToolCallbacks clusterElementToolCallbacks;
 
-    @Nullable
-    private final ToolExecutionRecorder toolExecutionRecorder;
-
     public final ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> clusterElementDefinition;
 
     @SuppressFBWarnings("EI")
     public AiAgentUtilsApprovalGate(
         ClusterElementToolCallbacks clusterElementToolCallbacks,
-        ClusterElementDefinitionService clusterElementDefinitionService,
-        @Nullable ToolExecutionRecorder toolExecutionRecorder) {
+        ClusterElementDefinitionService clusterElementDefinitionService) {
 
         this.clusterElementToolCallbacks = clusterElementToolCallbacks;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
-        this.toolExecutionRecorder = toolExecutionRecorder;
 
         this.clusterElementDefinition =
             ComponentDsl.<MultipleConnectionsToolCallbackProviderFunction>clusterElement(APPROVAL_GATE)
@@ -151,7 +145,7 @@ public class AiAgentUtilsApprovalGate {
                 toolCallbacks.add(
                     new ApprovalGateToolCallback(
                         toolCallback, gateName, approvalChannelClusterElements, componentConnections,
-                        clusterElementDefinitionService, context, toolExecutionRecorder, approvalExpiry));
+                        clusterElementDefinitionService, context, approvalExpiry));
             }
         }
 

@@ -262,6 +262,14 @@ expiry, so a destructive tool can escalate to Slack within four hours while a
 routine one goes to chat with a week to respond. Give each gate a name - it
 appears in the approval request and groups the tools in the editor.
 
+The run's execution view shows each gated call in the agent's call list. While
+it waits for a reviewer the call is marked **Waiting for a response**. If the reviewer
+discards it, the call shows as **Denied**, with the reviewer and their comment.
+If the reviewer approves it, the call completes with the reviewer's decision,
+and the tool run it allowed appears nested under it, with its own result or
+error. Gated calls are not listed on the Tool Invocations page, which records
+only calls that come in through MCP servers and the embedded API.
+
 ### More delivery channels
 
 Beyond Slack, Gmail, Microsoft Outlook 365, and Approval Task, more channels

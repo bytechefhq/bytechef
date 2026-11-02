@@ -42,7 +42,6 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,7 +68,6 @@ import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.execution.ToolExecutionException;
 import org.springframework.ai.tool.resolution.DelegatingToolCallbackResolver;
-import org.springframework.beans.factory.ObjectProvider;
 import reactor.core.publisher.Flux;
 
 /**
@@ -281,17 +279,6 @@ final class AiAgentResumeTestSupport {
         persistedContinueParameters.put(ToolSuspendConstants.GATED_TOOL_INPUT, "{}");
 
         return ParametersFactory.create(persistedContinueParameters);
-    }
-
-    @SuppressWarnings("unchecked")
-    static ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider(
-        ToolExecutionRecorder toolExecutionRecorder) {
-
-        ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider = mock(ObjectProvider.class);
-
-        when(toolExecutionRecorderObjectProvider.getIfAvailable()).thenReturn(toolExecutionRecorder);
-
-        return toolExecutionRecorderObjectProvider;
     }
 
     static ChatResponse toolCallResponse(String toolName, String... toolCallIds) {

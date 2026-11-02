@@ -217,13 +217,18 @@ User docs: `docs/content/docs/platform/automation/build/workflows/human-in-the-l
   - Then it suspends with `GatedToolSuspension.toContinueParameters()`: `GATED_TOOL_NAME`, `GATED_TOOL_INPUT`,
     `formUrl`, `approvalRaisedAt`, `APPROVAL_RESUME=true`, `APPROVAL_FORM_PARAMETERS`. It returns
     `ToolSuspension.suspendedToolResult`, a per-suspend random sentinel, so tool output cannot impersonate a suspend.
-  - It records `APPROVAL_REQUIRED` via `ToolExecutionRecorder`.
+  - It records nothing in the tool invocation log. The gate call itself is the agent's `SUSPENDED` cluster element call
+    record, which the execution view shows.
 - **Resume.** `AbstractAiAgentChatAction.buildResumedRequestSpec` reads `GatedToolSuspension.from(continueParameters)`
   and `GateDecision.from(resumeData)`. Only `approved == true` (or `"true"`) is `Approved`, so anything else denies.
-  - Denied → `{denied, reason, deniedBy}`.
+  - Denied → `{denied, reason, deniedBy}`. `ClusterElementCallRecorder.callDenied` ends the suspended gate call as
+    `DENIED` with that denial (kept even without a listener), streamed as `cluster_element_denied`.
   - Approved (`resolveGatedToolResumeData`) → rebuilds the agent's TOOLS, matches the gated tool by name, unwraps it
     with `DelegatingToolCallback.unwrap` (`ai/llm`), and runs the RAW callback with the stored arguments, honoring
     tool simulations. It returns `{approvedByReviewer, reviewerComment, reviewer, result|error}`.
+  - The approved run is observed as its own agent call, nested under the gate call through
+    `ClusterElementCallScope.callWith`, and the gate call completes with the resume data above.
+  - Gate calls never reach the tool invocation log, which covers MCP and embedded API calls only.
   - It throws if the tool is no longer configured.
   - The gate (`ai/agent/utils`) and the agent action (`ai/agent`) couple only through `ToolSuspendConstants`,
     `GatedToolSuspension` and `GateDecision` (`platform-ai-api`).

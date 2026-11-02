@@ -51,6 +51,33 @@ describe('WorkflowTaskExecutionItem', () => {
         });
     });
 
+    describe('approved gate rows', () => {
+        const createApprovedExecution = (clusterElementCallApproval: {comment?: string; reviewer?: string}) =>
+            createTaskExecution({
+                clusterElementCallApproval,
+                clusterElementCallId: 'call-1',
+                parentTaskExecutionId: '42',
+                status: 'COMPLETED',
+            } as Partial<TaskExecution>);
+
+        it('shows who approved the call and their comment', () => {
+            render(
+                <WorkflowTaskExecutionItem
+                    taskExecution={createApprovedExecution({comment: 'ship it', reviewer: 'jane@example.com'})}
+                />
+            );
+
+            expect(screen.getByText('Approved by jane@example.com')).toBeInTheDocument();
+            expect(screen.getByText('ship it')).toBeInTheDocument();
+        });
+
+        it('shows Approved when the reviewer is unknown', () => {
+            render(<WorkflowTaskExecutionItem taskExecution={createApprovedExecution({})} />);
+
+            expect(screen.getByText('Approved')).toBeInTheDocument();
+        });
+    });
+
     describe('outcome rows', () => {
         const createOutcomeExecution = (clusterElementCallOutcome: string) =>
             createTaskExecution({
@@ -72,6 +99,12 @@ describe('WorkflowTaskExecutionItem', () => {
             );
 
             expect(container.querySelector('svg.lucide-shield-alert.text-amber-500')).toBeInTheDocument();
+        });
+
+        it('shows the rejected user for a denied row', () => {
+            const {container} = render(<WorkflowTaskExecutionItem taskExecution={createOutcomeExecution('DENIED')} />);
+
+            expect(container.querySelector('svg.lucide-user-x.text-rose-500')).toBeInTheDocument();
         });
 
         it('shows the eraser for a redacted row', () => {

@@ -11,6 +11,8 @@ export default function getTestNodeStateBorderClassName(testNodeState?: Workflow
         case 'BLOCKED':
         case 'WITHHELD':
             return 'border-amber-500 hover:border-amber-500';
+        case 'DENIED':
+            return 'border-rose-500 hover:border-rose-500';
         case 'REDACTED':
             return 'border-sky-500 hover:border-sky-500';
         default:
