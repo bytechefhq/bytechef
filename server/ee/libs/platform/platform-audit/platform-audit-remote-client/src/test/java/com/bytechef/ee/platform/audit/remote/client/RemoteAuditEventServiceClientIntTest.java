@@ -10,6 +10,8 @@ package com.bytechef.ee.platform.audit.remote.client;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.bytechef.ee.platform.audit.aspect.AuditAspect;
+import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.facade.AuditEventFacade;
 import com.bytechef.ee.platform.audit.remote.client.config.AuditRemoteClientIntTestConfiguration;
@@ -18,6 +20,9 @@ import com.bytechef.ee.platform.audit.remote.grpc.AuditEventRemoteServiceGrpcSer
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventServiceImpl;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
+import com.bytechef.platform.audit.AuditInvocation;
+import com.bytechef.platform.audit.AuditMapper;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import io.grpc.ManagedChannel;
@@ -34,9 +39,14 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -51,6 +61,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @ActiveProfiles("testint")
 @Import(PostgreSQLContainerConfiguration.class)
+@ExtendWith(OutputCaptureExtension.class)
 @SpringBootTest(classes = AuditRemoteClientIntTestConfiguration.class)
 class RemoteAuditEventServiceClientIntTest {
 
@@ -159,6 +170,35 @@ class RemoteAuditEventServiceClientIntTest {
     }
 
     @Test
+    void testAuditedCallInsideATransactionThatRollsBackIsSentAsRolledBackAndNotReportedLost(CapturedOutput output) {
+        StaticListableBeanFactory staticListableBeanFactory = new StaticListableBeanFactory();
+
+        staticListableBeanFactory.addBean("projectAuditMapper", new ProjectAuditMapper());
+
+        AspectJProxyFactory aspectJProxyFactory = new AspectJProxyFactory(new ProjectOperations());
+
+        aspectJProxyFactory.addAspect(
+            new AuditAspect(remoteAuditEventServiceClient, new AuditMapperResolver(staticListableBeanFactory)));
+
+        ProjectOperations projectOperations = aspectJProxyFactory.getProxy();
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.executeWithoutResult(transactionStatus -> {
+            projectOperations.deleteProject();
+
+            transactionStatus.setRollbackOnly();
+        });
+
+        assertThat(findAll())
+            .singleElement()
+            .satisfies(persistentAuditEvent -> {
+                assertThat(persistentAuditEvent.getEventType()).isEqualTo("PROJECT_DELETED");
+                assertThat(persistentAuditEvent.getData()).containsEntry("result", "ROLLED_BACK");
+            });
+        assertThat(output).doesNotContain("AUDIT PERSISTENCE FAILURE");
+    }
+
+    @Test
     void testSaveAllWhenServerIsDownDoesNotThrow() {
         server.shutdownNow();
 
@@ -209,6 +249,21 @@ class RemoteAuditEventServiceClientIntTest {
             .forEach(persistentAuditEvents::add);
 
         return persistentAuditEvents;
+    }
+
+    static class ProjectAuditMapper implements AuditMapper {
+
+        @Override
+        public Map<String, String> map(AuditInvocation auditInvocation) {
+            return Map.of("projectId", "1050");
+        }
+    }
+
+    static class ProjectOperations {
+
+        @Audited(event = "PROJECT_DELETED", mapper = ProjectAuditMapper.class)
+        public void deleteProject() {
+        }
     }
 
     private static PersistentAuditEvent createPersistentAuditEvent(String eventType) {

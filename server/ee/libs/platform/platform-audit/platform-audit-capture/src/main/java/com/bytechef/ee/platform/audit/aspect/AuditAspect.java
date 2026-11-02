@@ -143,7 +143,9 @@ public class AuditAspect {
                     if (persistentAuditEvent != null) {
                         pendingAuditEvents.add(persistentAuditEvent);
 
-                        if (!outermost && auditOutcome == AuditOutcome.SUCCESS) {
+                        if ((!outermost || !auditEventService.savesWithinTheCallerTransaction()) &&
+                            auditOutcome == AuditOutcome.SUCCESS) {
+
                             markRolledBackWhenTheTransactionRollsBack(persistentAuditEvent);
                         }
                     }
@@ -210,7 +212,9 @@ public class AuditAspect {
             return;
         }
 
-        if (saveAuditEvents(auditEvents) && TransactionSynchronizationManager.isSynchronizationActive()) {
+        if (saveAuditEvents(auditEvents) && auditEventService.savesWithinTheCallerTransaction() &&
+            TransactionSynchronizationManager.isSynchronizationActive()) {
+
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
                 @Override

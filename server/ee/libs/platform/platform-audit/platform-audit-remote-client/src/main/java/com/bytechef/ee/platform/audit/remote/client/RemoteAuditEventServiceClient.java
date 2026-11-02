@@ -77,6 +77,11 @@ public class RemoteAuditEventServiceClient implements AuditEventService {
     }
 
     @Override
+    public boolean savesWithinTheCallerTransaction() {
+        return false;
+    }
+
+    @Override
     public void updateJobCreatedPlatform(long jobId, PlatformType platform, LocalDateTime since) {
         getStub().updateJobCreatedPlatform(
             UpdateJobCreatedPlatformRequest.newBuilder()
