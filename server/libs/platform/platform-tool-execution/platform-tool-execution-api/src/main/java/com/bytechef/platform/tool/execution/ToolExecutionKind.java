@@ -22,7 +22,5 @@ package com.bytechef.platform.tool.execution;
 public enum ToolExecutionKind {
 
     COMPONENT,
-    WORKFLOW,
-    CONTRIBUTED,
-    MANAGEMENT_TOOL
+    WORKFLOW
 }

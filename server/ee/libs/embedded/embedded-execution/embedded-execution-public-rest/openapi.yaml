@@ -1219,8 +1219,6 @@ components:
       enum:
         - "COMPONENT"
         - "WORKFLOW"
-        - "CONTRIBUTED"
-        - "MANAGEMENT_TOOL"
     ToolInvocationOutcome:
       description: "The outcome of a tool invocation."
       type: "string"
