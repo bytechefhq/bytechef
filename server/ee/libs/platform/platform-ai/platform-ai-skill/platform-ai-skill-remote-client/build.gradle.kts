@@ -1,5 +1,25 @@
 dependencies {
     implementation("org.springframework:spring-context")
+    implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
+
+    implementation(project(":server:ee:libs:core:remote:remote-grpc"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-grpc"))
+
+    testImplementation("io.grpc:grpc-inprocess")
+    testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation("org.springframework.grpc:spring-grpc-core")
+    testImplementation("org.springframework.security:spring-security-core")
+    testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
+    testImplementation(project(":server:libs:config:jackson-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:core:commons:commons-data"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-file-storage:platform-ai-skill-file-storage-api"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-file-storage:platform-ai-skill-file-storage-impl"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-service"))
+    testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    testImplementation(project(":server:libs:test:test-int-support"))
 }

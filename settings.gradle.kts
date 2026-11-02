@@ -697,6 +697,8 @@ include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-graphql")
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-client")
+include("server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-grpc")
+include("server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-grpc-proto")
 include("server:ee:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-remote-client")
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-api")
 include("server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-graphql")

@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package bytechef.platform.ai.skill.remote.v1;
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.ai.skill.remote.grpc.proto";
+
+service AiSkillFacadeRemoteService {
+  rpc CreateAdditionalFilesInSkill(SkillFilesRequest) returns (AiSkillResponse);
+  rpc CreateAiSkill(CreateAiSkillRequest) returns (AiSkillResponse);
+  rpc CreateAiSkillFromInstructions(CreateAiSkillFromInstructionsRequest) returns (AiSkillResponse);
+  rpc DeleteAiSkill(AiSkillIdRequest) returns (google.protobuf.Empty);
+  rpc GetAiSkill(AiSkillIdRequest) returns (AiSkillResponse);
+  rpc GetAiSkillDownload(AiSkillIdRequest) returns (ArchiveResponse);
+  rpc GetAiSkillFileContent(SkillFileRequest) returns (FileContentResponse);
+  rpc GetAiSkillFilePaths(AiSkillIdRequest) returns (FilePathsResponse);
+  rpc GetAiSkillWithDownload(AiSkillIdRequest) returns (AiSkillDownloadResponse);
+  rpc GetAiSkills(google.protobuf.Empty) returns (AiSkillsResponse);
+  rpc GetTags(TagIdsRequest) returns (TagsResponse);
+  rpc RemoveFileInSkill(SkillFileRequest) returns (AiSkillResponse);
+  rpc UpdateAiSkill(UpdateAiSkillRequest) returns (AiSkillResponse);
+  rpc UpdateAiSkillContent(UpdateAiSkillContentRequest) returns (AiSkillResponse);
+  rpc UpdateAiSkillTags(UpdateAiSkillTagsRequest) returns (AiSkillResponse);
+}
+
+message AiSkillDownloadResponse {
+  bytes ai_skill = 1;
+  bytes archive = 2;
+}
+
+message AiSkillIdRequest {
+  int64 id = 1;
+}
+
+message AiSkillResponse {
+  bytes ai_skill = 1;
+}
+
+message AiSkillsResponse {
+  repeated bytes ai_skills = 1;
+}
+
+message ArchiveResponse {
+  bytes archive = 1;
+}
+
+message CreateAiSkillFromInstructionsRequest {
+  string name = 1;
+  optional string description = 2;
+  string instructions = 3;
+  map<string, string> additional_files = 4;
+}
+
+message CreateAiSkillRequest {
+  string name = 1;
+  optional string description = 2;
+  string filename = 3;
+  bytes archive = 4;
+}
+
+message FileContentResponse {
+  string content = 1;
+}
+
+message FilePathsResponse {
+  repeated string paths = 1;
+}
+
+message SkillFileRequest {
+  int64 id = 1;
+  string path = 2;
+}
+
+message SkillFilesRequest {
+  int64 id = 1;
+  map<string, string> files = 2;
+}
+
+message TagIdsRequest {
+  repeated int64 tag_ids = 1;
+}
+
+message TagsResponse {
+  bytes tags = 1;
+}
+
+message UpdateAiSkillContentRequest {
+  int64 id = 1;
+  optional string path = 2;
+  string content = 3;
+}
+
+message UpdateAiSkillRequest {
+  int64 id = 1;
+  string name = 2;
+  optional string description = 3;
+}
+
+message UpdateAiSkillTagsRequest {
+  int64 id = 1;
+  bytes tags = 2;
+}
