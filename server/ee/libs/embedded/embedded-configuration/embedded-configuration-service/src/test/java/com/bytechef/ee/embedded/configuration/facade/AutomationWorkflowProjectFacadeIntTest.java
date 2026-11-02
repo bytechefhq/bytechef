@@ -52,6 +52,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
@@ -154,6 +155,9 @@ class AutomationWorkflowProjectFacadeIntTest {
 
     private final List<Long> createdIntegrationInstanceConfigurationIds = new ArrayList<>();
     private final List<Long> createdIntegrationIds = new ArrayList<>();
+
+    @Autowired
+    private AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
 
     @Autowired
     private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
@@ -923,6 +927,41 @@ class AutomationWorkflowProjectFacadeIntTest {
     }
 
     @Test
+    void testHubHidesProjectWhenNoConfigurationExpressionPasses() {
+        useRealPermissionEvaluator();
+
+        long projectId = createPublishedProject("Beta Only");
+
+        automationWorkflowProjectConfigurationService.create(
+            projectId, Environment.PRODUCTION.ordinal(), "Beta", "metadata['beta'] == 'true'", 1, true, true);
+
+        assertThat(getEnvironmentProjectIds()).doesNotContain(projectId);
+    }
+
+    @Test
+    void testHubUsesAssignedConfigurationVisibility() {
+        useRealPermissionEvaluator();
+
+        long projectId = createPublishedProject("Assigned Visibility");
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        automationWorkflowProjectConfigurationService.create(
+            projectId, Environment.PRODUCTION.ordinal(), "A", null, 2, true, true);
+
+        AutomationWorkflowProjectConfiguration hiddenConfiguration = automationWorkflowProjectConfigurationService
+            .create(projectId, Environment.PRODUCTION.ordinal(), "B", null, 1, true, false);
+
+        automationWorkflowProjectConfigurationResolver.assign(
+            connectedUserService.getConnectedUser(connectedUserId), projectId, hiddenConfiguration.getId());
+
+        AutomationWorkflowProjectDTO environmentProject = getEnvironmentProject(projectId);
+
+        assertThat(environmentProject.automationHubVisible()).isFalse();
+        assertThat(environmentProject.lastPublishedVersion()).isEqualTo(1);
+    }
+
+    @Test
     void testCopyWorkflowTemplateNotReleasedThrows() {
         long projectId = createPublishedProject("Not Released");
 
@@ -973,6 +1012,15 @@ class AutomationWorkflowProjectFacadeIntTest {
         assertThat(workflowService.getWorkflow(copiedWorkflowId)
             .getLabel()).isEqualTo("Original");
         assertThat(getPublishedTemplate(projectId, workflowUuid).label()).isEqualTo("Renamed");
+    }
+
+    private void useRealPermissionEvaluator() {
+        EmbeddedPermissionEvaluator realEmbeddedPermissionEvaluator = new EmbeddedPermissionEvaluator(
+            SpelEvaluator.create());
+
+        when(embeddedPermissionEvaluator.evaluate(any(), any()))
+            .thenAnswer(invocation -> realEmbeddedPermissionEvaluator.evaluate(
+                invocation.getArgument(0), invocation.getArgument(1)));
     }
 
     private AutomationWorkflowProjectConfiguration createConfiguration(

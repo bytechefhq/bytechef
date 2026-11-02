@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -39,6 +40,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -51,6 +53,7 @@ import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProject
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -193,6 +196,9 @@ class ConnectedUserProjectFacadeIntTest {
     private ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @Autowired
+    private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
+
+    @Autowired
     private ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager;
 
     @Autowired
@@ -233,6 +239,9 @@ class ConnectedUserProjectFacadeIntTest {
 
     @Autowired
     private ProjectWorkflowService projectWorkflowService;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @Autowired
     private WorkflowValidatorFacade workflowValidatorFacade;
@@ -706,6 +715,46 @@ class ConnectedUserProjectFacadeIntTest {
                 .kind() == ConnectedUserProjectWorkflowDTO.Kind.REFERENCE)
             .singleElement()
             .satisfies(referenceDTO -> assertThat(referenceDTO.copiedFromWorkflowUuid()).isNull());
+    }
+
+    @Test
+    void testCopyAssignsAndUsesTheAssignedVersion() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Copy Assignment");
+
+        String firstWorkflowTemplateUuid =
+            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String secondWorkflowTemplateUuid = addAutomationWorkflow(
+            automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration configurationA = automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "A", null, 1, true, true);
+
+        connectedUserProjectFacade.copyWorkflowTemplate(
+            externalUserId, firstWorkflowTemplateUuid, Environment.PRODUCTION);
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(
+            connectedUser.getId(), automationWorkflowProjectId))
+                .map(ConnectedUserProjectConfiguration::getConfigurationId)
+                .contains(configurationA.getId());
+
+        automationWorkflowProjectFacade.updateProjectWorkflow(secondWorkflowTemplateUuid, "Version two", "");
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "B", null, 2, true, true);
+
+        String secondCopyWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
+            externalUserId, secondWorkflowTemplateUuid, Environment.PRODUCTION);
+
+        String secondCopyWorkflowId = projectWorkflowService.getLastWorkflowId(secondCopyWorkflowUuid);
+
+        assertThat(workflowService.getWorkflow(secondCopyWorkflowId)
+            .getLabel()).isEqualTo("Sync leads");
     }
 
     @Test
