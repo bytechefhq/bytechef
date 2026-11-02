@@ -1,14 +1,16 @@
 ---
 title: Notifications
-description: Send an email when a workflow run reaches a given status - create, edit, and delete notification rules.
+description: Send an email, Slack message, or webhook when a workflow run reaches a given status - create, edit, and delete notification rules.
 ---
 
-A **notification** is a rule that says *"when a job reaches this status, tell this address"*. Each rule
-names one or more job lifecycle events and one delivery target. When a workflow run hits one of those
+A **notification** is a rule that says *"when a job reaches this status, tell this target"*. Each rule
+names one or more job lifecycle events and one delivery target: an email address, a Slack channel, or a
+webhook URL. When a workflow run hits one of those
 events, every notification subscribed to it fires.
 
 **Settings → Notifications** requires the `ADMIN` authority. Unlike most of the Settings area, the page
-is available in both Community and Enterprise Edition.
+is available in both Community and Enterprise Edition. The **Email** and **Slack** delivery types work
+in both editions; the **Webhook** delivery type is Enterprise Edition only.
 
 ---
 
@@ -43,7 +45,7 @@ current values loaded.
 
 ## Events
 
-Events are job lifecycle transitions. The full set:
+Events are job lifecycle transitions, plus two reminders about runs paused on an approval. The full set:
 
 | Event | Fires when |
 |---|---|
@@ -53,26 +55,67 @@ Events are job lifecycle transitions. The full set:
 | `JOB_FAILED` | A run failed. |
 | `JOB_CANCELLED` | A run was cancelled before it ever started. |
 | `JOB_STOPPED` | A run was stopped mid-execution. |
+| `JOB_APPROVAL_EXPIRING` | A run paused on an approval is about to expire. Sent once, a configurable lead time (24 hours by default) before the approval expires. |
+| `JOB_APPROVAL_ESCALATED` | A run has been waiting on an approval past the configured escalation window. Off until an escalation window is set. |
 
 The list is not per-workspace or per-project: a notification subscribes to an event across the whole
-deployment. `JOB_STOPPED` has no email content defined, so subscribing to it records the interest but
-sends nothing.
+deployment. The approval reminder and escalation timings are set with environment variables; see
+[Human in the loop](/platform/automation/build/workflows/human-in-the-loop) and
+[Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables).
 
 ## Delivery types
 
-| Type | Field | Notes |
-|---|---|---|
-| **EMAIL** | **Email** - the recipient address. | The default and the only type available out of the box. Requires a mail host to be configured; without one the send is skipped with a warning. |
-| **WEBHOOK** | **Webhook URL** | *Coming soon.* Enterprise Edition only, and not functional in the latest released version: selecting it stores the URL, but the webhook transport delivers nothing. |
+| Type | Field | Edition | Notes |
+|---|---|---|---|
+| **EMAIL** | **Email** - the recipient address. | Community and Enterprise | The default. Requires a mail host to be configured; without one the send is skipped with a warning. |
+| **SLACK** | **Slack Webhook URL** - a Slack [incoming webhook](https://api.slack.com/messaging/webhooks) URL. | Community and Enterprise | Posts one message to the channel the incoming webhook belongs to. |
+| **WEBHOOK** | **Webhook URL** - any HTTPS or HTTP endpoint. | Enterprise only | Sends a JSON `POST` to the URL. See [Webhook requests](#webhook-requests). |
 
-<Callout type="warn" title="Coming soon">
-    A **Slack** delivery type, HMAC signing for webhook payloads, and per-workspace scoping of a
-    notification are on the upcoming release track and are not yet available in the latest released
-    version of ByteChef.
-</Callout>
+In Community Edition the **Type** dropdown offers only **Email** and **Slack**, and the API refuses to
+save a Webhook notification. A Webhook notification created earlier under an Enterprise license is kept
+but skipped, with a warning in the server log, while the deployment runs as Community Edition.
+
+### Message content
 
 Email subject and body come from the platform's message bundle, parameterised with the workflow's
-label and the job id. There is no per-notification template.
+label and the job id; the approval events also carry the approval's expiry time and a link to resolve
+it. A Slack message carries the same text as the email body, prefixed with an emoji. There is no
+per-notification template.
+
+### Webhook requests
+
+Each delivery is a single `POST` with a `Content-Type: application/json` body:
+
+```json
+{
+  "eventType": "JOB_FAILED",
+  "jobId": 1042,
+  "jobName": "Sync new leads",
+  "timestamp": "2026-11-02T14:03:27.512Z"
+}
+```
+
+For `JOB_APPROVAL_EXPIRING` and `JOB_APPROVAL_ESCALATED` the body also includes `approvalExpiresAt` and
+`approvalFormUrl`.
+
+Every request carries these headers:
+
+| Header | Value |
+|---|---|
+| `X-ByteChef-Event` | `job.status` |
+| `X-ByteChef-Timestamp` | The send time, in milliseconds since the epoch. |
+| `X-ByteChef-Delivery` | A random UUID, unique per request. Use it to deduplicate. |
+
+The URL must use `http` or `https` and must resolve to a public address: loopback, private,
+link-local and carrier-grade NAT ranges are refused. Each request has a 10-second connect timeout and
+a 30-second read timeout, and a `4xx` or `5xx` response counts as a failure. A failed job-status
+delivery is logged and not retried. For the two approval events, if every subscribed notification
+fails, the next approval sweep tries again.
+
+<Callout type="warn" title="Coming soon">
+    Signing webhook payloads with a shared secret (HMAC) and per-workspace scoping of a notification
+    are on the upcoming release track and are not yet available.
+</Callout>
 
 ## Delete a notification
 
