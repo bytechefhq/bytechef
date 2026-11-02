@@ -10,7 +10,10 @@ package com.bytechef.ee.platform.external.invocation.log.remote.client;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.mock;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.ee.platform.external.invocation.log.remote.grpc.ExternalInvocationEventProtoMapper;
@@ -44,6 +47,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -146,7 +150,7 @@ class RemoteExternalInvocationEventListenerIntTest {
             () -> remoteExternalInvocationEventListener.onExternalInvocationEvent(
                 ExternalInvocationEvent
                     .builder(
-                        PlatformType.AUTOMATION, ExternalInvocationSource.API_TOOL, ExternalInvocationKind.COMPONENT,
+                        PlatformType.AUTOMATION, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.COMPONENT,
                         "list_projects")
                     .build()))
                         .doesNotThrowAnyException();
@@ -169,6 +173,16 @@ class RemoteExternalInvocationEventListenerIntTest {
     @EnableConfigurationProperties(ApplicationProperties.class)
     @Configuration
     static class RemoteExternalInvocationEventListenerIntTestConfiguration {
+
+        @Bean
+        JobService jobService() {
+            return mock(JobService.class);
+        }
+
+        @Bean
+        WorkflowService workflowService() {
+            return mock(WorkflowService.class);
+        }
 
         @Configuration
         static class RemoteExternalInvocationEventListenerIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {

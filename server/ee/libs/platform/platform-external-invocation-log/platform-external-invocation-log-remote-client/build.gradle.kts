@@ -8,6 +8,8 @@ dependencies {
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-remote-grpc"))
 
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     testImplementation("io.grpc:grpc-inprocess")
     testImplementation("org.awaitility:awaitility")
     testImplementation("org.springframework.grpc:spring-grpc-core")
