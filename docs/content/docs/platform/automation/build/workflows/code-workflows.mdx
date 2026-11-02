@@ -965,6 +965,9 @@ Responses:
 | `401 Unauthorized` | The API key is unknown in that environment, is not a workspace API key, or `X-ENVIRONMENT` is not a valid environment. |
 | `403 Forbidden` | The key's user is not an administrator. |
 
+With Enterprise Edition role-based access control, which is on the upcoming release track, the deploy endpoint
+requires both `PROJECT_CREATE` and `PROJECT_PUBLISH` on the workspace. A caller without them gets HTTP 403.
+
 A second endpoint, `POST /api/automation/v1/projects/{id}/git/pull`, pulls a project from its configured Git
 repository instead of taking an upload.
 
