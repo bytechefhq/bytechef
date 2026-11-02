@@ -5,7 +5,7 @@ ee: true
 comingSoon: true
 ---
 
-**Settings → Audit Events** records privileged actions across the platform. Recording is automatic - there is no per-resource opt-in and no way for a user to suppress an entry. The page requires the `ADMIN` authority and is Enterprise Edition.
+**Settings → Audit Events** records privileged actions across the platform. Recording is off by default: set `bytechef.audit.enabled` (environment variable `BYTECHEF_AUDIT_ENABLED`) to `true` and restart the server to turn it on. While it is off, the page explains how to enable it. Once on, recording is automatic - there is no per-resource opt-in and no way for a user to suppress an entry. The page requires the `ADMIN` authority and is Enterprise Edition.
 
 ---
 
@@ -123,6 +123,7 @@ A `retention-days` of zero or less disables the purge rather than deleting the w
 
 | Property | Default | Meaning |
 |---|---|---|
+| `bytechef.audit.enabled` | `false` | Record audit events. When off, nothing is written; entries recorded earlier are still listed through the API and purged by the retention job. |
 | `bytechef.audit.credential-usage-interval` | `1h` | Minimum time between two `CREDENTIAL_USED` entries for the same credential. Zero or a negative value records every request. |
 | `bytechef.audit.record-allowed-permission-checks` | `false` | Also record passed permission checks on calls that change something. |
 
