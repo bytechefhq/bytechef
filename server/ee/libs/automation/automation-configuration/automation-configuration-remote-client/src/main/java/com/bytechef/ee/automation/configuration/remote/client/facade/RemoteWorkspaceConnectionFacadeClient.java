@@ -60,7 +60,7 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
     }
 
     @Override
-    public List<Tag> getConnectionTags(long workspaceId) {
+    public List<Tag> getConnectionTags(long workspaceId, Long environmentId) {
         throw new UnsupportedOperationException();
     }
 

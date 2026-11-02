@@ -17,6 +17,7 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
 import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.ConnectionPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
@@ -63,7 +64,7 @@ import tools.jackson.databind.ObjectMapper;
 @EnableMethodSecurity
 @Import({
     A2aPermissionScopeProvider.class, ApiKeyPermissionScopeProvider.class, CacheConfiguration.class,
-    CurrentUserResolverImpl.class, DeploymentPermissionScopeProvider.class,
+    ConnectionPermissionScopeProvider.class, CurrentUserResolverImpl.class, DeploymentPermissionScopeProvider.class,
     EmbeddedOwnerContributorsTestConfiguration.class, LiquibaseConfiguration.class, McpPermissionScopeProvider.class,
     PermissionScopeRegistry.class, PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class,
     ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectServiceImpl.class,

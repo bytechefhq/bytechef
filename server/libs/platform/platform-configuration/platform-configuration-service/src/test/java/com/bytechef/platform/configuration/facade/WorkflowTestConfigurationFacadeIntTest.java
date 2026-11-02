@@ -18,6 +18,10 @@ package com.bytechef.platform.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
@@ -27,7 +31,9 @@ import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestCo
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfigurationSharedMocks;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
+import com.bytechef.platform.configuration.service.WorkflowConnectionUsageChecker;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.service.ConnectionService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -75,7 +82,13 @@ class WorkflowTestConfigurationFacadeIntTest {
         """;
 
     @Autowired
+    private ConnectionService connectionService;
+
+    @Autowired
     private JdbcWorkflowRepository jdbcWorkflowRepository;
+
+    @MockitoBean
+    private WorkflowConnectionUsageChecker workflowConnectionUsageChecker;
 
     @Autowired
     private WorkflowService workflowService;
@@ -93,6 +106,42 @@ class WorkflowTestConfigurationFacadeIntTest {
     void afterEach() {
         workflowTestConfigurationRepository.deleteAll();
         jdbcWorkflowRepository.deleteAll();
+    }
+
+    @Test
+    void testSaveWorkflowTestConfigurationConnectionStopsWhenTheConnectionMayNotBeUsed() {
+        Workflow workflow = workflowService.create(
+            REQUIRED_INPUT_WORKFLOW_DEFINITION, Format.JSON, Workflow.SourceType.JDBC);
+
+        doThrow(new IllegalStateException("denied")).when(workflowConnectionUsageChecker)
+            .checkConnectionUsage(anyString(), anyLong(), anyLong());
+
+        assertThatThrownBy(() -> workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
+            workflow.getId(), "node_1", "connection", 9L, ENVIRONMENT_ID))
+                .isInstanceOf(IllegalStateException.class);
+
+        verifyNoInteractions(connectionService);
+
+        assertThat(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflow.getId(), ENVIRONMENT_ID))
+            .isEmpty();
+    }
+
+    @Test
+    void testSaveClusterElementTestConfigurationConnectionStopsWhenTheConnectionMayNotBeUsed() {
+        Workflow workflow = workflowService.create(
+            REQUIRED_INPUT_WORKFLOW_DEFINITION, Format.JSON, Workflow.SourceType.JDBC);
+
+        doThrow(new IllegalStateException("denied")).when(workflowConnectionUsageChecker)
+            .checkConnectionUsage(anyString(), anyLong(), anyLong());
+
+        assertThatThrownBy(() -> workflowTestConfigurationFacade.saveClusterElementTestConfigurationConnection(
+            workflow.getId(), "node_1", "MODEL", "model_1", "connection", 9L, ENVIRONMENT_ID))
+                .isInstanceOf(IllegalStateException.class);
+
+        verifyNoInteractions(connectionService);
+
+        assertThat(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflow.getId(), ENVIRONMENT_ID))
+            .isEmpty();
     }
 
     @Test
