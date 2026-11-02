@@ -16,13 +16,6 @@
 
 package com.bytechef.platform.workflow.task.dispatcher;
 
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.dynamicProperties;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
-import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -38,31 +31,5 @@ public class TaskDispatcherDefinitionRegistryTest {
     @Test
     public void testGetTaskDispatcherDefinitions() {
         // TODO
-    }
-
-    @Test
-    public void testRegistryAcceptsDynamicPropertiesPropertyWithPropertiesFunction() {
-        TaskDispatcherDefinition taskDispatcherDefinition = taskDispatcher("dispatcher")
-            .properties(
-                dynamicProperties("inputs")
-                    .properties(inputParameters -> List.of()));
-
-        TaskDispatcherDefinitionRegistry taskDispatcherDefinitionRegistry = new TaskDispatcherDefinitionRegistry(
-            List.of(() -> taskDispatcherDefinition));
-
-        assertThat(taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions())
-            .containsExactly(taskDispatcherDefinition);
-    }
-
-    @Test
-    public void testRegistryRejectsDynamicPropertiesPropertyWithoutPropertiesFunction() {
-        TaskDispatcherDefinition taskDispatcherDefinition = taskDispatcher("dispatcher")
-            .properties(
-                dynamicProperties("inputs")
-                    .propertiesLookupDependsOn("workflowUuid"));
-
-        assertThatThrownBy(() -> new TaskDispatcherDefinitionRegistry(List.of(() -> taskDispatcherDefinition)))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("inputs");
     }
 }

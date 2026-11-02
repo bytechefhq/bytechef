@@ -53,8 +53,10 @@ public final class TaskDispatcherDsl {
         return new ModifiableBooleanProperty(name);
     }
 
-    public static ModifiableDynamicPropertiesProperty dynamicProperties(String name) {
-        return new ModifiableDynamicPropertiesProperty(name);
+    public static ModifiableDynamicPropertiesProperty dynamicProperties(
+        String name, TaskDispatcherDefinition.PropertiesFunction propertiesFunction) {
+
+        return new ModifiableDynamicPropertiesProperty(name, propertiesFunction);
     }
 
     public static ModifiableDateProperty date() {
@@ -536,10 +538,14 @@ public final class TaskDispatcherDsl {
         private String description;
         private String header;
         private List<String> propertiesLookupDependsOn = List.of();
-        private TaskDispatcherDefinition.PropertiesFunction propertiesFunction;
+        private final TaskDispatcherDefinition.PropertiesFunction propertiesFunction;
 
-        private ModifiableDynamicPropertiesProperty(String name) {
+        private ModifiableDynamicPropertiesProperty(
+            String name, TaskDispatcherDefinition.PropertiesFunction propertiesFunction) {
+
             super(name, Type.DYNAMIC_PROPERTIES);
+
+            this.propertiesFunction = Objects.requireNonNull(propertiesFunction, "propertiesFunction");
         }
 
         public ModifiableDynamicPropertiesProperty description(String description) {
@@ -562,14 +568,6 @@ public final class TaskDispatcherDsl {
             return this;
         }
 
-        public ModifiableDynamicPropertiesProperty properties(
-            TaskDispatcherDefinition.PropertiesFunction propertiesFunction) {
-
-            this.propertiesFunction = propertiesFunction;
-
-            return this;
-        }
-
         @Override
         public Optional<String> getDescription() {
             return Optional.ofNullable(description);
@@ -582,11 +580,6 @@ public final class TaskDispatcherDsl {
 
         @Override
         public PropertiesDataSource getDynamicPropertiesDataSource() {
-            if (propertiesFunction == null) {
-                throw new IllegalStateException(
-                    "Dynamic properties property '%s' does not define a properties function".formatted(getName()));
-            }
-
             return new PropertiesDataSourceImpl(propertiesLookupDependsOn, propertiesFunction);
         }
     }
