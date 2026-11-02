@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.workflow.execution.remote.client.service;
+package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,8 +16,8 @@ import com.bytechef.ee.platform.workflow.execution.remote.grpc.TaskStateRemoteSe
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.execution.repository.TaskStateRepository;
-import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -49,7 +49,7 @@ import tools.jackson.databind.ObjectMapper;
         "bytechef.workflow.repository.jdbc.enabled=true", "spring.quartz.auto-startup=false"
     })
 @Import(PostgreSQLContainerConfiguration.class)
-class RemoteTaskStateServiceClientIntTest {
+class RemoteTaskStateFacadeClientIntTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -58,10 +58,10 @@ class RemoteTaskStateServiceClientIntTest {
     private TaskStateRepository taskStateRepository;
 
     @Autowired
-    private TaskStateService taskStateService;
+    private TaskStateFacade taskStateFacade;
 
     private ManagedChannel managedChannel;
-    private RemoteTaskStateServiceClient remoteTaskStateServiceClient;
+    private RemoteTaskStateFacadeClient remoteTaskStateFacadeClient;
     private Server server;
 
     @BeforeEach
@@ -73,7 +73,7 @@ class RemoteTaskStateServiceClientIntTest {
             .addService(
                 ServerInterceptors.intercept(
                     new TaskStateRemoteServiceGrpcServer(
-                        taskStateService, new PlatformWorkflowExecutionProtoMapper(objectMapper)),
+                        taskStateFacade, new PlatformWorkflowExecutionProtoMapper(objectMapper)),
                     new GrpcExceptionHandlerInterceptor(new GrpcRemoteExceptionHandler())))
             .build()
             .start();
@@ -82,7 +82,7 @@ class RemoteTaskStateServiceClientIntTest {
             .directExecutor()
             .build();
 
-        remoteTaskStateServiceClient = new RemoteTaskStateServiceClient(
+        remoteTaskStateFacadeClient = new RemoteTaskStateFacadeClient(
             new FixedGrpcChannels(managedChannel), objectMapper);
     }
 
@@ -100,10 +100,10 @@ class RemoteTaskStateServiceClientIntTest {
         Suspend suspend = new Suspend(
             Map.of("approvalResume", true, "fields", List.of("name")), Instant.parse("2026-10-28T10:00:00Z"));
 
-        remoteTaskStateServiceClient.save(jobResumeId, suspend);
+        remoteTaskStateFacadeClient.save(jobResumeId, suspend);
 
-        assertThat(taskStateService.<Suspend>fetchValue(jobResumeId)).contains(suspend);
-        assertThat(remoteTaskStateServiceClient.<Suspend>fetchValue(jobResumeId))
+        assertThat(taskStateFacade.<Suspend>fetchValue(jobResumeId)).contains(suspend);
+        assertThat(remoteTaskStateFacadeClient.<Suspend>fetchValue(jobResumeId))
             .containsInstanceOf(Suspend.class)
             .contains(suspend);
     }
@@ -112,18 +112,18 @@ class RemoteTaskStateServiceClientIntTest {
     void testSaveReplacesTheValue() {
         JobResumeId jobResumeId = JobResumeId.of("public", 7L);
 
-        taskStateService.save(jobResumeId, Map.of("step", 1));
+        taskStateFacade.save(jobResumeId, Map.of("step", 1));
 
-        remoteTaskStateServiceClient.save(jobResumeId, Map.of("step", 2, "id", 9_007_199_254_740_993L));
+        remoteTaskStateFacadeClient.save(jobResumeId, Map.of("step", 2, "id", 9_007_199_254_740_993L));
 
-        assertThat(taskStateService.<Map<String, Object>>fetchValue(jobResumeId))
+        assertThat(taskStateFacade.<Map<String, Object>>fetchValue(jobResumeId))
             .contains(Map.of("step", 2, "id", 9_007_199_254_740_993L));
         assertThat(taskStateRepository.count()).isEqualTo(1);
     }
 
     @Test
     void testFetchMissingValueIsEmpty() {
-        assertThat(remoteTaskStateServiceClient.<Suspend>fetchValue(JobResumeId.of("public", 7L))).isEmpty();
+        assertThat(remoteTaskStateFacadeClient.<Suspend>fetchValue(JobResumeId.of("public", 7L))).isEmpty();
     }
 
     @Test
@@ -131,12 +131,12 @@ class RemoteTaskStateServiceClientIntTest {
         JobResumeId jobResumeId = JobResumeId.of("public", 7L);
         JobResumeId otherJobResumeId = JobResumeId.of("public", 8L);
 
-        taskStateService.save(jobResumeId, Map.of("step", 1));
-        taskStateService.save(otherJobResumeId, Map.of("step", 2));
+        taskStateFacade.save(jobResumeId, Map.of("step", 1));
+        taskStateFacade.save(otherJobResumeId, Map.of("step", 2));
 
-        remoteTaskStateServiceClient.delete(jobResumeId);
+        remoteTaskStateFacadeClient.delete(jobResumeId);
 
-        assertThat(taskStateService.<Object>fetchValue(jobResumeId)).isEmpty();
-        assertThat(taskStateService.<Object>fetchValue(otherJobResumeId)).contains(Map.of("step", 2));
+        assertThat(taskStateFacade.<Object>fetchValue(jobResumeId)).isEmpty();
+        assertThat(taskStateFacade.<Object>fetchValue(otherJobResumeId)).contains(Map.of("step", 2));
     }
 }
