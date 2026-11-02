@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.configuration.domain.Environment;
@@ -35,8 +34,6 @@ import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationShare
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -70,19 +67,13 @@ public class McpServerGraphQlControllerIntTest {
     @Autowired
     private McpServerService mcpServerService;
 
-    @BeforeEach
-    void beforeEach() {
-        when(mcpServerService.getMcpServer(anyLong())).thenReturn(
-            createMockMcpServer(1L, "Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true));
-    }
-
     @Test
     void testGetMcpServerById() {
         // Given
         McpServer mockServer = createMockMcpServer(
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        when(mcpServerService.getMcpServer(1L)).thenReturn(mockServer);
+        when(mcpServerFacade.getMcpServer(1L)).thenReturn(mockServer);
 
         // When & Then
         this.graphQlTester
@@ -116,7 +107,7 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mockServer = createMockMcpServer(
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        when(mcpServerService.getMcpServer(1L)).thenReturn(mockServer);
+        when(mcpServerFacade.getMcpServer(1L)).thenReturn(mockServer);
         when(mcpServerService.getMcpServerSecretKey(1L)).thenThrow(new AccessDeniedException("Access Denied"));
 
         this.graphQlTester
@@ -141,7 +132,7 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mockServer = createMockMcpServer(
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        when(mcpServerService.getMcpServer(1L)).thenReturn(mockServer);
+        when(mcpServerFacade.getMcpServer(1L)).thenReturn(mockServer);
         when(mcpServerService.getMcpServerSecretKey(1L)).thenReturn("secret-key-1");
 
         this.graphQlTester
@@ -164,7 +155,7 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mockServer = createMockMcpServer(
             1L, "Updated Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, false);
 
-        when(mcpServerService.update(1L, "Updated Server", false, null, null)).thenReturn(mockServer);
+        when(mcpServerFacade.updateMcpServer(1L, "Updated Server", false, null, null)).thenReturn(mockServer);
 
         // When & Then
         this.graphQlTester
@@ -199,7 +190,7 @@ public class McpServerGraphQlControllerIntTest {
 
         mockServer.setAuthenticationRequired(false);
 
-        when(mcpServerService.update(1L, "Test Server", true, null, false)).thenReturn(mockServer);
+        when(mcpServerFacade.updateMcpServer(1L, "Test Server", true, null, false)).thenReturn(mockServer);
 
         this.graphQlTester
             .document("""
@@ -222,13 +213,13 @@ public class McpServerGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(false);
 
-        verify(mcpServerService).update(1L, "Test Server", true, null, false);
+        verify(mcpServerFacade).updateMcpServer(1L, "Test Server", true, null, false);
         verify(mcpServerService, never()).update(any(McpServer.class));
     }
 
     @Test
     void testUpdateMcpServerRejectsInvariantViolation() {
-        when(mcpServerService.update(1L, "Test Server", true, true, false))
+        when(mcpServerFacade.updateMcpServer(1L, "Test Server", true, true, false))
             .thenThrow(new IllegalArgumentException(
                 "enforceToolAuthorization requires authenticationRequired to be enabled"));
 
@@ -268,7 +259,7 @@ public class McpServerGraphQlControllerIntTest {
         mockServer.setAuthenticationRequired(true);
         mockServer.setEnforceToolAuthorization(true);
 
-        when(mcpServerService.update(1L, "Test Server", true, true, true)).thenReturn(mockServer);
+        when(mcpServerFacade.updateMcpServer(1L, "Test Server", true, true, true)).thenReturn(mockServer);
 
         this.graphQlTester
             .document("""
@@ -298,7 +289,7 @@ public class McpServerGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(mcpServerService).update(1L, "Test Server", true, true, true);
+        verify(mcpServerFacade).updateMcpServer(1L, "Test Server", true, true, true);
         verify(mcpServerService, never()).update(1L, "Test Server", true);
     }
 
@@ -354,8 +345,8 @@ public class McpServerGraphQlControllerIntTest {
         McpServer mcpServer = createMockMcpServer(
             1L, "Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
-        when(mcpServerService.getMcpServer(1L)).thenReturn(mcpServer);
-        when(mcpServerService.rotateSecretKey(1L)).thenReturn(mcpServer);
+        when(mcpServerFacade.getMcpServer(1L)).thenReturn(mcpServer);
+        when(mcpServerFacade.rotateMcpServerSecretKey(1L)).thenReturn(mcpServer);
 
         this.graphQlTester
             .document("""
@@ -369,111 +360,41 @@ public class McpServerGraphQlControllerIntTest {
             .satisfies(
                 url -> assertThat(url).endsWith("/test/" + mcpServer.getSecretKey() + "/mcp"));
 
-        verify(mcpServerService).rotateSecretKey(1L);
+        verify(mcpServerFacade).rotateMcpServerSecretKey(1L);
     }
 
-    @Nested
-    class EmbeddedMcpServerTest {
-
-        @BeforeEach
-        void beforeEach() {
-            when(mcpServerService.getMcpServer(1L)).thenReturn(
-                createMockMcpServer(1L, "Embedded", PlatformType.EMBEDDED, Environment.DEVELOPMENT, true));
-        }
-
-        @Test
-        void testGetMcpServerByIdRejectsEmbeddedMcpServer() {
-            assertRejected("""
-                query {
-                    mcpServer(id: "1") {
-                        id
-                        secretKey
-                    }
+    @Test
+    void testGetMcpServersRejectsEmbeddedType() {
+        assertRejected("""
+            query {
+                mcpServers(type: EMBEDDED) {
+                    id
+                    secretKey
                 }
-                """);
-        }
+            }
+            """);
 
-        @Test
-        void testGetMcpServersRejectsEmbeddedType() {
-            assertRejected("""
-                query {
-                    mcpServers(type: EMBEDDED) {
-                        id
-                        secretKey
-                    }
+        verify(mcpServerService, never()).getMcpServers(any());
+    }
+
+    @Test
+    void testCreateMcpServerRejectsEmbeddedType() {
+        assertRejected("""
+            mutation {
+                createMcpServer(input: {name: "Embedded", type: EMBEDDED, environmentId: "0", enabled: true}) {
+                    id
                 }
-                """);
+            }
+            """);
 
-            verify(mcpServerService, never()).getMcpServers(any());
-        }
+        verify(mcpServerService, never()).create(anyString(), any(), any(), any());
+    }
 
-        @Test
-        void testCreateMcpServerRejectsEmbeddedType() {
-            assertRejected("""
-                mutation {
-                    createMcpServer(input: {name: "Embedded", type: EMBEDDED, environmentId: "0", enabled: true}) {
-                        id
-                    }
-                }
-                """);
-
-            verify(mcpServerService, never()).create(anyString(), any(), any(), any());
-        }
-
-        @Test
-        void testUpdateMcpServerRejectsEmbeddedMcpServer() {
-            assertRejected("""
-                mutation {
-                    updateMcpServer(id: "1", input: {name: "Renamed", enabled: false}) {
-                        id
-                    }
-                }
-                """);
-
-            verify(mcpServerService, never()).update(anyLong(), any(), any());
-        }
-
-        @Test
-        void testUpdateMcpServerTagsRejectsEmbeddedMcpServer() {
-            assertRejected("""
-                mutation {
-                    updateMcpServerTags(id: "1", tags: [{name: "tag"}]) {
-                        id
-                    }
-                }
-                """);
-
-            verifyNoInteractions(mcpServerFacade);
-        }
-
-        @Test
-        void testUpdateMcpServerUrlRejectsEmbeddedMcpServer() {
-            assertRejected("""
-                mutation {
-                    updateMcpServerUrl(id: "1")
-                }
-                """);
-
-            verify(mcpServerService, never()).rotateSecretKey(anyLong());
-        }
-
-        @Test
-        void testDeleteMcpServerRejectsEmbeddedMcpServer() {
-            assertRejected("""
-                mutation {
-                    deleteMcpServer(id: "1")
-                }
-                """);
-
-            verifyNoInteractions(mcpServerFacade);
-        }
-
-        private void assertRejected(String document) {
-            graphQlTester.document(document)
-                .execute()
-                .errors()
-                .satisfy(errors -> assertThat(errors).hasSize(1));
-        }
+    private void assertRejected(String document) {
+        graphQlTester.document(document)
+            .execute()
+            .errors()
+            .satisfy(errors -> assertThat(errors).hasSize(1));
     }
 
     private McpServer createMockMcpServer(

@@ -17,19 +17,12 @@
 package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.mcp.domain.McpComponent;
-import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
-import com.bytechef.platform.mcp.service.McpComponentService;
-import com.bytechef.platform.mcp.service.McpServerService;
-import com.bytechef.platform.mcp.service.McpToolService;
-import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -42,64 +35,32 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class McpToolGraphQlController {
 
-    private final McpComponentService mcpComponentService;
     private final McpServerFacade mcpServerFacade;
-    private final McpServerService mcpServerService;
-    private final McpServerTypeDefinitions mcpServerTypeDefinitions;
-    private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
-    public McpToolGraphQlController(
-        McpComponentService mcpComponentService, McpServerFacade mcpServerFacade, McpServerService mcpServerService,
-        List<McpServerTypeDefinition> mcpServerTypeDefinitions, McpToolService mcpToolService) {
-
-        this.mcpComponentService = mcpComponentService;
+    public McpToolGraphQlController(McpServerFacade mcpServerFacade) {
         this.mcpServerFacade = mcpServerFacade;
-        this.mcpServerService = mcpServerService;
-        this.mcpServerTypeDefinitions = new McpServerTypeDefinitions(mcpServerTypeDefinitions);
-        this.mcpToolService = mcpToolService;
     }
 
     @QueryMapping
     public McpTool mcpTool(@Argument long id) {
-        McpTool mcpTool = mcpToolService.fetchMcpTool(id)
-            .orElse(null);
+        Optional<McpTool> mcpToolOptional = mcpServerFacade.fetchMcpTool(id);
 
-        if (mcpTool != null) {
-            checkMcpComponentSharedAdministration(mcpTool.getMcpComponentId());
-        }
-
-        return mcpTool;
+        return mcpToolOptional.orElse(null);
     }
 
     @QueryMapping
     public List<McpTool> mcpTools() {
-        Set<Long> sharedAdministrationMcpServerIds =
-            mcpServerTypeDefinitions.getSharedAdministrationMcpServerIds(mcpServerService);
-
-        Set<Long> sharedAdministrationMcpComponentIds = mcpComponentService.getMcpComponents()
-            .stream()
-            .filter(mcpComponent -> sharedAdministrationMcpServerIds.contains(mcpComponent.getMcpServerId()))
-            .map(McpComponent::getId)
-            .collect(Collectors.toSet());
-
-        return mcpToolService.getMcpTools()
-            .stream()
-            .filter(mcpTool -> sharedAdministrationMcpComponentIds.contains(mcpTool.getMcpComponentId()))
-            .toList();
+        return mcpServerFacade.getMcpTools();
     }
 
     @QueryMapping
     public List<McpTool> mcpToolsByComponentId(@Argument long mcpComponentId) {
-        checkMcpComponentSharedAdministration(mcpComponentId);
-
         return mcpServerFacade.getMcpComponentMcpTools(mcpComponentId);
     }
 
     @MutationMapping
     public McpTool createMcpTool(@Argument McpToolInput input) {
-        checkMcpComponentSharedAdministration(input.mcpComponentId());
-
         Map<String, Object> parameters = input.parameters() != null ? input.parameters() : Map.of();
 
         return mcpServerFacade.createMcpTool(new McpTool(input.name(), parameters, input.mcpComponentId()));
@@ -107,10 +68,9 @@ public class McpToolGraphQlController {
 
     @MutationMapping
     public boolean deleteMcpTool(@Argument long id) {
-        McpTool mcpTool = mcpToolService.fetchMcpTool(id)
-            .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
+        Optional<McpTool> mcpToolOptional = mcpServerFacade.fetchMcpTool(id);
 
-        checkMcpComponentSharedAdministration(mcpTool.getMcpComponentId());
+        McpTool mcpTool = mcpToolOptional.orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
 
         mcpServerFacade.deleteMcpTool(mcpTool);
 
@@ -119,12 +79,6 @@ public class McpToolGraphQlController {
 
     @MutationMapping
     public McpTool updateMcpTool(@Argument long id, @Argument McpToolInput input) {
-        McpTool currentMcpTool = mcpToolService.fetchMcpTool(id)
-            .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
-
-        checkMcpComponentSharedAdministration(currentMcpTool.getMcpComponentId());
-        checkMcpComponentSharedAdministration(input.mcpComponentId());
-
         Map<String, Object> parameters = input.parameters() != null ? input.parameters() : Map.of();
 
         McpTool mcpTool = new McpTool(input.name(), parameters, input.mcpComponentId());
@@ -136,14 +90,6 @@ public class McpToolGraphQlController {
         }
 
         return mcpServerFacade.updateMcpTool(mcpTool);
-    }
-
-    private void checkMcpComponentSharedAdministration(long mcpComponentId) {
-        McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpComponentId);
-
-        McpServer mcpServer = mcpServerService.getMcpServer(mcpComponent.getMcpServerId());
-
-        mcpServerTypeDefinitions.checkSharedAdministration(mcpServer.getType());
     }
 
     @SuppressFBWarnings("EI")

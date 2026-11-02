@@ -18,20 +18,12 @@ package com.bytechef.platform.mcp.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.mcp.domain.McpComponent;
-import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
-import com.bytechef.platform.mcp.service.McpComponentService;
-import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationSharedMocks;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
@@ -39,8 +31,6 @@ import graphql.ErrorType;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -67,35 +57,17 @@ class McpToolGraphQlControllerIntTest {
     private GraphQlTester graphQlTester;
 
     @Autowired
-    private McpComponentService mcpComponentService;
-
-    @Autowired
     private McpServerFacade mcpServerFacade;
 
     @Autowired
-    private McpServerService mcpServerService;
-
-    @Autowired
     private McpToolService mcpToolService;
-
-    @BeforeEach
-    void beforeEach() {
-        when(mcpComponentService.getMcpComponent(anyLong())).thenReturn(createMcpComponent(1L));
-        when(mcpServerService.getMcpServer(anyLong())).thenReturn(createMcpServer(PlatformType.AUTOMATION));
-
-        McpServer automationMcpServer = createMcpServer(PlatformType.AUTOMATION);
-
-        automationMcpServer.setId(1L);
-
-        when(mcpServerService.getMcpServers(PlatformType.AUTOMATION)).thenReturn(List.of(automationMcpServer));
-    }
 
     @Test
     void testGetMcpToolById() {
         // Given
         McpTool mockTool = createMockMcpTool(1L, "test-tool", Map.of("param1", "value1"), 1L);
 
-        when(mcpToolService.fetchMcpTool(1L)).thenReturn(Optional.of(mockTool));
+        when(mcpServerFacade.fetchMcpTool(1L)).thenReturn(Optional.of(mockTool));
 
         // When & Then
         this.graphQlTester
@@ -123,7 +95,7 @@ class McpToolGraphQlControllerIntTest {
     @Test
     void testGetMcpToolByIdNotFound() {
         // Given
-        when(mcpToolService.fetchMcpTool(1L)).thenReturn(Optional.empty());
+        when(mcpServerFacade.fetchMcpTool(1L)).thenReturn(Optional.empty());
 
         // When & Then
         this.graphQlTester
@@ -147,9 +119,7 @@ class McpToolGraphQlControllerIntTest {
             createMockMcpTool(1L, "tool1", Map.of("param1", "value1"), 1L),
             createMockMcpTool(2L, "tool2", Map.of("param2", "value2"), 2L));
 
-        when(mcpComponentService.getMcpComponents()).thenReturn(
-            List.of(createMcpComponent(1L, 1L), createMcpComponent(2L, 1L)));
-        when(mcpToolService.getMcpTools()).thenReturn(mockTools);
+        when(mcpServerFacade.getMcpTools()).thenReturn(mockTools);
 
         // When & Then
         this.graphQlTester
@@ -263,7 +233,7 @@ class McpToolGraphQlControllerIntTest {
     void testUpdateMcpTool() {
         McpTool mcpTool = createMockMcpTool(1L, "test-tool", Map.of("param1", "value1"), 1L);
 
-        when(mcpToolService.fetchMcpTool(1L)).thenReturn(Optional.of(mcpTool));
+        when(mcpServerFacade.fetchMcpTool(1L)).thenReturn(Optional.of(mcpTool));
         when(mcpServerFacade.updateMcpTool(any(McpTool.class))).thenReturn(mcpTool);
 
         this.graphQlTester
@@ -286,7 +256,7 @@ class McpToolGraphQlControllerIntTest {
     void testDeleteMcpTool() {
         McpTool mcpTool = createMockMcpTool(1L, "test-tool", Map.of(), 1L);
 
-        when(mcpToolService.fetchMcpTool(1L)).thenReturn(Optional.of(mcpTool));
+        when(mcpServerFacade.fetchMcpTool(1L)).thenReturn(Optional.of(mcpTool));
 
         this.graphQlTester
             .document("""
@@ -321,146 +291,6 @@ class McpToolGraphQlControllerIntTest {
                 }));
 
         verifyNoInteractions(mcpToolService);
-    }
-
-    @Nested
-    class EmbeddedMcpServerTest {
-
-        private static final long EMBEDDED_MCP_COMPONENT_ID = 2L;
-        private static final long EMBEDDED_MCP_SERVER_ID = 2L;
-
-        @BeforeEach
-        void beforeEach() {
-            McpComponent embeddedMcpComponent = createMcpComponent(EMBEDDED_MCP_SERVER_ID);
-
-            when(mcpComponentService.getMcpComponent(EMBEDDED_MCP_COMPONENT_ID)).thenReturn(embeddedMcpComponent);
-            when(mcpServerService.getMcpServer(EMBEDDED_MCP_SERVER_ID)).thenReturn(
-                createMcpServer(PlatformType.EMBEDDED));
-            when(mcpToolService.fetchMcpTool(2L)).thenReturn(
-                Optional.of(createMockMcpTool(2L, "embedded-tool", Map.of(), EMBEDDED_MCP_COMPONENT_ID)));
-            when(mcpToolService.fetchMcpTool(1L)).thenReturn(
-                Optional.of(createMockMcpTool(1L, "automation-tool", Map.of(), 1L)));
-        }
-
-        @Test
-        void testMcpToolRejectsEmbeddedMcpTool() {
-            assertRejected("""
-                query {
-                    mcpTool(id: "2") {
-                        id
-                    }
-                }
-                """);
-        }
-
-        @Test
-        void testMcpToolsByComponentIdRejectsEmbeddedMcpComponent() {
-            assertRejected("""
-                query {
-                    mcpToolsByComponentId(mcpComponentId: "2") {
-                        id
-                    }
-                }
-                """);
-
-            verify(mcpServerFacade, never()).getMcpComponentMcpTools(anyLong());
-        }
-
-        @Test
-        void testMcpToolsOmitsEmbeddedMcpTools() {
-            when(mcpComponentService.getMcpComponents()).thenReturn(
-                List.of(createMcpComponent(1L, 1L),
-                    createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID)));
-            when(mcpToolService.getMcpTools()).thenReturn(
-                List.of(
-                    createMockMcpTool(1L, "automation-tool", Map.of(), 1L),
-                    createMockMcpTool(2L, "embedded-tool", Map.of(), EMBEDDED_MCP_COMPONENT_ID)));
-
-            graphQlTester.document("""
-                query {
-                    mcpTools {
-                        id
-                    }
-                }
-                """)
-                .execute()
-                .path("mcpTools[*].id")
-                .entityList(String.class)
-                .containsExactly("1");
-        }
-
-        @Test
-        void testCreateMcpToolRejectsEmbeddedMcpComponent() {
-            assertRejected("""
-                mutation {
-                    createMcpTool(input: {name: "tool", mcpComponentId: "2"}) {
-                        id
-                    }
-                }
-                """);
-
-            verify(mcpServerFacade, never()).createMcpTool(any(McpTool.class));
-        }
-
-        @Test
-        void testUpdateMcpToolRejectsEmbeddedMcpTool() {
-            assertRejected("""
-                mutation {
-                    updateMcpTool(id: "2", input: {name: "embedded-tool", mcpComponentId: "2"}) {
-                        id
-                    }
-                }
-                """);
-
-            verify(mcpToolService, never()).update(any(McpTool.class));
-        }
-
-        @Test
-        void testUpdateMcpToolRejectsMoveIntoEmbeddedMcpComponent() {
-            assertRejected("""
-                mutation {
-                    updateMcpTool(id: "1", input: {name: "automation-tool", mcpComponentId: "2"}) {
-                        id
-                    }
-                }
-                """);
-
-            verify(mcpToolService, never()).update(any(McpTool.class));
-        }
-
-        @Test
-        void testDeleteMcpToolRejectsEmbeddedMcpTool() {
-            assertRejected("""
-                mutation {
-                    deleteMcpTool(id: "2")
-                }
-                """);
-
-            verify(mcpServerFacade, never()).deleteMcpTool(any(McpTool.class));
-        }
-
-        private void assertRejected(String document) {
-            graphQlTester.document(document)
-                .execute()
-                .errors()
-                .satisfy(errors -> assertThat(errors).hasSize(1));
-        }
-    }
-
-    private static McpComponent createMcpComponent(long mcpServerId) {
-        return new McpComponent("component", 1, mcpServerId, null);
-    }
-
-    private static McpComponent createMcpComponent(long id, long mcpServerId) {
-        McpComponent mcpComponent = createMcpComponent(mcpServerId);
-
-        mcpComponent.setId(id);
-
-        return mcpComponent;
-    }
-
-    private static McpServer createMcpServer(PlatformType type) {
-        return new McpServer("Server", type, Environment.DEVELOPMENT, true);
     }
 
     private McpTool createMockMcpTool(Long id, String name, Map<String, String> parameters, long mcpComponentId) {
