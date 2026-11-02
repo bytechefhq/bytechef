@@ -72,7 +72,7 @@ public class McpToolGraphQlController {
 
         McpTool mcpTool = mcpToolOptional.orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
 
-        mcpServerFacade.deleteSharedMcpTool(mcpTool);
+        mcpServerFacade.deleteMcpTool(mcpTool);
 
         return true;
     }
@@ -89,7 +89,7 @@ public class McpToolGraphQlController {
             mcpTool.setVersion(input.version());
         }
 
-        return mcpServerFacade.updateSharedMcpTool(mcpTool);
+        return mcpServerFacade.updateMcpTool(mcpTool);
     }
 
     @SuppressFBWarnings("EI")

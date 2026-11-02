@@ -92,12 +92,12 @@ public class McpServerGraphQlController {
             })
             .toList();
 
-        return mcpServerFacade.updateSharedMcpServerTags(id, tagList);
+        return mcpServerFacade.updateMcpServerTags(id, tagList);
     }
 
     @MutationMapping
     public boolean deleteMcpServer(@Argument long id) {
-        mcpServerFacade.deleteSharedMcpServer(id);
+        mcpServerFacade.deleteMcpServer(id);
 
         return true;
     }

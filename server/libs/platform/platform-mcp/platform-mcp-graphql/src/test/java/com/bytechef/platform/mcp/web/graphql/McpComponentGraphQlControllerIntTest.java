@@ -186,14 +186,14 @@ public class McpComponentGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(mcpServerFacade).deleteSharedMcpComponent(1L);
+        verify(mcpServerFacade).deleteMcpComponent(1L);
     }
 
     @Test
     void testUpdateMcpComponentWithTools() {
         McpComponent mcpComponent = createMockMcpComponent(1L, "component", 1);
 
-        when(mcpServerFacade.updateSharedMcpComponent(any(McpComponent.class), any(), any())).thenReturn(mcpComponent);
+        when(mcpServerFacade.update(any(McpComponent.class), any(), any())).thenReturn(mcpComponent);
 
         this.graphQlTester
             .document("""
@@ -210,14 +210,14 @@ public class McpComponentGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("1");
 
-        verify(mcpServerFacade).updateSharedMcpComponent(any(McpComponent.class), isNull(), any());
+        verify(mcpServerFacade).update(any(McpComponent.class), isNull(), any());
     }
 
     @Test
     void testUpdateMcpComponentWithToolsWithEmptyRequiredAuthorities() {
         McpComponent mcpComponent = createMockMcpComponent(1L, "component", 1);
 
-        when(mcpServerFacade.updateSharedMcpComponent(any(McpComponent.class), any(), any())).thenReturn(mcpComponent);
+        when(mcpServerFacade.update(any(McpComponent.class), any(), any())).thenReturn(mcpComponent);
 
         this.graphQlTester
             .document("""
@@ -235,14 +235,14 @@ public class McpComponentGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("1");
 
-        verify(mcpServerFacade).updateSharedMcpComponent(any(McpComponent.class), eq(Set.of()), any());
+        verify(mcpServerFacade).update(any(McpComponent.class), eq(Set.of()), any());
     }
 
     @Test
     void testUpdateMcpComponentWithToolsWithRequiredAuthorities() {
         McpComponent mcpComponent = createMockMcpComponent(1L, "component", 1);
 
-        when(mcpServerFacade.updateSharedMcpComponent(any(McpComponent.class), any(), any())).thenReturn(mcpComponent);
+        when(mcpServerFacade.update(any(McpComponent.class), any(), any())).thenReturn(mcpComponent);
 
         this.graphQlTester
             .document("""
@@ -260,7 +260,7 @@ public class McpComponentGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("1");
 
-        verify(mcpServerFacade).updateSharedMcpComponent(any(McpComponent.class), eq(Set.of("ROLE_ADMIN")), any());
+        verify(mcpServerFacade).update(any(McpComponent.class), eq(Set.of("ROLE_ADMIN")), any());
     }
 
     private McpComponent createMockMcpComponent(Long id, String componentName, int componentVersion) {

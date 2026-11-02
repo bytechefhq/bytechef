@@ -290,55 +290,6 @@ class McpServerFacadeIntTest {
     }
 
     @Test
-    void testEmbeddedMcpServerIsAdministeredThroughItsOwnOperations() {
-        McpServer embeddedMcpServer = saveEmbeddedMcpServer();
-
-        long embeddedMcpServerId = embeddedMcpServer.getId();
-
-        McpComponent embeddedMcpComponent = mcpServerFacade.create(
-            new McpComponent("component", 1, embeddedMcpServerId, null), List.of(getMcpTool("tool")));
-
-        long embeddedMcpComponentId = embeddedMcpComponent.getId();
-
-        McpComponent changedMcpComponent = new McpComponent(
-            "component", 2, embeddedMcpServerId, null, embeddedMcpComponent.getVersion());
-
-        changedMcpComponent.setId(embeddedMcpComponentId);
-
-        mcpServerFacade.update(changedMcpComponent, null, List.of(getMcpTool("tool"), getMcpTool("other")));
-
-        List<McpTool> embeddedMcpTools = mcpToolService.getMcpComponentMcpTools(embeddedMcpComponentId);
-
-        assertThat(embeddedMcpTools).hasSize(2);
-
-        McpTool embeddedMcpTool = embeddedMcpTools.getFirst();
-
-        embeddedMcpTool.setParameters(Map.of("key", "value"));
-
-        McpTool updatedEmbeddedMcpTool = mcpServerFacade.updateMcpTool(embeddedMcpTool);
-
-        assertThat(updatedEmbeddedMcpTool.getParameters()).isEqualTo(Map.of("key", "value"));
-
-        mcpServerFacade.deleteMcpTool(updatedEmbeddedMcpTool);
-
-        assertThat(mcpToolService.getMcpComponentMcpTools(embeddedMcpComponentId)).hasSize(1);
-
-        mcpServerFacade.updateMcpServerTags(embeddedMcpServerId, List.of(new Tag("tag")));
-
-        McpServer currentMcpServer = mcpServerService.getMcpServer(embeddedMcpServerId);
-
-        assertThat(currentMcpServer.getTagIds()).hasSize(1);
-
-        mcpServerFacade.deleteMcpComponent(embeddedMcpComponentId);
-
-        assertThat(mcpComponentService.getMcpServerMcpComponents(embeddedMcpServerId)).isEmpty();
-
-        mcpServerFacade.deleteMcpServer(embeddedMcpServerId);
-
-        assertThat(mcpServerRepository.findById(embeddedMcpServerId)).isNotPresent();
-    }
-
-    @Test
     void testEmbeddedMcpServerIsRejected() {
         McpServer embeddedMcpServer = saveEmbeddedMcpServer();
 
@@ -347,9 +298,9 @@ class McpServerFacadeIntTest {
         assertRejected(() -> mcpServerFacade.getMcpServer(embeddedMcpServerId));
         assertRejected(() -> mcpServerFacade.updateMcpServer(embeddedMcpServerId, "Renamed", false, null, null));
         assertRejected(() -> mcpServerFacade.rotateMcpServerSecretKey(embeddedMcpServerId));
-        assertRejected(() -> mcpServerFacade.updateSharedMcpServerTags(embeddedMcpServerId, List.of()));
+        assertRejected(() -> mcpServerFacade.updateMcpServerTags(embeddedMcpServerId, List.of()));
         assertRejected(() -> mcpServerFacade.getMcpServerMcpComponents(embeddedMcpServerId));
-        assertRejected(() -> mcpServerFacade.deleteSharedMcpServer(embeddedMcpServerId));
+        assertRejected(() -> mcpServerFacade.deleteMcpServer(embeddedMcpServerId));
 
         McpServer currentMcpServer = mcpServerService.getMcpServer(embeddedMcpServerId);
 
@@ -375,12 +326,12 @@ class McpServerFacadeIntTest {
         assertRejected(
             () -> mcpServerFacade.createMcpComponent(new McpComponent("component", 1, embeddedMcpServerId, null)));
         assertRejected(
-            () -> mcpServerFacade.createSharedMcpComponent(new McpComponent("component", 1, embeddedMcpServerId, null),
+            () -> mcpServerFacade.create(new McpComponent("component", 1, embeddedMcpServerId, null),
                 List.of()));
         assertRejected(() -> mcpServerFacade.getMcpComponent(embeddedMcpComponentId));
         assertRejected(() -> mcpServerFacade.getMcpComponentMcpTools(embeddedMcpComponentId));
-        assertRejected(() -> mcpServerFacade.updateSharedMcpComponent(changedMcpComponent, null, List.of()));
-        assertRejected(() -> mcpServerFacade.deleteSharedMcpComponent(embeddedMcpComponentId));
+        assertRejected(() -> mcpServerFacade.update(changedMcpComponent, null, List.of()));
+        assertRejected(() -> mcpServerFacade.deleteMcpComponent(embeddedMcpComponentId));
 
         assertThat(mcpComponentService.getMcpServerMcpComponents(embeddedMcpServerId)).hasSize(1);
     }
@@ -400,8 +351,8 @@ class McpServerFacadeIntTest {
 
         assertRejected(() -> mcpServerFacade.createMcpTool(getMcpTool("other", embeddedMcpComponentId)));
         assertRejected(() -> mcpServerFacade.fetchMcpTool(embeddedMcpToolId));
-        assertRejected(() -> mcpServerFacade.updateSharedMcpTool(embeddedMcpTool));
-        assertRejected(() -> mcpServerFacade.deleteSharedMcpTool(embeddedMcpTool));
+        assertRejected(() -> mcpServerFacade.updateMcpTool(embeddedMcpTool));
+        assertRejected(() -> mcpServerFacade.deleteMcpTool(embeddedMcpTool));
 
         assertThat(mcpToolService.getMcpComponentMcpTools(embeddedMcpComponentId)).hasSize(1);
     }
@@ -419,7 +370,7 @@ class McpServerFacadeIntTest {
 
         mcpTool.setMcpComponentId(embeddedMcpComponent.getId());
 
-        assertRejected(() -> mcpServerFacade.updateSharedMcpTool(mcpTool));
+        assertRejected(() -> mcpServerFacade.updateMcpTool(mcpTool));
     }
 
     @Test

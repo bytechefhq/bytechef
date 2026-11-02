@@ -234,7 +234,7 @@ class McpToolGraphQlControllerIntTest {
         McpTool mcpTool = createMockMcpTool(1L, "test-tool", Map.of("param1", "value1"), 1L);
 
         when(mcpServerFacade.fetchMcpTool(1L)).thenReturn(Optional.of(mcpTool));
-        when(mcpServerFacade.updateSharedMcpTool(any(McpTool.class))).thenReturn(mcpTool);
+        when(mcpServerFacade.updateMcpTool(any(McpTool.class))).thenReturn(mcpTool);
 
         this.graphQlTester
             .document("""
@@ -249,7 +249,7 @@ class McpToolGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("1");
 
-        verify(mcpServerFacade).updateSharedMcpTool(any(McpTool.class));
+        verify(mcpServerFacade).updateMcpTool(any(McpTool.class));
     }
 
     @Test
@@ -269,7 +269,7 @@ class McpToolGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(mcpServerFacade).deleteSharedMcpTool(mcpTool);
+        verify(mcpServerFacade).deleteMcpTool(mcpTool);
     }
 
     @Test

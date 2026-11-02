@@ -40,6 +40,7 @@ import com.bytechef.platform.mcp.facade.McpServerFacadeImpl;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
+import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import java.util.List;
@@ -79,6 +80,9 @@ class McpServerAuditIntTest {
 
     @Autowired
     private McpComponentRepository mcpComponentRepository;
+
+    @Autowired
+    private McpComponentService mcpComponentService;
 
     @Autowired
     private McpServerFacade mcpServerFacade;
@@ -287,7 +291,7 @@ class McpServerAuditIntTest {
     void testDeleteRecordsThePlatformCapturedBeforeTheDelete() {
         McpServer mcpServer = saveMcpServer(PlatformType.EMBEDDED);
 
-        mcpServerFacade.deleteMcpServer(mcpServer.getId());
+        mcpServerService.delete(mcpServer.getId());
 
         assertThat(mcpServerRepository.findById(mcpServer.getId())).isEmpty();
 
@@ -304,7 +308,7 @@ class McpServerAuditIntTest {
 
     @Test
     void testDeleteOfAnUnknownServerRecordsAnErrorWithoutAPlatform() {
-        assertThatThrownBy(() -> mcpServerFacade.deleteMcpServer(Long.MAX_VALUE))
+        assertThatThrownBy(() -> mcpServerService.delete(Long.MAX_VALUE))
             .isInstanceOf(NoSuchElementException.class);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpServerAuditEvents.MCP_SERVER_DELETED);
@@ -320,7 +324,7 @@ class McpServerAuditIntTest {
     void testCreateComponentRecordsTheComponentAndThePlatformOfItsServer() {
         McpServer mcpServer = saveMcpServer(PlatformType.EMBEDDED);
 
-        McpComponent mcpComponent = mcpServerFacade.create(
+        McpComponent mcpComponent = mcpComponentService.create(
             new McpComponent("slack", 1, mcpServer.getId(), null), List.of());
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpComponentAuditEvents.MCP_COMPONENT_CREATED);
@@ -403,7 +407,7 @@ class McpServerAuditIntTest {
 
     @Test
     void testDeleteOfAnUnknownComponentRecordsAnErrorWithoutAPlatform() {
-        assertThatThrownBy(() -> mcpServerFacade.deleteMcpComponent(Long.MAX_VALUE))
+        assertThatThrownBy(() -> mcpComponentService.delete(Long.MAX_VALUE))
             .isInstanceOf(NoSuchElementException.class);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpComponentAuditEvents.MCP_COMPONENT_DELETED);

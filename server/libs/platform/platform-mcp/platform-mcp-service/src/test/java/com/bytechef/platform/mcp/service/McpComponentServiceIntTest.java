@@ -124,7 +124,7 @@ class McpComponentServiceIntTest {
 
         mcpComponent.setConnectionId(2L);
 
-        mcpComponent = mcpComponentService.update(mcpComponent, null);
+        mcpComponent = mcpComponentService.update(mcpComponent, null, List.of());
 
         assertThat(mcpComponent)
             .hasFieldOrPropertyWithValue("connectionId", 2L)
@@ -203,7 +203,7 @@ class McpComponentServiceIntTest {
             McpComponent existingMcpComponent = saveMcpComponentWithRequiredAuthorities(Set.of("ROLE_ADMIN"));
 
             McpComponent updatedMcpComponent = mcpComponentService.update(
-                getMcpComponentUpdate(existingMcpComponent), null);
+                getMcpComponentUpdate(existingMcpComponent), null, List.of());
 
             assertThat(updatedMcpComponent.getRequiredAuthorities()).containsExactly("ROLE_ADMIN");
             assertThat(getStoredRequiredAuthorities(existingMcpComponent)).containsExactly("ROLE_ADMIN");
@@ -214,7 +214,7 @@ class McpComponentServiceIntTest {
             McpComponent existingMcpComponent = saveMcpComponentWithRequiredAuthorities(Set.of("ROLE_ADMIN"));
 
             McpComponent updatedMcpComponent = mcpComponentService.update(
-                getMcpComponentUpdate(existingMcpComponent), Set.of());
+                getMcpComponentUpdate(existingMcpComponent), Set.of(), List.of());
 
             assertThat(updatedMcpComponent.getRequiredAuthorities()).isEmpty();
             assertThat(getStoredRequiredAuthorities(existingMcpComponent)).isEmpty();
@@ -225,7 +225,7 @@ class McpComponentServiceIntTest {
             McpComponent existingMcpComponent = saveMcpComponentWithRequiredAuthorities(Set.of("ROLE_ADMIN"));
 
             McpComponent updatedMcpComponent = mcpComponentService.update(
-                getMcpComponentUpdate(existingMcpComponent), Set.of("ROLE_REVIEWER"));
+                getMcpComponentUpdate(existingMcpComponent), Set.of("ROLE_REVIEWER"), List.of());
 
             assertThat(updatedMcpComponent.getRequiredAuthorities()).containsExactly("ROLE_REVIEWER");
             assertThat(getStoredRequiredAuthorities(existingMcpComponent)).containsExactly("ROLE_REVIEWER");
@@ -308,7 +308,7 @@ class McpComponentServiceIntTest {
 
             mcpComponent.setId(existingMcpComponent.getId());
 
-            assertThatThrownBy(() -> mcpComponentService.update(mcpComponent, Set.of("ROLE_TAMPERED")))
+            assertThatThrownBy(() -> mcpComponentService.update(mcpComponent, Set.of("ROLE_TAMPERED"), List.of()))
                 .isInstanceOf(AccessDeniedException.class);
 
             McpComponent storedMcpComponent = mcpComponentRepository.findById(existingMcpComponent.getId())
@@ -327,7 +327,7 @@ class McpComponentServiceIntTest {
                 .thenReturn(true);
 
             McpComponent updatedMcpComponent = mcpComponentService.update(
-                existingMcpComponent, Set.of("ROLE_REVIEWER"));
+                existingMcpComponent, Set.of("ROLE_REVIEWER"), List.of());
 
             assertThat(updatedMcpComponent.getRequiredAuthorities()).containsExactly("ROLE_REVIEWER");
         }
