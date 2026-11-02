@@ -28,6 +28,7 @@ import com.bytechef.automation.task.domain.ApprovalTask.Status;
 import com.bytechef.automation.task.domain.ApprovalTaskStatusException;
 import com.bytechef.automation.task.domain.PendingApproval;
 import com.bytechef.automation.task.facade.ApprovalTaskFacade;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -107,6 +108,28 @@ class ApprovalTaskGraphQlControllerIntTest {
             .isEqualTo("Review");
 
         verify(approvalTaskFacade, never()).createApprovalTask(any());
+    }
+
+    @Test
+    void testCreateApprovalTaskKeepsTheEnvironmentItWasCreatedIn() {
+        when(approvalTaskFacade.createManualApprovalTask(any(ApprovalTask.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        graphQlTester.document(
+            "mutation { createApprovalTask(approvalTask: {name: \"Review\", environmentId: 2}) { name } }")
+            .execute()
+            .path("createApprovalTask.name")
+            .entity(String.class)
+            .isEqualTo("Review");
+
+        ArgumentCaptor<ApprovalTask> approvalTaskArgumentCaptor = ArgumentCaptor.forClass(ApprovalTask.class);
+
+        verify(approvalTaskFacade).createManualApprovalTask(approvalTaskArgumentCaptor.capture());
+
+        ApprovalTask createdApprovalTask = approvalTaskArgumentCaptor.getValue();
+
+        assertThat(createdApprovalTask.getEnvironment()).isEqualTo(Environment.PRODUCTION);
+        assertThat(createdApprovalTask.getJobResumeId()).isNull();
     }
 
     @Test

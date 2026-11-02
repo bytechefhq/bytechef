@@ -23,6 +23,7 @@ import com.bytechef.automation.task.domain.ApprovalTask.Status;
 import com.bytechef.automation.task.domain.ApprovalTaskStatusException;
 import com.bytechef.automation.task.domain.PendingApproval;
 import com.bytechef.automation.task.facade.ApprovalTaskFacade;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
@@ -137,6 +138,11 @@ public class ApprovalTaskGraphQlController {
     }
 
     @Nullable
+    private static Environment toEnvironment(@Nullable Integer environmentId) {
+        return environmentId == null ? null : Environment.values()[environmentId];
+    }
+
+    @Nullable
     private static Instant toInstant(@Nullable String dueDate) {
         return dueDate == null ? null : Instant.parse(dueDate);
     }
@@ -146,6 +152,7 @@ public class ApprovalTaskGraphQlController {
             .id(approvalTaskInput.id())
             .name(approvalTaskInput.name())
             .description(approvalTaskInput.description())
+            .environment(toEnvironment(approvalTaskInput.environmentId()))
             .status(approvalTaskInput.status())
             .priority(approvalTaskInput.priority())
             .assigneeId(approvalTaskInput.assigneeId())
@@ -155,7 +162,7 @@ public class ApprovalTaskGraphQlController {
     }
 
     public record ApprovalTaskInput(
-        Long id, String name, String description, Status status, Priority priority, Long assigneeId, String dueDate,
-        Integer version) {
+        Long id, String name, String description, Integer environmentId, Status status, Priority priority,
+        Long assigneeId, String dueDate, Integer version) {
     }
 }
