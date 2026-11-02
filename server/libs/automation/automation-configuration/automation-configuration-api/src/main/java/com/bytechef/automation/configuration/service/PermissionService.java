@@ -25,9 +25,10 @@ import java.util.Set;
  * Central RBAC service backing the {@code @PreAuthorize} SpEL checks used across the automation tier (both the custom
  * root built-ins {@code isCurrentUser}/{@code isTenantAdmin}/{@code isResourceOwner} and the {@code hasPermission(...)}
  * scope/role tokens). The EE implementation enforces real workspace-role, scope and ownership checks; the CE
- * implementation is a permissive pass-through (except {@link #isTenantAdmin()}). EE checks short-circuit to
- * {@code true} when {@code AutomationAuthorizationContext.isSkipChecks()} is set or the user is a tenant admin, and
- * otherwise fail closed.
+ * implementation is a permissive pass-through (except {@link #isTenantAdmin()}). EE checks answer a connected user
+ * through the {@code ConnectedUserAccessDecider} first, then short-circuit to {@code true} when
+ * {@code AutomationAuthorizationContext.isSkipChecks()} is set or the user is a tenant admin, and otherwise fail
+ * closed.
  *
  * @author Ivica Cardic
  */
@@ -279,6 +280,14 @@ public interface PermissionService {
      * @return {@code true} if the current user owns the resource
      */
     boolean isResourceOwner(String resourceType, long id);
+
+    /**
+     * Returns whether the authorization checks are skipped for the current caller: only in skip mode, and never for a
+     * connected user.
+     *
+     * @return {@code true} if the checks are skipped
+     */
+    boolean isAuthorizationSkipped();
 
     /**
      * Returns whether the current user holds the tenant-admin authority. Enforced in both editions.

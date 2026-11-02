@@ -43,7 +43,7 @@ public class CustomRoleScopeResolverImpl implements CustomRoleScopeResolver {
 
     /**
      * Per-{@code customRoleId} last-log timestamps for rate-limiting the orphan ERROR and the unknown-scope WARN. This
-     * resolver is reached from inside {@link WorkspaceScopeCacheService#getWorkspaceScopes(long, long)}, whose
+     * resolver is reached from inside {@link WorkspaceScopeCache#getWorkspaceScopes(long, long)}, whose
      * {@code @Cacheable} caches the result only until the next miss, and misses are not rare: the whole cache is
      * dropped on every custom-role scope edit, per member on every membership change, and on its own TTL, and each
      * distinct {@code (userId, workspaceId)} key referencing the same role misses separately. Without the rate limit a
