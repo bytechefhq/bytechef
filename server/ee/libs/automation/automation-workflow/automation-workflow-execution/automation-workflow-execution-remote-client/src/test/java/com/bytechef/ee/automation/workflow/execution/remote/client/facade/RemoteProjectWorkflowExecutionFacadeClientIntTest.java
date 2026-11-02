@@ -58,6 +58,8 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
+import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.ee.automation.workflow.execution.remote.grpc.ProjectWorkflowExecutionRemoteServiceGrpcServer;
 import com.bytechef.ee.automation.workflow.execution.remote.grpc.WorkflowExecutionProtoMapper;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
@@ -78,12 +80,8 @@ import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.repository.WorkflowExecutionRowRepositoryImpl;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.StringToTaskStateValueConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.StringToTriggerStateValueConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToWorkflowTriggerConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.TaskStateValueToStringConverter;
-import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -386,7 +384,7 @@ class RemoteProjectWorkflowExecutionFacadeClientIntTest {
     @EnableAutoConfiguration
     @Import({
         CacheConfiguration.class, ContextServiceImpl.class, EnvironmentServiceImpl.class, JacksonConfiguration.class,
-        JobServiceImpl.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class,
+        LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class,
         PrincipalJobServiceImpl.class, ProjectCallback.class, ProjectDeploymentServiceImpl.class,
         ProjectServiceImpl.class,
         ProjectWorkflowCallback.class,
@@ -415,6 +413,11 @@ class RemoteProjectWorkflowExecutionFacadeClientIntTest {
         }
 
         @Bean
+        JobServiceImpl jobService(JdbcJobRepository jdbcJobRepository) {
+            return new JobServiceImpl(jdbcJobRepository);
+        }
+
+        @Bean
         TaskFileStorage taskFileStorage() {
             return new TaskFileStorageImpl(new Base64FileStorageService());
         }
@@ -438,12 +441,10 @@ class RemoteProjectWorkflowExecutionFacadeClientIntTest {
                     new JobResumeIdToStringConverter(), new MapWrapperToStringConverter(objectMapper),
                     new StringToExecutionErrorConverter(objectMapper), new StringToFileEntryConverter(objectMapper),
                     new StringToJobResumeIdConverter(), new StringToMapWrapperConverter(objectMapper),
-                    new StringToTaskStateValueConverter(objectMapper),
-                    new StringToTriggerStateValueConverter(objectMapper), new StringToWebhooksConverter(objectMapper),
+                    new StringToTypedValueConverter(objectMapper), new StringToWebhooksConverter(objectMapper),
                     new StringToWorkflowExecutionIdConverter(), new StringToWorkflowTaskConverter(objectMapper),
                     new StringToWorkflowTriggerConverter(objectMapper),
-                    new TaskStateValueToStringConverter(objectMapper),
-                    new TriggerStateValueToStringConverter(objectMapper), new WebhooksToStringConverter(objectMapper),
+                    new TypedValueToStringConverter(objectMapper), new WebhooksToStringConverter(objectMapper),
                     new WorkflowExecutionIdToStringConverter(), new WorkflowTaskToStringConverter(objectMapper),
                     new WorkflowTriggerToStringConverter(objectMapper));
             }
