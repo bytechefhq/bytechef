@@ -12,36 +12,39 @@ interface ColumnHeaderCellProps {
     columnName: string;
     onDelete: (columnId: string, columnName: string) => void;
     onRename: (columnId: string, columnName: string) => void;
+    readOnly?: boolean;
 }
 
-const ColumnHeaderCell = ({columnId, columnName, onDelete, onRename}: ColumnHeaderCellProps) => {
+const ColumnHeaderCell = ({columnId, columnName, onDelete, onRename, readOnly = false}: ColumnHeaderCellProps) => {
     return (
         <div className="relative flex items-center justify-center pr-8">
             <span className="truncate text-center" title={columnName}>
                 {columnName}
             </span>
 
-            <div className="absolute right-0">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label={`Column ${columnName} menu`}
-                            icon={<MoreVerticalIcon className="size-4" />}
-                            variant="ghost"
-                        />
-                    </DropdownMenuTrigger>
+            {!readOnly && (
+                <div className="absolute right-0">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label={`Column ${columnName} menu`}
+                                icon={<MoreVerticalIcon className="size-4" />}
+                                variant="ghost"
+                            />
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem label="Rename" onClick={() => onRename(columnId, columnName)} />
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem label="Rename" onClick={() => onRename(columnId, columnName)} />
 
-                        <DropdownMenuItem
-                            label="Delete"
-                            onClick={() => onDelete(columnId, columnName)}
-                            variant="destructive"
-                        />
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+                            <DropdownMenuItem
+                                label="Delete"
+                                onClick={() => onDelete(columnId, columnName)}
+                                variant="destructive"
+                            />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            )}
         </div>
     );
 };

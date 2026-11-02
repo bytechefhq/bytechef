@@ -7,5 +7,6 @@ export type SummaryRowType = object;
 export interface BooleanCellRendererProps {
     columnName: string;
     onToggle: (rowId: string, columnName: string, value: boolean) => void;
+    readOnly?: boolean;
     setLocalRows: Dispatch<SetStateAction<GridRowType[]>>;
 }

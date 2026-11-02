@@ -57,6 +57,15 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+const hoistedScope = vi.hoisted(() => ({
+    grantedScopes: ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'] as string[],
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => number) =>
         selector({currentWorkspaceId: 1049}),
@@ -143,6 +152,8 @@ const addDraftRow = (result: {current: ReturnType<typeof useDataTable>}) => {
 };
 
 beforeEach(() => {
+    hoistedScope.grantedScopes = ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'];
+
     hoisted.dataTable.columns = hoisted.defaultColumns;
     hoisted.rowsQueryResult.isFetchingNextPage = false;
 
@@ -498,6 +509,57 @@ describe('useDataTable', () => {
             });
 
             expect(result.current.selectedRows).toEqual(new Set(['row-1']));
+        });
+    });
+
+    describe('editing permissions', () => {
+        const editableRow = {id: 'row-1'} as GridRowType;
+
+        it('should make user columns editable and offer add column with DATA_TABLE_EDIT', () => {
+            const {result} = renderUseDataTable();
+
+            const userColumns = result.current.gridColumns.slice(1, -1);
+            const trailingColumn = result.current.gridColumns[result.current.gridColumns.length - 1];
+
+            expect(
+                userColumns.every((column) => typeof column.editable === 'function' && column.editable(editableRow))
+            ).toBe(true);
+
+            render(<>{trailingColumn.renderHeaderCell?.({} as never)}</>);
+
+            expect(screen.getByRole('button', {name: 'Add column'})).toBeInTheDocument();
+        });
+
+        it('should make the grid read-only without DATA_TABLE_EDIT', () => {
+            hoistedScope.grantedScopes = [];
+
+            const {result} = renderUseDataTable();
+
+            const userColumns = result.current.gridColumns.slice(1, -1);
+            const trailingColumn = result.current.gridColumns[result.current.gridColumns.length - 1];
+
+            expect(
+                userColumns.every((column) => typeof column.editable === 'function' && !column.editable(editableRow))
+            ).toBe(true);
+
+            render(<>{trailingColumn.renderHeaderCell?.({} as never)}</>);
+
+            expect(screen.queryByRole('button', {name: 'Add column'})).not.toBeInTheDocument();
+        });
+
+        it('should not add a draft row from the add row cell without DATA_TABLE_EDIT', () => {
+            hoistedScope.grantedScopes = [];
+
+            const {result} = renderUseDataTable();
+
+            const keyboardEvent = createKeyboardEvent('Enter');
+
+            act(() => {
+                result.current.handleCellKeyDown(createKeyDownArgs(ADD_ROW_ID), keyboardEvent);
+            });
+
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+            expect(result.current.gridRowsWithAdd.map((row) => row.id)).toEqual(['row-1', 'row-2', ADD_ROW_ID]);
         });
     });
 });
