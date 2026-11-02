@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -67,16 +68,18 @@ const renderDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = 
     render(
         <QueryClientProvider client={new QueryClient()}>
             <MemoryRouter>
-                <ConnectionDialog
-                    componentDefinitions={COMPONENT_DEFINITIONS as never}
-                    connectionTagsQueryKey={['connectionTags']}
-                    connectionsQueryKey={['connections']}
-                    useCreateConnectionMutation={
-                        (() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never
-                    }
-                    useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
-                    {...props}
-                />
+                <TooltipProvider>
+                    <ConnectionDialog
+                        componentDefinitions={COMPONENT_DEFINITIONS as never}
+                        connectionTagsQueryKey={['connectionTags']}
+                        connectionsQueryKey={['connections']}
+                        useCreateConnectionMutation={
+                            (() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never
+                        }
+                        useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
+                        {...props}
+                    />
+                </TooltipProvider>
             </MemoryRouter>
         </QueryClientProvider>
     );
@@ -161,6 +164,25 @@ describe('ConnectionDialog', () => {
         renderDialog();
 
         expect(screen.getByTestId('connection-properties')).toBeInTheDocument();
+    });
+
+    it('should explain the shared connection switch in a tooltip instead of inline text', async () => {
+        vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+            data: {properties: []},
+            error: null,
+            isLoading: false,
+        } as never);
+
+        renderDialog({showSharedOption: true});
+
+        const hint = 'Every connected user in this environment will be able to use this connection.';
+
+        expect(screen.getByRole('switch', {name: 'Shared Connection'})).toBeInTheDocument();
+        expect(screen.queryByText(hint)).not.toBeInTheDocument();
+
+        await userEvent.hover(screen.getByLabelText('About Shared Connection'));
+
+        expect(await screen.findByRole('tooltip')).toHaveTextContent(hint);
     });
 
     it('should offer a documentation link when the connection definition has one', () => {

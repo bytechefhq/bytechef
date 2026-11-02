@@ -15,8 +15,9 @@ import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import Switch from '@/components/Switch/Switch';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -42,7 +43,7 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, ExternalLinkIcon, KeyRoundIcon, RocketIcon} from 'lucide-react';
+import {ClipboardIcon, ExternalLinkIcon, InfoIcon, KeyRoundIcon, RocketIcon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link} from 'react-router-dom';
@@ -646,21 +647,31 @@ const ConnectionDialog = ({
                                             name="shared"
                                             render={({field}) => (
                                                 <FormItem>
-                                                    <FormLabel>Shared Connection</FormLabel>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <FormLabel>Shared Connection</FormLabel>
 
-                                                    <div className="flex items-center gap-2">
-                                                        <FormControl>
-                                                            <Switch
-                                                                checked={field.value}
-                                                                onCheckedChange={field.onChange}
-                                                            />
-                                                        </FormControl>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <InfoIcon
+                                                                    aria-label="About Shared Connection"
+                                                                    className="size-4 text-content-neutral-secondary"
+                                                                />
+                                                            </TooltipTrigger>
 
-                                                        <FormDescription>
-                                                            Every connected user in this environment will be able to use
-                                                            this connection.
-                                                        </FormDescription>
+                                                            <TooltipContent>
+                                                                Every connected user in this environment will be able to
+                                                                use this connection.
+                                                            </TooltipContent>
+                                                        </Tooltip>
                                                     </div>
+
+                                                    <FormControl>
+                                                        <Switch
+                                                            aria-label="Shared Connection"
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
                                                 </FormItem>
                                             )}
                                         />
