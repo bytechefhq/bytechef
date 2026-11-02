@@ -20,15 +20,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.platform.notification.delivery.WebhookNotificationClient.WebhookRetry;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +49,11 @@ class WebhookNotificationClientTest {
     private final List<Long> requestNanoTimes = new CopyOnWriteArrayList<>();
     private final WebhookNotificationClient webhookNotificationClient = new WebhookNotificationClient();
 
+    private final AtomicReference<Headers> receivedHeaders = new AtomicReference<>();
+    private final AtomicReference<String> receivedBody = new AtomicReference<>();
+    private final AtomicReference<String> receivedRawQuery = new AtomicReference<>();
+    private final AtomicInteger redirectTargetHits = new AtomicInteger();
+
     private HttpServer httpServer;
     private String url;
 
@@ -53,14 +62,40 @@ class WebhookNotificationClientTest {
         httpServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
 
         httpServer.createContext("/hook", httpExchange -> {
-            requestNanoTimes.add(System.nanoTime());
+            URI requestUri = httpExchange.getRequestURI();
 
-            httpExchange.getRequestBody()
+            receivedRawQuery.set(requestUri.getRawQuery());
+            requestNanoTimes.add(System.nanoTime());
+            receivedHeaders.set(httpExchange.getRequestHeaders());
+
+            byte[] requestBody = httpExchange.getRequestBody()
                 .readAllBytes();
+
+            receivedBody.set(new String(requestBody, StandardCharsets.UTF_8));
 
             int status = failuresBeforeSuccess.getAndDecrement() > 0 ? responseStatus.get() : 200;
 
             httpExchange.sendResponseHeaders(status, -1);
+            httpExchange.close();
+        });
+
+        httpServer.createContext("/redirect", httpExchange -> {
+            httpExchange.getRequestBody()
+                .readAllBytes();
+
+            int port = httpServer.getAddress()
+                .getPort();
+
+            httpExchange.getResponseHeaders()
+                .add("Location", "http://localhost:" + port + "/target");
+            httpExchange.sendResponseHeaders(302, -1);
+            httpExchange.close();
+        });
+
+        httpServer.createContext("/target", httpExchange -> {
+            redirectTargetHits.incrementAndGet();
+
+            httpExchange.sendResponseHeaders(200, -1);
             httpExchange.close();
         });
 
@@ -185,6 +220,134 @@ class WebhookNotificationClientTest {
             () -> webhookNotificationClient.deliver(
                 WebhookDeliveryRequest.of("ftp://example.com/hook", "job.status", "{}")))
                     .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testPostSendsJsonBodyAndEventHeaders() {
+        WebhookDelivery webhookDelivery = delivery(url).eventType("job.status")
+            .headers(Map.of("X-Custom", "custom-value"))
+            .build();
+
+        webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst());
+
+        Headers headers = receivedHeaders.get();
+
+        assertThat(headers.getFirst("Content-Type")).isEqualTo("application/json");
+        assertThat(headers.getFirst("X-ByteChef-Event")).isEqualTo("job.status");
+        assertThat(headers.getFirst("X-ByteChef-Timestamp")).isNotBlank();
+        assertThat(headers.getFirst("X-ByteChef-Delivery")).isNotBlank();
+        assertThat(headers.getFirst("X-Custom")).isEqualTo("custom-value");
+        assertThat(headers.getFirst("X-ByteChef-Signature")).isNull();
+        assertThat(receivedBody.get()).isEqualTo("{\"a\":1}");
+    }
+
+    @Test
+    void testPostEncodesUrlCharactersThatAStrictUriRejects() {
+        WebhookDelivery webhookDelivery = delivery(url + "?status=a b|c^d").build();
+
+        webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst());
+
+        assertThat(receivedRawQuery.get()).isEqualTo("status=a%20b%7Cc%5Ed");
+        assertThat(receivedBody.get()).isEqualTo("{\"a\":1}");
+    }
+
+    @Test
+    void testPostWithoutEventTypeSendsBareJson() {
+        WebhookDelivery webhookDelivery = delivery(url).build();
+
+        webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst());
+
+        Headers headers = receivedHeaders.get();
+
+        assertThat(headers.getFirst("Content-Type")).isEqualTo("application/json");
+        assertThat(headers.getFirst("X-ByteChef-Event")).isNull();
+        assertThat(headers.getFirst("X-ByteChef-Timestamp")).isNull();
+        assertThat(headers.getFirst("X-ByteChef-Delivery")).isNull();
+        assertThat(receivedBody.get()).isEqualTo("{\"a\":1}");
+    }
+
+    @Test
+    void testPostSignsWithSecret() {
+        WebhookDelivery webhookDelivery = delivery(url).eventType("job.status")
+            .secret("s3cret")
+            .build();
+
+        webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst());
+
+        Headers headers = receivedHeaders.get();
+        String timestamp = headers.getFirst("X-ByteChef-Timestamp");
+
+        assertThat(headers.getFirst("X-ByteChef-Signature")).isEqualTo(
+            "t=" + timestamp + ",v1=" + WebhookNotificationClient.sign("s3cret", timestamp + ".{\"a\":1}"));
+    }
+
+    @Test
+    void testNon2xxIsAnException() {
+        failuresBeforeSuccess.set(Integer.MAX_VALUE);
+
+        WebhookDelivery webhookDelivery = delivery(url).build();
+
+        assertThatThrownBy(() -> webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst())).isInstanceOfSatisfying(
+                WebhookDeliveryException.class,
+                webhookDeliveryException -> {
+                    assertThat(webhookDeliveryException.getStatusCode()).isEqualTo(500);
+                    assertThat(webhookDeliveryException.getMessage()).contains("localhost")
+                        .doesNotContain("/hook");
+                });
+
+        assertThat(requestNanoTimes).hasSize(1);
+    }
+
+    @Test
+    void testRedirectIsAnExceptionAndIsNotFollowed() {
+        String redirectUrl = "http://localhost:" + httpServer.getAddress()
+            .getPort() + "/redirect";
+        WebhookDelivery webhookDelivery = delivery(redirectUrl).build();
+
+        assertThatThrownBy(() -> webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst())).isInstanceOfSatisfying(
+                WebhookDeliveryException.class,
+                webhookDeliveryException -> assertThat(webhookDeliveryException.getStatusCode()).isEqualTo(302));
+
+        assertThat(redirectTargetHits.get()).isZero();
+    }
+
+    @Test
+    void testConnectionFailureHasNoStatusCode() {
+        httpServer.stop(0);
+
+        WebhookDelivery webhookDelivery = delivery(url).build();
+
+        assertThatThrownBy(() -> webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst())).isInstanceOfSatisfying(
+                WebhookDeliveryException.class,
+                webhookDeliveryException -> {
+                    assertThat(webhookDeliveryException.getStatusCode()).isNull();
+                    assertThat(webhookDeliveryException.getCause()).isInstanceOf(ResourceAccessException.class);
+                    assertThat(webhookDeliveryException.getMessage()).doesNotContain("/hook");
+                });
+    }
+
+    @Test
+    void testInvalidUrlThrowsInvalidWebhookUrlException() {
+        for (String invalidUrl : List.of("not a url", "ftp://x")) {
+            WebhookDelivery webhookDelivery = delivery(invalidUrl).build();
+
+            assertThatThrownBy(() -> webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+                .getFirst())).isInstanceOf(InvalidWebhookUrlException.class);
+        }
+    }
+
+    private static WebhookDelivery.Builder delivery(String targetUrl) {
+        return WebhookDelivery.builder("test", targetUrl)
+            .tenantId("tenant")
+            .description("test delivery")
+            .payload("body", "{\"a\":1}");
     }
 
     @Test
