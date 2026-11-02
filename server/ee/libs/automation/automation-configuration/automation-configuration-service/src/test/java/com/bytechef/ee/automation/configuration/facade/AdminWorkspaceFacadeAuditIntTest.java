@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.configuration.domain.Workspace;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditEvents;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditMapper;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
@@ -38,7 +37,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -238,10 +236,5 @@ class AdminWorkspaceFacadeAuditIntTest {
         AuditMapperResolver.class, WorkspaceAuditMapper.class, WorkspaceServiceImpl.class
     })
     static class AuditConfiguration {
-
-        @Bean
-        ApplicationProperties applicationProperties() {
-            return new ApplicationProperties();
-        }
     }
 }

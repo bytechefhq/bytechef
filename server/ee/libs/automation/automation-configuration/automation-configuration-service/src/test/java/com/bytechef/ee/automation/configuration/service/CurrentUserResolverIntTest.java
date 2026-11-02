@@ -8,8 +8,10 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import com.bytechef.ee.automation.configuration.config.EmbeddedOwnerContributorsTestConfiguration;
+import com.bytechef.encryption.Encryption;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.user.callback.UserCallback;
 import com.bytechef.platform.user.repository.AuthorityRepository;
@@ -123,6 +125,11 @@ class CurrentUserResolverIntTest {
         @Bean
         CacheManager cacheManager() {
             return new ConcurrentMapCacheManager();
+        }
+
+        @Bean
+        Encryption encryption() {
+            return mock(Encryption.class);
         }
 
         @Bean
