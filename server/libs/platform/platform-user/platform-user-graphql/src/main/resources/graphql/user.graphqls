@@ -5,8 +5,19 @@ extend type Query {
 
 extend type Mutation {
     deleteUser(login: String!): Boolean!
-    inviteUser(email: String!, role: String!): Boolean!
+    """
+    Invite a user, who sets their own password on the mailed invitation link.
+    Optionally place the invitee into workspaces; an empty or omitted list provisions an account
+    belonging to no workspace, which is how a second tenant admin is created.
+    """
+    inviteUser(email: String!, role: String!, workspaces: [WorkspaceAssignmentInput!]): Boolean!
     updateUser(login: String!, role: String!): AdminUser!
+}
+
+input WorkspaceAssignmentInput {
+    workspaceId: ID!
+    "WorkspaceRole name, e.g. ADMIN, EDITOR or VIEWER"
+    roleName: String!
 }
 
 type AdminUser {

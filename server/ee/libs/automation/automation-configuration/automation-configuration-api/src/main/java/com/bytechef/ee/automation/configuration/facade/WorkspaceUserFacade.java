@@ -9,6 +9,8 @@ package com.bytechef.ee.automation.configuration.facade;
 
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
+import java.util.List;
 
 /**
  * @version ee
@@ -17,17 +19,20 @@ import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
  */
 public interface WorkspaceUserFacade {
 
-    WorkspaceUser addWorkspaceUser(long userId, long workspaceId, WorkspaceRole workspaceRole);
+    WorkspaceUser addWorkspaceUser(long userId, long workspaceId, WorkspaceRole workspaceRole, Long customRoleId);
 
-    /**
-     * Removes the given user from the given workspace and evicts the impacted {@code (userId, workspaceId)} scope cache
-     * entry so subsequent permission checks re-resolve from the (now-removed) membership.
-     *
-     * @return {@code true} once the membership row has been removed
-     * @throws com.bytechef.exception.ConfigurationException if the user is not a member of the workspace, or if
-     *                                                       removing them would leave the workspace without an admin
-     */
+    WorkspaceUser assignCustomRole(long userId, long workspaceId, long customRoleId);
+
+    List<WorkspaceUser> getWorkspaceWorkspaceUsers(long workspaceId);
+
+    WorkspaceUser inviteWorkspaceUser(long workspaceId, String email, WorkspaceRole workspaceRole, Long customRoleId);
+
+    void removeEnvironmentRole(long userId, long workspaceId, Environment environment);
+
     boolean removeWorkspaceUser(long userId, long workspaceId);
+
+    WorkspaceUser setEnvironmentRole(
+        long userId, long workspaceId, Environment environment, WorkspaceRole workspaceRole, Long customRoleId);
 
     WorkspaceUser updateWorkspaceUserRole(long userId, long workspaceId, WorkspaceRole workspaceRole);
 }

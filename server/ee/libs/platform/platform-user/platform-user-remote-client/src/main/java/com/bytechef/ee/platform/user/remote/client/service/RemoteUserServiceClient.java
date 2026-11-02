@@ -110,6 +110,11 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
+    public List<User> getUsersByAuthorityName(String authorityName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public User getCurrentUser() {
         throw new UnsupportedOperationException();
     }

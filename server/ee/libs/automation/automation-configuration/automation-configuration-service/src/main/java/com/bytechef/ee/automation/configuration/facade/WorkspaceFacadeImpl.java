@@ -7,8 +7,10 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditMapper;
 import com.bytechef.ee.automation.configuration.service.WorkspaceService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
  */
 @Service("com.bytechef.ee.automation.configuration.facade.WorkspaceFacade")
 @ConditionalOnEEVersion
+@ConditionalOnCoordinator
 public class WorkspaceFacadeImpl implements WorkspaceFacade {
 
     private final WorkspaceService workspaceService;
@@ -46,9 +49,7 @@ public class WorkspaceFacadeImpl implements WorkspaceFacade {
     }
 
     @Override
-    @Audited(event = WorkspaceAuditEvents.WORKSPACE_DELETED, data = {
-        @AuditData(key = "workspaceId", value = "#id")
-    })
+    @Audited(event = WorkspaceAuditEvents.WORKSPACE_DELETED, mapper = WorkspaceAuditMapper.class)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteWorkspace(long id) {
         workspaceService.getWorkspace(id);

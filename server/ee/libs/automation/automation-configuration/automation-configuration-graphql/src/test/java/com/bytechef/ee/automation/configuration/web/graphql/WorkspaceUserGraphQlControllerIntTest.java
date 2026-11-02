@@ -11,6 +11,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.automation.configuration.facade.WorkspaceUserFacade;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.user.service.UserService;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
         "bytechef.edition=ee",
         "spring.graphql.schema.locations=classpath*:/graphql/"
     })
+@MockitoBean(types = {
+    UserService.class, WorkspaceUserFacade.class
+})
 class WorkspaceUserGraphQlControllerIntTest {
 
     @Autowired
@@ -42,7 +48,8 @@ class WorkspaceUserGraphQlControllerIntTest {
 
     @Test
     void testMyWorkspaceScopesReturnsTheCallersScopes() {
-        when(permissionService.getMyWorkspaceScopes(7L)).thenReturn(Set.of("API_KEY_VIEW", "API_KEY_CREATE"));
+        when(permissionService.getMyWorkspaceScopes(7L, Environment.PRODUCTION))
+            .thenReturn(Set.of("API_KEY_VIEW", "API_KEY_CREATE"));
 
         graphQlTester.document("{ myWorkspaceScopes(workspaceId: \"7\", environment: PRODUCTION) }")
             .execute()
@@ -51,7 +58,7 @@ class WorkspaceUserGraphQlControllerIntTest {
             .hasSize(2)
             .contains("API_KEY_VIEW", "API_KEY_CREATE");
 
-        verify(permissionService).getMyWorkspaceScopes(7L);
+        verify(permissionService).getMyWorkspaceScopes(7L, Environment.PRODUCTION);
     }
 
     @Test
