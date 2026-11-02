@@ -320,7 +320,7 @@ class EmbeddedMcpServerFacadeIntTest {
         void testDeleteEmbeddedMcpTool() {
             embeddedMcpServerFacade.deleteEmbeddedMcpTool(EMBEDDED_MCP_TOOL_ID);
 
-            verify(mcpToolService).delete(any(McpTool.class));
+            verify(mcpServerFacade).deleteMcpTool(any(McpTool.class));
         }
 
         @Test
@@ -508,7 +508,7 @@ class EmbeddedMcpServerFacadeIntTest {
         void testUpdateEmbeddedMcpTool() {
             McpTool mcpTool = createMcpTool(EMBEDDED_MCP_TOOL_ID, EMBEDDED_MCP_COMPONENT_ID);
 
-            when(mcpToolService.update(mcpTool)).thenReturn(mcpTool);
+            when(mcpServerFacade.updateMcpTool(mcpTool)).thenReturn(mcpTool);
 
             assertThat(embeddedMcpServerFacade.updateEmbeddedMcpTool(mcpTool)).isSameAs(mcpTool);
         }
@@ -561,7 +561,7 @@ class EmbeddedMcpServerFacadeIntTest {
             assertThatThrownBy(() -> embeddedMcpServerFacade.deleteEmbeddedMcpTool(AUTOMATION_MCP_TOOL_ID))
                 .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpToolService, never()).delete(any());
+            verify(mcpServerFacade, never()).deleteMcpTool(any());
         }
 
         @Test
@@ -628,7 +628,7 @@ class EmbeddedMcpServerFacadeIntTest {
             assertThatThrownBy(() -> embeddedMcpServerFacade.updateEmbeddedMcpTool(mcpTool))
                 .isInstanceOf(IllegalArgumentException.class);
 
-            verify(mcpToolService, never()).update(any());
+            verify(mcpServerFacade, never()).updateMcpTool(any());
         }
 
         @Test

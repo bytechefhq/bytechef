@@ -224,6 +224,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_WORKFLOW_RUN, data = {
+        @AuditData(key = "projectDeploymentId", value = "#id"),
+        @AuditData(key = "workflowId", value = "#workflowId"),
+        @AuditData(key = "jobId", value = "#result")
+    })
     @Transactional(propagation = Propagation.NEVER)
     public long createProjectDeploymentWorkflowJob(Long id, String workflowId) {
         ProjectDeploymentWorkflow projectDeploymentWorkflow =

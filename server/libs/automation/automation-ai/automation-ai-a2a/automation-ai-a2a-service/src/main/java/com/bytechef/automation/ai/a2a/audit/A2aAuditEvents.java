@@ -24,6 +24,7 @@ public final class A2aAuditEvents {
     public static final String A2A_PROJECT_CREATED = "A2A_PROJECT_CREATED";
     public static final String A2A_PROJECT_DELETED = "A2A_PROJECT_DELETED";
     public static final String A2A_PROJECT_UPDATED = "A2A_PROJECT_UPDATED";
+    public static final String A2A_PROJECT_WORKFLOW_ENABLED_UPDATED = "A2A_PROJECT_WORKFLOW_ENABLED_UPDATED";
     public static final String A2A_SERVER_CREATED = "A2A_SERVER_CREATED";
     public static final String A2A_SERVER_DELETED = "A2A_SERVER_DELETED";
     public static final String A2A_SERVER_UPDATED = "A2A_SERVER_UPDATED";

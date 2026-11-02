@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
+import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -43,16 +44,18 @@ import org.springframework.stereotype.Controller;
 public class McpToolGraphQlController {
 
     private final McpComponentService mcpComponentService;
+    private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
     private final McpServerTypeDefinitions mcpServerTypeDefinitions;
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
     public McpToolGraphQlController(
-        McpComponentService mcpComponentService, McpServerService mcpServerService,
+        McpComponentService mcpComponentService, McpServerFacade mcpServerFacade, McpServerService mcpServerService,
         List<McpServerTypeDefinition> mcpServerTypeDefinitions, McpToolService mcpToolService) {
 
         this.mcpComponentService = mcpComponentService;
+        this.mcpServerFacade = mcpServerFacade;
         this.mcpServerService = mcpServerService;
         this.mcpServerTypeDefinitions = new McpServerTypeDefinitions(mcpServerTypeDefinitions);
         this.mcpToolService = mcpToolService;
@@ -101,7 +104,7 @@ public class McpToolGraphQlController {
 
         Map<String, Object> parameters = input.parameters() != null ? input.parameters() : Map.of();
 
-        return mcpToolService.create(new McpTool(input.name(), parameters, input.mcpComponentId()));
+        return mcpServerFacade.createMcpTool(new McpTool(input.name(), parameters, input.mcpComponentId()));
     }
 
     @MutationMapping
@@ -111,7 +114,7 @@ public class McpToolGraphQlController {
 
         checkMcpComponentSharedAdministration(mcpTool.getMcpComponentId());
 
-        mcpToolService.delete(mcpTool);
+        mcpServerFacade.deleteMcpTool(mcpTool);
 
         return true;
     }
@@ -134,7 +137,7 @@ public class McpToolGraphQlController {
             mcpTool.setVersion(input.version());
         }
 
-        return mcpToolService.update(mcpTool);
+        return mcpServerFacade.updateMcpTool(mcpTool);
     }
 
     private void checkMcpComponentSharedAdministration(long mcpComponentId) {

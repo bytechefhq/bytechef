@@ -41,6 +41,8 @@ public interface McpServerFacade {
      */
     McpComponent create(McpComponent mcpComponent, List<McpTool> mcpTools);
 
+    McpTool createMcpTool(McpTool mcpTool);
+
     /**
      * Deletes the MCP component identified by the specified ID.
      *
@@ -54,6 +56,8 @@ public interface McpServerFacade {
      * @param mcpServerId the unique identifier of the MCP server to be deleted
      */
     void deleteMcpServer(long mcpServerId);
+
+    void deleteMcpTool(McpTool mcpTool);
 
     /**
      * Gets MCP components for multiple MCP servers in batch.
@@ -91,4 +95,5 @@ public interface McpServerFacade {
      */
     List<Tag> updateMcpServerTags(long id, List<Tag> tags);
 
+    McpTool updateMcpTool(McpTool mcpTool);
 }

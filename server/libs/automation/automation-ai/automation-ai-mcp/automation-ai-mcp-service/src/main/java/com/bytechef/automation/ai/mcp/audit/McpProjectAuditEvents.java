@@ -25,6 +25,9 @@ public final class McpProjectAuditEvents {
     public static final String MCP_PROJECT_CREATED = "MCP_PROJECT_CREATED";
     public static final String MCP_PROJECT_DELETED = "MCP_PROJECT_DELETED";
     public static final String MCP_PROJECT_UPDATED = "MCP_PROJECT_UPDATED";
+    public static final String MCP_PROJECT_WORKFLOW_CREATED = "MCP_PROJECT_WORKFLOW_CREATED";
+    public static final String MCP_PROJECT_WORKFLOW_DELETED = "MCP_PROJECT_WORKFLOW_DELETED";
+    public static final String MCP_PROJECT_WORKFLOW_ENABLED_UPDATED = "MCP_PROJECT_WORKFLOW_ENABLED_UPDATED";
 
     private McpProjectAuditEvents() {
     }

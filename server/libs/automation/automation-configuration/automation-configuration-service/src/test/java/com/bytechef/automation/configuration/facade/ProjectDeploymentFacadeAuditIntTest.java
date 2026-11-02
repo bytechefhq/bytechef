@@ -18,6 +18,8 @@ package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -45,6 +47,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +90,9 @@ class ProjectDeploymentFacadeAuditIntTest {
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @Autowired
+    private PrincipalJobFacade principalJobFacade;
 
     @Autowired
     private ProjectDeploymentFacade projectDeploymentFacade;
@@ -371,6 +377,47 @@ class ProjectDeploymentFacadeAuditIntTest {
             Map.of(
                 "result", "ERROR", "errorClass", NoSuchElementException.class.getName(), "projectDeploymentId",
                 String.valueOf(Long.MAX_VALUE), "workflowId", workflowId, "enabled", "false"));
+    }
+
+    @Test
+    void testRunningADeploymentWorkflowRecordsThePrincipalAndTheJob() {
+        long projectDeploymentId = createProjectDeployment();
+
+        String workflowId = publishedProjectWorkflow.getWorkflowId();
+
+        when(principalJobFacade.createJob(any(), eq(projectDeploymentId), eq(PlatformType.AUTOMATION)))
+            .thenReturn(42L);
+
+        projectDeploymentFacade.createProjectDeploymentWorkflowJob(projectDeploymentId, workflowId);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            ProjectDeploymentAuditEvents.DEPLOYMENT_WORKFLOW_RUN);
+
+        assertSuccess(persistentAuditEvent);
+        assertData(
+            persistentAuditEvent, "createProjectDeploymentWorkflowJob",
+            Map.of(
+                "result", "SUCCESS", "projectDeploymentId", String.valueOf(projectDeploymentId), "workflowId",
+                workflowId, "jobId", "42"));
+    }
+
+    @Test
+    void testRunningAWorkflowOfAnUnknownDeploymentIsRecordedAsAnError() {
+        String workflowId = publishedProjectWorkflow.getWorkflowId();
+
+        assertThatThrownBy(
+            () -> projectDeploymentFacade.createProjectDeploymentWorkflowJob(Long.MAX_VALUE, workflowId))
+                .isInstanceOf(NoSuchElementException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            ProjectDeploymentAuditEvents.DEPLOYMENT_WORKFLOW_RUN);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", NoSuchElementException.class.getName())
+            .containsEntry("projectDeploymentId", String.valueOf(Long.MAX_VALUE))
+            .containsEntry("workflowId", workflowId)
+            .doesNotContainKey("jobId");
     }
 
     private long createProjectDeployment() {

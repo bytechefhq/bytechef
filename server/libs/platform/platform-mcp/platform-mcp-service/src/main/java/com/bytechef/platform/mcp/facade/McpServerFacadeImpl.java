@@ -23,6 +23,7 @@ import com.bytechef.platform.mcp.audit.McpComponentAuditEvents;
 import com.bytechef.platform.mcp.audit.McpComponentAuditMapper;
 import com.bytechef.platform.mcp.audit.McpServerAuditEvents;
 import com.bytechef.platform.mcp.audit.McpServerAuditMapper;
+import com.bytechef.platform.mcp.audit.McpToolAuditEvents;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -85,6 +86,17 @@ public class McpServerFacadeImpl implements McpServerFacade {
         }
 
         return savedComponent;
+    }
+
+    @Override
+    @Audited(event = McpToolAuditEvents.MCP_TOOL_CREATED, mapper = McpComponentAuditMapper.class, data = {
+        @AuditData(key = "mcpToolId", value = "#result?.id"),
+        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
+        @AuditData(key = "name", value = "#mcpTool.name")
+    })
+    @PreAuthorize("hasPermission(#mcpTool.mcpComponentId, 'McpComponent', 'MCP_EDIT')")
+    public McpTool createMcpTool(McpTool mcpTool) {
+        return mcpToolService.create(mcpTool);
     }
 
     @Override
@@ -198,6 +210,17 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @Audited(event = McpToolAuditEvents.MCP_TOOL_DELETED, mapper = McpComponentAuditMapper.class, data = {
+        @AuditData(key = "mcpToolId", value = "#mcpTool.id"),
+        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
+        @AuditData(key = "name", value = "#mcpTool.name")
+    })
+    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')")
+    public void deleteMcpTool(McpTool mcpTool) {
+        mcpToolService.delete(mcpTool);
+    }
+
+    @Override
     @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
     public List<Tag> updateMcpServerTags(long id, List<Tag> tags) {
         List<Tag> validatedTags = checkTags(tags);
@@ -205,6 +228,17 @@ public class McpServerFacadeImpl implements McpServerFacade {
         mcpServerService.updateTags(id, CollectionUtils.map(validatedTags, Tag::getId));
 
         return validatedTags;
+    }
+
+    @Override
+    @Audited(event = McpToolAuditEvents.MCP_TOOL_UPDATED, mapper = McpComponentAuditMapper.class, data = {
+        @AuditData(key = "mcpToolId", value = "#mcpTool.id"),
+        @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
+        @AuditData(key = "name", value = "#mcpTool.name")
+    })
+    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')")
+    public McpTool updateMcpTool(McpTool mcpTool) {
+        return mcpToolService.update(mcpTool);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {

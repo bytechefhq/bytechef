@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceConfigurationAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -18,6 +19,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -66,6 +69,13 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     }
 
     @Override
+    @Audited(
+        event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_DELETED,
+        data = {
+            @AuditData(
+                key = "mcpIntegrationInstanceConfigurationWorkflowId",
+                value = "#mcpIntegrationInstanceConfigurationWorkflowId")
+        })
     @PreAuthorize("isTenantAdmin()")
     public void deleteMcpIntegrationInstanceConfigurationWorkflow(long mcpIntegrationInstanceConfigurationWorkflowId) {
         McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
@@ -89,6 +99,15 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     }
 
     @Override
+    @Audited(
+        event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_CREATED,
+        data = {
+            @AuditData(key = "mcpIntegrationInstanceConfigurationWorkflowId", value = "#result?.id"),
+            @AuditData(key = "mcpIntegrationInstanceConfigurationId", value = "#mcpIntegrationInstanceConfigurationId"),
+            @AuditData(
+                key = "integrationInstanceConfigurationWorkflowId",
+                value = "#integrationInstanceConfigurationWorkflowId")
+        })
     @PreAuthorize("isTenantAdmin()")
     public McpIntegrationInstanceConfigurationWorkflow createMcpIntegrationInstanceConfigurationWorkflow(
         long mcpIntegrationInstanceConfigurationId, long integrationInstanceConfigurationWorkflowId) {
@@ -116,6 +135,15 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     }
 
     @Override
+    @Audited(
+        event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ENABLED_UPDATED,
+        data = {
+            @AuditData(key = "mcpIntegrationInstanceConfigurationWorkflowId", value = "#id"),
+            @AuditData(
+                key = "mcpIntegrationInstanceConfigurationId",
+                value = "#result?.mcpIntegrationInstanceConfigurationId"),
+            @AuditData(key = "enabled", value = "#enabled")
+        })
     @PreAuthorize("isTenantAdmin()")
     public McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflowEnabled(
         long id, boolean enabled) {

@@ -163,7 +163,7 @@ public class McpProjectWorkflowGraphQlController {
         Long mcpProjectId = Long.valueOf(String.valueOf(input.get("mcpProjectId")));
         Long projectDeploymentWorkflowId = Long.valueOf(String.valueOf(input.get("projectDeploymentWorkflowId")));
 
-        return mcpProjectWorkflowService.create(mcpProjectId, projectDeploymentWorkflowId);
+        return mcpProjectWorkflowFacade.createMcpProjectWorkflow(mcpProjectId, projectDeploymentWorkflowId);
     }
 
     @SuppressWarnings("unchecked")
@@ -200,7 +200,7 @@ public class McpProjectWorkflowGraphQlController {
         }
 
         if (input.get("enabled") instanceof Boolean enabled) {
-            mcpProjectWorkflow = mcpProjectWorkflowService.updateEnabled(id, enabled);
+            mcpProjectWorkflow = mcpProjectWorkflowFacade.updateMcpProjectWorkflowEnabled(id, enabled);
         }
 
         return mcpProjectWorkflow;

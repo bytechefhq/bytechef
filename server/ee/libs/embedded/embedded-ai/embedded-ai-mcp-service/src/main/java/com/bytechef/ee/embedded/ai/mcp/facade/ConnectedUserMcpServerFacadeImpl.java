@@ -225,6 +225,10 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
+    @Audited(event = ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_TOOL_ENABLED_UPDATED, data = {
+        @AuditData(key = "mcpIntegrationInstanceToolId", value = "#mcpIntegrationInstanceToolId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void enableMcpTool(long mcpIntegrationInstanceToolId, boolean enable) {
         mcpIntegrationInstanceToolService.updateEnabled(mcpIntegrationInstanceToolId, enable);

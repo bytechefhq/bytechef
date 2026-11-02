@@ -77,34 +77,29 @@ class AuditDataContractTest {
         "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
-    private static final String JOB_RUN = "job run, recorded by the job status listener";
     private static final String TAGS = "tag assignment";
-    private static final String TOOL_SETTING = "per-tool setting of an audited MCP or A2A server";
+    private static final String RECORDED_BY_CALLER = "called only from audited methods";
+    private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
     private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
     private static final String WORKFLOW_INPUTS = "workflow input or connection values";
     private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
         "IntegrationInstanceAdminFacadeImpl", DELEGATES,
         "WebhookTriggerTestAdminFacadeImpl", "editor-time webhook trigger test");
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
-        Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowEnabled", TOOL_SETTING),
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
         Map.entry("AutomationWorkflowProjectAdminFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("AutomationWorkflowProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
-        Map.entry("ConnectedUserMcpServerFacadeImpl.enableMcpTool", TOOL_SETTING),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpServer", DELEGATES),
-        Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpTool", TOOL_SETTING),
+        Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpTool", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpServerSecretKey", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpServerTags", TAGS),
-        Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpTool", TOOL_SETTING),
-        Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpToolEnabled", TOOL_SETTING),
-        Map.entry("IntegrationInstanceConfigurationFacadeImpl.createIntegrationInstanceConfigurationWorkflowJob",
-            JOB_RUN),
+        Map.entry("EmbeddedMcpServerFacadeImpl.updateEmbeddedMcpTool", DELEGATES),
         Map.entry("IntegrationInstanceConfigurationFacadeImpl.updateIntegrationInstanceConfigurationTags", TAGS),
         Map.entry("IntegrationInstanceConfigurationFacadeImpl.updateIntegrationInstanceConfigurationWorkflow",
             WORKFLOW_INPUTS),
@@ -117,41 +112,28 @@ class AuditDataContractTest {
         Map.entry("McpComponentServiceImpl.create", DELEGATES),
         Map.entry("McpComponentServiceImpl.update", DELEGATES),
         Map.entry(
-            "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.createMcpIntegrationInstanceConfigurationWorkflow",
-            TOOL_SETTING),
-        Map.entry(
-            "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.deleteMcpIntegrationInstanceConfigurationWorkflow",
-            TOOL_SETTING),
-        Map.entry(
             "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.updateMcpIntegrationInstanceConfigurationWorkflow",
-            TOOL_SETTING),
-        Map.entry(
-            "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.updateMcpIntegrationInstanceConfigurationWorkflowEnabled",
             TOOL_SETTING),
         Map.entry(
             "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.updateMcpIntegrationInstanceConfigurationWorkflowParameters",
             TOOL_SETTING),
-        Map.entry("McpIntegrationInstanceToolFacadeImpl.enableMcpIntegrationInstanceTool", TOOL_SETTING),
-        Map.entry("McpIntegrationInstanceWorkflowFacadeImpl.enableMcpIntegrationInstanceWorkflow", TOOL_SETTING),
         Map.entry("McpIntegrationInstanceWorkflowFacadeImpl.updateMcpIntegrationInstanceWorkflow", TOOL_SETTING),
-        Map.entry("McpProjectWorkflowFacadeImpl.deleteMcpProjectWorkflow", TOOL_SETTING),
-        Map.entry("McpProjectWorkflowServiceImpl.create", TOOL_SETTING),
-        Map.entry("McpProjectWorkflowServiceImpl.delete", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowServiceImpl.create", RECORDED_BY_CALLER),
+        Map.entry("McpProjectWorkflowServiceImpl.delete", RECORDED_BY_CALLER),
         Map.entry("McpProjectWorkflowServiceImpl.update", TOOL_SETTING),
-        Map.entry("McpProjectWorkflowServiceImpl.updateEnabled", TOOL_SETTING),
+        Map.entry("McpProjectWorkflowServiceImpl.updateEnabled", RECORDED_BY_CALLER),
         Map.entry("McpProjectWorkflowServiceImpl.updateParameters", TOOL_SETTING),
         Map.entry("McpServerFacadeImpl.updateMcpServerTags", TAGS),
-        Map.entry("McpToolServiceImpl.create", TOOL_SETTING),
-        Map.entry("McpToolServiceImpl.delete", TOOL_SETTING),
-        Map.entry("McpToolServiceImpl.update", TOOL_SETTING),
+        Map.entry("McpToolServiceImpl.create", RECORDED_BY_CALLER),
+        Map.entry("McpToolServiceImpl.delete", RECORDED_BY_CALLER),
+        Map.entry("McpToolServiceImpl.update", RECORDED_BY_CALLER),
         Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer", DELEGATES),
-        Map.entry("WorkspaceMcpServerFacadeImpl.updateWorkspaceMcpServer", DELEGATES),
-        Map.entry("WorkspaceMcpServerFacadeImpl.updateWorkspaceMcpToolEnabled", TOOL_SETTING));
+        Map.entry("WorkspaceMcpServerFacadeImpl.updateWorkspaceMcpServer", DELEGATES));
     private static final List<String> NON_SECRET_NAME_SUFFIXES = List.of(
         "count", "id", "ids", "name", "names", "type");
     private static final List<String> SECRET_NAME_FRAGMENTS = List.of(
