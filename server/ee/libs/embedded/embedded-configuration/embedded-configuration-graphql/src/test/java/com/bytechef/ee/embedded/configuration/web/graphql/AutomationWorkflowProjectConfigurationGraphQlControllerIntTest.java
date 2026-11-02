@@ -68,7 +68,7 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
     @Test
     void testAutomationWorkflowProjectConfigurationsReturnsWorkflowsWithTheirSwitches() {
         AutomationWorkflowProjectConfigurationDTO configuration = new AutomationWorkflowProjectConfigurationDTO(
-            5L, 7L, 0L, 2, true, false,
+            5L, 7L, 0L, "DEVELOPMENT", null, 2, true, false, 0,
             List.of(
                 new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-one", "workflow-id-one", "One", true,
                     null, Map.of("openai", 42L), Map.of("channel", "general")),
@@ -350,8 +350,9 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
 
     @Test
     void testCreateAutomationWorkflowProjectConfigurationDelegatesAndReturnsId() {
-        when(automationWorkflowProjectConfigurationAdminFacade.createConfiguration(7L, 0L, 2, true, false))
-            .thenReturn(11L);
+        when(automationWorkflowProjectConfigurationAdminFacade.createConfiguration(7L, 0L, "DEVELOPMENT", null, 2, true,
+            false))
+                .thenReturn(11L);
 
         this.graphQlTester
             .document("""

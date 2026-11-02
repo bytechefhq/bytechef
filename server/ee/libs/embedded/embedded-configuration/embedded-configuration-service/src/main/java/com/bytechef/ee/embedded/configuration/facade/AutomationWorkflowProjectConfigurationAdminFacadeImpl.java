@@ -20,7 +20,9 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.audit.AutomationWorkflowProjectAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDeleteImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
@@ -85,6 +87,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
+    private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
     private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
     private final ConnectionService connectionService;
     private final JobService jobService;
@@ -101,6 +104,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
+        ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
         ConnectionService connectionService, JobService jobService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
@@ -113,6 +117,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserProjectConfigurationService = connectedUserProjectConfigurationService;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
+        this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
         this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
         this.connectionService = connectionService;
         this.jobService = jobService;
@@ -127,36 +132,33 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         @AuditData(key = "configurationId", value = "#result"),
         @AuditData(key = "projectId", value = "#projectId"),
         @AuditData(key = "environmentId", value = "#environmentId"),
+        @AuditData(key = "name", value = "#name"),
         @AuditData(key = "projectVersion", value = "#projectVersion"),
         @AuditData(key = "enabled", value = "#enabled"),
         @AuditData(key = "automationHubVisible", value = "#automationHubVisible")
     })
     public long createConfiguration(
-        long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible) {
+        long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
+        boolean enabled, boolean automationHubVisible) {
 
         validateEnvironmentId(environmentId);
         validatePublishedProjectVersion(projectId, projectVersion);
 
-        Optional<AutomationWorkflowProjectConfiguration> existingConfigurationOptional =
-            automationWorkflowProjectConfigurationService.getConfigurations(projectId, environmentId)
-                .stream()
-                .findFirst();
+        String configurationName = getConfigurationName(name);
 
-        if (existingConfigurationOptional.isPresent()) {
-            throw newConfigurationAlreadyExistsException(projectId, environmentId);
-        }
+        validateConfigurationNameIsUnique(projectId, environmentId, configurationName, null);
 
         AutomationWorkflowProjectConfiguration configuration;
 
         try {
             configuration = automationWorkflowProjectConfigurationService.create(
-                projectId, environmentId, Environment.values()[(int) environmentId].name(), null, projectVersion,
-                enabled, automationHubVisible);
+                projectId, environmentId, configurationName, StringUtils.trimToNull(permissionExpression),
+                projectVersion, enabled, automationHubVisible);
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
-            throw newConfigurationAlreadyExistsException(projectId, environmentId);
+            throw newConfigurationNameExistsException(projectId, environmentId, configurationName);
         }
 
-        publishUpdatedEvent(projectId, environmentId);
+        publishUpdatedEvent(configuration);
 
         return configuration.getId();
     }
@@ -180,13 +182,16 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             }
         }
 
+        connectedUserReferenceRolloutManager.deleteReferenceDeployments(
+            configuration.getProjectId(), getAssignedConnectedUserIds(id));
+
         connectedUserProjectConfigurationService.deleteByConfigurationId(id);
 
         automationWorkflowProjectConfigurationService.delete(id);
 
         applicationEventPublisher.publishEvent(
             new AutomationWorkflowProjectConfigurationDeletedEvent(
-                configuration.getProjectId(), configuration.getEnvironmentId(), providedInputNames));
+                configuration.getProjectId(), configuration.getEnvironmentId(), id, providedInputNames));
     }
 
     @Override
@@ -199,7 +204,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.updateEnabled(id, enable);
 
-        publishUpdatedEvent(configuration.getProjectId(), configuration.getEnvironmentId());
+        publishUpdatedEvent(configuration);
     }
 
     @Override
@@ -215,15 +220,31 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
                 id, UUID.fromString(workflowUuid), enable);
 
-        publishUpdatedEvent(configuration.getProjectId(), configuration.getEnvironmentId());
+        publishUpdatedEvent(configuration);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AutomationWorkflowProjectConfigurationDTO getConfiguration(long id) {
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.getConfiguration(id);
+
+        return toDTO(configuration, getAssignedConnectedUserIds(id).size());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId) {
-        return automationWorkflowProjectConfigurationService.getConfigurations(projectId)
-            .stream()
-            .map(this::toDTO)
+        List<AutomationWorkflowProjectConfiguration> configurations =
+            automationWorkflowProjectConfigurationService.getConfigurations(projectId);
+
+        Map<Long, Integer> connectedUserCounts = connectedUserProjectConfigurationService.countByConfigurationIds(
+            configurations.stream()
+                .map(AutomationWorkflowProjectConfiguration::getId)
+                .toList());
+
+        return configurations.stream()
+            .map(configuration -> toDTO(configuration, connectedUserCounts.getOrDefault(configuration.getId(), 0)))
             .toList();
     }
 
@@ -289,6 +310,20 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .map(option -> new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.InputOption(
                 option.getLabel(), String.valueOf(option.getValue()), option.getDescription()))
             .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AutomationWorkflowProjectConfigurationDeleteImpactDTO getDeleteImpact(long id) {
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.getConfiguration(id);
+
+        Set<Long> assignedConnectedUserIds = getAssignedConnectedUserIds(id);
+
+        return new AutomationWorkflowProjectConfigurationDeleteImpactDTO(
+            assignedConnectedUserIds.size(),
+            connectedUserReferenceRolloutManager.countReferences(
+                configuration.getProjectId(), assignedConnectedUserIds));
     }
 
     @Override
@@ -363,25 +398,39 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     @Override
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_UPDATED, data = {
         @AuditData(key = "configurationId", value = "#id"),
+        @AuditData(key = "name", value = "#name"),
         @AuditData(key = "projectVersion", value = "#projectVersion"),
         @AuditData(key = "enabled", value = "#enabled"),
         @AuditData(key = "automationHubVisible", value = "#automationHubVisible")
     })
-    public void updateConfiguration(long id, int projectVersion, boolean enabled, boolean automationHubVisible) {
+    public void updateConfiguration(
+        long id, String name, @Nullable String permissionExpression, int projectVersion, boolean enabled,
+        boolean automationHubVisible) {
+
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
 
         validatePublishedProjectVersion(configuration.getProjectId(), projectVersion);
 
+        String configurationName = getConfigurationName(name);
+
+        validateConfigurationNameIsUnique(
+            configuration.getProjectId(), configuration.getEnvironmentId(), configurationName, id);
+
         if (projectVersion < configuration.getProjectVersion()) {
             validateReferencedWorkflowsExistInVersion(configuration, projectVersion);
         }
 
-        configuration = automationWorkflowProjectConfigurationService.update(
-            id, configuration.getName(), configuration.getPermissionExpression(), projectVersion, enabled,
-            automationHubVisible);
+        try {
+            configuration = automationWorkflowProjectConfigurationService.update(
+                id, configurationName, StringUtils.trimToNull(permissionExpression), projectVersion, enabled,
+                automationHubVisible);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw newConfigurationNameExistsException(
+                configuration.getProjectId(), configuration.getEnvironmentId(), configurationName);
+        }
 
-        publishUpdatedEvent(configuration.getProjectId(), configuration.getEnvironmentId());
+        publishUpdatedEvent(configuration);
     }
 
     @Override
@@ -419,7 +468,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         applicationEventPublisher.publishEvent(
             new AutomationWorkflowProjectConfigurationUpdatedEvent(
                 updatedConfiguration.getProjectId(), updatedConfiguration.getEnvironmentId(),
-                removedProvidedInputNames.isEmpty()
+                updatedConfiguration.getId(), removedProvidedInputNames.isEmpty()
                     ? Map.of() : Map.of(workflowUuid, removedProvidedInputNames)));
     }
 
@@ -536,10 +585,41 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             message, AutomationWorkflowProjectConfigurationErrorType.INVALID_PROVIDED_VALUE);
     }
 
-    private static ConfigurationException newConfigurationAlreadyExistsException(long projectId, long environmentId) {
+    private static ConfigurationException newConfigurationNameExistsException(
+        long projectId, long environmentId, String name) {
+
         return new ConfigurationException(
-            "Project id=%s already has a configuration for environment id=%s".formatted(projectId, environmentId),
-            AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_ALREADY_EXISTS);
+            "Project id=%s already has a configuration named '%s' in environment id=%s".formatted(
+                projectId, name, environmentId),
+            AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_NAME_EXISTS);
+    }
+
+    private static String getConfigurationName(String name) {
+        if (StringUtils.isBlank(name)) {
+            throw new IllegalArgumentException("A configuration name is required");
+        }
+
+        return name.trim();
+    }
+
+    private Set<Long> getAssignedConnectedUserIds(long configurationId) {
+        return connectedUserProjectConfigurationService.getAssignments(configurationId)
+            .stream()
+            .map(ConnectedUserProjectConfiguration::getConnectedUserId)
+            .collect(Collectors.toSet());
+    }
+
+    private void validateConfigurationNameIsUnique(
+        long projectId, long environmentId, String name, @Nullable Long excludedConfigurationId) {
+
+        boolean nameExists = automationWorkflowProjectConfigurationService.getConfigurations(projectId, environmentId)
+            .stream()
+            .filter(configuration -> !Objects.equals(configuration.getId(), excludedConfigurationId))
+            .anyMatch(configuration -> StringUtils.equalsIgnoreCase(StringUtils.trim(configuration.getName()), name));
+
+        if (nameExists) {
+            throw newConfigurationNameExistsException(projectId, environmentId, name);
+        }
     }
 
     private static void validateEnvironmentId(long environmentId) {
@@ -550,9 +630,10 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         }
     }
 
-    private void publishUpdatedEvent(long projectId, long environmentId) {
+    private void publishUpdatedEvent(AutomationWorkflowProjectConfiguration configuration) {
         applicationEventPublisher.publishEvent(
-            new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, environmentId));
+            new AutomationWorkflowProjectConfigurationUpdatedEvent(
+                configuration.getProjectId(), configuration.getEnvironmentId(), configuration.getId()));
     }
 
     private int getAffectedConnectedUserCount(
@@ -592,13 +673,32 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     private Map<String, List<ConnectedUserWorkflowReferenceDTO>> getTurnedOnReferences(
         AutomationWorkflowProjectConfiguration configuration, Set<String> workflowUuids) {
 
+        return getAssignedUsersReferences(configuration, workflowUuids)
+            .stream()
+            .filter(reference -> reference.enabled() && !reference.dangling())
+            .collect(Collectors.groupingBy(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid));
+    }
+
+    /**
+     * Returns the references to the workflows held by the connected users assigned to the configuration, so users on
+     * another configuration of the same project and environment never count.
+     */
+    private List<ConnectedUserWorkflowReferenceDTO> getAssignedUsersReferences(
+        AutomationWorkflowProjectConfiguration configuration, Set<String> workflowUuids) {
+
+        Set<Long> assignedConnectedUserIds = getAssignedConnectedUserIds(configuration.getId());
+
+        if (assignedConnectedUserIds.isEmpty() || workflowUuids.isEmpty()) {
+            return List.of();
+        }
+
         Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
 
         return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
             .stream()
-            .filter(reference -> reference.enabled() && !reference.dangling() &&
+            .filter(reference -> assignedConnectedUserIds.contains(reference.connectedUserId()) &&
                 Objects.equals(reference.environment(), environment.name()))
-            .collect(Collectors.groupingBy(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid));
+            .toList();
     }
 
     private List<String> getNewRequiredConnections(String currentWorkflowId, String requestedWorkflowId) {
@@ -635,23 +735,22 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     private Map<String, List<String>> getReferenceWorkflowIds(
         AutomationWorkflowProjectConfiguration configuration, List<ProjectWorkflow> projectWorkflows) {
 
-        Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
-
         Set<String> workflowUuids = projectWorkflows.stream()
             .map(ProjectWorkflow::getUuidAsString)
             .collect(Collectors.toSet());
 
-        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
+        return getAssignedUsersReferences(configuration, workflowUuids)
             .stream()
-            .filter(reference -> Objects.equals(reference.environment(), environment.name()) &&
-                reference.workflowId() != null)
+            .filter(reference -> reference.workflowId() != null)
             .collect(
                 Collectors.groupingBy(
                     ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid,
                     Collectors.mapping(ConnectedUserWorkflowReferenceDTO::workflowId, Collectors.toList())));
     }
 
-    private AutomationWorkflowProjectConfigurationDTO toDTO(AutomationWorkflowProjectConfiguration configuration) {
+    private AutomationWorkflowProjectConfigurationDTO toDTO(
+        AutomationWorkflowProjectConfiguration configuration, int connectedUserCount) {
+
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             configuration.getProjectId(), configuration.getProjectVersion());
 
@@ -671,8 +770,9 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         return new AutomationWorkflowProjectConfigurationDTO(
             configuration.getId(), configuration.getProjectId(), configuration.getEnvironmentId(),
-            configuration.getProjectVersion(), configuration.isEnabled(), configuration.isAutomationHubVisible(),
-            workflows, configuration.getLastModifiedDate(), lastExecutionDate);
+            configuration.getName(), configuration.getPermissionExpression(), configuration.getProjectVersion(),
+            configuration.isEnabled(), configuration.isAutomationHubVisible(), connectedUserCount, workflows,
+            configuration.getLastModifiedDate(), lastExecutionDate);
     }
 
     private AutomationWorkflowProjectConfigurationDTO.Workflow toWorkflowDTO(
@@ -718,12 +818,9 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .map(ProjectWorkflow::getUuidAsString)
             .collect(Collectors.toSet());
 
-        Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
-
-        Set<String> missingWorkflowUuids = connectedUserWorkflowReferenceAdminFacade
-            .getReferences(currentWorkflowUuids)
+        Set<String> missingWorkflowUuids = getAssignedUsersReferences(configuration, currentWorkflowUuids)
             .stream()
-            .filter(reference -> !reference.dangling() && Objects.equals(reference.environment(), environment.name()))
+            .filter(reference -> !reference.dangling())
             .map(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid)
             .filter(workflowUuid -> !targetWorkflowUuids.contains(workflowUuid))
             .collect(Collectors.toSet());

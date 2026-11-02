@@ -104,7 +104,8 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
         Environment environment = connectedUser.getEnvironment();
 
         return new ConnectedUserWorkflowReferenceDTO(
-            reference.getAutomationWorkflowUuid(), connectedUser.getExternalId(), environment.name(),
+            reference.getAutomationWorkflowUuid(), connectedUser.getId(), connectedUser.getExternalId(),
+            environment.name(),
             reference.isEnabled(), reference.isDangling(), reference.getDanglingReason(),
             workflowIds.get(reference.getProjectWorkflowId()), reference.getProjectDeploymentId());
     }

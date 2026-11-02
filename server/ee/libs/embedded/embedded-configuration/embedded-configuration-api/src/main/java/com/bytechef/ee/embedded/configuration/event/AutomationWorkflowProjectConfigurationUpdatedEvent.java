@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 @SuppressFBWarnings("EI")
 public record AutomationWorkflowProjectConfigurationUpdatedEvent(
-    long projectId, long environmentId, Map<String, Set<String>> removedProvidedInputNames) {
+    long projectId, long environmentId, long configurationId, Map<String, Set<String>> removedProvidedInputNames) {
 
     public AutomationWorkflowProjectConfigurationUpdatedEvent {
         removedProvidedInputNames = removedProvidedInputNames.entrySet()
@@ -27,7 +27,8 @@ public record AutomationWorkflowProjectConfigurationUpdatedEvent(
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> Set.copyOf(entry.getValue())));
     }
 
-    public AutomationWorkflowProjectConfigurationUpdatedEvent(long projectId, long environmentId) {
-        this(projectId, environmentId, Map.of());
+    public AutomationWorkflowProjectConfigurationUpdatedEvent(long projectId, long environmentId,
+        long configurationId) {
+        this(projectId, environmentId, configurationId, Map.of());
     }
 }
