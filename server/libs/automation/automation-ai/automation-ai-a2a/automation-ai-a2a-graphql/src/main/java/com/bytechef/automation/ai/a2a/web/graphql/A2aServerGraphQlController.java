@@ -33,7 +33,6 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -53,13 +52,11 @@ public class A2aServerGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
     public List<A2aServer> a2aServers(@Argument long workspaceId) {
         return a2aServerFacade.getWorkspaceA2aServers(workspaceId);
     }
 
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
     public List<Tag> a2aServerTags(@Argument long workspaceId) {
         return a2aServerFacade.getA2aServerTags(workspaceId);
     }

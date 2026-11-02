@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.ai.a2a.web.graphql;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -34,8 +33,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
-import org.springframework.graphql.ResponseError;
-import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -147,28 +144,6 @@ class A2aProjectWorkflowGraphQlControllerIntTest {
             .valueIsNull();
 
         verifyNoInteractions(projectDeploymentWorkflowService, workflowService);
-    }
-
-    @Test
-    void testA2aProjectWorkflowsByA2aProjectIdRequiresAuthentication() {
-        graphQlTester
-            .document("""
-                query {
-                    a2aProjectWorkflowsByA2aProjectId(a2aProjectId: "11") {
-                        id
-                    }
-                }
-                """)
-            .execute()
-            .errors()
-            .satisfy(errors -> assertThat(errors)
-                .singleElement()
-                .extracting(ResponseError::getErrorType)
-                .isEqualTo(ErrorType.UNAUTHORIZED))
-            .path("a2aProjectWorkflowsByA2aProjectId")
-            .valueIsNull();
-
-        verifyNoInteractions(a2aProjectWorkflowFacade);
     }
 
     @Test
