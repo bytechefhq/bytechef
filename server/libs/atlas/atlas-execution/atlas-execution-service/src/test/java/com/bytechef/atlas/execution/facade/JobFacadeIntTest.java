@@ -22,10 +22,12 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
@@ -54,6 +56,7 @@ import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -380,6 +383,32 @@ public class JobFacadeIntTest {
         verify(taskFileStorage).storeTaskExecutionOutput(jobId, taskExecutionId, Map.of("approved", true));
 
         assertThat(applicationEvents.stream(TaskExecutionCompleteEvent.class)).hasSize(1);
+    }
+
+    @Test
+    public void testResumeApprovalOfAnAlreadyProcessedApprovalLeavesTheJobStopped() {
+        long jobId = saveJob(Job.Status.STOPPED);
+
+        saveStartedTaskExecution(jobId, WAIT_FOR_APPROVAL_TYPE);
+
+        FileEntry jobContextFileEntry = new FileEntry("job-context-" + jobId + ".json", "memory://" + jobId);
+
+        when(contextService.peek(jobId, Context.Classname.JOB)).thenReturn(jobContextFileEntry);
+        doReturn(Map.of("approvals", Map.of("uuid-1", true))).when(taskFileStorage)
+            .readContextValue(jobContextFileEntry);
+
+        assertThatThrownBy(() -> jobFacade.resumeApproval(jobId, "uuid-1", false))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Approval already processed");
+
+        assertThat(jobRepository.findById(jobId))
+            .get()
+            .extracting(Job::getStatus)
+            .isEqualTo(Job.Status.STOPPED);
+
+        verify(taskFileStorage, never()).storeTaskExecutionOutput(eq(jobId), anyLong(), anyMap());
+
+        assertThat(applicationEvents.stream(TaskExecutionCompleteEvent.class)).isEmpty();
     }
 
     private long saveJob(Job.Status status) {

@@ -228,10 +228,6 @@ public class JobFacadeImpl implements JobFacade {
         TaskExecution waitingTaskExecution = findWaitingApprovalTaskExecution(jobId)
             .orElseThrow(() -> new IllegalStateException("Job %s has no pending approval".formatted(jobId)));
 
-        if (!jobService.tryClaimResume(job)) {
-            throw new IllegalStateException("Job %s approval was already resolved".formatted(jobId));
-        }
-
         Map<String, Object> jobContext = new HashMap<>(
             taskFileStorage.readContextValue(contextService.peek(jobId, Context.Classname.JOB)));
 
@@ -241,6 +237,10 @@ public class JobFacadeImpl implements JobFacade {
 
         if (approvalMap.containsKey(uuid)) {
             throw new IllegalArgumentException("Approval already processed");
+        }
+
+        if (!jobService.tryClaimResume(job)) {
+            throw new IllegalStateException("Job %s approval was already resolved".formatted(jobId));
         }
 
         approvalMap.put(uuid, approved);
