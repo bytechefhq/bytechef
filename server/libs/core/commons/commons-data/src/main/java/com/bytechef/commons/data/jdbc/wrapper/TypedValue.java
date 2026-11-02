@@ -25,6 +25,7 @@ import tools.jackson.databind.ObjectMapper;
 public record TypedValue(Object value, String classname) {
 
     private static final List<String> ALLOWED_CLASSNAME_PREFIXES = List.of("java.", "com.bytechef.");
+    private static final List<String> PRIMITIVE_ARRAY_TYPES = List.of("B", "C", "D", "F", "I", "J", "S", "Z");
 
     public TypedValue(Object value) {
         this(value, getClassname(value));
@@ -35,9 +36,7 @@ public record TypedValue(Object value, String classname) {
 
         String classname = typedValue.classname();
 
-        if (ALLOWED_CLASSNAME_PREFIXES.stream()
-            .noneMatch(classname::startsWith)) {
-
+        if (!isAllowed(classname)) {
             throw new IllegalArgumentException("Disallowed class in a stored value: " + classname);
         }
 
@@ -51,6 +50,34 @@ public record TypedValue(Object value, String classname) {
 
     public String write(ObjectMapper objectMapper) {
         return objectMapper.writeValueAsString(this);
+    }
+
+    private static boolean isAllowed(String classname) {
+        String elementClassname = classname;
+
+        while (elementClassname.startsWith("[")) {
+            elementClassname = elementClassname.substring(1);
+        }
+
+        if (elementClassname.length() != classname.length()) {
+            if (elementClassname.length() == 1) {
+                return PRIMITIVE_ARRAY_TYPES.contains(elementClassname);
+            }
+
+            if (!elementClassname.startsWith("L") || !elementClassname.endsWith(";")) {
+                return false;
+            }
+
+            elementClassname = elementClassname.substring(1, elementClassname.length() - 1);
+        }
+
+        for (String allowedClassnamePrefix : ALLOWED_CLASSNAME_PREFIXES) {
+            if (elementClassname.startsWith(allowedClassnamePrefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static String getClassname(Object value) {
