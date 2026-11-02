@@ -14,6 +14,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,7 +43,7 @@ public class ProjectCodeWorkflowApiController implements ProjectCodeWorkflowApi 
     public ResponseEntity<Void> deployProject(Long workspaceId, MultipartFile projectFile) {
         try {
             projectCodeWorkflowFacade.save(
-                workspaceId, projectFile.getBytes(),
+                Validate.notNull(workspaceId, "workspaceId"), projectFile.getBytes(),
                 Language.of(Objects.requireNonNull(projectFile.getOriginalFilename())));
         } catch (IOException e) {
             throw new RuntimeException(e);

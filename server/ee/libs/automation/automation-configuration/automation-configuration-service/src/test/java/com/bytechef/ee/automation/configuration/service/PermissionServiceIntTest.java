@@ -526,7 +526,19 @@ class PermissionServiceIntTest {
     }
 
     @Test
-    void testHasWorkflowScopeIfProjectWorkflowGrantsWhenTheWorkflowBelongsToNoProject() {
+    void testHasWorkflowScopeIfProjectWorkflowDeniesANonAdminWhenTheWorkflowBelongsToNoProject() {
+        addMember(WorkspaceRole.ADMIN, Environment.DEVELOPMENT);
+
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow(
+                "unknown-workflow-" + UUID.randomUUID(), "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                    .isFalse();
+    }
+
+    @Test
+    void testHasWorkflowScopeIfProjectWorkflowGrantsATenantAdminWhenTheWorkflowBelongsToNoProject() {
+        authenticate(LOGIN, AuthorityConstants.ADMIN);
+
         assertThat(
             permissionService.hasWorkflowScopeIfProjectWorkflow(
                 "integration-workflow-" + UUID.randomUUID(), "WORKFLOW_EDIT", Environment.DEVELOPMENT))

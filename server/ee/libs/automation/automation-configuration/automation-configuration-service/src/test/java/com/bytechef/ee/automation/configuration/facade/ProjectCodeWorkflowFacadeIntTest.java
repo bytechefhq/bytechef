@@ -134,13 +134,23 @@ class ProjectCodeWorkflowFacadeIntTest {
     }
 
     @Test
-    void testSaveIsAdminOnly() {
-        assertRequiresAdminAuthority(() -> projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA));
+    void testSaveNeedsProjectCreateAndProjectPublishInTheWorkspace() {
+        ThrowingCallable save = () -> projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA);
+
+        assertDenied(save);
+
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_CREATE")).thenReturn(true);
+
+        assertDenied(save);
+
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_PUBLISH")).thenReturn(true);
+
+        assertNotDenied(save);
     }
 
     @Test
     void testSaveUpdatesTheSameNamedProjectOfTheCallerWorkspace() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSave();
 
         Project project = new Project();
 
@@ -160,7 +170,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveCreatesAProjectInTheCallerWorkspaceWhenItHasNoProjectOfThatName() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSave();
 
         Project createdProject = new Project();
 
@@ -202,16 +212,9 @@ class ProjectCodeWorkflowFacadeIntTest {
         }
     }
 
-    private void assertRequiresAdminAuthority(ThrowingCallable call) {
-        authenticate(AuthorityConstants.USER);
-
-        assertDenied(call);
-
-        authenticate(AuthorityConstants.ADMIN);
-
-        assertNotDenied(call);
-
-        authenticate(AuthorityConstants.USER);
+    private void allowSave() {
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_CREATE")).thenReturn(true);
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_PUBLISH")).thenReturn(true);
     }
 
     private static void assertDenied(ThrowingCallable call) {

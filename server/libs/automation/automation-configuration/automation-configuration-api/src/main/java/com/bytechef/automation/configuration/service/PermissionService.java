@@ -203,15 +203,14 @@ public interface PermissionService {
 
     /**
      * Returns whether the current user has {@code scope} in the workspace that owns the workflow, in the environment
-     * being acted on, or the workflow belongs to no automation project. For the platform workflow-editor endpoints
-     * shared with embedded, whose integration workflows have no project and are authorized by the embedded surface
-     * rather than by workspace membership.
+     * being acted on. For the platform workflow-editor endpoints shared with embedded: a workflow that belongs to no
+     * automation project, such as an embedded integration workflow, is granted to a tenant administrator only.
      *
      * @param workflowId  the workflow whose owning workspace is checked
      * @param scope       the scope name the user must hold in that workspace
      * @param environment the environment the caller intends to act on
-     * @return {@code true} if the workflow belongs to no project, or the current user holds {@code scope} in the
-     *         workspace of the project it belongs to for that environment
+     * @return {@code true} if the current user is a tenant administrator, or holds {@code scope} in the workspace of
+     *         the project the workflow belongs to for that environment
      */
     boolean hasWorkflowScopeIfProjectWorkflow(String workflowId, String scope, Environment environment);
 
