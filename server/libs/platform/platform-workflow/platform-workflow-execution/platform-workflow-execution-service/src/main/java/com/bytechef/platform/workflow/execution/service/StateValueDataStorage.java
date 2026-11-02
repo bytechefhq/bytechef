@@ -44,21 +44,19 @@ public class StateValueDataStorage {
     static final String TASK_STATE_COMPONENT_NAME = "__task_state";
     static final String TRIGGER_STATE_COMPONENT_NAME = "__trigger_state";
 
-    private final ObjectProvider<ApplicationProperties> applicationPropertiesObjectProvider;
+    private final ApplicationProperties applicationProperties;
     private final ObjectProvider<DataStorage> dataStorageObjectProvider;
-    private final ObjectProvider<JobPrincipalAccessorRegistry> jobPrincipalAccessorRegistryObjectProvider;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final PrincipalJobService principalJobService;
 
     @SuppressFBWarnings("EI")
     StateValueDataStorage(
-        ObjectProvider<ApplicationProperties> applicationPropertiesObjectProvider,
-        ObjectProvider<DataStorage> dataStorageObjectProvider,
-        ObjectProvider<JobPrincipalAccessorRegistry> jobPrincipalAccessorRegistryObjectProvider,
-        PrincipalJobService principalJobService) {
+        ApplicationProperties applicationProperties, ObjectProvider<DataStorage> dataStorageObjectProvider,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobService principalJobService) {
 
-        this.applicationPropertiesObjectProvider = applicationPropertiesObjectProvider;
+        this.applicationProperties = applicationProperties;
         this.dataStorageObjectProvider = dataStorageObjectProvider;
-        this.jobPrincipalAccessorRegistryObjectProvider = jobPrincipalAccessorRegistryObjectProvider;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.principalJobService = principalJobService;
     }
 
@@ -90,10 +88,7 @@ public class StateValueDataStorage {
     }
 
     Optional<Location> fetchLocation(long jobPrincipalId, @Nullable PlatformType type) {
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry =
-            jobPrincipalAccessorRegistryObjectProvider.getIfAvailable();
-
-        if (type == null || jobPrincipalAccessorRegistry == null || !isEnabled()) {
+        if (type == null || !isEnabled()) {
             return Optional.empty();
         }
 
@@ -191,9 +186,7 @@ public class StateValueDataStorage {
     }
 
     private boolean isEnabled() {
-        ApplicationProperties applicationProperties = applicationPropertiesObjectProvider.getIfAvailable();
-
-        if (applicationProperties == null || dataStorageObjectProvider.getIfAvailable() == null) {
+        if (dataStorageObjectProvider.getIfAvailable() == null) {
             return false;
         }
 
