@@ -20,6 +20,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 
 /**
@@ -31,13 +32,13 @@ public class AuditEventRemoteServiceGrpcServer extends AuditEventRemoteServiceGr
 
     private final AuditEventFacade auditEventFacade;
     private final AuditEventProtoMapper auditEventProtoMapper;
-    private final AuditEventRepository auditEventRepository;
+    private final @Nullable AuditEventRepository auditEventRepository;
     private final AuditEventService auditEventService;
 
     @SuppressFBWarnings("EI")
     public AuditEventRemoteServiceGrpcServer(
         AuditEventFacade auditEventFacade, AuditEventService auditEventService,
-        AuditEventRepository auditEventRepository, AuditEventProtoMapper auditEventProtoMapper) {
+        @Nullable AuditEventRepository auditEventRepository, AuditEventProtoMapper auditEventProtoMapper) {
 
         this.auditEventFacade = auditEventFacade;
         this.auditEventProtoMapper = auditEventProtoMapper;
@@ -47,7 +48,9 @@ public class AuditEventRemoteServiceGrpcServer extends AuditEventRemoteServiceGr
 
     @Override
     public void addAuditEvent(RemoteAuditEvent request, StreamObserver<Empty> responseObserver) {
-        auditEventRepository.add(auditEventProtoMapper.toAuditEvent(request));
+        if (auditEventRepository != null) {
+            auditEventRepository.add(auditEventProtoMapper.toAuditEvent(request));
+        }
 
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();

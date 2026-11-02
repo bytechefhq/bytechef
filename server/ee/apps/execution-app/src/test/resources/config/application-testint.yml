@@ -20,6 +20,8 @@ openapi:
       platform: /api/platform
 
 bytechef:
+  audit:
+    enabled: true
   data-storage:
     provider: JDBC
   edition: EE
