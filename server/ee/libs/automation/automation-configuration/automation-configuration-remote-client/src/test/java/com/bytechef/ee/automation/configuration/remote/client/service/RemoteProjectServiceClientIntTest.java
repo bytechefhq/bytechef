@@ -121,7 +121,7 @@ class RemoteProjectServiceClientIntTest {
     void testGetUnknownProjectFailsWithTheServerError() {
         assertThatThrownBy(() -> remoteProjectServiceClient.getProject(Long.MAX_VALUE))
             .isInstanceOf(StatusRuntimeException.class)
-            .hasMessage("INTERNAL: NoSuchElementException: No value present");
+            .hasMessage("INTERNAL: NoSuchElementException: Project " + Long.MAX_VALUE + " not found");
     }
 
     @Test
