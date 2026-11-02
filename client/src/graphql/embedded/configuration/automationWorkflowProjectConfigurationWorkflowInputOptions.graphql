@@ -1,0 +1,23 @@
+query automationWorkflowProjectConfigurationWorkflowInputOptions(
+    $id: ID!
+    $workflowUuid: ID!
+    $inputName: String!
+    $propertyName: String!
+    $connectionId: ID!
+    $lookupDependsOnValues: Map
+    $searchText: String
+) {
+    automationWorkflowProjectConfigurationWorkflowInputOptions(
+        id: $id
+        workflowUuid: $workflowUuid
+        inputName: $inputName
+        propertyName: $propertyName
+        connectionId: $connectionId
+        lookupDependsOnValues: $lookupDependsOnValues
+        searchText: $searchText
+    ) {
+        label
+        value
+        description
+    }
+}
