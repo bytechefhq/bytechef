@@ -18,10 +18,7 @@ package com.bytechef.automation.configuration.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,8 +36,6 @@ import com.bytechef.automation.configuration.web.rest.config.AutomationConfigura
 import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.category.service.CategoryService;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,9 +64,6 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 class ConnectionTagApiControllerIntTest {
 
     @Autowired
-    private ConnectionFacade connectionFacade;
-
-    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -87,12 +79,12 @@ class ConnectionTagApiControllerIntTest {
 
     @Test
     void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(PlatformType.AUTOMATION))
+        when(workspaceConnectionFacade.getConnectionTags(7L, null))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         webTestClient
             .get()
-            .uri("/internal/connections/tags")
+            .uri("/internal/workspaces/7/connection-tags")
             .exchange()
             .expectStatus()
             .isOk()
@@ -108,7 +100,7 @@ class ConnectionTagApiControllerIntTest {
             .jsonPath("$[1].name")
             .isEqualTo("tag2");
 
-        verify(connectionFacade).getConnectionTags(PlatformType.AUTOMATION);
+        verify(workspaceConnectionFacade).getConnectionTags(7L, null);
     }
 
     @Test
@@ -129,7 +121,6 @@ class ConnectionTagApiControllerIntTest {
         ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
         verify(workspaceConnectionFacade).updateConnectionTags(eq(5L), tagsArgumentCaptor.capture());
-        verify(connectionFacade, never()).update(anyLong(), anyList());
 
         assertThat(tagsArgumentCaptor.getValue())
             .extracting(Tag::getId, Tag::getName)

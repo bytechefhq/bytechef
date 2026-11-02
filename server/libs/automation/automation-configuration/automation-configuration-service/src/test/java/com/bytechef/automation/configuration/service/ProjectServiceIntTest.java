@@ -232,7 +232,7 @@ public class ProjectServiceIntTest {
 
         ProjectTagFacade projectTagFacade = new ProjectTagFacadeImpl(projectService, tagService);
 
-        assertThat(projectTagFacade.getProjectTags())
+        assertThat(projectTagFacade.getProjectTags(workspace.getId()))
             .extracting(Tag::getName)
             .containsExactly("regular");
     }
