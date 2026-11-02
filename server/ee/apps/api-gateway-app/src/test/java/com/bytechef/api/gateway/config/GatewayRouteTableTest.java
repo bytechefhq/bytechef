@@ -116,7 +116,18 @@ class GatewayRouteTableTest {
         "/job/resume/abc, webhook-app",
         "/file-entries/abc/content, webhook-app",
         "/icons/slack.svg, configuration-app",
-        "/graphql, configuration-app"
+        "/graphql, configuration-app",
+        "/oauth2/authorize, configuration-oauth2",
+        "/oauth2/token, configuration-oauth2",
+        "/oauth2/jwks, configuration-oauth2",
+        "/oauth2/revoke, configuration-oauth2",
+        "/oauth2/introspect, configuration-oauth2",
+        "/oauth2/register, configuration-oauth2",
+        "/oauth2/par, configuration-oauth2",
+        "/.well-known/oauth-authorization-server, configuration-oauth2",
+        "/.well-known/oauth-authorization-server/api/management/mcp, configuration-oauth2",
+        "/.well-known/openid-configuration, configuration-oauth2",
+        "/.well-known/oauth-protected-resource/api/management/mcp, configuration-oauth2"
     })
     void testPathRoutesToApp(String path, String routeId) {
         assertThat(resolve(path, Map.of())).contains(routeId);
@@ -130,7 +141,8 @@ class GatewayRouteTableTest {
     @ParameterizedTest
     @ValueSource(strings = {
         "/api/account", "/api/authentication", "/api/logout", "/api/register", "/api/activate",
-        "/api/user/graphql", "/oauth2/authorization/google", "/login/oauth2/code/google", "/actuator/health"
+        "/api/user/graphql", "/oauth2/authorization/google", "/login/oauth2/code/google", "/actuator/health",
+        "/oauth2/consent", "/oauth2/redirect"
     })
     void testGatewayOwnedPathsMatchNoRoute(String path) {
         assertThat(resolve(path, Map.of())).isEmpty();
