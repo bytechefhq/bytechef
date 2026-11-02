@@ -19,7 +19,7 @@ package com.bytechef.component.approval.cluster.tool;
 import static com.bytechef.component.approval.constant.ApprovalConstants.APPROVAL;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
-import com.bytechef.component.approval.action.ApprovalRequestApprovalAction;
+import com.bytechef.component.approval.action.RequestApprovalApprovalAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ComponentDsl;
@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Adapts the {@link ApprovalRequestApprovalAction} into a {@link MultipleConnectionsToolFunction} so the AI agent can
+ * Adapts the {@link RequestApprovalApprovalAction} into a {@link MultipleConnectionsToolFunction} so the AI agent can
  * invoke it as a tool. It is built by hand because {@code ComponentDsl#tool(...)} supports only single-connection
  * performs, while this action's {@link MultipleConnectionsPerformFunction} needs every connection and must be able to
  * suspend the agent.
@@ -67,7 +67,7 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-public class ApprovalRequestApprovalTool {
+public class RequestApprovalApprovalTool {
 
     static final String EDITOR_ENVIRONMENT_RESULT =
         "Approval requests cannot be sent in a workflow editor test run, so nothing was approved. Do not perform the " +
@@ -77,7 +77,7 @@ public class ApprovalRequestApprovalTool {
     public static ModifiableClusterElementDefinition<MultipleConnectionsToolFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
             .orElseThrow();
@@ -120,6 +120,6 @@ public class ApprovalRequestApprovalTool {
             });
     }
 
-    private ApprovalRequestApprovalTool() {
+    private RequestApprovalApprovalTool() {
     }
 }
