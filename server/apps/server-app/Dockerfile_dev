@@ -18,7 +18,7 @@ WORKDIR ./
 RUN --mount=type=cache,target=/home/gradle/.gradle/caches \
     gradle bootJar --no-daemon
 
-FROM ghcr.io/graalvm/graalvm-community:25i2-25.0.4
+FROM ghcr.io/graalvm/jdk-community:25i2-25.0.4
 
 WORKDIR /opt
 
