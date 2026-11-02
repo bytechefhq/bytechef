@@ -34,11 +34,13 @@ public class NotificationEvent {
 
     public enum Type {
 
+        // Append only: the type is persisted as its ordinal.
         JOB_CANCELLED(Source.JOB, "CANCELLED"), JOB_CREATED(Source.JOB, "CREATED"),
         JOB_COMPLETED(Source.JOB, "COMPLETED"), JOB_FAILED(Source.JOB, "FAILED"),
         JOB_STARTED(Source.JOB, "STARTED"), JOB_STOPPED(Source.JOB, "STOPPED"),
         JOB_APPROVAL_EXPIRING(Source.JOB, "APPROVAL_EXPIRING"),
-        JOB_APPROVAL_ESCALATED(Source.JOB, "APPROVAL_ESCALATED");
+        JOB_APPROVAL_ESCALATED(Source.JOB, "APPROVAL_ESCALATED"),
+        JOB_PAYMENT_REQUIRED(Source.JOB, "PAYMENT_REQUIRED");
 
         private final Source source;
         private final String value;
