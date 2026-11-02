@@ -13,6 +13,7 @@ import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {UseFormReturn, useWatch} from 'react-hook-form';
 
 import useNotifications, {NotificationFormValuesType} from '../hooks/useNotifications';
@@ -32,7 +33,9 @@ const NotificationDialog = ({
     saveNotification,
     selectedNotification,
 }: NotificationDialogProps) => {
-    const {ff_1132, isNotificationEventsLoading, notificationEvents, openEditDialog} = useNotifications();
+    const isEnterpriseEdition = useApplicationInfoStore((state) => state.application?.edition === EditionType.EE);
+
+    const {isNotificationEventsLoading, notificationEvents, openEditDialog} = useNotifications();
 
     const {control, handleSubmit} = form;
 
@@ -131,7 +134,7 @@ const NotificationDialog = ({
                                                             {NotificationTypeEnum.Email.toString()}
                                                         </SelectItem>
 
-                                                        {ff_1132 && (
+                                                        {isEnterpriseEdition && (
                                                             <SelectItem
                                                                 key={NotificationTypeEnum.Webhook.toString()}
                                                                 value={NotificationTypeEnum.Webhook.toString()}
@@ -140,14 +143,12 @@ const NotificationDialog = ({
                                                             </SelectItem>
                                                         )}
 
-                                                        {ff_1132 && (
-                                                            <SelectItem
-                                                                key={NotificationTypeEnum.Slack.toString()}
-                                                                value={NotificationTypeEnum.Slack.toString()}
-                                                            >
-                                                                {NotificationTypeEnum.Slack.toString()}
-                                                            </SelectItem>
-                                                        )}
+                                                        <SelectItem
+                                                            key={NotificationTypeEnum.Slack.toString()}
+                                                            value={NotificationTypeEnum.Slack.toString()}
+                                                        >
+                                                            {NotificationTypeEnum.Slack.toString()}
+                                                        </SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </FormControl>

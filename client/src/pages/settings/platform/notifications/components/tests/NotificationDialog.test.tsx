@@ -1,15 +1,15 @@
 import {NotificationTypeEnum} from '@/shared/middleware/platform/notification';
+import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useForm} from 'react-hook-form';
-import {describe, expect, it, vi} from 'vitest';
+import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {NotificationFormValuesType} from '../../hooks/useNotifications';
 import NotificationDialog from '../NotificationDialog';
 
 vi.mock('../../hooks/useNotifications', () => ({
     default: () => ({
-        ff_1132: true,
         isNotificationEventsLoading: false,
         notificationEvents: [],
         openEditDialog: vi.fn(),
@@ -42,7 +42,17 @@ function NotificationDialogHarness({saveNotification, settings = {}, type}: Noti
     );
 }
 
+beforeAll(() => {
+    Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || vi.fn();
+    Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture || vi.fn();
+    Element.prototype.scrollIntoView = Element.prototype.scrollIntoView || vi.fn();
+});
+
 describe('NotificationDialog', () => {
+    beforeEach(() => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}});
+    });
+
     it('saves the Slack webhook URL under settings.slackWebhookUrl for a Slack notification', async () => {
         const saveNotification = vi.fn();
 
@@ -74,5 +84,27 @@ describe('NotificationDialog', () => {
 
         expect(screen.getByLabelText('Slack Webhook URL')).toHaveValue('https://hooks.slack.com/services/T/B/X');
         expect(screen.queryByLabelText('Email')).not.toBeInTheDocument();
+    });
+
+    it('offers Email, Webhook and Slack types in the enterprise edition', async () => {
+        render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Email} />);
+
+        await userEvent.click(screen.getByRole('combobox'));
+
+        expect(screen.getByRole('option', {name: NotificationTypeEnum.Email})).toBeInTheDocument();
+        expect(screen.getByRole('option', {name: NotificationTypeEnum.Webhook})).toBeInTheDocument();
+        expect(screen.getByRole('option', {name: NotificationTypeEnum.Slack})).toBeInTheDocument();
+    });
+
+    it('offers Email and Slack but not Webhook in the community edition', async () => {
+        applicationInfoStore.setState({application: {edition: EditionType.CE}});
+
+        render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Email} />);
+
+        await userEvent.click(screen.getByRole('combobox'));
+
+        expect(screen.getByRole('option', {name: NotificationTypeEnum.Email})).toBeInTheDocument();
+        expect(screen.getByRole('option', {name: NotificationTypeEnum.Slack})).toBeInTheDocument();
+        expect(screen.queryByRole('option', {name: NotificationTypeEnum.Webhook})).not.toBeInTheDocument();
     });
 });
