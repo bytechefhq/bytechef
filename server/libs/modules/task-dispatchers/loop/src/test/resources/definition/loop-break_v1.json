@@ -1,4 +1,5 @@
 {
+  "deprecated": null,
   "description": "Breaks the loop execution.",
   "help": null,
   "icon": "path:assets/loop-break.svg",

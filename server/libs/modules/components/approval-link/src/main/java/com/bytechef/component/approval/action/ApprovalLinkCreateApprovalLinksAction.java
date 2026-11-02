@@ -32,7 +32,10 @@ public class ApprovalLinkCreateApprovalLinksAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createApprovalLinks")
         .title("Create Approval Links")
-        .description("Creates approval/disapproval links.")
+        .deprecated(true)
+        .description(
+            "Deprecated: use the Request Approval action of the Approval component instead. Creates " +
+                "approval/disapproval links.")
         .properties()
         .output(ApprovalLinkCreateApprovalLinksAction::output)
         .help("", "https://docs.bytechef.io/reference/components/approval-link_v1#create-approval-links")

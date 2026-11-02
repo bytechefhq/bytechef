@@ -1,5 +1,6 @@
 {
-  "description": "Allows a person to review and either approve or reject requests.",
+  "deprecated": true,
+  "description": "Deprecated: use the Request Approval action of the Approval component instead. Allows a person to review and either approve or reject requests.",
   "help": null,
   "icon": "path:assets/wait-for-approval.svg",
   "name": "waitForApproval",

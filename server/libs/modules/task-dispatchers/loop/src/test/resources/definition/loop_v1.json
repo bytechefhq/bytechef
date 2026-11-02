@@ -1,4 +1,5 @@
 {
+  "deprecated": null,
   "description": "Loops sequentially over list of items.",
   "help": null,
   "icon": "path:assets/loop.svg",
