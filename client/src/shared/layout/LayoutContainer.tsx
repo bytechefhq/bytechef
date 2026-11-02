@@ -77,6 +77,7 @@ const LayoutContainer = ({
         !leftSidebarHidden && (isLeftSidebarControlled ? leftSidebarOpen : uncontrolledLeftSidebarOpen);
 
     const [leftAsideMounted, setLeftAsideMounted] = useState(leftSidebarIsOpen);
+    const [leftSidebarTransitionEnabled, setLeftSidebarTransitionEnabled] = useState(!leftSidebarHidden);
 
     const ownLeftSidebarToggle = useMemo(
         () => ({
@@ -112,6 +113,20 @@ const LayoutContainer = ({
 
         return () => clearTimeout(timerId);
     }, [leftSidebarIsOpen]);
+
+    // A page hides its sidebar until it has loaded, so revealing it must not slide the content over. Enable the
+    // padding transition only a frame after the sidebar first shows, once its padding has painted without one.
+    useEffect(() => {
+        if (leftSidebarHidden) {
+            setLeftSidebarTransitionEnabled(false);
+
+            return;
+        }
+
+        const frameId = requestAnimationFrame(() => setLeftSidebarTransitionEnabled(true));
+
+        return () => cancelAnimationFrame(frameId);
+    }, [leftSidebarHidden]);
 
     const leftSidebarNav = (
         <nav className="flex h-full flex-col">
@@ -156,7 +171,9 @@ const LayoutContainer = ({
                 <div
                     className={twMerge(
                         'size-full',
-                        !leftSidebarHidden && 'transition-[padding] duration-300 ease-in-out',
+                        !leftSidebarHidden &&
+                            leftSidebarTransitionEnabled &&
+                            'transition-[padding] duration-300 ease-in-out',
                         topHeader && 'flex flex-col',
                         leftSidebarIsOpen && leftSidebarWidths[leftSidebarWidth][1]
                     )}
