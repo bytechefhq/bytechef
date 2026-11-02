@@ -10,13 +10,20 @@ package com.bytechef.ee.automation.task.remote.client.facade;
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.domain.PendingApproval;
 import com.bytechef.automation.task.facade.ApprovalTaskFacade;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.automation.task.remote.grpc.ApprovalTaskProtoMapper;
+import com.bytechef.ee.automation.task.remote.grpc.proto.ApprovalTaskFacadeRemoteServiceGrpc;
+import com.bytechef.ee.automation.task.remote.grpc.proto.ApprovalTaskMessage;
+import com.bytechef.ee.automation.task.remote.grpc.proto.PendingApprovalsRequest;
+import com.bytechef.ee.automation.task.remote.grpc.proto.PendingApprovalsResponse;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import java.util.List;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -28,23 +35,24 @@ import org.springframework.stereotype.Component;
 public class RemoteApprovalTaskFacadeClient implements ApprovalTaskFacade {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String APPROVAL_TASK_FACADE = "/remote/approval-task-facade";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final ApprovalTaskProtoMapper approvalTaskProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteApprovalTaskFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteApprovalTaskFacadeClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.approvalTaskProtoMapper = new ApprovalTaskProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public ApprovalTask createApprovalTask(ApprovalTask approvalTask) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(APPROVAL_TASK_FACADE + "/create-approval-task")
-                .build(),
-            approvalTask, ApprovalTask.class);
+        ApprovalTaskMessage approvalTaskMessage = call(
+            () -> getStub().createApprovalTask(
+                ApprovalTaskMessage.newBuilder()
+                    .setApprovalTask(approvalTaskProtoMapper.write(approvalTask))
+                    .build()));
+
+        return approvalTaskProtoMapper.toApprovalTask(approvalTaskMessage.getApprovalTask());
     }
 
     @Override
@@ -74,22 +82,37 @@ public class RemoteApprovalTaskFacadeClient implements ApprovalTaskFacade {
 
     @Override
     public List<PendingApproval> getPendingApprovals(@Nullable Integer environmentId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> {
-                uriBuilder.host(CONFIGURATION_APP)
-                    .path(APPROVAL_TASK_FACADE + "/get-pending-approvals");
+        PendingApprovalsRequest.Builder builder = PendingApprovalsRequest.newBuilder();
 
-                if (environmentId != null) {
-                    uriBuilder.queryParam("environmentId", environmentId);
-                }
+        if (environmentId != null) {
+            builder.setEnvironmentId(environmentId);
+        }
 
-                return uriBuilder.build();
-            },
-            new ParameterizedTypeReference<>() {});
+        PendingApprovalsResponse pendingApprovalsResponse = call(() -> getStub().getPendingApprovals(builder.build()));
+
+        return approvalTaskProtoMapper.toPendingApprovals(pendingApprovalsResponse.getPendingApprovals());
     }
 
     @Override
     public ApprovalTask updateApprovalTask(ApprovalTask approvalTask) {
         throw new UnsupportedOperationException();
+    }
+
+    private static <T> T call(Supplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (StatusRuntimeException statusRuntimeException) {
+            Status status = statusRuntimeException.getStatus();
+
+            if (status.getCode() == Status.Code.INVALID_ARGUMENT) {
+                throw new IllegalArgumentException(status.getDescription(), statusRuntimeException);
+            }
+
+            throw statusRuntimeException;
+        }
+    }
+
+    private ApprovalTaskFacadeRemoteServiceGrpc.ApprovalTaskFacadeRemoteServiceBlockingStub getStub() {
+        return ApprovalTaskFacadeRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
     }
 }
