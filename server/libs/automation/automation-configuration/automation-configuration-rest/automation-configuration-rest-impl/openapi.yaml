@@ -114,6 +114,13 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+        - name: "environmentId"
+          description: "The id of an environment."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of connection tags."
@@ -243,6 +250,13 @@ paths:
           description: "The id of a workspace."
           in: "path"
           required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "environmentId"
+          description: "The id of an environment."
+          in: "query"
+          required: false
           schema:
             type: "integer"
             format: "int64"
@@ -509,7 +523,7 @@ paths:
   /workspaces/{id}/project-tags:
     get:
       description: "Get project tags for a workspace."
-      summary: "Get project tags for a workspace."
+      summary: "Get project tags."
       tags:
       - "project-tag"
       operationId: "getProjectTags"
@@ -1310,6 +1324,30 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Project"
+  /workspaces/{id}/workflows:
+    get:
+      description: "Get workflows for particular workspace."
+      summary: "Get workflows for particular workspace."
+      tags:
+        - "workflow"
+      operationId: "getWorkspaceWorkflows"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The array of workspace workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Workflow"
   /workspaces/{workspaceId}/projects/import:
     post:
       description: "Import project from a zip file."

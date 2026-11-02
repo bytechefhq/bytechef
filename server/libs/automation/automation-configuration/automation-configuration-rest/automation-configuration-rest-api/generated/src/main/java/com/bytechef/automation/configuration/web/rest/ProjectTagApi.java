@@ -45,7 +45,7 @@ public interface ProjectTagApi {
 
     String PATH_GET_PROJECT_TAGS = "/workspaces/{id}/project-tags";
     /**
-     * GET /workspaces/{id}/project-tags : Get project tags for a workspace.
+     * GET /workspaces/{id}/project-tags : Get project tags.
      * Get project tags for a workspace.
      *
      * @param id The id of a workspace. (required)
@@ -53,7 +53,7 @@ public interface ProjectTagApi {
      */
     @Operation(
         operationId = "getProjectTags",
-        summary = "Get project tags for a workspace.",
+        summary = "Get project tags.",
         description = "Get project tags for a workspace.",
         tags = { "project-tag" },
         responses = {
