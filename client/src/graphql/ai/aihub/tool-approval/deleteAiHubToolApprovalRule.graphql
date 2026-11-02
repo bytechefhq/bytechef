@@ -1,0 +1,3 @@
+mutation deleteAiHubToolApprovalRule($workspaceId: ID!, $ruleId: ID!) {
+    deleteAiHubToolApprovalRule(workspaceId: $workspaceId, ruleId: $ruleId)
+}

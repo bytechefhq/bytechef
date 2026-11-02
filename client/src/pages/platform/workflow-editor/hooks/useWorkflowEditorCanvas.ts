@@ -65,6 +65,7 @@ interface UseWorkflowEditorCanvasParamsI {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
     fitViewOnLoad?: boolean;
+    fitViewOnWorkflowChange?: boolean;
     leftSidebarOpen?: boolean;
     readOnlyLayoutDirection?: LayoutDirectionType;
     readOnlyWorkflow?: Workflow;
@@ -131,6 +132,7 @@ const useWorkflowEditorCanvas = ({
     componentDefinitions,
     customCanvasWidth,
     fitViewOnLoad,
+    fitViewOnWorkflowChange,
     leftSidebarOpen,
     readOnlyLayoutDirection,
     readOnlyWorkflow,
@@ -549,7 +551,12 @@ const useWorkflowEditorCanvas = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowUuid]);
 
-    useInitialViewport({canvasHeight, enabled: !fitViewOnLoad, getViewportOffsetX, workflowUuid});
+    useInitialViewport({
+        canvasHeight,
+        enabled: !fitViewOnLoad && !fitViewOnWorkflowChange,
+        getViewportOffsetX,
+        workflowUuid,
+    });
 
     return {
         edgeTypes,

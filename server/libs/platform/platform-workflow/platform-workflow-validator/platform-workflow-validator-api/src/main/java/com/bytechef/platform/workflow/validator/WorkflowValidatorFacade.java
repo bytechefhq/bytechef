@@ -150,6 +150,13 @@ public interface WorkflowValidatorFacade {
     record NodeValidationIssue(
         String nodeName, @Nullable String propertyPath, WorkflowIssueKind kind, WorkflowIssueSeverity severity,
         String message) {
+
+        /**
+         * Whether only the user can resolve the issue: bind a connection, or create a resource the node refers to.
+         */
+        public boolean userAction() {
+            return kind == WorkflowIssueKind.MISSING_CONNECTION || kind == WorkflowIssueKind.MISSING_RESOURCE;
+        }
     }
 
     default void validateNoReservedInputNames(String workflow) {
@@ -227,6 +234,22 @@ public interface WorkflowValidatorFacade {
             this.errors = List.copyOf(errors);
             this.warnings = List.copyOf(warnings);
             this.nodeIssues = List.copyOf(nodeIssues);
+        }
+
+        /**
+         * The errors that block saving a workflow: every error except those only the user can resolve after the save, a
+         * missing connection or a missing resource such as a knowledge base the user has yet to create.
+         */
+        public List<String> savingErrors() {
+            List<String> userActionMessages = nodeIssues.stream()
+                .filter(NodeValidationIssue::userAction)
+                .map(NodeValidationIssue::message)
+                .toList();
+
+            return errors.stream()
+                .filter(error -> userActionMessages.stream()
+                    .noneMatch(error::contains))
+                .toList();
         }
     }
 }

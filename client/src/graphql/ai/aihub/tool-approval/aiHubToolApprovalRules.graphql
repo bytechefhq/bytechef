@@ -1,0 +1,10 @@
+query aiHubToolApprovalRules($workspaceId: ID!) {
+    aiHubToolApprovalRules(workspaceId: $workspaceId) {
+        id
+        workspaceId
+        toolKind
+        componentName
+        toolName
+        mode
+    }
+}

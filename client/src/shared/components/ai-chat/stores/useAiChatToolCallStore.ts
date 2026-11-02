@@ -50,8 +50,12 @@ interface ToolCallStateI {
     failRunningInChat: (chatId: string, errorResult: unknown, status?: 'aborted' | 'error') => void;
     findRunningToolCallByName: (toolName: string, chatId?: string) => RunningToolCallEntryType | undefined;
     order: string[];
+    /** Drops the entries of `chatId` attached to the message at `fromMessageIndex` or any later one. */
+    removeFromMessageIndex: (chatId: string, fromMessageIndex: number) => void;
     reset: () => void;
     resetForChat: (chatId: string | undefined) => void;
+    /** Moves the entries of `chatId` down by `offset` messages, after that many messages were inserted before them. */
+    shiftMessageIndexes: (chatId: string, offset: number) => void;
     startToolCall: (toolCallId: string, toolName: string, messageIndex: number, chatId?: string) => void;
     toolCalls: Record<string, ToolCallEntryI>;
     updateToolCallArgs: (toolCallId: string, args: Record<string, unknown>) => void;
@@ -267,7 +271,44 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
             return undefined;
         },
 
+        removeFromMessageIndex: (chatId, fromMessageIndex) =>
+            set((state) => {
+                const survivingOrder = state.order.filter((id) => {
+                    const entry = state.toolCalls[id];
+
+                    return entry != null && (entry.chatId !== chatId || entry.messageIndex < fromMessageIndex);
+                });
+
+                if (survivingOrder.length === state.order.length) {
+                    return state;
+                }
+
+                const survivingToolCalls: Record<string, ToolCallEntryI> = {};
+
+                for (const id of survivingOrder) {
+                    survivingToolCalls[id] = state.toolCalls[id];
+                }
+
+                return {...state, order: survivingOrder, toolCalls: survivingToolCalls};
+            }),
+
         reset: () => set({order: [], toolCalls: {}}),
+
+        shiftMessageIndexes: (chatId, offset) =>
+            set((state) => {
+                if (offset === 0) {
+                    return state;
+                }
+
+                const shiftedToolCalls: Record<string, ToolCallEntryI> = {};
+
+                for (const [id, entry] of Object.entries(state.toolCalls)) {
+                    shiftedToolCalls[id] =
+                        entry.chatId === chatId ? {...entry, messageIndex: entry.messageIndex + offset} : entry;
+                }
+
+                return {...state, toolCalls: shiftedToolCalls};
+            }),
 
         resetForChat: (chatId) =>
             set((state) => {
