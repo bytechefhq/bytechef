@@ -86,10 +86,6 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean isCurrentUser(long userId) {
-        if (isAutomationAuthorizationSkipped()) {
-            return true;
-        }
-
         OptionalLong currentUserId = currentUserResolver.fetchCurrentUserId();
 
         return currentUserId.isPresent() && currentUserId.getAsLong() == userId;
@@ -97,10 +93,6 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkspaceRole(long workspaceId, String minimumRole) {
-        if (isAutomationAuthorizationSkipped()) {
-            return true;
-        }
-
         if (isTenantAdmin()) {
             return true;
         }
@@ -164,20 +156,7 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (isTenantAdmin()) {
-            return true;
-        }
-
-        OptionalLong userId = currentUserResolver.fetchCurrentUserId();
-
-        if (userId.isEmpty()) {
-            return false;
-        }
-
-        Set<String> scopeNames =
-            workspaceScopeCacheService.getWorkspaceScopes(userId.getAsLong(), workspaceId, environment);
-
-        return scopeNames.contains(scope);
+        return checkWorkspaceScope(workspaceId, scope, environment);
     }
 
     /**
@@ -186,16 +165,12 @@ public class PermissionServiceImpl implements PermissionService {
      */
     @Override
     public boolean hasWorkspaceScopeInEveryEnvironment(long workspaceId, String scope) {
-        if (isAutomationAuthorizationSkipped()) {
-            return true;
-        }
-
         if (isTenantAdmin()) {
             return true;
         }
 
         for (Environment environment : Environment.values()) {
-            if (!hasWorkspaceScope(workspaceId, scope, environment)) {
+            if (!checkWorkspaceScope(workspaceId, scope, environment)) {
                 return false;
             }
         }
@@ -271,11 +246,21 @@ public class PermissionServiceImpl implements PermissionService {
         // A resource that lives in an environment is checked against the role the caller holds THERE. Without this,
         // a member who is viewer in Production would still pass a by-id check on a Production deployment, because the
         // environment-unaware check unions the environments they can reach. A type with no resolver, or a resolver
-        // that cannot answer, keeps the environment-unaware check it had before.
+        // that reports no environment, keeps the environment-unaware check. A resolver that fails denies: falling back
+        // would answer the check from that union.
         ResourceEnvironmentResolver resourceEnvironmentResolver = resourceEnvironmentResolvers.get(resourceType);
 
         if (resourceEnvironmentResolver != null) {
-            Optional<Environment> environment = resourceEnvironmentResolver.fetchEnvironment(id);
+            Optional<Environment> environment;
+
+            try {
+                environment = resourceEnvironmentResolver.fetchEnvironment(id);
+            } catch (RuntimeException exception) {
+                log.error(
+                    "Denying {} on {} id={}: resolving its environment failed", scope, resourceType, id, exception);
+
+                return false;
+            }
 
             if (environment.isPresent()) {
                 return hasWorkspaceScope(workspaceId.getAsLong(), scope, environment.get());
@@ -321,10 +306,6 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean isResourceOwner(String resourceType, long id) {
-        if (isAutomationAuthorizationSkipped()) {
-            return true;
-        }
-
         if (isTenantAdmin()) {
             return true;
         }
@@ -343,10 +324,6 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasResourceRole(long id, String resourceType, String minimumRole) {
-        if (isAutomationAuthorizationSkipped()) {
-            return true;
-        }
-
         if (isTenantAdmin()) {
             return true;
         }
@@ -496,6 +473,23 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void evictAllWorkspaceScopeCache() {
         workspaceScopeCache.evictAllWorkspaceScopeCache();
+    }
+
+    private boolean checkWorkspaceScope(long workspaceId, String scope, Environment environment) {
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        OptionalLong userId = currentUserResolver.fetchCurrentUserId();
+
+        if (userId.isEmpty()) {
+            return false;
+        }
+
+        Set<String> scopeNames =
+            workspaceScopeCacheService.getWorkspaceScopes(userId.getAsLong(), workspaceId, environment);
+
+        return scopeNames.contains(scope);
     }
 
     private static boolean isAutomationAuthorizationSkipped() {

@@ -24,6 +24,7 @@ import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.WorkspaceApiKeyIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
@@ -139,6 +140,11 @@ class PermissionServiceIntTest {
         assertThat(permissionService.hasWorkspaceScope(1L, "WORKFLOW_VIEW")).isFalse();
         assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isFalse();
         assertThat(permissionService.hasWorkflowScope("workflow-1", "WORKFLOW_VIEW")).isFalse();
+        assertThat(permissionService.hasWorkflowScope("workflow-1", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+            .isFalse();
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow("workflow-1", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
         assertThat(permissionService.hasResourceRole(1L, "project", "ADMIN")).isFalse();
         assertThat(permissionService.isResourceOwner("project", 1L)).isFalse();
     }
@@ -154,6 +160,11 @@ class PermissionServiceIntTest {
     @Test
     void testGetMyWorkspaceScopesReturnsEmpty() {
         assertThat(permissionService.getMyWorkspaceScopes(1L)).isEmpty();
+    }
+
+    @Test
+    void testGetMyWorkspaceScopesForAnEnvironmentReturnsEmpty() {
+        assertThat(permissionService.getMyWorkspaceScopes(1L, Environment.PRODUCTION)).isEmpty();
     }
 
     @Test
