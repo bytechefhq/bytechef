@@ -32,6 +32,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
+import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -77,6 +78,9 @@ class McpToolGraphQlControllerIntTest {
 
     @Autowired
     private McpComponentService mcpComponentService;
+
+    @Autowired
+    private McpServerFacade mcpServerFacade;
 
     @Autowired
     private McpServerService mcpServerService;
@@ -205,7 +209,7 @@ class McpToolGraphQlControllerIntTest {
         Map<String, String> parameters = Map.of("param1", "value1", "param2", "value2");
         McpTool mockTool = createMockMcpTool(1L, "new-tool", parameters, 1L);
 
-        when(mcpToolService.create(any(McpTool.class))).thenReturn(mockTool);
+        when(mcpServerFacade.createMcpTool(any(McpTool.class))).thenReturn(mockTool);
 
         // When & Then
         this.graphQlTester
@@ -230,7 +234,7 @@ class McpToolGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("new-tool");
 
-        verify(mcpToolService).create(any(McpTool.class));
+        verify(mcpServerFacade).createMcpTool(any(McpTool.class));
     }
 
     @Test
@@ -238,7 +242,7 @@ class McpToolGraphQlControllerIntTest {
         // Given
         McpTool mockTool = createMockMcpTool(1L, "simple-tool", Map.of(), 2L);
 
-        when(mcpToolService.create(any(McpTool.class))).thenReturn(mockTool);
+        when(mcpServerFacade.createMcpTool(any(McpTool.class))).thenReturn(mockTool);
 
         // When & Then
         this.graphQlTester
@@ -262,7 +266,7 @@ class McpToolGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("simple-tool");
 
-        verify(mcpToolService).create(any(McpTool.class));
+        verify(mcpServerFacade).createMcpTool(any(McpTool.class));
     }
 
     @Test
@@ -270,7 +274,7 @@ class McpToolGraphQlControllerIntTest {
         McpTool mcpTool = createMockMcpTool(1L, "test-tool", Map.of("param1", "value1"), 1L);
 
         when(mcpToolService.fetchMcpTool(1L)).thenReturn(Optional.of(mcpTool));
-        when(mcpToolService.update(any(McpTool.class))).thenReturn(mcpTool);
+        when(mcpServerFacade.updateMcpTool(any(McpTool.class))).thenReturn(mcpTool);
 
         this.graphQlTester
             .document("""
@@ -285,7 +289,7 @@ class McpToolGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("1");
 
-        verify(mcpToolService).update(any(McpTool.class));
+        verify(mcpServerFacade).updateMcpTool(any(McpTool.class));
     }
 
     @Test
@@ -305,7 +309,7 @@ class McpToolGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(mcpToolService).delete(mcpTool);
+        verify(mcpServerFacade).deleteMcpTool(mcpTool);
     }
 
     @Test
@@ -405,7 +409,7 @@ class McpToolGraphQlControllerIntTest {
                 }
                 """);
 
-            verify(mcpToolService, never()).create(any(McpTool.class));
+            verify(mcpServerFacade, never()).createMcpTool(any(McpTool.class));
         }
 
         @Test
@@ -442,7 +446,7 @@ class McpToolGraphQlControllerIntTest {
                 }
                 """);
 
-            verify(mcpToolService, never()).delete(any(McpTool.class));
+            verify(mcpServerFacade, never()).deleteMcpTool(any(McpTool.class));
         }
 
         private void assertRejected(String document) {

@@ -18,6 +18,7 @@ public final class ConnectedUserMcpServerAuditEvents {
     public static final String CONNECTED_USER_MCP_SERVER_ENABLED_UPDATED =
         "CONNECTED_USER_MCP_SERVER_ENABLED_UPDATED";
     public static final String CONNECTED_USER_MCP_SERVER_PROVISIONED = "CONNECTED_USER_MCP_SERVER_PROVISIONED";
+    public static final String CONNECTED_USER_MCP_TOOL_ENABLED_UPDATED = "CONNECTED_USER_MCP_TOOL_ENABLED_UPDATED";
 
     private ConnectedUserMcpServerAuditEvents() {
     }

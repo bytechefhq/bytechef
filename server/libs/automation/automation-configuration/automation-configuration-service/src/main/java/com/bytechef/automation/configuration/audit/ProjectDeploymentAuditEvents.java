@@ -26,6 +26,7 @@ public final class ProjectDeploymentAuditEvents {
     public static final String DEPLOYMENT_ENABLED_UPDATED = "DEPLOYMENT_ENABLED_UPDATED";
     public static final String DEPLOYMENT_UPDATED = "DEPLOYMENT_UPDATED";
     public static final String DEPLOYMENT_WORKFLOW_ENABLED_UPDATED = "DEPLOYMENT_WORKFLOW_ENABLED_UPDATED";
+    public static final String DEPLOYMENT_WORKFLOW_RUN = "DEPLOYMENT_WORKFLOW_RUN";
 
     private ProjectDeploymentAuditEvents() {
     }

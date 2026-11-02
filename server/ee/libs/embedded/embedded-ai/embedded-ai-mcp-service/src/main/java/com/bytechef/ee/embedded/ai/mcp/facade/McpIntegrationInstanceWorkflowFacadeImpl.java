@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
+import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
@@ -14,6 +15,8 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationIns
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +52,11 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
     }
 
     @Override
+    @Audited(event = McpIntegrationInstanceAuditEvents.MCP_INTEGRATION_INSTANCE_WORKFLOW_ENABLED_UPDATED, data = {
+        @AuditData(key = "integrationInstanceId", value = "#integrationInstanceId"),
+        @AuditData(key = "workflowUuid", value = "#workflowUuid"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("isTenantAdmin() or isConnectedUser()")
     public void enableMcpIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowUuid, boolean enable) {

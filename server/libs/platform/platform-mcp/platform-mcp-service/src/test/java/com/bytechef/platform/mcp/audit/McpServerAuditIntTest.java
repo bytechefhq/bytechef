@@ -34,12 +34,15 @@ import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.mcp.config.PlatformMcpIntTestConfiguration;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.facade.McpServerFacadeImpl;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.platform.mcp.service.McpServerService;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -86,6 +89,9 @@ class McpServerAuditIntTest {
     private McpServerService mcpServerService;
 
     @Autowired
+    private McpToolRepository mcpToolRepository;
+
+    @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     @BeforeEach
@@ -103,6 +109,7 @@ class McpServerAuditIntTest {
     void afterEach() {
         SecurityContextHolder.clearContext();
 
+        mcpToolRepository.deleteAll();
         mcpComponentRepository.deleteAll();
         mcpServerRepository.deleteAll();
         persistenceAuditEventRepository.deleteAll();
@@ -386,6 +393,86 @@ class McpServerAuditIntTest {
             .containsEntry("result", "ERROR")
             .containsEntry("errorClass", NoSuchElementException.class.getName())
             .containsEntry("mcpComponentId", String.valueOf(Long.MAX_VALUE));
+    }
+
+    @Test
+    void testCreateToolRecordsTheToolAndThePlatformOfItsServer() {
+        McpComponent mcpComponent = saveMcpComponent(PlatformType.EMBEDDED);
+
+        McpTool mcpTool = mcpServerFacade.createMcpTool(
+            new McpTool("slack_send_message", Map.of(), mcpComponent.getId()));
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpToolAuditEvents.MCP_TOOL_CREATED);
+
+        assertThat(persistentAuditEvent.getPrincipal()).isEqualTo(ADMIN_LOGIN);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("mcpToolId", String.valueOf(mcpTool.getId()))
+            .containsEntry("mcpComponentId", String.valueOf(mcpComponent.getId()))
+            .containsEntry("mcpServerId", String.valueOf(mcpComponent.getMcpServerId()))
+            .containsEntry("name", "slack_send_message")
+            .doesNotContainKeys("dataError", "mapperError", "captureError");
+    }
+
+    @Test
+    void testUpdateToolRecordsTheToolAndThePlatformOfItsServer() {
+        McpComponent mcpComponent = saveMcpComponent(PlatformType.AUTOMATION);
+
+        McpTool mcpTool = mcpServerFacade.createMcpTool(
+            new McpTool("slack_send_message", Map.of(), mcpComponent.getId()));
+
+        persistenceAuditEventRepository.deleteAll();
+
+        mcpTool.setParameters(Map.of("channel", "general"));
+
+        mcpServerFacade.updateMcpTool(mcpTool);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpToolAuditEvents.MCP_TOOL_UPDATED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("mcpToolId", String.valueOf(mcpTool.getId()))
+            .containsEntry("mcpComponentId", String.valueOf(mcpComponent.getId()))
+            .containsEntry("mcpServerId", String.valueOf(mcpComponent.getMcpServerId()))
+            .containsEntry("name", "slack_send_message")
+            .doesNotContainValue("general")
+            .doesNotContainKeys("dataError", "mapperError", "captureError");
+    }
+
+    @Test
+    void testDeleteToolRecordsTheToolAndThePlatformOfItsServer() {
+        McpComponent mcpComponent = saveMcpComponent(PlatformType.EMBEDDED);
+
+        McpTool mcpTool = mcpServerFacade.createMcpTool(
+            new McpTool("slack_send_message", Map.of(), mcpComponent.getId()));
+
+        persistenceAuditEventRepository.deleteAll();
+
+        mcpServerFacade.deleteMcpTool(mcpTool);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(McpToolAuditEvents.MCP_TOOL_DELETED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("mcpToolId", String.valueOf(mcpTool.getId()))
+            .containsEntry("mcpComponentId", String.valueOf(mcpComponent.getId()))
+            .containsEntry("mcpServerId", String.valueOf(mcpComponent.getMcpServerId()))
+            .containsEntry("name", "slack_send_message")
+            .doesNotContainKeys("dataError", "mapperError", "captureError");
+    }
+
+    private McpComponent saveMcpComponent(PlatformType platformType) {
+        McpServer mcpServer = saveMcpServer(platformType);
+
+        McpComponent mcpComponent = mcpComponentRepository.save(
+            new McpComponent("slack", 1, mcpServer.getId(), null));
+
+        persistenceAuditEventRepository.deleteAll();
+
+        return mcpComponent;
     }
 
     private PersistentAuditEvent findSingleEvent(String eventType) {

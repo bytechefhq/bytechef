@@ -208,6 +208,11 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_RUN, data = {
+        @AuditData(key = "integrationInstanceConfigurationId", value = "#id"),
+        @AuditData(key = "workflowId", value = "#workflowId"),
+        @AuditData(key = "jobId", value = "#result")
+    })
     @Transactional(propagation = Propagation.NEVER)
     @PreAuthorize("isTenantAdmin()")
     public long createIntegrationInstanceConfigurationWorkflowJob(Long id, String workflowId) {

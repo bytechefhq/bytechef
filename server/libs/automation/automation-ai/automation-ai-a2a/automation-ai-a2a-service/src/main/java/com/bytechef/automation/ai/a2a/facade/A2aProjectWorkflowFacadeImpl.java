@@ -16,8 +16,11 @@
 
 package com.bytechef.automation.ai.a2a.facade;
 
+import com.bytechef.automation.ai.a2a.audit.A2aAuditEvents;
 import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
 import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
@@ -47,6 +50,11 @@ public class A2aProjectWorkflowFacadeImpl implements A2aProjectWorkflowFacade {
     }
 
     @Override
+    @Audited(event = A2aAuditEvents.A2A_PROJECT_WORKFLOW_ENABLED_UPDATED, data = {
+        @AuditData(key = "a2aProjectWorkflowId", value = "#a2aProjectWorkflowId"),
+        @AuditData(key = "a2aProjectId", value = "#result?.a2aProjectId"),
+        @AuditData(key = "enabled", value = "#enabled")
+    })
     @PreAuthorize("hasPermission(#a2aProjectWorkflowId, 'A2aProjectWorkflow', 'A2A_EDIT')")
     public A2aProjectWorkflow updateA2aProjectWorkflowEnabled(long a2aProjectWorkflowId, boolean enabled) {
         return a2aProjectWorkflowService.updateEnabled(a2aProjectWorkflowId, enabled);
