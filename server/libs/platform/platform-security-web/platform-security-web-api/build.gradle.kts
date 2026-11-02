@@ -9,6 +9,7 @@ configurations.testFixturesImplementation {
 dependencies {
     api(libs.org.springaicommunity.mcp.server.security)
     api("org.springframework.security:spring-security-config")
+    api("org.springframework.security:spring-security-oauth2-jose")
     api("org.springframework.security:spring-security-web")
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 

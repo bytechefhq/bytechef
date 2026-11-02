@@ -37,6 +37,7 @@ import com.bytechef.platform.security.web.config.McpResourceServerProperties.Iss
 import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
+import com.bytechef.platform.security.web.mcp.SelfIssuedJwtDecoder;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -153,10 +154,12 @@ public class ManagementMcpOAuth2ResourceServerIntTestConfiguration {
     McpOAuth2ResourceServerSecurityConfigurerContributor mcpOAuth2ResourceServerSecurityConfigurerContributor(
         ObjectProvider<McpEndpoint> mcpEndpointProvider,
         ObjectProvider<McpJwtDecoderFactory> mcpJwtDecoderFactoryProvider,
+        ObjectProvider<SelfIssuedJwtDecoder> selfIssuedJwtDecoderProvider,
         McpResourceServerProperties mcpResourceServerProperties) {
 
         return new McpOAuth2ResourceServerSecurityConfigurerContributor(
-            mcpEndpointProvider, mcpJwtDecoderFactoryProvider, mcpResourceServerProperties,
+            mcpEndpointProvider, mcpJwtDecoderFactoryProvider, selfIssuedJwtDecoderProvider,
+            mcpResourceServerProperties,
             new ApplicationProperties());
     }
 
