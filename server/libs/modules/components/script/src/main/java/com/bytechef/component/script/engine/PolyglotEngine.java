@@ -82,7 +82,6 @@ public class PolyglotEngine {
                 case "js" -> "function perform(input, context) {\n\treturn null;\n}";
                 case "python" -> "def perform(input, context):\n\treturn null";
                 case "R" -> "perform <- function(input, context) {\n\treturn null\n}";
-                case "ruby" -> "def perform(input, context)\n\treturn null;\nend";
                 default -> throw new IllegalArgumentException("languageId: %s does not exist".formatted(languageId));
             }));
 

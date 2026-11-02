@@ -8,7 +8,6 @@ There is NO event loop, NO browser APIs, and NO Node.js APIs available.
 The main function is `perform(input, context)` and must use this exact signature:
 - JavaScript: `function perform(input, context) { ... }`
 - Python: `def perform(input, context):`
-- Ruby: `def perform(input, context) ... end`
 
 The function MUST always return a value. It MUST be synchronous (not async).
 
@@ -36,7 +35,6 @@ Only standard language features from the respective language specifications are 
   template literals, Array/Object/String/Math/JSON/Date built-ins, regular expressions,
   Map, Set, Symbol, Proxy, Reflect, WeakMap, WeakSet, iterators, generators, Intl.
 - Python: Standard Python language features, built-in functions, data structures.
-- Ruby: Standard Ruby language features, built-in classes and methods.
 
 ## NOT Available (all languages)
 
@@ -60,8 +58,6 @@ Use the `httpClient` component instead of fetch/XMLHttpRequest:
   `var response = context.component.httpClient.get({uri: 'https://api.example.com/data'});`
 - Python:
   `response = context.component.httpClient.get({"uri": "https://api.example.com/data"})`
-- Ruby:
-  `response = context.component.httpClient.get({"uri" => "https://api.example.com/data"})`
 
 Available HTTP methods: `get`, `post`, `put`, `patch`, `delete`, `head`.
 Common parameters: `uri` (required), `headers` (object with array values),

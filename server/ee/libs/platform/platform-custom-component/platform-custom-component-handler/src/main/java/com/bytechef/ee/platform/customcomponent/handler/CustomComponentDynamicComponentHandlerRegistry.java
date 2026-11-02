@@ -22,8 +22,11 @@ import com.bytechef.platform.component.definition.ComponentHandlerWrapper;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +38,8 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnEEVersion
 public class CustomComponentDynamicComponentHandlerRegistry implements DynamicComponentHandlerRegistry {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomComponentDynamicComponentHandlerRegistry.class);
 
     private final CacheManager cacheManager;
     private final CustomComponentFileStorage customComponentFileStorage;
@@ -52,11 +57,23 @@ public class CustomComponentDynamicComponentHandlerRegistry implements DynamicCo
 
     @Override
     public List<? extends ComponentHandler> getComponentHandlers() {
-        return customComponentService.getCustomComponents()
-            .stream()
-            .filter(CustomComponent::isEnabled)
-            .map(customComponent -> loadComponentHandler(customComponent, customComponent.getComponentVersion()))
-            .toList();
+        List<ComponentHandler> componentHandlers = new ArrayList<>();
+
+        for (CustomComponent customComponent : customComponentService.getCustomComponents()) {
+            if (!customComponent.isEnabled()) {
+                continue;
+            }
+
+            try {
+                componentHandlers.add(loadComponentHandler(customComponent, customComponent.getComponentVersion()));
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Skipping custom component {} (version {}), could not load it", customComponent.getName(),
+                    customComponent.getComponentVersion(), exception);
+            }
+        }
+
+        return componentHandlers;
     }
 
     @Override
