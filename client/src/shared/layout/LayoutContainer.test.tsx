@@ -96,6 +96,36 @@ describe('LayoutContainer', () => {
         expect(screen.queryByRole('button', {name: 'Toggle sidebar'})).not.toBeInTheDocument();
     });
 
+    // A page hides its sidebar while it loads, so revealing it afterwards must not slide the content over.
+    it('reveals a hidden left sidebar without animating the content padding', () => {
+        const renderLoadingPage = (leftSidebarHidden: boolean) => (
+            <TooltipProvider>
+                <LayoutContainer
+                    header={<Header position="main" title="Projects" />}
+                    leftSidebarBody={<div>Categories</div>}
+                    leftSidebarHidden={leftSidebarHidden}
+                >
+                    <div>Content</div>
+                </LayoutContainer>
+            </TooltipProvider>
+        );
+
+        const {rerender} = render(renderLoadingPage(true));
+
+        rerender(renderLoadingPage(false));
+
+        const contentContainer = screen.getByText('Content').closest('.size-full.overflow-auto > div');
+
+        expect(contentContainer).toHaveClass('lg:pl-64');
+        expect(contentContainer).not.toHaveClass('transition-[padding]');
+
+        act(() => {
+            vi.advanceTimersByTime(50);
+        });
+
+        expect(contentContainer).toHaveClass('transition-[padding]');
+    });
+
     // With the sidebar hidden, the main header carries the page title the sidebar header would have shown.
     it('styles the main header title like the sidebar header while the sidebar is hidden', () => {
         render(
