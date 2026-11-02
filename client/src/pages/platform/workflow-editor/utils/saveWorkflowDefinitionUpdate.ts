@@ -3,6 +3,7 @@ import {UpdateWorkflowMutationType, WorkflowDefinitionType} from '@/shared/types
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {drainPendingSaves, enqueuePendingSave, isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface SaveWorkflowDefinitionUpdateProps {
@@ -13,6 +14,10 @@ interface SaveWorkflowDefinitionUpdateProps {
 }
 
 export default function saveWorkflowDefinitionUpdate(props: SaveWorkflowDefinitionUpdateProps): void {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const {onError, onSuccess, updateDefinition, updateWorkflowMutation} = props;
 
     const {workflow} = useWorkflowDataStore.getState();

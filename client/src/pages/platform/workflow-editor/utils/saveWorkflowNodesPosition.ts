@@ -4,6 +4,7 @@ import {Node} from '@xyflow/react';
 
 import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowDataStore';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {
     consumePendingDefinition,
     drainPendingSaves,
@@ -195,6 +196,10 @@ export default function saveWorkflowNodesPosition({
     nodePositions,
     updateWorkflowMutation,
 }: SaveWorkflowNodesPositionProps) {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const {workflow} = useWorkflowDataStore.getState();
 
     if (!workflow.definition) {

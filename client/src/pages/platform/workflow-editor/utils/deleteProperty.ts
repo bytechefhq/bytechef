@@ -12,6 +12,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import {decodePath} from './encodingUtils';
 import {getPropertySaveOverride} from './propertySaveOverrides';
 import {resolveMainClusterRootName} from './resolveClusterRootId';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {enqueueWorkflowMutation} from './workflowMutationQueue';
 
 export default function deleteProperty(
@@ -30,6 +31,10 @@ export default function deleteProperty(
         unknown
     >
 ) {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const currentNode = useWorkflowNodeDetailsPanelStore.getState().currentNode;
     const rootClusterElementNodeData = useWorkflowEditorStore.getState().rootClusterElementNodeData;
     const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
