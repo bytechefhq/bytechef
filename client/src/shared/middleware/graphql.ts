@@ -2373,7 +2373,7 @@ export type ToolInvocationLogsQueryVariables = Exact<{
 }>;
 
 
-export type ToolInvocationLogsQuery = { toolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+export type ToolInvocationLogsQuery = { toolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
 
 export type WorkspaceToolInvocationLogsQueryVariables = Exact<{
   type: Types.PlatformType;
@@ -2390,7 +2390,7 @@ export type WorkspaceToolInvocationLogsQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceToolInvocationLogsQuery = { workspaceToolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+export type WorkspaceToolInvocationLogsQuery = { workspaceToolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
 
 
 export class TypedDocumentString<TResult, TVariables>
@@ -11264,6 +11264,7 @@ export const ToolInvocationLogsDocument = new TypedDocumentString(`
       integrationInstanceId
       mcpServerId
       jobId
+      workflowName
       outcome
       errorType
       errorMessage
@@ -11324,6 +11325,7 @@ export const WorkspaceToolInvocationLogsDocument = new TypedDocumentString(`
       integrationInstanceId
       mcpServerId
       jobId
+      workflowName
       outcome
       errorType
       errorMessage

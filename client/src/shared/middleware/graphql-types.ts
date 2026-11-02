@@ -4499,6 +4499,7 @@ export type ToolInvocationLogType = {
   outcome: Scalars['String']['output'];
   surface: Scalars['String']['output'];
   toolName?: Maybe<Scalars['String']['output']>;
+  workflowName?: Maybe<Scalars['String']['output']>;
   workspaceId?: Maybe<Scalars['Long']['output']>;
 };
 
