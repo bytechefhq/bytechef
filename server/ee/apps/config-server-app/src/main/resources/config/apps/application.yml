@@ -150,6 +150,23 @@ spring:
 
 bytechef:
   ai:
+    agent-utils:
+      # Hosts the web fetch and A2A agent tools may reach although they resolve to a private or loopback address
+      allowed-private-hosts: []
+      shell:
+        # Allow Shell Tools elements to run commands directly on the server instead of in a Docker container. Local
+        # commands are not confined to the agent workspace; allow only on trusted single-tenant installations
+        allow-local: false
+        docker:
+          # Docker-compatible CLI on the server's PATH (docker | podman)
+          command: docker
+          # How long an agent's container may stay unused before it is removed
+          idle-timeout: 10m
+          # Container image for shell commands; must provide /bin/bash and sleep
+          image: debian:bookworm-slim
+        enabled: false
+      workspace:
+        basedir: ${user.home}/bytechef/data/ai-agent-workspaces
     copilot:
       enabled: false
       # Default LLM provider of the Copilot when the user has not selected one; empty uses the catalog default

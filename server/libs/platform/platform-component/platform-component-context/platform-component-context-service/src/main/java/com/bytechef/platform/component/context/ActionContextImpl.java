@@ -46,8 +46,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -55,8 +53,6 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Ivica Cardic
  */
 class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
-
-    private static final Logger log = LoggerFactory.getLogger(ActionContextImpl.class);
 
     private final String actionName;
     private @Nullable Approval approval;

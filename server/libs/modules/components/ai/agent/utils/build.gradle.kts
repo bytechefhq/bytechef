@@ -1,5 +1,7 @@
 dependencies {
     implementation(libs.org.springaicommunity.spring.ai.agent.utils)
+    implementation(libs.org.springaicommunity.spring.ai.agent.utils.docker.cli)
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))

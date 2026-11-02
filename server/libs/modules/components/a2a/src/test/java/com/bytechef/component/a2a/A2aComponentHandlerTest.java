@@ -16,6 +16,7 @@
 
 package com.bytechef.component.a2a;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +27,7 @@ class A2aComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/a2a_v1.json", new A2aComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/a2a_v1.json", new A2aComponentHandler(new ApplicationProperties()).getDefinition());
     }
 }

@@ -42,21 +42,26 @@ import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSmartWebFetchTo
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSubagentTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTaskTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTodoWriteTool;
+import com.bytechef.component.ai.agent.utils.cluster.exec.DockerExecBackendRegistry;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,25 +77,30 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
     private final ComponentDefinition componentDefinition;
 
     public AiAgentUtilsComponentHandler(
-        AiAgentToolFacade aiAgentToolFacade, AiSkillFacade aiSkillFacade,
+        AiAgentToolFacade aiAgentToolFacade, AiSkillFacade aiSkillFacade, ApplicationProperties applicationProperties,
         List<AiAgentUtilsClusterElementContributor> clusterElementContributors,
         ClusterElementDefinitionService clusterElementDefinitionService, AiAutoMemoryService aiAutoMemoryService,
         ProjectDeploymentService projectDeploymentService, ProjectService projectService) {
 
+        ApplicationProperties.Ai.AgentUtils agentUtils = applicationProperties.getAi()
+            .getAgentUtils();
+
+        Set<String> allowedPrivateHosts = getAllowedPrivateHosts(agentUtils);
+        AgentWorkspaceResolver agentWorkspaceResolver = createAgentWorkspaceResolver(agentUtils);
+
         AiAgentUtilsAutoMemoryTool agentUtilsAutoMemoryTool = new AiAgentUtilsAutoMemoryTool(
             aiAutoMemoryService, projectDeploymentService, projectService);
         AiAgentUtilsSmartWebFetchTool agentUtilsSmartWebFetchTool = new AiAgentUtilsSmartWebFetchTool(
-            clusterElementDefinitionService);
+            clusterElementDefinitionService, allowedPrivateHosts);
         AiAgentUtilsTaskTool agentUtilsTaskTool = new AiAgentUtilsTaskTool(
             aiAgentToolFacade, clusterElementDefinitionService);
 
         List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(
             AiAgentUtilsAskUserQuestionTool.CLUSTER_ELEMENT_DEFINITION,
-            AiAgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
-            AiAgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
-            AiAgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
-            AiAgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
-            AiAgentUtilsListDirectoryTool.CLUSTER_ELEMENT_DEFINITION,
+            new AiAgentUtilsFileSystemTools(agentWorkspaceResolver).clusterElementDefinition,
+            new AiAgentUtilsGrepTool(agentWorkspaceResolver).clusterElementDefinition,
+            new AiAgentUtilsGlobTool(agentWorkspaceResolver).clusterElementDefinition,
+            new AiAgentUtilsListDirectoryTool(agentWorkspaceResolver).clusterElementDefinition,
             agentUtilsSmartWebFetchTool.clusterElementDefinition,
             AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
             agentUtilsAutoMemoryTool.clusterElementDefinition,
@@ -102,6 +112,15 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             tool(AiAgentUtilsDeleteAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsRemoveFileFromAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsUpdateAiSkillAction.of(aiSkillFacade))));
+
+        ApplicationProperties.Ai.AgentUtils.Shell shell = agentUtils.getShell();
+
+        if (shell.isEnabled()) {
+            clusterElements.add(
+                new AiAgentUtilsShellTools(
+                    agentWorkspaceResolver, createDockerExecBackendRegistry(shell.getDocker()),
+                    shell.isAllowLocal()).clusterElementDefinition);
+        }
 
         for (AiAgentUtilsClusterElementContributor clusterElementContributor : clusterElementContributors) {
             clusterElements.add(clusterElementContributor.getClusterElementDefinition());
@@ -128,6 +147,34 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
     @Override
     public ComponentDefinition getDefinition() {
         return componentDefinition;
+    }
+
+    private static AgentWorkspaceResolver createAgentWorkspaceResolver(ApplicationProperties.Ai.AgentUtils agentUtils) {
+        ApplicationProperties.Ai.AgentUtils.Workspace workspace = agentUtils.getWorkspace();
+
+        String basedir = workspace.getBasedir();
+
+        if (basedir == null || basedir.isBlank()) {
+            return new AgentWorkspaceResolver(null);
+        }
+
+        return new AgentWorkspaceResolver(Path.of(basedir));
+    }
+
+    private static DockerExecBackendRegistry createDockerExecBackendRegistry(
+        ApplicationProperties.Ai.AgentUtils.Shell.Docker docker) {
+
+        return new DockerExecBackendRegistry(docker.getCommand(), docker.getImage(), docker.getIdleTimeout());
+    }
+
+    private static Set<String> getAllowedPrivateHosts(ApplicationProperties.Ai.AgentUtils agentUtils) {
+        List<String> allowedPrivateHosts = agentUtils.getAllowedPrivateHosts();
+
+        if (allowedPrivateHosts == null) {
+            return Set.of();
+        }
+
+        return Set.copyOf(allowedPrivateHosts);
     }
 
     private static Map<String, List<String>> buildActionClusterElementTypes(List<ActionDefinition> actions) {

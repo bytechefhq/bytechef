@@ -11,7 +11,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "The URL of the remote A2A agent - for a ByteChef A2A Server, the endpoint URL from the server's Connect tab. The agent card is read from <Agent URL>/.well-known/agent-card.json.",
+      "description": "The URL of the remote A2A agent - for a ByteChef A2A Server, the endpoint URL from the server's Connect tab. The agent card is read from <Agent URL>/.well-known/agent-card.json. Private and loopback addresses are not allowed.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,

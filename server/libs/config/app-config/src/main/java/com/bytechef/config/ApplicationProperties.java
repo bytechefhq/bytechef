@@ -788,6 +788,7 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
+        private AgentUtils agentUtils = new AgentUtils();
         private AutoMemory autoMemory = new AutoMemory();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
@@ -797,6 +798,10 @@ public class ApplicationProperties {
         private Memory memory = new Memory();
         private Provider provider = new Provider();
         private Vectorstore vectorstore = new Vectorstore();
+
+        public AgentUtils getAgentUtils() {
+            return agentUtils;
+        }
 
         public AutoMemory getAutoMemory() {
             return autoMemory;
@@ -834,6 +839,10 @@ public class ApplicationProperties {
             return vectorstore;
         }
 
+        public void setAgentUtils(AgentUtils agentUtils) {
+            this.agentUtils = agentUtils;
+        }
+
         public void setAutoMemory(AutoMemory autoMemory) {
             this.autoMemory = autoMemory;
         }
@@ -868,6 +877,150 @@ public class ApplicationProperties {
 
         public void setVectorstore(Vectorstore vectorstore) {
             this.vectorstore = vectorstore;
+        }
+
+        /**
+         * AI Agent Utils tools configuration. Isolates the file and shell tools of each agent in its own workspace.
+         */
+        public static class AgentUtils {
+
+            /**
+             * Hosts the web fetch and A2A agent tools may reach even though they resolve to a private or loopback
+             * address.
+             */
+            private List<String> allowedPrivateHosts;
+
+            private Shell shell = new Shell();
+            private Workspace workspace = new Workspace();
+
+            public List<String> getAllowedPrivateHosts() {
+                return allowedPrivateHosts;
+            }
+
+            public Shell getShell() {
+                return shell;
+            }
+
+            public Workspace getWorkspace() {
+                return workspace;
+            }
+
+            public void setAllowedPrivateHosts(List<String> allowedPrivateHosts) {
+                this.allowedPrivateHosts = allowedPrivateHosts;
+            }
+
+            public void setShell(Shell shell) {
+                this.shell = shell;
+            }
+
+            public void setWorkspace(Workspace workspace) {
+                this.workspace = workspace;
+            }
+
+            /**
+             * Shell Tools configuration. The tool is only offered when explicitly enabled; its commands run in a Docker
+             * container unless running them on the server is allowed.
+             */
+            public static class Shell {
+
+                /**
+                 * Whether a Shell Tools element may run commands directly on the server instead of in a Docker
+                 * container
+                 */
+                private boolean allowLocal;
+
+                private Docker docker = new Docker();
+                private boolean enabled;
+
+                public Docker getDocker() {
+                    return docker;
+                }
+
+                public boolean isAllowLocal() {
+                    return allowLocal;
+                }
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setAllowLocal(boolean allowLocal) {
+                    this.allowLocal = allowLocal;
+                }
+
+                public void setDocker(Docker docker) {
+                    this.docker = docker;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                /**
+                 * Docker sandbox for shell commands. Each agent workspace gets its own container with the workspace
+                 * bind-mounted at the same path.
+                 */
+                public static class Docker {
+
+                    /**
+                     * Docker-compatible CLI used to manage the containers, e.g. docker or podman
+                     */
+                    private String command;
+
+                    /**
+                     * How long a container may stay unused before it is removed
+                     */
+                    private Duration idleTimeout;
+
+                    /**
+                     * Container image; it must provide /bin/bash and sleep
+                     */
+                    private String image;
+
+                    public String getCommand() {
+                        return command;
+                    }
+
+                    public Duration getIdleTimeout() {
+                        return idleTimeout;
+                    }
+
+                    public String getImage() {
+                        return image;
+                    }
+
+                    public void setCommand(String command) {
+                        this.command = command;
+                    }
+
+                    public void setIdleTimeout(Duration idleTimeout) {
+                        this.idleTimeout = idleTimeout;
+                    }
+
+                    public void setImage(String image) {
+                        this.image = image;
+                    }
+                }
+            }
+
+            /**
+             * Agent workspace configuration.
+             */
+            public static class Workspace {
+
+                /**
+                 * Base directory under which each tenant's agents get their own workspace directory
+                 */
+                private String basedir;
+
+                public String getBasedir() {
+                    return basedir;
+                }
+
+                public void setBasedir(String basedir) {
+                    this.basedir = basedir;
+                }
+            }
         }
 
         public static class AutoMemory {
