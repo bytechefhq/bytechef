@@ -45,7 +45,8 @@ class TaskDispatcherProtoMapperTest {
     @Test
     void testTaskDispatcherDefinitionsRoundTrip() {
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories = List.of(
-            new BranchTaskDispatcherDefinitionFactory(), new ConditionTaskDispatcherDefinitionFactory(),
+            new BranchTaskDispatcherDefinitionFactory(Optional.empty()),
+            new ConditionTaskDispatcherDefinitionFactory(Optional.empty()),
             new EachTaskDispatcherDefinitionFactory(), new LoopBreakTaskDispatcherDefinitionFactory(),
             new LoopTaskDispatcherDefinitionFactory(), new MapTaskDispatcherDefinitionFactory(Optional.empty()),
             new ParallelTaskDispatcherDefinitionFactory());
@@ -74,9 +75,8 @@ class TaskDispatcherProtoMapperTest {
                 .description("Probe dispatcher")
                 .properties(
                     fileEntry("file"),
-                    dynamicProperties("fields")
-                        .propertiesLookupDependsOn("file")
-                        .properties(inputParameters -> List.of())));
+                    dynamicProperties("fields", inputParameters -> List.of())
+                        .propertiesLookupDependsOn("file")));
 
         assertThat(
             taskDispatcherProtoMapper
