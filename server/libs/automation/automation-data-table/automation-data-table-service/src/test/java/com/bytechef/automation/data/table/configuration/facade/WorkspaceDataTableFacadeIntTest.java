@@ -250,7 +250,8 @@ class WorkspaceDataTableFacadeIntTest {
 
         workspaceDataTableFacade.createTable("copy", null, COLUMN_SPECS, SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
-        Map<Long, List<Tag>> tagsByTableId = workspaceDataTableFacade.getTagsByTableId(WORKSPACE_ID);
+        Map<Long, List<Tag>> tagsByTableId = workspaceDataTableFacade.getTagsByTableId(
+            WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
         assertThat(tagsByTableId).containsOnlyKeys(eventsDataTableId, originalDataTableId);
     }

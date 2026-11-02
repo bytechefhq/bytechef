@@ -43,13 +43,15 @@ public class KnowledgeBaseTagGraphQlController {
     }
 
     @QueryMapping
-    public List<Tag> knowledgeBaseTags(@Argument long workspaceId) {
-        return workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTags(workspaceId);
+    public List<Tag> knowledgeBaseTags(@Argument long environmentId, @Argument long workspaceId) {
+        return workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTags(workspaceId, environmentId);
     }
 
     @QueryMapping
-    public List<KnowledgeBaseTagsEntry> knowledgeBaseTagsByKnowledgeBase(@Argument long workspaceId) {
-        return workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(workspaceId)
+    public List<KnowledgeBaseTagsEntry> knowledgeBaseTagsByKnowledgeBase(
+        @Argument long environmentId, @Argument long workspaceId) {
+
+        return workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(workspaceId, environmentId)
             .entrySet()
             .stream()
             .map(entry -> new KnowledgeBaseTagsEntry(entry.getKey(), entry.getValue()))

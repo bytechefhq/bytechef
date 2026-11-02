@@ -37,6 +37,7 @@ public class DataTableWebhookGraphQlController {
     private final EnvironmentService environmentService;
     private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
+    @SuppressFBWarnings("EI")
     public DataTableWebhookGraphQlController(
         EnvironmentService environmentService, WorkspaceDataTableFacade workspaceDataTableFacade) {
 

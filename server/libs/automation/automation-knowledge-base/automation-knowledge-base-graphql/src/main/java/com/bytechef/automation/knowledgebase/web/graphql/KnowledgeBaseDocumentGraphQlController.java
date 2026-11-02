@@ -54,7 +54,7 @@ class KnowledgeBaseDocumentGraphQlController {
     }
 
     @QueryMapping
-    List<KnowledgeBaseDocumentChunk> knowledgeBaseDocumentChunks(@Argument Long id) {
+    public List<KnowledgeBaseDocumentChunk> knowledgeBaseDocumentChunks(@Argument Long id) {
         return workspaceKnowledgeBaseDocumentFacade.getKnowledgeBaseDocumentChunks(id);
     }
 
@@ -70,17 +70,17 @@ class KnowledgeBaseDocumentGraphQlController {
     }
 
     @QueryMapping
-    KnowledgeBaseDocument knowledgeBaseDocument(@Argument Long id) {
+    public KnowledgeBaseDocument knowledgeBaseDocument(@Argument Long id) {
         return workspaceKnowledgeBaseDocumentFacade.getKnowledgeBaseDocument(id);
     }
 
     @QueryMapping
-    DocumentStatusUpdate knowledgeBaseDocumentStatus(@Argument Long id) {
+    public DocumentStatusUpdate knowledgeBaseDocumentStatus(@Argument Long id) {
         return workspaceKnowledgeBaseDocumentFacade.getKnowledgeBaseDocumentStatus(id);
     }
 
     @MutationMapping
-    boolean deleteKnowledgeBaseDocument(@Argument Long id) {
+    public boolean deleteKnowledgeBaseDocument(@Argument Long id) {
         workspaceKnowledgeBaseDocumentFacade.deleteKnowledgeBaseDocument(id);
 
         return true;

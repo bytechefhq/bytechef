@@ -56,7 +56,7 @@ class KnowledgeBaseDocumentChunkGraphQlController {
     }
 
     @MutationMapping
-    KnowledgeBaseDocumentChunk updateKnowledgeBaseDocumentChunk(
+    public KnowledgeBaseDocumentChunk updateKnowledgeBaseDocumentChunk(
         @Argument Long id,
         @Argument("knowledgeBaseDocumentChunk") KnowledgeBaseDocumentChunkInput knowledgeBaseDocumentChunk) {
 
@@ -65,7 +65,7 @@ class KnowledgeBaseDocumentChunkGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteKnowledgeBaseDocumentChunk(@Argument Long id) {
+    public boolean deleteKnowledgeBaseDocumentChunk(@Argument Long id) {
         workspaceKnowledgeBaseDocumentFacade.deleteKnowledgeBaseDocumentChunk(id);
 
         return true;

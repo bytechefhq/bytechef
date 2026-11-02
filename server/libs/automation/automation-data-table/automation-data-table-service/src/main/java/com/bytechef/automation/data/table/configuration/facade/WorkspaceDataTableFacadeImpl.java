@@ -30,39 +30,18 @@ import com.bytechef.platform.data.table.configuration.service.DataTableTagServic
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
-import com.bytechef.platform.data.table.domain.ColumnType;
-import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
-import com.bytechef.platform.data.table.domain.LinkSpec;
-import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
-import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
-import com.bytechef.platform.data.table.execution.domain.NewRow;
-import com.bytechef.platform.data.table.execution.domain.UpsertResult;
-import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
-import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.jspecify.annotations.Nullable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,68 +53,67 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
 
-    private static final int DEFAULT_LINK_OPTIONS_LIMIT = 20;
-    private static final int MAX_LINK_OPTIONS_LIMIT = 100;
-    private static final Pattern ROW_ID_SEARCH_PATTERN = Pattern.compile("#?(\\d{1,18})");
-
-    private final DataTableRowFacade dataTableRowFacade;
     private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
-    private final DataTableStorageService dataTableStorageService;
     private final DataTableTagService dataTableTagService;
     private final DataTableWebhookService dataTableWebhookService;
-    private final TagService tagService;
+    private final WorkspaceDataTableService workspaceDataTableService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceDataTableFacadeImpl(
-        DataTableRowFacade dataTableRowFacade, DataTableRowService dataTableRowService,
-        DataTableService dataTableService, DataTableStorageService dataTableStorageService,
+        DataTableRowService dataTableRowService, DataTableService dataTableService,
         DataTableTagService dataTableTagService, DataTableWebhookService dataTableWebhookService,
-        TagService tagService) {
+        WorkspaceDataTableService workspaceDataTableService) {
 
-        this.dataTableRowFacade = dataTableRowFacade;
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
-        this.dataTableStorageService = dataTableStorageService;
         this.dataTableTagService = dataTableTagService;
         this.dataTableWebhookService = dataTableWebhookService;
-        this.tagService = tagService;
+        this.workspaceDataTableService = workspaceDataTableService;
     }
 
     @Override
-    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
-    public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
-        dataTableService.addColumn(dataTableId, columnSpec, environmentId);
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
+    public void addColumn(long tableId, ColumnSpec columnSpec, long environmentId) {
+        dataTableService.addColumn(dataTableService.getBaseNameById(tableId), columnSpec, environmentId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'DATA_TABLE_CREATE')")
     @Audited(event = DataTableAuditEvents.DATA_TABLE_CREATED, data = {
         @AuditData(key = "name", value = "#name"),
         @AuditData(key = "workspaceId", value = "#workspaceId"),
         @AuditData(key = "environmentId", value = "#environmentId")
     })
-    public long createTable(
-        String name, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId) {
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'DATA_TABLE_CREATE', #environmentId)")
+    public void createTable(
+        String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId) {
 
         return dataTableService.createTable(workspaceId, name, description, columnSpecs, environmentId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
-    public void dropTable(long dataTableId, long environmentId) {
-        dataTableService.dropTable(dataTableId, environmentId);
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
+    public boolean deleteRow(long tableId, long rowId, long environmentId) {
+        return dataTableRowService.deleteRow(dataTableService.getBaseNameById(tableId), rowId, environmentId);
+    }
+
+    // Keyed on the table id rather than the base name the service takes, because the base name encodes an environment
+    // and is not what the relation is keyed on.
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_DELETE', #environmentId)")
+    public void dropTable(long tableId, long environmentId) {
+        dataTableService.dropTable(dataTableService.getBaseNameById(tableId), environmentId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
     @Audited(event = DataTableAuditEvents.DATA_TABLE_DUPLICATED, data = {
         @AuditData(key = "sourceDataTableId", value = "#dataTableId"),
         @AuditData(key = "newName", value = "#newName"),
         @AuditData(key = "environmentId", value = "#environmentId")
     })
-    public long duplicateTable(long dataTableId, String newName, long environmentId) {
-        Optional<DataTableInfo> dataTableInfoOptional = dataTableService.fetchDataTableInfo(dataTableId, environmentId);
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_CREATE', #environmentId)")
+    public void duplicateTable(long tableId, String newBaseName, long environmentId) {
+        String baseName = dataTableService.getBaseNameById(tableId);
 
         if (dataTableInfoOptional.isEmpty()) {
             throw new DataTableException(
@@ -149,10 +127,106 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_VIEW', #environmentId)")
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'DATA_TABLE_VIEW')")
-    public List<Tag> getDataTableTags(long workspaceId) {
-        List<Long> dataTableIds = dataTableService.getWorkspaceDataTables(workspaceId)
+    public String exportCsv(long tableId, long environmentId) {
+        return dataTableRowService.exportCsv(dataTableService.getBaseNameById(tableId), environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'DATA_TABLE_VIEW', #environmentId)")
+    @Transactional(readOnly = true)
+    public Map<Long, List<Tag>> getTagsByTableId(long workspaceId, long environmentId) {
+        Map<String, Long> tableIdsByBaseName = new HashMap<>();
+
+        for (DataTableInfo dataTableInfo : listWorkspaceTables(workspaceId, environmentId)) {
+            if (dataTableInfo.id() != null) {
+                tableIdsByBaseName.put(dataTableInfo.baseName(), dataTableInfo.id());
+            }
+        }
+
+        Map<String, List<Tag>> tagsByTableName = dataTableTagService.getTagsByTableName();
+        Map<Long, List<Tag>> tagsByTableId = new LinkedHashMap<>();
+
+        for (Map.Entry<String, List<Tag>> entry : tagsByTableName.entrySet()) {
+            Long tableId = tableIdsByBaseName.get(entry.getKey());
+
+            if (tableId != null) {
+                tagsByTableId.put(tableId, entry.getValue());
+            }
+        }
+
+        return tagsByTableId;
+    }
+
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
+    public void importCsv(long tableId, String csv, long environmentId) {
+        dataTableRowService.importCsv(dataTableService.getBaseNameById(tableId), csv, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
+    public DataTableRow insertRow(long tableId, Map<String, Object> values, long environmentId) {
+        return dataTableRowService.insertRow(dataTableService.getBaseNameById(tableId), values, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_VIEW', #environmentId)")
+    @Transactional(readOnly = true)
+    public List<DataTableRow> listRows(long tableId, int limit, int offset, long environmentId) {
+        return dataTableRowService.listRows(dataTableService.getBaseNameById(tableId), limit, offset, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'DATA_TABLE_VIEW', #environmentId)")
+    @Transactional(readOnly = true)
+    public List<DataTableInfo> listTables(long workspaceId, long environmentId) {
+        return listWorkspaceTables(workspaceId, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_VIEW', #environmentId)")
+    @Transactional(readOnly = true)
+    public List<Webhook> listWebhooks(long tableId, long environmentId) {
+        return dataTableWebhookService.listWebhooks(dataTableService.getBaseNameById(tableId), environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
+    public void removeColumn(long tableId, String columnName, long environmentId) {
+        dataTableService.removeColumn(dataTableService.getBaseNameById(tableId), columnName, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
+    public void renameColumn(long tableId, String fromColumnName, String toColumnName, long environmentId) {
+        dataTableService.renameColumn(
+            dataTableService.getBaseNameById(tableId), fromColumnName, toColumnName, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
+    public void renameTable(long tableId, String newBaseName, long environmentId) {
+        dataTableService.renameTable(dataTableService.getBaseNameById(tableId), newBaseName, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
+    public DataTableRow updateRow(long tableId, long rowId, Map<String, Object> values, long environmentId) {
+        return dataTableRowService.updateRow(dataTableService.getBaseNameById(tableId), rowId, values, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#tableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public void updateTags(long tableId, List<Tag> tags) {
+        dataTableTagService.updateTags(tableId, tags);
+    }
+
+    private List<DataTableInfo> listWorkspaceTables(long workspaceId, long environmentId) {
+        List<DataTableInfo> dataTableInfos = dataTableService.listTables(environmentId);
+
+        Set<Long> dataTableIds = workspaceDataTableService.getWorkspaceDataTables(workspaceId)
             .stream()
             .map(DataTable::getId)
             .toList();
