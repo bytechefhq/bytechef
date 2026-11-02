@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.auto.memory.facade.AiAutoMemoryFacadeImpl;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
@@ -78,7 +79,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ContextConfiguration(classes = {
     AiAutoMemoryGraphQlControllerIntTest.AiAutoMemoryGraphQlTestConfiguration.class,
-    AiAutoMemoryGraphQlController.class
+    AiAutoMemoryFacadeImpl.class, AiAutoMemoryGraphQlController.class
 })
 @GraphQlTest(
     controllers = AiAutoMemoryGraphQlController.class,
