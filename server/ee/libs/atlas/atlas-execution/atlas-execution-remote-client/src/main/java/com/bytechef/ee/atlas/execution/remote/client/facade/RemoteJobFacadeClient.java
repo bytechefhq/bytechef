@@ -80,17 +80,17 @@ public class RemoteJobFacadeClient implements JobFacade {
 
     @Override
     public void resumeJob(long id) {
-        throw new UnsupportedOperationException();
+        getStub().resumeJob(atlasExecutionProtoMapper.toResumeJobRequest(id, null, null));
     }
 
     @Override
     public void resumeJob(long id, long taskExecutionId, @Nullable Map<String, ?> data) {
-        throw new UnsupportedOperationException();
+        getStub().resumeJob(atlasExecutionProtoMapper.toResumeJobRequest(id, taskExecutionId, data));
     }
 
     @Override
     public void resumeClaimedJob(long id, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data) {
-        throw new UnsupportedOperationException();
+        getStub().resumeClaimedJob(atlasExecutionProtoMapper.toResumeJobRequest(id, taskExecutionId, data));
     }
 
     @Override
