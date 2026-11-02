@@ -7,13 +7,13 @@
 
 package com.bytechef.ee.tenant.remote.client.service;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.ee.tenant.remote.grpc.proto.TenantRemoteServiceGrpc;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.constant.Tenancy;
 import com.bytechef.tenant.service.TenantService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.google.protobuf.Empty;
 import java.util.List;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,23 +26,21 @@ import org.springframework.stereotype.Component;
 public class RemoteTenantServiceClient implements TenantService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String TENANT_SERVICE = "/remote/tenant-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteTenantServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteTenantServiceClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public List<String> getTenantIds() {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(TENANT_SERVICE + "/get-tenant-ids")
-                .build(),
-            new ParameterizedTypeReference<>() {});
+        TenantRemoteServiceGrpc.TenantRemoteServiceBlockingStub stub = TenantRemoteServiceGrpc.newBlockingStub(
+            grpcChannels.getChannel(CONFIGURATION_APP));
+
+        return List.copyOf(
+            stub.getTenantIds(Empty.getDefaultInstance())
+                .getTenantIdsList());
     }
 
     @Override
