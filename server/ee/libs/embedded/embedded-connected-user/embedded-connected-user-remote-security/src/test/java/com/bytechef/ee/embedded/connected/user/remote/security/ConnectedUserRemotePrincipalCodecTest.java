@@ -15,6 +15,9 @@ import com.bytechef.ee.remote.grpc.InProcessGrpc;
 import com.bytechef.ee.remote.grpc.interceptor.GrpcMetadataKeys;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -27,7 +30,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -50,16 +52,18 @@ class ConnectedUserRemotePrincipalCodecTest {
         SecurityContextHolder.getContext()
             .setAuthentication(new LocalConnectedUserAuthentication("external-user-1", 7L, 2L, true));
 
-        assertThat(describe(echoWithCodec())).isEqualTo("external-user-1|7|2|false");
+        assertThat(describe(echoWithCodec())).isEqualTo("external-user-1|7|2|false|EMBEDDED_API_KEY|EMBEDDED");
     }
 
     @Test
     void testConnectedUserSurvivesASecondHop() throws Exception {
         SecurityContextHolder.getContext()
             .setAuthentication(
-                new RemoteConnectedUserAuthenticationToken(2L, 7L, new User("external-user-1", "", List.of()), true));
+                new RemoteConnectedUserAuthenticationToken(
+                    2L, 7L, new User("external-user-1", "", List.of()), true,
+                    CredentialType.EMBEDDED_MCP_SERVER_API_KEY, null));
 
-        assertThat(describe(echoWithCodec())).isEqualTo("external-user-1|7|2|true");
+        assertThat(describe(echoWithCodec())).isEqualTo("external-user-1|7|2|true|EMBEDDED_MCP_SERVER_API_KEY|null");
     }
 
     @Test
@@ -92,10 +96,19 @@ class ConnectedUserRemotePrincipalCodecTest {
     }
 
     @Test
+    void testMissingCredentialTypeBindsNoIdentity() throws Exception {
+        assertThat(echoWithMetadata(metadata -> {
+            putConnectedUser(metadata, "7", "2", "false");
+
+            metadata.removeAll(GrpcMetadataKeys.CREDENTIAL_TYPE);
+        })).isNull();
+    }
+
+    @Test
     void testWellFormedMetadataBindsTheConnectedUser() throws Exception {
         assertThat(describe(echoWithMetadata(metadata -> {
             putConnectedUser(metadata, "7", "2", "false");
-        }))).isEqualTo("external-user-1|7|2|false");
+        }))).isEqualTo("external-user-1|7|2|false|EMBEDDED_API_KEY|null");
     }
 
     private Authentication echoWithCodec() throws Exception {
@@ -129,9 +142,13 @@ class ConnectedUserRemotePrincipalCodecTest {
 
         ConnectedUserAuthentication connectedUserAuthentication = (ConnectedUserAuthentication) authentication;
 
+        AbstractApiKeyAuthenticationToken apiKeyAuthenticationToken =
+            (AbstractApiKeyAuthenticationToken) authentication;
+
         return connectedUserAuthentication.externalUserId() + "|" + connectedUserAuthentication.connectedUserId() +
             "|" + connectedUserAuthentication.environmentId() + "|" +
-            connectedUserAuthentication.apiKeyAuthenticated();
+            connectedUserAuthentication.apiKeyAuthenticated() + "|" + apiKeyAuthenticationToken.getCredentialType() +
+            "|" + apiKeyAuthenticationToken.getPlatformType();
     }
 
     private static ClientInterceptor metadataInterceptor(Consumer<Metadata> metadataWriter) {
@@ -163,9 +180,10 @@ class ConnectedUserRemotePrincipalCodecTest {
         metadata.put(ConnectedUserRemotePrincipalCodec.CONNECTED_USER_ID, connectedUserId);
         metadata.put(GrpcMetadataKeys.ENVIRONMENT_ID, environmentId);
         metadata.put(ConnectedUserRemotePrincipalCodec.API_KEY_AUTHENTICATED, apiKeyAuthenticated);
+        metadata.put(GrpcMetadataKeys.CREDENTIAL_TYPE, CredentialType.EMBEDDED_API_KEY.name());
     }
 
-    private static final class LocalConnectedUserAuthentication extends AbstractAuthenticationToken
+    private static final class LocalConnectedUserAuthentication extends AbstractApiKeyAuthenticationToken
         implements ConnectedUserAuthentication {
 
         private final long connectedUserId;
@@ -174,8 +192,6 @@ class ConnectedUserRemotePrincipalCodecTest {
 
         LocalConnectedUserAuthentication(
             String externalUserId, long connectedUserId, long environmentId, boolean authenticated) {
-
-            super(List.of());
 
             this.connectedUserId = connectedUserId;
             this.environmentId = environmentId;
@@ -200,8 +216,13 @@ class ConnectedUserRemotePrincipalCodecTest {
         }
 
         @Override
-        public Object getCredentials() {
-            return "";
+        public CredentialType getCredentialType() {
+            return CredentialType.EMBEDDED_API_KEY;
+        }
+
+        @Override
+        public PlatformType getPlatformType() {
+            return PlatformType.EMBEDDED;
         }
 
         @Override

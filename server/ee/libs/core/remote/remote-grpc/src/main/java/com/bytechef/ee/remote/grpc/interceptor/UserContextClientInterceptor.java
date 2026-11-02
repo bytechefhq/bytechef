@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.remote.grpc.interceptor;
 
+import com.bytechef.ee.remote.grpc.security.RemoteCredentialMetadata;
 import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.ExternalIssuerAuthentication;
@@ -75,6 +76,10 @@ public class UserContextClientInterceptor implements ClientInterceptor {
             if (remotePrincipalCodec.supports(authentication)) {
                 if (remotePrincipalCodec.encode(authentication, metadata)) {
                     metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, remotePrincipalCodec.getPrincipalKind());
+
+                    if (authentication instanceof AbstractApiKeyAuthenticationToken apiKeyAuthenticationToken) {
+                        RemoteCredentialMetadata.put(apiKeyAuthenticationToken, metadata);
+                    }
                 }
 
                 return;
@@ -106,6 +111,8 @@ public class UserContextClientInterceptor implements ClientInterceptor {
         metadata.put(GrpcMetadataKeys.USER_LOGIN, login.getBytes(StandardCharsets.UTF_8));
         metadata.put(
             GrpcMetadataKeys.ENVIRONMENT_ID, String.valueOf(apiKeyAuthenticationToken.getEnvironmentId()));
+
+        RemoteCredentialMetadata.put(apiKeyAuthenticationToken, metadata);
 
         putAuthorities(apiKeyAuthenticationToken, metadata);
     }
