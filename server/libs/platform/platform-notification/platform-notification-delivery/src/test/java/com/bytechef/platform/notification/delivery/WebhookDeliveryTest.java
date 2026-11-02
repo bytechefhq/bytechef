@@ -106,6 +106,22 @@ class WebhookDeliveryTest {
             .build();
 
         assertThat(webhookDelivery.host()).isEqualTo("hooks.example.com");
+
+        WebhookDelivery unencodedWebhookDelivery = WebhookDelivery.builder(
+            "source", "https://hooks.example.com/path?status=a b|c")
+            .description("description")
+            .payload("label", "{}")
+            .build();
+
+        assertThat(unencodedWebhookDelivery.host()).isEqualTo("hooks.example.com");
+
+        WebhookDelivery underscoreWebhookDelivery = WebhookDelivery.builder(
+            "source", "https://my_hooks.example.com/path")
+            .description("description")
+            .payload("label", "{}")
+            .build();
+
+        assertThat(underscoreWebhookDelivery.host()).isEqualTo("my_hooks.example.com");
     }
 
     @Test
