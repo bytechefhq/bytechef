@@ -1,14 +1,16 @@
 import {NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {zodResolver} from '@hookform/resolvers/zod';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useForm} from 'react-hook-form';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {NotificationFormValuesType} from '../../hooks/useNotifications';
+import {NotificationFormValuesType, notificationFormSchema} from '../../hooks/useNotifications';
 import NotificationDialog from '../NotificationDialog';
 
-vi.mock('../../hooks/useNotifications', () => ({
+vi.mock('../../hooks/useNotifications', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('../../hooks/useNotifications')>()),
     default: () => ({
         isNotificationEventsLoading: false,
         notificationEvents: [],
@@ -30,6 +32,7 @@ function NotificationDialogHarness({saveNotification, settings = {}, type}: Noti
             settings,
             type,
         },
+        resolver: zodResolver(notificationFormSchema),
     });
 
     return (
@@ -64,6 +67,40 @@ describe('NotificationDialog', () => {
         expect(saveNotification).toHaveBeenCalledWith(
             expect.objectContaining({settings: {slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}}),
             expect.anything()
+        );
+    });
+
+    it('does not save a Webhook notification without a URL', async () => {
+        const saveNotification = vi.fn();
+
+        render(<NotificationDialogHarness saveNotification={saveNotification} type={NotificationTypeEnum.Webhook} />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(await screen.findByText('Webhook URL is required.')).toBeInTheDocument();
+        expect(saveNotification).not.toHaveBeenCalled();
+    });
+
+    it('saves the Webhook URL under settings.webhook for a Webhook notification', async () => {
+        const saveNotification = vi.fn();
+
+        render(<NotificationDialogHarness saveNotification={saveNotification} type={NotificationTypeEnum.Webhook} />);
+
+        await userEvent.type(screen.getByLabelText('Webhook URL'), 'https://example.com/ingest');
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(saveNotification).toHaveBeenCalledWith(
+            expect.objectContaining({settings: {webhook: 'https://example.com/ingest'}}),
+            expect.anything()
+        );
+    });
+
+    it('links the Webhook URL field to the payload format documentation', () => {
+        render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />);
+
+        expect(screen.getByRole('link', {name: 'See the payload format'})).toHaveAttribute(
+            'href',
+            'https://docs.bytechef.io/platform/settings/notifications#webhook-requests'
         );
     });
 

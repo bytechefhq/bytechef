@@ -11,12 +11,14 @@ import {
 import {Input} from '@/components/Input/Input';
 import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {UseFormReturn, useWatch} from 'react-hook-form';
 
 import useNotifications, {NotificationFormValuesType} from '../hooks/useNotifications';
+
+const WEBHOOK_PAYLOAD_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/settings/notifications#webhook-requests';
 
 interface NotificationDialogProps {
     closeEditDialog: () => void;
@@ -213,10 +215,27 @@ const NotificationDialog = ({
 
                                                 <FormControl>
                                                     <Input
-                                                        onChange={(e) => field.onChange(e.target.value)}
+                                                        onChange={(event) => field.onChange(event.target.value)}
+                                                        placeholder="https://example.com/ingest"
                                                         value={(field.value as string) || ''}
                                                     />
                                                 </FormControl>
+
+                                                <FormDescription>
+                                                    <span>
+                                                        ByteChef sends a JSON POST with the event type, job ID, job name
+                                                        and timestamp.
+                                                    </span>
+
+                                                    <a
+                                                        className="ml-1 underline"
+                                                        href={WEBHOOK_PAYLOAD_DOCUMENTATION_URL}
+                                                        rel="noreferrer"
+                                                        target="_blank"
+                                                    >
+                                                        See the payload format
+                                                    </a>
+                                                </FormDescription>
 
                                                 <FormMessage />
                                             </FormItem>

@@ -33,30 +33,66 @@ export const notificationFormSchema = z
         }),
     })
     .superRefine(({settings, type}, context) => {
-        if (type !== 'SLACK') {
-            return;
-        }
-
-        const slackWebhookUrl = settings.slackWebhookUrl;
-
-        if (typeof slackWebhookUrl !== 'string' || slackWebhookUrl.trim() === '') {
-            context.addIssue({
-                code: 'custom',
-                message: 'Slack webhook URL is required.',
-                path: ['settings', 'slackWebhookUrl'],
+        if (type === 'SLACK') {
+            validateUrlSetting({
+                context,
+                invalidMessage: 'Enter a valid Slack webhook URL.',
+                requiredMessage: 'Slack webhook URL is required.',
+                settingKey: 'slackWebhookUrl',
+                value: settings.slackWebhookUrl,
             });
-
-            return;
-        }
-
-        if (!z.url().safeParse(slackWebhookUrl.trim()).success) {
-            context.addIssue({
-                code: 'custom',
-                message: 'Enter a valid Slack webhook URL.',
-                path: ['settings', 'slackWebhookUrl'],
+        } else if (type === 'WEBHOOK') {
+            validateUrlSetting({
+                context,
+                invalidMessage: 'Enter a valid http or https URL.',
+                requiredMessage: 'Webhook URL is required.',
+                settingKey: 'webhook',
+                value: settings.webhook,
             });
         }
     });
+
+interface ValidateUrlSettingPropsI {
+    context: z.RefinementCtx;
+    invalidMessage: string;
+    requiredMessage: string;
+    settingKey: string;
+    value: unknown;
+}
+
+function validateUrlSetting({context, invalidMessage, requiredMessage, settingKey, value}: ValidateUrlSettingPropsI) {
+    if (typeof value !== 'string' || value.trim() === '') {
+        context.addIssue({
+            code: 'custom',
+            message: requiredMessage,
+            path: ['settings', settingKey],
+        });
+
+        return;
+    }
+
+    if (!z.url({protocol: /^https?$/}).safeParse(value.trim()).success) {
+        context.addIssue({
+            code: 'custom',
+            message: invalidMessage,
+            path: ['settings', settingKey],
+        });
+    }
+}
+
+function trimUrlSettings(settings: Record<string, unknown>): Notification['settings'] {
+    const trimmedSettings: Record<string, unknown> = {...settings};
+
+    for (const settingKey of ['slackWebhookUrl', 'webhook']) {
+        const value = trimmedSettings[settingKey];
+
+        if (typeof value === 'string') {
+            trimmedSettings[settingKey] = value.trim();
+        }
+    }
+
+    return trimmedSettings as Notification['settings'];
+}
 
 const emptyFormValues = {
     name: '',
@@ -134,16 +170,11 @@ export default function useNotifications() {
     function saveNotification() {
         const formValues = getValues();
 
-        const {slackWebhookUrl} = formValues.settings;
-
         const updatedFormData = {
             ...selectedNotification,
             ...formValues,
             ...{notificationEventIds: formValues.notificationEventIds.map((id: string) => Number(id))},
-            settings:
-                typeof slackWebhookUrl === 'string'
-                    ? {...formValues.settings, slackWebhookUrl: slackWebhookUrl.trim()}
-                    : formValues.settings,
+            settings: trimUrlSettings(formValues.settings),
         };
 
         if (selectedNotification?.id) {
