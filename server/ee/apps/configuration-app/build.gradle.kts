@@ -93,7 +93,6 @@ dependencies {
 
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:core:tenant:tenant-single-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
@@ -114,8 +113,7 @@ dependencies {
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
-    implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
-    implementation(project(":server:ee:libs:core:tenant:tenant-remote-rest"))
+    implementation(project(":server:ee:libs:core:tenant:tenant-remote-grpc"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-security"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
