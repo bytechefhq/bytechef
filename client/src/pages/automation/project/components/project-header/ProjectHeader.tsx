@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import {ButtonGroup} from '@/components/ui/button-group';
 import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
 import ProjectDeploymentsSheet from '@/pages/automation/project/components/ProjectDeploymentsSheet';
@@ -10,9 +11,12 @@ import ProjectItemSelect from '@/pages/automation/project/components/project-hea
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import SettingsMenu from '@/pages/automation/project/components/project-header/components/settings-menu/SettingsMenu';
 import {useProjectHeader} from '@/pages/automation/project/components/project-header/hooks/useProjectHeader';
+import useProjectPublishPermission from '@/pages/automation/project/components/project-header/hooks/useProjectPublishPermission';
+import {useProjectWorkflowViewOnlyNotice} from '@/pages/automation/project/hooks/useProjectWorkflowViewOnlyNotice';
 import useProjectHeaderDialogsStore from '@/pages/automation/project/stores/useProjectHeaderDialogsStore';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
@@ -22,6 +26,7 @@ import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilo
 import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
+import {EyeIcon} from 'lucide-react';
 import {RefObject, useEffect, useSyncExternalStore} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {twMerge} from 'tailwind-merge';
@@ -95,6 +100,8 @@ const ProjectHeader = ({
 
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
+    const readOnly = useWorkflowEditorReadOnly();
+    const viewOnlyNoticeVisible = useProjectWorkflowViewOnlyNotice();
     const {
         handleProjectValueChange,
         handleProjectWorkflowValueChange,
@@ -112,6 +119,7 @@ const ProjectHeader = ({
         chatTrigger,
         projectId,
     });
+    const {canPublishProject, disabledTooltip: publishDisabledTooltip} = useProjectPublishPermission();
 
     useEffect(
         () => () => {
@@ -163,6 +171,19 @@ const ProjectHeader = ({
                 )}
 
                 {loadingIndicator}
+
+                {readOnly && viewOnlyNoticeVisible && (
+                    <Badge
+                        aria-label="View only"
+                        className="ml-3"
+                        icon={<EyeIcon />}
+                        role="status"
+                        styleType="secondary-outline"
+                        title="You can view this workflow but not change or run it"
+                    >
+                        View only
+                    </Badge>
+                )}
             </div>
 
             <div className="flex shrink-0 items-center gap-1">
@@ -170,13 +191,15 @@ const ProjectHeader = ({
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
+                    readOnly={readOnly}
                     runDisabled={runDisabled}
                     workflowIsRunning={workflowIsRunning}
                 />
 
                 <ButtonGroup>
                     <PublishPopover
-                        disabled={!hasUnpublishedChanges}
+                        disabled={!canPublishProject || !hasUnpublishedChanges}
+                        disabledTooltip={publishDisabledTooltip}
                         isPending={publishProjectMutationIsPending}
                         onOpenChange={setPublishPopoverOpen}
                         onPublishSubmit={handlePublishProjectSubmit}

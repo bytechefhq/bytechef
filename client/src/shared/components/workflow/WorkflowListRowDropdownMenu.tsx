@@ -12,8 +12,8 @@ import {ReactNode} from 'react';
 interface WorkflowListRowDropdownMenuProps {
     children?: ReactNode;
     exportUrl: string;
-    onDeleteClick: () => void;
-    onEditClick: () => void;
+    onDeleteClick?: () => void;
+    onEditClick?: () => void;
     workflowLabel?: string;
 }
 
@@ -35,7 +35,7 @@ const WorkflowListRowDropdownMenu = ({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
-            <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
+            {onEditClick && <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />}
 
             {children}
 
@@ -45,9 +45,18 @@ const WorkflowListRowDropdownMenu = ({
                 onClick={() => (window.location.href = exportUrl)}
             />
 
-            <DropdownMenuSeparator />
+            {onDeleteClick && (
+                <>
+                    <DropdownMenuSeparator />
 
-            <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
+                    <DropdownMenuItem
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onClick={onDeleteClick}
+                        variant="destructive"
+                    />
+                </>
+            )}
         </DropdownMenuContent>
     </DropdownMenu>
 );

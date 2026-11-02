@@ -24,6 +24,7 @@ import ProjectListItemPublishMenuItem from '@/pages/automation/projects/componen
 import ProjectListItemTabs, {
     ProjectListItemTabType,
 } from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
+import {useProjectListItemScopes} from '@/pages/automation/projects/hooks/useProjectListItemScopes';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
@@ -113,6 +114,19 @@ const ProjectListItem = ({
     const [searchParams] = useSearchParams();
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const {
+        canConfigureProjectGit,
+        canCreateProject,
+        canCreateWorkflow,
+        canDeleteProject,
+        canDeployProject,
+        canEditProject,
+        canManageProjectGit,
+        canManageProjectSettings,
+        canPublishProject,
+        canPullProjectFromGit,
+    } = useProjectListItemScopes(currentWorkspaceId);
 
     const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
         {
@@ -349,6 +363,7 @@ const ProjectListItem = ({
                                                 },
                                             })}
                                             id={project.id!}
+                                            readOnly={!canEditProject}
                                             remainingTags={remainingTags}
                                             tags={project.tags}
                                             updateTagsMutation={updateProjectTagsMutation}
@@ -411,31 +426,39 @@ const ProjectListItem = ({
 
                             <DropdownMenuContent align="end">
                                 <DropdownMenuGroup aria-label="Project Actions">
-                                    <DropdownMenuItem
-                                        aria-label="Edit Project"
-                                        icon={<EditIcon />}
-                                        label="Edit"
-                                        onClick={() => setShowEditDialog(true)}
-                                    />
+                                    {canEditProject && (
+                                        <DropdownMenuItem
+                                            aria-label="Edit Project"
+                                            icon={<EditIcon />}
+                                            label="Edit"
+                                            onClick={() => setShowEditDialog(true)}
+                                        />
+                                    )}
 
-                                    <ProjectListItemPublishMenuItem
-                                        hasWorkflows={hasWorkflows}
-                                        onClick={() => setShowPublishProjectDialog(true)}
-                                    />
+                                    {canPublishProject && (
+                                        <ProjectListItemPublishMenuItem
+                                            hasWorkflows={hasWorkflows}
+                                            onClick={() => setShowPublishProjectDialog(true)}
+                                        />
+                                    )}
 
-                                    <DropdownMenuItem
-                                        aria-label="Duplicate Project"
-                                        icon={<CopyIcon />}
-                                        label="Duplicate"
-                                        onClick={() => duplicateProjectMutation.mutate(project.id!)}
-                                    />
+                                    {canCreateProject && (
+                                        <DropdownMenuItem
+                                            aria-label="Duplicate Project"
+                                            icon={<CopyIcon />}
+                                            label="Duplicate"
+                                            onClick={() => duplicateProjectMutation.mutate(project.id!)}
+                                        />
+                                    )}
 
-                                    <DropdownMenuItem
-                                        aria-label="Share Project"
-                                        icon={<Share2Icon />}
-                                        label="Share"
-                                        onClick={() => setShowProjectShareDialog(true)}
-                                    />
+                                    {canManageProjectSettings && (
+                                        <DropdownMenuItem
+                                            aria-label="Share Project"
+                                            icon={<Share2Icon />}
+                                            label="Share"
+                                            onClick={() => setShowProjectShareDialog(true)}
+                                        />
+                                    )}
 
                                     {templatesSubmissionForm && (
                                         <DropdownMenuItem
@@ -459,19 +482,23 @@ const ProjectListItem = ({
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuGroup aria-label="Workflow Actions">
-                                    <DropdownMenuItem
-                                        aria-label="New Workflow"
-                                        icon={<PlusIcon />}
-                                        label="New Workflow"
-                                        onSelect={() => setShowWorkflowDialog(true)}
-                                    />
+                                    {canCreateWorkflow && (
+                                        <>
+                                            <DropdownMenuItem
+                                                aria-label="New Workflow"
+                                                icon={<PlusIcon />}
+                                                label="New Workflow"
+                                                onSelect={() => setShowWorkflowDialog(true)}
+                                            />
 
-                                    <DropdownMenuItem
-                                        aria-label="Import Workflow"
-                                        icon={<UploadIcon />}
-                                        label="Import Workflow"
-                                        onSelect={() => hiddenFileInputRef.current?.click()}
-                                    />
+                                            <DropdownMenuItem
+                                                aria-label="Import Workflow"
+                                                icon={<UploadIcon />}
+                                                label="Import Workflow"
+                                                onSelect={() => hiddenFileInputRef.current?.click()}
+                                            />
+                                        </>
+                                    )}
 
                                     {hasWorkflows && (
                                         <DropdownMenuItem
@@ -487,50 +514,62 @@ const ProjectListItem = ({
                                     )}
                                 </DropdownMenuGroup>
 
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuGroup aria-label="Deployment Actions">
-                                    <ProjectListItemNewDeploymentMenuItem
-                                        hasWorkflows={hasWorkflows}
-                                        isPublished={isPublished}
-                                        onClick={handleNewDeploymentClick}
-                                    />
-                                </DropdownMenuGroup>
-
-                                <DropdownMenuSeparator />
-
-                                {ff_1039 && (
-                                    <EEVersion hidden={true}>
-                                        <DropdownMenuItem
-                                            aria-label="Pull Project from Git"
-                                            disabled={!projectGitConfiguration?.enabled}
-                                            icon={<GitPullRequestArrowIcon />}
-                                            label="Pull Project from Git"
-                                            onClick={handlePullProjectFromGitClick}
-                                        />
-
-                                        <DropdownMenuItem
-                                            aria-label="Git Configuration"
-                                            icon={<GitBranchIcon />}
-                                            label="Git Configuration"
-                                            onClick={() => setShowProjectGitConfigurationDialog(true)}
-                                        />
-
+                                {canDeployProject && (
+                                    <>
                                         <DropdownMenuSeparator />
+
+                                        <DropdownMenuGroup aria-label="Deployment Actions">
+                                            <ProjectListItemNewDeploymentMenuItem
+                                                hasWorkflows={hasWorkflows}
+                                                isPublished={isPublished}
+                                                onClick={handleNewDeploymentClick}
+                                            />
+                                        </DropdownMenuGroup>
+                                    </>
+                                )}
+
+                                {ff_1039 && canManageProjectGit && (
+                                    <EEVersion hidden={true}>
+                                        <DropdownMenuSeparator />
+
+                                        {canPullProjectFromGit && (
+                                            <DropdownMenuItem
+                                                aria-label="Pull Project from Git"
+                                                disabled={!projectGitConfiguration?.enabled}
+                                                icon={<GitPullRequestArrowIcon />}
+                                                label="Pull Project from Git"
+                                                onClick={handlePullProjectFromGitClick}
+                                            />
+                                        )}
+
+                                        {canConfigureProjectGit && (
+                                            <DropdownMenuItem
+                                                aria-label="Git Configuration"
+                                                icon={<GitBranchIcon />}
+                                                label="Git Configuration"
+                                                onClick={() => setShowProjectGitConfigurationDialog(true)}
+                                            />
+                                        )}
                                     </EEVersion>
                                 )}
 
-                                <DropdownMenuItem
-                                    aria-label="Delete Project"
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={(event: MouseEvent) => {
-                                        setShowDeleteDialog(true);
+                                {canDeleteProject && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                        event.stopPropagation();
-                                    }}
-                                    variant="destructive"
-                                />
+                                        <DropdownMenuItem
+                                            aria-label="Delete Project"
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={(event: MouseEvent) => {
+                                                setShowDeleteDialog(true);
+
+                                                event.stopPropagation();
+                                            }}
+                                            variant="destructive"
+                                        />
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -540,7 +579,7 @@ const ProjectListItem = ({
             <CollapsibleContent className="mt-1 mr-3 mb-3 ml-11">
                 <ProjectListItemTabs
                     actions={
-                        activeTab === 'workflows' && hasWorkflows ? (
+                        activeTab === 'workflows' && hasWorkflows && canCreateWorkflow ? (
                             <ButtonGroup aria-label="Workflow Creation Actions">
                                 <Button
                                     aria-label="Create Workflow"
@@ -625,7 +664,7 @@ const ProjectListItem = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
-                        ) : activeTab === 'deployments' && isPublished && deploymentCount !== 0 ? (
+                        ) : activeTab === 'deployments' && canDeployProject && isPublished && deploymentCount !== 0 ? (
                             <ProjectDeploymentDialog
                                 onSuccess={(projectDeploymentId) => onTabChange('deployments', projectDeploymentId)}
                                 projectDeployment={{
