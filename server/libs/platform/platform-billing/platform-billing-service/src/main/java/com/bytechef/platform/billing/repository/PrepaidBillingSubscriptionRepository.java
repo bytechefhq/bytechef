@@ -48,6 +48,16 @@ public interface PrepaidBillingSubscriptionRepository extends Repository<Billing
     @Query("UPDATE billing_subscription SET plan_unit_used = 0 WHERE id = :id")
     void resetPlanUnitUsed(long id);
 
+    // On renewal the consumed extra units are dropped from the total, so it holds only what is left to spend instead
+    // of growing with every purchased package. One statement, so a concurrent increment cannot be lost.
+    @Modifying
+    @Query("""
+        UPDATE billing_subscription
+        SET plan_unit_used = 0, extra_unit_total = extra_unit_total - extra_unit_used, extra_unit_used = 0
+        WHERE id = :id
+        """)
+    void resetUnitUsedForNewPeriod(long id);
+
     @Modifying
     @Query("UPDATE billing_subscription SET extra_unit_total = extra_unit_total + :units WHERE id = :id")
     void addExtraUnitTotal(long id, int units);
