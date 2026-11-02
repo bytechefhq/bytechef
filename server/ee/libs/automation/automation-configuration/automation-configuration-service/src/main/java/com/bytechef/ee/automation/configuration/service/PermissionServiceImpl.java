@@ -401,7 +401,7 @@ public class PermissionServiceImpl implements PermissionService {
             .orElse(null);
 
         if (workspaceId == null) {
-            return true;
+            return false;
         }
 
         return hasWorkspaceScope(workspaceId, scope, environment);

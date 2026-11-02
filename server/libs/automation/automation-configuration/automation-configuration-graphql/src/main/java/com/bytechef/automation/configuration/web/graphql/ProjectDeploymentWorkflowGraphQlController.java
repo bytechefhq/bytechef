@@ -51,6 +51,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -96,6 +97,9 @@ public class ProjectDeploymentWorkflowGraphQlController {
     }
 
     @QueryMapping(name = "projectDeploymentWorkflow")
+    @PreAuthorize("hasPermission(T(com.bytechef.platform.workflow.WorkflowExecutionId).parse(#id).getJobPrincipalId(), "
+        +
+        "'ProjectDeployment', 'DEPLOYMENT_VIEW')")
     public ProjectDeploymentWorkflow projectDeploymentWorkflow(@Argument String id) {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
@@ -171,6 +175,7 @@ public class ProjectDeploymentWorkflowGraphQlController {
      * mappings incurred.
      */
     @QueryMapping(name = "workspaceChatWorkflows")
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'DEPLOYMENT_VIEW', #environmentId)")
     public List<ChatWorkflow> workspaceChatWorkflows(@Argument Long workspaceId, @Argument Long environmentId) {
         Environment environment = environmentService.getEnvironment(environmentId);
 

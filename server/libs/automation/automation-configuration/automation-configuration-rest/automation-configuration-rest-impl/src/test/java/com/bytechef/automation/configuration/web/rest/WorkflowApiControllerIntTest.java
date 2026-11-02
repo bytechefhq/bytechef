@@ -178,6 +178,34 @@ public class WorkflowApiControllerIntTest {
     }
 
     @Test
+    public void testGetWorkspaceWorkflows() {
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(1L);
+
+        projectWorkflow.setProjectVersion(1);
+        projectWorkflow.setUuid(UUID.randomUUID());
+        projectWorkflow.setWorkflowId("workflow1");
+
+        ProjectWorkflowDTO workflow = new ProjectWorkflowDTO(
+            new Workflow("workflow1", "{}", Workflow.Format.JSON), projectWorkflow, false);
+
+        when(projectFacade.getWorkspaceProjectWorkflows(3L))
+            .thenReturn(List.of(workflow));
+
+        this.webTestClient
+            .get()
+            .uri("/internal/workspaces/3/workflows")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.[0].id")
+            .isEqualTo("workflow1");
+
+        verify(projectFacade).getWorkspaceProjectWorkflows(3L);
+    }
+
+    @Test
     public void testPostProjectWorkflows() {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 

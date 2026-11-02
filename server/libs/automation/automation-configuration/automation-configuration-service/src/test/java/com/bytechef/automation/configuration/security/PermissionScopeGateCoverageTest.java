@@ -83,6 +83,7 @@ class PermissionScopeGateCoverageTest {
         "hasResourceScopeInEnvironment",
         "hasWorkspaceScopeInEnvironment",
         "hasWorkspaceScopeInEnvironmentId",
+        "hasWorkflowScope",
         "hasWorkflowScopeIfProjectWorkflowInEnvironment",
         "hasWorkflowScopeIfProjectWorkflowInEnvironmentId",
         "hasWorkflowScopeInEnvironment",
@@ -113,6 +114,7 @@ class PermissionScopeGateCoverageTest {
      * suffix defeats, so a shared pattern would read no scope at all out of this function and every scope named only
      * here would look uncatalogued.</li>
      * <li>{@code hasResourceScopeInEnvironment(id, 'Type', 'SCOPE', environment)} — third of four.</li>
+     * <li>{@code hasWorkflowScope(workflowId, 'SCOPE')} — second of two.</li>
      * <li>{@code hasWorkflowScopeInEnvironment(workflowId, 'SCOPE', environment)} — second of three.</li>
      * <li>{@code hasWorkflowScopeIfProjectWorkflowInEnvironment(workflowId, 'SCOPE', environment)} and its
      * {@code InEnvironmentId} sibling — second of three, each with its own pattern for the same reason as above. The
@@ -122,6 +124,7 @@ class PermissionScopeGateCoverageTest {
      * </ul>
      */
     private static final List<Pattern> SCOPE_PATTERNS = List.of(
+        Pattern.compile("hasWorkflowScope\\(\\s*[^,()]+?,\\s*" + SCOPE_GROUP + "\\s*\\)"),
         Pattern.compile("hasWorkflowScopeInEnvironment\\(\\s*[^,()]+?,\\s*" + SCOPE_GROUP + "\\s*,"),
         Pattern.compile("hasWorkflowScopeIfProjectWorkflowInEnvironment\\(\\s*[^,()]+?,\\s*" + SCOPE_GROUP + "\\s*,"),
         Pattern.compile(
