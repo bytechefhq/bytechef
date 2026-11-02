@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.audit.remote.grpc;
 
 import com.bytechef.ee.platform.audit.facade.AuditEventFacade;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
@@ -26,9 +27,10 @@ public class AuditGrpcServerConfiguration {
     @Bean
     AuditEventRemoteServiceGrpcServer auditEventRemoteServiceGrpcServer(
         AuditEventFacade auditEventFacade, AuditEventService auditEventService,
-        AuditEventRepository auditEventRepository) {
+        ObjectProvider<AuditEventRepository> auditEventRepositoryProvider) {
 
         return new AuditEventRemoteServiceGrpcServer(
-            auditEventFacade, auditEventService, auditEventRepository, new AuditEventProtoMapper());
+            auditEventFacade, auditEventService, auditEventRepositoryProvider.getIfAvailable(),
+            new AuditEventProtoMapper());
     }
 }
