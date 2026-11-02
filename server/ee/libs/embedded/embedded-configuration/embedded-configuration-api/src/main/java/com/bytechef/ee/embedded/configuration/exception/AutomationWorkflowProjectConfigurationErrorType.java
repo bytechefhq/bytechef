@@ -32,6 +32,12 @@ public class AutomationWorkflowProjectConfigurationErrorType extends AbstractErr
     public static final AutomationWorkflowProjectConfigurationErrorType INVALID_PROVIDED_VALUE =
         new AutomationWorkflowProjectConfigurationErrorType(104);
 
+    public static final AutomationWorkflowProjectConfigurationErrorType CONFIGURATION_NAME_EXISTS =
+        new AutomationWorkflowProjectConfigurationErrorType(105);
+
+    public static final AutomationWorkflowProjectConfigurationErrorType CONFIGURATION_PROJECT_MISMATCH =
+        new AutomationWorkflowProjectConfigurationErrorType(106);
+
     private AutomationWorkflowProjectConfigurationErrorType(int errorKey) {
         super(AutomationWorkflowProjectConfiguration.class, errorKey);
     }
