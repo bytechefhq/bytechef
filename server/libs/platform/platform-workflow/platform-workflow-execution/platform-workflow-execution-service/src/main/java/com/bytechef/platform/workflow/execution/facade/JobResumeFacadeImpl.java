@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionCallback;
@@ -112,6 +113,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'DEPLOYMENT_EDIT')")
     public boolean cancelApproval(long jobId) {
         return Objects.requireNonNull(transactionOperations.execute(transactionStatus -> {
             Job job = jobService.getJob(jobId);

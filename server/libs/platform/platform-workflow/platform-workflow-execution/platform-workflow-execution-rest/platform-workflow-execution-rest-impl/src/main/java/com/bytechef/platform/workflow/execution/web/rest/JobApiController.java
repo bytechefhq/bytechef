@@ -20,8 +20,6 @@ package com.bytechef.platform.workflow.execution.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel;
@@ -47,41 +45,37 @@ public class JobApiController implements JobApi {
     private final ConversionService conversionService;
     private final JobFacade jobFacade;
     private final JobResumeFacade jobResumeFacade;
-    private final JobService jobService;
 
     @SuppressFBWarnings("EI2")
     public JobApiController(
-        ConversionService conversionService, JobFacade jobFacade, JobResumeFacade jobResumeFacade,
-        JobService jobService) {
+        ConversionService conversionService, JobFacade jobFacade, JobResumeFacade jobResumeFacade) {
 
         this.conversionService = conversionService;
         this.jobFacade = jobFacade;
         this.jobResumeFacade = jobResumeFacade;
-        this.jobService = jobService;
     }
 
     @Override
     public ResponseEntity<JobModel> getJob(Long id) {
-        return ResponseEntity.ok(conversionService.convert(jobService.getJob(id), JobModel.class));
+        return ResponseEntity.ok(conversionService.convert(jobFacade.getJob(id), JobModel.class));
     }
 
     @Override
     @SuppressWarnings("rawtypes")
     public ResponseEntity<Page> getJobsPage(Integer pageNumber) {
         return ResponseEntity.ok(
-            jobService.getJobsPage(pageNumber)
+            jobFacade.getJobsPage(pageNumber)
                 .map(job -> conversionService.convert(job, JobBasicModel.class)));
     }
 
     @Override
     public ResponseEntity<JobModel> getLatestJob() {
-        return ResponseEntity.ok(
-            conversionService.convert(OptionalUtils.orElse(jobService.fetchLastJob(), null), JobModel.class));
+        return ResponseEntity.ok(conversionService.convert(jobFacade.getLatestJob(), JobModel.class));
     }
 
     @Override
     public ResponseEntity<Void> restartJob(Long id) {
-        if (JobSuspends.isAwaitingApproval(jobService.getJob(id))) {
+        if (JobSuspends.isAwaitingApproval(jobFacade.getJob(id))) {
             throw new ResponseStatusException(
                 HttpStatus.CONFLICT,
                 "Job %s is waiting on an approval; resolve the approval or stop the job instead of restarting it"
