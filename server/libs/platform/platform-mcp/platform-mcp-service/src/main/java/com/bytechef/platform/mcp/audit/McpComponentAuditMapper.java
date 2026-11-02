@@ -21,9 +21,11 @@ import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -54,20 +56,38 @@ public class McpComponentAuditMapper implements AuditMapper {
             return null;
         }
 
-        return mcpServerRepository.findById(mcpServerId)
+        PlatformType platformType = mcpServerRepository.findById(mcpServerId)
             .map(McpServer::getType)
             .orElse(null);
+
+        return new CapturedMcpServer(mcpServerId, platformType);
     }
 
     @Override
     public Map<String, String> map(AuditInvocation auditInvocation) {
-        return Map.of();
+        if (auditInvocation.argument("mcpTool") instanceof McpTool &&
+            auditInvocation.captured() instanceof CapturedMcpServer capturedMcpServer) {
+
+            return Map.of("mcpServerId", String.valueOf(capturedMcpServer.mcpServerId()));
+        }
+
+        if (!(auditInvocation.argument("mcpTools") instanceof List<?> mcpTools)) {
+            return Map.of();
+        }
+
+        List<String> toolNames = mcpTools.stream()
+            .filter(McpTool.class::isInstance)
+            .map(McpTool.class::cast)
+            .map(McpTool::getName)
+            .toList();
+
+        return Map.of("toolNames", String.valueOf(toolNames));
     }
 
     @Override
     public @Nullable PlatformType platform(AuditInvocation auditInvocation) {
-        if (auditInvocation.captured() instanceof PlatformType platformType) {
-            return platformType;
+        if (auditInvocation.captured() instanceof CapturedMcpServer capturedMcpServer) {
+            return capturedMcpServer.platformType();
         }
 
         return null;
@@ -84,6 +104,8 @@ public class McpComponentAuditMapper implements AuditMapper {
             }
         } else if (auditInvocation.argument("mcpComponentId") instanceof Long argumentMcpComponentId) {
             mcpComponentId = argumentMcpComponentId;
+        } else if (auditInvocation.argument("mcpTool") instanceof McpTool mcpTool) {
+            mcpComponentId = mcpTool.getMcpComponentId();
         }
 
         if (mcpComponentId == null) {
@@ -94,5 +116,8 @@ public class McpComponentAuditMapper implements AuditMapper {
 
         return mcpComponentOptional.map(McpComponent::getMcpServerId)
             .orElse(null);
+    }
+
+    private record CapturedMcpServer(long mcpServerId, @Nullable PlatformType platformType) {
     }
 }

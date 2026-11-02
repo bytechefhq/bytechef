@@ -21,8 +21,11 @@ import com.bytechef.automation.ai.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.audit.McpToolAuditEvents;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -152,6 +155,12 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     }
 
     @Override
+    @Audited(event = McpToolAuditEvents.MCP_TOOL_ENABLED_UPDATED, data = {
+        @AuditData(key = "mcpToolId", value = "#mcpToolId"),
+        @AuditData(key = "mcpComponentId", value = "#result?.mcpComponentId"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "enabled", value = "#enabled")
+    })
     @PreAuthorize("hasPermission(#mcpToolId, 'McpTool', 'MCP_EDIT')")
     public McpTool updateWorkspaceMcpToolEnabled(long mcpToolId, boolean enabled) {
         getAutomationMcpTool(mcpToolId);

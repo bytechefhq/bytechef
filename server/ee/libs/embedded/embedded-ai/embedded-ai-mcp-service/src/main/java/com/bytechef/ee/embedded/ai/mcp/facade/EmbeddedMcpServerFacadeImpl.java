@@ -16,10 +16,13 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.audit.McpToolAuditEvents;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -128,7 +131,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     public void deleteEmbeddedMcpTool(long mcpToolId) {
         McpTool mcpTool = getEmbeddedMcpTool(mcpToolId);
 
-        mcpToolService.delete(mcpTool);
+        mcpServerFacade.deleteMcpTool(mcpTool);
     }
 
     @Override
@@ -287,10 +290,16 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         getEmbeddedMcpTool(mcpTool.getId());
         checkEmbeddedMcpComponent(mcpTool.getMcpComponentId());
 
-        return mcpToolService.update(mcpTool);
+        return mcpServerFacade.updateMcpTool(mcpTool);
     }
 
     @Override
+    @Audited(event = McpToolAuditEvents.MCP_TOOL_ENABLED_UPDATED, data = {
+        @AuditData(key = "mcpToolId", value = "#mcpToolId"),
+        @AuditData(key = "mcpComponentId", value = "#result?.mcpComponentId"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "enabled", value = "#enabled")
+    })
     @PreAuthorize("isTenantAdmin()")
     public McpTool updateEmbeddedMcpToolEnabled(long mcpToolId, boolean enabled) {
         getEmbeddedMcpTool(mcpToolId);

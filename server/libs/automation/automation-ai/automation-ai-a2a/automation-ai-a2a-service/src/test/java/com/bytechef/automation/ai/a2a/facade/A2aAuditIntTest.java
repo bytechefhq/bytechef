@@ -25,6 +25,7 @@ import com.bytechef.automation.ai.a2a.config.A2aIntTestConfiguration;
 import com.bytechef.automation.ai.a2a.config.A2aIntTestConfigurationSharedMocks;
 import com.bytechef.automation.ai.a2a.config.A2aIntTestWorkflows;
 import com.bytechef.automation.ai.a2a.domain.A2aProject;
+import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.repository.A2aProjectRepository;
 import com.bytechef.automation.ai.a2a.repository.A2aProjectWorkflowRepository;
@@ -88,6 +89,9 @@ class A2aAuditIntTest {
 
     @Autowired
     private A2aProjectRepository a2aProjectRepository;
+
+    @Autowired
+    private A2aProjectWorkflowFacade a2aProjectWorkflowFacade;
 
     @Autowired
     private A2aProjectWorkflowRepository a2aProjectWorkflowRepository;
@@ -336,6 +340,28 @@ class A2aAuditIntTest {
             Map.of(
                 "result", "ERROR", "errorClass", IllegalArgumentException.class.getName(), "a2aServerId",
                 String.valueOf(Long.MAX_VALUE)));
+    }
+
+    @Test
+    void testDisablingAnA2aProjectWorkflowRecordsTheWorkflowItsProjectAndTheNewState() {
+        A2aProject a2aProject = createA2aProject();
+
+        List<A2aProjectWorkflow> a2aProjectWorkflows = a2aProjectWorkflowRepository.findAllByA2aProjectId(
+            a2aProject.getId());
+
+        A2aProjectWorkflow a2aProjectWorkflow = a2aProjectWorkflows.getFirst();
+
+        a2aProjectWorkflowFacade.updateA2aProjectWorkflowEnabled(a2aProjectWorkflow.getId(), false);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            A2aAuditEvents.A2A_PROJECT_WORKFLOW_ENABLED_UPDATED);
+
+        assertSuccess(persistentAuditEvent);
+        assertData(
+            persistentAuditEvent, "updateA2aProjectWorkflowEnabled",
+            Map.of(
+                "result", "SUCCESS", "a2aProjectWorkflowId", String.valueOf(a2aProjectWorkflow.getId()),
+                "a2aProjectId", String.valueOf(a2aProject.getId()), "enabled", "false"));
     }
 
     private static void assertData(

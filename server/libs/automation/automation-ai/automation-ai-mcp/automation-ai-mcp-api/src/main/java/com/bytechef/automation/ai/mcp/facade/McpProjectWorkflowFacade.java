@@ -16,6 +16,8 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+
 /**
  * Facade for managing MCP Project Workflow operations that involve multiple services.
  *
@@ -23,10 +25,14 @@ package com.bytechef.automation.ai.mcp.facade;
  */
 public interface McpProjectWorkflowFacade {
 
+    McpProjectWorkflow createMcpProjectWorkflow(long mcpProjectId, long projectDeploymentWorkflowId);
+
     /**
      * Deletes an MCP project workflow and its associated project deployment workflow.
      *
      * @param mcpProjectWorkflowId the ID of the MCP project workflow to delete
      */
     void deleteMcpProjectWorkflow(long mcpProjectWorkflowId);
+
+    McpProjectWorkflow updateMcpProjectWorkflowEnabled(long mcpProjectWorkflowId, boolean enabled);
 }
