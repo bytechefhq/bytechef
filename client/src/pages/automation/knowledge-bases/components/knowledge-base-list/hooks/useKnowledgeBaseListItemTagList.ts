@@ -37,7 +37,7 @@ export default function useKnowledgeBaseListItemTagList({
             }
         },
         onMutate: async (variables: UpdateKnowledgeBaseTagsVarsI) => {
-            await queryClient.cancelQueries({queryKey: ['knowledgeBaseTagsByKnowledgeBase']});
+            await queryClient.cancelQueries({queryKey: tagsByKnowledgeBaseQueryKey});
 
             const previous = queryClient.getQueryData<{knowledgeBaseTagsByKnowledgeBase: KnowledgeBaseTagsEntry[]}>(
                 tagsByKnowledgeBaseQueryKey
