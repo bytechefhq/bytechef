@@ -35,6 +35,7 @@ import com.bytechef.atlas.coordinator.task.UnfinishedTaskExecutionCanceller;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -151,6 +152,10 @@ public class TaskCoordinator {
         Map<String, ?> data = resumeJobEvent.getData();
 
         Long taskExecutionId = resumeJobEvent.getTaskExecutionId();
+
+        if (taskExecutionId == null) {
+            taskExecutionId = SuspendedJobs.getSuspendedTaskExecutionId(job);
+        }
 
         if (taskExecutionId == null) {
             try {

@@ -109,7 +109,7 @@ public interface WebhookWorkflowExecutor {
     boolean hasStreamingTask(WorkflowExecutionId workflowExecutionId);
 
     /**
-     * Checks whether the workflow contains a task that can pause the run: an approval or a wait.
+     * Checks whether the workflow contains a task that can pause the run: an approval, a wait or an approval gate.
      *
      * @param workflowExecutionId the workflow execution id
      * @return {@code true} when the workflow contains a suspending task

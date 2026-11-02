@@ -46,6 +46,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProce
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -750,9 +751,9 @@ public class JobSyncExecutor {
 
         Job job = jobOptional.get();
 
-        if (job.getStatus() != Job.Status.STARTED) {
+        if (!SuspendedJobs.canRunTasks(job)) {
             if (log.isDebugEnabled()) {
-                log.debug("Skipping task scheduling for non-STARTED job (status={}): {}", job.getStatus(), jobId);
+                log.debug("Skipping task scheduling for job id={} in status {}", jobId, job.getStatus());
             }
 
             return;
