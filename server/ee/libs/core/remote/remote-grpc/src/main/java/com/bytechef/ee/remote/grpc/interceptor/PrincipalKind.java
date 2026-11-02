@@ -13,6 +13,7 @@ package com.bytechef.ee.remote.grpc.interceptor;
 final class PrincipalKind {
 
     static final String API_KEY = "api-key";
+    static final String EXTERNAL_ISSUER = "external-issuer";
     static final String USER = "user";
 
     private PrincipalKind() {

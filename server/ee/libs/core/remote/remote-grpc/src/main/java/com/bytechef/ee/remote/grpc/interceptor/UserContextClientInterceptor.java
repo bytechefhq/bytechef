@@ -9,6 +9,7 @@ package com.bytechef.ee.remote.grpc.interceptor;
 
 import com.bytechef.ee.remote.grpc.security.RemotePrincipalCodec;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.ExternalIssuerAuthentication;
 import com.bytechef.platform.security.web.authentication.PlatformUserAuthentication;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -29,8 +30,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Sends the caller's principal with every outgoing call: an interactively authenticated platform user, a
- * {@link PlatformUserAuthentication} or an API-key user with their login and authorities, or a principal kind written
- * by a {@link RemotePrincipalCodec}.
+ * {@link PlatformUserAuthentication}, an {@link ExternalIssuerAuthentication} or an API-key user with their login and
+ * authorities, or a principal kind written by a {@link RemotePrincipalCodec}.
  *
  * @version ee
  */
@@ -86,7 +87,9 @@ public class UserContextClientInterceptor implements ClientInterceptor {
             authentication instanceof RememberMeAuthenticationToken ||
             authentication instanceof PlatformUserAuthentication) {
 
-            putUser(authentication, metadata);
+            putUser(authentication, PrincipalKind.USER, metadata);
+        } else if (authentication instanceof ExternalIssuerAuthentication) {
+            putUser(authentication, PrincipalKind.EXTERNAL_ISSUER, metadata);
         }
     }
 
@@ -117,14 +120,14 @@ public class UserContextClientInterceptor implements ClientInterceptor {
         }
     }
 
-    private static void putUser(Authentication authentication, Metadata metadata) {
+    private static void putUser(Authentication authentication, String principalKind, Metadata metadata) {
         String login = getLogin(authentication.getPrincipal());
 
         if (login == null) {
             return;
         }
 
-        metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, PrincipalKind.USER);
+        metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, principalKind);
         metadata.put(GrpcMetadataKeys.USER_LOGIN, login.getBytes(StandardCharsets.UTF_8));
 
         putAuthorities(authentication, metadata);
