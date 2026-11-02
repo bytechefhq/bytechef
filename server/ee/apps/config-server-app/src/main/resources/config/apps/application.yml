@@ -324,6 +324,12 @@ bytechef:
   tool-invocation-log:
     # Number of days tool invocation records are kept, default: 90
     retention-days: 90
+  webhook-delivery:
+    # Outbound webhook POSTs (job status and task started webhooks, notification webhooks, Slack, approval reminders)
+    # in flight at once across all endpoints; each endpoint receives one delivery at a time.
+    concurrency-limit: 10
+    # Deliveries to one endpoint that may wait or run at the same time; further ones are dropped and logged.
+    max-pending-deliveries: 1000
   webhook-url: http://127.0.0.1:7888/webhooks/{id}
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"

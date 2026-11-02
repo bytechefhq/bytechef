@@ -21,6 +21,9 @@ bytechef:
   edition: EE
   file-storage:
     provider: JDBC
+  webhook-delivery:
+    concurrency-limit: 10
+    max-pending-deliveries: 1000
   worker:
     enabled: false
   workflow:

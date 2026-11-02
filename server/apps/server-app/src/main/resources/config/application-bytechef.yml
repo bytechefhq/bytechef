@@ -298,6 +298,12 @@ bytechef:
     whatsapp:
       # Token Meta echoes back when verifying the WhatsApp interactivity webhook
       verify-token:
+  webhook-delivery:
+    # Outbound webhook POSTs (job status and task started webhooks, notification webhooks, Slack, approval reminders)
+    # in flight at once across all endpoints; each endpoint receives one delivery at a time.
+    concurrency-limit: 10
+    # Deliveries to one endpoint that may wait or run at the same time; further ones are dropped and logged.
+    max-pending-deliveries: 1000
   webhook-url:
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
