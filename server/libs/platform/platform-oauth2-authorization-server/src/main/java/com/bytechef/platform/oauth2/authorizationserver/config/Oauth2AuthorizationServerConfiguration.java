@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
+import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.authorizationserver.config.McpAuthorizationServerConfigurer;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -100,9 +101,12 @@ public class Oauth2AuthorizationServerConfiguration {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityFilterChain oauth2AuthorizationServerSecurityFilterChain(
-        HttpSecurity http, AuthorizationServerSettings authorizationServerSettings, JwtDecoder jwtDecoder,
+        ApplicationProperties applicationProperties, HttpSecurity http,
+        AuthorizationServerSettings authorizationServerSettings, JwtDecoder jwtDecoder,
         RegisteredClientRepository registeredClientRepository, ObjectProvider<McpEndpoint> mcpEndpointProvider)
         throws Exception {
+
+        String consentPageUri = getConsentPageUri(applicationProperties.getPublicUrl());
 
         List<String> mcpScopes = mcpEndpointProvider.orderedStream()
             .map(McpEndpoint::getScope)
@@ -140,7 +144,7 @@ public class Oauth2AuthorizationServerConfiguration {
                                     .matcher("/.well-known/openid-configuration")));
 
                         authorizationServer.authorizationEndpoint(
-                            authorizationEndpoint -> authorizationEndpoint.consentPage(CONSENT_PAGE_URI));
+                            authorizationEndpoint -> authorizationEndpoint.consentPage(consentPageUri));
 
                         TenantKeyedAuthorizationCodeGenerator authorizationCodeGenerator =
                             new TenantKeyedAuthorizationCodeGenerator();
@@ -257,6 +261,14 @@ public class Oauth2AuthorizationServerConfiguration {
                 }
             }
         };
+    }
+
+    private static String getConsentPageUri(@Nullable String publicUrl) {
+        if (publicUrl == null || publicUrl.isBlank()) {
+            return CONSENT_PAGE_URI;
+        }
+
+        return removeTrailingSlash(publicUrl.strip()) + CONSENT_PAGE_URI;
     }
 
     private static void setAuthorizationCodeGenerator(
