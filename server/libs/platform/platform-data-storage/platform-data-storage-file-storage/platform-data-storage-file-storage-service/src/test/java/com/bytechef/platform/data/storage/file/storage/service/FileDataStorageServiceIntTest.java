@@ -16,61 +16,44 @@
 
 package com.bytechef.platform.data.storage.file.storage.service;
 
-import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.file.storage.config.FileDataStorageIntTestConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import tools.jackson.databind.json.JsonMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-public class FileDataStorageServiceTest {
+@SpringBootTest(
+    classes = FileDataStorageIntTestConfiguration.class, properties = "bytechef.data-storage.provider=filesystem")
+public class FileDataStorageServiceIntTest {
 
-    private static final FileDataStorageService FILE_DATA_STORAGE_SERVICE;
-
-    static {
-        try {
-            Path fileDataStorageTest = Files.createTempDirectory("file_data_storage_test");
-
-            File baseDir = fileDataStorageTest.toFile();
-
-            if (!baseDir.exists() && !baseDir.mkdirs()) {
-                throw new RuntimeException("Failed to create base directory");
-            }
-
-            FILE_DATA_STORAGE_SERVICE = new FileDataStorageServiceImpl(
-                new FilesystemFileStorageService(baseDir.getAbsolutePath()), JsonMapper.builder()
-                    .build());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    @Autowired
+    private DataStorage dataStorage;
 
     @Test
     public void testDelete() {
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
 
-        String value1 = FILE_DATA_STORAGE_SERVICE.get(
+        String value1 = dataStorage.get(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value1", value1);
 
-        FILE_DATA_STORAGE_SERVICE.delete("test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0,
+        dataStorage.delete("test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0,
             PlatformType.AUTOMATION);
 
-        Optional<String> value1Optional = FILE_DATA_STORAGE_SERVICE.fetch(
+        Optional<String> value1Optional = dataStorage.fetch(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(Optional.empty(), value1Optional);
@@ -78,10 +61,10 @@ public class FileDataStorageServiceTest {
 
     @Test
     public void testFetch() {
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
 
-        Optional<String> value1Optional = FILE_DATA_STORAGE_SERVICE.fetch(
+        Optional<String> value1Optional = dataStorage.fetch(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value1", value1Optional.get());
@@ -89,10 +72,10 @@ public class FileDataStorageServiceTest {
 
     @Test
     public void testGet() {
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
 
-        String value1 = FILE_DATA_STORAGE_SERVICE.get(
+        String value1 = dataStorage.get(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value1", value1);
@@ -100,12 +83,12 @@ public class FileDataStorageServiceTest {
 
     @Test
     public void testGetAll() {
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key2", "value2", 0, PlatformType.AUTOMATION);
 
-        Map<String, String> values = FILE_DATA_STORAGE_SERVICE.getAll(
+        Map<String, String> values = dataStorage.getAll(
             "test", DataStorageScope.WORKFLOW, "scopeId1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(values.size(), 2);
@@ -115,16 +98,16 @@ public class FileDataStorageServiceTest {
 
     @Test
     public void testGetAllReturnsOnlyTheEntriesOfTheComponentAndScope() {
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "listed", DataStorageScope.WORKFLOW, "scopeId2", "first_key", "value1", 1, PlatformType.AUTOMATION);
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "other", DataStorageScope.WORKFLOW, "scopeId2", "key1", "value2", 1, PlatformType.AUTOMATION);
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "__internal_state", DataStorageScope.WORKFLOW, "scopeId2", "key1", "value3", 1, PlatformType.AUTOMATION);
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "listed", DataStorageScope.ACCOUNT, "scopeId2", "key1", "value4", 1, PlatformType.AUTOMATION);
 
-        Map<String, String> values = FILE_DATA_STORAGE_SERVICE.getAll(
+        Map<String, String> values = dataStorage.getAll(
             "listed", DataStorageScope.WORKFLOW, "scopeId2", 1, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(Map.of("first_key", "value1"), values);
@@ -132,51 +115,51 @@ public class FileDataStorageServiceTest {
 
     @Test
     public void testPut() {
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value1", 0, PlatformType.AUTOMATION);
 
-        Object value = FILE_DATA_STORAGE_SERVICE.get(
+        Object value = dataStorage.get(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value1", value);
 
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", "value2", 0, PlatformType.AUTOMATION);
 
-        value = FILE_DATA_STORAGE_SERVICE.get(
+        value = dataStorage.get(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals("value2", value);
 
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 34, 0, PlatformType.AUTOMATION);
 
-        value = FILE_DATA_STORAGE_SERVICE.get(
+        value = dataStorage.get(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(34, value);
 
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 44L, 0, PlatformType.AUTOMATION);
 
-        value = FILE_DATA_STORAGE_SERVICE.get(
+        value = dataStorage.get(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(44L, value);
 
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", Map.of("key1", "value1"), 0,
             PlatformType.AUTOMATION);
 
-        value = FILE_DATA_STORAGE_SERVICE.get(
+        value = dataStorage.get(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(Map.of("key1", "value1"), value);
 
-        FILE_DATA_STORAGE_SERVICE.put(
+        dataStorage.put(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", Map.of("key1", 23), 0, PlatformType.AUTOMATION);
 
-        value = FILE_DATA_STORAGE_SERVICE.get(
+        value = dataStorage.get(
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(Map.of("key1", 23), value);
