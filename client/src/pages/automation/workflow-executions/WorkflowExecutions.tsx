@@ -12,7 +12,6 @@ import {
     getProjectDeploymentLabel,
     getWorkflowExecutionsFilters,
 } from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
-import ExecutionsTabs from '@/shared/components/executions/ExecutionsTabs';
 import FilterTitle from '@/shared/components/filters/FilterTitle';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
@@ -188,13 +187,11 @@ export const WorkflowExecutions = () => {
                         </div>
                     }
                     title={
-                        <div className="flex items-center gap-4">
-                            <ExecutionsTabs fallback={isFirstRun && 'Workflow Executions'} />
-
-                            {workflowExecutionPage?.content && workflowExecutionPage.content.length > 0 && (
-                                <FilterTitle filters={activeFilters} />
-                            )}
-                        </div>
+                        workflowExecutionPage?.content && workflowExecutionPage.content.length > 0 ? (
+                            <FilterTitle filters={activeFilters} />
+                        ) : (
+                            isFirstRun && 'Workflow Executions'
+                        )
                     }
                 />
             }
