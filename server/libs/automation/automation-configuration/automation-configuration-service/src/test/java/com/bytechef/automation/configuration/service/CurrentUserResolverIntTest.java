@@ -25,12 +25,14 @@ import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.service.UserServiceImpl;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.OptionalLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -132,10 +134,12 @@ class CurrentUserResolverIntTest {
         @Bean
         UserService userService(
             AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
-            PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
+            PersistentTokenRepository persistentTokenRepository, UserRepository userRepository,
+            ObjectProvider<WorkspaceMembershipAssigner> workspaceMembershipAssignerProvider) {
 
             return new UserServiceImpl(
-                authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, userRepository);
+                authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, userRepository,
+                workspaceMembershipAssignerProvider);
         }
 
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

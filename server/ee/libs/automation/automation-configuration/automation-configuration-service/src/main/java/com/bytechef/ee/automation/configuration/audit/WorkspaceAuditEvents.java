@@ -16,6 +16,7 @@ public final class WorkspaceAuditEvents {
 
     public static final String WORKSPACE_CREATED = "WORKSPACE_CREATED";
     public static final String WORKSPACE_DELETED = "WORKSPACE_DELETED";
+    public static final String WORKSPACE_MEMBERSHIPS_REMOVED = "WORKSPACE_MEMBERSHIPS_REMOVED";
     public static final String WORKSPACE_UPDATED = "WORKSPACE_UPDATED";
 
     private WorkspaceAuditEvents() {
