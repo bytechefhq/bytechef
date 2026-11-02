@@ -166,6 +166,39 @@ class StateValueDataStorageIntTest {
     }
 
     @Test
+    void testSaveTaskStateOverwritesEntryLeftByFailedCleanup() {
+        taskStateService.save(JOB_RESUME_ID, "first");
+
+        String firstKey = getTaskStateReference().key();
+
+        taskStateService.save(JOB_RESUME_ID, "second");
+
+        putTaskStateEntry(firstKey, "first");
+
+        assertThat(getTaskStateEntries()).hasSize(2);
+
+        taskStateService.save(JOB_RESUME_ID, "third");
+
+        assertThat(getTaskStateReference().key()).isEqualTo(firstKey);
+        assertThat(getTaskStateEntries()).containsOnly(Map.entry(firstKey, "third"));
+    }
+
+    @Test
+    void testDeleteTaskStateDeletesEntryLeftByFailedCleanup() {
+        taskStateService.save(JOB_RESUME_ID, "first");
+
+        String firstKey = getTaskStateReference().key();
+
+        taskStateService.save(JOB_RESUME_ID, "second");
+
+        putTaskStateEntry(firstKey, "first");
+
+        taskStateService.delete(JOB_RESUME_ID);
+
+        assertThat(getTaskStateEntries()).isEmpty();
+    }
+
+    @Test
     void testRolledBackTaskStateSaveKeepsCommittedValue() {
         taskStateService.save(JOB_RESUME_ID, "first");
 
@@ -290,6 +323,12 @@ class StateValueDataStorageIntTest {
         return dataStorage.getAll(
             StateValueDataStorage.TASK_STATE_COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION,
             String.valueOf(JOB_ID), ENVIRONMENT_ID, PlatformType.AUTOMATION);
+    }
+
+    private void putTaskStateEntry(String key, Object value) {
+        dataStorage.put(
+            StateValueDataStorage.TASK_STATE_COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION,
+            String.valueOf(JOB_ID), key, value, ENVIRONMENT_ID, PlatformType.AUTOMATION);
     }
 
     private Map<String, Object> getTriggerStateEntries() {
