@@ -30,14 +30,12 @@ import {
     ServerCogIcon,
     ServerIcon,
     Settings2Icon,
-    SquareActivityIcon,
     SquareIcon,
     Table2Icon,
     UnplugIcon,
     UsersIcon,
     VectorSquareIcon,
     Workflow,
-    WrenchIcon,
     ZapIcon,
 } from 'lucide-react';
 import {Suspense, lazy, useEffect, useLayoutEffect, useState} from 'react';
@@ -58,8 +56,6 @@ type NavigationType = {
     href: string;
     icon: LucideIcon;
 };
-
-const executionsNavigationGroup: NavigationGroupType = {icon: SquareActivityIcon, name: 'Executions'};
 
 const serversNavigationGroup: NavigationGroupType = {icon: ServerCogIcon, name: 'Servers'};
 
@@ -92,16 +88,9 @@ const automationNavigation: NavigationType[] = [
         name: 'A2A Servers',
     },
     {
-        group: executionsNavigationGroup,
         href: '/automation/executions',
         icon: ActivityIcon,
-        name: 'Workflow Executions',
-    },
-    {
-        group: executionsNavigationGroup,
-        href: '/automation/executions/tool-invocations',
-        icon: WrenchIcon,
-        name: 'Tool Invocations',
+        name: 'Executions',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
@@ -141,16 +130,9 @@ const embeddedNavigation: NavigationType[] = [
         name: 'Connected Users',
     },
     {
-        group: executionsNavigationGroup,
         href: '/embedded/executions',
         icon: ActivityIcon,
-        name: 'Workflow Executions',
-    },
-    {
-        group: executionsNavigationGroup,
-        href: '/embedded/executions/tool-invocations',
-        icon: WrenchIcon,
-        name: 'Tool Invocations',
+        name: 'Executions',
     },
     {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
 ];
@@ -223,10 +205,6 @@ function App() {
 
         if (navItem.href === '/automation/knowledge-bases') {
             return ai.knowledgeBase.enabled;
-        }
-
-        if (navItem.href === '/automation/executions/tool-invocations') {
-            return edition === EditionType.EE;
         }
 
         return true;
