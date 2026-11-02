@@ -1,34 +1,62 @@
 import {FC, useState} from 'react';
+import {ApprovalFormField} from '@/components/ApprovalFormField';
 import {useApprovalResolution} from '@/components/approvalResolutionContext';
-import {useChatStore} from '@/stores/useChatStore';
+import {PendingApprovalI, useChatStore} from '@/stores/useChatStore';
+import {
+    getApprovalFormDefaultValues,
+    hasCommentField,
+    toApprovalFormData,
+    validateApprovalForm,
+} from '@/utils/approval-form';
+import type {ApprovalFormValuesType} from '@/utils/approval-form';
 import {isAcceptedResumeResponse} from '@/utils/approval-utils';
 import {Button} from './ui/button';
 
 export const ApprovalCard: FC = () => {
     const pendingApproval = useChatStore((state) => state.pendingApproval);
-    const setMessage = useChatStore((state) => state.setMessage);
-    const setPendingApproval = useChatStore((state) => state.setPendingApproval);
-
-    const approvalResolution = useApprovalResolution();
-
-    const [comment, setComment] = useState('');
-    const [error, setError] = useState<string | null>(null);
-    const [submitting, setSubmitting] = useState(false);
 
     if (!pendingApproval) {
         return null;
     }
 
+    return <ApprovalCardContent key={pendingApproval.resumeUrl} pendingApproval={pendingApproval} />;
+};
+
+const ApprovalCardContent: FC<{pendingApproval: PendingApprovalI}> = ({pendingApproval}) => {
+    const setMessage = useChatStore((state) => state.setMessage);
+    const setPendingApproval = useChatStore((state) => state.setPendingApproval);
+
+    const approvalResolution = useApprovalResolution();
+
+    const inputs = pendingApproval.inputs ?? [];
+
+    const [comment, setComment] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [submitting, setSubmitting] = useState(false);
+    const [values, setValues] = useState<ApprovalFormValuesType>(() => getApprovalFormDefaultValues(inputs));
+
     const title = pendingApproval.formTitle || 'Approval requested';
+    const showCommentField = !hasCommentField(inputs);
 
     const resolve = async (approved: boolean) => {
+        if (approved) {
+            const validationErrors = validateApprovalForm(inputs, values);
+
+            setFieldErrors(validationErrors);
+
+            if (Object.keys(validationErrors).length > 0) {
+                return;
+            }
+        }
+
         setSubmitting(true);
         setError(null);
 
-        const body: Record<string, unknown> = {approved};
+        const body: Record<string, unknown> = {...toApprovalFormData(inputs, values), approved};
         const trimmedComment = comment.trim();
 
-        if (trimmedComment) {
+        if (trimmedComment && showCommentField) {
             body.comment = trimmedComment;
         }
 
@@ -80,14 +108,31 @@ export const ApprovalCard: FC = () => {
                 </div>
             )}
 
-            <textarea
-                aria-label="Comment (optional)"
-                className="min-h-16 w-full resize-y rounded-md border border-border bg-background p-2 text-sm outline-none"
-                disabled={submitting}
-                onChange={(changeEvent) => setComment(changeEvent.target.value)}
-                placeholder="Add a note for the requester — included whether you approve or discard."
-                value={comment}
-            />
+            {inputs.map((input) => {
+                const fieldName = input.fieldName!;
+
+                return (
+                    <ApprovalFormField
+                        disabled={submitting}
+                        error={fieldErrors[fieldName]}
+                        input={input}
+                        key={fieldName}
+                        onChange={(value) => setValues((currentValues) => ({...currentValues, [fieldName]: value}))}
+                        value={values[fieldName]}
+                    />
+                );
+            })}
+
+            {showCommentField && (
+                <textarea
+                    aria-label="Comment (optional)"
+                    className="min-h-16 w-full resize-y rounded-md border border-border bg-background p-2 text-sm outline-none"
+                    disabled={submitting}
+                    onChange={(changeEvent) => setComment(changeEvent.target.value)}
+                    placeholder="Add a note for the requester — included whether you approve or discard."
+                    value={comment}
+                />
+            )}
 
             {error && (
                 <div className="text-destructive" role="alert">

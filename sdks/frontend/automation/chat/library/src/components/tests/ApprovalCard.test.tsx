@@ -54,3 +54,97 @@ describe('ApprovalCard without an approval resolution provider', () => {
         ]);
     });
 });
+
+describe('ApprovalCard with form inputs', () => {
+    const fetchSpy = vi.fn<typeof fetch>();
+    const originalFetch = globalThis.fetch;
+
+    const FORM_APPROVAL = {
+        formTitle: 'Approve refund',
+        inputs: [
+            {fieldLabel: 'Amount', fieldName: 'amount', fieldType: 9, required: true},
+            {
+                fieldLabel: 'Reason',
+                fieldName: 'reason',
+                fieldOptions: [
+                    {label: 'Damaged', value: 'damaged'},
+                    {label: 'Late', value: 'late'},
+                ],
+                fieldType: 7,
+            },
+            {defaultValue: 'r-1', fieldName: 'requestId', fieldType: 13},
+        ],
+        resumeUrl: 'https://bytechef.example.com/job/resume/abc',
+    };
+
+    beforeEach(() => {
+        globalThis.fetch = fetchSpy;
+
+        fetchSpy.mockResolvedValue(new Response(null, {status: 204}));
+
+        useChatStore.setState({messages: [], pendingApproval: FORM_APPROVAL});
+    });
+
+    afterEach(() => {
+        globalThis.fetch = originalFetch;
+
+        vi.clearAllMocks();
+    });
+
+    it('does not submit an approval while a required field is empty', () => {
+        render(<ApprovalCard />);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Approve'}));
+
+        expect(screen.getByText('This field is required')).toBeInTheDocument();
+        expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('posts the field values, hidden fields and comment with the decision', async () => {
+        render(<ApprovalCard />);
+
+        fireEvent.change(screen.getByLabelText(/Amount/), {target: {value: '25'}});
+        fireEvent.change(screen.getByLabelText(/Reason/), {target: {value: 'late'}});
+        fireEvent.change(screen.getByLabelText('Comment (optional)'), {target: {value: 'ok'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Approve'}));
+
+        await waitFor(() => expect(useChatStore.getState().pendingApproval).toBeNull());
+
+        expect(fetchSpy).toHaveBeenCalledWith(FORM_APPROVAL.resumeUrl, expect.objectContaining({method: 'POST'}));
+        expect(JSON.parse(fetchSpy.mock.calls[0][1]!.body as string)).toEqual({
+            amount: 25,
+            approved: true,
+            comment: 'ok',
+            reason: 'late',
+            requestId: 'r-1',
+        });
+    });
+
+    it('discards without requiring the form fields', async () => {
+        render(<ApprovalCard />);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Discard'}));
+
+        await waitFor(() => expect(useChatStore.getState().pendingApproval).toBeNull());
+
+        expect(JSON.parse(fetchSpy.mock.calls[0][1]!.body as string)).toEqual({
+            approved: false,
+            reason: '',
+            requestId: 'r-1',
+        });
+    });
+
+    it('hides the comment box when the form defines its own comment field', () => {
+        useChatStore.setState({
+            pendingApproval: {
+                ...FORM_APPROVAL,
+                inputs: [{fieldLabel: 'Comment', fieldName: 'comment', fieldType: 5}],
+            },
+        });
+
+        render(<ApprovalCard />);
+
+        expect(screen.queryByLabelText('Comment (optional)')).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Comment')).toBeInTheDocument();
+    });
+});
