@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -109,6 +110,7 @@ public class ProjectDeploymentGraphQlController {
     }
 
     @QueryMapping(name = "workspaceProjectDeployments")
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'DEPLOYMENT_VIEW', #environmentId)")
     public List<ProjectDeployment> workspaceProjectDeployments(
         @Argument Long workspaceId, @Argument Long environmentId, @Argument Long projectId, @Argument Long tagId) {
 

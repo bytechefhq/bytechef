@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -34,6 +35,7 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.SharedTemplateRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -67,6 +69,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @author Ivica Cardic
@@ -91,6 +94,9 @@ class ProjectFacadeAuditIntTest {
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @MockitoSpyBean
+    private PermissionService permissionService;
 
     @Autowired
     private ProjectFacade projectFacade;
@@ -215,6 +221,9 @@ class ProjectFacadeAuditIntTest {
         persistenceAuditEventRepository.deleteAll();
 
         authenticate(AuthorityConstants.USER);
+
+        doReturn(false).when(permissionService)
+            .hasResourceScope(projectId, "Project", "PROJECT_DELETE");
 
         assertThatThrownBy(() -> projectFacade.deleteProject(projectId))
             .isInstanceOf(AccessDeniedException.class);
