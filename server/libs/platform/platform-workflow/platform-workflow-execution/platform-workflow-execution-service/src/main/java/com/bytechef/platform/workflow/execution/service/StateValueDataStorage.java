@@ -29,7 +29,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.Optional;
-import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
@@ -65,7 +64,12 @@ public class StateValueDataStorage {
 
     void delete(Key key, @Nullable Object storedValue) {
         if (storedValue instanceof StateValueReference reference) {
-            runAfterCompletion(() -> deleteEntry(key, reference), null);
+            runAfterCompletion(
+                () -> {
+                    deleteEntry(key, reference, getSlotKey(key, 0));
+                    deleteEntry(key, reference, getSlotKey(key, 1));
+                },
+                null);
         }
     }
 
@@ -121,7 +125,7 @@ public class StateValueDataStorage {
         if (locationOptional.isPresent()) {
             Location location = locationOptional.get();
             StateValueReference reference = new StateValueReference(
-                location.environmentId(), location.type(), key.key() + "_" + UUID.randomUUID());
+                location.environmentId(), location.type(), getNextSlotKey(key, previousStoredValue));
 
             DataStorage dataStorage = getDataStorage();
 
@@ -129,13 +133,13 @@ public class StateValueDataStorage {
                 key.componentName(), key.scope(), key.scopeId(), reference.key(), value, reference.environmentId(),
                 reference.type());
 
-            runAfterCompletion(null, () -> deleteEntry(key, reference));
+            runAfterCompletion(null, () -> deleteEntry(key, reference, reference.key()));
 
             storedValue = reference;
         }
 
         if (previousStoredValue instanceof StateValueReference previousReference) {
-            runAfterCompletion(() -> deleteEntry(key, previousReference), null);
+            runAfterCompletion(() -> deleteEntry(key, previousReference, previousReference.key()), null);
         }
 
         return storedValue;
@@ -152,12 +156,28 @@ public class StateValueDataStorage {
         }
     }
 
-    private void deleteEntry(Key key, StateValueReference reference) {
+    private void deleteEntry(Key key, StateValueReference reference, String storageKey) {
         DataStorage dataStorage = getDataStorage();
 
         dataStorage.delete(
-            key.componentName(), key.scope(), key.scopeId(), reference.key(), reference.environmentId(),
+            key.componentName(), key.scope(), key.scopeId(), storageKey, reference.environmentId(),
             reference.type());
+    }
+
+    private static String getNextSlotKey(Key key, @Nullable Object previousStoredValue) {
+        if (previousStoredValue instanceof StateValueReference previousReference) {
+            String previousKey = previousReference.key();
+
+            if (previousKey.equals(getSlotKey(key, 0))) {
+                return getSlotKey(key, 1);
+            }
+        }
+
+        return getSlotKey(key, 0);
+    }
+
+    private static String getSlotKey(Key key, int slot) {
+        return key.key() + "_" + slot;
     }
 
     private DataStorage getDataStorage() {
