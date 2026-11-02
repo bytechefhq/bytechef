@@ -43,9 +43,13 @@ export default function useKnowledgeBases(): UseKnowledgeBasesResultI {
     const tagId = tagIdParam ?? undefined;
 
     const {data: tagsByKnowledgeBaseQueryData} = useKnowledgeBaseTagsByKnowledgeBaseQuery({
+        environmentId: String(environmentId),
         workspaceId: String(workspaceId),
     });
-    const {data: allTagsData} = useKnowledgeBaseTagsQuery({workspaceId: String(workspaceId)});
+    const {data: allTagsData} = useKnowledgeBaseTagsQuery({
+        environmentId: String(environmentId),
+        workspaceId: String(workspaceId),
+    });
 
     const tagsByKnowledgeBaseData = useMemo(
         () => tagsByKnowledgeBaseQueryData?.knowledgeBaseTagsByKnowledgeBase ?? [],
