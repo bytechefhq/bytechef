@@ -64,9 +64,8 @@ class TaskDispatcherDslTest {
     void testDynamicPropertiesDataSourceCarriesPropertiesFunction() {
         PropertiesFunction propertiesFunction = inputParameters -> List.of();
 
-        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty = dynamicProperties("inputs")
-            .propertiesLookupDependsOn("workflowUuid")
-            .properties(propertiesFunction);
+        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty = dynamicProperties("inputs", propertiesFunction)
+            .propertiesLookupDependsOn("workflowUuid");
 
         PropertiesDataSource propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
 
@@ -78,8 +77,7 @@ class TaskDispatcherDslTest {
     void testDynamicPropertiesDataSourceWithoutLookupDependenciesKeepsPropertiesFunction() {
         PropertiesFunction propertiesFunction = inputParameters -> List.of();
 
-        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty = dynamicProperties("inputs")
-            .properties(propertiesFunction);
+        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty = dynamicProperties("inputs", propertiesFunction);
 
         PropertiesDataSource propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
 
@@ -88,12 +86,9 @@ class TaskDispatcherDslTest {
     }
 
     @Test
-    void testDynamicPropertiesDataSourceRequiresPropertiesFunction() {
-        ModifiableDynamicPropertiesProperty dynamicPropertiesProperty = dynamicProperties("inputs")
-            .propertiesLookupDependsOn("workflowUuid");
-
-        assertThatThrownBy(dynamicPropertiesProperty::getDynamicPropertiesDataSource)
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("inputs");
+    void testDynamicPropertiesRejectsNullPropertiesFunction() {
+        assertThatThrownBy(() -> dynamicProperties("inputs", null))
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining("propertiesFunction");
     }
 }
