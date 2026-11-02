@@ -148,7 +148,8 @@ public final class EchoService implements BindableService {
     public static String describePrincipal(Authentication authentication) {
         if (authentication instanceof AbstractApiKeyAuthenticationToken apiKeyAuthenticationToken) {
             return "api-key|" + apiKeyAuthenticationToken.getName() + "|" +
-                apiKeyAuthenticationToken.getEnvironmentId() + "|" + joinAuthorities(apiKeyAuthenticationToken);
+                apiKeyAuthenticationToken.getEnvironmentId() + "|" + apiKeyAuthenticationToken.getCredentialType() +
+                "|" + apiKeyAuthenticationToken.getPlatformType() + "|" + joinAuthorities(apiKeyAuthenticationToken);
         }
 
         return describeUser(authentication);

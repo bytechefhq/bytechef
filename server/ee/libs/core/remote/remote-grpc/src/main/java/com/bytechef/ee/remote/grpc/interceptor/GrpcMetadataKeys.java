@@ -16,8 +16,14 @@ import io.grpc.Metadata;
  */
 public final class GrpcMetadataKeys {
 
+    public static final Metadata.Key<String> CREDENTIAL_TYPE =
+        Metadata.Key.of("x-bytechef-credential-type", Metadata.ASCII_STRING_MARSHALLER);
+
     public static final Metadata.Key<String> ENVIRONMENT_ID =
         Metadata.Key.of("x-bytechef-environment-id", Metadata.ASCII_STRING_MARSHALLER);
+
+    public static final Metadata.Key<String> PLATFORM_TYPE =
+        Metadata.Key.of("x-bytechef-platform-type", Metadata.ASCII_STRING_MARSHALLER);
 
     public static final Metadata.Key<String> PRINCIPAL_KIND =
         Metadata.Key.of("x-bytechef-principal-kind", Metadata.ASCII_STRING_MARSHALLER);
