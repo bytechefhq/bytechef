@@ -30,11 +30,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Ivica Cardic
@@ -49,25 +53,32 @@ public class StateValueDataStorage {
     private final ObjectProvider<DataStorage> dataStorageObjectProvider;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final PrincipalJobService principalJobService;
+    private final TransactionTemplate requiresNewTransactionTemplate;
 
     @SuppressFBWarnings("EI")
     StateValueDataStorage(
         ApplicationProperties applicationProperties, ObjectProvider<DataStorage> dataStorageObjectProvider,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobService principalJobService) {
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        PlatformTransactionManager platformTransactionManager,
+        PrincipalJobService principalJobService) {
 
         this.applicationProperties = applicationProperties;
         this.dataStorageObjectProvider = dataStorageObjectProvider;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.principalJobService = principalJobService;
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        this.requiresNewTransactionTemplate = transactionTemplate;
     }
 
-    void delete(Key key, @Nullable Object storedValue) {
+    void delete(Key key, @Nullable Object storedValue, Supplier<Optional<Object>> lockedStoredValueSupplier) {
         if (storedValue instanceof StateValueReference reference) {
             runAfterCompletion(
-                () -> {
-                    deleteEntry(key, reference, getSlotKey(key, 0));
-                    deleteEntry(key, reference, getSlotKey(key, 1));
-                },
+                () -> deleteStaleEntries(
+                    key, reference, lockedStoredValueSupplier, getSlotKey(key, 0), getSlotKey(key, 1)),
                 null);
         }
     }
@@ -115,7 +126,10 @@ public class StateValueDataStorage {
         return storedValue;
     }
 
-    Object write(Key key, Object value, Optional<Location> locationOptional, @Nullable Object previousStoredValue) {
+    Object write(
+        Key key, Object value, Optional<Location> locationOptional, @Nullable Object previousStoredValue,
+        Supplier<Optional<Object>> lockedStoredValueSupplier) {
+
         Object storedValue = value;
 
         if (locationOptional.isPresent()) {
@@ -129,13 +143,16 @@ public class StateValueDataStorage {
                 key.componentName(), key.scope(), key.scopeId(), reference.key(), value, reference.environmentId(),
                 reference.type());
 
-            runAfterCompletion(null, () -> deleteEntry(key, reference, reference.key()));
+            runAfterCompletion(
+                null, () -> deleteStaleEntries(key, reference, lockedStoredValueSupplier, reference.key()));
 
             storedValue = reference;
         }
 
         if (previousStoredValue instanceof StateValueReference previousReference) {
-            runAfterCompletion(() -> deleteEntry(key, previousReference, previousReference.key()), null);
+            runAfterCompletion(
+                () -> deleteStaleEntries(key, previousReference, lockedStoredValueSupplier, previousReference.key()),
+                null);
         }
 
         return storedValue;
@@ -158,6 +175,26 @@ public class StateValueDataStorage {
         dataStorage.delete(
             key.componentName(), key.scope(), key.scopeId(), storageKey, reference.environmentId(),
             reference.type());
+    }
+
+    private void deleteStaleEntries(
+        Key key, StateValueReference reference, Supplier<Optional<Object>> lockedStoredValueSupplier,
+        String... storageKeys) {
+
+        requiresNewTransactionTemplate.executeWithoutResult(transactionStatus -> {
+            Optional<Object> currentStoredValueOptional = lockedStoredValueSupplier.get();
+
+            String currentKey = currentStoredValueOptional
+                .filter(StateValueReference.class::isInstance)
+                .map(currentStoredValue -> ((StateValueReference) currentStoredValue).key())
+                .orElse(null);
+
+            for (String storageKey : storageKeys) {
+                if (!storageKey.equals(currentKey)) {
+                    deleteEntry(key, reference, storageKey);
+                }
+            }
+        });
     }
 
     private static String getNextSlotKey(Key key, @Nullable Object previousStoredValue) {
