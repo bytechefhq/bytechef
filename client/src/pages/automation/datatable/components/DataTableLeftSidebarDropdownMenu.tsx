@@ -5,6 +5,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {MoreVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 
 import useDeleteDataTableAlertDialog from '../hooks/useDeleteDataTableAlertDialog';
@@ -19,6 +21,15 @@ const DataTableLeftSidebarDropdownMenu = ({tableId, tableName}: Props) => {
     const {handleOpen: handleDeleteOpen} = useDeleteDataTableAlertDialog();
     const {handleOpen: handleRenameOpen} = useRenameDataTableDialog();
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canDeleteDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_DELETE');
+    const canEditDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_EDIT');
+
+    if (!canEditDataTable && !canDeleteDataTable) {
+        return null;
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -32,18 +43,22 @@ const DataTableLeftSidebarDropdownMenu = ({tableId, tableName}: Props) => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                    icon={<PencilIcon />}
-                    label="Rename"
-                    onSelect={() => handleRenameOpen(tableId, tableName)}
-                />
+                {canEditDataTable && (
+                    <DropdownMenuItem
+                        icon={<PencilIcon />}
+                        label="Rename"
+                        onSelect={() => handleRenameOpen(tableId, tableName)}
+                    />
+                )}
 
-                <DropdownMenuItem
-                    icon={<Trash2Icon />}
-                    label="Delete"
-                    onSelect={() => handleDeleteOpen(tableId, tableName)}
-                    variant="destructive"
-                />
+                {canDeleteDataTable && (
+                    <DropdownMenuItem
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onSelect={() => handleDeleteOpen(tableId, tableName)}
+                        variant="destructive"
+                    />
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
