@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.execution.config;
 
+import static org.mockito.Mockito.mock;
+
 import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
 import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -23,11 +25,14 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.execution.repository.TaskStateRepository;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.service.StateValueDataStorage;
 import com.bytechef.platform.workflow.execution.service.TaskStateServiceImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -49,9 +54,14 @@ import tools.jackson.databind.ObjectMapper;
     basePackageClasses = TaskStateRepository.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = TaskStateRepository.class))
 @Import({
-    JacksonConfiguration.class, LiquibaseConfiguration.class, TaskStateServiceImpl.class
+    JacksonConfiguration.class, LiquibaseConfiguration.class, StateValueDataStorage.class, TaskStateServiceImpl.class
 })
 public class ApprovalFormFacadeIntTestConfiguration {
+
+    @Bean
+    PrincipalJobService principalJobService() {
+        return mock(PrincipalJobService.class);
+    }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class ApprovalFormFacadeIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {

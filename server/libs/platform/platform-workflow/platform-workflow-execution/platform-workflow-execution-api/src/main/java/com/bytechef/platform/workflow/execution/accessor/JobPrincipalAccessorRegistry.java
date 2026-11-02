@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.execution.accessor;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,10 @@ public class JobPrincipalAccessorRegistry {
         this.joPrincipalAccessorMap = jobPrincipalAccessors.stream()
             .collect(
                 Collectors.toMap(JobPrincipalAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
+    }
+
+    public Optional<JobPrincipalAccessor> fetchJobPrincipalAccessor(PlatformType type) {
+        return Optional.ofNullable(joPrincipalAccessorMap.get(type));
     }
 
     public JobPrincipalAccessor getJobPrincipalAccessor(PlatformType type) {
