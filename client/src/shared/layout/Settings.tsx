@@ -1,3 +1,4 @@
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -39,6 +40,7 @@ export const isNavItemCurrent = (pathname: string, href: string): boolean => {
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
+    const isTenantAdmin = useIsTenantAdmin();
 
     const location = useLocation();
 
@@ -56,7 +58,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         }
 
         if (navItem.href === 'mcp-server') {
-            return isFeatureFlagEnabled('ff-2197');
+            return isTenantAdmin && isFeatureFlagEnabled('ff-2197');
         }
 
         if (navItem.href === 'admin-api-keys') {
