@@ -14,6 +14,8 @@ import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,6 +41,23 @@ class GatewayProxySecurityConfigurationIntTest {
     @Test
     void testRoutedRequestMatches() {
         assertThat(proxyFilterChain.matches(request("/api/automation/internal/projects"))).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "/oauth2/authorize", "/oauth2/token", "/oauth2/revoke", "/oauth2/register", "/oauth2/jwks",
+        "/.well-known/oauth-authorization-server", "/.well-known/oauth-protected-resource/api/management/mcp"
+    })
+    void testAuthorizationServerRequestMatches(String requestUri) {
+        assertThat(proxyFilterChain.matches(request(requestUri))).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "/oauth2/consent", "/oauth2/redirect"
+    })
+    void testOAuth2SpaPageDoesNotMatch(String requestUri) {
+        assertThat(proxyFilterChain.matches(request(requestUri))).isFalse();
     }
 
     @Test
