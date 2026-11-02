@@ -935,6 +935,10 @@ curl -X POST "$BYTECHEF_URL/api/automation/v1/projects/deploy?workspaceId=1&enab
   -F "projectFile=@src/sample_code_project.py"
 ```
 
+With Enterprise Edition role-based access control, which is on the upcoming release track, the deploy
+endpoint requires both `PROJECT_CREATE` and `PROJECT_PUBLISH` on the workspace. A caller without them
+gets HTTP 403.
+
 What the endpoint does:
 
 - **It saves *and* publishes.** The upload is saved as the project's draft and published in the same call, so the
