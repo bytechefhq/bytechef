@@ -266,9 +266,11 @@ public class AiHubChatArtifactServiceImpl implements AiHubChatArtifactService {
 
         AiHubChatArtifactKind kind = artifact.getKind();
 
-        if (kind != AiHubChatArtifactKind.WORKFLOW_REFERENCED) {
+        if (kind != AiHubChatArtifactKind.WORKFLOW_REFERENCED && kind != AiHubChatArtifactKind.AI_AGENT_REFERENCED) {
             throw new IllegalArgumentException(
-                "Only WORKFLOW_REFERENCED artifacts can be deleted via this surface; got kind=" + kind);
+                "Only WORKFLOW_REFERENCED and AI_AGENT_REFERENCED artifacts can be deleted via this surface; got kind="
+                    +
+                    kind);
         }
 
         chatArtifactRepository.deleteById(artifactId);

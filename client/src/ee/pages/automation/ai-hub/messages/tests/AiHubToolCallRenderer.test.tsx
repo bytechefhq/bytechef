@@ -90,8 +90,8 @@ describe('AiHubToolCallRenderer', () => {
     });
 
     describe('openWorkflowTab', () => {
-        it('is the only artifact-open tool name', () => {
-            expect([...ARTIFACT_OPEN_TOOL_NAMES]).toEqual(['openWorkflowTab']);
+        it('is one of the two artifact-open tool names', () => {
+            expect([...ARTIFACT_OPEN_TOOL_NAMES]).toEqual(['openAiAgentTab', 'openWorkflowTab']);
         });
 
         it('renders as a clickable workflow link instead of a JSON card', () => {
@@ -141,6 +141,30 @@ describe('AiHubToolCallRenderer', () => {
             fireEvent.click(screen.getByRole('button'));
 
             expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
+        });
+    });
+
+    describe('openAiAgentTab', () => {
+        it('renders as a clickable AI Agent link that opens the agent tab', () => {
+            render(
+                <AiHubToolCallRenderer
+                    args={{aiAgentId: '42', name: 'Support Agent'}}
+                    result={{opened: true}}
+                    toolCallId="call-agent"
+                    toolName="openAiAgentTab"
+                />
+            );
+
+            expect(screen.getByText('Support Agent')).toBeInTheDocument();
+            expect(screen.getByText('AI Agent')).toBeInTheDocument();
+
+            fireEvent.click(screen.getByRole('button'));
+
+            expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({
+                aiAgentId: '42',
+                kind: 'aiAgent',
+                name: 'Support Agent',
+            });
         });
     });
 });

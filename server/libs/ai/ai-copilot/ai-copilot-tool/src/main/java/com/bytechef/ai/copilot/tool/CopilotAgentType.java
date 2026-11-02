@@ -45,6 +45,8 @@ public enum CopilotAgentType implements AgentType {
     SAMPLE_OUTPUT_ASK(Source.SAMPLE_OUTPUT, Mode.ASK),
     SAMPLE_OUTPUT_BUILD(Source.SAMPLE_OUTPUT, Mode.BUILD),
     MCP_SERVER_BUILD(Source.MCP_SERVER, Mode.BUILD),
+    AI_AGENT_ASK(Source.AI_AGENT, Mode.ASK),
+    AI_AGENT_BUILD(Source.AI_AGENT, Mode.BUILD),
     WORKFLOW_EDITOR_EMBEDDED_ASK(Source.WORKFLOW_EDITOR_EMBEDDED, Mode.ASK),
     WORKFLOW_EDITOR_EMBEDDED_BUILD(Source.WORKFLOW_EDITOR_EMBEDDED, Mode.BUILD),
     SKILLS("skills"),
@@ -54,7 +56,8 @@ public enum CopilotAgentType implements AgentType {
     IMPORT_WORKFLOW("importWorkflow"),
     DEBUG_WORKFLOW_EXECUTION("debugWorkflowExecution"),
     BUILD_INTEGRATION_WORKFLOW("buildIntegrationWorkflow"),
-    CONFIGURE_MCP_SERVER("configureMcpServer");
+    CONFIGURE_MCP_SERVER("configureMcpServer"),
+    BUILD_AI_AGENT("buildAiAgent");
 
     private final String key;
 

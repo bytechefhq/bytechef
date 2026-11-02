@@ -16,16 +16,21 @@
 
 package com.bytechef.ai.copilot.config;
 
+import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +40,18 @@ import org.springframework.context.annotation.Bean;
  */
 @AutoConfiguration
 public class ToolCallbacksFactoryConfiguration {
+
+    @Bean
+    @ConditionalOnBean(AiAgentFacade.class)
+    AiAgentToolCallbacksFactory aiAgentToolCallbacksFactory(
+        AiAgentFacade aiAgentFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ObjectProvider<AiSkillFacade> aiSkillFacadeProvider,
+        ObjectProvider<WorkspaceKnowledgeBaseFacade> workspaceKnowledgeBaseFacadeProvider) {
+
+        return new AiAgentToolCallbacksFactory(
+            aiAgentFacade, clusterElementDefinitionService, aiSkillFacadeProvider.getIfAvailable(),
+            workspaceKnowledgeBaseFacadeProvider.getIfAvailable());
+    }
 
     @Bean
     @ConditionalOnBean({

@@ -52,7 +52,7 @@ describe('AgentInstructionsCard', () => {
     it('saves the edited markdown on blur', async () => {
         const user = userEvent.setup();
 
-        render(wrap(<AgentInstructionsCard agentId="agent-1" instructions="Be terse." />));
+        render(wrap(<AgentInstructionsCard agentId="agent-1" externalChangeRevision={0} instructions="Be terse." />));
 
         const editor = screen.getByLabelText('Instructions');
 
@@ -66,7 +66,7 @@ describe('AgentInstructionsCard', () => {
     it('does not save when the field is blurred without an edit', async () => {
         const user = userEvent.setup();
 
-        render(wrap(<AgentInstructionsCard agentId="agent-1" instructions="* Be terse." />));
+        render(wrap(<AgentInstructionsCard agentId="agent-1" externalChangeRevision={0} instructions="* Be terse." />));
 
         await user.click(screen.getByLabelText('Instructions'));
         await user.tab();
@@ -74,8 +74,39 @@ describe('AgentInstructionsCard', () => {
         expect(updateAiAgentMutate).not.toHaveBeenCalled();
     });
 
+    it('keeps unsaved edits when the agent changes outside the card', async () => {
+        const user = userEvent.setup();
+
+        const {rerender} = render(
+            wrap(<AgentInstructionsCard agentId="agent-1" externalChangeRevision={0} instructions="Be terse." />)
+        );
+
+        const editor = screen.getByLabelText('Instructions');
+
+        await user.clear(editor);
+        await user.type(editor, 'Draft');
+
+        rerender(
+            wrap(<AgentInstructionsCard agentId="agent-1" externalChangeRevision={1} instructions="Be verbose." />)
+        );
+
+        expect(screen.getByLabelText('Instructions')).toHaveValue('Draft');
+    });
+
+    it('shows the refetched instructions after an outside change when nothing is unsaved', () => {
+        const {rerender} = render(
+            wrap(<AgentInstructionsCard agentId="agent-1" externalChangeRevision={0} instructions="Be terse." />)
+        );
+
+        rerender(
+            wrap(<AgentInstructionsCard agentId="agent-1" externalChangeRevision={1} instructions="Be verbose." />)
+        );
+
+        expect(screen.getByLabelText('Instructions')).toHaveValue('Be verbose.');
+    });
+
     it('renders an empty editor when the agent has no instructions', () => {
-        render(wrap(<AgentInstructionsCard agentId="agent-1" instructions={null} />));
+        render(wrap(<AgentInstructionsCard agentId="agent-1" externalChangeRevision={0} instructions={null} />));
 
         expect(screen.getByLabelText('Instructions')).toHaveValue('');
     });
