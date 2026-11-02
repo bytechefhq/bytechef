@@ -10,16 +10,27 @@ package com.bytechef.ee.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacadeImpl;
+import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
+import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
+import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
@@ -27,6 +38,9 @@ import com.bytechef.ee.automation.configuration.repository.WorkspaceUserReposito
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.repository.UserRepository;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -35,6 +49,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -54,7 +71,9 @@ import org.springframework.web.context.request.RequestContextHolder;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = WorkspacePermissionIntTestConfiguration.class,
+    classes = {
+        WorkspacePermissionIntTestConfiguration.class, PermissionServiceIntTest.ProjectDeploymentConfiguration.class
+    },
     properties = {
         "bytechef.edition=ee", "spring.liquibase.contexts=mono,dev"
     })
@@ -77,6 +96,12 @@ class PermissionServiceIntTest {
     private PermissionService permissionService;
 
     @Autowired
+    private ProjectDeploymentFacade projectDeploymentFacade;
+
+    @Autowired
+    private ProjectDeploymentRepository projectDeploymentRepository;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
@@ -87,6 +112,9 @@ class PermissionServiceIntTest {
 
     @Autowired
     private WorkspaceScopeCacheService workspaceScopeCacheService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
@@ -107,6 +135,73 @@ class PermissionServiceIntTest {
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testDevelopmentViewerIsDeniedADeploymentWriteInDevelopment() {
+        long developmentDeploymentId = saveDeployment(createProject(), Environment.DEVELOPMENT);
+
+        authenticate(createMember(workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT), AuthorityConstants.USER);
+
+        ProjectDeployment projectDeployment = renamedDeployment(developmentDeploymentId);
+
+        assertThatThrownBy(
+            () -> projectDeploymentFacade.updateProjectDeployment(projectDeployment, List.of(), List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(storedDeploymentName(developmentDeploymentId)).isNotEqualTo(projectDeployment.getName());
+    }
+
+    @Test
+    void testDevelopmentEditorIsAllowedTheDeploymentWriteInDevelopment() {
+        long developmentDeploymentId = saveDeployment(createProject(), Environment.DEVELOPMENT);
+
+        authenticate(createMember(workspaceId, WorkspaceRole.EDITOR, Environment.DEVELOPMENT), AuthorityConstants.USER);
+
+        ProjectDeployment projectDeployment = renamedDeployment(developmentDeploymentId);
+
+        projectDeploymentFacade.updateProjectDeployment(projectDeployment, List.of(), List.of());
+
+        assertThat(storedDeploymentName(developmentDeploymentId)).isEqualTo(projectDeployment.getName());
+    }
+
+    @Test
+    void testDevelopmentViewerIsDeniedReadingAProductionDeploymentById() {
+        long productionDeploymentId = saveDeployment(createProject(), Environment.PRODUCTION);
+
+        authenticate(createMember(workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT), AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeployment(productionDeploymentId))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testDevelopmentViewerIsAllowedReadingADevelopmentDeploymentById() {
+        long developmentDeploymentId = saveDeployment(createProject(), Environment.DEVELOPMENT);
+
+        authenticate(createMember(workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT), AuthorityConstants.USER);
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacade.getProjectDeployment(
+            developmentDeploymentId);
+
+        assertThat(projectDeploymentDTO.id()).isEqualTo(developmentDeploymentId);
+    }
+
+    @Test
+    void testMemberOfAnotherWorkspaceIsDeniedTheDeploymentById() {
+        long developmentDeploymentId = saveDeployment(createProject(), Environment.DEVELOPMENT);
+
+        Workspace otherWorkspace = workspaceRepository.save(new Workspace("Other " + UUID.randomUUID()));
+
+        authenticate(createMember(otherWorkspace.getId(), WorkspaceRole.EDITOR, null), AuthorityConstants.USER);
+
+        ProjectDeployment projectDeployment = renamedDeployment(developmentDeploymentId);
+
+        assertThatThrownBy(
+            () -> projectDeploymentFacade.updateProjectDeployment(projectDeployment, List.of(), List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeployment(developmentDeploymentId))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
@@ -707,10 +802,58 @@ class PermissionServiceIntTest {
         return workflowId;
     }
 
+    private String createMember(long memberWorkspaceId, WorkspaceRole workspaceRole, Environment environment) {
+        String login = "member-" + UUID.randomUUID();
+
+        User user = new User();
+
+        user.setActivated(true);
+        user.setEmail(login + "@localhost.com");
+        user.setLogin(login);
+        user.setPassword(String.valueOf(UUID.randomUUID()));
+        user.setUuid(String.valueOf(UUID.randomUUID()));
+
+        user = userRepository.save(user);
+
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(user.getId(), memberWorkspaceId, workspaceRole, environment));
+
+        return login;
+    }
+
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resourceOwnershipResolver), List.of());
+    }
+
+    private ProjectDeployment renamedDeployment(long projectDeploymentId) {
+        ProjectDeployment projectDeployment = projectDeploymentRepository.findById(projectDeploymentId)
+            .orElseThrow();
+
+        projectDeployment.setName("renamed-" + UUID.randomUUID());
+
+        return projectDeployment;
+    }
+
+    private long saveDeployment(Project project, Environment environment) {
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(environment);
+        projectDeployment.setName(environment.name() + "-" + UUID.randomUUID());
+        projectDeployment.setProjectId(project.getId());
+        projectDeployment.setProjectVersion(1);
+
+        projectDeployment = projectDeploymentRepository.save(projectDeployment);
+
+        return projectDeployment.getId();
+    }
+
+    private String storedDeploymentName(long projectDeploymentId) {
+        ProjectDeployment projectDeployment = projectDeploymentRepository.findById(projectDeploymentId)
+            .orElseThrow();
+
+        return projectDeployment.getName();
     }
 
     private static void authenticate(String login, String authority) {
@@ -732,5 +875,40 @@ class PermissionServiceIntTest {
                 return resourceOwner;
             }
         };
+    }
+
+    @TestConfiguration
+    @Import({
+        ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
+        ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class
+    })
+    static class ProjectDeploymentConfiguration {
+
+        @Bean
+        ProjectDeploymentFacade projectDeploymentFacade(
+            PermissionService permissionService, ProjectDeploymentService projectDeploymentService)
+            throws ReflectiveOperationException {
+
+            Constructor<?>[] constructors = ProjectDeploymentFacadeImpl.class.getConstructors();
+
+            Constructor<?> constructor = constructors[0];
+
+            Class<?>[] parameterTypes = constructor.getParameterTypes();
+            Object[] arguments = new Object[parameterTypes.length];
+
+            for (int index = 0; index < parameterTypes.length; index++) {
+                Class<?> parameterType = parameterTypes[index];
+
+                if (parameterType == PermissionService.class) {
+                    arguments[index] = permissionService;
+                } else if (parameterType == ProjectDeploymentService.class) {
+                    arguments[index] = projectDeploymentService;
+                } else {
+                    arguments[index] = mock(parameterType);
+                }
+            }
+
+            return (ProjectDeploymentFacade) constructor.newInstance(arguments);
+        }
     }
 }
