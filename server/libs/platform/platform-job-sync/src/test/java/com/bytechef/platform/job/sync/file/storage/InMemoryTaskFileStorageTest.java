@@ -28,6 +28,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -111,6 +112,35 @@ class InMemoryTaskFileStorageTest {
         assertEquals(contextValue, read);
         assertEquals(1, durable.storeContextCalls.get());
         assertEquals(0, durable.readContextCalls.get());
+    }
+
+    @Test
+    void testStoreContextValueSharesUnchangedNestedValuesWithTheStoredContext() {
+        FileEntry durableFileEntry = new FileEntry("ctx.json", "base64://Q1RY");
+        List<Map<String, Object>> records = List.of(Map.of("name", "first"), Map.of("name", "second"));
+        Map<String, Object> contextValue = Map.of("records", records);
+
+        InMemoryTaskFileStorage storage = new InMemoryTaskFileStorage(new RecordingTaskFileStorage(durableFileEntry));
+
+        storage.storeContextValue(jobId, 7, Context.Classname.TASK_EXECUTION, contextValue);
+
+        Map<String, ?> read = storage.readContextValue(durableFileEntry);
+
+        assertSame(records, read.get("records"));
+    }
+
+    @Test
+    void testStoreTaskExecutionOutputCachesACopyOfTheOutput() {
+        FileEntry durableFileEntry = new FileEntry("43.json", "base64://VEVY");
+        List<Object> output = new ArrayList<>(List.of("first"));
+
+        InMemoryTaskFileStorage storage = new InMemoryTaskFileStorage(new RecordingTaskFileStorage(durableFileEntry));
+
+        storage.storeTaskExecutionOutput(jobId, 43L, output);
+
+        output.add("second");
+
+        assertEquals(List.of("first"), storage.readTaskExecutionOutput(durableFileEntry));
     }
 
     @Test

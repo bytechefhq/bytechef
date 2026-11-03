@@ -110,7 +110,7 @@ public final class InMemoryTaskFileStorage implements TaskFileStorage {
     public FileEntry storeContextValue(long stackId, Context.Classname classname, Map<String, ?> value) {
         FileEntry fileEntry = durableTaskFileStorage.storeContextValue(stackId, classname, value);
 
-        cache(fileEntry, value);
+        cacheContextValue(fileEntry, value);
 
         return fileEntry;
     }
@@ -121,7 +121,7 @@ public final class InMemoryTaskFileStorage implements TaskFileStorage {
 
         FileEntry fileEntry = durableTaskFileStorage.storeContextValue(stackId, subStackId, classname, value);
 
-        cache(fileEntry, value);
+        cacheContextValue(fileEntry, value);
 
         return fileEntry;
     }
@@ -178,5 +178,10 @@ public final class InMemoryTaskFileStorage implements TaskFileStorage {
         }
 
         return normalizedValue;
+    }
+
+    private void cacheContextValue(FileEntry fileEntry, Map<String, ?> value) {
+        jobDataStorage.put(
+            fileEntry.getUrl(), Objects.requireNonNull(TemporalValueUtils.normalizeSharingUnchanged(value)));
     }
 }

@@ -18,6 +18,7 @@ package com.bytechef.evaluator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.expression.AccessException;
@@ -39,9 +40,11 @@ class Remove implements MethodExecutor {
 
             return new TypedValue(list);
         } else if (arguments[0] instanceof Map<?, ?> map) {
-            map.remove(arguments[1]);
+            Map<Object, Object> newMap = new LinkedHashMap<>(map);
 
-            return new TypedValue(map);
+            newMap.remove(arguments[1]);
+
+            return new TypedValue(newMap);
         } else {
             throw new IllegalArgumentException("Invalid arguments for add.");
         }

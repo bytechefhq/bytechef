@@ -64,6 +64,18 @@ public final class TemporalValueUtils {
         };
     }
 
+    /**
+     * Normalizes like {@link #normalize(Object)}, but returns a map or list itself, instead of a copy, when none of its
+     * keys or nested values change, so unchanged values stay shared with the caller.
+     */
+    public static @Nullable Object normalizeSharingUnchanged(@Nullable Object value) {
+        return switch (value) {
+            case Map<?, ?> map -> normalizeMapSharingUnchanged(map);
+            case List<?> list -> normalizeListSharingUnchanged(list);
+            case null, default -> normalize(value);
+        };
+    }
+
     private static Map<String, @Nullable Object> normalizeMap(Map<?, ?> map) {
         Map<String, @Nullable Object> normalizedMap = new LinkedHashMap<>();
 
@@ -82,5 +94,45 @@ public final class TemporalValueUtils {
         }
 
         return normalizedList;
+    }
+
+    private static Map<?, ?> normalizeMapSharingUnchanged(Map<?, ?> map) {
+        Map<String, @Nullable Object> normalizedMap = new LinkedHashMap<>();
+        boolean changed = false;
+
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            Object key = entry.getKey();
+            Object entryValue = entry.getValue();
+
+            Object normalizedEntryValue = normalizeSharingUnchanged(entryValue);
+
+            if (!(key instanceof String) || normalizedEntryValue != entryValue) {
+                changed = true;
+            }
+
+            normalizedMap.put(String.valueOf(key), normalizedEntryValue);
+        }
+
+        return changed ? normalizedMap : map;
+    }
+
+    private static List<?> normalizeListSharingUnchanged(List<?> list) {
+        List<@Nullable Object> normalizedList = null;
+
+        for (int index = 0; index < list.size(); index++) {
+            Object item = list.get(index);
+
+            Object normalizedItem = normalizeSharingUnchanged(item);
+
+            if (normalizedList == null && normalizedItem != item) {
+                normalizedList = new ArrayList<>(list.subList(0, index));
+            }
+
+            if (normalizedList != null) {
+                normalizedList.add(normalizedItem);
+            }
+        }
+
+        return normalizedList == null ? list : normalizedList;
     }
 }
