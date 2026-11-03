@@ -20,6 +20,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,13 +123,27 @@ public class AutomationWorkflowProjectConfigurationResolver {
 
         Optional<AutomationWorkflowProjectConfiguration> pickOptional = pickSelfServe(connectedUser, projectId);
 
-        if (pickOptional.isPresent()) {
+        while (pickOptional.isPresent()) {
             AutomationWorkflowProjectConfiguration pick = pickOptional.get();
 
-            connectedUserProjectConfigurationService.assign(connectedUser.getId(), projectId, pick.getId());
+            if (isEnabled(pick)) {
+                connectedUserProjectConfigurationService.assign(connectedUser.getId(), projectId, pick.getId());
+
+                return pickOptional;
+            }
+
+            pickOptional = pickSelfServe(connectedUser, projectId);
         }
 
         return pickOptional;
+    }
+
+    private boolean isEnabled(AutomationWorkflowProjectConfiguration configuration) {
+        return automationWorkflowProjectConfigurationService
+            .getConfigurations(configuration.getProjectId(), configuration.getEnvironmentId())
+            .stream()
+            .anyMatch(currentConfiguration -> Objects.equals(currentConfiguration.getId(), configuration.getId()) &&
+                currentConfiguration.isEnabled());
     }
 
     private void lockConnectedUser(ConnectedUser connectedUser) {

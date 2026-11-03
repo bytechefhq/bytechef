@@ -63,6 +63,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -209,6 +210,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_DELETED, data = {
         @AuditData(key = "configurationId", value = "#id")
     })
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void deleteConfiguration(long id) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
@@ -224,12 +226,22 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             }
         }
 
-        connectedUserReferenceRolloutManager.deleteReferenceDeployments(
-            configuration.getProjectId(), getAssignedConnectedUserIds(id));
+        requiresNewTransactionTemplate.executeWithoutResult(
+            status -> automationWorkflowProjectConfigurationService.updateEnabled(id, false));
 
-        connectedUserProjectConfigurationService.deleteByConfigurationId(id);
+        deleteAssignedReferenceDeployments(configuration);
 
-        automationWorkflowProjectConfigurationService.delete(id);
+        if (!deleteUnassignedConfiguration(id)) {
+            deleteAssignedReferenceDeployments(configuration);
+
+            if (!deleteUnassignedConfiguration(id)) {
+                restoreEnabled(configuration);
+
+                throw new ConfigurationException(
+                    "Configuration is in use, try again",
+                    AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_IN_USE);
+            }
+        }
 
         applicationEventPublisher.publishEvent(
             new AutomationWorkflowProjectConfigurationDeletedEvent(
@@ -431,7 +443,96 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         AutomationWorkflowProjectConfigurationVersionImpactDTO versionImpact = getVersionImpact(
             sourceConfiguration, targetConfiguration.getProjectVersion(), sourceConnectedUserIds);
 
-        return new ConfigurationMoveImpactDTO(versionImpact.workflows(), skipped);
+        return new ConfigurationMoveImpactDTO(
+            addRemovedProvidedInputs(
+                versionImpact.workflows(), sourceConfiguration, targetConfiguration, sourceConnectedUserIds),
+            skipped);
+    }
+
+    private List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> addRemovedProvidedInputs(
+        List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> impactedWorkflows,
+        AutomationWorkflowProjectConfiguration sourceConfiguration,
+        AutomationWorkflowProjectConfiguration targetConfiguration, Set<Long> sourceConnectedUserIds) {
+
+        Map<String, Set<String>> removedProvidedInputNames = getRemovedProvidedInputNames(
+            sourceConfiguration, targetConfiguration);
+
+        if (removedProvidedInputNames.isEmpty()) {
+            return impactedWorkflows;
+        }
+
+        Map<String, ProjectWorkflow> targetProjectWorkflows = projectWorkflowService
+            .getProjectWorkflows(targetConfiguration.getProjectId(), targetConfiguration.getProjectVersion())
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getUuidAsString, projectWorkflow -> projectWorkflow));
+
+        Map<String, List<ConnectedUserWorkflowReferenceDTO>> referencesByWorkflowUuid = getUsersReferences(
+            sourceConfiguration, sourceConnectedUserIds, removedProvidedInputNames.keySet())
+                .stream()
+                .filter(reference -> !reference.dangling())
+                .collect(Collectors.groupingBy(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid));
+
+        Map<String, AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> workflowsByUuid =
+            new LinkedHashMap<>();
+
+        for (AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow impactedWorkflow : impactedWorkflows) {
+            workflowsByUuid.put(impactedWorkflow.workflowUuid(), impactedWorkflow);
+        }
+
+        for (Map.Entry<String, Set<String>> entry : removedProvidedInputNames.entrySet()) {
+            String workflowUuid = entry.getKey();
+            ProjectWorkflow targetProjectWorkflow = targetProjectWorkflows.get(workflowUuid);
+
+            if (targetProjectWorkflow == null) {
+                continue;
+            }
+
+            int affectedConnectedUserCount = (int) referencesByWorkflowUuid.getOrDefault(workflowUuid, List.of())
+                .stream()
+                .map(ConnectedUserWorkflowReferenceDTO::connectedUserId)
+                .distinct()
+                .count();
+
+            AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow impactedWorkflow = workflowsByUuid.get(
+                workflowUuid);
+
+            if (impactedWorkflow == null) {
+                Workflow workflow = workflowService.getWorkflow(targetProjectWorkflow.getWorkflowId());
+
+                String label = StringUtils.isBlank(workflow.getLabel()) ? workflowUuid : workflow.getLabel();
+
+                workflowsByUuid.put(
+                    workflowUuid,
+                    new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                        workflowUuid, label, entry.getValue()
+                            .stream()
+                            .sorted()
+                            .toList(),
+                        List.of(), affectedConnectedUserCount));
+
+                continue;
+            }
+
+            Set<String> newRequiredInputs = new LinkedHashSet<>(impactedWorkflow.newRequiredInputs());
+
+            newRequiredInputs.addAll(
+                entry.getValue()
+                    .stream()
+                    .sorted()
+                    .toList());
+
+            workflowsByUuid.put(
+                workflowUuid,
+                new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                    workflowUuid, impactedWorkflow.label(), List.copyOf(newRequiredInputs),
+                    impactedWorkflow.newRequiredConnections(),
+                    Math.max(impactedWorkflow.affectedConnectedUserCount(), affectedConnectedUserCount)));
+        }
+
+        return workflowsByUuid.values()
+            .stream()
+            .sorted(Comparator.comparing(AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow::label))
+            .toList();
     }
 
     @Override
@@ -776,6 +877,55 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         }
 
         return name.trim();
+    }
+
+    /**
+     * Deletes the references, the reference deployment and the assignment of every connected user still assigned to the
+     * configuration. Takes the rollout lock first and then each user's connected user projects; no path takes the
+     * rollout lock while it holds a connected user project lock.
+     */
+    private void deleteAssignedReferenceDeployments(AutomationWorkflowProjectConfiguration configuration) {
+        requiresNewTransactionTemplate.executeWithoutResult(status -> {
+            automationWorkflowProjectConfigurationService.lockRollout(
+                configuration.getProjectId(), configuration.getEnvironmentId());
+
+            connectedUserReferenceRolloutManager.deleteReferenceDeployments(
+                configuration.getProjectId(), configuration.getId(),
+                getAssignedConnectedUserIds(configuration.getId()));
+        });
+    }
+
+    private boolean deleteUnassignedConfiguration(long id) {
+        try {
+            return Boolean.TRUE.equals(requiresNewTransactionTemplate.execute(status -> {
+                if (!connectedUserProjectConfigurationService.getAssignments(id)
+                    .isEmpty()) {
+
+                    return false;
+                }
+
+                automationWorkflowProjectConfigurationService.delete(id);
+
+                return true;
+            }));
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            log.debug("Configuration id={} gained an assignment while it was deleted", id);
+
+            return false;
+        }
+    }
+
+    private void restoreEnabled(AutomationWorkflowProjectConfiguration configuration) {
+        if (!configuration.isEnabled()) {
+            return;
+        }
+
+        AutomationWorkflowProjectConfiguration restoredConfiguration = requiresNewTransactionTemplate.execute(
+            status -> automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), true));
+
+        if (restoredConfiguration != null) {
+            publishUpdatedEvent(restoredConfiguration);
+        }
     }
 
     private Set<Long> getAssignedConnectedUserIds(long configurationId) {

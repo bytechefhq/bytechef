@@ -33,6 +33,8 @@ public interface ConnectedUserProjectConfigurationService {
 
     Map<Long, Integer> countByConfigurationIds(Collection<Long> configurationIds);
 
+    void delete(long id);
+
     void deleteByConfigurationId(long configurationId);
 
     Optional<ConnectedUserProjectConfiguration> fetchAssignment(long connectedUserId, long projectId);
