@@ -87,6 +87,7 @@ class AuditDataContractTest {
     private static final String EXISTENCE_CHECK = "read-only existence check";
     private static final String RUNTIME_APPROVAL = "approval task opened by a workflow run";
     private static final String TAGS = "tag assignment";
+    private static final String PREVIEW = "returns a generated preview without saving it";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String ROW_DATA = "data table rows are data and are not recorded";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
@@ -107,6 +108,7 @@ class AuditDataContractTest {
         Map.entry("AiAgentTestFacadeImpl.executeAiAgentAction", EDITOR_TEST),
         Map.entry("AiSkillFacadeImpl.updateAiSkillTags", TAGS),
         Map.entry("ApiCollectionFacadeImpl.updateApiCollectionTags", TAGS),
+        Map.entry("ApiConnectorFacadeImpl.generateSpecification", PREVIEW),
         Map.entry("ApprovalTaskFacadeImpl.createApprovalTask", RUNTIME_APPROVAL),
         Map.entry("AutomationProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("AutomationProjectCodeWorkflowFacadeImpl.createEmptyCodeWorkflow", DELEGATES),
