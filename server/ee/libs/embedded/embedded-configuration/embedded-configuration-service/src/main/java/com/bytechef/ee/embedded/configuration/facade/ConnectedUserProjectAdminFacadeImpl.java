@@ -169,6 +169,13 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     public void provisionProjectWorkflows(
         long connectedUserId, long configurationId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows) {
 
+        if (workflows.isEmpty()) {
+            throw new ConfigurationException(
+                "No workflows to provision for connected user %s on configuration %s".formatted(
+                    connectedUserId, configurationId),
+                ConnectedUserProjectWorkflowErrorType.WORKFLOW_NOT_PROVISIONABLE);
+        }
+
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
         // The assignment commits before the references, which keep committing one by one with their triggers.
@@ -195,8 +202,9 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     /**
      * Locks the connected user's project, then assigns the connected user to the configuration (which locks the
      * connected user), so the lock order matches the reference paths: connected user project, then connected user.
-     * Rejects a configuration other than the one the connected user is already assigned to, and workflows the
-     * configuration does not release; a rejection rolls the assignment back.
+     * Rejects a configuration the provisioning list does not offer the connected user, a configuration other than the
+     * one the connected user is already assigned to, and workflows the configuration does not release; a rejection
+     * rolls the assignment back.
      */
     private void assignConfiguration(
         ConnectedUser connectedUser, long configurationId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows) {
@@ -210,6 +218,9 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
             .getOrCreateConnectedUserProject(connectedUser.getExternalId(), connectedUser.getEnvironment());
 
         connectedUserProjectService.lockConnectedUserProject(Objects.requireNonNull(connectedUserProject.getId()));
+
+        ProvisionableAutomationWorkflowProjectDTO.Configuration provisionableConfiguration =
+            getProvisionableConfiguration(connectedUser, projectId, configurationId);
 
         Optional<ConnectedUserProjectConfiguration> assignmentOptional =
             connectedUserProjectConfigurationService.fetchAssignment(connectedUser.getId(), projectId);
@@ -228,8 +239,10 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
             automationWorkflowProjectConfigurationResolver.assign(connectedUser, projectId, configurationId);
         }
 
-        Set<String> provisionableWorkflowUuids = getProvisionableWorkflowUuids(
-            connectedUser.getId(), projectId, configurationId);
+        Set<String> provisionableWorkflowUuids = provisionableConfiguration.workflows()
+            .stream()
+            .map(ProvisionableAutomationWorkflowProjectDTO.Workflow::workflowUuid)
+            .collect(Collectors.toSet());
 
         for (ProvisionConnectedUserProjectWorkflowDTO workflow : workflows) {
             if (!provisionableWorkflowUuids.contains(workflow.workflowUuid())) {
@@ -241,16 +254,27 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
         }
     }
 
-    private Set<String> getProvisionableWorkflowUuids(long connectedUserId, long projectId, long configurationId) {
-        return getProvisionableProjects(connectedUserId).stream()
+    /**
+     * Returns the configuration from the same list the provisioning dialog shows: an enabled configuration in the
+     * connected user's environment of a published project whose permission expression the connected user passes.
+     *
+     * @throws ConfigurationException with {@code CONFIGURATION_PROJECT_MISMATCH} when the configuration is not one of
+     *                                them
+     */
+    private ProvisionableAutomationWorkflowProjectDTO.Configuration getProvisionableConfiguration(
+        ConnectedUser connectedUser, long projectId, long configurationId) {
+
+        return getProvisionableProjects(connectedUser.getId()).stream()
             .filter(project -> project.projectId() == projectId)
             .flatMap(project -> project.configurations()
                 .stream())
             .filter(configuration -> configuration.id() == configurationId)
-            .flatMap(configuration -> configuration.workflows()
-                .stream())
-            .map(ProvisionableAutomationWorkflowProjectDTO.Workflow::workflowUuid)
-            .collect(Collectors.toSet());
+            .findFirst()
+            .orElseThrow(() -> new ConfigurationException(
+                ("Configuration id=%s of project id=%s cannot be provisioned for connected user id=%s: it is " +
+                    "disabled, in another environment, or the project is not released to the connected user")
+                        .formatted(configurationId, projectId, connectedUser.getId()),
+                AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH));
     }
 
     private ConnectedUserAutomationProjectConfigurationDTO toConnectedUserAutomationProjectConfiguration(
