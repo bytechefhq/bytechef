@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.notification.remote.client.facade;
 
 import com.bytechef.platform.notification.domain.Notification;
+import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.dto.NotificationDTO;
 import com.bytechef.platform.notification.facade.NotificationFacade;
 import java.util.List;
@@ -33,6 +34,16 @@ public class RemoteNotificationFacadeClient implements NotificationFacade {
 
     @Override
     public NotificationDTO updateNotification(Notification notification) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteNotification(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<NotificationEvent> getNotificationEvents() {
         throw new UnsupportedOperationException();
     }
 }
