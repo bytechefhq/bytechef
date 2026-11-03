@@ -236,7 +236,7 @@ for a receiver that needs one. The headers are sent on every delivery.
 |---|---|
 | Number of headers | At most 20. |
 | Header name | 1 to 256 characters. Letters, digits and the symbols `! # $ % & ' * + . ^ _ ~ -`, the backtick and the pipe character are allowed. |
-| Header value | At most 4096 characters. |
+| Header value | At most 4096 characters, with no line breaks or other control characters. |
 | Uniqueness | Names must be unique, ignoring case. |
 
 These names are reserved and are refused, ignoring case: any name starting with `X-ByteChef-`, and
@@ -246,9 +246,13 @@ notification.
 
 Header values are stored encrypted and are never returned by the API. When you reopen a notification,
 each saved value shows as `********` with the hint "Saved, leave unchanged to keep". Leave it alone and
-the stored value is kept. If you rename a saved header, its value is cleared, so you must enter the
-value again. Placeholders such as `{{workflow.name}}` are not expanded in header values or in the URL;
-they are sent as written.
+the stored value is kept. A saved header that you rename must have its value entered again: the dialog
+clears the value, and a renamed header sent without a new value is refused with the message
+`Header <name> has no saved value`. Placeholders such as `{{workflow.name}}` are not expanded in header values
+or in the URL; they are sent as written.
+
+Only header values are stored encrypted. The webhook URL and the body template are stored and returned
+by the API in plain text, so put API keys and tokens in custom headers, not in the URL or the template.
 
 ### Body template
 
@@ -270,6 +274,9 @@ allowed, so `{{ jobId }}` works too. Use the field names from the tables above.
   as escaped text, so it also belongs inside quotes.
 - `{{summary}}` is the one exception. It inserts the whole default body as raw JSON, so write it without
   quotes: `"event": {{summary}}`.
+- Only `{{summary}}` and fields that every event carries, such as `{{jobId}}`, may be left without
+  quotes. Put every other placeholder inside quotes. Optional fields, such as `{{job.durationMillis}}`
+  or `{{error.message}}`, are empty on some events, and an empty value without quotes breaks the JSON.
 
 For example, this template:
 
@@ -292,8 +299,9 @@ sends this body for the `JOB_FAILED` event above:
 ```
 
 The template is checked when you save. It can have at most 10000 characters, and it must produce valid
-JSON when filled with sample data, otherwise the save is refused with the message "Webhook body template
-must render to valid JSON". A template changes only the body. The headers described above are still
+JSON twice: once filled with sample data for every field, and once with only the fields every event
+carries. Otherwise the save is refused with the message "Webhook body template must render to valid JSON
+for every event; quote optional fields". A template changes only the body. The headers described above are still
 sent.
 
 ### Verifying signatures
@@ -303,8 +311,11 @@ Signing needs a signing secret:
 
 - A new Webhook notification gets a secret when you save it. The **Signing Secret** dialog shows it
   once, with a **Copy** button: "Copy this secret now. You won't be able to see it again."
-- Webhook notifications created before signing existed have no secret and are sent unsigned. Open the
-  notification and click **Generate signing secret**, then confirm.
+- Changing an Email or Slack notification to Webhook also generates a secret when you save it, and the
+  **Signing Secret** dialog shows it once in the same way.
+- Webhook notifications created before signing existed have no secret and are sent unsigned until they
+  get one. Saving the notification generates one, or open the notification and click **Generate signing
+  secret**, then confirm.
 - To replace a secret, click **Regenerate signing secret** and confirm. The old secret stops working
   immediately, so update your receiver with the new one.
 - The secret is stored encrypted and is never shown again or returned by the API.
