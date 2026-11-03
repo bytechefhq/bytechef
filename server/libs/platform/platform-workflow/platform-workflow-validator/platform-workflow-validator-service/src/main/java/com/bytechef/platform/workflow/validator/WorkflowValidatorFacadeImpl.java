@@ -156,6 +156,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             new HashMap<>(), nodeOutputMaps.outputMap(), nodeOutputMaps.variableOutputMap(), new HashMap<>(), errors,
             warnings);
 
+        appendMissingDefinitions(workflow, errors);
+
         if (workflowId != null) {
             appendMissingConnections(workflow, workflowId, environmentId, errors);
         }
@@ -308,6 +310,143 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 .append("\n");
 
             return null;
+        }
+    }
+
+    private void appendMissingDefinitions(String workflow, StringBuilder errors) {
+        try {
+            JsonNode workflowJsonNode = JsonUtils.readTree(workflow);
+
+            appendMissingNodeDefinitions(workflowJsonNode.get("triggers"), true, errors);
+            appendMissingNodeDefinitions(workflowJsonNode.get("tasks"), false, errors);
+        } catch (Exception e) {
+            log.debug("Failed to check the node definitions of the workflow", e);
+        }
+    }
+
+    private void appendMissingNodeDefinitions(@Nullable JsonNode nodesJsonNode, boolean trigger, StringBuilder errors) {
+        if (nodesJsonNode == null) {
+            return;
+        }
+
+        if (!nodesJsonNode.isArray()) {
+            appendMissingNodeDefinition(nodesJsonNode, trigger, errors);
+
+            return;
+        }
+
+        for (JsonNode nodeJsonNode : nodesJsonNode) {
+            appendMissingNodeDefinition(nodeJsonNode, trigger, errors);
+        }
+    }
+
+    private void appendMissingNodeDefinition(JsonNode nodeJsonNode, boolean trigger, StringBuilder errors) {
+        if (!nodeJsonNode.isObject() || !nodeJsonNode.has("name") || !nodeJsonNode.has("type")) {
+            return;
+        }
+
+        String name = nodeJsonNode.get("name")
+            .asString();
+        String type = nodeJsonNode.get("type")
+            .asString();
+
+        String missingDefinitionMessage = getMissingDefinitionMessage(type, trigger ? "trigger" : "task");
+
+        if (missingDefinitionMessage != null) {
+            StringUtils.appendWithNewline("[" + name + "] " + missingDefinitionMessage, errors);
+        }
+
+        appendMissingClusterElementDefinitions(nodeJsonNode.get("clusterElements"), errors);
+
+        WorkflowValidator.forEachNestedTask(
+            nodeJsonNode.get("parameters"),
+            nestedTaskJsonNode -> appendMissingNodeDefinition(nestedTaskJsonNode, false, errors));
+    }
+
+    private void appendMissingClusterElementDefinitions(
+        @Nullable JsonNode clusterElementsJsonNode, StringBuilder errors) {
+
+        if (clusterElementsJsonNode == null || !clusterElementsJsonNode.isObject()) {
+            return;
+        }
+
+        for (JsonNode clusterElementJsonNode : clusterElementsJsonNode.values()) {
+            if (clusterElementJsonNode.isArray()) {
+                for (JsonNode elementJsonNode : clusterElementJsonNode) {
+                    appendMissingClusterElementDefinition(elementJsonNode, errors);
+                }
+            } else {
+                appendMissingClusterElementDefinition(clusterElementJsonNode, errors);
+            }
+        }
+    }
+
+    private void appendMissingClusterElementDefinition(JsonNode elementJsonNode, StringBuilder errors) {
+        if (!elementJsonNode.isObject() || !elementJsonNode.has("name") || !elementJsonNode.has("type")) {
+            return;
+        }
+
+        String missingDefinitionMessage = getMissingDefinitionMessage(
+            elementJsonNode.get("type")
+                .asString(),
+            "clusterElement");
+
+        if (missingDefinitionMessage != null) {
+            StringUtils.appendWithNewline(
+                "[" + elementJsonNode.get("name")
+                    .asString() + "] " + missingDefinitionMessage,
+                errors);
+        }
+
+        appendMissingClusterElementDefinitions(elementJsonNode.get("clusterElements"), errors);
+    }
+
+    private @Nullable String getMissingDefinitionMessage(String type, String kind) {
+        WorkflowNodeType workflowNodeType;
+
+        try {
+            workflowNodeType = WorkflowNodeType.ofType(type);
+        } catch (RuntimeException runtimeException) {
+            log.debug("Failed to parse the node type '{}'", type, runtimeException);
+
+            return null;
+        }
+
+        String name = workflowNodeType.name();
+        int version = workflowNodeType.version();
+        String operation = workflowNodeType.operation();
+
+        if (operation == null) {
+            try {
+                taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
+
+                return null;
+            } catch (IllegalArgumentException illegalArgumentException) {
+                return ValidationErrorUtils.missingTaskDispatcher(name, version);
+            }
+        }
+
+        if (!componentDefinitionService.hasComponentDefinition(name, version)) {
+            return ValidationErrorUtils.missingComponent(name, version);
+        }
+
+        try {
+            switch (kind) {
+                case "trigger" -> triggerDefinitionService.getTriggerDefinition(name, version, operation);
+                case "clusterElement" -> clusterElementDefinitionService.getClusterElementDefinition(
+                    name, version, operation);
+                default -> actionDefinitionService.getActionDefinition(name, version, operation);
+            }
+
+            return null;
+        } catch (IllegalArgumentException illegalArgumentException) {
+            String operationLabel = switch (kind) {
+                case "trigger" -> "Trigger";
+                case "clusterElement" -> "Cluster element";
+                default -> "Action";
+            };
+
+            return ValidationErrorUtils.missingOperation(operationLabel, operation, name, version);
         }
     }
 
