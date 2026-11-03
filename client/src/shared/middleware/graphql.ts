@@ -1128,6 +1128,29 @@ export type AutomationWorkflowProjectCategoriesQueryVariables = Exact<{ [key: st
 
 export type AutomationWorkflowProjectCategoriesQuery = { automationWorkflowProjectCategories: Array<{ id: string, name: string }> };
 
+export type AutomationWorkflowProjectConfigurationConnectedUsersQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AutomationWorkflowProjectConfigurationConnectedUsersQuery = { automationWorkflowProjectConfigurationConnectedUsers: Array<{ connectedUserId: string, externalId: string, name: string | null, email: string | null }> };
+
+export type AutomationWorkflowProjectConfigurationDeleteImpactQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AutomationWorkflowProjectConfigurationDeleteImpactQuery = { automationWorkflowProjectConfigurationDeleteImpact: { connectedUserCount: number, referenceWorkflowCount: number } };
+
+export type AutomationWorkflowProjectConfigurationMoveImpactQueryVariables = Exact<{
+  sourceId: string | number;
+  targetId: string | number;
+  connectedUserIds: Array<string | number> | string | number;
+}>;
+
+
+export type AutomationWorkflowProjectConfigurationMoveImpactQuery = { automationWorkflowProjectConfigurationMoveImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
+
 export type AutomationWorkflowProjectConfigurationVersionImpactQueryVariables = Exact<{
   id: string | number;
   projectVersion: number;
@@ -1162,7 +1185,7 @@ export type AutomationWorkflowProjectConfigurationsQueryVariables = Exact<{
 }>;
 
 
-export type AutomationWorkflowProjectConfigurationsQuery = { automationWorkflowProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, lastExecutionDate: string | null, workflows: Array<{ workflowUuid: string, workflowId: string, label: string | null, enabled: boolean, lastExecutionDate: string | null, providedConnections: any, providedInputs: any }> }> };
+export type AutomationWorkflowProjectConfigurationsQuery = { automationWorkflowProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, name: string, permissionExpression: string | null, connectedUserCount: number, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, lastExecutionDate: string | null, workflows: Array<{ workflowUuid: string, workflowId: string, label: string | null, enabled: boolean, lastExecutionDate: string | null, providedConnections: any, providedInputs: any }> }> };
 
 export type AutomationWorkflowProjectTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1282,11 +1305,13 @@ export type ConnectedUserProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, automationWorkflowUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }> }> };
+export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, automationWorkflowUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number }> }> };
 
 export type CreateAutomationWorkflowProjectConfigurationMutationVariables = Exact<{
   projectId: string | number;
   environmentId: string | number;
+  name: string;
+  permissionExpression?: string | null | undefined;
   projectVersion: number;
   enabled: boolean;
   automationHubVisible: boolean;
@@ -1525,6 +1550,15 @@ export type McpIntegrationInstanceConfigurationsByServerIdQueryVariables = Exact
 
 export type McpIntegrationInstanceConfigurationsByServerIdQuery = { mcpIntegrationInstanceConfigurationsByServerId: Array<{ id: string, integrationInstanceConfigurationId: string, integrationInstanceConfigurationName: string | null, integrationVersion: number | null, lastModifiedDate: any, mcpServerId: string, integration: { componentName: string, id: string, name: string } | null, mcpIntegrationInstanceConfigurationWorkflows: Array<{ id: string, enabled: boolean, integrationInstanceConfigurationWorkflowId: any, mcpIntegrationInstanceConfigurationId: any, parameters: any, integrationInstanceConfigurationWorkflow: { id: string, enabled: boolean, inputs: any, integrationInstanceConfigurationId: string, version: number, workflowId: string, connections: Array<{ connectionId: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow: { id: string, label: string } | null } | null> | null } | null> | null };
 
+export type MoveAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables = Exact<{
+  sourceId: string | number;
+  targetId: string | number;
+  connectedUserIds: Array<string | number> | string | number;
+}>;
+
+
+export type MoveAutomationWorkflowProjectConfigurationConnectedUsersMutation = { moveAutomationWorkflowProjectConfigurationConnectedUsers: { movedConnectedUserIds: Array<string>, needsAttentionConnectedUserIds: Array<string>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
+
 export type ProvisionConnectedUserMcpServerMutationVariables = Exact<{
   connectedUserId: string | number;
   mcpServerId: string | number;
@@ -1535,6 +1569,7 @@ export type ProvisionConnectedUserMcpServerMutation = { provisionConnectedUserMc
 
 export type ProvisionConnectedUserProjectWorkflowsMutationVariables = Exact<{
   connectedUserId: string | number;
+  configurationId: string | number;
   workflows: Array<Types.ProvisionConnectedUserProjectWorkflowInput> | Types.ProvisionConnectedUserProjectWorkflowInput;
 }>;
 
@@ -1553,7 +1588,7 @@ export type ProvisionableConnectedUserProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ProvisionableConnectedUserProjectsQuery = { provisionableConnectedUserProjects: Array<{ projectId: string, name: string, projectVersion: number, workflows: Array<{ workflowUuid: string, label: string | null, provisioned: boolean, dangling: boolean, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }> }> }> };
+export type ProvisionableConnectedUserProjectsQuery = { provisionableConnectedUserProjects: Array<{ projectId: string, name: string, projectVersion: number, assignedConfigurationId: string | null, workflows: Array<{ workflowUuid: string, label: string | null, provisioned: boolean, dangling: boolean, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }> }>, configurations: Array<{ id: string, name: string, projectVersion: number, selfServe: boolean, workflows: Array<{ workflowUuid: string, label: string | null, provisioned: boolean, dangling: boolean, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }> }> }> }> };
 
 export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
   integrationInstanceConfigurationId: string | number;
@@ -1572,6 +1607,8 @@ export type ToolEligibleIntegrationVersionWorkflowsQuery = { toolEligibleIntegra
 
 export type UpdateAutomationWorkflowProjectConfigurationMutationVariables = Exact<{
   id: string | number;
+  name: string;
+  permissionExpression?: string | null | undefined;
   projectVersion: number;
   enabled: boolean;
   automationHubVisible: boolean;
@@ -6405,6 +6442,97 @@ export const useAutomationWorkflowProjectCategoriesQuery = <
   }
     )};
 
+export const AutomationWorkflowProjectConfigurationConnectedUsersDocument = new TypedDocumentString(`
+    query automationWorkflowProjectConfigurationConnectedUsers($id: ID!) {
+  automationWorkflowProjectConfigurationConnectedUsers(id: $id) {
+    connectedUserId
+    externalId
+    name
+    email
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectConfigurationConnectedUsersQuery = <
+      TData = AutomationWorkflowProjectConfigurationConnectedUsersQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectConfigurationConnectedUsersQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectConfigurationConnectedUsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectConfigurationConnectedUsersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectConfigurationConnectedUsersQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectConfigurationConnectedUsers', variables],
+    queryFn: fetcher<AutomationWorkflowProjectConfigurationConnectedUsersQuery, AutomationWorkflowProjectConfigurationConnectedUsersQueryVariables>(AutomationWorkflowProjectConfigurationConnectedUsersDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationWorkflowProjectConfigurationDeleteImpactDocument = new TypedDocumentString(`
+    query automationWorkflowProjectConfigurationDeleteImpact($id: ID!) {
+  automationWorkflowProjectConfigurationDeleteImpact(id: $id) {
+    connectedUserCount
+    referenceWorkflowCount
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectConfigurationDeleteImpactQuery = <
+      TData = AutomationWorkflowProjectConfigurationDeleteImpactQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectConfigurationDeleteImpactQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectConfigurationDeleteImpactQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectConfigurationDeleteImpactQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectConfigurationDeleteImpactQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectConfigurationDeleteImpact', variables],
+    queryFn: fetcher<AutomationWorkflowProjectConfigurationDeleteImpactQuery, AutomationWorkflowProjectConfigurationDeleteImpactQueryVariables>(AutomationWorkflowProjectConfigurationDeleteImpactDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationWorkflowProjectConfigurationMoveImpactDocument = new TypedDocumentString(`
+    query automationWorkflowProjectConfigurationMoveImpact($sourceId: ID!, $targetId: ID!, $connectedUserIds: [ID!]!) {
+  automationWorkflowProjectConfigurationMoveImpact(
+    sourceId: $sourceId
+    targetId: $targetId
+    connectedUserIds: $connectedUserIds
+  ) {
+    workflows {
+      workflowUuid
+      label
+      newRequiredInputs
+      newRequiredConnections
+      affectedConnectedUserCount
+    }
+    skipped {
+      connectedUserId
+      reason
+      workflowLabels
+    }
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectConfigurationMoveImpactQuery = <
+      TData = AutomationWorkflowProjectConfigurationMoveImpactQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectConfigurationMoveImpactQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectConfigurationMoveImpactQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectConfigurationMoveImpactQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectConfigurationMoveImpactQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectConfigurationMoveImpact', variables],
+    queryFn: fetcher<AutomationWorkflowProjectConfigurationMoveImpactQuery, AutomationWorkflowProjectConfigurationMoveImpactQueryVariables>(AutomationWorkflowProjectConfigurationMoveImpactDocument, variables),
+    ...options
+  }
+    )};
+
 export const AutomationWorkflowProjectConfigurationVersionImpactDocument = new TypedDocumentString(`
     query automationWorkflowProjectConfigurationVersionImpact($id: ID!, $projectVersion: Int!) {
   automationWorkflowProjectConfigurationVersionImpact(
@@ -6528,6 +6656,9 @@ export const AutomationWorkflowProjectConfigurationsDocument = new TypedDocument
     id
     projectId
     environmentId
+    name
+    permissionExpression
+    connectedUserCount
     projectVersion
     enabled
     automationHubVisible
@@ -7002,6 +7133,12 @@ export const ConnectedUserProjectsDocument = new TypedDocumentString(`
         }
       }
     }
+    automationProjectConfigurations {
+      projectId
+      configurationId
+      configurationName
+      configurationProjectVersion
+    }
     environmentId
     lastExecutionDate
     projectId
@@ -7027,10 +7164,12 @@ export const useConnectedUserProjectsQuery = <
     )};
 
 export const CreateAutomationWorkflowProjectConfigurationDocument = new TypedDocumentString(`
-    mutation createAutomationWorkflowProjectConfiguration($projectId: ID!, $environmentId: ID!, $projectVersion: Int!, $enabled: Boolean!, $automationHubVisible: Boolean!) {
+    mutation createAutomationWorkflowProjectConfiguration($projectId: ID!, $environmentId: ID!, $name: String!, $permissionExpression: String, $projectVersion: Int!, $enabled: Boolean!, $automationHubVisible: Boolean!) {
   createAutomationWorkflowProjectConfiguration(
     projectId: $projectId
     environmentId: $environmentId
+    name: $name
+    permissionExpression: $permissionExpression
     projectVersion: $projectVersion
     enabled: $enabled
     automationHubVisible: $automationHubVisible
@@ -7944,6 +8083,37 @@ export const useMcpIntegrationInstanceConfigurationsByServerIdQuery = <
   }
     )};
 
+export const MoveAutomationWorkflowProjectConfigurationConnectedUsersDocument = new TypedDocumentString(`
+    mutation moveAutomationWorkflowProjectConfigurationConnectedUsers($sourceId: ID!, $targetId: ID!, $connectedUserIds: [ID!]!) {
+  moveAutomationWorkflowProjectConfigurationConnectedUsers(
+    sourceId: $sourceId
+    targetId: $targetId
+    connectedUserIds: $connectedUserIds
+  ) {
+    movedConnectedUserIds
+    needsAttentionConnectedUserIds
+    skipped {
+      connectedUserId
+      reason
+      workflowLabels
+    }
+  }
+}
+    `);
+
+export const useMoveAutomationWorkflowProjectConfigurationConnectedUsersMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<MoveAutomationWorkflowProjectConfigurationConnectedUsersMutation, TError, MoveAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables, TContext>) => {
+    
+    return useMutation<MoveAutomationWorkflowProjectConfigurationConnectedUsersMutation, TError, MoveAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables, TContext>(
+      {
+    mutationKey: ['moveAutomationWorkflowProjectConfigurationConnectedUsers'],
+    mutationFn: (variables?: MoveAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables) => fetcher<MoveAutomationWorkflowProjectConfigurationConnectedUsersMutation, MoveAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables>(MoveAutomationWorkflowProjectConfigurationConnectedUsersDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const ProvisionConnectedUserMcpServerDocument = new TypedDocumentString(`
     mutation provisionConnectedUserMcpServer($connectedUserId: ID!, $mcpServerId: ID!) {
   provisionConnectedUserMcpServer(
@@ -7967,9 +8137,10 @@ export const useProvisionConnectedUserMcpServerMutation = <
     )};
 
 export const ProvisionConnectedUserProjectWorkflowsDocument = new TypedDocumentString(`
-    mutation provisionConnectedUserProjectWorkflows($connectedUserId: ID!, $workflows: [ProvisionConnectedUserProjectWorkflowInput!]!) {
+    mutation provisionConnectedUserProjectWorkflows($connectedUserId: ID!, $configurationId: ID!, $workflows: [ProvisionConnectedUserProjectWorkflowInput!]!) {
   provisionConnectedUserProjectWorkflows(
     connectedUserId: $connectedUserId
+    configurationId: $configurationId
     workflows: $workflows
   )
 }
@@ -8022,6 +8193,7 @@ export const ProvisionableConnectedUserProjectsDocument = new TypedDocumentStrin
     projectId
     name
     projectVersion
+    assignedConfigurationId
     workflows {
       workflowUuid
       label
@@ -8033,6 +8205,24 @@ export const ProvisionableConnectedUserProjectsDocument = new TypedDocumentStrin
       }
       provisioned
       dangling
+    }
+    configurations {
+      id
+      name
+      projectVersion
+      selfServe
+      workflows {
+        workflowUuid
+        label
+        inputs {
+          name
+          label
+          type
+          required
+        }
+        provisioned
+        dangling
+      }
     }
   }
 }
@@ -8112,9 +8302,11 @@ export const useToolEligibleIntegrationVersionWorkflowsQuery = <
     )};
 
 export const UpdateAutomationWorkflowProjectConfigurationDocument = new TypedDocumentString(`
-    mutation updateAutomationWorkflowProjectConfiguration($id: ID!, $projectVersion: Int!, $enabled: Boolean!, $automationHubVisible: Boolean!) {
+    mutation updateAutomationWorkflowProjectConfiguration($id: ID!, $name: String!, $permissionExpression: String, $projectVersion: Int!, $enabled: Boolean!, $automationHubVisible: Boolean!) {
   updateAutomationWorkflowProjectConfiguration(
     id: $id
+    name: $name
+    permissionExpression: $permissionExpression
     projectVersion: $projectVersion
     enabled: $enabled
     automationHubVisible: $automationHubVisible

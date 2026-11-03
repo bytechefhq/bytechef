@@ -564,14 +564,25 @@ export type AutomationWorkflowProjectComponent = {
 export type AutomationWorkflowProjectConfiguration = {
   __typename?: 'AutomationWorkflowProjectConfiguration';
   automationHubVisible: Scalars['Boolean']['output'];
+  connectedUserCount: Scalars['Int']['output'];
   enabled: Scalars['Boolean']['output'];
   environmentId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
   lastExecutionDate?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  permissionExpression?: Maybe<Scalars['String']['output']>;
   projectId: Scalars['ID']['output'];
   projectVersion: Scalars['Int']['output'];
   workflows: Array<AutomationWorkflowProjectConfigurationWorkflow>;
+};
+
+export type AutomationWorkflowProjectConfigurationConnectedUser = {
+  __typename?: 'AutomationWorkflowProjectConfigurationConnectedUser';
+  connectedUserId: Scalars['ID']['output'];
+  email?: Maybe<Scalars['String']['output']>;
+  externalId: Scalars['String']['output'];
+  name?: Maybe<Scalars['String']['output']>;
 };
 
 export type AutomationWorkflowProjectConfigurationConnectionSlot = {
@@ -580,6 +591,12 @@ export type AutomationWorkflowProjectConfigurationConnectionSlot = {
   providableConnections: Array<AutomationWorkflowProjectConfigurationProvidableConnection>;
   required: Scalars['Boolean']['output'];
   title: Scalars['String']['output'];
+};
+
+export type AutomationWorkflowProjectConfigurationDeleteImpact = {
+  __typename?: 'AutomationWorkflowProjectConfigurationDeleteImpact';
+  connectedUserCount: Scalars['Int']['output'];
+  referenceWorkflowCount: Scalars['Int']['output'];
 };
 
 export type AutomationWorkflowProjectConfigurationInput = {
@@ -599,6 +616,12 @@ export type AutomationWorkflowProjectConfigurationInputOption = {
   description?: Maybe<Scalars['String']['output']>;
   label?: Maybe<Scalars['String']['output']>;
   value: Scalars['String']['output'];
+};
+
+export type AutomationWorkflowProjectConfigurationMoveImpact = {
+  __typename?: 'AutomationWorkflowProjectConfigurationMoveImpact';
+  skipped: Array<ConfigurationMoveSkipped>;
+  workflows: Array<AutomationWorkflowProjectConfigurationVersionImpactWorkflow>;
 };
 
 export type AutomationWorkflowProjectConfigurationProvidableConnection = {
@@ -790,6 +813,20 @@ export enum ComponentOperationType {
   Trigger = 'TRIGGER'
 }
 
+export type ConfigurationMoveResult = {
+  __typename?: 'ConfigurationMoveResult';
+  movedConnectedUserIds: Array<Scalars['ID']['output']>;
+  needsAttentionConnectedUserIds: Array<Scalars['ID']['output']>;
+  skipped: Array<ConfigurationMoveSkipped>;
+};
+
+export type ConfigurationMoveSkipped = {
+  __typename?: 'ConfigurationMoveSkipped';
+  connectedUserId: Scalars['ID']['output'];
+  reason: Scalars['String']['output'];
+  workflowLabels: Array<Scalars['String']['output']>;
+};
+
 export type ConnectedUser = {
   __typename?: 'ConnectedUser';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -800,6 +837,14 @@ export type ConnectedUser = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ConnectedUserAutomationProjectConfiguration = {
+  __typename?: 'ConnectedUserAutomationProjectConfiguration';
+  configurationId: Scalars['ID']['output'];
+  configurationName: Scalars['String']['output'];
+  configurationProjectVersion: Scalars['Int']['output'];
+  projectId: Scalars['ID']['output'];
 };
 
 export type ConnectedUserCodeWorkflowReference = {
@@ -856,6 +901,7 @@ export type ConnectedUserPage = {
 
 export type ConnectedUserProject = {
   __typename?: 'ConnectedUserProject';
+  automationProjectConfigurations: Array<ConnectedUserAutomationProjectConfiguration>;
   connectedUser: ConnectedUser;
   connectedUserProjectWorkflows: Array<ConnectedUserProjectWorkflow>;
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -1863,6 +1909,7 @@ export type Mutation = {
   importWorkflowTemplate: Scalars['ID']['output'];
   insertDataTableRow: DataTableRow;
   inviteUser: Scalars['Boolean']['output'];
+  moveAutomationWorkflowProjectConfigurationConnectedUsers: ConfigurationMoveResult;
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
@@ -2063,6 +2110,8 @@ export type MutationCreateAutomationWorkflowProjectConfigurationArgs = {
   automationHubVisible: Scalars['Boolean']['input'];
   enabled: Scalars['Boolean']['input'];
   environmentId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
   projectId: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
 };
@@ -2481,6 +2530,13 @@ export type MutationInviteUserArgs = {
 };
 
 
+export type MutationMoveAutomationWorkflowProjectConfigurationConnectedUsersArgs = {
+  connectedUserIds: Array<Scalars['ID']['input']>;
+  sourceId: Scalars['ID']['input'];
+  targetId: Scalars['ID']['input'];
+};
+
+
 export type MutationProvisionConnectedUserMcpServerArgs = {
   connectedUserId: Scalars['ID']['input'];
   mcpServerId: Scalars['ID']['input'];
@@ -2488,6 +2544,7 @@ export type MutationProvisionConnectedUserMcpServerArgs = {
 
 
 export type MutationProvisionConnectedUserProjectWorkflowsArgs = {
+  configurationId: Scalars['ID']['input'];
   connectedUserId: Scalars['ID']['input'];
   workflows: Array<ProvisionConnectedUserProjectWorkflowInput>;
 };
@@ -2729,6 +2786,8 @@ export type MutationUpdateAutomationWorkflowProjectConfigurationArgs = {
   automationHubVisible: Scalars['Boolean']['input'];
   enabled: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
   projectVersion: Scalars['Int']['input'];
 };
 
@@ -3190,9 +3249,20 @@ export type ProvisionableConnectedUserMcpServer = {
 
 export type ProvisionableConnectedUserProject = {
   __typename?: 'ProvisionableConnectedUserProject';
+  assignedConfigurationId?: Maybe<Scalars['ID']['output']>;
+  configurations: Array<ProvisionableConnectedUserProjectConfiguration>;
   name: Scalars['String']['output'];
   projectId: Scalars['ID']['output'];
   projectVersion: Scalars['Int']['output'];
+  workflows: Array<ProvisionableConnectedUserProjectWorkflow>;
+};
+
+export type ProvisionableConnectedUserProjectConfiguration = {
+  __typename?: 'ProvisionableConnectedUserProjectConfiguration';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  projectVersion: Scalars['Int']['output'];
+  selfServe: Scalars['Boolean']['output'];
   workflows: Array<ProvisionableConnectedUserProjectWorkflow>;
 };
 
@@ -3279,6 +3349,9 @@ export type Query = {
   authorities: Array<Scalars['String']['output']>;
   automationSearch: Array<SearchResult>;
   automationWorkflowProjectCategories: Array<AutomationWorkflowProjectCategory>;
+  automationWorkflowProjectConfigurationConnectedUsers: Array<AutomationWorkflowProjectConfigurationConnectedUser>;
+  automationWorkflowProjectConfigurationDeleteImpact: AutomationWorkflowProjectConfigurationDeleteImpact;
+  automationWorkflowProjectConfigurationMoveImpact: AutomationWorkflowProjectConfigurationMoveImpact;
   automationWorkflowProjectConfigurationVersionImpact: AutomationWorkflowProjectConfigurationVersionImpact;
   automationWorkflowProjectConfigurationWorkflowInputOptions: Array<AutomationWorkflowProjectConfigurationInputOption>;
   automationWorkflowProjectConfigurationWorkflowProvidableValues: AutomationWorkflowProjectConfigurationWorkflowProvidableValues;
@@ -3602,6 +3675,23 @@ export type QueryAuditEventsArgs = {
 export type QueryAutomationSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectConfigurationConnectedUsersArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectConfigurationDeleteImpactArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectConfigurationMoveImpactArgs = {
+  connectedUserIds: Array<Scalars['ID']['input']>;
+  sourceId: Scalars['ID']['input'];
+  targetId: Scalars['ID']['input'];
 };
 
 
