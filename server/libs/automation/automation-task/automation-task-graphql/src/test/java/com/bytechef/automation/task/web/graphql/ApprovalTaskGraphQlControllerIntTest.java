@@ -44,14 +44,19 @@ import com.bytechef.automation.task.security.ApprovalTaskJobResolver;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import com.bytechef.automation.task.web.graphql.ApprovalTaskGraphQlController.ApprovalTaskInput;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
+import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -279,6 +284,8 @@ class ApprovalTaskGraphQlControllerIntTest {
         private static final String BODY_REACHED = "body reached";
         private static final long CURRENT_USER_ID = 7L;
         private static final long JOB_ID = 9L;
+        private static final ApprovalTokens SIGNING_APPROVAL_TOKENS = newApprovalTokens(
+            "approval-token-secret-key-0001!!");
         private static final long OTHER_USER_ID = 8L;
 
         @Autowired
@@ -314,6 +321,10 @@ class ApprovalTaskGraphQlControllerIntTest {
             when(approvalTaskService.getApprovalTask(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
             when(approvalTaskService.update(any(ApprovalTask.class)))
                 .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(approvalTokens.resolveInnerToken(anyString())).thenAnswer(
+                invocation -> SIGNING_APPROVAL_TOKENS.resolveInnerToken(invocation.getArgument(0)));
+            when(approvalTokens.resolveJobResumeId(anyString())).thenAnswer(
+                invocation -> SIGNING_APPROVAL_TOKENS.resolveJobResumeId(invocation.getArgument(0)));
         }
 
         @AfterEach
@@ -339,17 +350,14 @@ class ApprovalTaskGraphQlControllerIntTest {
         @ValueSource(booleans = {
             false, true
         })
-        void testCreateApprovalTaskForAJobRequiresDeploymentEditOnThatJob(boolean granted) {
-            String token = "signed-resume-token";
-
-            when(approvalTokens.resolveJobResumeId(token)).thenReturn(Optional.of(JobResumeId.of("public", JOB_ID)));
+        void testCreateApprovalTaskForASignedApprovalTokenRequiresDeploymentEditOnItsJob(boolean granted) {
             when(permissionService.hasResourceScope(JOB_ID, "Job", "DEPLOYMENT_EDIT")).thenReturn(granted);
-            when(principalJobService.getJobPrincipalId(anyLong(), any()))
+            when(principalJobService.fetchJobPrincipalId(JOB_ID, PlatformType.AUTOMATION))
                 .thenThrow(new IllegalStateException(BODY_REACHED));
 
             ApprovalTask approvalTask = ApprovalTask.builder()
                 .name("Approve the invoice")
-                .jobResumeId(token)
+                .jobResumeId(signedApprovalToken(SIGNING_APPROVAL_TOKENS))
                 .build();
 
             assertInvocationOutcome(() -> approvalTaskFacade.createApprovalTask(approvalTask), granted);
@@ -359,20 +367,32 @@ class ApprovalTaskGraphQlControllerIntTest {
             verifyNoMoreInteractions(permissionService);
         }
 
-        @Test
-        void testCreateApprovalTaskWithAnUnresolvableTokenIsDeniedToANonAdmin() {
-            when(approvalTokens.resolveJobResumeId("forged")).thenReturn(Optional.empty());
+        @ParameterizedTest(name = "tenantAdmin={0}")
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testCreateApprovalTaskForAnApprovalTokenSignedWithAnotherSecretGrantsNoJobScope(boolean tenantAdmin) {
+            when(permissionService.isTenantAdmin()).thenReturn(tenantAdmin);
 
             ApprovalTask approvalTask = ApprovalTask.builder()
                 .name("Approve the invoice")
-                .jobResumeId("forged")
+                .jobResumeId(signedApprovalToken(newApprovalTokens("approval-token-secret-key-0002!!")))
                 .build();
 
-            assertInvocationOutcome(() -> approvalTaskFacade.createApprovalTask(approvalTask), false);
+            if (tenantAdmin) {
+                assertThatThrownBy(() -> approvalTaskFacade.createApprovalTask(approvalTask))
+                    .isInstanceOf(IllegalArgumentException.class);
+            } else {
+                assertThatThrownBy(() -> approvalTaskFacade.createApprovalTask(approvalTask))
+                    .isInstanceOf(AccessDeniedException.class);
+
+                verify(permissionService).hasResourceScope(-1L, "Job", "DEPLOYMENT_EDIT");
+            }
 
             verify(permissionService).isTenantAdmin();
-            verify(permissionService).hasResourceScope(-1L, "Job", "DEPLOYMENT_EDIT");
             verifyNoMoreInteractions(permissionService);
+            verify(principalJobService, never()).fetchJobPrincipalId(anyLong(), any());
+            verify(approvalTaskService, never()).create(any(ApprovalTask.class));
         }
 
         @ParameterizedTest(name = "granted={0}")
@@ -500,6 +520,20 @@ class ApprovalTaskGraphQlControllerIntTest {
             } else {
                 assertThat(visibleApprovalTasks).containsExactly(viewableThroughItsJob, assignedToCaller);
             }
+        }
+
+        private static ApprovalTokens newApprovalTokens(String secret) {
+            Base64.Encoder encoder = Base64.getEncoder();
+
+            return new ApprovalTokensImpl(
+                Clock.systemUTC(), encoder.encodeToString(secret.getBytes(StandardCharsets.UTF_8)), List.of(),
+                Duration.ofDays(1), Duration.ofSeconds(60), false);
+        }
+
+        private static String signedApprovalToken(ApprovalTokens approvalTokens) {
+            JobResumeId jobResumeId = JobResumeId.of("public", JOB_ID);
+
+            return approvalTokens.toSignedToken(jobResumeId.toString(), Duration.ofDays(1));
         }
 
         private static void assertInvocationOutcome(ThrowingCallable invocation, boolean allowed) {
