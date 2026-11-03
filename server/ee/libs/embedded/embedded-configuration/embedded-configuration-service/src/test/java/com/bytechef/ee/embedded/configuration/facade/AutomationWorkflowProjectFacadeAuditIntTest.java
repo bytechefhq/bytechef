@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -113,7 +115,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(
     classes = {
         AutomationWorkflowProjectFacadeIntTestConfiguration.class,
-        AutomationWorkflowProjectAdminFacadeAuditIntTest.AuditConfiguration.class
+        AutomationWorkflowProjectFacadeAuditIntTest.AuditConfiguration.class
     },
     properties = {
         "bytechef.edition=ee",
@@ -145,14 +147,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     WorkflowTestConfigurationFacade.class, WorkflowTestConfigurationService.class,
     WorkspaceConnectionFacade.class, WorkspaceFacade.class
 })
-class AutomationWorkflowProjectAdminFacadeAuditIntTest {
+class AutomationWorkflowProjectFacadeAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";
     private static final String CONFIGURATION_NAME = "Production";
     private static final String PERMISSION_EXPRESSION = "metadata['tier'] == 'pro'";
-
-    @Autowired
-    private AutomationWorkflowProjectAdminFacade automationWorkflowProjectAdminFacade;
 
     @Autowired
     private AutomationWorkflowProjectConfigurationAdminFacade automationWorkflowProjectConfigurationAdminFacade;
@@ -212,7 +211,7 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
 
         String workflowUuid = projectWorkflowUuid.toString();
 
-        automationWorkflowProjectAdminFacade.updateProjectWorkflowPermissionExpression(
+        automationWorkflowProjectFacade.updateProjectWorkflowPermissionExpression(
             workflowUuid, PERMISSION_EXPRESSION);
 
         assertThat(automationWorkflowProjectService.getWorkflowPermissionExpressions(projectId))
@@ -229,7 +228,7 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
         String workflowUuid = String.valueOf(UUID.randomUUID());
 
         assertThatThrownBy(
-            () -> automationWorkflowProjectAdminFacade.updateProjectWorkflowPermissionExpression(
+            () -> automationWorkflowProjectFacade.updateProjectWorkflowPermissionExpression(
                 workflowUuid, PERMISSION_EXPRESSION))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("No workflow found for workflow uuid " + workflowUuid);
@@ -245,7 +244,7 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
     void testProjectLifecycleRecordsEveryChange() {
         String name = "audit-" + UUID.randomUUID();
 
-        long projectId = automationWorkflowProjectAdminFacade.createProject(
+        long projectId = automationWorkflowProjectFacade.createProject(
             name, "", null, List.of(), PERMISSION_EXPRESSION);
 
         assertThat(findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CREATED).getData())
@@ -254,34 +253,34 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
             .containsEntry("name", name)
             .containsEntry("permissionExpression", PERMISSION_EXPRESSION);
 
-        automationWorkflowProjectAdminFacade.updateProject(projectId, "renamed", "", null, List.of(), null);
+        automationWorkflowProjectFacade.updateProject(projectId, "renamed", "", null, List.of(), null);
 
         assertThat(findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_UPDATED).getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("projectId", String.valueOf(projectId))
             .containsEntry("name", "renamed");
 
-        String workflowUuid = automationWorkflowProjectAdminFacade.createProjectWorkflow(projectId, null, null);
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
         assertThat(findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_CREATED).getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("projectId", String.valueOf(projectId))
             .containsEntry("workflowUuid", workflowUuid);
 
-        String duplicatedWorkflowUuid = automationWorkflowProjectAdminFacade.duplicateProjectWorkflow(workflowUuid);
+        String duplicatedWorkflowUuid = automationWorkflowProjectFacade.duplicateProjectWorkflow(workflowUuid);
 
         assertThat(findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_DUPLICATED).getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("sourceWorkflowUuid", workflowUuid)
             .containsEntry("workflowUuid", duplicatedWorkflowUuid);
 
-        automationWorkflowProjectAdminFacade.deleteProjectWorkflow(duplicatedWorkflowUuid);
+        automationWorkflowProjectFacade.deleteProjectWorkflow(duplicatedWorkflowUuid);
 
         assertThat(findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_DELETED).getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("workflowUuid", duplicatedWorkflowUuid);
 
-        int projectVersion = automationWorkflowProjectAdminFacade.publishProject(projectId, null);
+        int projectVersion = automationWorkflowProjectFacade.publishProject(projectId, null);
 
         assertThat(
             findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_PUBLISHED).getData())
@@ -289,7 +288,7 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
                 .containsEntry("projectId", String.valueOf(projectId))
                 .containsEntry("projectVersion", String.valueOf(projectVersion));
 
-        long duplicatedProjectId = automationWorkflowProjectAdminFacade.duplicateProject(projectId);
+        long duplicatedProjectId = automationWorkflowProjectFacade.duplicateProject(projectId);
 
         assertThat(
             findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_DUPLICATED).getData())
@@ -297,7 +296,7 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
                 .containsEntry("sourceProjectId", String.valueOf(projectId))
                 .containsEntry("projectId", String.valueOf(duplicatedProjectId));
 
-        automationWorkflowProjectAdminFacade.deleteProject(duplicatedProjectId);
+        automationWorkflowProjectFacade.deleteProject(duplicatedProjectId);
 
         assertThat(findSingleEvent(AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_DELETED).getData())
             .containsEntry("result", "SUCCESS")
@@ -452,6 +451,8 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
             PermissionService permissionService = mock(PermissionService.class);
 
             when(permissionService.isTenantAdmin())
+                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
+            when(permissionService.hasResourceScope(any(), anyString(), anyString()))
                 .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
 
             return permissionService;
