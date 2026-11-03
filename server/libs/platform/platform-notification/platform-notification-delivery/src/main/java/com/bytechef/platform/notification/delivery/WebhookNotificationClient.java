@@ -21,6 +21,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.UUID;
@@ -91,12 +92,16 @@ public class WebhookNotificationClient {
 
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        long timestamp = System.currentTimeMillis();
+        Instant suppliedTimestamp = webhookDelivery.timestamp();
+        String suppliedDeliveryId = webhookDelivery.deliveryId();
+
+        long timestamp = suppliedTimestamp == null ? System.currentTimeMillis() : suppliedTimestamp.toEpochMilli();
 
         if (webhookDelivery.eventType() != null) {
             httpHeaders.set("X-ByteChef-Event", webhookDelivery.eventType());
             httpHeaders.set("X-ByteChef-Timestamp", String.valueOf(timestamp));
-            httpHeaders.set("X-ByteChef-Delivery", String.valueOf(UUID.randomUUID()));
+            httpHeaders.set("X-ByteChef-Delivery",
+                suppliedDeliveryId == null ? String.valueOf(UUID.randomUUID()) : suppliedDeliveryId);
         }
 
         for (Map.Entry<String, String> header : webhookDelivery.headers()

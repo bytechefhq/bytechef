@@ -69,6 +69,8 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
                 String.valueOf(notificationHandlerContext.getJobId()),
                 webhookNotificationHandler.getPayload(notificationHandlerContext))
             .retry(WebhookRetry.none())
+            .deliveryId(notificationHandlerContext.getDeliveryId())
+            .timestamp(notificationHandlerContext.getTimestamp())
             .build();
 
         return webhookDeliveryService.submit(webhookDelivery)

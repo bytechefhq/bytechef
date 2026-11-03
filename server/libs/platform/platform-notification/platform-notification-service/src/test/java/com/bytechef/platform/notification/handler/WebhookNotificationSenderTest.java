@@ -33,6 +33,7 @@ import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.Status
 import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.domain.Notification;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -81,6 +82,29 @@ class WebhookNotificationSenderTest {
         assertThat(webhookDelivery.retry()
             .maxRetries()).isZero();
         assertThat(future).isCompleted();
+    }
+
+    @Test
+    void testSendPassesContextDeliveryIdAndTimestamp() {
+        Instant timestamp = Instant.parse("2026-11-03T10:00:00Z");
+        NotificationHandlerContext context = new NotificationHandlerContext.Builder().deliveryId("d-1")
+            .timestamp(timestamp)
+            .build();
+
+        when(webhookNotificationHandler.getPayload(context)).thenReturn("{\"a\":1}");
+        when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
+
+        webhookNotificationSender.send(
+            createNotification(Map.of("webhook", "https://example.com/hook")), webhookNotificationHandler, context);
+
+        ArgumentCaptor<WebhookDelivery> webhookDeliveryArgumentCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
+
+        verify(webhookDeliveryService).submit(webhookDeliveryArgumentCaptor.capture());
+
+        WebhookDelivery webhookDelivery = webhookDeliveryArgumentCaptor.getValue();
+
+        assertThat(webhookDelivery.deliveryId()).isEqualTo("d-1");
+        assertThat(webhookDelivery.timestamp()).isEqualTo(timestamp);
     }
 
     @Test
