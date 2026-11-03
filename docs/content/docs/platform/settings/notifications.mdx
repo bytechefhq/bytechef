@@ -380,6 +380,44 @@ notification.
     Per-workspace scoping of a notification is on the upcoming release track and is not yet available.
 </Callout>
 
+## Testing a notification
+
+Click **Test** in the **Create Notification** or **Edit Notification** dialog, next to **Save**, to send
+one sample message to the target before you save. **Test** is offered for every type the dialog offers:
+**Email**, **Slack** and, in Enterprise Edition, **Webhook**. A Webhook test is refused in Community
+Edition for the same reason the save is. Testing needs the `ADMIN` authority, like the rest of the page,
+and each test is recorded in the audit log as `NOTIFICATION_TESTED`.
+
+- **It uses what is in the form.** The values you typed are used, saved or not. The form is validated
+  first, with the same rules as **Save**, and nothing is sent if it is invalid. A test never saves or
+  changes the notification.
+- **Saved secrets are kept.** When you edit a saved notification, a header value or Slack URL that shows
+  as `********` is replaced by the saved value for the test, so you do not have to enter it again.
+- **The message is a sample.** It is a `JOB_FAILED` event with example values, such as the workflow
+  `Example workflow` and the error `Example error: connection refused`. The timestamp is the time of the
+  test, so a receiver that rejects old timestamps accepts it. It is not a run of one of your workflows.
+- **It is a real request.** A Webhook or Slack test goes out through the same URL rules, timeouts, headers,
+  body template and signing as a real delivery. See [Webhook requests](#webhook-requests). An **Email**
+  test sends a real email to the configured address, and a **Slack** test posts a real message to the
+  channel.
+- **It is sent right away and only once.** A test is not queued and is never retried. It is not counted
+  in the delivery metrics, and a failed test never counts toward pausing a webhook endpoint, so testing
+  cannot pause your real alerts.
+- **An unsaved webhook is not signed.** A new Webhook notification has no signing secret until you save
+  it, so its test goes out without an `X-ByteChef-Signature` header. The result says "Sent without a
+  signature; save the notification to get a signing secret." A saved Webhook notification is signed with
+  its stored secret. See [Verifying signatures](#verifying-signatures).
+
+While a test runs, the button is disabled and shows a spinner. The result appears below the form:
+
+| Result | What it shows |
+|---|---|
+| **Test sent** | For a Webhook, the line `HTTP <status>` and the start of the response body. An Email test shows no status. |
+| **Test failed** | The reason, such as a URL that is not allowed, a timeout, or the receiver's `HTTP <status>` and response body. |
+
+The response body is cut to its first 1000 characters, with `…` added when it was longer. Error messages
+name the host only, never a header value, a signing secret or a Slack URL.
+
 ## Delete a notification
 
 Click the **delete** (trash) icon on the row and confirm in the **Delete &lt;name&gt; notification?** dialog
