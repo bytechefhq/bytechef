@@ -20,9 +20,12 @@ import static com.bytechef.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRI
 import static com.bytechef.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
 
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.ai.skill.audit.AiSkillAuditEvents;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.file.storage.AiSkillFileStorage;
 import com.bytechef.platform.ai.skill.service.AiSkillService;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -99,6 +102,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @Audited(event = AiSkillAuditEvents.AI_SKILL_CREATED, data = {
+        @AuditData(key = "aiSkillId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("isAuthenticated()")
     public AiSkill createAiSkill(String name, @Nullable String description, String filename, byte[] bytes) {
         checkPlatformUser();
@@ -180,6 +187,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @Audited(event = AiSkillAuditEvents.AI_SKILL_CREATED, data = {
+        @AuditData(key = "aiSkillId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("isAuthenticated()")
     public AiSkill createAiSkillFromInstructions(
         String name, @Nullable String description, String instructions,
@@ -222,6 +233,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @Audited(event = AiSkillAuditEvents.AI_SKILL_CREATED, data = {
+        @AuditData(key = "aiSkillId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("isAuthenticated()")
     public AiSkill createAiSkillFromInstructions(String name, @Nullable String description, String instructions) {
         checkPlatformUser();
@@ -230,6 +245,9 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @Audited(event = AiSkillAuditEvents.AI_SKILL_DELETED, data = {
+        @AuditData(key = "aiSkillId", value = "#id")
+    })
     @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public void deleteAiSkill(long id) {
         checkPlatformUser();
@@ -434,6 +452,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @Audited(event = AiSkillAuditEvents.AI_SKILL_CONTENT_UPDATED, data = {
+        @AuditData(key = "aiSkillId", value = "#id"),
+        @AuditData(key = "path", value = "#path")
+    })
     @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public AiSkill updateAiSkillContent(long id, @Nullable String path, String content) {
         checkPlatformUser();
@@ -503,6 +525,9 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @Audited(event = AiSkillAuditEvents.AI_SKILL_FILES_ADDED, data = {
+        @AuditData(key = "aiSkillId", value = "#id")
+    })
     @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public AiSkill createAdditionalFilesInSkill(long id, Map<String, String> additionalFiles) {
         checkPlatformUser();
@@ -567,6 +592,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @Audited(event = AiSkillAuditEvents.AI_SKILL_FILE_REMOVED, data = {
+        @AuditData(key = "aiSkillId", value = "#id"),
+        @AuditData(key = "path", value = "#path")
+    })
     @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public AiSkill removeFileInSkill(long id, String path) {
         checkPlatformUser();
@@ -623,6 +652,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    @Audited(event = AiSkillAuditEvents.AI_SKILL_UPDATED, data = {
+        @AuditData(key = "aiSkillId", value = "#id"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
     public AiSkill updateAiSkill(long id, String name, @Nullable String description) {
         checkPlatformUser();
