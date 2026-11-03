@@ -54,7 +54,7 @@ export interface Job {
      */
     readonly currentTask?: number;
     /**
-     * The time execution entered end status COMPLETED, STOPPED, FAILED
+     * The time execution entered end status COMPLETED, STOPPED, FAILED, PAYMENT_REQUIRED
      */
     endDate?: Date;
     /**
@@ -130,6 +130,7 @@ export const JobStatusEnum = {
     Cancelled: 'CANCELLED',
     Failed: 'FAILED',
     Completed: 'COMPLETED',
+    PaymentRequired: 'PAYMENT_REQUIRED',
 } as const;
 export type JobStatusEnum = typeof JobStatusEnum[keyof typeof JobStatusEnum];
 
