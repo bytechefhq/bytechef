@@ -20,6 +20,7 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.DAT
 import static com.bytechef.component.datastream.constant.DataStreamConstants.STREAM;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(DATA_STREAM + "/v1/stream")
 public class DataStreamStreamTaskHandler extends AbstractTaskHandler {
 
-    public DataStreamStreamTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(DATA_STREAM, 1, STREAM, actionDefinitionFacade);
+    public DataStreamStreamTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(DATA_STREAM, 1, STREAM, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

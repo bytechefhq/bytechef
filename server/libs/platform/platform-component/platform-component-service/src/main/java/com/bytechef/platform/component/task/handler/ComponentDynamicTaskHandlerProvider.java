@@ -11,6 +11,7 @@ import com.bytechef.atlas.worker.task.handler.DynamicTaskHandlerProvider;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +25,14 @@ import org.springframework.stereotype.Component;
 public class ComponentDynamicTaskHandlerProvider implements DynamicTaskHandlerProvider {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner;
 
-    public ComponentDynamicTaskHandlerProvider(ActionDefinitionFacade actionDefinitionFacade) {
+    public ComponentDynamicTaskHandlerProvider(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.jobPrincipalAuthenticationRunner = jobPrincipalAuthenticationRunner;
     }
 
     @Override
@@ -34,6 +40,7 @@ public class ComponentDynamicTaskHandlerProvider implements DynamicTaskHandlerPr
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
         return new ComponentTaskHandler(
-            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), actionDefinitionFacade);
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), actionDefinitionFacade,
+            jobPrincipalAuthenticationRunner);
     }
 }

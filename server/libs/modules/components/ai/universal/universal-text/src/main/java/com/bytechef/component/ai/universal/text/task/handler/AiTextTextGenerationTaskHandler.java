@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.
 import static com.bytechef.platform.component.definition.AiUniversalComponentDefinition.AI_TEXT;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(AI_TEXT + "/v1/" + TEXT_GENERATION)
 public class AiTextTextGenerationTaskHandler extends AbstractTaskHandler {
 
-    public AiTextTextGenerationTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(AI_TEXT, 1, TEXT_GENERATION, actionDefinitionFacade);
+    public AiTextTextGenerationTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(AI_TEXT, 1, TEXT_GENERATION, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

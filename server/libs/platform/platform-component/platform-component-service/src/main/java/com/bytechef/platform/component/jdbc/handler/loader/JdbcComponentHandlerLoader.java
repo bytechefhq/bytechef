@@ -83,8 +83,8 @@ public class JdbcComponentHandlerLoader implements ComponentHandlerLoader {
 
         return new ComponentHandlerEntry(
             jdbcComponentHandlerImpl,
-            (actionName, actionDefinitionFacade) -> new ComponentTaskHandler(
+            (actionName, actionDefinitionFacade, jobPrincipalAuthenticationRunner) -> new ComponentTaskHandler(
                 jdbcComponentHandlerImpl.getName(), jdbcComponentHandlerImpl.getVersion(), actionName,
-                actionDefinitionFacade));
+                actionDefinitionFacade, jobPrincipalAuthenticationRunner));
     }
 }

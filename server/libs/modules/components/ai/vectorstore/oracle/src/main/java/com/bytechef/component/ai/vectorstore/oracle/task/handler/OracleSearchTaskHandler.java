@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConsta
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(ORACLE_VECTOR_STORE + "/v1/" + SEARCH)
 public class OracleSearchTaskHandler extends AbstractTaskHandler {
 
-    public OracleSearchTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(ORACLE_VECTOR_STORE, 1, SEARCH, actionDefinitionFacade);
+    public OracleSearchTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(ORACLE_VECTOR_STORE, 1, SEARCH, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

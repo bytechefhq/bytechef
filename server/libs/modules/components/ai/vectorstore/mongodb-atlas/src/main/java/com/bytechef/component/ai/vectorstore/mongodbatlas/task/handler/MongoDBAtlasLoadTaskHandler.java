@@ -20,13 +20,17 @@ import static com.bytechef.component.ai.vectorstore.mongodbatlas.constant.MongoD
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
 @Component(MONGODB_ATLAS + "/v1/" + LOAD)
 public class MongoDBAtlasLoadTaskHandler extends AbstractTaskHandler {
 
-    public MongoDBAtlasLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(MONGODB_ATLAS, 1, LOAD, actionDefinitionFacade);
+    public MongoDBAtlasLoadTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(MONGODB_ATLAS, 1, LOAD, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

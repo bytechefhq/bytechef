@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.agent.constant.AiAgentConstants.AI_AGENT
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(AI_AGENT + "/v1/" + CHAT)
 public class AiAgentChatTaskHandler extends AbstractTaskHandler {
 
-    public AiAgentChatTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(AI_AGENT, 1, CHAT, actionDefinitionFacade);
+    public AiAgentChatTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(AI_AGENT, 1, CHAT, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }
