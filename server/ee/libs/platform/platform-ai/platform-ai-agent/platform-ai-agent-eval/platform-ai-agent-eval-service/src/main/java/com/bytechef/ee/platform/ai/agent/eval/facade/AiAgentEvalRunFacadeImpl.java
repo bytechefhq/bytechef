@@ -16,6 +16,7 @@
 
 package com.bytechef.ee.platform.ai.agent.eval.facade;
 
+import com.bytechef.ee.platform.ai.agent.eval.audit.AiAgentEvalAuditEvents;
 import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentEvalRunStatus;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentEvalRun;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentEvalScenario;
@@ -24,6 +25,8 @@ import com.bytechef.ee.platform.ai.agent.eval.executor.AiAgentEvalRunExecutor;
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentEvalRunService;
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentEvalScenarioService;
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentEvalTestService;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +63,12 @@ class AiAgentEvalRunFacadeImpl implements AiAgentEvalRunFacade {
     }
 
     @Override
+    @Audited(event = AiAgentEvalAuditEvents.AI_AGENT_EVAL_RUN_STARTED, data = {
+        @AuditData(key = "aiAgentEvalRunId", value = "#result?.id"),
+        @AuditData(key = "aiAgentEvalTestId", value = "#agentEvalTestId"),
+        @AuditData(key = "name", value = "#name"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId("
         + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalTest', #agentEvalTestId), "
         + "'WORKFLOW_EDIT', #environmentId)")
@@ -114,6 +123,9 @@ class AiAgentEvalRunFacadeImpl implements AiAgentEvalRunFacade {
     }
 
     @Override
+    @Audited(event = AiAgentEvalAuditEvents.AI_AGENT_EVAL_RUN_CANCELLED, data = {
+        @AuditData(key = "aiAgentEvalRunId", value = "#id")
+    })
     @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId("
         + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalRun', #id), 'WORKFLOW_EDIT', "
         + "@aiAgentEvalWorkflowResolver.getEnvironmentId('AiAgentEvalRun', #id))")

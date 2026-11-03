@@ -27,6 +27,8 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-oauth2-authorization-server")
     testImplementation("org.springframework.security:spring-security-oauth2-resource-server")
+    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-service"))
     testImplementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-api"))
     testImplementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-service"))
     testImplementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-file-storage:platform-custom-component-file-storage-api"))
