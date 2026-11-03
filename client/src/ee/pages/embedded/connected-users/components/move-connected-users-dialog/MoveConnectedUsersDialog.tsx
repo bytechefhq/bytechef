@@ -112,7 +112,6 @@ const MoveConnectedUsersDialog = ({
         try {
             setResult(await onMove(targetId, selectedConnectedUserIds));
         } catch {
-            // The global fetch interceptor shows the error toast.
             setResult(undefined);
         } finally {
             setMoving(false);
