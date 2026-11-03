@@ -233,12 +233,14 @@ const WorkflowEditorLayout = ({
         if (integrationId) {
             return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR_EMBEDDED, () => {
                 if (integrationWorkflowId) {
-                    queryClient.invalidateQueries({
+                    void queryClient.invalidateQueries({
                         queryKey: IntegrationWorkflowKeys.integrationWorkflow(+integrationId, +integrationWorkflowId),
                     });
                 }
 
-                queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
+                void queryClient.invalidateQueries({
+                    queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
+                });
             });
         }
 
@@ -247,7 +249,7 @@ const WorkflowEditorLayout = ({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
             });
 
-            queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
+            void queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
         });
     }, [integrationId, integrationWorkflowId, projectId, projectWorkflowId, queryClient]);
 
