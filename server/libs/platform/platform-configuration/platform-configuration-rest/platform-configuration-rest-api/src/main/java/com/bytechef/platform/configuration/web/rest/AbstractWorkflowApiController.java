@@ -40,8 +40,10 @@ public abstract class AbstractWorkflowApiController {
     }
 
     protected ResponseEntity<Resource> doExportWorkflow(String id) {
-        Workflow workflow = workflowService.getWorkflow(id);
+        return doExportWorkflow(workflowService.getWorkflow(id));
+    }
 
+    protected ResponseEntity<Resource> doExportWorkflow(Workflow workflow) {
         String definition = workflow.getDefinition();
         Workflow.Format format = workflow.getFormat();
 

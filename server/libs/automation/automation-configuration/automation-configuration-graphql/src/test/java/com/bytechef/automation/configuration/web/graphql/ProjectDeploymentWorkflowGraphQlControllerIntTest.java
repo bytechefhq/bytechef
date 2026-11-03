@@ -27,7 +27,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -79,7 +79,7 @@ class ProjectDeploymentWorkflowGraphQlControllerIntTest {
     private GraphQlTester graphQlTester;
 
     @MockitoBean
-    private ProjectDeploymentService projectDeploymentService;
+    private ProjectDeploymentFacade projectDeploymentFacade;
 
     @MockitoBean
     private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -180,7 +180,7 @@ class ProjectDeploymentWorkflowGraphQlControllerIntTest {
         when(triggerDefinition.getType()).thenReturn(TriggerType.STATIC_WEBHOOK);
 
         when(environmentService.getEnvironment(2L)).thenReturn(Environment.PRODUCTION);
-        when(projectDeploymentService.getProjectDeployments(false, Environment.PRODUCTION, null, null, 1L))
+        when(projectDeploymentFacade.getProjectDeployments(1L, Environment.PRODUCTION, null, null))
             .thenReturn(List.of(projectDeployment));
         when(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(List.of(10L)))
             .thenReturn(List.of(projectDeploymentWorkflow));
