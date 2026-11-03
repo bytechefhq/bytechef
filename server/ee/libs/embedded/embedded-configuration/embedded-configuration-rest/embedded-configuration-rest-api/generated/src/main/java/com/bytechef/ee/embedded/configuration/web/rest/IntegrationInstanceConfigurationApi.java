@@ -5,6 +5,10 @@
  */
 package com.bytechef.ee.embedded.configuration.web.rest;
 
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationConnectedUserModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveImpactModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveRequestModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveResultModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
@@ -36,7 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T03:39:06.802257+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "integration-instance-configuration", description = "the integration-instance-configuration API")
 public interface IntegrationInstanceConfigurationApi {
@@ -244,7 +248,92 @@ public interface IntegrationInstanceConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"enabled\" : true, \"environmentId\" : 0, \"id\" : 6, \"integrationId\" : 1, \"integrationVersion\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"authorizationType\" : \"API_KEY\", \"connectionAuthorizationParameters\" : { \"key\" : \"\" }, \"connectionConnectionParameters\" : { \"key\" : \"\" }, \"connectionParameters\" : { \"key\" : \"\" }, \"integration\" : { \"componentName\" : \"componentName\", \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"icon\" : \"icon\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastStatus\" : \"DRAFT\", \"lastIntegrationVersion\" : 2, \"multipleInstances\" : false, \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\" }, \"integrationInstanceConfigurationWorkflows\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 9, \"integrationInstanceConfigurationId\" : 3, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 2 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 9, \"integrationInstanceConfigurationId\" : 3, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 2 } ], \"tags\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 } ], \"__version\" : 4 }";
+                    String exampleString = "{ \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"enabled\" : true, \"environmentId\" : 5, \"id\" : 5, \"integrationId\" : 2, \"integrationVersion\" : 7, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\", \"authorizationType\" : \"API_KEY\", \"connectionAuthorizationParameters\" : { \"key\" : \"\" }, \"connectionConnectionParameters\" : { \"key\" : \"\" }, \"connectionParameters\" : { \"key\" : \"\" }, \"integration\" : { \"componentName\" : \"componentName\", \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"icon\" : \"icon\", \"id\" : 0, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastStatus\" : \"DRAFT\", \"lastIntegrationVersion\" : 6, \"multipleInstances\" : false, \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\" }, \"integrationInstanceConfigurationWorkflows\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 3, \"integrationInstanceConfigurationId\" : 2, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 4 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 3, \"integrationInstanceConfigurationId\" : 2, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 4 } ], \"tags\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 } ], \"__version\" : 7 }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USERS = "/integration-instance-configurations/{id}/connected-users";
+    /**
+     * GET /integration-instance-configurations/{id}/connected-users : Get the connected users of an integration instance configuration
+     * Get the connected users that have an integration instance on an integration instance configuration.
+     *
+     * @param id The id of an integration instance configuration. (required)
+     * @return The connected users of the integration instance configuration. (status code 200)
+     */
+    @Operation(
+        operationId = "getIntegrationInstanceConfigurationConnectedUsers",
+        summary = "Get the connected users of an integration instance configuration",
+        description = "Get the connected users that have an integration instance on an integration instance configuration.",
+        tags = { "integration-instance-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The connected users of the integration instance configuration.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConfigurationConnectedUserModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = IntegrationInstanceConfigurationApi.PATH_GET_INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USERS,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<ConfigurationConnectedUserModel>> getIntegrationInstanceConfigurationConnectedUsers(
+        @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"connectedUserId\" : 0, \"email\" : \"email\", \"externalId\" : \"externalId\", \"name\" : \"name\" }, { \"connectedUserId\" : 0, \"email\" : \"email\", \"externalId\" : \"externalId\", \"name\" : \"name\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_INTEGRATION_INSTANCE_CONFIGURATION_MOVE_IMPACT = "/integration-instance-configurations/{id}/move-impact";
+    /**
+     * POST /integration-instance-configurations/{id}/move-impact : Preview moving connected users to another integration instance configuration
+     * Preview what moving connected users from an integration instance configuration to another one would change.
+     *
+     * @param id The id of the source integration instance configuration. (required)
+     * @param configurationMoveRequestModel  (required)
+     * @return What the move would change. (status code 200)
+     */
+    @Operation(
+        operationId = "getIntegrationInstanceConfigurationMoveImpact",
+        summary = "Preview moving connected users to another integration instance configuration",
+        description = "Preview what moving connected users from an integration instance configuration to another one would change.",
+        tags = { "integration-instance-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "What the move would change.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ConfigurationMoveImpactModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = IntegrationInstanceConfigurationApi.PATH_GET_INTEGRATION_INSTANCE_CONFIGURATION_MOVE_IMPACT,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<ConfigurationMoveImpactModel> getIntegrationInstanceConfigurationMoveImpact(
+        @Parameter(name = "id", description = "The id of the source integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "ConfigurationMoveRequestModel", description = "", required = true) @Valid @RequestBody ConfigurationMoveRequestModel configurationMoveRequestModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"mcpServerCount\" : 0, \"skipped\" : [ { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] }, { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] } ], \"workflows\" : [ { \"affectedConnectedUserCount\" : 1, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" }, { \"affectedConnectedUserCount\" : 1, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -291,7 +380,51 @@ public interface IntegrationInstanceConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"enabled\" : true, \"environmentId\" : 0, \"id\" : 6, \"integrationId\" : 1, \"integrationVersion\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"authorizationType\" : \"API_KEY\", \"connectionAuthorizationParameters\" : { \"key\" : \"\" }, \"connectionConnectionParameters\" : { \"key\" : \"\" }, \"connectionParameters\" : { \"key\" : \"\" }, \"integration\" : { \"componentName\" : \"componentName\", \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"icon\" : \"icon\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastStatus\" : \"DRAFT\", \"lastIntegrationVersion\" : 2, \"multipleInstances\" : false, \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\" }, \"integrationInstanceConfigurationWorkflows\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 9, \"integrationInstanceConfigurationId\" : 3, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 2 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 9, \"integrationInstanceConfigurationId\" : 3, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 2 } ], \"tags\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 } ], \"__version\" : 4 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"enabled\" : true, \"environmentId\" : 0, \"id\" : 6, \"integrationId\" : 1, \"integrationVersion\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"authorizationType\" : \"API_KEY\", \"connectionAuthorizationParameters\" : { \"key\" : \"\" }, \"connectionConnectionParameters\" : { \"key\" : \"\" }, \"connectionParameters\" : { \"key\" : \"\" }, \"integration\" : { \"componentName\" : \"componentName\", \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"icon\" : \"icon\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastStatus\" : \"DRAFT\", \"lastIntegrationVersion\" : 2, \"multipleInstances\" : false, \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\" }, \"integrationInstanceConfigurationWorkflows\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 9, \"integrationInstanceConfigurationId\" : 3, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 2 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 7, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 9, \"integrationInstanceConfigurationId\" : 3, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 2 } ], \"tags\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 } ], \"__version\" : 4 } ]";
+                    String exampleString = "[ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"enabled\" : true, \"environmentId\" : 5, \"id\" : 5, \"integrationId\" : 2, \"integrationVersion\" : 7, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\", \"authorizationType\" : \"API_KEY\", \"connectionAuthorizationParameters\" : { \"key\" : \"\" }, \"connectionConnectionParameters\" : { \"key\" : \"\" }, \"connectionParameters\" : { \"key\" : \"\" }, \"integration\" : { \"componentName\" : \"componentName\", \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"icon\" : \"icon\", \"id\" : 0, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastStatus\" : \"DRAFT\", \"lastIntegrationVersion\" : 6, \"multipleInstances\" : false, \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\" }, \"integrationInstanceConfigurationWorkflows\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 3, \"integrationInstanceConfigurationId\" : 2, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 4 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 3, \"integrationInstanceConfigurationId\" : 2, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 4 } ], \"tags\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 } ], \"__version\" : 7 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"enabled\" : true, \"environmentId\" : 5, \"id\" : 5, \"integrationId\" : 2, \"integrationVersion\" : 7, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\", \"authorizationType\" : \"API_KEY\", \"connectionAuthorizationParameters\" : { \"key\" : \"\" }, \"connectionConnectionParameters\" : { \"key\" : \"\" }, \"connectionParameters\" : { \"key\" : \"\" }, \"integration\" : { \"componentName\" : \"componentName\", \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"icon\" : \"icon\", \"id\" : 0, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastStatus\" : \"DRAFT\", \"lastIntegrationVersion\" : 6, \"multipleInstances\" : false, \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\" }, \"integrationInstanceConfigurationWorkflows\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 3, \"integrationInstanceConfigurationId\" : 2, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 4 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"connections\" : [ { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" }, { \"connectionId\" : 9, \"workflowConnectionKey\" : \"workflowConnectionKey\", \"workflowNodeName\" : \"workflowNodeName\" } ], \"enabled\" : true, \"id\" : 3, \"integrationInstanceConfigurationId\" : 2, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"workflowUuid\" : \"workflowUuid\", \"__version\" : 4 } ], \"tags\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"id\" : 5, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"__version\" : 5 } ], \"__version\" : 7 } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_MOVE_INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USERS = "/integration-instance-configurations/{id}/move";
+    /**
+     * POST /integration-instance-configurations/{id}/move : Move connected users to another integration instance configuration
+     * Move connected users from an integration instance configuration to another one.
+     *
+     * @param id The id of the source integration instance configuration. (required)
+     * @param configurationMoveRequestModel  (required)
+     * @return The outcome of the move. (status code 200)
+     */
+    @Operation(
+        operationId = "moveIntegrationInstanceConfigurationConnectedUsers",
+        summary = "Move connected users to another integration instance configuration",
+        description = "Move connected users from an integration instance configuration to another one.",
+        tags = { "integration-instance-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The outcome of the move.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ConfigurationMoveResultModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = IntegrationInstanceConfigurationApi.PATH_MOVE_INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USERS,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<ConfigurationMoveResultModel> moveIntegrationInstanceConfigurationConnectedUsers(
+        @Parameter(name = "id", description = "The id of the source integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "ConfigurationMoveRequestModel", description = "", required = true) @Valid @RequestBody ConfigurationMoveRequestModel configurationMoveRequestModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"movedConnectedUserIds\" : [ 0, 0 ], \"needsAttentionConnectedUserIds\" : [ 6, 6 ], \"skipped\" : [ { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] }, { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

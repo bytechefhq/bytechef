@@ -18,6 +18,7 @@ Name | Type
 `lastModifiedBy` | string
 `lastModifiedDate` | Date
 `name` | string
+`permissionExpression` | string
 `authorizationType` | [AuthorizationType](AuthorizationType.md)
 `connectionAuthorizationParameters` | { [key: string]: any; }
 `connectionConnectionParameters` | { [key: string]: any; }
@@ -45,6 +46,7 @@ const example = {
   "lastModifiedBy": null,
   "lastModifiedDate": null,
   "name": null,
+  "permissionExpression": null,
   "authorizationType": null,
   "connectionAuthorizationParameters": null,
   "connectionConnectionParameters": null,
