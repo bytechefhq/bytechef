@@ -1,0 +1,7 @@
+#### Things to know
+
+- Choose the events that should start the workflow: New Message, Conversation Started, Subscribed or Unsubscribed. Events you did not choose are ignored.
+- Conversation Started happens when a person opens the chat with your bot, before they have written anything. If you fill in the Welcome Message, Viber shows it to that person right away. The workflow still runs for the event.
+- The welcome message is not sent while testing in the editor. Deploy the workflow to see it.
+- The webhook is set when the workflow is enabled and removed when it is disabled. If the bot already sends its messages to a different workflow, enabling is refused with an error that says so. Use a separate bot for testing in the editor.
+- Use `user.id` from the output as the Receiver ID when you reply. To learn more, click [here](/reference/components/viber_v1#how-to-find-the-receiver-id).

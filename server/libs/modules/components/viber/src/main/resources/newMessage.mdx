@@ -1,0 +1,6 @@
+#### Things to know
+
+- This trigger starts the workflow when a person sends your bot a message. Use `user.id` from the output as the Receiver ID when you reply. To learn more, click [here](/reference/components/viber_v1#how-to-find-the-receiver-id).
+- The bot's webhook is set when the workflow is enabled and removed when it is disabled. If the bot already sends its messages to a different workflow, enabling is refused with an error that says so.
+- Every call to the webhook is checked against Viber's signature, so only genuine Viber calls start a workflow.
+- Pictures, videos and files are also downloaded and given to you as a file in the `file` output.

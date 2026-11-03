@@ -1,0 +1,15 @@
+### Before you start
+
+- A Viber bot can only message people who have written to it first. A person subscribes to your bot by sending it a message. Messages to anyone else are rejected by Viber.
+- One Viber bot can feed only one enabled workflow. Viber allows a single webhook per bot, so enabling a second workflow on the same bot is refused, and disabling a workflow never cuts off another one.
+- Testing a trigger in the editor needs its own bot, separate from any bot that a deployed workflow uses.
+- Only plain text messages can be sent in this version. Incoming messages of every type (text, picture, video, file, sticker, location, contact and link) reach your workflow.
+
+### How to find the Receiver ID
+
+1. Create a ByteChef workflow that starts with a Viber trigger.
+2. Write to your bot from Viber and run the workflow.
+3. Look at the trigger output. The `user.id` value is the Viber user ID.
+4. Use that value as the Receiver ID in Send Text Message, or add it to the Receiver IDs list in Broadcast Text Message.
+
+To reply to the person who wrote to your bot, point the Receiver ID at the `user.id` from the trigger.
