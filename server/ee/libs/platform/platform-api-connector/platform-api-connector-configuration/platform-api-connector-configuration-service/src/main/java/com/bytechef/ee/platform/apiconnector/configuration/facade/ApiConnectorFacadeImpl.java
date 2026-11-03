@@ -13,11 +13,13 @@ import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEn
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEndpoint.HttpMethod;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
+import com.bytechef.ee.platform.apiconnector.configuration.dto.GenerateSpecificationRequestDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
 import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiGenerator;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
+import com.bytechef.ee.platform.apiconnector.configuration.service.OpenApiSpecificationGenerator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
@@ -61,6 +63,7 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
     private final ApiConnectorGenerationJobFacade apiConnectorGenerationJobFacade;
     private final ApiConnectorGenerationJobService apiConnectorGenerationJobService;
     private final ApiConnectorService apiConnectorService;
+    private final OpenApiSpecificationGenerator openApiSpecificationGenerator;
 
     @SuppressFBWarnings("EI")
     public ApiConnectorFacadeImpl(
@@ -68,13 +71,14 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         ApiConnectorFileStorage apiConnectorFileStorage,
         @Nullable ApiConnectorGenerationJobFacade apiConnectorGenerationJobFacade,
         ApiConnectorGenerationJobService apiConnectorGenerationJobService,
-        ApiConnectorService apiConnectorService) {
+        ApiConnectorService apiConnectorService, OpenApiSpecificationGenerator openApiSpecificationGenerator) {
 
         this.apiConnectorAiService = apiConnectorAiService;
         this.apiConnectorFileStorage = apiConnectorFileStorage;
         this.apiConnectorGenerationJobFacade = apiConnectorGenerationJobFacade;
         this.apiConnectorGenerationJobService = apiConnectorGenerationJobService;
         this.apiConnectorService = apiConnectorService;
+        this.openApiSpecificationGenerator = openApiSpecificationGenerator;
     }
 
     @Override
@@ -120,6 +124,12 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         String specification = apiConnectorAiService.generateOpenApiSpecification(documentationUrl);
 
         return importOpenApiSpecification(name, specification);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public String generateSpecification(GenerateSpecificationRequestDTO generateSpecificationRequestDTO) {
+        return openApiSpecificationGenerator.generate(generateSpecificationRequestDTO);
     }
 
     @Override
