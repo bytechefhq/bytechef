@@ -10,8 +10,6 @@ package com.bytechef.ee.embedded.configuration.dto;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A connected user assigned to an automation workflow project configuration.
- *
  * @version ee
  *
  * @author Ivica Cardic

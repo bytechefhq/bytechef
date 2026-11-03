@@ -26,6 +26,8 @@ public interface ConnectedUserProjectAdminFacade {
     void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable);
 
     /**
+     * Returns the connected user's configuration assignments.
+     *
      * @param connectedUserId the connected user id
      * @return the configuration the connected user is assigned to in each automation workflow project, in project id
      *         order

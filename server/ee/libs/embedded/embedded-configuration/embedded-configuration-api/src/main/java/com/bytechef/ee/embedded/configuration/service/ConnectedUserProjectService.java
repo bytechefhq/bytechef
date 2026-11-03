@@ -58,6 +58,9 @@ public interface ConnectedUserProjectService {
     /**
      * Locks the connected user project's row until the current transaction ends. Callers that also lock the connected
      * user take this lock first, so the order is always connected user project, then connected user.
+     *
+     * @param connectedUserProjectId the connected user project id
+     * @return the locked connected user project
      */
     ConnectedUserProject lockConnectedUserProject(long connectedUserProjectId);
 }

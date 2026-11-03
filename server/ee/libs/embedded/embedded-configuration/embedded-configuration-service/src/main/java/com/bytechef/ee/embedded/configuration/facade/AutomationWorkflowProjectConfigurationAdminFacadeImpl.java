@@ -855,19 +855,12 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .collect(Collectors.groupingBy(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid));
     }
 
-    /**
-     * Returns the references to the workflows held by the connected users assigned to the configuration, so users on
-     * another configuration of the same project and environment never count.
-     */
     private List<ConnectedUserWorkflowReferenceDTO> getAssignedUsersReferences(
         AutomationWorkflowProjectConfiguration configuration, Set<String> workflowUuids) {
 
         return getUsersReferences(configuration, getAssignedConnectedUserIds(configuration.getId()), workflowUuids);
     }
 
-    /**
-     * Returns the references the given connected users hold to the workflows in the configuration's environment.
-     */
     private List<ConnectedUserWorkflowReferenceDTO> getUsersReferences(
         AutomationWorkflowProjectConfiguration configuration, Set<Long> connectedUserIds, Set<String> workflowUuids) {
 
@@ -1001,10 +994,6 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             AutomationWorkflowProjectConfigurationErrorType.VERSION_LACKS_REFERENCED_WORKFLOWS);
     }
 
-    /**
-     * Returns the sorted labels of the workflows of the configuration's project version that the given connected users
-     * still reference and the target project version lacks.
-     */
     private List<String> getMissingReferencedWorkflowLabels(
         AutomationWorkflowProjectConfiguration configuration, Set<Long> connectedUserIds, int targetProjectVersion) {
 
@@ -1053,7 +1042,6 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             return MoveOutcome.skipped(connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of());
         }
 
-        // connected_user_project before connected_user, which resolver.assign locks
         lockConnectedUserProjects(connectedUserId);
 
         boolean onSource = connectedUserProjectConfigurationService.fetchAssignment(connectedUserId, projectId)
@@ -1096,11 +1084,6 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         return MoveOutcome.moved(connectedUserId, needsAttention(references));
     }
 
-    /**
-     * A moved user needs attention when a workflow they keep turned on cannot run on the target, for example for a
-     * missing connection or input. A workflow the administrator turned off on the target is the administrator's
-     * decision, not something to fix, so it does not count.
-     */
     private boolean needsAttention(List<ConnectedUserProjectWorkflow> references) {
         return references.stream()
             .filter(ConnectedUserProjectWorkflow::isEnabled)
@@ -1124,10 +1107,6 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         }
     }
 
-    /**
-     * Returns, per workflow uuid, the inputs the source provides and the target does not, so that a move takes the
-     * source administrator's values off the moved users' rows.
-     */
     private static Map<String, Set<String>> getRemovedProvidedInputNames(
         AutomationWorkflowProjectConfiguration sourceConfiguration,
         AutomationWorkflowProjectConfiguration targetConfiguration) {
