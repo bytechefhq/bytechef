@@ -125,6 +125,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
+    @Audited(event = ApiKeyAuditEvents.API_KEY_UPDATED, mapper = ApiKeyAuditMapper.class)
     public ApiKey update(ApiKey apiKey) {
         Assert.notNull(apiKey, "'apiKey' must not be null");
 
