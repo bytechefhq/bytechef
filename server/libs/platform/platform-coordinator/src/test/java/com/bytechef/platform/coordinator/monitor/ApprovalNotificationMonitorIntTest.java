@@ -31,6 +31,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.coordinator.config.PlatformCoordinatorIntTestConfiguration;
 import com.bytechef.platform.coordinator.config.RecordingWebhookNotificationSender;
+import com.bytechef.platform.coordinator.notification.NotificationHandlerContexts;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
@@ -64,7 +65,7 @@ class ApprovalNotificationMonitorIntTest {
 
     private static final Duration ESCALATION_AFTER = Duration.ofHours(4);
     private static final Duration REMINDER_LEAD_TIME = Duration.ofHours(24);
-    private static final String PUBLIC_URL = "http://localhost:5173";
+    private static final String PUBLIC_URL = PlatformCoordinatorIntTestConfiguration.PUBLIC_URL;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -77,6 +78,9 @@ class ApprovalNotificationMonitorIntTest {
 
     @Autowired
     private NotificationEventRepository notificationEventRepository;
+
+    @Autowired
+    private NotificationHandlerContexts notificationHandlerContexts;
 
     @Autowired
     private NotificationHandlerRegistry notificationHandlerRegistry;
@@ -139,6 +143,8 @@ class ApprovalNotificationMonitorIntTest {
         assertThat(notificationHandlerContext.getApprovalExpiresAt()).isEqualTo(expiresAt.toString());
         assertThat(notificationHandlerContext.getApprovalFormUrl())
             .isEqualTo(PUBLIC_URL + "/resume/" + job.getMetadata(MetadataConstants.JOB_RESUME_ID));
+        assertThat(notificationHandlerContext.getDeliveryId()).isNotNull();
+        assertThat(notificationHandlerContext.getExecutionUrl()).isNull();
         assertThat(job.getMetadata(ApprovalNotificationMonitor.APPROVAL_REMINDER_SENT_AT)).isNotNull();
     }
 
@@ -540,9 +546,9 @@ class ApprovalNotificationMonitorIntTest {
         @Nullable Duration reminderLeadTime, @Nullable Duration escalationAfter, Duration deliveryWaitTimeout) {
 
         return new ApprovalNotificationMonitor(
-            null, escalationAfter, jobService, notificationHandlerRegistry, notificationSenderRegistry,
-            notificationService, PUBLIC_URL, reminderLeadTime, taskExecutionService, tenantService,
-            deliveryWaitTimeout);
+            null, escalationAfter, jobService, notificationHandlerContexts, notificationHandlerRegistry,
+            notificationSenderRegistry, notificationService, PUBLIC_URL, reminderLeadTime, taskExecutionService,
+            tenantService, deliveryWaitTimeout);
     }
 
     private long saveApprovalJob(Instant expiresAt, Instant startedAt, @Nullable Instant raisedAt) {

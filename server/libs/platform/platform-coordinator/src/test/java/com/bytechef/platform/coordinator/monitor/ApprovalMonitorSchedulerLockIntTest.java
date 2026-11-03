@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.platform.coordinator.config.PlatformCoordinatorIntTestConfiguration;
+import com.bytechef.platform.coordinator.notification.NotificationHandlerContexts;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
@@ -125,7 +126,8 @@ class ApprovalMonitorSchedulerLockIntTest {
 
     private static ApprovalNotificationMonitor createApprovalNotificationMonitor(TenantService tenantService) {
         return new ApprovalNotificationMonitor(
-            null, Duration.ofHours(4), mock(JobService.class), new NotificationHandlerRegistry(List.of()),
+            null, Duration.ofHours(4), mock(JobService.class), mock(NotificationHandlerContexts.class),
+            new NotificationHandlerRegistry(List.of()),
             new NotificationSenderRegistry(List.of()), mock(NotificationService.class), null, Duration.ofHours(24),
             mock(TaskExecutionService.class), tenantService);
     }

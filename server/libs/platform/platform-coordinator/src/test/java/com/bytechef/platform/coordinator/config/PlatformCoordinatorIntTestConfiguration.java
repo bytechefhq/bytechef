@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
@@ -39,8 +40,10 @@ import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
 import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.coordinator.notification.ApprovalEscalationWebhookNotificationHandler;
 import com.bytechef.platform.coordinator.notification.ApprovalReminderWebhookNotificationHandler;
+import com.bytechef.platform.coordinator.notification.NotificationHandlerContexts;
 import com.bytechef.platform.data.storage.jdbc.config.JdbcDataStorageConfiguration;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
@@ -51,6 +54,8 @@ import com.bytechef.platform.notification.handler.SlackNotificationHandler;
 import com.bytechef.platform.notification.repository.NotificationRepository;
 import com.bytechef.platform.notification.service.NotificationService;
 import com.bytechef.platform.notification.service.NotificationServiceImpl;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -77,9 +82,18 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class PlatformCoordinatorIntTestConfiguration {
 
+    public static final String PUBLIC_URL = "http://localhost:5173";
+
     @Bean
     JobService jobService(JobRepository jobRepository) {
         return new JobServiceImpl(jobRepository);
+    }
+
+    @Bean
+    NotificationHandlerContexts notificationHandlerContexts(TaskExecutionService taskExecutionService) {
+        return new NotificationHandlerContexts(
+            mock(EnvironmentService.class), mock(JobPrincipalAccessorRegistry.class), mock(PrincipalJobService.class),
+            PUBLIC_URL, taskExecutionService, mock(WorkflowService.class));
     }
 
     @Bean
