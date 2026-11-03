@@ -1,5 +1,5 @@
-query automationWorkflowProjects {
-    automationWorkflowProjects {
+query automationWorkflowProjects($environmentId: ID) {
+    automationWorkflowProjects(environmentId: $environmentId) {
         id
         name
         description
