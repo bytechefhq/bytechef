@@ -67,9 +67,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class WorkspaceDataTableFacadeAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";
-    private static final List<String> BASE_NAMES = List.of("audited", "audited_copy");
+    private static final List<String> BASE_NAMES = List.of("audited", "audited_copy", "audited_renamed");
     private static final List<ColumnSpec> COLUMN_SPECS = List.of(new ColumnSpec("title", ColumnType.STRING));
     private static final long ENVIRONMENT_ID = 0;
+    private static final long OTHER_ENVIRONMENT_ID = 1;
     private static final long WORKSPACE_ID = 9101;
 
     @Autowired
@@ -188,10 +189,191 @@ class WorkspaceDataTableFacadeAuditIntTest {
             .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID));
     }
 
+    @Test
+    void testAddColumnRecordsTheColumn() {
+        long dataTableId = createAuditedTable();
+
+        workspaceDataTableFacade.addColumn(dataTableId, new ColumnSpec("amount", ColumnType.NUMBER), ENVIRONMENT_ID);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_ADDED);
+
+        assertThat(persistentAuditEvent.getPrincipal()).isEqualTo(ADMIN_LOGIN);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("dataTableId", String.valueOf(dataTableId))
+            .containsEntry("columnName", "amount")
+            .containsEntry("columnType", ColumnType.NUMBER.name())
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
+            .doesNotContainKeys("dataError", "errorClass");
+    }
+
+    @Test
+    void testAddColumnToAnUnknownTableRecordsAnError() {
+        ColumnSpec columnSpec = new ColumnSpec("amount", ColumnType.NUMBER);
+
+        assertThatThrownBy(() -> workspaceDataTableFacade.addColumn(Long.MAX_VALUE, columnSpec, ENVIRONMENT_ID))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_ADDED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", IllegalArgumentException.class.getName())
+            .containsEntry("dataTableId", String.valueOf(Long.MAX_VALUE))
+            .containsEntry("columnName", "amount")
+            .containsEntry("columnType", ColumnType.NUMBER.name())
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testDropTableRecordsTheTable() {
+        long dataTableId = createAuditedTable();
+
+        boolean dropped = workspaceDataTableFacade.dropTable(dataTableId, ENVIRONMENT_ID);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_DELETED);
+
+        assertThat(dropped).isTrue();
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("dataTableId", String.valueOf(dataTableId))
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
+            .doesNotContainKeys("dataError", "errorClass");
+    }
+
+    @Test
+    void testDropOfATableMissingFromTheEnvironmentIsNotRecorded() {
+        long dataTableId = createAuditedTable();
+
+        boolean dropped = workspaceDataTableFacade.dropTable(dataTableId, OTHER_ENVIRONMENT_ID);
+
+        assertThat(dropped).isFalse();
+        assertThat(findEventTypes()).doesNotContain(DataTableAuditEvents.DATA_TABLE_DELETED);
+    }
+
+    @Test
+    void testRemoveColumnRecordsTheColumn() {
+        long dataTableId = createAuditedTable();
+
+        workspaceDataTableFacade.removeColumn(dataTableId, "title", ENVIRONMENT_ID);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_REMOVED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("dataTableId", String.valueOf(dataTableId))
+            .containsEntry("columnName", "title")
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
+            .doesNotContainKeys("dataError", "errorClass");
+    }
+
+    @Test
+    void testRenameColumnRecordsBothColumnNames() {
+        long dataTableId = createAuditedTable();
+
+        workspaceDataTableFacade.renameColumn(dataTableId, "title", "headline", ENVIRONMENT_ID);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_RENAMED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("dataTableId", String.valueOf(dataTableId))
+            .containsEntry("fromColumnName", "title")
+            .containsEntry("toColumnName", "headline")
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
+            .doesNotContainKeys("dataError", "errorClass");
+    }
+
+    @Test
+    void testRenameTableRecordsTheNewName() {
+        long dataTableId = createAuditedTable();
+
+        workspaceDataTableFacade.renameTable(dataTableId, "audited_renamed", ENVIRONMENT_ID);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_RENAMED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("dataTableId", String.valueOf(dataTableId))
+            .containsEntry("toBaseName", "audited_renamed")
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
+            .doesNotContainKeys("dataError", "errorClass");
+    }
+
+    @Test
+    void testRenameOfAnUnknownTableRecordsAnError() {
+        assertThatThrownBy(
+            () -> workspaceDataTableFacade.renameTable(Long.MAX_VALUE, "audited_renamed", ENVIRONMENT_ID))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_RENAMED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", IllegalArgumentException.class.getName())
+            .containsEntry("dataTableId", String.valueOf(Long.MAX_VALUE))
+            .containsEntry("toBaseName", "audited_renamed")
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testExportCsvRecordsTheTableWithoutItsRows() {
+        long dataTableId = createAuditedTable();
+
+        workspaceDataTableFacade.importCsv(dataTableId, "title\nconfidential title\n", ENVIRONMENT_ID);
+
+        String csv = workspaceDataTableFacade.exportCsv(dataTableId, ENVIRONMENT_ID);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_EXPORTED);
+
+        assertThat(csv).contains("confidential title");
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("dataTableId", String.valueOf(dataTableId))
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
+            .doesNotContainValue("confidential title")
+            .doesNotContainKeys("dataError", "errorClass");
+        assertThat(findEventTypes()).containsExactly(DataTableAuditEvents.DATA_TABLE_EXPORTED);
+    }
+
+    @Test
+    void testExportOfAnUnknownTableRecordsAnError() {
+        assertThatThrownBy(() -> workspaceDataTableFacade.exportCsv(Long.MAX_VALUE, ENVIRONMENT_ID))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_EXPORTED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", IllegalArgumentException.class.getName())
+            .containsEntry("dataTableId", String.valueOf(Long.MAX_VALUE));
+    }
+
+    private long createAuditedTable() {
+        workspaceDataTableFacade.createTable("audited", null, COLUMN_SPECS, WORKSPACE_ID, ENVIRONMENT_ID);
+
+        persistenceAuditEventRepository.deleteAll();
+
+        return dataTableService.getIdByBaseName("audited");
+    }
+
     private void dropTestTables() {
         for (String baseName : BASE_NAMES) {
             dataTableService.dropTable(baseName, ENVIRONMENT_ID);
         }
+    }
+
+    private List<String> findEventTypes() {
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+            AuditEventFilter.empty(), PageRequest.of(0, 25));
+
+        return page.getContent()
+            .stream()
+            .map(PersistentAuditEvent::getEventType)
+            .toList();
     }
 
     private PersistentAuditEvent findSingleEvent(String eventType) {

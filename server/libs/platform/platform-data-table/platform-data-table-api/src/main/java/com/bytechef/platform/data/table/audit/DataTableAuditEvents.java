@@ -27,6 +27,7 @@ public final class DataTableAuditEvents {
     public static final String DATA_TABLE_CREATED = "DATA_TABLE_CREATED";
     public static final String DATA_TABLE_DELETED = "DATA_TABLE_DELETED";
     public static final String DATA_TABLE_DUPLICATED = "DATA_TABLE_DUPLICATED";
+    public static final String DATA_TABLE_EXPORTED = "DATA_TABLE_EXPORTED";
     public static final String DATA_TABLE_RENAMED = "DATA_TABLE_RENAMED";
 
     private DataTableAuditEvents() {

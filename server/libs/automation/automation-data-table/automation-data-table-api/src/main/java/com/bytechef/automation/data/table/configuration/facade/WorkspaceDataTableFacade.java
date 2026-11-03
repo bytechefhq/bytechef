@@ -39,7 +39,7 @@ public interface WorkspaceDataTableFacade {
 
     boolean deleteRow(long tableId, long rowId, long environmentId);
 
-    void dropTable(long tableId, long environmentId);
+    boolean dropTable(long tableId, long environmentId);
 
     void duplicateTable(long tableId, String newBaseName, long environmentId);
 
