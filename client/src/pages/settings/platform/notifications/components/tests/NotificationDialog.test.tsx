@@ -1,4 +1,4 @@
-import {NotificationTypeEnum} from '@/shared/middleware/platform/notification';
+import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {render, screen} from '@testing-library/react';
@@ -19,12 +19,20 @@ vi.mock('../../hooks/useNotifications', async (importOriginal) => ({
 }));
 
 interface NotificationDialogHarnessProps {
+    onRegenerateSigningSecret?: (notificationId: number) => void;
     saveNotification: (data: NotificationFormValuesType) => void;
+    selectedNotification?: Notification;
     settings?: Record<string, unknown>;
     type: NotificationTypeEnum;
 }
 
-function NotificationDialogHarness({saveNotification, settings = {}, type}: NotificationDialogHarnessProps) {
+function NotificationDialogHarness({
+    onRegenerateSigningSecret,
+    saveNotification,
+    selectedNotification,
+    settings = {},
+    type,
+}: NotificationDialogHarnessProps) {
     const form = useForm<NotificationFormValuesType>({
         defaultValues: {
             name: 'Failures',
@@ -40,7 +48,9 @@ function NotificationDialogHarness({saveNotification, settings = {}, type}: Noti
             closeEditDialog={vi.fn()}
             form={form}
             isEditDialogOpen
+            onRegenerateSigningSecret={onRegenerateSigningSecret}
             saveNotification={saveNotification}
+            selectedNotification={selectedNotification}
         />
     );
 }
@@ -245,6 +255,42 @@ describe('NotificationDialog', () => {
             expect.objectContaining({settings: {slackWebhookUrl: '********'}}),
             expect.anything()
         );
+    });
+
+    it('offers the signing secret button only when the stored notification is a Webhook', () => {
+        const {unmount} = render(
+            <NotificationDialogHarness
+                onRegenerateSigningSecret={vi.fn()}
+                saveNotification={vi.fn()}
+                selectedNotification={{id: 7, name: 'Failures', type: NotificationTypeEnum.Email} as Notification}
+                settings={{webhook: 'https://example.com/ingest'}}
+                type={NotificationTypeEnum.Webhook}
+            />
+        );
+
+        expect(screen.queryByRole('button', {name: 'Generate signing secret'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Regenerate signing secret'})).not.toBeInTheDocument();
+
+        unmount();
+
+        render(
+            <NotificationDialogHarness
+                onRegenerateSigningSecret={vi.fn()}
+                saveNotification={vi.fn()}
+                selectedNotification={
+                    {
+                        hasSigningSecret: true,
+                        id: 7,
+                        name: 'Failures',
+                        type: NotificationTypeEnum.Webhook,
+                    } as Notification
+                }
+                settings={{webhook: 'https://example.com/ingest'}}
+                type={NotificationTypeEnum.Webhook}
+            />
+        );
+
+        expect(screen.getByRole('button', {name: 'Regenerate signing secret'})).toBeInTheDocument();
     });
 
     it('requires a value after a stored header is renamed', async () => {

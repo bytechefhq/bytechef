@@ -197,16 +197,16 @@ export default function useNotifications() {
         closeEditDialog();
     };
 
-    const createNotificationMutation = useCreateNotificationMutation({
-        onSuccess: (result) => {
-            onSuccess();
+    const onSaveSuccess = (result?: Notification) => {
+        onSuccess();
 
-            if (result?.signingSecret) {
-                setSigningSecret(result.signingSecret);
-            }
-        },
-    });
-    const updateNotificationMutation = useUpdateNotificationMutation({onSuccess});
+        if (result?.signingSecret) {
+            setSigningSecret(result.signingSecret);
+        }
+    };
+
+    const createNotificationMutation = useCreateNotificationMutation({onSuccess: onSaveSuccess});
+    const updateNotificationMutation = useUpdateNotificationMutation({onSuccess: onSaveSuccess});
     const regenerateNotificationSigningSecretMutation = useRegenerateNotificationSigningSecretMutation({
         onSuccess: (result, notificationId) => {
             queryClient.invalidateQueries({
@@ -262,11 +262,16 @@ export default function useNotifications() {
     function saveNotification() {
         const formValues = getValues();
 
+        const latestNotification = notificationsData?.find(
+            (notification) => notification.id === selectedNotification?.id
+        );
+
         const updatedFormData = {
             ...selectedNotification,
             ...formValues,
             ...{notificationEventIds: formValues.notificationEventIds.map((id: string) => Number(id))},
             settings: trimUrlSettings(formValues.settings),
+            version: latestNotification?.version ?? selectedNotification?.version,
         };
 
         if (selectedNotification?.id) {
@@ -274,8 +279,6 @@ export default function useNotifications() {
         } else {
             createNotificationMutation.mutate(updatedFormData);
         }
-
-        closeEditDialog();
     }
 
     const currentNotification = useMemo(

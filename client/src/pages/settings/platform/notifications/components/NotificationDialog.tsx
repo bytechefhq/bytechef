@@ -285,20 +285,22 @@ const NotificationDialog = ({
                                             )}
                                         />
 
-                                        {selectedNotification?.id && onRegenerateSigningSecret && (
-                                            <div>
-                                                <Button
-                                                    label={
-                                                        selectedNotification.hasSigningSecret
-                                                            ? 'Regenerate signing secret'
-                                                            : 'Generate signing secret'
-                                                    }
-                                                    onClick={() => setIsRegenerateConfirmOpen(true)}
-                                                    type="button"
-                                                    variant="outline"
-                                                />
-                                            </div>
-                                        )}
+                                        {selectedNotification?.id &&
+                                            selectedNotification.type === NotificationTypeEnum.Webhook &&
+                                            onRegenerateSigningSecret && (
+                                                <div>
+                                                    <Button
+                                                        label={
+                                                            selectedNotification.hasSigningSecret
+                                                                ? 'Regenerate signing secret'
+                                                                : 'Generate signing secret'
+                                                        }
+                                                        onClick={() => setIsRegenerateConfirmOpen(true)}
+                                                        type="button"
+                                                        variant="outline"
+                                                    />
+                                                </div>
+                                            )}
                                     </>
                                 )}
                             </DialogBody>
