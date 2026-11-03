@@ -28,4 +28,11 @@ public interface NotificationSender<T extends NotificationHandler> {
 
     CompletableFuture<Void> send(
         Notification notification, T notificationHandler, NotificationHandlerContext notificationHandlerContext);
+
+    /**
+     * Sends a single test message synchronously, built exactly as a real send, and reports the outcome instead of
+     * throwing.
+     */
+    NotificationTestResult sendTest(
+        Notification notification, T notificationHandler, NotificationHandlerContext notificationHandlerContext);
 }

@@ -19,6 +19,7 @@ package com.bytechef.platform.coordinator.config;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.NotificationSender;
+import com.bytechef.platform.notification.handler.NotificationTestResult;
 import com.bytechef.platform.notification.handler.WebhookNotificationHandler;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -75,6 +76,14 @@ public class RecordingWebhookNotificationSender implements NotificationSender<We
         deliveredNotificationHandlerContexts.add(notificationHandlerContext);
 
         return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public NotificationTestResult sendTest(
+        Notification notification, WebhookNotificationHandler notificationHandler,
+        NotificationHandlerContext notificationHandlerContext) {
+
+        return NotificationTestResult.sent(false);
     }
 
     public List<String> getAttemptedNotificationNames() {

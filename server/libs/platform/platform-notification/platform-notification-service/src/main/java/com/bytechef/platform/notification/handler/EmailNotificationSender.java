@@ -19,6 +19,7 @@ package com.bytechef.platform.notification.handler;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.domain.Notification;
 import java.util.concurrent.CompletableFuture;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,5 +58,28 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
             emailNotificationHandler.isHtml());
 
         return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public NotificationTestResult sendTest(
+        Notification notification, EmailNotificationHandler emailNotificationHandler,
+        NotificationHandlerContext notificationHandlerContext) {
+
+        String email = (String) notification.getSetting("email");
+
+        if (email == null || email.isBlank()) {
+            return NotificationTestResult.failed("Email address is required");
+        }
+
+        try {
+            mailService.sendEmailNow(
+                email, emailNotificationHandler.getSubject(notificationHandlerContext),
+                emailNotificationHandler.getContent(notificationHandlerContext), emailNotificationHandler.isHtml());
+        } catch (MailException | IllegalStateException exception) {
+            return NotificationTestResult.failed(exception.getClass()
+                .getSimpleName() + ": " + exception.getMessage());
+        }
+
+        return NotificationTestResult.sent(false);
     }
 }

@@ -60,6 +60,7 @@ import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSender;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
+import com.bytechef.platform.notification.handler.NotificationTestResult;
 import com.bytechef.platform.notification.handler.SlackNotificationHandler;
 import com.bytechef.platform.notification.repository.NotificationRepository;
 import com.bytechef.platform.notification.service.NotificationService;
@@ -167,6 +168,14 @@ public class PlatformCoordinatorIntTestConfiguration {
 
         @Override
         public CompletableFuture<Void> send(
+            Notification notification, SlackNotificationHandler notificationHandler,
+            NotificationHandlerContext notificationHandlerContext) {
+
+            throw new AssertionError("No Slack handler is registered, so nothing should reach the Slack sender");
+        }
+
+        @Override
+        public NotificationTestResult sendTest(
             Notification notification, SlackNotificationHandler notificationHandler,
             NotificationHandlerContext notificationHandlerContext) {
 

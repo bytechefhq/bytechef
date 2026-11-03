@@ -28,6 +28,7 @@ import com.bytechef.platform.notification.handler.NotificationHandlerContext.Job
 import com.bytechef.platform.notification.handler.NotificationHandlerContext.ProjectSummary;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext.WorkflowSummary;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -74,6 +75,28 @@ class NotificationHandlerContextTest {
     }
 
     @Test
+    void testWithTimestampCopiesEveryField() {
+        NotificationHandlerContext sample = NotificationHandlerContext.sample();
+        Instant timestamp = Instant.parse("2027-02-03T04:05:06Z");
+
+        NotificationHandlerContext copy = sample.withTimestamp(timestamp);
+
+        assertEquals(timestamp, copy.getTimestamp());
+        assertEquals(Instant.parse("2026-01-01T00:00:00Z"), sample.getTimestamp());
+
+        Map<String, Object> expected = new LinkedHashMap<>(sample.toMap());
+
+        expected.put("timestamp", timestamp.toString());
+
+        assertEquals(expected, copy.toMap());
+        assertEquals(sample.getDeliveryId(), copy.getDeliveryId());
+        assertEquals(sample.getJobId(), copy.getJobId());
+        assertEquals(sample.getEnvironment(), copy.getEnvironment());
+        assertEquals(sample.getExecutionUrl(), copy.getExecutionUrl());
+        assertEquals(sample.getApproval(), copy.getApproval());
+    }
+
+    @Test
     void testSampleFillsEverySection() {
         NotificationHandlerContext sample = NotificationHandlerContext.sample();
 
@@ -105,7 +128,7 @@ class NotificationHandlerContextTest {
 
         NotificationHandlerContext copy = context.withDeliveryId("d-2");
 
-        Map<String, Object> expected = new java.util.LinkedHashMap<>(context.toMap());
+        Map<String, Object> expected = new LinkedHashMap<>(context.toMap());
 
         expected.put("deliveryId", "d-2");
 
