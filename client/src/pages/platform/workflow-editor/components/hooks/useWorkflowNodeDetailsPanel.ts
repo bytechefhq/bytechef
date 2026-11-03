@@ -92,6 +92,7 @@ import getMissingRequiredConnectionErrors, {
 import isActionDefinitionFresh from './isActionDefinitionFresh';
 import {resolveDisplayConditionsQueryTarget} from './resolveDisplayConditionsQueryTarget';
 import resolveFallbackTab from './resolveFallbackTab';
+import resolveMissingDefinitionMessage from './resolveMissingDefinitionMessage';
 import {resolveMissingRequiredPropertiesRefetch} from './resolveMissingRequiredPropertiesRefetch';
 import resolveNodeConnectionFields from './resolveNodeConnectionFields';
 import resolveShowOutputTab from './resolveShowOutputTab';
@@ -199,13 +200,14 @@ export default function useWorkflowNodeDetailsPanel({
 
     const isClusterElement = !!currentNode?.clusterElementType;
 
-    const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
-        {
-            componentName: currentNode?.componentName || '',
-            componentVersion: currentNode?.version || 1,
-        },
-        !!currentNode && !currentNode.taskDispatcher
-    );
+    const {data: currentComponentDefinition, failureCount: componentDefinitionFailureCount} =
+        useGetComponentDefinitionQuery(
+            {
+                componentName: currentNode?.componentName || '',
+                componentVersion: currentNode?.version || 1,
+            },
+            !!currentNode && !currentNode.taskDispatcher
+        );
 
     const {data: componentDefinitionVersions} = useGetComponentDefinitionVersionsQuery(
         {componentName: currentNode?.componentName || ''},
@@ -788,6 +790,30 @@ export default function useWorkflowNodeDetailsPanel({
             currentTaskDispatcherDefinition,
             currentWorkflowNodeConnections,
             showOutputTab,
+        ]
+    );
+
+    const missingDefinitionMessage = useMemo(
+        () =>
+            resolveMissingDefinitionMessage({
+                clusterElementType: currentNode?.clusterElementType,
+                componentDefinition: currentComponentDefinition,
+                componentDefinitionLookupFailed: componentDefinitionFailureCount > 0,
+                componentName: currentNode?.componentName,
+                componentVersion: currentNode?.version,
+                operationName: currentNode?.operationName,
+                taskDispatcher: currentNode?.taskDispatcher,
+                trigger: currentNode?.trigger,
+            }),
+        [
+            componentDefinitionFailureCount,
+            currentComponentDefinition,
+            currentNode?.clusterElementType,
+            currentNode?.componentName,
+            currentNode?.operationName,
+            currentNode?.taskDispatcher,
+            currentNode?.trigger,
+            currentNode?.version,
         ]
     );
 
@@ -1447,6 +1473,7 @@ export default function useWorkflowNodeDetailsPanel({
         handleOperationSelectChange,
         handlePanelClose,
         handleVersionSelectChange,
+        missingDefinitionMessage,
         nodeDefinition,
         nodeTabs,
         operationDataMissing,
