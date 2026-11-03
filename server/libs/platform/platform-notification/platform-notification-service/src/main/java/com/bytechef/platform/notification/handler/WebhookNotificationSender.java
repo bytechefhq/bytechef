@@ -23,6 +23,7 @@ import com.bytechef.platform.notification.delivery.WebhookRetry;
 import com.bytechef.platform.notification.domain.Notification;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
 
@@ -60,16 +61,19 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
                 "Notification " + notification.getId() + " has no webhook URL configured");
         }
 
+        NotificationHandlerContext deliveryContext = notificationHandlerContext.withDeliveryId(
+            String.valueOf(UUID.randomUUID()));
+
         WebhookDelivery webhookDelivery = WebhookDelivery.builder("notification", url)
             .description("notification " + notification.getId() + " '" + notification.getName() + "'")
             .eventType("job.status")
             .secret((String) settings.get("webhookSecret"))
             .validateUrl(true)
             .payload(
-                String.valueOf(notificationHandlerContext.getJobId()),
-                webhookNotificationHandler.getPayload(notificationHandlerContext))
+                String.valueOf(deliveryContext.getJobId()),
+                webhookNotificationHandler.getPayload(deliveryContext))
             .retry(WebhookRetry.none())
-            .deliveryId(notificationHandlerContext.getDeliveryId())
+            .deliveryId(deliveryContext.getDeliveryId())
             .timestamp(notificationHandlerContext.getTimestamp())
             .build();
 

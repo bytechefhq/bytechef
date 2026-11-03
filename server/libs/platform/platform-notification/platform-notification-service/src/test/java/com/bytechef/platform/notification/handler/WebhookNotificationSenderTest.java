@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +57,7 @@ class WebhookNotificationSenderTest {
 
     @Test
     void testSendSubmitsSignedDeliveryWithoutRetry() {
-        when(webhookNotificationHandler.getPayload(notificationHandlerContext)).thenReturn("{\"a\":1}");
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{\"a\":1}");
         when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
 
         CompletableFuture<Void> future = webhookNotificationSender.send(
@@ -85,13 +86,13 @@ class WebhookNotificationSenderTest {
     }
 
     @Test
-    void testSendPassesContextDeliveryIdAndTimestamp() {
+    void testSendPassesTimestampAndMintsDeliveryId() {
         Instant timestamp = Instant.parse("2026-11-03T10:00:00Z");
         NotificationHandlerContext context = new NotificationHandlerContext.Builder().deliveryId("d-1")
             .timestamp(timestamp)
             .build();
 
-        when(webhookNotificationHandler.getPayload(context)).thenReturn("{\"a\":1}");
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{\"a\":1}");
         when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
 
         webhookNotificationSender.send(
@@ -103,13 +104,47 @@ class WebhookNotificationSenderTest {
 
         WebhookDelivery webhookDelivery = webhookDeliveryArgumentCaptor.getValue();
 
-        assertThat(webhookDelivery.deliveryId()).isEqualTo("d-1");
+        assertThat(webhookDelivery.deliveryId()).isNotEqualTo("d-1");
         assertThat(webhookDelivery.timestamp()).isEqualTo(timestamp);
     }
 
     @Test
+    void testSendGivesEachDeliveryItsOwnDeliveryIdMatchingThePayload() {
+        NotificationHandlerContext context = new NotificationHandlerContext.Builder().deliveryId("d-1")
+            .build();
+
+        when(webhookNotificationHandler.getPayload(any())).thenAnswer(
+            invocation -> "{\"deliveryId\":\"" + ((NotificationHandlerContext) invocation.getArgument(0))
+                .getDeliveryId() + "\"}");
+        when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
+
+        Notification notification = createNotification(Map.of("webhook", "https://example.com/hook"));
+
+        webhookNotificationSender.send(notification, webhookNotificationHandler, context);
+        webhookNotificationSender.send(notification, webhookNotificationHandler, context);
+
+        ArgumentCaptor<WebhookDelivery> webhookDeliveryArgumentCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
+
+        verify(webhookDeliveryService, times(2)).submit(webhookDeliveryArgumentCaptor.capture());
+
+        List<WebhookDelivery> webhookDeliveries = webhookDeliveryArgumentCaptor.getAllValues();
+
+        assertThat(webhookDeliveries.get(0)
+            .deliveryId())
+                .isNotEqualTo(webhookDeliveries.get(1)
+                    .deliveryId());
+
+        for (WebhookDelivery webhookDelivery : webhookDeliveries) {
+            assertThat(webhookDelivery.deliveryId()).isNotEqualTo("d-1");
+            assertThat(webhookDelivery.payloads()
+                .getFirst()
+                .json()).isEqualTo("{\"deliveryId\":\"" + webhookDelivery.deliveryId() + "\"}");
+        }
+    }
+
+    @Test
     void testSendFutureFailsWhenNothingWasSent() {
-        when(webhookNotificationHandler.getPayload(notificationHandlerContext)).thenReturn("{}");
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
         when(webhookDeliveryService.submit(any()))
             .thenReturn(
                 CompletableFuture.completedFuture(
@@ -148,7 +183,7 @@ class WebhookNotificationSenderTest {
 
     @Test
     void testSendReturnsTheDeliveryFutureWithoutBlocking() {
-        when(webhookNotificationHandler.getPayload(notificationHandlerContext)).thenReturn("{}");
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
         when(webhookDeliveryService.submit(any())).thenReturn(new CompletableFuture<>());
 
         CompletableFuture<Void> future = assertTimeoutPreemptively(

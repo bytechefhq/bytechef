@@ -74,6 +74,34 @@ class NotificationHandlerContextTest {
     }
 
     @Test
+    void testWithDeliveryIdCopiesEveryOtherField() {
+        NotificationHandlerContext context = new NotificationHandlerContext.Builder()
+            .eventType(NotificationEvent.Type.JOB_FAILED)
+            .jobId(42L)
+            .jobName("Daily sync")
+            .approvalExpiresAt("2026-11-04T10:00:00Z")
+            .approvalFormUrl("https://x/resume/t")
+            .timestamp(Instant.parse("2026-11-03T10:00:00Z"))
+            .deliveryId("d-1")
+            .source("AUTOMATION")
+            .environment("PRODUCTION")
+            .executionUrl("https://x/e")
+            .build();
+
+        NotificationHandlerContext copy = context.withDeliveryId("d-2");
+
+        Map<String, Object> expected = new java.util.LinkedHashMap<>(context.toMap());
+
+        expected.put("deliveryId", "d-2");
+
+        assertEquals("d-2", copy.getDeliveryId());
+        assertEquals("d-1", context.getDeliveryId());
+        assertEquals(expected, copy.toMap());
+        assertEquals(context.getTimestamp(), copy.getTimestamp());
+        assertEquals(context.getJobId(), copy.getJobId());
+    }
+
+    @Test
     void testToMapDefaultsTimestampWhenNotSet() {
         NotificationHandlerContext context = new NotificationHandlerContext.Builder()
             .eventType(NotificationEvent.Type.JOB_FAILED)
