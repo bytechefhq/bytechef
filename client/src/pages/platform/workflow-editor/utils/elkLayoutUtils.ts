@@ -165,17 +165,25 @@ function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDi
         return;
     }
 
+    // One uniform pitch, wide enough for the widest gap: with uneven gaps the
+    // row mean (where the fan-in bus drops) drifts off the middle trigger, and
+    // its add-button edge bends sideways into the bus
+    let pitch = 0;
+
     for (let index = 1; index < triggerNodes.length; index++) {
         const previousNode = triggerNodes[index - 1];
-        const currentNode = triggerNodes[index];
 
-        const previousLabelEnd = previousNode.position.x + NODE_ANCHOR_SIZE + getLabelCrossOverhang(previousNode);
-        const requiredLeft = previousLabelEnd + TRIGGER_LABEL_CLEARANCE;
+        const currentGap = triggerNodes[index].position.x - previousNode.position.x;
+        const requiredGap = NODE_ANCHOR_SIZE + getLabelCrossOverhang(previousNode) + TRIGGER_LABEL_CLEARANCE;
 
-        if (currentNode.position.x < requiredLeft) {
-            currentNode.position = {...currentNode.position, x: requiredLeft};
-        }
+        pitch = Math.max(pitch, currentGap, requiredGap);
     }
+
+    const firstTriggerX = triggerNodes[0].position.x;
+
+    triggerNodes.forEach((triggerNode, index) => {
+        triggerNode.position = {...triggerNode.position, x: firstTriggerX + index * pitch};
+    });
 
     // Center the row on the fan-in target's axis: the chain below is laid out
     // around the first task, so aligning the trigger mean with it keeps the

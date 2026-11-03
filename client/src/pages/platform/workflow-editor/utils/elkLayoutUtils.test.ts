@@ -3478,6 +3478,30 @@ describe('trigger row label separation', () => {
         expect(Math.abs((firstX + secondX) / 2 + 36 - taskCenter)).toBeLessThanOrEqual(1);
     });
 
+    it('keeps the middle trigger and the fan-in add button above the first task when labels differ', async () => {
+        const nodes: Node[] = [
+            triggerNode('trigger_1', 'Viber'),
+            triggerNode('trigger_2', 'Infobip New Viber Bot Message'),
+            triggerNode('trigger_3', 'Infobip'),
+            taskNode('task1'),
+        ];
+
+        const edges: Edge[] = [edge('trigger_1', 'task1'), edge('trigger_2', 'task1'), edge('trigger_3', 'task1')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const firstX = positionOf(result.nodes, 'trigger_1').x;
+        const middleX = positionOf(result.nodes, 'trigger_2').x;
+        const lastX = positionOf(result.nodes, 'trigger_3').x;
+        const taskX = positionOf(result.nodes, 'task1').x;
+
+        // A long middle label used to push only the last trigger out, so the
+        // row mean (where the bus drops) slid off the middle trigger and its
+        // add-button edge bent sideways into the bus
+        expect(Math.abs(middleX - firstX - (lastX - middleX))).toBeLessThanOrEqual(1);
+        expect(Math.abs(middleX - taskX)).toBeLessThanOrEqual(1);
+    });
+
     it('starts the chain at the same height whether or not it has tasks yet', async () => {
         const triggerPlaceholderNode: Node = {
             data: {label: '+'},
