@@ -89,6 +89,10 @@ Each expression is a multi-line **Permission Expression** text field, scoped to 
 - The **Automation Workflow Project** dialog (in **Embedded → Automations**) has a project-level **Permission Expression** field.
 - Each workflow's **Automation Workflow** dialog has its own **Permission Expression** field.
 
+**Configurations:**
+
+- Integration instance configurations and automation workflow project configurations have an **Assignment rule** field. It takes the same expressions, but it does not hide anything. It decides which configuration self-serve places a new user on, and it is checked only once, when the user is first assigned. See [Several configurations in one environment](/platform/embedded/build/automations#several-configurations-in-one-environment).
+
 ## Setting an expression through the admin API
 
 The same expressions are settable programmatically, scoped to the resource they gate.
