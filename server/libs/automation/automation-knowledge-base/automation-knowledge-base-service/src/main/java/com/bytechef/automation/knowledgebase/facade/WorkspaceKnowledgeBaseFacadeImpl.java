@@ -26,13 +26,10 @@ import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
-import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseTagFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseStorageService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -57,10 +54,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseFacade {
 
-    private final KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade;
     private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
-    private final KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService;
     private final KnowledgeBaseFacade knowledgeBaseFacade;
     private final KnowledgeBaseService knowledgeBaseService;
     private final KnowledgeBaseStorageService knowledgeBaseStorageService;
@@ -69,18 +64,14 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
 
     @SuppressFBWarnings("EI")
     public WorkspaceKnowledgeBaseFacadeImpl(
-        KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
         KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService, KnowledgeBaseFacade knowledgeBaseFacade,
-        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseStorageService knowledgeBaseStorageService,
-        KnowledgeBaseTagFacade knowledgeBaseTagFacade,
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFacade knowledgeBaseFacade,
+        KnowledgeBaseService knowledgeBaseService,
+        KnowledgeBaseStorageService knowledgeBaseStorageService, KnowledgeBaseTagFacade knowledgeBaseTagFacade,
         WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
 
-        this.knowledgeBaseDocumentChunkFacade = knowledgeBaseDocumentChunkFacade;
         this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
-        this.knowledgeBaseDocumentTagService = knowledgeBaseDocumentTagService;
         this.knowledgeBaseFacade = knowledgeBaseFacade;
         this.knowledgeBaseService = knowledgeBaseService;
         this.knowledgeBaseStorageService = knowledgeBaseStorageService;
@@ -89,32 +80,25 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'KNOWLEDGE_BASE_VIEW', #environmentId)")
-    @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')")
     public List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId) {
-        List<WorkspaceKnowledgeBase> workspaceKnowledgeBases =
-            workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId);
-
-        return workspaceKnowledgeBases.stream()
-            .map(workspaceKnowledgeBase -> knowledgeBaseService.getKnowledgeBase(
-                workspaceKnowledgeBase.getKnowledgeBaseId()))
-            .filter(knowledgeBase -> knowledgeBase.getEnvironmentId() == environmentId)
-            .toList();
+        return getKnowledgeBases(workspaceId, environmentId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')")
-    public List<Tag> getWorkspaceKnowledgeBaseTags(long workspaceId) {
-        return knowledgeBaseTagFacade.getTags(getWorkspaceKnowledgeBaseIds(workspaceId));
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'KNOWLEDGE_BASE_VIEW', #environmentId)")
+    public List<Tag> getWorkspaceKnowledgeBaseTags(long workspaceId, long environmentId) {
+        return knowledgeBaseTagFacade.getTags(getWorkspaceKnowledgeBaseIds(workspaceId, environmentId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')")
-    public Map<Long, List<Tag>> getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(long workspaceId) {
-        return knowledgeBaseTagFacade.getTagsByKnowledgeBaseId(getWorkspaceKnowledgeBaseIds(workspaceId));
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'KNOWLEDGE_BASE_VIEW', #environmentId)")
+    public Map<Long, List<Tag>> getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(long workspaceId, long environmentId) {
+        return knowledgeBaseTagFacade.getTagsByKnowledgeBaseId(
+            getWorkspaceKnowledgeBaseIds(workspaceId, environmentId));
     }
 
     @Override
@@ -151,7 +135,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
         @AuditData(key = "workspaceId", value = "#workspaceId"),
         @AuditData(key = "environmentId", value = "#targetEnvironmentId")
     })
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_CREATE')")
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'KNOWLEDGE_BASE_CREATE', #targetEnvironmentId)")
     public KnowledgeBase cloneWorkspaceKnowledgeBase(
         Long knowledgeBaseId, Long workspaceId, long targetEnvironmentId, @Nullable String newName) {
 
@@ -219,91 +203,6 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_EDIT')")
-    public void deleteKnowledgeBaseDocument(long id) {
-        knowledgeBaseDocumentFacade.deleteKnowledgeBaseDocument(id);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocumentChunk', 'KNOWLEDGE_BASE_EDIT')")
-    public void deleteKnowledgeBaseDocumentChunk(long id) {
-        knowledgeBaseDocumentChunkFacade.deleteKnowledgeBaseDocumentChunk(id);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
-    @Transactional(readOnly = true)
-    public KnowledgeBase getKnowledgeBase(long id) {
-        return knowledgeBaseService.getKnowledgeBase(id);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_VIEW')")
-    @Transactional(readOnly = true)
-    public KnowledgeBaseDocument getKnowledgeBaseDocument(long id) {
-        return knowledgeBaseDocumentService.getKnowledgeBaseDocument(id);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_VIEW')")
-    @Transactional(readOnly = true)
-    public List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunks(long id) {
-        return knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentId(id);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_VIEW')")
-    @Transactional(readOnly = true)
-    public DocumentStatusUpdate getKnowledgeBaseDocumentStatus(long id) {
-        return knowledgeBaseDocumentService.getKnowledgeBaseDocumentStatus(id);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
-    @Transactional(readOnly = true)
-    public List<String> getKnowledgeBaseDocumentTagNames(long knowledgeBaseId) {
-        return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseId(knowledgeBaseId);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
-    @Transactional(readOnly = true)
-    public Map<Long, List<String>> getKnowledgeBaseDocumentTagNamesByDocument(long knowledgeBaseId) {
-        return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseDocumentId(knowledgeBaseId);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
-    @Transactional(readOnly = true)
-    public List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(long id, String query, String metadataFilters) {
-        return knowledgeBaseFacade.searchKnowledgeBase(id, query, metadataFilters);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
-    public KnowledgeBase updateKnowledgeBase(long id, KnowledgeBase knowledgeBase) {
-        return knowledgeBaseService.updateKnowledgeBase(id, knowledgeBase);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocumentChunk', 'KNOWLEDGE_BASE_EDIT')")
-    public KnowledgeBaseDocumentChunk updateKnowledgeBaseDocumentChunk(long id, String content) {
-        return knowledgeBaseDocumentChunkFacade.updateKnowledgeBaseDocumentChunk(id, content);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#knowledgeBaseDocumentId, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_EDIT')")
-    public void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames) {
-        knowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentTags(knowledgeBaseDocumentId, tagNames);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
-    public void updateKnowledgeBaseTags(long knowledgeBaseId, List<Tag> tags) {
-        knowledgeBaseTagFacade.updateTags(knowledgeBaseId, tags);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
     public KnowledgeBase getKnowledgeBase(long knowledgeBaseId) {
@@ -311,6 +210,10 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_UPDATED, data = {
+        @AuditData(key = "knowledgeBaseId", value = "#knowledgeBaseId"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
     public KnowledgeBase updateKnowledgeBase(long knowledgeBaseId, KnowledgeBase knowledgeBase) {
         return knowledgeBaseService.updateKnowledgeBase(knowledgeBaseId, knowledgeBase);
@@ -337,10 +240,22 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
         return knowledgeBaseStorageService.getUsage();
     }
 
-    private List<Long> getWorkspaceKnowledgeBaseIds(long workspaceId) {
-        return workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId)
-            .stream()
-            .map(WorkspaceKnowledgeBase::getKnowledgeBaseId)
+    private List<KnowledgeBase> getKnowledgeBases(Long workspaceId, long environmentId) {
+        List<WorkspaceKnowledgeBase> workspaceKnowledgeBases =
+            workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId);
+
+        return workspaceKnowledgeBases.stream()
+            .map(workspaceKnowledgeBase -> knowledgeBaseService.getKnowledgeBase(
+                workspaceKnowledgeBase.getKnowledgeBaseId()))
+            .filter(knowledgeBase -> knowledgeBase.getEnvironmentId() == environmentId)
+            .toList();
+    }
+
+    private List<Long> getWorkspaceKnowledgeBaseIds(long workspaceId, long environmentId) {
+        List<KnowledgeBase> knowledgeBases = getKnowledgeBases(workspaceId, environmentId);
+
+        return knowledgeBases.stream()
+            .map(KnowledgeBase::getId)
             .toList();
     }
 }

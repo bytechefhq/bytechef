@@ -83,6 +83,7 @@ class AuditDataContractTest {
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
     private static final String TAGS = "tag assignment";
+    private static final String ROW_DATA = "data table rows";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String ROW_DATA = "data table rows are data and are not recorded";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
@@ -162,28 +163,13 @@ class AuditDataContractTest {
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
-        Map.entry("WorkspaceDataTableFacadeImpl.addColumn", DELEGATES),
-        Map.entry("WorkspaceDataTableFacadeImpl.clearRows", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.deleteRow", ROW_DATA),
-        Map.entry("WorkspaceDataTableFacadeImpl.deleteRowByExternalId", ROW_DATA),
-        Map.entry("WorkspaceDataTableFacadeImpl.deleteRows", ROW_DATA),
-        Map.entry("WorkspaceDataTableFacadeImpl.dropTable", DELEGATES),
-        Map.entry("WorkspaceDataTableFacadeImpl.exportCsv", "read-only CSV export of table rows"),
         Map.entry("WorkspaceDataTableFacadeImpl.importCsv", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.insertRow", ROW_DATA),
-        Map.entry("WorkspaceDataTableFacadeImpl.insertRows", ROW_DATA),
-        Map.entry("WorkspaceDataTableFacadeImpl.removeColumn", DELEGATES),
-        Map.entry("WorkspaceDataTableFacadeImpl.renameColumn", DELEGATES),
-        Map.entry("WorkspaceDataTableFacadeImpl.renameTable", DELEGATES),
-        Map.entry("WorkspaceDataTableFacadeImpl.updateDescription", "table description edit"),
         Map.entry("WorkspaceDataTableFacadeImpl.updateRow", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.updateTags", TAGS),
-        Map.entry("WorkspaceDataTableFacadeImpl.upsertRow", ROW_DATA),
-        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.deleteKnowledgeBaseDocument", DELEGATES),
-        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.deleteKnowledgeBaseDocumentChunk", CHUNK_DATA),
-        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.updateKnowledgeBaseDocumentChunk", CHUNK_DATA),
-        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.updateKnowledgeBaseDocumentTags", TAGS),
-        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBase", DELEGATES),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.deleteKnowledgeBaseDocument", DELEGATES),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseDocumentTags", TAGS),
         Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseTags", TAGS),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer", DELEGATES),
