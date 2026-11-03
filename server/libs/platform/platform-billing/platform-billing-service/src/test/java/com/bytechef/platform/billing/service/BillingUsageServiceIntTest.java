@@ -194,6 +194,7 @@ class BillingUsageServiceIntTest {
         subscription.setSubscriptionId(subscriptionId);
         subscription.setPlanName(planName);
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
+        subscription.setSubscriptionModel(BillingSubscription.SubscriptionModel.METERED);
         subscription.setProductUnitLimit(5000);
         subscription.setCurrentPeriodStart(periodStart);
         subscription.setCurrentPeriodEnd(periodStart.plusSeconds(30L * 24 * 3600));

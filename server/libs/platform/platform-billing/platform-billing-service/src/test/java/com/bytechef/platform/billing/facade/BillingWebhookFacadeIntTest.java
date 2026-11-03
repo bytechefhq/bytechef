@@ -171,6 +171,7 @@ class BillingWebhookFacadeIntTest {
         subscription.setSubscriptionId(SUBSCRIPTION_ID);
         subscription.setPlanName("STARTER");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
+        subscription.setSubscriptionModel(BillingSubscription.SubscriptionModel.METERED);
         subscription.setProductUnitLimit(100);
         subscription.setCurrentPeriodStart(Instant.parse("2026-05-01T00:00:00Z"));
         subscription.setCurrentPeriodEnd(Instant.parse("2026-06-01T00:00:00Z"));

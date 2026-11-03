@@ -20,6 +20,8 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.billing.client.StripeClient;
+import com.bytechef.platform.billing.handler.prepaid.PrepaidStripeClient;
+import com.bytechef.platform.billing.handler.prepaid.PrepaidStripeClientImpl;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -44,9 +46,13 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.platform.billing.facade", "com.bytechef.platform.billing.service"
+        "com.bytechef.platform.billing.facade", "com.bytechef.platform.billing.handler",
+        "com.bytechef.platform.billing.service"
     },
-    excludeFilters = @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class))
+    excludeFilters = {
+        @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+        @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = PrepaidStripeClientImpl.class)
+    })
 @EnableAutoConfiguration(excludeName = {
     "com.bytechef.atlas.execution.repository.jdbc.config.AtlasExecutionJdbcRepositoryConfiguration",
     "com.bytechef.platform.workflow.execution.config.PlatformWorkflowExecutionJdbcRepositoryConfiguration"
@@ -59,6 +65,11 @@ public class BillingIntTestConfiguration {
     @Bean
     CacheManager cacheManager() {
         return new ConcurrentMapCacheManager();
+    }
+
+    @Bean
+    PrepaidStripeClient prepaidStripeClient() {
+        return mock(PrepaidStripeClient.class);
     }
 
     @Bean

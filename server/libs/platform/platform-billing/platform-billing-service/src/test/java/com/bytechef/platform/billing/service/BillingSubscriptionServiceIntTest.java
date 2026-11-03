@@ -143,6 +143,7 @@ class BillingSubscriptionServiceIntTest {
 
         subscription.setPlanName(planName);
         subscription.setStatus(status);
+        subscription.setSubscriptionModel(BillingSubscription.SubscriptionModel.METERED);
         subscription.setProductUnitLimit(5000);
         subscription.setCurrentPeriodStart(NOW.minus(7, ChronoUnit.DAYS));
         subscription.setCurrentPeriodEnd(NOW.plus(7, ChronoUnit.DAYS));
