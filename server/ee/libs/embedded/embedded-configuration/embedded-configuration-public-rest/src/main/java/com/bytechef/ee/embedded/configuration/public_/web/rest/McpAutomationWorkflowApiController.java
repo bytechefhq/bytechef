@@ -8,17 +8,16 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.ai.mcp.exception.McpAutomationWorkflowNotFoundException;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
@@ -67,6 +66,8 @@ public class McpAutomationWorkflowApiController implements McpAutomationWorkflow
     public ResponseEntity<Void> disableMcpAutomationWorkflow(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
 
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         return updateMcpAutomationWorkflowEnabled(externalUserId, workflowUuid, xEnvironment, false);
     }
 
@@ -81,6 +82,8 @@ public class McpAutomationWorkflowApiController implements McpAutomationWorkflow
     @Override
     public ResponseEntity<Void> enableMcpAutomationWorkflow(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         return updateMcpAutomationWorkflowEnabled(externalUserId, workflowUuid, xEnvironment, true);
     }
@@ -111,6 +114,6 @@ public class McpAutomationWorkflowApiController implements McpAutomationWorkflow
     }
 
     private static String getCurrentExternalUserId() {
-        return OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found");
+        return ConnectedUserAuthentications.getCurrentExternalUserId();
     }
 }
