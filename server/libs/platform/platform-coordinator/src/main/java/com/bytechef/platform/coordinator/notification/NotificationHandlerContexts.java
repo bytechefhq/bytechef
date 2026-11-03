@@ -53,6 +53,7 @@ public class NotificationHandlerContexts {
 
     private static final Logger log = LoggerFactory.getLogger(NotificationHandlerContexts.class);
 
+    private static final int MAX_ERROR_MESSAGE_LENGTH = 1000;
     private static final int MAX_STACK_TRACE_LENGTH = 2000;
     private static final List<PlatformType> PLATFORM_TYPES = List.of(PlatformType.AUTOMATION, PlatformType.EMBEDDED);
 
@@ -138,7 +139,7 @@ public class NotificationHandlerContexts {
             ExecutionError error = taskExecution.getError();
 
             return new ErrorSummary(
-                taskExecution.getName(), taskExecution.getType(), error.getMessage(), getStackTrace(error));
+                taskExecution.getName(), taskExecution.getType(), getMessage(error), getStackTrace(error));
         }
 
         ExecutionError jobError = job.getError();
@@ -147,7 +148,7 @@ public class NotificationHandlerContexts {
             return null;
         }
 
-        return new ErrorSummary(null, null, jobError.getMessage(), getStackTrace(jobError));
+        return new ErrorSummary(null, null, getMessage(jobError), getStackTrace(jobError));
     }
 
     private @Nullable String getExecutionUrl(PlatformType platformType, long jobId) {
@@ -179,6 +180,16 @@ public class NotificationHandlerContexts {
 
         return new JobSummary(
             job.getId(), job.getLabel(), status == null ? null : status.name(), startDate, endDate, durationMillis);
+    }
+
+    private static @Nullable String getMessage(ExecutionError error) {
+        String message = error.getMessage();
+
+        if (message == null) {
+            return null;
+        }
+
+        return StringUtils.truncate(message, MAX_ERROR_MESSAGE_LENGTH);
     }
 
     private static @Nullable String getStackTrace(ExecutionError error) {
