@@ -215,28 +215,36 @@ public class NotificationHandlerContexts {
         builder.executionUrl(getExecutionUrl(platformType, jobId));
         builder.source(platformType.name());
 
+        JobPrincipalSummary jobPrincipalSummary;
+
         try {
             JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
                 platformType);
 
-            JobPrincipalSummary jobPrincipalSummary = jobPrincipalAccessor.getJobPrincipalSummary(jobPrincipalId);
-
-            if (jobPrincipalSummary.projectId() != null || jobPrincipalSummary.projectName() != null ||
-                jobPrincipalSummary.projectVersion() != null) {
-
-                builder.project(
-                    new ProjectSummary(
-                        jobPrincipalSummary.projectId(), jobPrincipalSummary.projectName(),
-                        jobPrincipalSummary.projectVersion()));
-            }
-
-            Environment environment = environmentService.getEnvironment(jobPrincipalSummary.environmentId());
-
-            builder.environment(environment.name());
+            jobPrincipalSummary = jobPrincipalAccessor.getJobPrincipalSummary(jobPrincipalId);
         } catch (RuntimeException runtimeException) {
             log.warn(
                 "Could not resolve the project and environment of job {} for its notification", jobId,
                 runtimeException);
+
+            return;
+        }
+
+        if (jobPrincipalSummary.projectId() != null || jobPrincipalSummary.projectName() != null ||
+            jobPrincipalSummary.projectVersion() != null) {
+
+            builder.project(
+                new ProjectSummary(
+                    jobPrincipalSummary.projectId(), jobPrincipalSummary.projectName(),
+                    jobPrincipalSummary.projectVersion()));
+        }
+
+        try {
+            Environment environment = environmentService.getEnvironment(jobPrincipalSummary.environmentId());
+
+            builder.environment(environment.name());
+        } catch (RuntimeException runtimeException) {
+            log.warn("Could not resolve the environment of job {} for its notification", jobId, runtimeException);
         }
     }
 }

@@ -26,6 +26,7 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -133,9 +134,13 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
         String integrationName = null;
 
         if (integrationId != null) {
-            Integration integration = integrationService.getIntegration(integrationId);
+            try {
+                Integration integration = integrationService.getIntegration(integrationId);
 
-            integrationName = integration.getName();
+                integrationName = integration.getName();
+            } catch (NoSuchElementException noSuchElementException) {
+                integrationName = null;
+            }
         }
 
         return new JobPrincipalSummary(
