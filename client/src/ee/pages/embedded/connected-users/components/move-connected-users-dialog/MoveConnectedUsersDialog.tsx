@@ -13,20 +13,30 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useMemo, useState} from 'react';
 
+type ConnectedUserIdType = number | string;
+
+interface MoveConnectedUsersDialogConnectedUserI {
+    connectedUserId: string;
+    email?: string | null;
+    externalId: string;
+    name?: string | null;
+}
+
 interface MoveConnectedUsersSkippedI {
-    label: string;
+    connectedUserId: ConnectedUserIdType;
     reason: string;
     workflowLabels: string[];
 }
 
 export interface MoveConnectedUsersResultI {
-    movedCount: number;
-    needsAttentionCount: number;
+    movedConnectedUserIds: ConnectedUserIdType[];
+    needsAttentionConnectedUserIds: ConnectedUserIdType[];
     skipped: MoveConnectedUsersSkippedI[];
 }
 
 interface MoveConnectedUsersDialogProps {
-    connectedUsers: Array<{connectedUserId: string; email?: string | null; externalId: string; name?: string | null}>;
+    connectedUsers?: MoveConnectedUsersDialogConnectedUserI[];
+    connectedUsersError?: boolean;
     impact?: Array<{
         affectedConnectedUserCount: number;
         label: string;
@@ -46,7 +56,17 @@ interface MoveConnectedUsersDialogProps {
     title: string;
 }
 
-const formatSkippedLine = ({label, reason, workflowLabels}: MoveConnectedUsersSkippedI): string => {
+type MoveConnectedUsersDialogContentPropsType = Omit<
+    MoveConnectedUsersDialogProps,
+    'connectedUsers' | 'connectedUsersError'
+> & {
+    connectedUsers: MoveConnectedUsersDialogConnectedUserI[];
+};
+
+const getConnectedUserLabel = (connectedUser: MoveConnectedUsersDialogConnectedUserI): string =>
+    connectedUser.name || connectedUser.email || connectedUser.externalId;
+
+const formatSkippedLine = (label: string, {reason, workflowLabels}: MoveConnectedUsersSkippedI): string => {
     const workflows = workflowLabels.join(', ');
 
     switch (reason) {
@@ -65,7 +85,7 @@ const formatSkippedLine = ({label, reason, workflowLabels}: MoveConnectedUsersSk
     }
 };
 
-const MoveConnectedUsersDialog = ({
+const MoveConnectedUsersDialogContent = ({
     connectedUsers,
     impact,
     initialSelectedConnectedUserIds,
@@ -79,7 +99,7 @@ const MoveConnectedUsersDialog = ({
     sourceLabel,
     targets,
     title,
-}: MoveConnectedUsersDialogProps) => {
+}: MoveConnectedUsersDialogContentPropsType) => {
     const [moving, setMoving] = useState(false);
     const [result, setResult] = useState<MoveConnectedUsersResultI>();
     const [search, setSearch] = useState('');
@@ -101,6 +121,23 @@ const MoveConnectedUsersDialog = ({
             )
         );
     }, [connectedUsers, search]);
+
+    const labelByConnectedUserId = useMemo(
+        () =>
+            new Map(
+                connectedUsers.map((connectedUser) => [
+                    connectedUser.connectedUserId,
+                    getConnectedUserLabel(connectedUser),
+                ])
+            ),
+        [connectedUsers]
+    );
+
+    const toSkippedLine = (skippedUser: MoveConnectedUsersSkippedI): string => {
+        const connectedUserId = String(skippedUser.connectedUserId);
+
+        return formatSkippedLine(labelByConnectedUserId.get(connectedUserId) || connectedUserId, skippedUser);
+    };
 
     const canMove = !!targetId && selectedConnectedUserIds.length > 0 && !moving && !previewLoading;
 
@@ -148,12 +185,15 @@ const MoveConnectedUsersDialog = ({
                 {result ? (
                     <div className="flex flex-col gap-2">
                         <p className="text-sm font-medium">
-                            {`${result.movedCount} moved, ${result.needsAttentionCount} need attention`}
+                            {`${result.movedConnectedUserIds.length} moved, ${result.needsAttentionConnectedUserIds.length} need attention`}
                         </p>
 
                         {result.skipped.map((skippedUser, index) => (
-                            <p className="text-sm text-content-neutral-secondary" key={`${skippedUser.label}-${index}`}>
-                                {formatSkippedLine(skippedUser)}
+                            <p
+                                className="text-sm text-content-neutral-secondary"
+                                key={`${skippedUser.connectedUserId}-${index}`}
+                            >
+                                {toSkippedLine(skippedUser)}
                             </p>
                         ))}
                     </div>
@@ -214,7 +254,7 @@ const MoveConnectedUsersDialog = ({
                                 <p className="font-medium">Users that would be skipped</p>
 
                                 {previewSkipped.map((skippedUser, index) => (
-                                    <p key={`${skippedUser.label}-${index}`}>{formatSkippedLine(skippedUser)}</p>
+                                    <p key={`${skippedUser.connectedUserId}-${index}`}>{toSkippedLine(skippedUser)}</p>
                                 ))}
                             </div>
                         )}
@@ -228,7 +268,7 @@ const MoveConnectedUsersDialog = ({
 
                         <ul className="flex max-h-64 flex-col gap-2 overflow-y-auto">
                             {filteredConnectedUsers.map((connectedUser) => {
-                                const label = connectedUser.name || connectedUser.email || connectedUser.externalId;
+                                const label = getConnectedUserLabel(connectedUser);
 
                                 return (
                                     <li className="flex items-center gap-2" key={connectedUser.connectedUserId}>
@@ -272,6 +312,26 @@ const MoveConnectedUsersDialog = ({
             </DialogContent>
         </Dialog>
     );
+};
+
+const MoveConnectedUsersDialog = ({connectedUsers, connectedUsersError, ...props}: MoveConnectedUsersDialogProps) => {
+    if (!connectedUsers) {
+        return (
+            <Dialog onOpenChange={(open) => !open && props.onClose()} open>
+                <DialogContent showCloseButton>
+                    <DialogHeader>
+                        <DialogTitle>{props.title}</DialogTitle>
+
+                        <DialogDescription>
+                            {connectedUsersError ? 'Could not load the connected users.' : 'Loading users...'}
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+        );
+    }
+
+    return <MoveConnectedUsersDialogContent connectedUsers={connectedUsers} {...props} />;
 };
 
 export default MoveConnectedUsersDialog;

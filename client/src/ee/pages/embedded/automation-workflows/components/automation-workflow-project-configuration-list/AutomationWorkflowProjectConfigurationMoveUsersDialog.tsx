@@ -1,4 +1,3 @@
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import MoveConnectedUsersDialog, {
     MoveConnectedUsersResultI,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
@@ -32,12 +31,6 @@ const formatConfigurationLabel = (configuration: ConfigurationReferenceType): st
 
 const formatTargetLabel = (configuration: TargetConfigurationType): string =>
     `${formatConfigurationLabel(configuration)}${configuration.enabled === false ? ' (disabled)' : ''}`;
-
-interface SkippedConnectedUserI {
-    connectedUserId: string;
-    reason: string;
-    workflowLabels: string[];
-}
 
 const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
     configuration,
@@ -89,30 +82,7 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
         [targetConfigurations]
     );
 
-    const labelByConnectedUserId = useMemo(
-        () =>
-            new Map(
-                (connectedUsers ?? []).map((connectedUser) => [
-                    connectedUser.connectedUserId,
-                    connectedUser.name || connectedUser.email || connectedUser.externalId,
-                ])
-            ),
-        [connectedUsers]
-    );
-
     const moveImpact = moveImpactData?.automationWorkflowProjectConfigurationMoveImpact;
-
-    const toSkippedLines = useCallback(
-        (skippedUsers: SkippedConnectedUserI[]) =>
-            skippedUsers.map((skippedUser) => ({
-                label: labelByConnectedUserId.get(skippedUser.connectedUserId) || skippedUser.connectedUserId,
-                reason: skippedUser.reason,
-                workflowLabels: skippedUser.workflowLabels,
-            })),
-        [labelByConnectedUserId]
-    );
-
-    const previewSkipped = useMemo(() => toSkippedLines(moveImpact?.skipped ?? []), [moveImpact, toSkippedLines]);
 
     const {mutateAsync: moveConnectedUsers} = moveMutation;
 
@@ -124,36 +94,15 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
                 targetId,
             });
 
-            const moveResult = response.moveAutomationWorkflowProjectConfigurationConnectedUsers;
-
-            return {
-                movedCount: moveResult.movedConnectedUserIds.length,
-                needsAttentionCount: moveResult.needsAttentionConnectedUserIds.length,
-                skipped: toSkippedLines(moveResult.skipped),
-            };
+            return response.moveAutomationWorkflowProjectConfigurationConnectedUsers;
         },
-        [configuration.id, moveConnectedUsers, toSkippedLines]
+        [configuration.id, moveConnectedUsers]
     );
-
-    if (!connectedUsers) {
-        return (
-            <Dialog onOpenChange={(open) => !open && onClose()} open>
-                <DialogContent showCloseButton>
-                    <DialogHeader>
-                        <DialogTitle>{title}</DialogTitle>
-
-                        <DialogDescription>
-                            {connectedUsersError ? 'Could not load the connected users.' : 'Loading users...'}
-                        </DialogDescription>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-        );
-    }
 
     return (
         <MoveConnectedUsersDialog
             connectedUsers={connectedUsers}
+            connectedUsersError={connectedUsersError}
             impact={moveImpact?.workflows}
             initialSelectedConnectedUserIds={initialSelectedConnectedUserIds}
             onClose={onClose}
@@ -161,7 +110,7 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
             onSelectionChange={(targetId, connectedUserIds) => setSelection({connectedUserIds, targetId})}
             previewError={moveImpactError}
             previewLoading={moveImpactLoading}
-            previewSkipped={previewSkipped}
+            previewSkipped={moveImpact?.skipped}
             sourceLabel={formatConfigurationLabel(configuration)}
             targets={targets}
             title={title}
