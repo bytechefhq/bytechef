@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.billing.facade;
 
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.billing.audit.BillingAuditEvents;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
 import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
@@ -55,6 +58,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    @Audited(event = BillingAuditEvents.BILLING_SUBSCRIPTION_CANCELLED)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void cancelSubscription() {
         BillingSubscription subscription = billingSubscriptionService.fetchCurrentSubscription()
@@ -65,6 +69,9 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    @Audited(event = BillingAuditEvents.BILLING_CHECKOUT_SESSION_CREATED, data = {
+        @AuditData(key = "planName", value = "#planName")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public String createCheckoutSession(String planName) {
         return subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.PREPAID)
@@ -95,6 +102,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    @Audited(event = BillingAuditEvents.BILLING_SUBSCRIPTION_REACTIVATED)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void reactivateSubscription() {
         BillingSubscription subscription = billingSubscriptionService.fetchCurrentSubscription()
@@ -105,6 +113,9 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    @Audited(event = BillingAuditEvents.BILLING_SUBSCRIPTION_UPDATED, data = {
+        @AuditData(key = "planName", value = "#newPlanName")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void updateSubscription(String newPlanName) {
         BillingSubscription currentSubscription = billingSubscriptionService.fetchCurrentSubscription()
