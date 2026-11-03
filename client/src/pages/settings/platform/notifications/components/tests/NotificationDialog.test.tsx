@@ -556,4 +556,168 @@ describe('NotificationDialog', () => {
             )
         );
     });
+
+    describe('webhook presets', () => {
+        const DATADOG_URL = 'https://event-management-intake.datadoghq.com/api/v2/events';
+
+        async function pickPreset(label: string) {
+            await userEvent.click(screen.getByRole('combobox', {name: 'Preset'}));
+            await userEvent.click(screen.getByRole('option', {name: label}));
+        }
+
+        it('fills the form when Datadog is picked on an empty Webhook form', async () => {
+            render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />);
+
+            await pickPreset('Datadog');
+
+            expect(screen.getByLabelText('Webhook URL')).toHaveValue(DATADOG_URL);
+
+            const headerNames = screen.getAllByLabelText('Header name');
+            const headerValues = screen.getAllByLabelText('Header value');
+
+            expect(headerNames.map((input) => (input as HTMLInputElement).value)).toEqual([
+                'DD-API-KEY',
+                'DD-APPLICATION-KEY',
+            ]);
+            expect(headerValues.map((input) => (input as HTMLInputElement).value)).toEqual(['', '']);
+            expect((screen.getByLabelText('Body template') as HTMLTextAreaElement).value).toContain(
+                '"category": "alert"'
+            );
+        });
+
+        it('keeps every field editable after a preset is applied', async () => {
+            render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />);
+
+            await pickPreset('Datadog');
+            await userEvent.type(screen.getByLabelText('Webhook URL'), '/extra');
+
+            expect(screen.getByLabelText('Webhook URL')).toHaveValue(`${DATADOG_URL}/extra`);
+        });
+
+        it('asks for confirmation before replacing a non-empty form', async () => {
+            render(
+                <NotificationDialogHarness
+                    saveNotification={vi.fn()}
+                    settings={{webhook: 'https://example.com/ingest', webhookHeaders: []}}
+                    type={NotificationTypeEnum.Webhook}
+                />
+            );
+
+            await pickPreset('New Relic');
+
+            expect(screen.getByText('Replace the URL, headers and body template?')).toBeInTheDocument();
+
+            await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+            expect(screen.getByLabelText('Webhook URL')).toHaveValue('https://example.com/ingest');
+
+            await pickPreset('New Relic');
+            await userEvent.click(screen.getByRole('button', {name: 'Replace'}));
+
+            expect(screen.getByLabelText('Webhook URL')).toHaveValue(
+                'https://insights-collector.newrelic.com/v1/accounts/YOUR_ACCOUNT_ID/events'
+            );
+            expect(screen.getByLabelText('Header name')).toHaveValue('Api-Key');
+        });
+
+        it('asks for confirmation when only the body template is filled', async () => {
+            render(
+                <NotificationDialogHarness
+                    saveNotification={vi.fn()}
+                    settings={{webhookBodyTemplate: 'plain'}}
+                    type={NotificationTypeEnum.Webhook}
+                />
+            );
+
+            await pickPreset('Custom');
+
+            expect(screen.getByText('Replace the URL, headers and body template?')).toBeInTheDocument();
+        });
+
+        it('applies Custom immediately on an empty form and leaves it empty', async () => {
+            render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />);
+
+            await pickPreset('Custom');
+
+            expect(screen.queryByText('Replace the URL, headers and body template?')).not.toBeInTheDocument();
+            expect(screen.getByLabelText('Webhook URL')).toHaveValue('');
+            expect(screen.queryByLabelText('Header name')).not.toBeInTheDocument();
+            expect(screen.getByLabelText('Body template')).toHaveValue('');
+        });
+
+        it('replaces masked header rows of a saved webhook with the preset rows', async () => {
+            const settings = {
+                webhook: 'https://example.com/ingest',
+                webhookHeaders: [{name: 'Authorization', value: '********'}],
+            };
+
+            render(
+                <NotificationDialogHarness
+                    saveNotification={vi.fn()}
+                    selectedNotification={
+                        {
+                            hasSigningSecret: true,
+                            id: 7,
+                            name: 'Failures',
+                            settings,
+                            type: NotificationTypeEnum.Webhook,
+                        } as unknown as Notification
+                    }
+                    settings={settings}
+                    type={NotificationTypeEnum.Webhook}
+                />
+            );
+
+            await pickPreset('Datadog');
+            await userEvent.click(screen.getByRole('button', {name: 'Replace'}));
+
+            const headerNames = screen.getAllByLabelText('Header name');
+            const headerValues = screen.getAllByLabelText('Header value');
+
+            expect(headerNames.map((input) => (input as HTMLInputElement).value)).toEqual([
+                'DD-API-KEY',
+                'DD-APPLICATION-KEY',
+            ]);
+            expect(headerValues.map((input) => (input as HTMLInputElement).value)).toEqual(['', '']);
+            expect(screen.queryByDisplayValue('********')).not.toBeInTheDocument();
+        });
+
+        it('does not send the preset selection to saveNotification', async () => {
+            const saveNotification = vi.fn();
+
+            render(
+                <NotificationDialogHarness saveNotification={saveNotification} type={NotificationTypeEnum.Webhook} />
+            );
+
+            await pickPreset('Datadog');
+
+            const headerValues = screen.getAllByLabelText('Header value');
+
+            await userEvent.type(headerValues[0], 'api');
+            await userEvent.type(headerValues[1], 'app');
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            expect(saveNotification).toHaveBeenCalledTimes(1);
+
+            const savedValues = saveNotification.mock.calls[0][0] as Record<string, unknown>;
+
+            expect(JSON.stringify(savedValues)).not.toMatch(/preset/i);
+            expect(Object.keys(savedValues)).not.toContain('preset');
+            expect(Object.keys(savedValues.settings as Record<string, unknown>)).not.toContain('preset');
+        });
+
+        it('blocks Save with Enter a value until the header values are filled', async () => {
+            const saveNotification = vi.fn();
+
+            render(
+                <NotificationDialogHarness saveNotification={saveNotification} type={NotificationTypeEnum.Webhook} />
+            );
+
+            await pickPreset('Datadog');
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            expect((await screen.findAllByText('Enter a value')).length).toBeGreaterThan(0);
+            expect(saveNotification).not.toHaveBeenCalled();
+        });
+    });
 });
