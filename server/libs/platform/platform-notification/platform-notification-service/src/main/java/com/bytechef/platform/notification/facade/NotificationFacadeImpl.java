@@ -187,7 +187,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
         testNotification.setName(notification.getName());
         testNotification.setType(notification.getType());
 
-        NotificationSecretSettings.apply(testNotification, notification.getSettings(), storedNotification);
+        NotificationSecretSettings.applyForTest(testNotification, notification.getSettings(), storedNotification);
 
         NotificationHandler notificationHandler = notificationHandlerRegistry.getNotificationHandler(
             NotificationEvent.Type.JOB_FAILED, notification.getType());
@@ -199,10 +199,26 @@ public class NotificationFacadeImpl implements NotificationFacade {
         NotificationSender notificationSender = notificationSenderRegistry.getNotificationSender(
             notification.getType());
 
-        NotificationHandlerContext notificationHandlerContext = NotificationHandlerContext.sample()
-            .withTimestamp(Instant.now());
+        NotificationHandlerContext sampleContext = NotificationHandlerContext.sample();
+        Instant now = Instant.now();
 
-        return notificationSender.sendTest(testNotification, notificationHandler, notificationHandlerContext);
+        NotificationHandlerContext notificationHandlerContext = sampleContext.withTimestamp(now);
+
+        NotificationTestResult notificationTestResult = notificationSender.sendTest(
+            testNotification, notificationHandler, notificationHandlerContext);
+
+        if (notification.getType() != Notification.Type.WEBHOOK || notificationTestResult.signed()) {
+            return notificationTestResult;
+        }
+
+        boolean urlChanged = storedNotification != null &&
+            NotificationSecretSettings.hasSigningSecret(storedNotification) &&
+            NotificationSecretSettings.isWebhookUrlChanged(notification.getSettings(), storedNotification);
+
+        return notificationTestResult.withUnsignedReason(
+            urlChanged
+                ? NotificationTestResult.UNSIGNED_REASON_URL_CHANGED
+                : NotificationTestResult.UNSIGNED_REASON_NO_SECRET);
     }
 
     @Override

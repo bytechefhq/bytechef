@@ -19,6 +19,7 @@ package com.bytechef.platform.notification.handler;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.domain.Notification;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 import org.springframework.mail.MailException;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class EmailNotificationSender implements NotificationSender<EmailNotificationHandler> {
+
+    private static final int MAX_ERROR_LENGTH = 200;
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
     private final MailService mailService;
 
@@ -79,7 +83,7 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
             String exceptionName = exception.getClass()
                 .getSimpleName();
 
-            return NotificationTestResult.failed(exceptionName + ": " + exception.getMessage());
+            return NotificationTestResult.failed(abbreviate(exceptionName + ": " + exception.getMessage()));
         } catch (RuntimeException exception) {
             String exceptionName = exception.getClass()
                 .getSimpleName();
@@ -88,5 +92,24 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
         }
 
         return NotificationTestResult.sent(false);
+    }
+
+    private static String abbreviate(String text) {
+        String singleLineText = WHITESPACE_PATTERN.matcher(text)
+            .replaceAll(" ");
+
+        singleLineText = singleLineText.strip();
+
+        if (singleLineText.length() <= MAX_ERROR_LENGTH) {
+            return singleLineText;
+        }
+
+        int end = MAX_ERROR_LENGTH;
+
+        if (Character.isHighSurrogate(singleLineText.charAt(end - 1))) {
+            end--;
+        }
+
+        return singleLineText.substring(0, end) + "…";
     }
 }

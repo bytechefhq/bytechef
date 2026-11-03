@@ -21,11 +21,23 @@ import org.jspecify.annotations.Nullable;
 /**
  * The outcome of a test send of a notification.
  *
+ * @param unsignedReason why a webhook test was sent without a signature, {@link #UNSIGNED_REASON_NO_SECRET} or
+ *                       {@link #UNSIGNED_REASON_URL_CHANGED}; {@code null} when the test was signed or is not a webhook
  * @author Ivica Cardic
  */
 public record NotificationTestResult(
     boolean success, @Nullable Integer statusCode, @Nullable String responseBody, @Nullable String error,
-    boolean signed) {
+    boolean signed, @Nullable String unsignedReason) {
+
+    public static final String UNSIGNED_REASON_NO_SECRET = "NO_SECRET";
+    public static final String UNSIGNED_REASON_URL_CHANGED = "URL_CHANGED";
+
+    public NotificationTestResult(
+        boolean success, @Nullable Integer statusCode, @Nullable String responseBody, @Nullable String error,
+        boolean signed) {
+
+        this(success, statusCode, responseBody, error, signed, null);
+    }
 
     public static NotificationTestResult sent(boolean signed) {
         return new NotificationTestResult(true, null, null, null, signed);
@@ -33,5 +45,9 @@ public record NotificationTestResult(
 
     public static NotificationTestResult failed(String error) {
         return new NotificationTestResult(false, null, null, error, false);
+    }
+
+    public NotificationTestResult withUnsignedReason(@Nullable String unsignedReason) {
+        return new NotificationTestResult(success, statusCode, responseBody, error, signed, unsignedReason);
     }
 }

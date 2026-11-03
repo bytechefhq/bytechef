@@ -248,9 +248,17 @@ spring:
         debug: ${bytechef.mail.debug}
         smtp:
           auth: ${bytechef.mail.auth}
+          # Milliseconds; JavaMail waits forever by default and a test send runs on the request thread
+          connectiontimeout: 10000
           starttls:
             enable: ${bytechef.mail.starttls.enable}
             required: ${bytechef.mail.starttls.required}
+          timeout: 30000
+          writetimeout: 30000
+        smtps:
+          connectiontimeout: 10000
+          timeout: 30000
+          writetimeout: 30000
         transport:
           protocol: ${bytechef.mail.protocol}
     protocol: ${bytechef.mail.protocol}

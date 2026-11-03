@@ -23,6 +23,7 @@ import com.bytechef.platform.notification.delivery.WebhookRetry;
 import com.bytechef.platform.notification.delivery.WebhookTestResult;
 import com.bytechef.platform.notification.domain.Notification;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
@@ -78,9 +79,12 @@ public class SlackNotificationSender implements NotificationSender<SlackNotifica
         WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(
             buildDelivery(notification, slackNotificationHandler, notificationHandlerContext, slackWebhookUrl));
 
+        TestSendRedaction testSendRedaction = TestSendRedaction.of(List.of(slackWebhookUrl));
+
         return new NotificationTestResult(
-            webhookTestResult.success(), webhookTestResult.statusCode(), webhookTestResult.responseBody(),
-            webhookTestResult.error(), false);
+            webhookTestResult.success(), webhookTestResult.statusCode(),
+            testSendRedaction.redact(webhookTestResult.responseBody()),
+            testSendRedaction.redact(webhookTestResult.error()), false);
     }
 
     private static WebhookDelivery buildDelivery(

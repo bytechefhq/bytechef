@@ -37,6 +37,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
@@ -389,6 +390,120 @@ public class NotificationFacadeIntTest {
         }
 
         @Test
+        public void testUpdateWithNewUrlRequiresHeaderValues() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(
+                    Notification.Type.WEBHOOK,
+                    Map.of(
+                        "webhook", "https://example.com/hook", "webhookHeaders",
+                        List.of(Map.of("name", "Authorization", "value", "token-1")))));
+
+            Notification maskedUpdate = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of(
+                    "webhook", "https://example.com/other-hook", "webhookHeaders",
+                    List.of(Map.of("name", "Authorization", "value", "********"))));
+
+            maskedUpdate.setId(createdNotificationDTO.id());
+            maskedUpdate.setVersion(createdNotificationDTO.version());
+
+            assertThatThrownBy(() -> notificationFacade.updateNotification(maskedUpdate))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Re-enter header Authorization to send to a new URL");
+
+            Map<String, Object> omittedHeader = new HashMap<>();
+
+            omittedHeader.put("name", "Authorization");
+            omittedHeader.put("value", null);
+
+            Notification omittedUpdate = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of("webhook", "https://example.com/other-hook", "webhookHeaders", List.of(omittedHeader)));
+
+            omittedUpdate.setId(createdNotificationDTO.id());
+            omittedUpdate.setVersion(createdNotificationDTO.version());
+
+            assertThatThrownBy(() -> notificationFacade.updateNotification(omittedUpdate))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Re-enter header Authorization to send to a new URL");
+
+            Notification reenteredUpdate = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of(
+                    "webhook", "https://example.com/other-hook", "webhookHeaders",
+                    List.of(Map.of("name", "Authorization", "value", "token-2"))));
+
+            reenteredUpdate.setId(createdNotificationDTO.id());
+            reenteredUpdate.setVersion(createdNotificationDTO.version());
+
+            NotificationDTO updatedNotificationDTO = notificationFacade.updateNotification(reenteredUpdate);
+
+            assertThat(updatedNotificationDTO.signingSecret()).isNull();
+
+            Notification storedNotification = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            assertThat(storedNotification.getSetting("webhookHeaders"))
+                .isEqualTo(List.of(Map.of("name", "Authorization", "value", "token-2")));
+            assertThat(storedNotification.getSetting("webhookSecret"))
+                .isEqualTo(createdNotificationDTO.signingSecret());
+        }
+
+        @Test
+        public void testUpdateWithNewUrlAndNoHeadersKeyIsRejected() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(
+                    Notification.Type.WEBHOOK,
+                    Map.of(
+                        "webhook", "https://example.com/hook", "webhookHeaders",
+                        List.of(Map.of("name", "Authorization", "value", "token-1")))));
+
+            Notification update = createNotification(
+                Notification.Type.WEBHOOK, Map.of("webhook", "https://attacker.example.net/hook"));
+
+            update.setId(createdNotificationDTO.id());
+            update.setVersion(createdNotificationDTO.version());
+
+            assertThatThrownBy(() -> notificationFacade.updateNotification(update))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Re-enter the headers to send to a new URL");
+
+            Notification storedNotification = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            assertThat(storedNotification.getSetting("webhook")).isEqualTo("https://example.com/hook");
+        }
+
+        @Test
+        public void testUpdateWithSameUrlKeepsMaskedHeaders() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(
+                    Notification.Type.WEBHOOK,
+                    Map.of(
+                        "webhook", "https://example.com/hook?a=1", "webhookHeaders",
+                        List.of(Map.of("name", "Authorization", "value", "token-1")))));
+
+            Notification update = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of(
+                    "webhook", " HTTPS://Example.COM:443/hook?a=1 ", "webhookHeaders",
+                    List.of(Map.of("name", "Authorization", "value", "********"))));
+
+            update.setId(createdNotificationDTO.id());
+            update.setVersion(createdNotificationDTO.version());
+
+            notificationFacade.updateNotification(update);
+
+            Notification storedNotification = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            assertThat(storedNotification.getSetting("webhookHeaders"))
+                .isEqualTo(List.of(Map.of("name", "Authorization", "value", "token-1")));
+            assertThat(storedNotification.getSetting("webhookSecret"))
+                .isEqualTo(createdNotificationDTO.signingSecret());
+        }
+
+        @Test
         public void testRejectsHeaderValueWithLineBreak() {
             Notification notification = createNotification(
                 Notification.Type.WEBHOOK,
@@ -567,6 +682,7 @@ public class NotificationFacadeIntTest {
         private final List<ReceivedRequest> receivedRequests = new CopyOnWriteArrayList<>();
 
         private HttpServer httpServer;
+        private boolean echoAuthorizationHeader;
         private int responseStatus = 200;
         private String responseBody = "ok";
 
@@ -594,7 +710,12 @@ public class NotificationFacadeIntTest {
                                         .getFirst(),
                                     (first, second) -> first))));
 
-                byte[] responseBytes = responseBody.getBytes(StandardCharsets.UTF_8);
+                String body = echoAuthorizationHeader
+                    ? "Authorization: " + exchange.getRequestHeaders()
+                        .getFirst("Authorization")
+                    : responseBody;
+
+                byte[] responseBytes = body.getBytes(StandardCharsets.UTF_8);
 
                 exchange.sendResponseHeaders(responseStatus, responseBytes.length);
 
@@ -665,6 +786,7 @@ public class NotificationFacadeIntTest {
 
             assertThat(notificationTestResult.success()).isTrue();
             assertThat(notificationTestResult.signed()).isTrue();
+            assertThat(notificationTestResult.unsignedReason()).isNull();
             assertThat(receivedRequests).hasSize(1);
 
             ReceivedRequest receivedRequest = receivedRequests.getFirst();
@@ -740,6 +862,75 @@ public class NotificationFacadeIntTest {
             assertThat(notificationTestResult.success()).isFalse();
             assertThat(notificationTestResult.statusCode()).isEqualTo(422);
             assertThat(notificationTestResult.responseBody()).isEqualTo("bad");
+        }
+
+        @Test
+        public void testSendTestRedactsEchoedHeaderValue() {
+            echoAuthorizationHeader = true;
+
+            NotificationTestResult notificationTestResult = notificationFacade.testNotification(
+                createNotification(
+                    Notification.Type.WEBHOOK,
+                    Map.of(
+                        "webhook", receiverUrl(), "webhookHeaders",
+                        List.of(Map.of("name", "Authorization", "value", "token-12345")))));
+
+            assertThat(receivedRequests).hasSize(1);
+            assertThat(receivedRequests.getFirst()
+                .headers()).containsEntry("authorization", "token-12345");
+            assertThat(notificationTestResult.responseBody()).contains("********")
+                .doesNotContain("token-12345");
+        }
+
+        @Test
+        public void testTestWithNewUrlIsUnsignedWithUrlChangedReason() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(
+                    Notification.Type.WEBHOOK,
+                    Map.of(
+                        "webhook", receiverUrl(), "webhookHeaders",
+                        List.of(Map.of("name", "Authorization", "value", "token-1")))));
+
+            Notification maskedNotification = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of(
+                    "webhook", receiverUrl() + "/moved", "webhookHeaders",
+                    List.of(Map.of("name", "Authorization", "value", "********"))));
+
+            maskedNotification.setId(createdNotificationDTO.id());
+
+            assertThatThrownBy(() -> notificationFacade.testNotification(maskedNotification))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Re-enter header Authorization to send to a new URL");
+
+            assertThat(receivedRequests).isEmpty();
+
+            Notification notification = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of(
+                    "webhook", receiverUrl() + "/moved", "webhookHeaders",
+                    List.of(Map.of("name", "Authorization", "value", "token-2"))));
+
+            notification.setId(createdNotificationDTO.id());
+
+            NotificationTestResult notificationTestResult = notificationFacade.testNotification(notification);
+
+            assertThat(notificationTestResult.success()).isTrue();
+            assertThat(notificationTestResult.signed()).isFalse();
+            assertThat(notificationTestResult.unsignedReason()).isEqualTo("URL_CHANGED");
+            assertThat(receivedRequests).hasSize(1);
+            assertThat(receivedRequests.getFirst()
+                .headers()).doesNotContainKey("x-bytechef-signature")
+                    .containsEntry("authorization", "token-2");
+        }
+
+        @Test
+        public void testTestUnsavedWebhookHasNoSecretReason() {
+            NotificationTestResult notificationTestResult = notificationFacade.testNotification(
+                createNotification(Notification.Type.WEBHOOK, Map.of("webhook", receiverUrl())));
+
+            assertThat(notificationTestResult.signed()).isFalse();
+            assertThat(notificationTestResult.unsignedReason()).isEqualTo("NO_SECRET");
         }
 
         private String receiverUrl() {

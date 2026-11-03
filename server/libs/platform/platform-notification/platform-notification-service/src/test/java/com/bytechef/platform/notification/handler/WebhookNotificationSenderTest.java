@@ -384,6 +384,29 @@ class WebhookNotificationSenderTest {
         verify(webhookDeliveryService, never()).sendTest(any());
     }
 
+    @Test
+    void testSendTestRedactsSigningSecretAndHeaderValues() {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
+        when(webhookDeliveryService.sendTest(any())).thenReturn(
+            new WebhookTestResult(
+                false, 401, "got token-12345 and whsec_signing and abc", "rejected token-12345 whsec_signing"));
+
+        Notification notification = createNotification(Map.of("webhook", "https://example.com/hook"));
+
+        notification.setSecretSettings(
+            Map.of(
+                "webhookSecret", "whsec_signing", "webhookHeaders",
+                List.of(
+                    Map.of("name", "Authorization", "value", "token-12345"),
+                    Map.of("name", "X-Short", "value", "abc"))));
+
+        NotificationTestResult notificationTestResult = webhookNotificationSender.sendTest(
+            notification, webhookNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.responseBody()).isEqualTo("got ******** and ******** and abc");
+        assertThat(notificationTestResult.error()).isEqualTo("rejected ******** ********");
+    }
+
     private static WebhookDeliveryOutcome sentOutcome() {
         return new WebhookDeliveryOutcome(List.of(new PayloadResult("1", Status.SENT)), null, null, null);
     }

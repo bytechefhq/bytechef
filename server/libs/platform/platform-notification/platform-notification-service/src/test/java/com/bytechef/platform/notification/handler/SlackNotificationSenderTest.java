@@ -223,6 +223,22 @@ class SlackNotificationSenderTest {
         verify(webhookDeliveryService, never()).sendTest(any());
     }
 
+    @Test
+    void testSendTestRedactsSlackUrl() {
+        when(slackNotificationHandler.getText(any())).thenReturn("Approval pending");
+        when(webhookDeliveryService.sendTest(any())).thenReturn(
+            new WebhookTestResult(
+                false, 404, "no hook at https://hooks.slack.com/services/T/B/X",
+                "failed https://hooks.slack.com/services/T/B/X"));
+
+        NotificationTestResult notificationTestResult = slackNotificationSender.sendTest(
+            createNotification(Map.of("slackWebhookUrl", " https://hooks.slack.com/services/T/B/X ")),
+            slackNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.responseBody()).isEqualTo("no hook at ********");
+        assertThat(notificationTestResult.error()).isEqualTo("failed ********");
+    }
+
     private static WebhookDeliveryOutcome sentOutcome() {
         return new WebhookDeliveryOutcome(List.of(new PayloadResult("1", Status.SENT)), null, null, null);
     }
