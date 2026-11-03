@@ -204,6 +204,7 @@ class BillingSubscriptionFacadeIntTest {
         subscription.setUsageProductId("si_usage_starter");
         subscription.setPlanName("STARTER");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
+        subscription.setSubscriptionModel(BillingSubscription.SubscriptionModel.METERED);
         subscription.setProductUnitLimit(5000);
         subscription.setCurrentPeriodStart(Instant.parse("2026-06-01T00:00:00Z"));
         subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
@@ -219,6 +220,7 @@ class BillingSubscriptionFacadeIntTest {
         subscription.setUsageProductId("si_usage_growth");
         subscription.setPlanName("GROWTH");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
+        subscription.setSubscriptionModel(BillingSubscription.SubscriptionModel.METERED);
         subscription.setProductUnitLimit(5000);
         subscription.setCurrentPeriodStart(Instant.parse("2026-06-01T00:00:00Z"));
         subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));

@@ -238,6 +238,7 @@ class TrialServiceIntTest {
 
         subscription.setPlanName("TRIAL");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
+        subscription.setSubscriptionModel(BillingSubscription.SubscriptionModel.METERED);
         subscription.setProductUnitLimit(5000);
         subscription.setCurrentPeriodStart(Instant.now()
             .minus(7, ChronoUnit.DAYS));

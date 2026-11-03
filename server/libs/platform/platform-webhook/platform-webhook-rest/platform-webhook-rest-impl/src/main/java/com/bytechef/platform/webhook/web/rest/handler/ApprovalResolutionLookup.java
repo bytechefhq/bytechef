@@ -87,7 +87,7 @@ public class ApprovalResolutionLookup {
             case CREATED, STARTED, COMPLETED -> Resolution.RESOLVED;
             case STOPPED -> jobResumeId.matches((String) job.getMetadata(MetadataConstants.JOB_RESUME_ID))
                 ? Resolution.UNAVAILABLE : Resolution.RESOLVED;
-            case FAILED, CANCELLED -> Resolution.UNAVAILABLE;
+            case FAILED, CANCELLED, PAYMENT_REQUIRED -> Resolution.UNAVAILABLE;
         };
     }
 
