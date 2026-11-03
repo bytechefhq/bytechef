@@ -88,6 +88,7 @@ class AuditDataContractTest {
     private static final String GETTING_STARTED_DISMISSAL = "onboarding page dismissal";
     private static final String TAGS = "tag assignment";
     private static final String ROW_DATA = "data table rows";
+    private static final String JOB_STATUS = "job status change recorded by the job status listener";
     private static final String PREVIEW = "returns a generated preview without saving it";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String RUNTIME_APPROVAL = "approval task opened by a workflow run";
@@ -147,6 +148,8 @@ class AuditDataContractTest {
         Map.entry("IntegrationInstanceFacadeImpl.updateIntegrationInstanceWorkflow", WORKFLOW_INPUTS),
         Map.entry("IntegrationTagFacadeImpl.updateIntegrationTags", TAGS),
         Map.entry("IntegrationWorkflowFacadeImpl.updateWorkflow", DEFINITION_EDIT),
+        Map.entry("JobFacadeImpl.resumeJob", JOB_STATUS),
+        Map.entry("JobFacadeImpl.stopJob", JOB_STATUS),
         Map.entry("LogFileStorageImpl.deleteLogEntries", EXECUTION_LOGS),
         Map.entry("LogFileStorageImpl.logsExist", EXISTENCE_CHECK),
         Map.entry(
