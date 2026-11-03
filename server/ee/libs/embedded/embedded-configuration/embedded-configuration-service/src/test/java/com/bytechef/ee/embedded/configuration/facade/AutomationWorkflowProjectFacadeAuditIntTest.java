@@ -9,10 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -84,11 +81,13 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -448,14 +447,19 @@ class AutomationWorkflowProjectFacadeAuditIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            PermissionService permissionService = mock(PermissionService.class);
+            return mock(PermissionService.class, invocation -> {
+                Method method = invocation.getMethod();
 
-            when(permissionService.isTenantAdmin())
-                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
-            when(permissionService.hasResourceScope(any(), anyString(), anyString()))
-                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
+                String methodName = method.getName();
 
-            return permissionService;
+                if (method.getReturnType() == boolean.class &&
+                    (methodName.equals("isTenantAdmin") || methodName.startsWith("has"))) {
+
+                    return SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
+                }
+
+                return Mockito.RETURNS_DEFAULTS.answer(invocation);
+            });
         }
     }
 }

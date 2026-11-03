@@ -12,8 +12,8 @@ import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceWorkflowFaca
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -91,6 +91,8 @@ class McpIntegrationInstanceWorkflowApiController {
     public ResponseEntity<Void> enableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
 
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         updateMcpIntegrationInstanceWorkflowEnabled(externalUserId, id, workflowUuid, true);
 
         return ResponseEntity.noContent()
@@ -100,6 +102,8 @@ class McpIntegrationInstanceWorkflowApiController {
     @DeleteMapping("/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
     public ResponseEntity<Void> disableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         updateMcpIntegrationInstanceWorkflowEnabled(externalUserId, id, workflowUuid, false);
 
@@ -122,7 +126,6 @@ class McpIntegrationInstanceWorkflowApiController {
     }
 
     private static String getCurrentExternalUserId() {
-        return SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        return ConnectedUserAuthentications.getCurrentExternalUserId();
     }
 }

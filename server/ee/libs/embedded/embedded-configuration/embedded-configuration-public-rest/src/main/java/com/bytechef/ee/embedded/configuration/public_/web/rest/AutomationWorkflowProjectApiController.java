@@ -15,10 +15,10 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.Automation
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowTemplateModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -61,17 +61,9 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
     @CrossOrigin
     @Override
     public ResponseEntity<List<AutomationWorkflowProjectModel>> getFrontendProjects(EnvironmentModel xEnvironment) {
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
-        List<AutomationWorkflowProjectModel> models = automationWorkflowProjectFacade
-            .getPublishedProjects(externalUserId, getEnvironment(xEnvironment))
-            .stream()
-            .filter(AutomationWorkflowProjectDTO::automationHubVisible)
-            .map(project -> conversionService.convert(project, AutomationWorkflowProjectModel.class))
-            .toList();
-
-        return ResponseEntity.ok(models);
+        return ResponseEntity.ok(
+            toAutomationWorkflowProjectModels(ConnectedUserAuthentications.getCurrentExternalUserId(),
+                getEnvironment(xEnvironment)));
     }
 
     @CrossOrigin
@@ -79,40 +71,26 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
     public ResponseEntity<AutomationWorkflowProjectWorkflowTemplateModel> getFrontendWorkflowTemplate(
         String workflowUuid, EnvironmentModel xEnvironment) {
 
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return getWorkflowTemplate(externalUserId, workflowUuid, xEnvironment);
+        return toWorkflowTemplate(
+            ConnectedUserAuthentications.getCurrentExternalUserId(), workflowUuid, getEnvironment(xEnvironment));
     }
 
     @Override
     public ResponseEntity<List<AutomationWorkflowProjectModel>> getProjects(
         String externalUserId, EnvironmentModel xEnvironment) {
 
-        List<AutomationWorkflowProjectModel> models = automationWorkflowProjectFacade
-            .getPublishedProjects(externalUserId, getEnvironment(xEnvironment))
-            .stream()
-            .filter(AutomationWorkflowProjectDTO::automationHubVisible)
-            .map(project -> conversionService.convert(project, AutomationWorkflowProjectModel.class))
-            .toList();
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
-        return ResponseEntity.ok(models);
+        return ResponseEntity.ok(toAutomationWorkflowProjectModels(externalUserId, getEnvironment(xEnvironment)));
     }
 
     @Override
     public ResponseEntity<AutomationWorkflowProjectWorkflowTemplateModel> getWorkflowTemplate(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
 
-        return automationWorkflowProjectFacade.getPublishedProjects(externalUserId, getEnvironment(xEnvironment))
-            .stream()
-            .flatMap(project -> project.workflowTemplates()
-                .stream())
-            .filter(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid))
-            .findFirst()
-            .map(automationWorkflowProjectMapper::toWorkflowTemplateModel)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound()
-                .build());
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
+        return toWorkflowTemplate(externalUserId, workflowUuid, getEnvironment(xEnvironment));
     }
 
     @InitBinder
@@ -122,5 +100,30 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
 
     private Environment getEnvironment(EnvironmentModel xEnvironment) {
         return environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
+    }
+
+    private List<AutomationWorkflowProjectModel> toAutomationWorkflowProjectModels(
+        String externalUserId, Environment environment) {
+
+        return automationWorkflowProjectFacade.getPublishedProjects(externalUserId, environment)
+            .stream()
+            .filter(AutomationWorkflowProjectDTO::automationHubVisible)
+            .map(project -> conversionService.convert(project, AutomationWorkflowProjectModel.class))
+            .toList();
+    }
+
+    private ResponseEntity<AutomationWorkflowProjectWorkflowTemplateModel> toWorkflowTemplate(
+        String externalUserId, String workflowUuid, Environment environment) {
+
+        return automationWorkflowProjectFacade.getPublishedProjects(externalUserId, environment)
+            .stream()
+            .flatMap(project -> project.workflowTemplates()
+                .stream())
+            .filter(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid))
+            .findFirst()
+            .map(automationWorkflowProjectMapper::toWorkflowTemplateModel)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound()
+                .build());
     }
 }

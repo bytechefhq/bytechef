@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -172,6 +174,22 @@ class EmbeddedApiKeyAuthenticationProviderTest {
         assertThat(connectedUserAuthentication.connectedUserId()).isEqualTo(42L);
         assertThat(connectedUserAuthentication.externalUserId()).isEqualTo(EXTERNAL_USER_ID);
         assertThat(connectedUserAuthentication.environmentId()).isEqualTo(ENVIRONMENT_ID);
+        assertThat(connectedUserAuthentication.apiKeyAuthenticated()).isTrue();
+    }
+
+    @Test
+    void testAConnectedUserTokenIsNotApiKeyAuthenticated() {
+        when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(connectedUser(42L)));
+
+        Authentication authentication = provider.authenticate(
+            new EmbeddedApiKeyAuthenticationToken(ENVIRONMENT_ID, EXTERNAL_USER_ID, null, "tenant"));
+
+        ConnectedUserAuthentication connectedUserAuthentication = (ConnectedUserAuthentication) authentication;
+
+        assertThat(connectedUserAuthentication.apiKeyAuthenticated()).isFalse();
+
+        verify(apiKeyService, never()).fetchApiKey(anyString(), anyLong());
     }
 
     private static ConnectedUser connectedUser(long id) {

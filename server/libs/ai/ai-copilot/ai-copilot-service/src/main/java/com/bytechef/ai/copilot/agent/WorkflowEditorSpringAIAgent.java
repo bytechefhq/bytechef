@@ -29,7 +29,6 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.util.CopilotToolContextUtils;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
@@ -169,16 +168,15 @@ public class WorkflowEditorSpringAIAgent extends CopilotSpringAIAgent {
 
         Long userId = NumberUtils.asLong(state.get(CopilotConstants.STATE_AUTHENTICATED_USER_ID));
 
-        if (userId == null) {
-            if (state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication) {
-                return;
-            }
+        boolean allowed = false;
 
-            throw new AccessDeniedException("Access to workflow '" + workflowId + "' is denied");
+        if (state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication authentication) {
+            allowed = SecurityUtils.runAs(
+                authentication, () -> permissionService.hasWorkflowScope(workflowId, "WORKFLOW_VIEW"));
+        } else if (userId != null) {
+            allowed = securityContextRehydrator.withUserSecurityContext(
+                userId, () -> permissionService.hasWorkflowScope(workflowId, "WORKFLOW_VIEW"));
         }
-
-        boolean allowed = securityContextRehydrator.withUserSecurityContext(
-            userId, () -> permissionService.hasWorkflowScope(workflowId, "WORKFLOW_VIEW"));
 
         if (!allowed) {
             throw new AccessDeniedException("Access to workflow '" + workflowId + "' is denied");
@@ -186,27 +184,17 @@ public class WorkflowEditorSpringAIAgent extends CopilotSpringAIAgent {
     }
 
     private <T> T runWithCallerSecurityContext(State state, Supplier<T> action) {
+        if (state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication authentication) {
+            return SecurityUtils.runAs(authentication, action);
+        }
+
         Long userId = NumberUtils.asLong(state.get(CopilotConstants.STATE_AUTHENTICATED_USER_ID));
 
         if (userId != null) {
             return securityContextRehydrator.withUserSecurityContext(userId, action);
         }
 
-        if (state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication authentication) {
-            return SecurityUtils.runAs(authentication, () -> callSkippingChecks(action));
-        }
-
         return action.get();
-    }
-
-    private static <T> T callSkippingChecks(Supplier<T> action) {
-        try {
-            return AutomationAuthorizationContext.callSkippingChecks(action::get);
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
-        }
     }
 
     private String getSampleOutputs(List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs) {
