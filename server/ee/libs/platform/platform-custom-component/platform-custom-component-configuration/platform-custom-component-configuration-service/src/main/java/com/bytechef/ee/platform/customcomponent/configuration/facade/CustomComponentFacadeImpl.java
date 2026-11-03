@@ -138,6 +138,10 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     @Override
+    @Audited(event = CustomComponentAuditEvents.CUSTOM_COMPONENT_ENABLED_UPDATED, data = {
+        @AuditData(key = "customComponentId", value = "#id"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void enableCustomComponent(long id, boolean enable) {
         customComponentService.enableCustomComponent(id, enable);
