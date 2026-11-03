@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.notification.facade;
 
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.notification.audit.NotificationAuditEvents;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.dto.NotificationDTO;
@@ -62,6 +65,11 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @Audited(event = NotificationAuditEvents.NOTIFICATION_CREATED, data = {
+        @AuditData(key = "notificationId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#notification.name"),
+        @AuditData(key = "type", value = "#notification.type")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public NotificationDTO createNotification(Notification notification) {
         validateNotification(notification);
@@ -74,6 +82,11 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @Audited(event = NotificationAuditEvents.NOTIFICATION_UPDATED, data = {
+        @AuditData(key = "notificationId", value = "#notification.id"),
+        @AuditData(key = "name", value = "#notification.name"),
+        @AuditData(key = "type", value = "#notification.type")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public NotificationDTO updateNotification(Notification notification) {
         validateNotification(notification);
@@ -86,6 +99,9 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @Audited(event = NotificationAuditEvents.NOTIFICATION_DELETED, data = {
+        @AuditData(key = "notificationId", value = "#id")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteNotification(long id) {
         notificationService.delete(id);
