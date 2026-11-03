@@ -23,12 +23,16 @@ import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import java.util.ArrayList;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Arik Cohen
@@ -36,69 +40,111 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class InMemoryContextRepository implements ContextRepository {
 
-    private final ConcurrentHashMap<String, Deque<FileEntry>> cache = new ConcurrentHashMap<>();
+    private static final String NO_SUB_STACK = "";
+
+    private final ConcurrentHashMap<String, ConcurrentMap<String, Deque<FileEntry>>> cache =
+        new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
     @Override
     public List<Context> findAllByStackIdAndClassnameId(long stackId, int classnameId) {
-        throw new UnsupportedOperationException();
+        Map<String, Deque<FileEntry>> subStacks = cache.get(getStackKey(stackId, classnameId));
+
+        if (subStacks == null) {
+            return List.of();
+        }
+
+        List<Context> contexts = new ArrayList<>();
+
+        for (Map.Entry<String, Deque<FileEntry>> entry : subStacks.entrySet()) {
+            Integer subStackId = toSubStackId(entry.getKey());
+
+            for (FileEntry fileEntry : entry.getValue()) {
+                contexts.add(new Context(stackId, subStackId, Context.Classname.values()[classnameId], fileEntry));
+            }
+        }
+
+        return contexts;
     }
 
     @Override
     public void deleteAllByStackIdAndClassnameId(long stackId, int classnameId) {
-        throw new UnsupportedOperationException();
+        cache.remove(getStackKey(stackId, classnameId));
     }
 
     @Override
     public Optional<Context> findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId) {
-        Deque<FileEntry> stack = getStack(getKey(stackId, null, classnameId));
-
-        return Optional.ofNullable(stack == null ? null : new Context(stack.peek()));
+        return findTop(stackId, null, classnameId);
     }
 
     @Override
     public Optional<Context> findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
         long stackId, int subStackId, int classnameId) {
 
-        Deque<FileEntry> linkedList = getStack(getKey(stackId, subStackId, classnameId));
-
-        return Optional.ofNullable(linkedList == null ? null : new Context(linkedList.peek()));
+        return findTop(stackId, subStackId, classnameId);
     }
 
     @Override
     public Context save(Context context) {
-        String key = getKey(context.getStackId(), context.getSubStackId(), context.getClassnameId());
+        long stackId = context.getStackId();
+        int classnameId = context.getClassnameId();
+        String subStackKey = getSubStackKey(context.getSubStackId());
 
-        ReentrantLock lock = locks.computeIfAbsent(key, k -> new ReentrantLock());
+        String lockKey = TenantCacheKeyUtils.getKey(stackId, context.getSubStackId(), classnameId);
+
+        ReentrantLock lock = locks.computeIfAbsent(lockKey, key -> new ReentrantLock());
 
         try {
             lock.lock();
 
-            Deque<FileEntry> stack = getStack(key);
+            Map<String, Deque<FileEntry>> subStacks = cache.computeIfAbsent(
+                getStackKey(stackId, classnameId), key -> new ConcurrentHashMap<>());
+
+            Deque<FileEntry> stack = subStacks.computeIfAbsent(subStackKey, key -> new ConcurrentLinkedDeque<>());
 
             if (context.isNew()) {
                 context.setId(Math.abs(Math.max(RandomUtils.nextLong(), Long.MIN_VALUE + 1)));
             }
 
             stack.push(context.getValue());
-
-            cache.put(key, stack);
         } finally {
             lock.unlock();
 
             if (!lock.isLocked() && !lock.hasQueuedThreads()) {
-                locks.remove(key, lock);
+                locks.remove(lockKey, lock);
             }
         }
 
         return context;
     }
 
-    private static String getKey(long stackId, Integer subStackId, int classnameId) {
-        return TenantCacheKeyUtils.getKey(stackId, subStackId, classnameId);
+    private Optional<Context> findTop(long stackId, @Nullable Integer subStackId, int classnameId) {
+        Map<String, Deque<FileEntry>> subStacks = cache.get(getStackKey(stackId, classnameId));
+
+        if (subStacks == null) {
+            return Optional.empty();
+        }
+
+        Deque<FileEntry> stack = subStacks.get(getSubStackKey(subStackId));
+
+        if (stack == null) {
+            return Optional.empty();
+        }
+
+        FileEntry fileEntry = stack.peek();
+
+        return fileEntry == null ? Optional.empty() : Optional.of(new Context(fileEntry));
     }
 
-    private Deque<FileEntry> getStack(String key) {
-        return cache.computeIfAbsent(key, (key1) -> new LinkedList<>());
+    private static String getStackKey(long stackId, int classnameId) {
+        return TenantCacheKeyUtils.getKey(stackId, classnameId);
+    }
+
+    private static String getSubStackKey(@Nullable Integer subStackId) {
+        return subStackId == null ? NO_SUB_STACK : String.valueOf(subStackId);
+    }
+
+    private static @Nullable Integer toSubStackId(String subStackKey) {
+        return subStackKey.equals(NO_SUB_STACK) ? null : Integer.valueOf(subStackKey);
     }
 }
