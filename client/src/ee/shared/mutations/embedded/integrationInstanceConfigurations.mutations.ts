@@ -1,10 +1,12 @@
 import {
+    ConfigurationMoveResult,
     EnableIntegrationInstanceConfigurationRequest,
     EnableIntegrationInstanceConfigurationWorkflowRequest,
     IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationApi,
     IntegrationInstanceConfigurationTagApi,
     IntegrationInstanceConfigurationWorkflow,
+    MoveIntegrationInstanceConfigurationConnectedUsersRequest,
     UpdateIntegrationInstanceConfigurationTagsRequest,
     UpdateIntegrationTagsRequest,
 } from '@/ee/shared/middleware/embedded/configuration';
@@ -128,6 +130,27 @@ export const useUpdateIntegrationInstanceConfigurationTagsMutation = (
     useMutation({
         mutationFn: (request: UpdateIntegrationTagsRequest) => {
             return new IntegrationInstanceConfigurationTagApi().updateIntegrationInstanceConfigurationTags(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface MoveIntegrationInstanceConfigurationConnectedUsersMutationProps {
+    onSuccess?: (
+        result: ConfigurationMoveResult,
+        variables: MoveIntegrationInstanceConfigurationConnectedUsersRequest
+    ) => void;
+    onError?: (error: Error, variables: MoveIntegrationInstanceConfigurationConnectedUsersRequest) => void;
+}
+
+export const useMoveIntegrationInstanceConfigurationConnectedUsersMutation = (
+    mutationProps?: MoveIntegrationInstanceConfigurationConnectedUsersMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: MoveIntegrationInstanceConfigurationConnectedUsersRequest) => {
+            return new IntegrationInstanceConfigurationApi().moveIntegrationInstanceConfigurationConnectedUsers(
+                request
+            );
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

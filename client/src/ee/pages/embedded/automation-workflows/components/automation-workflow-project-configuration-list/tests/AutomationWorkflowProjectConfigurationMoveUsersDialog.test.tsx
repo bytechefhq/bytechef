@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
     connectedUsers: undefined as unknown[] | undefined,
     connectedUsersEnabled: undefined as boolean | undefined,
     connectedUsersError: false,
+    moveImpactError: false,
+    moveImpactLoading: false,
     moveMutateAsync: vi.fn(),
     moveVariables: [] as unknown[],
 }));
@@ -49,6 +51,8 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
                       },
                   }
                 : undefined,
+            isError: mocks.moveImpactError,
+            isLoading: mocks.moveImpactLoading,
         };
     },
     useMoveAutomationWorkflowProjectConfigurationConnectedUsersMutation: (options?: {onSuccess?: () => void}) => ({
@@ -106,6 +110,8 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
         ];
         mocks.connectedUsersEnabled = undefined;
         mocks.connectedUsersError = false;
+        mocks.moveImpactError = false;
+        mocks.moveImpactLoading = false;
         mocks.moveVariables = [];
 
         vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
@@ -137,7 +143,7 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
         expect(onClose).toHaveBeenCalledOnce();
     });
 
-    it('shows an error with a Close button instead of blocking when the users fail to load', async () => {
+    it('shows an error with one Close button instead of blocking when the users fail to load', async () => {
         mocks.connectedUsers = undefined;
         mocks.connectedUsersError = true;
 
@@ -147,7 +153,7 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
 
         expect(screen.getByText('Could not load the connected users.')).toBeInTheDocument();
 
-        await userEvent.click(screen.getAllByRole('button', {name: 'Close'})[0]);
+        await userEvent.click(screen.getByRole('button', {name: 'Close'}));
 
         expect(onClose).toHaveBeenCalled();
     });
@@ -158,12 +164,29 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
         await userEvent.click(screen.getByRole('combobox', {name: 'Target'}));
         await userEvent.click(await screen.findByRole('option', {name: 'BETA · v2'}));
 
-        expect(await screen.findByText('Bob: Sync missing in the target version')).toBeInTheDocument();
+        expect(await screen.findByText('Bob: the target has no Sync')).toBeInTheDocument();
         expect(mocks.moveVariables.at(-1)).toEqual({
             connectedUserIds: ['1', '2'],
             sourceId: 'source',
             targetId: 'target',
         });
+    });
+
+    it('marks a disabled target configuration as disabled', async () => {
+        render(
+            <QueryClientProvider client={queryClient}>
+                <AutomationWorkflowProjectConfigurationMoveUsersDialog
+                    configuration={configuration}
+                    onClose={vi.fn()}
+                    targetConfigurations={[targetConfiguration, {...targetConfiguration, enabled: false, id: 'paused'}]}
+                />
+            </QueryClientProvider>
+        );
+
+        await userEvent.click(screen.getByRole('combobox', {name: 'Target'}));
+
+        expect(await screen.findByRole('option', {name: 'BETA · v2'})).toBeInTheDocument();
+        expect(screen.getByRole('option', {name: 'BETA · v2 (disabled)'})).toBeInTheDocument();
     });
 
     it('moves the users, reports the result and invalidates the affected queries', async () => {
@@ -227,5 +250,28 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
                 targetId: 'target',
             })
         );
+    });
+
+    it('disables Move while the move preview loads', async () => {
+        mocks.moveImpactLoading = true;
+
+        renderDialog();
+
+        await userEvent.click(screen.getByRole('combobox', {name: 'Target'}));
+        await userEvent.click(await screen.findByRole('option', {name: 'BETA · v2'}));
+
+        expect(screen.getByRole('button', {name: 'Move'})).toBeDisabled();
+    });
+
+    it('says when the move preview fails and still allows the move', async () => {
+        mocks.moveImpactError = true;
+
+        renderDialog();
+
+        await userEvent.click(screen.getByRole('combobox', {name: 'Target'}));
+        await userEvent.click(await screen.findByRole('option', {name: 'BETA · v2'}));
+
+        expect(screen.getByText('Could not load the move preview.')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
     });
 });

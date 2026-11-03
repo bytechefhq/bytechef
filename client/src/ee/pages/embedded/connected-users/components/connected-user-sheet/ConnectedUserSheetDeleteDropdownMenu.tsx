@@ -5,9 +5,22 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 
-const ConnectedUserSheetDeleteDropdownMenu = ({onDeleteClick}: {onDeleteClick: () => void}) => (
+interface ConnectedUserSheetDeleteDropdownMenuProps {
+    changeConfigurationDisabled?: boolean;
+    changeConfigurationDisabledReason?: string;
+    onChangeConfigurationClick?: () => void;
+    onDeleteClick: () => void;
+}
+
+const ConnectedUserSheetDeleteDropdownMenu = ({
+    changeConfigurationDisabled,
+    changeConfigurationDisabledReason,
+    onChangeConfigurationClick,
+    onDeleteClick,
+}: ConnectedUserSheetDeleteDropdownMenuProps) => (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
             <Button
@@ -19,6 +32,26 @@ const ConnectedUserSheetDeleteDropdownMenu = ({onDeleteClick}: {onDeleteClick: (
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
+            {onChangeConfigurationClick && (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span className="block">
+                            <DropdownMenuItem
+                                aria-label="Change configuration"
+                                disabled={changeConfigurationDisabled || !!changeConfigurationDisabledReason}
+                                icon={<RefreshCcwIcon />}
+                                label="Change configuration…"
+                                onClick={onChangeConfigurationClick}
+                            />
+                        </span>
+                    </TooltipTrigger>
+
+                    {changeConfigurationDisabledReason && (
+                        <TooltipContent side="left">{changeConfigurationDisabledReason}</TooltipContent>
+                    )}
+                </Tooltip>
+            )}
+
             <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
         </DropdownMenuContent>
     </DropdownMenu>

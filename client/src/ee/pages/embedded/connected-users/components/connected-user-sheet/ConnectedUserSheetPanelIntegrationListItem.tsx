@@ -7,13 +7,21 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserSheetPanelIntegrationWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowList';
-import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
+import {
+    CONFIGURATIONS_LOAD_FAILED_REASON,
+    NO_OTHER_CONFIGURATION_REASON,
+} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import IntegrationInstanceConfigurationMoveUsersDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationMoveUsersDialog';
+import {ConnectedUser, ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {
     useDeleteIntegrationInstanceMutation,
     useEnableIntegrationInstanceMutation,
 } from '@/ee/shared/mutations/embedded/integrationInstances.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
-import {useGetIntegrationInstanceConfigurationQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {
+    useGetIntegrationInstanceConfigurationQuery,
+    useGetIntegrationInstanceConfigurationsQuery,
+} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {
     IntegrationInstanceKeys,
     useGetIntegrationInstanceQuery,
@@ -21,16 +29,18 @@ import {
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 const ConnectedUserSheetPanelIntegrationListItem = ({
     componentDefinition,
+    connectedUser,
     connectedUserId,
     connectedUserIntegrationInstance,
 }: {
     componentDefinition: ComponentDefinitionBasic;
+    connectedUser: Pick<ConnectedUser, 'email' | 'externalId' | 'name'>;
     connectedUserIntegrationInstance: ConnectedUserIntegrationInstance;
     connectedUserId: number;
 }) => {
@@ -45,9 +55,53 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
     const {data: integrationInstance} = useGetIntegrationInstanceQuery(connectedUserIntegrationInstance.id!);
 
+    const [showChangeConfigurationDialog, setShowChangeConfigurationDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const queryClient = useQueryClient();
+
+    const {data: integrationConfigurations, isError: integrationConfigurationsError} =
+        useGetIntegrationInstanceConfigurationsQuery(
+            {
+                environmentId: integrationInstanceConfiguration?.environmentId,
+                integrationId: connectedUserIntegrationInstance.integrationId,
+            },
+            connectedUserIntegrationInstance.integrationId != null &&
+                integrationInstanceConfiguration?.environmentId != null
+        );
+
+    const targetConfigurations = useMemo(
+        () =>
+            (integrationConfigurations ?? []).filter(
+                (otherConfiguration) =>
+                    otherConfiguration.id !== connectedUserIntegrationInstance.integrationInstanceConfigurationId
+            ),
+        [connectedUserIntegrationInstance.integrationInstanceConfigurationId, integrationConfigurations]
+    );
+
+    const changeConfigurationDisabledReason = useMemo(() => {
+        if (integrationConfigurationsError) {
+            return CONFIGURATIONS_LOAD_FAILED_REASON;
+        }
+
+        return integrationConfigurations && targetConfigurations.length === 0
+            ? NO_OTHER_CONFIGURATION_REASON
+            : undefined;
+    }, [integrationConfigurations, integrationConfigurationsError, targetConfigurations.length]);
+
+    const presetConnectedUsers = useMemo(
+        () => [
+            {
+                connectedUserId,
+                email: connectedUser.email,
+                externalId: connectedUser.externalId,
+                name: connectedUser.name,
+            },
+        ],
+        [connectedUser.email, connectedUser.externalId, connectedUser.name, connectedUserId]
+    );
+
+    const initialSelectedConnectedUserIds = useMemo(() => [connectedUserId], [connectedUserId]);
 
     const deleteIntegrationInstanceMutation = useDeleteIntegrationInstanceMutation({
         onSuccess: () => {
@@ -172,7 +226,12 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
                         </div>
 
-                        <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                        <ConnectedUserSheetDeleteDropdownMenu
+                            changeConfigurationDisabled={!integrationConfigurations}
+                            changeConfigurationDisabledReason={changeConfigurationDisabledReason}
+                            onChangeConfigurationClick={() => setShowChangeConfigurationDialog(true)}
+                            onDeleteClick={() => setShowDeleteDialog(true)}
+                        />
                     </div>
                 </div>
             )}
@@ -186,6 +245,17 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                     />
                 )}
             </CollapsibleContent>
+
+            {showChangeConfigurationDialog && integrationInstanceConfiguration && (
+                <IntegrationInstanceConfigurationMoveUsersDialog
+                    configuration={integrationInstanceConfiguration}
+                    connectedUsers={presetConnectedUsers}
+                    initialSelectedConnectedUserIds={initialSelectedConnectedUserIds}
+                    onClose={() => setShowChangeConfigurationDialog(false)}
+                    targetConfigurations={targetConfigurations}
+                    title="Change configuration"
+                />
+            )}
 
             <AlertDialog
                 isPending={deleteIntegrationInstanceMutation.isPending}

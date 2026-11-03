@@ -216,7 +216,7 @@ const AutomationWorkflowProjectConfigurationDialog = ({
 
     const permissionExpressionFieldset = (
         <fieldset className="flex flex-col gap-2 border-0 p-0">
-            <Label htmlFor="configurationPermissionExpression">Permission expression</Label>
+            <Label htmlFor="configurationPermissionExpression">Assignment rule</Label>
 
             <Textarea
                 id="configurationPermissionExpression"
@@ -227,7 +227,8 @@ const AutomationWorkflowProjectConfigurationDialog = ({
             />
 
             <p className="text-sm text-content-neutral-secondary">
-                Who self-serve can place on this configuration. Empty means everyone.
+                Which new users self-serve places on this configuration. Checked once, when a user is first assigned.
+                Users already on it stay until you move them. Empty means everyone.
             </p>
         </fieldset>
     );

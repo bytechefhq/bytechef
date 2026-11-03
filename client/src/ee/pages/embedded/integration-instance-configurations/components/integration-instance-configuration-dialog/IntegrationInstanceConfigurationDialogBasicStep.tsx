@@ -1,7 +1,7 @@
 import {Input} from '@/components/Input/Input';
 import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
-import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox';
@@ -208,6 +208,33 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                                     {...field}
                                 />
                             </FormControl>
+
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            )}
+
+            {!updateIntegrationVersion && (
+                <FormField
+                    control={control}
+                    name="permissionExpression"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Assignment rule</FormLabel>
+
+                            <FormControl>
+                                <Input
+                                    placeholder="e.g. metadata['beta'] == 'true'"
+                                    {...field}
+                                    value={field.value ?? ''}
+                                />
+                            </FormControl>
+
+                            <FormDescription>
+                                Which connected users self-serve places on this configuration. Checked once, when their
+                                instance is created. Users already on it stay until you move them. Empty means everyone.
+                            </FormDescription>
 
                             <FormMessage />
                         </FormItem>

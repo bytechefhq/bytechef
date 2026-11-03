@@ -4,6 +4,10 @@ import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {
+    CONFIGURATIONS_LOAD_FAILED_REASON,
+    NO_OTHER_CONFIGURATION_REASON,
+} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
 import IntegrationInstanceConfigurationListItemDropdownMenu from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItemDropdownMenu';
 import {useIntegrationInstanceConfigurationsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
 import {IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
@@ -13,16 +17,21 @@ import {
     useUpdateIntegrationInstanceConfigurationTagsMutation,
 } from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
-import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {
+    IntegrationInstanceConfigurationKeys,
+    useGetIntegrationInstanceConfigurationsQuery,
+} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
-import {useCallback, useRef, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 import IntegrationInstanceConfigurationDialog from '../integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
+import IntegrationInstanceConfigurationMoveUsersDialog from './IntegrationInstanceConfigurationMoveUsersDialog';
 
 interface IntegrationInstanceConfigurationListItemProps {
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
@@ -41,10 +50,13 @@ const IntegrationInstanceConfigurationListItem = ({
 }: IntegrationInstanceConfigurationListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showMoveUsersDialog, setShowMoveUsersDialog] = useState(false);
     const [showUpdateIntegrationVersionDialog, setShowUpdateIntegrationVersionDialog] = useState(false);
     const setIntegrationInstanceConfigurationEnabled = useIntegrationInstanceConfigurationsEnabledStore(
         ({setIntegrationInstanceConfigurationEnabled}) => setIntegrationInstanceConfigurationEnabled
     );
+
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -90,6 +102,30 @@ const IntegrationInstanceConfigurationListItem = ({
             });
         },
     });
+
+    const {data: integrationConfigurations, isError: integrationConfigurationsError} =
+        useGetIntegrationInstanceConfigurationsQuery(
+            {environmentId: currentEnvironmentId, integrationId: integrationInstanceConfiguration.integrationId},
+            integrationInstanceConfiguration.integrationId != null
+        );
+
+    const moveTargetConfigurations = useMemo(
+        () =>
+            (integrationConfigurations ?? []).filter(
+                (otherConfiguration) => otherConfiguration.id !== integrationInstanceConfiguration.id
+            ),
+        [integrationConfigurations, integrationInstanceConfiguration.id]
+    );
+
+    const moveUsersDisabledReason = useMemo(() => {
+        if (integrationConfigurationsError) {
+            return CONFIGURATIONS_LOAD_FAILED_REASON;
+        }
+
+        return integrationConfigurations && moveTargetConfigurations.length === 0
+            ? NO_OTHER_CONFIGURATION_REASON
+            : undefined;
+    }, [integrationConfigurations, integrationConfigurationsError, moveTargetConfigurations.length]);
 
     const handleIntegrationInstanceConfigurationListItemClick = useCallback((event: React.MouseEvent) => {
         const target = event.target as HTMLElement;
@@ -237,8 +273,11 @@ const IntegrationInstanceConfigurationListItem = ({
                         </div>
 
                         <IntegrationInstanceConfigurationListItemDropdownMenu
+                            moveUsersDisabled={!integrationConfigurations}
+                            moveUsersDisabledReason={moveUsersDisabledReason}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
+                            onMoveUsersClick={() => setShowMoveUsersDialog(true)}
                             onUpdateIntegrationVersionClick={() => setShowUpdateIntegrationVersionDialog(true)}
                         />
                     </div>
@@ -264,6 +303,14 @@ const IntegrationInstanceConfigurationListItem = ({
                     excludeWorkflowIds={mcpWorkflowIds}
                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                     onClose={() => setShowEditDialog(false)}
+                />
+            )}
+
+            {showMoveUsersDialog && (
+                <IntegrationInstanceConfigurationMoveUsersDialog
+                    configuration={integrationInstanceConfiguration}
+                    onClose={() => setShowMoveUsersDialog(false)}
+                    targetConfigurations={moveTargetConfigurations}
                 />
             )}
 

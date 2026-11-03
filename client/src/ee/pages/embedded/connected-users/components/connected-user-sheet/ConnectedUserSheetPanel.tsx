@@ -6,8 +6,6 @@ import ConnectedUserSheetPanelToolInvocationList from '@/ee/pages/embedded/conne
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 
-// Underline tab styling that matches the workflow node details panel — brand-colored active
-// bottom border + text, no pill background — so tabs read consistently across the app.
 const tabsTriggerClassName =
     'grow rounded-none border-0 border-b border-border py-2.5 text-content-neutral-secondary shadow-none hover:text-content-brand-primary group-data-[variant=default]/tabs-list:data-[state=active]:shadow-none data-[state=active]:border-stroke-brand-primary data-[state=active]:bg-transparent data-[state=active]:text-content-brand-primary data-[state=active]:shadow-none';
 
@@ -46,6 +44,7 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                 <TabsContent value="integrations">
                     {connectedUser.integrationInstances && (
                         <ConnectedUserSheetPanelIntegrationList
+                            connectedUser={connectedUser}
                             connectedUserId={connectedUser.id!}
                             connectedUserIntegrationInstances={connectedUser.integrationInstances}
                         />
@@ -63,7 +62,11 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
 
                 <TabsContent value="workflows">
                     {connectedUser.id != null && (
-                        <ConnectedUserSheetPanelWorkflowList connectedUserId={connectedUser.id} />
+                        <ConnectedUserSheetPanelWorkflowList
+                            connectedUserEmail={connectedUser.email}
+                            connectedUserId={connectedUser.id}
+                            connectedUserName={connectedUser.name}
+                        />
                     )}
                 </TabsContent>
 

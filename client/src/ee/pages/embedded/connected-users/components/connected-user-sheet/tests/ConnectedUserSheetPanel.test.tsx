@@ -29,7 +29,17 @@ vi.mock(
 
 vi.mock(
     '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList',
-    () => ({default: () => <div>workflow list</div>})
+    () => ({
+        default: ({
+            connectedUserEmail,
+            connectedUserId,
+            connectedUserName,
+        }: {
+            connectedUserEmail?: string;
+            connectedUserId: number;
+            connectedUserName?: string;
+        }) => <div>{`workflow list ${connectedUserId} ${connectedUserName} ${connectedUserEmail}`}</div>,
+    })
 );
 
 describe('ConnectedUserSheetPanel', () => {
@@ -41,5 +51,19 @@ describe('ConnectedUserSheetPanel', () => {
         await userEvent.click(screen.getByRole('tab', {name: 'Tool Invocations'}));
 
         expect(screen.getByText('tool invocation list 7')).toBeInTheDocument();
+    });
+
+    it("passes the connected user's name and email to the Workflows tab", async () => {
+        render(
+            <ConnectedUserSheetPanel
+                connectedUser={
+                    {email: 'jane@example.com', externalId: 'external-user-1', id: 7, name: 'Jane'} as ConnectedUser
+                }
+            />
+        );
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Automation Workflows'}));
+
+        expect(screen.getByText('workflow list 7 Jane jane@example.com')).toBeInTheDocument();
     });
 });

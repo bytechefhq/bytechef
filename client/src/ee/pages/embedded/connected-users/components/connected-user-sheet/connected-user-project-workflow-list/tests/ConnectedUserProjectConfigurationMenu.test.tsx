@@ -7,14 +7,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import ConnectedUserProjectConfigurationMenu from '../ConnectedUserProjectConfigurationMenu';
 
 const hoisted = vi.hoisted(() => ({
-    configurations: [] as Array<Record<string, unknown>>,
+    configurations: [] as Array<Record<string, unknown>> | undefined,
     dialogProps: [] as Array<Record<string, unknown>>,
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useAutomationWorkflowProjectConfigurationsQuery: () => ({
-        data: {automationWorkflowProjectConfigurations: hoisted.configurations},
+        data: hoisted.configurations ? {automationWorkflowProjectConfigurations: hoisted.configurations} : undefined,
     }),
 }));
 
@@ -69,7 +69,9 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
         resetAll();
     });
 
-    it('opens the dialog for this user with the other enabled configurations of the environment', async () => {
+    it("opens the dialog for this user with the other configurations of the current configuration's environment", async () => {
+        environmentStore.setState({currentEnvironmentId: 1});
+
         hoisted.configurations = [
             createConfiguration('51'),
             createConfiguration('52'),
@@ -94,11 +96,32 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
             initialSelectedConnectedUserIds: ['7'],
             title: 'Change configuration',
         });
-        expect((props?.targetConfigurations as Array<{id: string}>).map((target) => target.id)).toEqual(['52']);
+        expect((props?.targetConfigurations as Array<{id: string}>).map((target) => target.id)).toEqual(['52', '53']);
+    });
+
+    it('offers a disabled sibling and stays enabled when it is the only one', async () => {
+        hoisted.configurations = [createConfiguration('51'), createConfiguration('53', {enabled: false})];
+
+        const user = userEvent.setup();
+
+        renderMenu();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        const item = await screen.findByRole('menuitem', {name: 'Change configuration'});
+
+        expect(item).not.toHaveAttribute('aria-disabled', 'true');
+
+        await user.click(item);
+
+        expect(await screen.findByText('dialog Change configuration')).toBeInTheDocument();
+        expect(hoisted.dialogProps.at(-1)?.targetConfigurations).toEqual([
+            expect.objectContaining({enabled: false, id: '53'}),
+        ]);
     });
 
     it('disables Change configuration with a tooltip when there is no other configuration', async () => {
-        hoisted.configurations = [createConfiguration('51'), createConfiguration('53', {enabled: false})];
+        hoisted.configurations = [createConfiguration('51'), createConfiguration('54', {environmentId: '1'})];
 
         const user = userEvent.setup();
 
@@ -115,5 +138,25 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
         await waitFor(async () =>
             expect((await screen.findAllByText('No other configuration in this environment')).length).toBeGreaterThan(0)
         );
+    });
+
+    it('disables Change configuration without a tooltip while the configurations load', async () => {
+        hoisted.configurations = undefined;
+
+        const user = userEvent.setup();
+
+        renderMenu();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        const item = await screen.findByRole('menuitem', {name: 'Change configuration'});
+
+        expect(item).toHaveAttribute('aria-disabled', 'true');
+
+        await user.hover(item.parentElement as HTMLElement);
+
+        await expect(
+            screen.findByText('No other configuration in this environment', {}, {timeout: 1500})
+        ).rejects.toThrow();
     });
 });

@@ -7,12 +7,10 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowProjectConfigurationMoveUsersDialog from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationMoveUsersDialog';
+import {NO_OTHER_CONFIGURATION_REASON} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
 import {useAutomationWorkflowProjectConfigurationsQuery} from '@/shared/middleware/graphql';
-import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {EllipsisVerticalIcon, RefreshCcwIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
-
-const NO_OTHER_CONFIGURATION_REASON = 'No other configuration in this environment';
 
 export interface ConnectedUserCurrentConfigurationI {
     configurationId: string;
@@ -21,7 +19,7 @@ export interface ConnectedUserCurrentConfigurationI {
 }
 
 interface ConnectedUserProjectConfigurationMenuProps {
-    connectedUser: {connectedUserId: string; externalId: string};
+    connectedUser: {connectedUserId: string; email?: string | null; externalId: string; name?: string | null};
     currentConfiguration: ConnectedUserCurrentConfigurationI;
     projectId: string;
 }
@@ -33,20 +31,21 @@ const ConnectedUserProjectConfigurationMenu = ({
 }: ConnectedUserProjectConfigurationMenuProps) => {
     const [showChangeDialog, setShowChangeDialog] = useState(false);
 
-    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-
     const {data} = useAutomationWorkflowProjectConfigurationsQuery({projectId});
 
-    const targetConfigurations = useMemo(
-        () =>
-            (data?.automationWorkflowProjectConfigurations ?? []).filter(
-                (configuration) =>
-                    configuration.enabled &&
-                    configuration.id !== currentConfiguration.configurationId &&
-                    configuration.environmentId === currentEnvironmentId?.toString()
-            ),
-        [currentConfiguration.configurationId, currentEnvironmentId, data]
-    );
+    const targetConfigurations = useMemo(() => {
+        const configurations = data?.automationWorkflowProjectConfigurations ?? [];
+
+        const currentConfigurationEnvironmentId = configurations.find(
+            (configuration) => configuration.id === currentConfiguration.configurationId
+        )?.environmentId;
+
+        return configurations.filter(
+            (configuration) =>
+                configuration.id !== currentConfiguration.configurationId &&
+                configuration.environmentId === currentConfigurationEnvironmentId
+        );
+    }, [currentConfiguration.configurationId, data]);
 
     const connectedUsers = useMemo(() => [connectedUser], [connectedUser]);
 
@@ -59,7 +58,7 @@ const ConnectedUserProjectConfigurationMenu = ({
         [currentConfiguration]
     );
 
-    const disabledReason = targetConfigurations.length === 0 ? NO_OTHER_CONFIGURATION_REASON : undefined;
+    const disabledReason = data && targetConfigurations.length === 0 ? NO_OTHER_CONFIGURATION_REASON : undefined;
 
     return (
         <>
@@ -79,7 +78,7 @@ const ConnectedUserProjectConfigurationMenu = ({
                             <span className="block">
                                 <DropdownMenuItem
                                     aria-label="Change configuration"
-                                    disabled={!!disabledReason}
+                                    disabled={!data || !!disabledReason}
                                     icon={<RefreshCcwIcon />}
                                     label="Change configuration…"
                                     onClick={() => setShowChangeDialog(true)}

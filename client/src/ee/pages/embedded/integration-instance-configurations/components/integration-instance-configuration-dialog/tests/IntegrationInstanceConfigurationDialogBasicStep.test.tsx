@@ -1,7 +1,7 @@
 import {Form} from '@/components/ui/form';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
-import {mockScrollIntoView, render, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {mockScrollIntoView, render, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {useForm, useWatch} from 'react-hook-form';
 import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -47,15 +47,20 @@ interface BasicStepHarnessPropsI {
     authorizations?: Authorization[];
     curIntegrationId?: number;
     integrationInstanceConfiguration?: IntegrationInstanceConfiguration;
+    onSubmit?: (formData: IntegrationInstanceConfiguration) => void;
 }
 
 const BasicStepHarness = ({
     authorizations,
     curIntegrationId,
     integrationInstanceConfiguration,
+    onSubmit,
 }: BasicStepHarnessPropsI) => {
     const form = useForm<IntegrationInstanceConfiguration>({
-        defaultValues: {authorizationType: integrationInstanceConfiguration?.authorizationType},
+        defaultValues: {
+            authorizationType: integrationInstanceConfiguration?.authorizationType,
+            permissionExpression: integrationInstanceConfiguration?.permissionExpression,
+        },
     });
 
     const authorizationType = useWatch({control: form.control, name: 'authorizationType'});
@@ -74,6 +79,10 @@ const BasicStepHarness = ({
             />
 
             <span data-testid="selected-authorization-type">{authorizationType}</span>
+
+            <button onClick={() => onSubmit?.(form.getValues())} type="button">
+                Submit
+            </button>
         </Form>
     );
 };
@@ -104,6 +113,46 @@ describe('IntegrationInstanceConfigurationDialogBasicStep', () => {
         render(<BasicStepHarness />);
 
         expect(screen.queryByText('Tags')).not.toBeInTheDocument();
+    });
+
+    it('basic step sends permissionExpression', async () => {
+        const onSubmit = vi.fn();
+        const user = userEvent.setup();
+
+        render(<BasicStepHarness onSubmit={onSubmit} />);
+
+        expect(screen.getByText('Assignment rule', {selector: 'label'})).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                /^Which connected users self-serve places on this configuration\. Checked once, when their instance is created\./
+            )
+        ).toBeInTheDocument();
+
+        await user.click(screen.getByRole('textbox', {name: 'Assignment rule'}));
+        await user.paste("metadata['beta'] == 'true'");
+        await user.click(screen.getByRole('button', {name: 'Submit'}));
+
+        await waitFor(() =>
+            expect(onSubmit).toHaveBeenCalledWith(
+                expect.objectContaining({permissionExpression: "metadata['beta'] == 'true'"})
+            )
+        );
+    });
+
+    it('should show the stored permission expression when editing', () => {
+        render(
+            <BasicStepHarness
+                integrationInstanceConfiguration={{
+                    id: 1,
+                    integrationId: 2,
+                    integrationVersion: 1,
+                    name: 'Existing',
+                    permissionExpression: "metadata['plan'] == 'pro'",
+                }}
+            />
+        );
+
+        expect(screen.getByRole('textbox', {name: 'Assignment rule'})).toHaveValue("metadata['plan'] == 'pro'");
     });
 
     describe('authorization select', () => {

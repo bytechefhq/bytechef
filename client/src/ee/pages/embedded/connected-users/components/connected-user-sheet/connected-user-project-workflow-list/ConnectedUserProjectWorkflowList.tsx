@@ -9,11 +9,14 @@ import ConnectedUserProjectWorkflowListItem, {
 } from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowListItem';
 import {useMemo} from 'react';
 
+const OTHER_GROUP_KEY = 'other';
+
 const OTHER_GROUP_NAME = 'Other';
 
 interface ConnectedUserProjectWorkflowGroupI {
     configuration?: ConnectedUserCurrentConfigurationI & {projectId: string};
     connectedUserProjectWorkflows: ConnectedUserProjectWorkflowType[];
+    key: string;
     projectName?: string;
 }
 
@@ -33,12 +36,12 @@ const ConnectedUserProjectWorkflowList = ({
     workflowTemplateSourcesByWorkflowUuid,
 }: {
     configurations?: Array<ConnectedUserCurrentConfigurationI & {projectId: string}>;
-    connectedUser?: {connectedUserId: string; externalId: string};
+    connectedUser?: {connectedUserId: string; email?: string | null; externalId: string; name?: string | null};
     connectedUserProjectWorkflows: ConnectedUserProjectWorkflowType[];
     workflowTemplateSourcesByWorkflowUuid: Map<string, ConnectedUserWorkflowTemplateSourceI>;
 }) => {
     const groups = useMemo(() => {
-        const groupsByProjectName = new Map<string, ConnectedUserProjectWorkflowGroupI>();
+        const groupsByKey = new Map<string, ConnectedUserProjectWorkflowGroupI>();
 
         for (const connectedUserProjectWorkflow of connectedUserProjectWorkflows) {
             const sourceWorkflowUuid =
@@ -49,27 +52,44 @@ const ConnectedUserProjectWorkflowList = ({
                 ? workflowTemplateSourcesByWorkflowUuid.get(sourceWorkflowUuid)?.projectName
                 : undefined;
 
-            const groupKey = projectName ?? OTHER_GROUP_NAME;
+            const groupKey = projectName ? `project-${connectedUserProjectWorkflow.projectId}` : OTHER_GROUP_KEY;
 
-            const group = groupsByProjectName.get(groupKey) ?? {
-                configuration: configurations?.find(
-                    (configuration) => configuration.projectId === connectedUserProjectWorkflow.projectId
-                ),
+            const group = groupsByKey.get(groupKey) ?? {
                 connectedUserProjectWorkflows: [],
+                key: groupKey,
                 projectName,
             };
 
             group.connectedUserProjectWorkflows.push(connectedUserProjectWorkflow);
 
-            groupsByProjectName.set(groupKey, group);
+            groupsByKey.set(groupKey, group);
         }
 
-        return [...groupsByProjectName.values()].sort((firstGroup, secondGroup) => {
+        for (const group of groupsByKey.values()) {
+            const groupProjectIds = new Set(
+                group.connectedUserProjectWorkflows.map(
+                    (connectedUserProjectWorkflow) => connectedUserProjectWorkflow.projectId
+                )
+            );
+
+            if (groupProjectIds.size === 1) {
+                const [groupProjectId] = groupProjectIds;
+
+                group.configuration = configurations?.find(
+                    (configuration) => configuration.projectId === groupProjectId
+                );
+            }
+        }
+
+        return [...groupsByKey.values()].sort((firstGroup, secondGroup) => {
             if (!firstGroup.projectName || !secondGroup.projectName) {
                 return firstGroup.projectName ? -1 : 1;
             }
 
-            return firstGroup.projectName.localeCompare(secondGroup.projectName);
+            return (
+                firstGroup.projectName.localeCompare(secondGroup.projectName) ||
+                firstGroup.key.localeCompare(secondGroup.key)
+            );
         });
     }, [configurations, connectedUserProjectWorkflows, workflowTemplateSourcesByWorkflowUuid]);
 
@@ -81,7 +101,7 @@ const ConnectedUserProjectWorkflowList = ({
                 const lastExecutionDate = getLastExecutionDate(group.connectedUserProjectWorkflows);
 
                 return (
-                    <Collapsible asChild key={groupName}>
+                    <Collapsible asChild key={group.key}>
                         <section aria-label={groupName} className="mb-2 rounded border border-border/50">
                             <div className="flex items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover">
                                 <CollapsibleTrigger className="flex-1 py-3 text-left">

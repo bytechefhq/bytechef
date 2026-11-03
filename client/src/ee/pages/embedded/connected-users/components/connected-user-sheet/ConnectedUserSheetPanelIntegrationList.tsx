@@ -5,12 +5,14 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 
-import type {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
+import type {ConnectedUser, ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 
 const ConnectedUserSheetPanelIntegrationList = ({
+    connectedUser,
     connectedUserId,
     connectedUserIntegrationInstances,
 }: {
+    connectedUser: Pick<ConnectedUser, 'email' | 'externalId' | 'name'>;
     connectedUserIntegrationInstances: ConnectedUserIntegrationInstance[];
     connectedUserId: number;
 }) => {
@@ -47,6 +49,7 @@ const ConnectedUserSheetPanelIntegrationList = ({
                             componentDefinitions && (
                                 <ConnectedUserSheetPanelIntegrationListItem
                                     componentDefinition={componentDefinition}
+                                    connectedUser={connectedUser}
                                     connectedUserId={connectedUserId}
                                     connectedUserIntegrationInstance={connectedUserIntegrationInstance}
                                     key={connectedUserIntegrationInstance.id}

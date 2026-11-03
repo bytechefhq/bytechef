@@ -1,12 +1,4 @@
-import Button from '@/components/Button/Button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import MoveConnectedUsersDialog, {
     MoveConnectedUsersResultI,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
@@ -24,17 +16,22 @@ type AutomationWorkflowProjectConfigurationType =
 
 type ConfigurationReferenceType = Pick<AutomationWorkflowProjectConfigurationType, 'id' | 'name' | 'projectVersion'>;
 
+type TargetConfigurationType = ConfigurationReferenceType & {enabled?: boolean};
+
 interface AutomationWorkflowProjectConfigurationMoveUsersDialogProps {
     configuration: ConfigurationReferenceType;
     connectedUsers?: Array<{connectedUserId: string; email?: string | null; externalId: string; name?: string | null}>;
     initialSelectedConnectedUserIds?: string[];
     onClose: () => void;
-    targetConfigurations: ConfigurationReferenceType[];
+    targetConfigurations: TargetConfigurationType[];
     title?: string;
 }
 
 const formatConfigurationLabel = (configuration: ConfigurationReferenceType): string =>
     `${configuration.name} · v${configuration.projectVersion}`;
+
+const formatTargetLabel = (configuration: TargetConfigurationType): string =>
+    `${formatConfigurationLabel(configuration)}${configuration.enabled === false ? ' (disabled)' : ''}`;
 
 interface SkippedConnectedUserI {
     connectedUserId: string;
@@ -63,7 +60,11 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
     const connectedUsers =
         presetConnectedUsers || connectedUsersData?.automationWorkflowProjectConfigurationConnectedUsers;
 
-    const {data: moveImpactData} = useAutomationWorkflowProjectConfigurationMoveImpactQuery(
+    const {
+        data: moveImpactData,
+        isError: moveImpactError,
+        isLoading: moveImpactLoading,
+    } = useAutomationWorkflowProjectConfigurationMoveImpactQuery(
         {
             connectedUserIds: selection.connectedUserIds ?? [],
             sourceId: configuration.id,
@@ -83,7 +84,7 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
         () =>
             targetConfigurations.map((targetConfiguration) => ({
                 id: targetConfiguration.id,
-                label: formatConfigurationLabel(targetConfiguration),
+                label: formatTargetLabel(targetConfiguration),
             })),
         [targetConfigurations]
     );
@@ -145,12 +146,6 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
                             {connectedUsersError ? 'Could not load the connected users.' : 'Loading users...'}
                         </DialogDescription>
                     </DialogHeader>
-
-                    {connectedUsersError && (
-                        <DialogFooter>
-                            <Button label="Close" onClick={onClose} />
-                        </DialogFooter>
-                    )}
                 </DialogContent>
             </Dialog>
         );
@@ -164,6 +159,8 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
             onClose={onClose}
             onMove={handleMove}
             onSelectionChange={(targetId, connectedUserIds) => setSelection({connectedUserIds, targetId})}
+            previewError={moveImpactError}
+            previewLoading={moveImpactLoading}
             previewSkipped={previewSkipped}
             sourceLabel={formatConfigurationLabel(configuration)}
             targets={targets}
