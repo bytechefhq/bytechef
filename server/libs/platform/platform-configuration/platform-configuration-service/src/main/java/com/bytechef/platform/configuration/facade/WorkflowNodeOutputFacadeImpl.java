@@ -285,8 +285,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 break;
             }
 
-            workflowNodeOutputDTOs.add(
-                getWorkflowNodeOutputDTO(workflowId, workflowTrigger, environmentId, true));
+            WorkflowNodeOutputDTO workflowNodeOutputDTO = getWorkflowNodeOutputDTO(
+                workflowId, workflowTrigger, environmentId, true);
+
+            if (workflowNodeOutputDTO != null) {
+                workflowNodeOutputDTOs.add(workflowNodeOutputDTO);
+            }
         }
 
         List<WorkflowTask> workflowTasks = workflow.getTasks(lastWorkflowNodeName);
@@ -297,6 +301,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             }
 
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+            boolean taskDispatcherOutput = true;
 
             if (Objects.equals(workflowNodeType.name(), "loop") || Objects.equals(workflowNodeType.name(), "each") ||
                 Objects.equals(workflowNodeType.name(), "map")) {
@@ -316,18 +321,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                         .toList();
                 }
 
-                if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
-                    workflowNodeOutputDTOs.add(
-                        getWorkflowNodeOutputDTO(workflowId, workflowTask, false, environmentId, sampleOutputsCache,
-                            true));
-                } else {
-                    workflowNodeOutputDTOs.add(
-                        getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId, sampleOutputsCache,
-                            true));
-                }
-            } else {
-                workflowNodeOutputDTOs.add(
-                    getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId, sampleOutputsCache, true));
+                taskDispatcherOutput = !containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName);
+            }
+
+            WorkflowNodeOutputDTO workflowNodeOutputDTO = getWorkflowNodeOutputDTO(
+                workflowId, workflowTask, taskDispatcherOutput, environmentId, sampleOutputsCache, true);
+
+            if (workflowNodeOutputDTO != null) {
+                workflowNodeOutputDTOs.add(workflowNodeOutputDTO);
             }
         }
 
@@ -439,7 +440,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         return Optional.ofNullable(outputResponse);
     }
 
-    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
+    private @Nullable WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
         String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId,
         Map<String, Map<String, ?>> sampleOutputsCache) {
 
@@ -447,7 +448,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             workflowId, workflowTask, taskDispatcherOutput, environmentId, sampleOutputsCache, false);
     }
 
-    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
+    private @Nullable WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
         String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId,
         Map<String, Map<String, ?>> sampleOutputsCache, boolean previousNode) {
 
@@ -472,12 +473,18 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .orElse(null);
 
-        if (workflowNodeType.operation() == null) {
-            taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
-                workflowNodeType.name(), workflowNodeType.version());
-        } else {
-            actionDefinition = actionDefinitionService.getActionDefinition(
-                workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
+        try {
+            if (workflowNodeType.operation() == null) {
+                taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+                    workflowNodeType.name(), workflowNodeType.version());
+            } else {
+                actionDefinition = actionDefinitionService.getActionDefinition(
+                    workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
+            }
+        } catch (IllegalArgumentException illegalArgumentException) {
+            logSkippedNode(workflowTask.getName(), illegalArgumentException);
+
+            return null;
         }
 
         if (outputResponse == null) {
@@ -537,13 +544,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             taskDispatcherDefinition, testoutputResponse, null, variableOutputResponse, workflowTask.getName());
     }
 
-    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
+    private @Nullable WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
         String workflowId, WorkflowTrigger workflowTrigger, long environmentId) {
 
         return getWorkflowNodeOutputDTO(workflowId, workflowTrigger, environmentId, false);
     }
 
-    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
+    private @Nullable WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
         String workflowId, WorkflowTrigger workflowTrigger, long environmentId, boolean previousNode) {
 
         boolean testoutputResponse = false;
@@ -551,8 +558,17 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
-        TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowNodeType.name(), workflowNodeType.version(), Objects.requireNonNull(workflowNodeType.operation()));
+        TriggerDefinition triggerDefinition;
+
+        try {
+            triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+                workflowNodeType.name(), workflowNodeType.version(),
+                Objects.requireNonNull(workflowNodeType.operation()));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            logSkippedNode(workflowTrigger.getName(), illegalArgumentException);
+
+            return null;
+        }
 
         Optional<WorkflowNodeTestOutput> workflowNodeTestOutputOptional = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName(), environmentId);
@@ -732,6 +748,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             properties, parameterMap == null ? Map.of() : parameterMap, evaluator);
 
         return !missingRequiredProperties.isEmpty();
+    }
+
+    private static void logSkippedNode(String workflowNodeName, IllegalArgumentException illegalArgumentException) {
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "Output of node {} was skipped, its definition is not available: {}", workflowNodeName,
+                illegalArgumentException.getMessage());
+        }
     }
 
     private record WorkflowTaskDispatcherDynamicOutputResponse(
