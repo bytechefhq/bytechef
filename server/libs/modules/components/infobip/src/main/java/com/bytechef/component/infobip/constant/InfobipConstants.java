@@ -16,6 +16,7 @@
 
 package com.bytechef.component.infobip.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -36,6 +37,7 @@ public class InfobipConstants {
     public static final String CONFIGURATION_KEY = "configurationKey";
     public static final String CONTENT = "content";
     public static final String DESCRIPTION = "description";
+    public static final String DESTINATION = "destination";
     public static final String DESTINATIONS = "destinations";
     public static final String FROM = "from";
     public static final String GROUP_ID = "groupId";
@@ -49,11 +51,13 @@ public class InfobipConstants {
     public static final String NAME = "name";
     public static final String NUMBER = "number";
     public static final String PLACEHOLDERS = "placeholders";
+    public static final String RESOURCE = "resource";
     public static final String SENDER = "sender";
     public static final String STATUS = "status";
     public static final String TEMPLATE_NAME = "templateName";
     public static final String TEXT = "text";
     public static final String TO = "to";
+    public static final String TYPE = "type";
 
     public static final ModifiableStringProperty KEYWORD_PROPERTY = string(KEYWORD)
         .label("Keyword")
@@ -61,6 +65,37 @@ public class InfobipConstants {
             "Keywords are words at the beginning of the message text of the inbound message that are used " +
                 "to filter out specific messages received on a number.")
         .required(false);
+
+    public static final ModifiableObjectProperty STATUS_OUTPUT_PROPERTY = object(STATUS)
+        .description("Status of the message.")
+        .properties(
+            integer(GROUP_ID)
+                .description("Status group ID."),
+            string(GROUP_NAME)
+                .description("Status group name."),
+            integer(ID)
+                .description("Status ID."),
+            string(NAME)
+                .description("Status name."),
+            string(DESCRIPTION)
+                .description("Human-readable description of the status."),
+            string("action")
+                .description("Action that should be taken to eliminate error."));
+
+    public static final ModifiableObjectProperty VIBER_MESSAGE_OUTPUT_PROPERTY = object()
+        .properties(
+            string(BULK_ID)
+                .description("ID assigned to the request, used to fetch delivery reports and message logs."),
+            array(MESSAGES)
+                .description("Messages accepted by Infobip, one for each destination.")
+                .items(
+                    object()
+                        .properties(
+                            string(MESSAGE_ID)
+                                .description("ID of the message sent."),
+                            STATUS_OUTPUT_PROPERTY,
+                            string(DESTINATION)
+                                .description("The destination address of the message."))));
 
     public static final ModifiableObjectProperty WHATSAPP_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
@@ -70,19 +105,5 @@ public class InfobipConstants {
                 .description("Number of messages required to deliver."),
             string(MESSAGE_ID)
                 .description("ID of the message sent."),
-            object(STATUS)
-                .description("Status of the message.")
-                .properties(
-                    integer(GROUP_ID)
-                        .description("Status group ID."),
-                    string(GROUP_NAME)
-                        .description("Status group name."),
-                    integer(ID)
-                        .description("Status ID."),
-                    string(NAME)
-                        .description("Status name."),
-                    string(DESCRIPTION)
-                        .description("Human-readable description of the status."),
-                    string("action")
-                        .description("Action that should be taken to eliminate error.")));
+            STATUS_OUTPUT_PROPERTY);
 }

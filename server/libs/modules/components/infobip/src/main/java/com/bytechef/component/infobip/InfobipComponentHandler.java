@@ -22,12 +22,16 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.infobip.action.InfobipSendSMSAction;
+import com.bytechef.component.infobip.action.InfobipSendViberBotTextMessageAction;
+import com.bytechef.component.infobip.action.InfobipSendViberBusinessTextMessageAction;
 import com.bytechef.component.infobip.action.InfobipSendWhatsAppTemplateMessageAction;
 import com.bytechef.component.infobip.action.InfobipSendWhatsappTextMessageAction;
 import com.bytechef.component.infobip.cluster.InfobipSmsApprovalChannel;
 import com.bytechef.component.infobip.cluster.InfobipWhatsAppApprovalChannel;
 import com.bytechef.component.infobip.connection.InfobipConnection;
 import com.bytechef.component.infobip.trigger.InfobipNewSMSTrigger;
+import com.bytechef.component.infobip.trigger.InfobipNewViberBotMessageTrigger;
+import com.bytechef.component.infobip.trigger.InfobipNewViberBusinessMessageTrigger;
 import com.bytechef.component.infobip.trigger.InfobipNewWhatsAppMessageTrigger;
 import com.google.auto.service.AutoService;
 
@@ -50,6 +54,8 @@ public class InfobipComponentHandler implements ComponentHandler {
         .connection(InfobipConnection.CONNECTION_DEFINITION)
         .actions(
             InfobipSendSMSAction.ACTION_DEFINITION,
+            InfobipSendViberBotTextMessageAction.ACTION_DEFINITION,
+            InfobipSendViberBusinessTextMessageAction.ACTION_DEFINITION,
             InfobipSendWhatsAppTemplateMessageAction.ACTION_DEFINITION,
             InfobipSendWhatsappTextMessageAction.ACTION_DEFINITION)
         .clusterElements(
@@ -57,6 +63,8 @@ public class InfobipComponentHandler implements ComponentHandler {
             InfobipWhatsAppApprovalChannel.CLUSTER_ELEMENT_DEFINITION)
         .triggers(
             InfobipNewSMSTrigger.TRIGGER_DEFINITION,
+            InfobipNewViberBotMessageTrigger.TRIGGER_DEFINITION,
+            InfobipNewViberBusinessMessageTrigger.TRIGGER_DEFINITION,
             InfobipNewWhatsAppMessageTrigger.TRIGGER_DEFINITION);
 
     @Override
