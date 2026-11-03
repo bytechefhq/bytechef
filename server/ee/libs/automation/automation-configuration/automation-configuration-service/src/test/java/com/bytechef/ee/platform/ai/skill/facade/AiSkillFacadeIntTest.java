@@ -14,7 +14,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -54,7 +56,6 @@ import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
@@ -64,7 +65,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -142,11 +142,21 @@ class AiSkillFacadeIntTest {
     }
 
     @Test
-    void testNonOwnerIsDenied() {
+    void testNonOwnerMayReadAnotherUsersSkill() {
         authenticate(platformUser("other", "ROLE_USER"));
 
-        assertThatThrownBy(() -> aiSkillFacade.getAiSkill(OWNER_SKILL_ID))
+        assertThat(aiSkillFacade.getAiSkill(OWNER_SKILL_ID)
+            .getId()).isEqualTo(OWNER_SKILL_ID);
+    }
+
+    @Test
+    void testNonOwnerMayNotDeleteAnotherUsersSkill() {
+        authenticate(platformUser("other", "ROLE_USER"));
+
+        assertThatThrownBy(() -> aiSkillFacade.deleteAiSkill(OWNER_SKILL_ID))
             .isInstanceOf(AccessDeniedException.class);
+
+        verify(aiSkillService, never()).deleteAiSkill(OWNER_SKILL_ID);
     }
 
     @Test
@@ -176,12 +186,12 @@ class AiSkillFacadeIntTest {
     }
 
     @Test
-    void testNonAdminListsOnlyOwnSkills() {
-        authenticate(platformUser("owner", "ROLE_USER"));
+    void testNonAdminListsAllSkills() {
+        authenticate(platformUser("other", "ROLE_USER"));
 
         assertThat(aiSkillFacade.getAiSkills())
             .extracting(AiSkill::getId)
-            .containsExactly(OWNER_SKILL_ID);
+            .containsExactly(OWNER_SKILL_ID, OTHER_SKILL_ID);
     }
 
     @Test
@@ -208,11 +218,10 @@ class AiSkillFacadeIntTest {
     }
 
     @Test
-    void testNonOwnerMayNotDownloadAnotherUsersSkill() {
+    void testNonOwnerMayDownloadAnotherUsersSkill() {
         authenticate(platformUser("other", "ROLE_USER"));
 
-        assertThatThrownBy(() -> aiSkillFacade.getAiSkillDownload(OWNER_SKILL_ID))
-            .isInstanceOf(AccessDeniedException.class);
+        assertThat(aiSkillFacade.getAiSkillDownload(OWNER_SKILL_ID)).containsExactly(1, 2, 3);
     }
 
     @Test
@@ -220,44 +229,45 @@ class AiSkillFacadeIntTest {
         authenticate(anonymous());
 
         for (Method method : getFacadeMethods()) {
-            if (isPostFiltered(method)) {
-                assertThat((List<?>) invoke(method))
-                    .as(method.toGenericString())
-                    .isEmpty();
-            } else {
-                assertThatThrownBy(() -> invoke(method))
-                    .as(method.toGenericString())
-                    .isInstanceOf(AccessDeniedException.class);
-            }
+            assertThatThrownBy(() -> invoke(method))
+                .as(method.toGenericString())
+                .isInstanceOf(AccessDeniedException.class);
         }
     }
 
     @Test
-    void testEveryResourceMethodDeniesANonOwner() {
+    void testEveryWriteMethodDeniesANonOwner() {
         authenticate(platformUser("other", "ROLE_USER"));
 
-        assertResourceMethodsDenied();
+        assertMethodsDenied(getWriteMethodCalls());
+    }
+
+    @Test
+    void testEveryReadMethodAdmitsANonOwner() {
+        authenticate(platformUser("other", "ROLE_USER"));
+
+        assertMethodsReachTheBody(getReadMethodCalls());
     }
 
     @Test
     void testEveryResourceMethodDeniesAConnectedUser() {
         authenticate(connectedUser("owner", "ROLE_ADMIN"));
 
-        assertResourceMethodsDenied();
+        assertMethodsDenied(getResourceMethodCalls());
     }
 
     @Test
     void testEveryResourceMethodAdmitsTheOwner() {
         authenticate(platformUser("owner", "ROLE_USER"));
 
-        assertResourceMethodsReachTheBody();
+        assertMethodsReachTheBody(getResourceMethodCalls());
     }
 
     @Test
     void testEveryResourceMethodAdmitsATenantAdmin() {
         authenticate(platformUser("admin", "ROLE_ADMIN"));
 
-        assertResourceMethodsReachTheBody();
+        assertMethodsReachTheBody(getResourceMethodCalls());
     }
 
     @Test
@@ -270,31 +280,22 @@ class AiSkillFacadeIntTest {
         assertThat(resourceMethodNames).containsExactlyInAnyOrderElementsOf(getResourceMethodCalls().keySet());
     }
 
-    @Test
-    void testNonOwnerListsOnlyOwnSkills() {
-        authenticate(platformUser("other", "ROLE_USER"));
-
-        assertThat(aiSkillFacade.getAiSkills())
-            .extracting(AiSkill::getId)
-            .containsExactly(OTHER_SKILL_ID);
-    }
-
-    private void assertResourceMethodsDenied() {
-        for (Map.Entry<String, ThrowingCallable> entry : getResourceMethodCalls().entrySet()) {
+    private void assertMethodsDenied(Map<String, ThrowingCallable> methodCalls) {
+        for (Map.Entry<String, ThrowingCallable> entry : methodCalls.entrySet()) {
             assertThatThrownBy(entry.getValue())
                 .as(entry.getKey())
                 .isInstanceOf(AccessDeniedException.class);
         }
     }
 
-    private void assertResourceMethodsReachTheBody() {
+    private void assertMethodsReachTheBody(Map<String, ThrowingCallable> methodCalls) {
         when(aiSkillService.getAiSkill(OWNER_SKILL_ID)).thenThrow(new IllegalStateException(BODY_REACHED));
         when(aiSkillService.updateAiSkill(eq(OWNER_SKILL_ID), anyString(), any()))
             .thenThrow(new IllegalStateException(BODY_REACHED));
         when(aiSkillService.updateAiSkillTags(eq(OWNER_SKILL_ID), any()))
             .thenThrow(new IllegalStateException(BODY_REACHED));
 
-        for (Map.Entry<String, ThrowingCallable> entry : getResourceMethodCalls().entrySet()) {
+        for (Map.Entry<String, ThrowingCallable> entry : methodCalls.entrySet()) {
             assertThatThrownBy(entry.getValue())
                 .as(entry.getKey())
                 .isInstanceOf(IllegalStateException.class)
@@ -302,29 +303,43 @@ class AiSkillFacadeIntTest {
         }
     }
 
-    private Map<String, ThrowingCallable> getResourceMethodCalls() {
-        Map<String, ThrowingCallable> resourceMethodCalls = new LinkedHashMap<>();
+    private Map<String, ThrowingCallable> getReadMethodCalls() {
+        Map<String, ThrowingCallable> readMethodCalls = new LinkedHashMap<>();
 
-        resourceMethodCalls.put(
-            "createAdditionalFilesInSkill",
-            () -> aiSkillFacade.createAdditionalFilesInSkill(OWNER_SKILL_ID, Map.of("notes.md", "notes")));
-        resourceMethodCalls.put("deleteAiSkill", () -> aiSkillFacade.deleteAiSkill(OWNER_SKILL_ID));
-        resourceMethodCalls.put("getAiSkill", () -> aiSkillFacade.getAiSkill(OWNER_SKILL_ID));
-        resourceMethodCalls.put("getAiSkillDownload", () -> aiSkillFacade.getAiSkillDownload(OWNER_SKILL_ID));
-        resourceMethodCalls.put(
+        readMethodCalls.put("getAiSkill", () -> aiSkillFacade.getAiSkill(OWNER_SKILL_ID));
+        readMethodCalls.put("getAiSkillDownload", () -> aiSkillFacade.getAiSkillDownload(OWNER_SKILL_ID));
+        readMethodCalls.put(
             "getAiSkillFileContent", () -> aiSkillFacade.getAiSkillFileContent(OWNER_SKILL_ID, "SKILL.md"));
-        resourceMethodCalls.put("getAiSkillFilePaths", () -> aiSkillFacade.getAiSkillFilePaths(OWNER_SKILL_ID));
-        resourceMethodCalls.put(
-            "getAiSkillWithDownload", () -> aiSkillFacade.getAiSkillWithDownload(OWNER_SKILL_ID));
-        resourceMethodCalls.put(
-            "removeFileInSkill", () -> aiSkillFacade.removeFileInSkill(OWNER_SKILL_ID, "notes.md"));
-        resourceMethodCalls.put("updateAiSkill", () -> aiSkillFacade.updateAiSkill(OWNER_SKILL_ID, "skill", null));
-        resourceMethodCalls.put(
-            "updateAiSkillContent", () -> aiSkillFacade.updateAiSkillContent(OWNER_SKILL_ID, "notes.md", "notes"));
-        resourceMethodCalls.put(
-            "updateAiSkillTags", () -> aiSkillFacade.updateAiSkillTags(OWNER_SKILL_ID, List.of()));
+        readMethodCalls.put("getAiSkillFilePaths", () -> aiSkillFacade.getAiSkillFilePaths(OWNER_SKILL_ID));
+        readMethodCalls.put("getAiSkillWithDownload", () -> aiSkillFacade.getAiSkillWithDownload(OWNER_SKILL_ID));
+
+        return readMethodCalls;
+    }
+
+    private Map<String, ThrowingCallable> getResourceMethodCalls() {
+        Map<String, ThrowingCallable> resourceMethodCalls = new LinkedHashMap<>(getReadMethodCalls());
+
+        resourceMethodCalls.putAll(getWriteMethodCalls());
 
         return resourceMethodCalls;
+    }
+
+    private Map<String, ThrowingCallable> getWriteMethodCalls() {
+        Map<String, ThrowingCallable> writeMethodCalls = new LinkedHashMap<>();
+
+        writeMethodCalls.put(
+            "createAdditionalFilesInSkill",
+            () -> aiSkillFacade.createAdditionalFilesInSkill(OWNER_SKILL_ID, Map.of("notes.md", "notes")));
+        writeMethodCalls.put("deleteAiSkill", () -> aiSkillFacade.deleteAiSkill(OWNER_SKILL_ID));
+        writeMethodCalls.put(
+            "removeFileInSkill", () -> aiSkillFacade.removeFileInSkill(OWNER_SKILL_ID, "notes.md"));
+        writeMethodCalls.put("updateAiSkill", () -> aiSkillFacade.updateAiSkill(OWNER_SKILL_ID, "skill", null));
+        writeMethodCalls.put(
+            "updateAiSkillContent", () -> aiSkillFacade.updateAiSkillContent(OWNER_SKILL_ID, "notes.md", "notes"));
+        writeMethodCalls.put(
+            "updateAiSkillTags", () -> aiSkillFacade.updateAiSkillTags(OWNER_SKILL_ID, List.of()));
+
+        return writeMethodCalls;
     }
 
     private List<Method> getFacadeMethods() {
@@ -349,17 +364,6 @@ class AiSkillFacadeIntTest {
             }
 
             throw new IllegalStateException(invocationTargetException.getCause());
-        }
-    }
-
-    private boolean isPostFiltered(Method method) {
-        try {
-            Method targetMethod = AopUtils.getTargetClass(aiSkillFacade)
-                .getMethod(method.getName(), method.getParameterTypes());
-
-            return targetMethod.isAnnotationPresent(PostFilter.class);
-        } catch (NoSuchMethodException noSuchMethodException) {
-            throw new IllegalStateException(noSuchMethodException);
         }
     }
 
