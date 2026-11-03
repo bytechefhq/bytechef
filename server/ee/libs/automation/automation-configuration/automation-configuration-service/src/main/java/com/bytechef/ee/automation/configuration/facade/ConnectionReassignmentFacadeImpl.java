@@ -229,6 +229,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
      * throwing — that's a benign outcome that the batch counts as {@code skipped}, distinct from real failures.
      */
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_PENDING_REASSIGNMENT, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public MarkPendingOutcome markSingleConnectionPendingReassignment(long connectionId, String expectedOwnerLogin) {

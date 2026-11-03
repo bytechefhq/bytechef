@@ -12,6 +12,7 @@ import com.bytechef.ee.automation.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.automation.configuration.audit.ConnectionAuditMapper;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -92,6 +93,10 @@ public class OrganizationConnectionFacadeImpl implements OrganizationConnectionF
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "name", value = "#name")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional
     public ConnectionDTO update(long connectionId, String name, List<Long> tagIds, int version) {

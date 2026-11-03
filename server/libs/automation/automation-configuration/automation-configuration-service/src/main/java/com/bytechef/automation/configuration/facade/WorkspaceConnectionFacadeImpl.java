@@ -308,6 +308,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId")
+    })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
         "isResourceOwner(#connectionId, 'Connection')")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
