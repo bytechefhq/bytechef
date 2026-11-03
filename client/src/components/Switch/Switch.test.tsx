@@ -103,6 +103,15 @@ describe('Switch - Variants', () => {
         expect(screen.queryByText('This should not appear')).not.toBeInTheDocument();
     });
 
+    it('should keep the label close to the toggle in small variant', () => {
+        render(<Switch label="Small" variant="small" />);
+
+        const content = screen.getByText('Small').closest('div')?.parentElement;
+
+        expect(content).toHaveClass('gap-1');
+        expect(content).not.toHaveClass('gap-2');
+    });
+
     it('should show description in default variant', () => {
         render(<Switch description="This description should appear" label="Default" variant="default" />);
 
