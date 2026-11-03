@@ -126,15 +126,12 @@ resolves to a blank value stops the step. Each condition accepts only the **Colu
 **Value**, **To Value** and **Values** fields, so a misspelled field name in a condition written by hand
 stops the step.
 
-To build the conditions with an expression, switch **OR Conditions** to
-[Formula](/platform/automation/build/workflows/data-pills#formula-mode) mode. The formula must
-return a list of AND Condition lists, and each condition uses the fields `column`, `operation`,
-`value`, `valueTo` and `values`. For example,
-`={{{column:'qty', operation:'GREATER', value:'4'}, {column:'customer', operation:'STARTS_WITH', value:'f'}}}`
-matches rows where `qty` is greater than 4 and `customer` starts with `f`. The operation is written
-in upper case with underscores, such as `GREATER_EQUALS`, `EQUALS_IGNORE_CASE` or `NOT_EMPTY`, and its case is
-ignored. A data pill can supply the whole list when an earlier step returns conditions in this shape, or one
-field, such as `value`, inside a condition.
+**OR Conditions** and each **AND Condition** are built in the editor, one condition at a time, like in the
+**Condition** task: they have no Text or Formula mode, so the whole list cannot come from a data pill or a
+formula. The fields of each condition still can: **Column**, **Operation**, **Value**, **To Value** and **Values**
+each accept a data pill, or a [formula](/platform/automation/build/workflows/data-pills#formula-mode) with the
+**Formula** switch, for example `${trigger.customerId}` in **Value** to find the rows of the customer that started
+the workflow.
 
 **Update Records** sets every column it is given to the same value on all matching rows. Its values
 must not be blank and must not include `id`; to clear a column, use **Update Record** on a single row,
