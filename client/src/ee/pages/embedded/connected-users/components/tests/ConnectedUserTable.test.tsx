@@ -9,6 +9,7 @@ import ConnectedUserTable from '../ConnectedUserTable';
 const hoisted = vi.hoisted(() => ({
     deleteConnectedUserMutate: vi.fn(),
     enableConnectedUserMutate: vi.fn(),
+    selectionChange: vi.fn(),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/connectedUsers.mutations', () => ({
@@ -25,10 +26,14 @@ const connectedUsers: ConnectedUser[] = [
     {enabled: false, externalId: 'external-2', id: 22, name: 'Grace Hopper'},
 ];
 
-const renderConnectedUserTable = () =>
+const renderConnectedUserTable = (selectedConnectedUserIds: number[] = []) =>
     render(
         <TooltipProvider>
-            <ConnectedUserTable connectedUsers={connectedUsers} />
+            <ConnectedUserTable
+                connectedUsers={connectedUsers}
+                onSelectionChange={hoisted.selectionChange}
+                selectedConnectedUserIds={selectedConnectedUserIds}
+            />
         </TooltipProvider>
     );
 
@@ -106,5 +111,32 @@ describe('ConnectedUserTable', () => {
         await userEvent.click(within(deleteDialog).getByRole('button', {name: 'Delete'}));
 
         expect(hoisted.deleteConnectedUserMutate).toHaveBeenCalledWith({id: 22});
+    });
+
+    it('should report the selected id without opening the sheet when clicking a row checkbox', async () => {
+        renderConnectedUserTable();
+
+        await userEvent.click(screen.getByRole('checkbox', {name: 'Select Grace Hopper'}));
+
+        expect(hoisted.selectionChange).toHaveBeenCalledWith([22]);
+        expect(useConnectedUserSheetStore.getState().connectedUserSheetOpen).toBe(false);
+    });
+
+    it('should select all visible rows when clicking the header checkbox', async () => {
+        renderConnectedUserTable();
+
+        await userEvent.click(screen.getByRole('checkbox', {name: 'Select all'}));
+
+        expect(hoisted.selectionChange).toHaveBeenCalledWith([11, 22]);
+    });
+
+    it('should clear the selection when clicking the header checkbox with all rows selected', async () => {
+        renderConnectedUserTable([11, 22]);
+
+        expect(screen.getByRole('checkbox', {name: 'Select Ada Lovelace'})).toBeChecked();
+
+        await userEvent.click(screen.getByRole('checkbox', {name: 'Select all'}));
+
+        expect(hoisted.selectionChange).toHaveBeenCalledWith([]);
     });
 });
