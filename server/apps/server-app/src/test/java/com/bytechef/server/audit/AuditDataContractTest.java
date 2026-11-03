@@ -92,8 +92,8 @@ class AuditDataContractTest {
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String ROW_DATA = "data table rows are data and are not recorded";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
-    private static final String WEBHOOK_TRIGGER_TEST = "editor-time webhook trigger test";
     private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
+    private static final String WEBHOOK_TRIGGER_TEST = "editor-time webhook trigger test";
     private static final String WORKFLOW_INPUTS = "workflow input or connection values";
     private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
         "ProjectWebhookTriggerTestFacadeImpl", WEBHOOK_TRIGGER_TEST,
@@ -196,7 +196,7 @@ class AuditDataContractTest {
         Map.entry("TriggerLogFileStorageImpl.logsExist", EXISTENCE_CHECK),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
-        Map.entry("WorkspaceConnectionFacadeImpl.updateTags", TAGS),
+        Map.entry("WorkspaceConnectionFacadeImpl.updateConnectionTags", TAGS),
         Map.entry("WorkspaceDataTableFacadeImpl.clearRows", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.deleteRow", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.deleteRowByExternalId", ROW_DATA),
