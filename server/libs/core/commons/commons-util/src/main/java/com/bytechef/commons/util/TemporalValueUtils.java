@@ -64,10 +64,6 @@ public final class TemporalValueUtils {
         };
     }
 
-    /**
-     * Normalizes like {@link #normalize(Object)}, but returns a map or list itself, instead of a copy, when none of its
-     * keys or nested values change, so unchanged values stay shared with the caller.
-     */
     public static @Nullable Object normalizeSharingUnchanged(@Nullable Object value) {
         return switch (value) {
             case Map<?, ?> map -> normalizeMapSharingUnchanged(map);
