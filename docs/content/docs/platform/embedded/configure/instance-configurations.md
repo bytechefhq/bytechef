@@ -97,6 +97,8 @@ Use a move to put connected users on another configuration of the same integrati
 
 The dialog previews the move before you confirm, and **Move** stays unavailable until the preview has loaded. If the preview cannot load, the dialog says so and you can still move. When MCP servers use either configuration, the dialog notes how many, because their tools follow the configuration each user lands on.
 
+To move chosen users from the Connected Users page instead, see [Upgrading Several Users at Once](/platform/embedded/monitor/connected-users#upgrading-several-users-at-once).
+
 To move one user, open them in [Connected Users](/platform/embedded/monitor/connected-users) and pick **Change configuration…** on the integration row. It also offers disabled configurations of the environment.
 
 A move keeps each instance's enabled state and inputs, matching workflows between the two configurations. A user is **skipped** and reported, and the rest still move, when:
