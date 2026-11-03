@@ -21,13 +21,14 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
     FolderIcon,
+    HammerIcon,
     Layers3Icon,
     LayoutTemplateIcon,
     Link2Icon,
     LucideIcon,
     MessagesSquareIcon,
     NetworkIcon,
-    ServerCogIcon,
+    RadioTowerIcon,
     ServerIcon,
     Settings2Icon,
     SlidersHorizontalIcon,
@@ -38,7 +39,6 @@ import {
     UsersIcon,
     VectorSquareIcon,
     Workflow,
-    WrenchIcon,
     ZapIcon,
 } from 'lucide-react';
 import {Suspense, lazy, useEffect, useLayoutEffect, useState} from 'react';
@@ -62,7 +62,7 @@ type NavigationType = {
 
 const executionsNavigationGroup: NavigationGroupType = {icon: SquareActivityIcon, name: 'Executions'};
 
-const serversNavigationGroup: NavigationGroupType = {icon: ServerCogIcon, name: 'Servers'};
+const serversNavigationGroup: NavigationGroupType = {icon: RadioTowerIcon, name: 'Servers'};
 
 const automationNavigation: NavigationType[] = [
     {
@@ -101,7 +101,7 @@ const automationNavigation: NavigationType[] = [
     {
         group: executionsNavigationGroup,
         href: '/automation/executions/tool-invocations',
-        icon: WrenchIcon,
+        icon: HammerIcon,
         name: 'Tool Invocations',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
@@ -155,7 +155,7 @@ const embeddedNavigation: NavigationType[] = [
     {
         group: executionsNavigationGroup,
         href: '/embedded/executions/tool-invocations',
-        icon: WrenchIcon,
+        icon: HammerIcon,
         name: 'Tool Invocations',
     },
     {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
