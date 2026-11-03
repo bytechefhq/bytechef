@@ -38,6 +38,8 @@ created yet."
 3. Pick one or more **Events** from the multi-select. At least one is required.
 4. Choose a **Type**.
 5. Fill in the type's one delivery field.
+   For a Webhook, you can also pick a **Preset** first, which fills in the URL, headers and body template
+   for a vendor. See [Presets](#presets).
 6. Click **Save**.
 
 Editing works the same way: the pencil icon reopens the dialog, titled **Edit Notification**, with the
@@ -313,6 +315,150 @@ JSON twice: once filled with sample data for every field, and once with only the
 carries. Otherwise the save is refused with the message "Webhook body template must render to valid JSON
 for every event; quote optional fields". A template changes only the body. The headers described above are still
 sent.
+
+### Presets
+
+In the dialog, a Webhook notification has a **Preset** control above **Webhook URL**, with the placeholder
+"Start from a preset" and the description "Fills in the URL, headers and body template. You can edit
+every field." It offers **Custom**, **Datadog** and **New Relic**.
+
+Picking a preset fills in three things: the **Webhook URL**, the **Headers** list and the **Body
+template**. **Custom** clears all three, so the default body is sent again. Then change anything you
+need. Every field stays editable.
+
+- **Nothing about the preset is saved.** Only the URL, headers and template are saved, like any other
+  webhook. The dialog does not remember which preset you picked.
+- **Header values start empty.** A preset adds the header names the vendor needs, with no values. **Save**
+  and **Test** show "Enter a value" until you paste your key into each one.
+- **A preset replaces all three fields.** If the URL, headers or template already has content, the dialog
+  first asks "Replace the URL, headers and body template?" with **Replace** and **Cancel**. When all three
+  are empty, the preset applies at once. The control resets after each pick, so picking the same preset
+  again applies it again.
+- **Saved header values are dropped.** When you edit a saved notification and pick a preset, its header
+  rows replace the saved ones, and you enter the values again. See [Custom headers](#custom-headers).
+
+After you fill in a preset, click **Test** to send a sample event to the vendor before you save. See
+[Testing a notification](#testing-a-notification).
+
+The URL and header values are sent as written, so a placeholder in them is plain text that you replace
+yourself, such as `YOUR_ACCOUNT_ID`. The templates follow the rules in [Body template](#body-template).
+
+#### Datadog
+
+Sends an event to the Datadog Events API v2.
+
+| Field | Value |
+|---|---|
+| **Webhook URL** | `https://event-management-intake.datadoghq.com/api/v2/events` |
+| **DD-API-KEY** header | Your Datadog API key. |
+| **DD-APPLICATION-KEY** header | Your Datadog application key. |
+
+The URL is for the US1 site. For another Datadog site, use the host `event-management-intake.<site>`:
+
+| Datadog site | Webhook URL |
+|---|---|
+| US1 | `https://event-management-intake.datadoghq.com/api/v2/events` |
+| EU | `https://event-management-intake.datadoghq.eu/api/v2/events` |
+| US3 | `https://event-management-intake.us3.datadoghq.com/api/v2/events` |
+| US5 | `https://event-management-intake.us5.datadoghq.com/api/v2/events` |
+| AP1 | `https://event-management-intake.ap1.datadoghq.com/api/v2/events` |
+| AP2 | `https://event-management-intake.ap2.datadoghq.com/api/v2/events` |
+| UK1 | `https://event-management-intake.uk1.datadoghq.com/api/v2/events` |
+| US1-FED | `https://event-management-intake.ddog-gov.com/api/v2/events` |
+| US2-FED | `https://event-management-intake.us2.ddog-gov.com/api/v2/events` |
+
+The body template:
+
+```json
+{
+  "data": {
+    "type": "event",
+    "attributes": {
+      "title": "{{workflow.name}}: {{eventType}}",
+      "category": "alert",
+      "integration_id": "custom-events",
+      "message": "Job {{jobName}} ({{jobId}}) in {{environment}}. {{error.message}} {{executionUrl}}",
+      "aggregation_key": "bytechef-job-{{jobId}}",
+      "tags": ["source:bytechef", "environment:{{environment}}", "event:{{eventType}}"],
+      "attributes": {
+        "status": "error",
+        "custom": {{summary}}
+      }
+    }
+  }
+}
+```
+
+The template always sends `"status": "error"`. For a notification that subscribes to success events,
+such as `JOB_COMPLETED`, change it to `"status": "ok"`. The whole default body is sent under
+`attributes.custom`, so no detail is lost.
+
+#### New Relic
+
+Sends one event to the New Relic Event API.
+
+| Field | Value |
+|---|---|
+| **Webhook URL** | `https://insights-collector.newrelic.com/v1/accounts/YOUR_ACCOUNT_ID/events` |
+| **Api-Key** header | Your New Relic license key. |
+
+Replace `YOUR_ACCOUNT_ID` with your account id. For an account in the EU region, use the host
+`insights-collector.eu01.nr-data.net` instead:
+`https://insights-collector.eu01.nr-data.net/v1/accounts/YOUR_ACCOUNT_ID/events`.
+
+The body template:
+
+```json
+[
+  {
+    "eventType": "ByteChefNotification",
+    "notificationEvent": "{{eventType}}",
+    "jobId": "{{jobId}}",
+    "jobName": "{{jobName}}",
+    "jobStatus": "{{job.status}}",
+    "workflowName": "{{workflow.name}}",
+    "projectName": "{{project.name}}",
+    "environment": "{{environment}}",
+    "source": "{{source}}",
+    "errorTaskName": "{{error.taskName}}",
+    "errorMessage": "{{error.message}}",
+    "executionUrl": "{{executionUrl}}"
+  }
+]
+```
+
+New Relic attributes must be flat, so the template has no nested objects. Every value is sent as a
+string, including `jobId`. The event type in New Relic is `ByteChefNotification`.
+
+#### Sentry via Custom
+
+Sentry is not a preset. Its current ingest format is a newline-delimited envelope, which one JSON
+template cannot produce. You can still send an event to the older JSON `store` endpoint with the
+**Custom** preset or no preset:
+
+| Field | Value |
+|---|---|
+| **Webhook URL** | `https://oORG_ID.ingest.sentry.io/api/PROJECT_ID/store/` |
+| **X-Sentry-Auth** header | `Sentry sentry_version=7, sentry_key=YOUR_PUBLIC_KEY` |
+
+Your Sentry DSN gives the three values. It has the form
+`https://<public_key>@o<org>.ingest.sentry.io/<project_id>`: use the public key for `YOUR_PUBLIC_KEY`, the
+number after `o` for `ORG_ID`, and the last part for `PROJECT_ID`.
+
+The body template:
+
+```json
+{
+  "message": "{{workflow.name}}: {{eventType}} {{error.message}}",
+  "level": "error",
+  "platform": "other",
+  "tags": {"environment": "{{environment}}", "event": "{{eventType}}", "jobId": "{{jobId}}"},
+  "extra": {{summary}}
+}
+```
+
+Sentry marks the JSON `store` endpoint as deprecated in favour of envelopes, and it may stop accepting
+it. If a test to it starts failing, check Sentry's documentation for the current ingest format.
 
 ### Verifying signatures
 
