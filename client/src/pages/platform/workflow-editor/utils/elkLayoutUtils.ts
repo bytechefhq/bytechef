@@ -165,9 +165,6 @@ function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDi
         return;
     }
 
-    // One uniform pitch, wide enough for the widest gap: with uneven gaps the
-    // row mean (where the fan-in bus drops) drifts off the middle trigger, and
-    // its add-button edge bends sideways into the bus
     let pitch = 0;
 
     for (let index = 1; index < triggerNodes.length; index++) {

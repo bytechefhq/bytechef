@@ -3495,9 +3495,6 @@ describe('trigger row label separation', () => {
         const lastX = positionOf(result.nodes, 'trigger_3').x;
         const taskX = positionOf(result.nodes, 'task1').x;
 
-        // A long middle label used to push only the last trigger out, so the
-        // row mean (where the bus drops) slid off the middle trigger and its
-        // add-button edge bent sideways into the bus
         expect(Math.abs(middleX - firstX - (lastX - middleX))).toBeLessThanOrEqual(1);
         expect(Math.abs(middleX - taskX)).toBeLessThanOrEqual(1);
     });
