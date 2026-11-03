@@ -384,6 +384,30 @@ public class NotificationHandlerContext {
         return String.join("\n", lines);
     }
 
+    /**
+     * Returns a copy of this context that differs only in its delivery id.
+     */
+    public NotificationHandlerContext withDeliveryId(String deliveryId) {
+        NotificationHandlerContext copy = new NotificationHandlerContext();
+
+        copy.approvalExpiresAt = approvalExpiresAt;
+        copy.approvalFormUrl = approvalFormUrl;
+        copy.eventType = eventType;
+        copy.jobId = jobId;
+        copy.jobName = jobName;
+        copy.deliveryId = deliveryId;
+        copy.timestamp = timestamp;
+        copy.source = source;
+        copy.environment = environment;
+        copy.executionUrl = executionUrl;
+        copy.job = job;
+        copy.workflow = workflow;
+        copy.project = project;
+        copy.error = error;
+
+        return copy;
+    }
+
     private NotificationHandlerContext() {
 
     }
