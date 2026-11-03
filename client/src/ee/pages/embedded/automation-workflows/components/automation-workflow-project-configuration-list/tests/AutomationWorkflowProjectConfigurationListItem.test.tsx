@@ -8,7 +8,9 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import AutomationWorkflowProjectConfigurationListItem from '../AutomationWorkflowProjectConfigurationListItem';
 
 const mocks = vi.hoisted(() => ({
-    deleteImpact: {connectedUserCount: 3, referenceWorkflowCount: 2},
+    deleteImpact: {connectedUserCount: 3, referenceWorkflowCount: 2} as
+        {connectedUserCount: number; referenceWorkflowCount: number} | undefined,
+    deleteImpactError: false,
     enableConfigurationMutate: vi.fn(),
     enableWorkflowMutate: vi.fn(),
     invalidateQueries: vi.fn(),
@@ -21,7 +23,11 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         _variables: unknown,
         options?: {enabled?: boolean}
     ) => ({
-        data: options?.enabled ? {automationWorkflowProjectConfigurationDeleteImpact: mocks.deleteImpact} : undefined,
+        data:
+            options?.enabled && mocks.deleteImpact
+                ? {automationWorkflowProjectConfigurationDeleteImpact: mocks.deleteImpact}
+                : undefined,
+        isError: mocks.deleteImpactError,
     }),
     useEnableAutomationWorkflowProjectConfigurationMutation: () => ({
         isPending: false,
@@ -107,7 +113,7 @@ const renderItem = (
         configuration?: typeof configuration;
         onDelete?: () => void;
         onEdit?: () => void;
-        otherConfigurations?: (typeof configuration)[];
+        configurations?: (typeof configuration)[];
         onUpdateVersion?: () => void;
         project?: typeof project;
     } = {}
@@ -116,11 +122,11 @@ const renderItem = (
         <TooltipProvider>
             <AutomationWorkflowProjectConfigurationListItem
                 configuration={overrides.configuration ?? configuration}
+                configurations={overrides.configurations}
                 environments={environments}
                 onDelete={overrides.onDelete ?? vi.fn()}
                 onEdit={overrides.onEdit ?? vi.fn()}
                 onUpdateVersion={overrides.onUpdateVersion ?? vi.fn()}
-                otherConfigurations={overrides.otherConfigurations}
                 project={overrides.project ?? project}
             />
         </TooltipProvider>
@@ -129,6 +135,9 @@ const renderItem = (
 describe('AutomationWorkflowProjectConfigurationListItem', () => {
     beforeEach(() => {
         windowResizeObserver();
+
+        mocks.deleteImpact = {connectedUserCount: 3, referenceWorkflowCount: 2};
+        mocks.deleteImpactError = false;
 
         useAutomationWorkflowExecutionsSheetStore.setState({
             automationWorkflowExecutionsSheetOpen: false,
@@ -294,7 +303,7 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
     it('disables Move Users with a tooltip when there is no other configuration in the environment', async () => {
         const user = userEvent.setup();
 
-        renderItem({otherConfigurations: [{...configuration, environmentId: '1', id: 'other'}]});
+        renderItem({configurations: [{...configuration, environmentId: '1', id: 'other'}]});
 
         await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
 
@@ -307,10 +316,74 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         expect((await screen.findAllByText('No other configuration in this environment')).length).toBeGreaterThan(0);
     });
 
+    it('does not offer the configuration itself as a move target', async () => {
+        const user = userEvent.setup();
+
+        renderItem({configuration: {...configuration, connectedUserCount: 2}, configurations: [configuration]});
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        expect(await screen.findByRole('menuitem', {name: 'Move Users'})).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('disables Move Users with a tooltip when the configuration has no connected users', async () => {
+        const user = userEvent.setup();
+
+        renderItem({
+            configuration: {...configuration, connectedUserCount: 0},
+            configurations: [{...configuration, id: 'other', name: 'BETA'}],
+        });
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        const moveUsersItem = await screen.findByRole('menuitem', {name: 'Move Users'});
+
+        expect(moveUsersItem).toHaveAttribute('aria-disabled', 'true');
+
+        await user.hover(moveUsersItem.parentElement as HTMLElement);
+
+        expect((await screen.findAllByText('No connected users on this configuration')).length).toBeGreaterThan(0);
+    });
+
+    it('keeps delete confirmation disabled until the impact has loaded', async () => {
+        const user = userEvent.setup();
+
+        mocks.deleteImpact = undefined;
+
+        renderItem();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Delete Configuration'}));
+
+        const alertDialog = await screen.findByRole('alertdialog');
+
+        expect(within(alertDialog).getByRole('button', {name: 'Delete'})).toBeDisabled();
+    });
+
+    it('keeps delete confirmation disabled and explains when the impact fails to load', async () => {
+        const user = userEvent.setup();
+
+        mocks.deleteImpact = undefined;
+        mocks.deleteImpactError = true;
+
+        renderItem();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Delete Configuration'}));
+
+        const alertDialog = await screen.findByRole('alertdialog');
+
+        expect(within(alertDialog).getByText('Could not load what this deletes.')).toBeInTheDocument();
+        expect(within(alertDialog).getByRole('button', {name: 'Delete'})).toBeDisabled();
+    });
+
     it('enables Move Users when another configuration shares the environment', async () => {
         const user = userEvent.setup();
 
-        renderItem({otherConfigurations: [{...configuration, id: 'other', name: 'BETA'}]});
+        renderItem({
+            configuration: {...configuration, connectedUserCount: 2},
+            configurations: [configuration, {...configuration, id: 'other', name: 'BETA'}],
+        });
 
         await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
 

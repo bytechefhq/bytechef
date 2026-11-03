@@ -65,6 +65,7 @@ const AutomationWorkflowProjectConfigurationList = ({
             {configurations.map((configuration) => (
                 <AutomationWorkflowProjectConfigurationListItem
                     configuration={configuration}
+                    configurations={configurations}
                     environments={environments ?? []}
                     key={configuration.id}
                     onDelete={(configurationToDelete) =>
@@ -72,9 +73,6 @@ const AutomationWorkflowProjectConfigurationList = ({
                     }
                     onEdit={onEdit}
                     onUpdateVersion={onUpdateVersion}
-                    otherConfigurations={configurations.filter(
-                        (otherConfiguration) => otherConfiguration.id !== configuration.id
-                    )}
                     project={project}
                 />
             ))}

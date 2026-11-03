@@ -1,12 +1,13 @@
-import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {render} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectConfigurationMoveUsersDialog from '../AutomationWorkflowProjectConfigurationMoveUsersDialog';
 
 const mocks = vi.hoisted(() => ({
     connectedUsers: undefined as unknown[] | undefined,
-    invalidateQueries: vi.fn(),
-    moveImpactEnabledCalls: [] as unknown[],
+    connectedUsersError: false,
     moveMutateAsync: vi.fn(),
     moveVariables: [] as unknown[],
 }));
@@ -17,6 +18,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         data: mocks.connectedUsers
             ? {automationWorkflowProjectConfigurationConnectedUsers: mocks.connectedUsers}
             : undefined,
+        isError: mocks.connectedUsersError,
     }),
     useAutomationWorkflowProjectConfigurationMoveImpactQuery: (
         variables: {connectedUserIds: string[]; targetId: string},
@@ -52,11 +54,6 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     }),
 }));
 
-vi.mock('@tanstack/react-query', async (importOriginal) => ({
-    ...(await importOriginal<typeof import('@tanstack/react-query')>()),
-    useQueryClient: () => ({invalidateQueries: mocks.invalidateQueries}),
-}));
-
 const configuration = {
     automationHubVisible: true,
     connectedUserCount: 2,
@@ -74,13 +71,17 @@ const configuration = {
 
 const targetConfiguration = {...configuration, id: 'target', name: 'BETA', projectVersion: 2};
 
+const queryClient = new QueryClient();
+
 const renderDialog = (onClose = vi.fn()) =>
     render(
-        <AutomationWorkflowProjectConfigurationMoveUsersDialog
-            configuration={configuration}
-            onClose={onClose}
-            targetConfigurations={[targetConfiguration]}
-        />
+        <QueryClientProvider client={queryClient}>
+            <AutomationWorkflowProjectConfigurationMoveUsersDialog
+                configuration={configuration}
+                onClose={onClose}
+                targetConfigurations={[targetConfiguration]}
+            />
+        </QueryClientProvider>
     );
 
 describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
@@ -95,7 +96,10 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
             {connectedUserId: '1', email: 'jane@example.com', externalId: 'ext-1', name: 'Jane'},
             {connectedUserId: '2', email: 'bob@example.com', externalId: 'ext-2', name: 'Bob'},
         ];
+        mocks.connectedUsersError = false;
         mocks.moveVariables = [];
+
+        vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
     });
 
     afterEach(() => {
@@ -110,6 +114,33 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
 
         expect(screen.getByText('Loading users...')).toBeInTheDocument();
         expect(screen.queryByRole('combobox', {name: 'Target'})).not.toBeInTheDocument();
+    });
+
+    it('closes the loading dialog with Escape', async () => {
+        mocks.connectedUsers = undefined;
+
+        const onClose = vi.fn();
+
+        renderDialog(onClose);
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onClose).toHaveBeenCalledOnce();
+    });
+
+    it('shows an error with a Close button instead of blocking when the users fail to load', async () => {
+        mocks.connectedUsers = undefined;
+        mocks.connectedUsersError = true;
+
+        const onClose = vi.fn();
+
+        renderDialog(onClose);
+
+        expect(screen.getByText('Could not load the connected users.')).toBeInTheDocument();
+
+        await userEvent.click(screen.getAllByRole('button', {name: 'Close'})[0]);
+
+        expect(onClose).toHaveBeenCalled();
     });
 
     it('offers only the given target configurations and previews skipped users for the chosen target', async () => {
@@ -150,10 +181,10 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
         });
 
         await waitFor(() => {
-            expect(mocks.invalidateQueries).toHaveBeenCalledWith({
+            expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
                 queryKey: ['automationWorkflowProjectConfigurations'],
             });
-            expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['connectedUserProjects']});
+            expect(queryClient.invalidateQueries).toHaveBeenCalledWith({queryKey: ['connectedUserProjects']});
         });
     });
 });

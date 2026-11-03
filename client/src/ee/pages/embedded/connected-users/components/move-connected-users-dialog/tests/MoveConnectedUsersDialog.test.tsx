@@ -102,9 +102,15 @@ describe('MoveConnectedUsersDialog', () => {
     });
 
     it('keeps the dialog open and enabled for a retry when the move fails', async () => {
+        const unhandledRejections: unknown[] = [];
+        const collectRejection = (reason: unknown) => unhandledRejections.push(reason);
+
+        process.on('unhandledRejection', collectRejection);
+
+        const onClose = vi.fn();
         const onMove = vi.fn().mockRejectedValue(new Error('Move failed'));
 
-        renderDialog({onMove});
+        renderDialog({onClose, onMove});
 
         await chooseTarget('Beta · v2');
         await userEvent.click(screen.getByRole('button', {name: 'Move'}));
@@ -115,6 +121,11 @@ describe('MoveConnectedUsersDialog', () => {
         });
 
         expect(screen.getByRole('combobox', {name: 'Target'})).toBeInTheDocument();
+        process.off('unhandledRejection', collectRejection);
+
+        expect(unhandledRejections).toEqual([]);
+        expect(onClose).not.toHaveBeenCalled();
+        expect(screen.queryByText(/moved, .* need attention/)).not.toBeInTheDocument();
     });
 
     it('shows users that would be skipped before moving', () => {

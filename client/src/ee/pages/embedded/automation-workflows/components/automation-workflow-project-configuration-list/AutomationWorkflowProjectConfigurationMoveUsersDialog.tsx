@@ -1,3 +1,12 @@
+import Button from '@/components/Button/Button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import MoveConnectedUsersDialog, {
     MoveConnectedUsersResultI,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
@@ -22,6 +31,12 @@ interface AutomationWorkflowProjectConfigurationMoveUsersDialogProps {
 const formatConfigurationLabel = (configuration: AutomationWorkflowProjectConfigurationType): string =>
     `${configuration.name} · v${configuration.projectVersion}`;
 
+interface SkippedConnectedUserI {
+    connectedUserId: string;
+    reason: string;
+    workflowLabels: string[];
+}
+
 const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
     configuration,
     onClose,
@@ -31,9 +46,10 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
 
     const queryClient = useQueryClient();
 
-    const {data: connectedUsersData} = useAutomationWorkflowProjectConfigurationConnectedUsersQuery({
-        id: configuration.id,
-    });
+    const {data: connectedUsersData, isError: connectedUsersError} =
+        useAutomationWorkflowProjectConfigurationConnectedUsersQuery({
+            id: configuration.id,
+        });
 
     const connectedUsers = connectedUsersData?.automationWorkflowProjectConfigurationConnectedUsers;
 
@@ -75,19 +91,23 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
 
     const moveImpact = moveImpactData?.automationWorkflowProjectConfigurationMoveImpact;
 
-    const previewSkipped = useMemo(
-        () =>
-            (moveImpact?.skipped ?? []).map((skippedUser) => ({
+    const toSkippedLines = useCallback(
+        (skippedUsers: SkippedConnectedUserI[]) =>
+            skippedUsers.map((skippedUser) => ({
                 label: labelByConnectedUserId.get(skippedUser.connectedUserId) || skippedUser.connectedUserId,
                 reason: skippedUser.reason,
                 workflowLabels: skippedUser.workflowLabels,
             })),
-        [labelByConnectedUserId, moveImpact]
+        [labelByConnectedUserId]
     );
+
+    const previewSkipped = useMemo(() => toSkippedLines(moveImpact?.skipped ?? []), [moveImpact, toSkippedLines]);
+
+    const {mutateAsync: moveConnectedUsers} = moveMutation;
 
     const handleMove = useCallback(
         async (targetId: string, connectedUserIds: string[]): Promise<MoveConnectedUsersResultI> => {
-            const response = await moveMutation.mutateAsync({
+            const response = await moveConnectedUsers({
                 connectedUserIds,
                 sourceId: configuration.id,
                 targetId,
@@ -98,21 +118,31 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
             return {
                 movedCount: moveResult.movedConnectedUserIds.length,
                 needsAttentionCount: moveResult.needsAttentionConnectedUserIds.length,
-                skipped: moveResult.skipped.map((skippedUser) => ({
-                    label: labelByConnectedUserId.get(skippedUser.connectedUserId) || skippedUser.connectedUserId,
-                    reason: skippedUser.reason,
-                    workflowLabels: skippedUser.workflowLabels,
-                })),
+                skipped: toSkippedLines(moveResult.skipped),
             };
         },
-        [configuration.id, labelByConnectedUserId, moveMutation]
+        [configuration.id, moveConnectedUsers, toSkippedLines]
     );
 
     if (!connectedUsers) {
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="status">
-                <span className="rounded bg-background px-4 py-2 text-sm">Loading users...</span>
-            </div>
+            <Dialog onOpenChange={(open) => !open && onClose()} open>
+                <DialogContent showCloseButton>
+                    <DialogHeader>
+                        <DialogTitle>Move Users</DialogTitle>
+
+                        <DialogDescription>
+                            {connectedUsersError ? 'Could not load the connected users.' : 'Loading users...'}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {connectedUsersError && (
+                        <DialogFooter>
+                            <Button label="Close" onClick={onClose} />
+                        </DialogFooter>
+                    )}
+                </DialogContent>
+            </Dialog>
         );
     }
 
