@@ -108,6 +108,8 @@ A guarded call that is denied or fails is recorded with `DENIED` or `ERROR` as i
 
 - **Secret values.** The log records that a credential was created or deleted, by whom, and when - never the secret material.
 - **Workflow execution data.** Execution inputs and outputs live in execution history, so the audit log stays focused on privileged administrative actions rather than data flow.
+- **Editor test runs.** Test runs of workflows, nodes, scripts and AI agents started from the workflow editor, and the test outputs, sample files, test configurations and editor logs they produce, are not recorded.
+- **Execution logs.** Deleting the component logs of an execution is not recorded.
 - **Fine-grained edits.** Tag assignments, edits to a workflow definition, workflow input and connection values, the parameters of MCP project and embedded MCP workflows, A2A skills, and webhook trigger tests started from the workflow editor are not recorded. A denied or failed attempt is still recorded as `PERMISSION_CHECK`.
 
 ## Retention
