@@ -1,5 +1,6 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {getWorkflowsProjectVersion} from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import {
@@ -14,7 +15,7 @@ import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/pr
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 export const useWorkflowExecutions = () => {
@@ -48,6 +49,11 @@ export const useWorkflowExecutions = () => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const navigate = useNavigate();
+
+    const setWorkflowExecutionId = useWorkflowExecutionSheetStore((state) => state.setWorkflowExecutionId);
+    const setWorkflowExecutionSheetOpen = useWorkflowExecutionSheetStore(
+        (state) => state.setWorkflowExecutionSheetOpen
+    );
 
     const {data: projectDeployment} = useGetProjectDeploymentQuery(
         filterProjectDeploymentId!,
@@ -281,6 +287,16 @@ export const useWorkflowExecutions = () => {
 
         filter(filterStatus, filterStartDate, filterEndDate, filterProjectId, undefined, undefined, undefined);
     });
+
+    useEffect(() => {
+        const linkedExecutionId = Number.parseInt(searchParams.get('id') ?? '', 10);
+
+        if (Number.isInteger(linkedExecutionId) && linkedExecutionId > 0) {
+            setWorkflowExecutionId(linkedExecutionId, 'JOB');
+            setWorkflowExecutionSheetOpen(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return {
         currentEnvironmentId,

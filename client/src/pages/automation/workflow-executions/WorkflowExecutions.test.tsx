@@ -4,6 +4,7 @@ import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {WorkflowExecutions} from './WorkflowExecutions';
+import useWorkflowExecutionSheetStore from './stores/useWorkflowExecutionSheetStore';
 
 const hoisted = vi.hoisted(() => ({navigate: vi.fn(), totalElements: 0}));
 
@@ -74,6 +75,32 @@ beforeEach(() => {
     vi.clearAllMocks();
 
     hoisted.totalElements = 0;
+
+    useWorkflowExecutionSheetStore.setState({
+        workflowExecutionId: 0,
+        workflowExecutionKind: 'JOB',
+        workflowExecutionSheetOpen: false,
+    });
+});
+
+describe('WorkflowExecutions deep link', () => {
+    it('opens the execution sheet for the id query param', () => {
+        renderWorkflowExecutions(['/?id=42']);
+
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(42);
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionKind).toBe('JOB');
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
+    });
+
+    it('ignores a non-numeric or zero id query param', () => {
+        renderWorkflowExecutions(['/?id=abc']);
+
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+
+        renderWorkflowExecutions(['/?id=0']);
+
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+    });
 });
 
 describe('WorkflowExecutions empty states', () => {

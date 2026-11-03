@@ -1,5 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {WorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/WorkflowExecutions';
+import useEmbeddedWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
+import useAutomationWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {act, mockScrollIntoView, render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -144,6 +146,13 @@ describe('WorkflowExecutions', () => {
 
         mockScrollIntoView();
 
+        useAutomationWorkflowExecutionSheetStore.setState({
+            workflowExecutionId: 0,
+            workflowExecutionKind: 'JOB',
+            workflowExecutionSheetOpen: false,
+        });
+        useEmbeddedWorkflowExecutionSheetStore.setState({workflowExecutionId: 0, workflowExecutionSheetOpen: false});
+
         Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || vi.fn();
         Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture || vi.fn();
 
@@ -170,6 +179,30 @@ describe('WorkflowExecutions', () => {
             workflowExecutionsIsFetching: false,
             workflowExecutionsIsLoading: false,
         });
+    });
+
+    it('opens the embedded execution sheet for the id query param', () => {
+        renderWorkflowExecutions('id=42');
+
+        expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(42);
+        expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
+        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+    });
+
+    it('opens the automation execution sheet when automations is 1', () => {
+        renderWorkflowExecutions('automations=1&id=42');
+
+        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(42);
+        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionKind).toBe('JOB');
+        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
+        expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+    });
+
+    it('ignores a non-numeric id query param', () => {
+        renderWorkflowExecutions('id=abc');
+
+        expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
     });
 
     it('requests the executions of the connected user named in the URL', () => {

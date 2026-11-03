@@ -9,6 +9,7 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
+import useEmbeddedWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {
     getIntegrationInstanceConfigurationIntegrationName,
     getWorkflowExecutionsFilters,
@@ -30,6 +31,7 @@ import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedd
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
+import useAutomationWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import FilterTitle from '@/shared/components/filters/FilterTitle';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import Footer from '@/shared/layout/Footer';
@@ -42,7 +44,7 @@ import {
 import {ConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -139,6 +141,19 @@ export const WorkflowExecutions = () => {
     );
 
     const navigate = useNavigate();
+
+    const setAutomationWorkflowExecutionId = useAutomationWorkflowExecutionSheetStore(
+        (state) => state.setWorkflowExecutionId
+    );
+    const setAutomationWorkflowExecutionSheetOpen = useAutomationWorkflowExecutionSheetStore(
+        (state) => state.setWorkflowExecutionSheetOpen
+    );
+    const setEmbeddedWorkflowExecutionId = useEmbeddedWorkflowExecutionSheetStore(
+        (state) => state.setWorkflowExecutionId
+    );
+    const setEmbeddedWorkflowExecutionSheetOpen = useEmbeddedWorkflowExecutionSheetStore(
+        (state) => state.setWorkflowExecutionSheetOpen
+    );
 
     const debouncedSetConnectedUserSearch = useDebouncedCallback(
         (search: string) => setConnectedUserSearch(search),
@@ -547,6 +562,23 @@ export const WorkflowExecutions = () => {
             undefined
         );
     });
+
+    useEffect(() => {
+        const linkedExecutionId = Number.parseInt(searchParams.get('id') ?? '', 10);
+
+        if (!Number.isInteger(linkedExecutionId) || linkedExecutionId <= 0) {
+            return;
+        }
+
+        if (filterAutomations === 1) {
+            setAutomationWorkflowExecutionId(linkedExecutionId, 'JOB');
+            setAutomationWorkflowExecutionSheetOpen(true);
+        } else {
+            setEmbeddedWorkflowExecutionId(linkedExecutionId);
+            setEmbeddedWorkflowExecutionSheetOpen(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <LayoutContainer
