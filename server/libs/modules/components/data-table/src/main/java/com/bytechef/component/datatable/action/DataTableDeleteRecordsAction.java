@@ -191,7 +191,8 @@ public class DataTableDeleteRecordsAction {
             bigDecimal = new BigDecimal(String.valueOf(id)
                 .trim());
         } catch (NumberFormatException exception) {
-            throw new IllegalArgumentException("Record ID '%s' is not a number".formatted(id), exception);
+            throw DataTableUtils.createIllegalArgumentException(
+                "Record ID '%s' is not a number".formatted(id), exception);
         }
 
         try {
@@ -201,7 +202,7 @@ public class DataTableDeleteRecordsAction {
 
             String reason = strippedBigDecimal.scale() > 0 ? "is not a whole number" : "is out of range";
 
-            throw new IllegalArgumentException("Record ID '%s' %s".formatted(id, reason), exception);
+            throw DataTableUtils.createIllegalArgumentException("Record ID '%s' %s".formatted(id, reason), exception);
         }
     }
 

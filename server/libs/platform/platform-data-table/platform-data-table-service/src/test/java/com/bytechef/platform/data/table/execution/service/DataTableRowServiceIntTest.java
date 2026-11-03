@@ -57,6 +57,7 @@ import java.util.Objects;
 import java.util.TimeZone;
 import java.util.stream.LongStream;
 import javax.sql.DataSource;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -1302,11 +1303,16 @@ class DataTableRowServiceIntTest {
     void testInsertRowsRejectsInvalidRowWithoutInsertingAnyRow() {
         int createdEventCount = getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size();
 
-        assertMessageContains(
-            "Record 2: Value 'abc' is not a valid integer for column 'amount'; no record was inserted",
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class,
             () -> dataTableRowService.insertRows(
                 "items", List.of(Map.of("title", "Pear", "amount", 1), Map.of("title", "Plum", "amount", "abc")),
                 DEV_ENVIRONMENT_ID));
+
+        assertEquals(
+            "Record 2: Value 'abc' is not a valid integer for column 'amount'; no record was inserted",
+            ExceptionUtils.getRootCause(illegalArgumentException)
+                .getMessage());
 
         assertEquals(itemIds, findItemIds(List.of(), null));
         assertEquals(createdEventCount, getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size());
@@ -1323,7 +1329,8 @@ class DataTableRowServiceIntTest {
 
         assertEquals(
             "Record 2: ERROR: value too long for type character varying(255); no record was inserted",
-            dataIntegrityViolationException.getMessage());
+            ExceptionUtils.getRootCause(dataIntegrityViolationException)
+                .getMessage());
         assertEquals(itemIds, findItemIds(List.of(), null));
         assertEquals(createdEventCount, getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size());
     }

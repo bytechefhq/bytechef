@@ -33,6 +33,7 @@ import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Oper
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -169,6 +170,10 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
             () -> perform(actionDefinition, Map.of("table", "conversations", "ids", List.of("abc"))));
 
         assertEquals("Record ID 'abc' is not a number", illegalArgumentException.getMessage());
+        assertEquals(
+            illegalArgumentException.getMessage(),
+            ExceptionUtils.getRootCause(illegalArgumentException)
+                .getMessage());
 
         verifyNoInteractions(dataTableRowService);
     }
@@ -180,6 +185,10 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
             () -> perform(actionDefinition, Map.of("table", "conversations", "ids", List.of(3.9))));
 
         assertEquals("Record ID '3.9' is not a whole number", illegalArgumentException.getMessage());
+        assertEquals(
+            illegalArgumentException.getMessage(),
+            ExceptionUtils.getRootCause(illegalArgumentException)
+                .getMessage());
 
         verifyNoInteractions(dataTableRowService);
     }
@@ -191,6 +200,10 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
             () -> perform(actionDefinition, Map.of("table", "conversations", "ids", List.of("1e30"))));
 
         assertEquals("Record ID '1e30' is out of range", illegalArgumentException.getMessage());
+        assertEquals(
+            illegalArgumentException.getMessage(),
+            ExceptionUtils.getRootCause(illegalArgumentException)
+                .getMessage());
 
         verifyNoInteractions(dataTableRowService);
     }
@@ -203,6 +216,10 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
 
         assertEquals(
             "Unknown Delete By 'FILTER'; expected one of IDS, CONDITIONS", illegalArgumentException.getMessage());
+        assertEquals(
+            illegalArgumentException.getMessage(),
+            ExceptionUtils.getRootCause(illegalArgumentException)
+                .getMessage());
 
         verifyNoInteractions(dataTableRowService);
     }
