@@ -1,0 +1,336 @@
+---
+title: "Viber"
+description: "Viber is a messaging platform whose bot API lets businesses send messages to subscribers and react to their events."
+---
+
+
+Categories: Communication
+
+
+Type: viber/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| authToken | Auth Token | STRING |  | true |
+
+
+
+## Connection Setup
+
+### Get the Auth Token of your Viber bot
+
+1. In the Viber app, open your bot's chat and go to **More**, then **Settings**, then **Bots**, then **Edit Info**.
+2. Copy the value shown as **Your app key**. Viber also calls this the authentication token. Keep it secret. Account admins can also find it on the Viber Admin Panel.
+3. Paste the token into the **Auth Token** field of the ByteChef connection.
+
+Good to know:
+- Since February 2024, new Viber bots can only be created under Viber's commercial terms. If you do not have a bot yet, you need an existing bot or an agreement with Viber first.
+- Viber sends messages to your workflow through a webhook, and the webhook address must be a public HTTPS address with a trusted certificate. If you run ByteChef on your own computer, use a tunnel such as ngrok and set it as the public URL of your ByteChef instance.
+- A bot has a single webhook, so one bot can feed one enabled workflow at a time. To test a workflow in the editor while another workflow is deployed, use a second bot for testing.
+
+Helpful links:
+- Viber REST Bot API: https://developers.viber.com/docs/api/rest-bot-api/
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Send Text Message
+Name: sendTextMessage
+
+`Sends a text message to a Viber subscriber.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| receiver | Receiver ID | STRING | Viber user ID of the receiver. Use the user.id value from a Viber trigger. | true |
+| text | Text | STRING | Text of the message to be sent. | true |
+| senderName | Sender Name | STRING | Name shown as the sender. Defaults to the bot name. | false |
+| senderAvatar | Sender Avatar URL | STRING | URL of the avatar image shown for the sender. | false |
+| trackingData | Tracking Data | STRING | Data returned with the next message from the receiver. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Text Message",
+  "name" : "sendTextMessage",
+  "parameters" : {
+    "receiver" : "",
+    "text" : "",
+    "senderName" : "",
+    "senderAvatar" : "",
+    "trackingData" : ""
+  },
+  "type" : "viber/v1/sendTextMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| status | INTEGER |  |
+| status_message | STRING |  |
+| message_token | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "status" : 1,
+  "status_message" : "",
+  "message_token" : ""
+}
+```
+
+#### Things to know
+
+- The receiver must have written to your bot before. Viber rejects messages to people who have not.
+- To reply to someone, use the `user.id` from a Viber trigger as the Receiver ID. To learn more, click [here](/reference/components/viber_v1#how-to-find-the-receiver-id).
+- Only plain text is supported. The text can be up to 7,000 characters and the sender name up to 28 characters.
+- Tracking Data comes back with the person's next message, so you can use it to remember where a conversation is.
+
+
+
+### Broadcast Text Message
+Name: broadcastTextMessage
+
+`Sends a text message to up to 300 Viber subscribers at once.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| receivers | Receiver IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | Viber user IDs of the receivers. Use the user.id values from a Viber trigger. | true |
+| text | Text | STRING | Text of the message to be sent. The placeholders replace_me_with_receiver_id, replace_me_with_url_encoded_receiver_id and replace_me_with_user_name are replaced for each receiver. | true |
+| senderName | Sender Name | STRING | Name shown as the sender. Defaults to the bot name. | false |
+| senderAvatar | Sender Avatar URL | STRING | URL of the avatar image shown for the sender. | false |
+| trackingData | Tracking Data | STRING | Data returned with the next message from the receiver. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Broadcast Text Message",
+  "name" : "broadcastTextMessage",
+  "parameters" : {
+    "receivers" : [ "" ],
+    "text" : "",
+    "senderName" : "",
+    "senderAvatar" : "",
+    "trackingData" : ""
+  },
+  "type" : "viber/v1/broadcastTextMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| status | INTEGER |  |
+| status_message | STRING |  |
+| failed_list | ARRAY <details> <summary> Items </summary> [&#123;STRING\(receiver), INTEGER\(status), STRING\(status_message)&#125;] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "status" : 1,
+  "status_message" : "",
+  "failed_list" : [ {
+    "receiver" : "",
+    "status" : 1,
+    "status_message" : ""
+  } ]
+}
+```
+
+#### Things to know
+
+- Send one text to between 1 and 300 people in a single step. Each person must have written to your bot before.
+- Receivers that Viber could not reach are listed in `failed_list` in the output, with the reason for each. The step does not fail for those.
+- To address each person by name, use the placeholders `replace_me_with_receiver_id`, `replace_me_with_url_encoded_receiver_id` and `replace_me_with_user_name` in the text.
+- Get the IDs from the `user.id` value of a Viber trigger. To learn more, click [here](/reference/components/viber_v1#how-to-find-the-receiver-id).
+
+
+
+
+## Triggers
+
+
+### New Message
+Name: newMessage
+
+`Triggers when a Viber user sends a message to your bot.`
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| event | STRING | The Viber event type. |
+| timestamp | INTEGER | Time of the event in epoch milliseconds. |
+| message_token | INTEGER | Unique ID of the message. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(avatar), STRING\(country), STRING\(language), INTEGER\(api_version)&#125; </details> | The Viber user the event relates to. |
+| message | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(text), STRING\(media), STRING\(thumbnail), STRING\(file_name), INTEGER\(file_size), INTEGER\(duration), INTEGER\(sticker_id), &#123;NUMBER\(lat), NUMBER\(lon)&#125;\(location), &#123;STRING\(name), STRING\(phone_number), STRING\(avatar)&#125;\(contact), STRING\(tracking_data)&#125; </details> | The message sent by the user. |
+| file | FILE_ENTRY | The downloaded media of a picture, video or file message. |
+| type | STRING | Conversation started type, such as open. |
+| context | STRING | Additional data passed when the conversation was opened. |
+| subscribed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the user is already subscribed. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Message",
+  "name" : "newMessage",
+  "type" : "viber/v1/newMessage"
+}
+```
+#### Things to know
+
+- This trigger starts the workflow when a person sends your bot a message. Use `user.id` from the output as the Receiver ID when you reply. To learn more, click [here](/reference/components/viber_v1#how-to-find-the-receiver-id).
+- The bot's webhook is set when the workflow is enabled and removed when it is disabled. If the bot already sends its messages to a different workflow, enabling is refused with an error that says so.
+- Every call to the webhook is checked against Viber's signature, so only genuine Viber calls start a workflow.
+- Pictures, videos and files are also downloaded and given to you as a file in the `file` output.
+
+
+
+### New Event
+Name: newEvent
+
+`Triggers when one of the selected Viber events happens.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| events | Events | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Viber events that trigger the workflow. | true |
+| welcomeMessage | Welcome Message | STRING | Text sent automatically when a user opens the chat with your bot. It is not sent when testing in the editor. | false |
+| welcomeSenderName | Welcome Sender Name | STRING | Name shown as the sender of the welcome message. | false |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| event | STRING | The Viber event type. |
+| timestamp | INTEGER | Time of the event in epoch milliseconds. |
+| message_token | INTEGER | Unique ID of the message. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(avatar), STRING\(country), STRING\(language), INTEGER\(api_version)&#125; </details> | The Viber user the event relates to. |
+| message | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(text), STRING\(media), STRING\(thumbnail), STRING\(file_name), INTEGER\(file_size), INTEGER\(duration), INTEGER\(sticker_id), &#123;NUMBER\(lat), NUMBER\(lon)&#125;\(location), &#123;STRING\(name), STRING\(phone_number), STRING\(avatar)&#125;\(contact), STRING\(tracking_data)&#125; </details> | The message sent by the user. |
+| file | FILE_ENTRY | The downloaded media of a picture, video or file message. |
+| type | STRING | Conversation started type, such as open. |
+| context | STRING | Additional data passed when the conversation was opened. |
+| subscribed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the user is already subscribed. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Event",
+  "name" : "newEvent",
+  "parameters" : {
+    "events" : [ "" ],
+    "welcomeMessage" : "",
+    "welcomeSenderName" : ""
+  },
+  "type" : "viber/v1/newEvent"
+}
+```
+#### Things to know
+
+- Choose the events that should start the workflow: New Message, Conversation Started, Subscribed or Unsubscribed. Events you did not choose are ignored.
+- Conversation Started happens when a person opens the chat with your bot, before they have written anything. If you fill in the Welcome Message, Viber shows it to that person right away. The workflow still runs for the event.
+- The welcome message is not sent while testing in the editor. Deploy the workflow to see it.
+- The webhook is set when the workflow is enabled and removed when it is disabled. If the bot already sends its messages to a different workflow, enabling is refused with an error that says so. Use a separate bot for testing in the editor.
+- Use `user.id` from the output as the Receiver ID when you reply. To learn more, click [here](/reference/components/viber_v1#how-to-find-the-receiver-id).
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+## Additional Instructions
+
+#### Before you start
+
+- A Viber bot can only message people who have written to it first. A person subscribes to your bot by sending it a message. Messages to anyone else are rejected by Viber.
+- One Viber bot can feed only one enabled workflow. Viber allows a single webhook per bot, so enabling a second workflow on the same bot is refused, and disabling a workflow never cuts off another one.
+- Testing a trigger in the editor needs its own bot, separate from any bot that a deployed workflow uses.
+- Only plain text messages can be sent in this version. Incoming messages of every type (text, picture, video, file, sticker, location, contact and link) reach your workflow.
+
+#### How to find the Receiver ID
+
+1. Create a ByteChef workflow that starts with a Viber trigger.
+2. Write to your bot from Viber and run the workflow.
+3. Look at the trigger output. The `user.id` value is the Viber user ID.
+4. Use that value as the Receiver ID in Send Text Message, or add it to the Receiver IDs list in Broadcast Text Message.
+
+To reply to the person who wrote to your bot, point the Receiver ID at the `user.id` from the trigger.
