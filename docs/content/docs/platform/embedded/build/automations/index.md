@@ -32,7 +32,7 @@ Runtime activity for end users lives in [Workflow Executions](/platform/embedded
 | Tags & Categories | Group projects by category (single) and tag (many) for filtering. |
 | Category / Tag filter sidebar | Narrow the list with two stacked navs - **Categories** and **Tags** - in the left sidebar. |
 | Inline template list | Expand any project row to see its **Workflows** (templates, their trigger, the components they use, and the last modified date) and its **Configurations**. |
-| Environment scoping | The page reflects projects in the currently selected environment (Development / Staging / Production). |
+| Environment scoping | Projects and workflows are edited in Development only. In Staging and Production, the **Automation Configurations** page takes the place of Automations. |
 
 ### Project row
 
@@ -189,7 +189,11 @@ Selecting an entry sets `?categoryId=` or `?tagId=` in the URL so the view is sh
 
 ### Environment selection
 
-Projects are scoped to the current environment. Switch environments from the selector in the left sidebar (next to the user menu) to see projects in **Development**, **Staging**, or **Production**.
+Projects and their workflows are shared by every environment, so you build and edit them only in **Development**. There, the **Configurations** tab of a project lists its Development configurations.
+
+In **Staging** and **Production**, the sidebar shows **Automation Configurations** instead of Automations, and the workflow editor is not available. The page lists each published project with its configurations in that environment. You can create, edit, turn on or off, move users between and delete configurations there, but not change a project or its workflows.
+
+Switching environment from the selector in the left sidebar (next to the user menu) moves you between the two pages.
 
 ## Related
 
