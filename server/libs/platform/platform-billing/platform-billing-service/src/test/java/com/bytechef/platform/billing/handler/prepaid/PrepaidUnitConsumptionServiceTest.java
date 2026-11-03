@@ -17,6 +17,7 @@
 package com.bytechef.platform.billing.handler.prepaid;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -124,13 +125,37 @@ class PrepaidUnitConsumptionServiceTest {
     }
 
     @Test
-    void testNoCurrentSubscriptionCountsNothing() {
+    void testMissingTrialFallbackThrows() {
         when(prepaidBillingSubscriptionRepository.existsPrincipalJobByJobId(JOB_ID)).thenReturn(true);
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
 
-        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isTrue();
+        assertThatThrownBy(() -> prepaidUnitConsumptionService.tryStart(job(null)))
+            .isInstanceOf(IllegalStateException.class);
 
         verify(prepaidBillingSubscriptionRepository, never()).incrementPlanUnitUsed(anyLong());
+    }
+
+    @Test
+    void testEndedTrialFallbackRefusesStart() {
+        BillingSubscription trialSubscription = deployedWithSubscription("TRIAL", SubscriptionModel.PREPAID);
+
+        trialSubscription.setStatus(BillingSubscription.Status.CANCELED);
+
+        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isFalse();
+
+        verify(prepaidBillingSubscriptionRepository, never()).incrementPlanUnitUsed(anyLong());
+    }
+
+    @Test
+    void testPastDuePrepaidRefusesStart() {
+        BillingSubscription prepaidSubscription = deployedWithSubscription("GROWTH", SubscriptionModel.PREPAID);
+
+        prepaidSubscription.setStatus(BillingSubscription.Status.PAST_DUE);
+
+        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isFalse();
+
+        verify(prepaidBillingSubscriptionRepository, never()).incrementPlanUnitUsed(anyLong());
+        verify(prepaidBillingSubscriptionRepository, never()).incrementExtraUnitUsed(anyLong());
     }
 
     private static Job job(Long parentTaskExecutionId) {
@@ -142,14 +167,17 @@ class PrepaidUnitConsumptionServiceTest {
         return job;
     }
 
-    private void deployedWithSubscription(String planName, SubscriptionModel subscriptionModel) {
+    private BillingSubscription deployedWithSubscription(String planName, SubscriptionModel subscriptionModel) {
         BillingSubscription billingSubscription = new BillingSubscription();
 
         billingSubscription.setId(SUBSCRIPTION_ID);
         billingSubscription.setPlanName(planName);
+        billingSubscription.setStatus(BillingSubscription.Status.ACTIVE);
         billingSubscription.setSubscriptionModel(subscriptionModel);
 
         when(prepaidBillingSubscriptionRepository.existsPrincipalJobByJobId(JOB_ID)).thenReturn(true);
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(billingSubscription));
+
+        return billingSubscription;
     }
 }

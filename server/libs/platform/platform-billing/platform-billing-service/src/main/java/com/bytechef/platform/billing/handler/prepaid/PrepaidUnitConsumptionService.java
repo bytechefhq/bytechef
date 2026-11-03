@@ -24,7 +24,6 @@ import com.bytechef.platform.billing.repository.PrepaidBillingSubscriptionReposi
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -67,19 +66,30 @@ public class PrepaidUnitConsumptionService implements JobStartGuard {
             return true;
         }
 
-        Optional<BillingSubscription> currentSubscriptionOptional =
-            billingSubscriptionService.fetchCurrentSubscription();
+        BillingSubscription billingSubscription = billingSubscriptionService.fetchCurrentSubscription()
+            .orElseThrow(() -> new IllegalStateException("No subscription found, TRIAL fallback is missing"));
 
-        if (currentSubscriptionOptional.isEmpty()) {
-            return true;
+        // With no paid subscription the tenant falls back to trial terms; an ended trial (CANCELED) runs no jobs.
+        if (billingSubscription.getStatus() == BillingSubscription.Status.CANCELED) {
+            log.warn("Job {} refused: subscription {} is canceled", jobId, billingSubscription.getId());
+
+            return false;
         }
-
-        BillingSubscription billingSubscription = currentSubscriptionOptional.get();
 
         if (billingSubscription.getSubscriptionModel() != SubscriptionModel.PREPAID ||
             "TRIAL".equals(billingSubscription.getPlanName())) {
 
             return true;
+        }
+
+        // Units are granted at period rollover, before the renewal invoice is paid; a failed payment shows up as a
+        // non-active status (past_due / unpaid / incomplete), so stop spending units until Stripe reports ACTIVE again.
+        if (billingSubscription.getStatus() != BillingSubscription.Status.ACTIVE) {
+            log.warn(
+                "Job {} refused: subscription {} is {}", jobId, billingSubscription.getId(),
+                billingSubscription.getStatus());
+
+            return false;
         }
 
         long subscriptionId = billingSubscription.getId();
