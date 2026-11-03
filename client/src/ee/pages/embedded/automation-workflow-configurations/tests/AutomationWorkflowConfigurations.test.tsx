@@ -132,15 +132,39 @@ describe('AutomationWorkflowConfigurations', () => {
         vi.clearAllMocks();
     });
 
-    it('lists the published projects with the configurations of the selected environment', () => {
+    it('lists only the projects with configurations in the selected environment', () => {
+        mocks.projects = [
+            makeProject('live', 'Live Project', true, 1),
+            makeProject('other', 'Other Project', true),
+            makeProject('draft', 'Draft Project', false),
+        ];
+
         renderPage();
 
         expect(mocks.projectsVariables).toEqual({environmentId: '2'});
+        expect(screen.getByText('Projects: All Projects')).toBeInTheDocument();
         expect(screen.getByRole('region', {name: 'Live Project'})).toBeInTheDocument();
+        expect(screen.queryByRole('region', {name: 'Other Project'})).not.toBeInTheDocument();
         expect(screen.queryByRole('region', {name: 'Draft Project'})).not.toBeInTheDocument();
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
         expect(mocks.configurationsVariables).toContainEqual({environmentId: '2', projectId: 'live'});
-        expect(screen.getByRole('button', {name: 'New Configuration for Live Project'})).toBeInTheDocument();
+    });
+
+    it('offers every published project from the New Configuration menu', async () => {
+        mocks.projects = [
+            makeProject('live', 'Live Project', true, 1),
+            makeProject('other', 'Other Project', true),
+            makeProject('draft', 'Draft Project', false),
+        ];
+
+        renderPage();
+
+        await userEvent.click(screen.getByRole('button', {name: 'New Configuration'}));
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual([
+            'Live Project',
+            'Other Project',
+        ]);
     });
 
     it('offers no workflow or project editing', () => {
@@ -152,13 +176,14 @@ describe('AutomationWorkflowConfigurations', () => {
         expect(screen.queryByRole('tab', {name: 'Workflows'})).not.toBeInTheDocument();
     });
 
-    it('offers to create the first configuration of a published project without one in this environment', () => {
+    it('shows one empty state when no published project has a configuration in this environment', () => {
         mocks.projects = [makeProject('other', 'Other Project', true)];
 
         renderPage();
 
-        expect(screen.getByRole('button', {name: 'Create Configuration'})).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'New Configuration for Other Project'})).not.toBeInTheDocument();
+        expect(screen.getByText('No configurations yet')).toBeInTheDocument();
+        expect(screen.queryByRole('region', {name: 'Other Project'})).not.toBeInTheDocument();
+        expect(screen.getAllByRole('button', {name: 'New Configuration'}).length).toBeGreaterThan(0);
     });
 
     it('shows only the project chosen in the sidebar', () => {
@@ -166,8 +191,11 @@ describe('AutomationWorkflowConfigurations', () => {
 
         renderPage('/embedded/automation-configurations?projectId=other');
 
+        expect(screen.getByText('Projects: Other Project')).toBeInTheDocument();
         expect(screen.getByRole('region', {name: 'Other Project'})).toBeInTheDocument();
         expect(screen.queryByRole('region', {name: 'Live Project'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Create Configuration'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'New Configuration'})).not.toHaveAttribute('aria-haspopup');
     });
 
     it('sends the user to Automations in development when no project is published', async () => {
