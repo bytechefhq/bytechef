@@ -16,12 +16,7 @@
 
 package com.bytechef.platform.data.table.configuration.service;
 
-import com.bytechef.platform.audit.AuditData;
-import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
-import com.bytechef.platform.data.table.audit.DataTableAuditMapper;
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.domain.DataTableLinkColumn;
@@ -73,12 +68,6 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_ADDED, platform = PlatformType.AUTOMATION, data = {
-        @AuditData(key = "dataTableId", value = "#dataTableId"),
-        @AuditData(key = "columnName", value = "#columnSpec.name"),
-        @AuditData(key = "columnType", value = "#columnSpec.type"),
-        @AuditData(key = "environmentId", value = "#environmentId")
-    })
     @Transactional
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
@@ -161,12 +150,6 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    @Audited(
-        event = DataTableAuditEvents.DATA_TABLE_DELETED, mapper = DataTableAuditMapper.class,
-        platform = PlatformType.AUTOMATION, data = {
-            @AuditData(key = "dataTableId", value = "#dataTableId"),
-            @AuditData(key = "environmentId", value = "#environmentId")
-        })
     @Transactional
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public boolean dropTable(long dataTableId, long environmentId) {
@@ -312,11 +295,6 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_REMOVED, platform = PlatformType.AUTOMATION, data = {
-        @AuditData(key = "dataTableId", value = "#dataTableId"),
-        @AuditData(key = "columnName", value = "#columnName"),
-        @AuditData(key = "environmentId", value = "#environmentId")
-    })
     @Transactional
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void removeColumn(long dataTableId, String columnName, long environmentId) {
@@ -355,12 +333,6 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_RENAMED, platform = PlatformType.AUTOMATION, data = {
-        @AuditData(key = "dataTableId", value = "#dataTableId"),
-        @AuditData(key = "fromColumnName", value = "#fromColumnName"),
-        @AuditData(key = "toColumnName", value = "#toColumnName"),
-        @AuditData(key = "environmentId", value = "#environmentId")
-    })
     @Transactional
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void renameColumn(long dataTableId, String fromColumnName, String toColumnName, long environmentId) {
@@ -404,10 +376,6 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    @Audited(event = DataTableAuditEvents.DATA_TABLE_RENAMED, platform = PlatformType.AUTOMATION, data = {
-        @AuditData(key = "dataTableId", value = "#dataTableId"),
-        @AuditData(key = "newName", value = "#newName")
-    })
     @Transactional
     public void renameTable(long dataTableId, String newName) {
         String normalizedName = DataTableNames.normalize(newName);

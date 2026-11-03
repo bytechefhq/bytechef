@@ -24,6 +24,8 @@ public final class KnowledgeBaseAuditEvents {
     public static final String KB_CLONED = "KB_CLONED";
     public static final String KB_CREATED = "KB_CREATED";
     public static final String KB_DELETED = "KB_DELETED";
+    public static final String KB_DOCUMENT_CHUNK_DELETED = "KB_DOCUMENT_CHUNK_DELETED";
+    public static final String KB_DOCUMENT_CHUNK_UPDATED = "KB_DOCUMENT_CHUNK_UPDATED";
     public static final String KB_DOCUMENT_CREATED = "KB_DOCUMENT_CREATED";
     public static final String KB_DOCUMENT_DELETED = "KB_DOCUMENT_DELETED";
     public static final String KB_UPDATED = "KB_UPDATED";
