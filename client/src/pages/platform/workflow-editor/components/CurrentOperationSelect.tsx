@@ -103,7 +103,7 @@ const CurrentOperationSelect = ({
     value,
 }: CurrentOperationSelectProps) => (
     <div className="flex items-end border-b border-b-border/50 p-4">
-        {operations?.length === 1 && !!operations[0] ? (
+        {operations?.length === 1 && operations[0]?.name === value ? (
             <div className="flex w-full flex-col">
                 <div className="flex items-center space-x-1">
                     <span className="text-sm leading-6 font-medium">

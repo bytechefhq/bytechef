@@ -52,4 +52,21 @@ describe('CurrentOperationSelect', () => {
         expect(legacyOption).toHaveTextContent('Deprecated');
         expect(screen.getByRole('option', {name: /current/})).not.toHaveTextContent('Deprecated');
     });
+
+    it('offers the only action of a component for selection when the node uses an action that does not exist', async () => {
+        const handleValueChange = vi.fn();
+
+        render(
+            <CurrentOperationSelect
+                handleValueChange={handleValueChange}
+                operations={[createAction('sendSms')]}
+                value="sendViberBotTextMessage"
+            />
+        );
+
+        await userEvent.click(screen.getByRole('combobox'));
+        await userEvent.click(screen.getByRole('option', {name: /sendSms/}));
+
+        expect(handleValueChange).toHaveBeenCalledWith('sendSms');
+    });
 });
