@@ -11,6 +11,9 @@ import {
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import MoveConnectedUsersImpact from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersImpact';
+import MoveConnectedUsersResult from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersResult';
+import {formatSkippedLine} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
 import {useMemo, useState} from 'react';
 
 type ConnectedUserIdType = number | string;
@@ -22,7 +25,7 @@ interface MoveConnectedUsersDialogConnectedUserI {
     name?: string | null;
 }
 
-interface MoveConnectedUsersSkippedI {
+export interface MoveConnectedUsersSkippedI {
     connectedUserId: ConnectedUserIdType;
     reason: string;
     workflowLabels: string[];
@@ -65,25 +68,6 @@ type MoveConnectedUsersDialogContentPropsType = Omit<
 
 const getConnectedUserLabel = (connectedUser: MoveConnectedUsersDialogConnectedUserI): string =>
     connectedUser.name || connectedUser.email || connectedUser.externalId;
-
-const formatSkippedLine = (label: string, {reason, workflowLabels}: MoveConnectedUsersSkippedI): string => {
-    const workflows = workflowLabels.join(', ');
-
-    switch (reason) {
-        case 'TARGET_LACKS_REFERENCED_WORKFLOWS':
-            return `${label}: the target has no ${workflows}`;
-        case 'TARGET_LACKS_ENABLED_WORKFLOWS':
-            return `${label}: the target has no enabled ${workflows}`;
-        case 'CONNECTION_MISMATCH':
-            return `${label}: the target uses a different authorization type`;
-        case 'NOT_ON_SOURCE':
-            return `${label}: no longer on this configuration`;
-        case 'MOVE_FAILED':
-            return `${label}: the move failed, try again`;
-        default:
-            return `${label}: ${reason}`;
-    }
-};
 
 const MoveConnectedUsersDialogContent = ({
     connectedUsers,
@@ -183,20 +167,7 @@ const MoveConnectedUsersDialogContent = ({
                 </DialogHeader>
 
                 {result ? (
-                    <div className="flex flex-col gap-2">
-                        <p className="text-sm font-medium">
-                            {`${result.movedConnectedUserIds.length} moved, ${result.needsAttentionConnectedUserIds.length} need attention`}
-                        </p>
-
-                        {result.skipped.map((skippedUser, index) => (
-                            <p
-                                className="text-sm text-content-neutral-secondary"
-                                key={`${skippedUser.connectedUserId}-${index}`}
-                            >
-                                {toSkippedLine(skippedUser)}
-                            </p>
-                        ))}
-                    </div>
+                    <MoveConnectedUsersResult result={result} toSkippedLine={toSkippedLine} />
                 ) : (
                     <div className="flex flex-col gap-4">
                         <fieldset className="space-y-2 border-0 p-0">
@@ -217,47 +188,13 @@ const MoveConnectedUsersDialogContent = ({
                             </Select>
                         </fieldset>
 
-                        {impact?.map((impactItem) => (
-                            <div
-                                className="rounded border border-border/50 px-3 py-2 text-sm"
-                                key={impactItem.label}
-                                role="alert"
-                            >
-                                <p className="font-medium">
-                                    {`${impactItem.label}: affects ${impactItem.affectedConnectedUserCount} ${impactItem.affectedConnectedUserCount === 1 ? 'user' : 'users'}`}
-                                </p>
-
-                                {impactItem.newRequiredConnections.length > 0 && (
-                                    <p>{`New required connections: ${impactItem.newRequiredConnections.join(', ')}`}</p>
-                                )}
-
-                                {impactItem.newRequiredInputs.length > 0 && (
-                                    <p>{`New required inputs: ${impactItem.newRequiredInputs.join(', ')}`}</p>
-                                )}
-                            </div>
-                        ))}
-
-                        {!!mcpServerCount && (
-                            <p className="text-sm text-content-neutral-secondary">
-                                {`${mcpServerCount} ${mcpServerCount === 1 ? 'MCP server uses' : 'MCP servers use'} one of these configurations. Their tools follow the configuration each user lands on.`}
-                            </p>
-                        )}
-
-                        {previewError && (
-                            <p className="text-sm text-content-destructive-primary" role="alert">
-                                Could not load the move preview.
-                            </p>
-                        )}
-
-                        {!!previewSkipped?.length && (
-                            <div className="space-y-1 text-sm text-content-neutral-secondary">
-                                <p className="font-medium">Users that would be skipped</p>
-
-                                {previewSkipped.map((skippedUser, index) => (
-                                    <p key={`${skippedUser.connectedUserId}-${index}`}>{toSkippedLine(skippedUser)}</p>
-                                ))}
-                            </div>
-                        )}
+                        <MoveConnectedUsersImpact
+                            impact={impact}
+                            mcpServerCount={mcpServerCount}
+                            previewError={previewError}
+                            previewSkipped={previewSkipped}
+                            toSkippedLine={toSkippedLine}
+                        />
 
                         <Input
                             aria-label="Search users"
