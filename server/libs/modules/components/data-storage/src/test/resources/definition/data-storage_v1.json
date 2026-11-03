@@ -331,30 +331,6 @@
       "placeholder": null,
       "required": true,
       "type": "TIME"
-    }, {
-      "advancedOption": false,
-      "controlType": "SELECT",
-      "defaultValue": null,
-      "description": "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Append a List as a Single Item",
-      "metadata": { },
-      "name": "appendListAsSingleItem",
-      "options": [ {
-        "description": null,
-        "label": "True",
-        "value": true
-      }, {
-        "description": null,
-        "label": "False",
-        "value": false
-      } ],
-      "placeholder": null,
-      "required": false,
-      "type": "BOOLEAN"
     } ],
     "resumePerform": null,
     "title": "Append Value to List",

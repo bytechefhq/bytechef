@@ -16,7 +16,6 @@
 
 package com.bytechef.component.data.storage.action;
 
-import static com.bytechef.component.data.storage.constant.DataStorageConstants.APPEND_LIST_AS_SINGLE_ITEM;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
@@ -122,12 +121,7 @@ public class DataStorageAppendValueToListAction {
                 .label("Value")
                 .description("The value to set under given key.")
                 .displayCondition("type == '%s'".formatted(ValueType.TIME))
-                .required(true),
-            bool(APPEND_LIST_AS_SINGLE_ITEM)
-                .label("Append a List as a Single Item")
-                .description(
-                    "When set to true, and the value is a list, it will be added as a single value rather than " +
-                        "concatenating the lists."))
+                .required(true))
         .help("", "https://docs.bytechef.io/reference/components/data-storage_v1#append-value-to-list")
         .perform(DataStorageAppendValueToListAction::perform);
 
@@ -151,8 +145,8 @@ public class DataStorageAppendValueToListAction {
             list = new ArrayList<>();
         }
 
-        if (value instanceof Object[] && !inputParameters.getRequiredBoolean(APPEND_LIST_AS_SINGLE_ITEM)) {
-            list.addAll(Arrays.asList((Object[]) value));
+        if (value instanceof Object[] values) {
+            list.addAll(Arrays.asList(values));
         } else {
             list.add(value);
         }
