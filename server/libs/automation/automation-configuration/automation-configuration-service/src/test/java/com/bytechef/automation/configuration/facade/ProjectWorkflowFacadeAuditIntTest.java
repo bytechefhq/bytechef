@@ -18,7 +18,10 @@ package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
@@ -27,22 +30,28 @@ import com.bytechef.automation.configuration.config.ProjectAuditIntTestConfigura
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
+import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +66,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -72,6 +84,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 class ProjectWorkflowFacadeAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";
+    private static final JsonMapper JSON_MAPPER = new JsonMapper();
     private static final Pattern SECRET_PATTERN = Pattern.compile(
         "(?i)secret|password|token|credential|private.?key|api.?key");
     private static final String WORKFLOW_DEFINITION =
@@ -82,6 +95,9 @@ class ProjectWorkflowFacadeAuditIntTest {
 
     @MockitoSpyBean
     private PermissionService permissionService;
+
+    @MockitoBean
+    private PreBuiltTemplateService preBuiltTemplateService;
 
     @Autowired
     private ProjectFacade projectFacade;
@@ -94,6 +110,9 @@ class ProjectWorkflowFacadeAuditIntTest {
 
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
+
+    @MockitoBean
+    private SharedTemplateService sharedTemplateService;
 
     @Autowired
     private WorkflowCrudRepository workflowCrudRepository;
@@ -252,6 +271,81 @@ class ProjectWorkflowFacadeAuditIntTest {
                 "workflowUuid", workflowUuid));
     }
 
+    @Test
+    void testExportWorkflowRecordsTheWorkflowWithoutItsDefinition() {
+        String workflowId = addWorkflow();
+
+        projectWorkflowFacade.exportWorkflow(workflowId);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(ProjectWorkflowAuditEvents.WORKFLOW_EXPORTED);
+
+        assertSuccess(persistentAuditEvent);
+        assertData(persistentAuditEvent, "exportWorkflow", Map.of("result", "SUCCESS", "workflowId", workflowId));
+    }
+
+    @Test
+    void testShareAndUnshareRecordTheWorkflow() {
+        String workflowId = addWorkflow();
+
+        projectWorkflowFacade.exportSharedWorkflow(workflowId, "Shared description");
+
+        PersistentAuditEvent sharedPersistentAuditEvent = findSingleEvent(ProjectWorkflowAuditEvents.WORKFLOW_SHARED);
+
+        assertSuccess(sharedPersistentAuditEvent);
+        assertData(
+            sharedPersistentAuditEvent, "exportSharedWorkflow", Map.of("result", "SUCCESS", "workflowId", workflowId));
+
+        SharedTemplate sharedTemplate = new SharedTemplate(1L, UUID.randomUUID(), mock(FileEntry.class), 0);
+
+        when(sharedTemplateService.getSharedTemplate(any(UUID.class))).thenReturn(sharedTemplate);
+
+        projectWorkflowFacade.deleteSharedWorkflow(workflowId);
+
+        PersistentAuditEvent unsharedPersistentAuditEvent = findSingleEvent(
+            ProjectWorkflowAuditEvents.WORKFLOW_UNSHARED);
+
+        assertSuccess(unsharedPersistentAuditEvent);
+        assertData(
+            unsharedPersistentAuditEvent, "deleteSharedWorkflow",
+            Map.of("result", "SUCCESS", "workflowId", workflowId));
+    }
+
+    @Test
+    void testImportWorkflowTemplateRecordsTheTemplateAndTheNewWorkflowOnce() {
+        JsonNode workflowDefinition = JSON_MAPPER.readTree(WORKFLOW_DEFINITION);
+
+        when(preBuiltTemplateService.getWorkflowTemplate("audit-template"))
+            .thenReturn(
+                new WorkflowTemplate(
+                    "audit-template", null, null, null, null, List.of(), null, null, List.of(), List.of(), null,
+                    List.of(), workflowDefinition, null, null));
+
+        long projectWorkflowId = projectWorkflowFacade.importWorkflowTemplate(projectId, "audit-template", false);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            ProjectWorkflowAuditEvents.WORKFLOW_TEMPLATE_IMPORTED);
+
+        assertSuccess(persistentAuditEvent);
+        assertData(
+            persistentAuditEvent, "importWorkflowTemplate",
+            Map.of(
+                "result", "SUCCESS", "projectId", String.valueOf(projectId), "templateId", "audit-template",
+                "sharedWorkflow", "false", "projectWorkflowId", String.valueOf(projectWorkflowId)));
+        assertThat(findEvents(ProjectWorkflowAuditEvents.WORKFLOW_CREATED)).isEmpty();
+    }
+
+    @Test
+    void testUnshareOfAnUnknownWorkflowIsRecordedAsAnError() {
+        assertThatThrownBy(() -> projectWorkflowFacade.deleteSharedWorkflow("unknown-workflow"))
+            .isInstanceOf(RuntimeException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(ProjectWorkflowAuditEvents.WORKFLOW_UNSHARED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("workflowId", "unknown-workflow");
+    }
+
     private String addWorkflow() {
         ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(projectId, WORKFLOW_DEFINITION);
 
@@ -291,14 +385,19 @@ class ProjectWorkflowFacadeAuditIntTest {
                 ADMIN_LOGIN, "n/a", List.of(new SimpleGrantedAuthority(authority))));
     }
 
-    private PersistentAuditEvent findSingleEvent(String eventType) {
+    private List<PersistentAuditEvent> findEvents(String eventType) {
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
             AuditEventFilter.empty(), PageRequest.of(0, 25));
 
-        List<PersistentAuditEvent> persistentAuditEvents = page.getContent()
-            .stream()
+        List<PersistentAuditEvent> pageContent = page.getContent();
+
+        return pageContent.stream()
             .filter(persistentAuditEvent -> eventType.equals(persistentAuditEvent.getEventType()))
             .toList();
+    }
+
+    private PersistentAuditEvent findSingleEvent(String eventType) {
+        List<PersistentAuditEvent> persistentAuditEvents = findEvents(eventType);
 
         assertThat(persistentAuditEvents).hasSize(1);
 
