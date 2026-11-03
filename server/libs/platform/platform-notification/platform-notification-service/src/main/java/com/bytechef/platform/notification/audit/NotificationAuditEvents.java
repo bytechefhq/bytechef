@@ -24,6 +24,7 @@ public final class NotificationAuditEvents {
     public static final String NOTIFICATION_CREATED = "NOTIFICATION_CREATED";
     public static final String NOTIFICATION_DELETED = "NOTIFICATION_DELETED";
     public static final String NOTIFICATION_SIGNING_SECRET_REGENERATED = "NOTIFICATION_SIGNING_SECRET_REGENERATED";
+    public static final String NOTIFICATION_TESTED = "NOTIFICATION_TESTED";
     public static final String NOTIFICATION_UPDATED = "NOTIFICATION_UPDATED";
 
     private NotificationAuditEvents() {

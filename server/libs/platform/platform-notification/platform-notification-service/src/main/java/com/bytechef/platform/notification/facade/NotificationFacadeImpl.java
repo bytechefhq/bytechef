@@ -23,7 +23,12 @@ import com.bytechef.platform.notification.delivery.WebhookReservedHeaders;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.dto.NotificationDTO;
+import com.bytechef.platform.notification.handler.NotificationHandler;
+import com.bytechef.platform.notification.handler.NotificationHandlerContext;
+import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
+import com.bytechef.platform.notification.handler.NotificationSender;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
+import com.bytechef.platform.notification.handler.NotificationTestResult;
 import com.bytechef.platform.notification.handler.WebhookBodyTemplate;
 import com.bytechef.platform.notification.service.NotificationEventService;
 import com.bytechef.platform.notification.service.NotificationService;
@@ -31,6 +36,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,15 +58,17 @@ public class NotificationFacadeImpl implements NotificationFacade {
     private static final int MAX_HEADER_VALUE_LENGTH = 4096;
 
     private final NotificationEventService notificationEventService;
+    private final NotificationHandlerRegistry notificationHandlerRegistry;
     private final NotificationSenderRegistry notificationSenderRegistry;
     private final NotificationService notificationService;
 
     @SuppressFBWarnings("EI")
     public NotificationFacadeImpl(
-        NotificationEventService notificationEventService, NotificationSenderRegistry notificationSenderRegistry,
-        NotificationService notificationService) {
+        NotificationEventService notificationEventService, NotificationHandlerRegistry notificationHandlerRegistry,
+        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
 
         this.notificationEventService = notificationEventService;
+        this.notificationHandlerRegistry = notificationHandlerRegistry;
         this.notificationSenderRegistry = notificationSenderRegistry;
         this.notificationService = notificationService;
     }
@@ -156,6 +164,45 @@ public class NotificationFacadeImpl implements NotificationFacade {
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteNotification(long id) {
         notificationService.delete(id);
+    }
+
+    @Override
+    @Audited(event = NotificationAuditEvents.NOTIFICATION_TESTED, data = {
+        @AuditData(key = "notificationId", value = "#notification.id"),
+        @AuditData(key = "type", value = "#notification.type")
+    })
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    public NotificationTestResult testNotification(Notification notification) {
+        validateNotification(notification);
+
+        Notification storedNotification = notification.getId() == null
+            ? null : notificationService.getNotification(notification.getId());
+
+        Notification testNotification = new Notification();
+
+        testNotification.setId(notification.getId());
+        testNotification.setName(notification.getName());
+        testNotification.setType(notification.getType());
+
+        NotificationSecretSettings.apply(testNotification, notification.getSettings(), storedNotification);
+
+        NotificationHandler notificationHandler = notificationHandlerRegistry.getNotificationHandler(
+            NotificationEvent.Type.JOB_FAILED, notification.getType());
+
+        if (notificationHandler == null) {
+            return NotificationTestResult.failed("Test send is not available in this deployment");
+        }
+
+        NotificationSender notificationSender = notificationSenderRegistry.getNotificationSender(
+            notification.getType());
+
+        NotificationHandlerContext notificationHandlerContext = NotificationHandlerContext.sample()
+            .withTimestamp(Instant.now());
+
+        return notificationSender.sendTest(testNotification, notificationHandler, notificationHandlerContext);
     }
 
     @Override
