@@ -60,6 +60,33 @@ describe('buildWorkflowGraph', () => {
         expect(edges.map((edge) => edge.id)).toEqual([`trigger_1=>${FINAL_PLACEHOLDER_NODE_ID}`]);
     });
 
+    it('keeps the node name of a task whose component definition is missing', () => {
+        const {nodes} = build([buildTask('viber_1', 'viber/v1/sendTextMessage')]);
+
+        const taskNode = nodes.find((node) => node.id === 'viber_1');
+
+        expect(taskNode?.data).toMatchObject({
+            componentName: 'viber',
+            name: 'viber_1',
+            operationName: 'sendTextMessage',
+            trigger: false,
+            workflowNodeName: 'viber_1',
+        });
+    });
+
+    it('keeps the node name of a trigger whose component definition is missing', () => {
+        const {nodes} = build([], [{name: 'trigger_1', type: 'viber/v1/newMessage'}]);
+
+        const triggerNode = nodes.find((node) => node.id === 'trigger_1');
+
+        expect(triggerNode?.data).toMatchObject({
+            componentName: 'viber',
+            name: 'trigger_1',
+            trigger: true,
+            workflowNodeName: 'trigger_1',
+        });
+    });
+
     it('returns fresh arrays on every call', () => {
         const tasks = [buildTask('t1')];
 
