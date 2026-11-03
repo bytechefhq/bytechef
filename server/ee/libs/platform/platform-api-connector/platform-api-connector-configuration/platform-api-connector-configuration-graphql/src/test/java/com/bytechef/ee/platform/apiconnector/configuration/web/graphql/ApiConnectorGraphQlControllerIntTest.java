@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorFacade;
 import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorFacadeImpl;
+import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorGenerationJobFacade;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
@@ -66,10 +67,10 @@ import org.springframework.test.context.ContextConfiguration;
 /**
  * Executes every {@link ApiConnectorGraphQlController} query and mutation through the real GraphQL schema with Spring
  * Security's method interceptor enforcing the real {@code @PreAuthorize} guards of the controller and of a spied
- * {@link ApiConnectorFacadeImpl} through the production {@link AutomationMethodSecurityConfiguration}. API connectors belong to the tenant, so each operation must decide on
- * the caller's {@code ROLE_ADMIN} authority alone and never consult {@link PermissionService}. Every collaborator
- * throws on any call, so an allowed operation proves it entered the controller method by reaching one of them, and a
- * denied one proves it never did.
+ * {@link ApiConnectorFacadeImpl} through the production {@link AutomationMethodSecurityConfiguration}. API connectors
+ * belong to the tenant, so each operation must decide on the caller's {@code ROLE_ADMIN} authority alone and never
+ * consult {@link PermissionService}. Every collaborator throws on any call, so an allowed operation proves it entered
+ * the controller method by reaching one of them, and a denied one proves it never did.
  *
  * @version ee
  *
@@ -227,12 +228,13 @@ class ApiConnectorGraphQlControllerIntTest {
         ApiConnectorFacade apiConnectorFacade(
             ApiConnectorAiService apiConnectorAiService,
             ApiConnectorGenerationJobService apiConnectorGenerationJobService,
-            ApiConnectorService apiConnectorService) {
+            ApiConnectorService apiConnectorService, OpenApiSpecificationGenerator openApiSpecificationGenerator) {
 
             return spy(
                 new ApiConnectorFacadeImpl(
                     apiConnectorAiService, mock(ApiConnectorFileStorage.class, bodyReachedAnswer()),
-                    apiConnectorGenerationJobService, apiConnectorService));
+                    mock(ApiConnectorGenerationJobFacade.class, bodyReachedAnswer()), apiConnectorGenerationJobService,
+                    apiConnectorService, openApiSpecificationGenerator));
         }
 
         @Bean
