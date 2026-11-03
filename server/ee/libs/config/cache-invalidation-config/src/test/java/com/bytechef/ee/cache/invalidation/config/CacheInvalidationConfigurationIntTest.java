@@ -213,6 +213,22 @@ class CacheInvalidationConfigurationIntTest {
         }
 
         @Test
+        void testSharedCacheReadsTheValueJustWritten() {
+            redisContextRunner()
+                .run(context -> {
+                    Cache cache = getCache(context, SHARED_CACHE);
+
+                    for (int count = 1; count <= 200; count++) {
+                        Integer previousCount = cache.get("count", Integer.class);
+
+                        cache.put("count", previousCount == null ? 1 : previousCount + 1);
+
+                        assertThat(cache.get("count", Integer.class)).isEqualTo(count);
+                    }
+                });
+        }
+
+        @Test
         void testSharedCacheKeepsNullValues() {
             redisContextRunner()
                 .run(context -> {
