@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.universal.image.constant.AiImageConstant
 import static com.bytechef.platform.component.definition.AiUniversalComponentDefinition.AI_IMAGE;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(AI_IMAGE + "/v1/" + GENERATE_IMAGE)
 public class AiImageGenerateImageTaskHandler extends AbstractTaskHandler {
 
-    public AiImageGenerateImageTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(AI_IMAGE, 1, GENERATE_IMAGE, actionDefinitionFacade);
+    public AiImageGenerateImageTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(AI_IMAGE, 1, GENERATE_IMAGE, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

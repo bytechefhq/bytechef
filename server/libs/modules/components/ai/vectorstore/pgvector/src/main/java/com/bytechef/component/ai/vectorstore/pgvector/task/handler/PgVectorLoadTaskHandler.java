@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorCo
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(PGVECTOR + "/v1/" + LOAD)
 public class PgVectorLoadTaskHandler extends AbstractTaskHandler {
 
-    public PgVectorLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(PGVECTOR, 1, LOAD, actionDefinitionFacade);
+    public PgVectorLoadTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(PGVECTOR, 1, LOAD, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }
