@@ -160,45 +160,50 @@ configs:
       server {
         listen 80;
         client_max_body_size 100m;
+        error_page 502 = @retry_502;
+        error_page 504 = @retry_504;
         proxy_buffering off;
+        proxy_connect_timeout 2s;
         proxy_http_version 1.1;
+        proxy_next_upstream error timeout http_502 http_503;
+        proxy_next_upstream_tries 0;
         proxy_read_timeout 600s;
+        proxy_set_header Connection $$connection_upgrade;
+        proxy_set_header Host $$host;
+        proxy_set_header Upgrade $$http_upgrade;
+        proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $$scheme;
+        proxy_set_header X-Real-IP $$remote_addr;
 
         location ~ ^/webhooks/[^/]+/test/ {
-          proxy_pass http://coordinators;
-          proxy_connect_timeout 2s;
-          proxy_next_upstream error timeout http_502 http_503;
-          proxy_next_upstream_tries 0;
-          proxy_set_header Connection "";
-          proxy_set_header Host $$host;
-          proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $$scheme;
-          proxy_set_header X-Real-IP $$remote_addr;
+          set $$proxy_upstream coordinators;
+          proxy_pass http://$$proxy_upstream;
         }
 
         location ~ ^/(webhooks|callback|approvals|job/resume|file-entries/[^/]+/content) {
-          proxy_pass http://webhooks;
-          proxy_connect_timeout 2s;
-          proxy_next_upstream error timeout http_502 http_503;
-          proxy_next_upstream_tries 0;
-          proxy_set_header Connection $$connection_upgrade;
-          proxy_set_header Host $$host;
-          proxy_set_header Upgrade $$http_upgrade;
-          proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $$scheme;
-          proxy_set_header X-Real-IP $$remote_addr;
+          set $$proxy_upstream webhooks;
+          proxy_pass http://$$proxy_upstream;
         }
 
         location / {
-          proxy_pass http://coordinators;
-          proxy_connect_timeout 2s;
-          proxy_next_upstream error timeout http_502 http_503;
-          proxy_next_upstream_tries 0;
-          proxy_set_header Connection "";
-          proxy_set_header Host $$host;
-          proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $$scheme;
-          proxy_set_header X-Real-IP $$remote_addr;
+          set $$proxy_upstream coordinators;
+          proxy_pass http://$$proxy_upstream;
+        }
+
+        location @retry_502 {
+          if ($$upstream_bytes_sent !~ "^[0, ]*$$") {
+            return 502;
+          }
+
+          proxy_pass http://$$proxy_upstream;
+        }
+
+        location @retry_504 {
+          if ($$upstream_bytes_sent !~ "^[0, ]*$$") {
+            return 504;
+          }
+
+          proxy_pass http://$$proxy_upstream;
         }
       }
 
