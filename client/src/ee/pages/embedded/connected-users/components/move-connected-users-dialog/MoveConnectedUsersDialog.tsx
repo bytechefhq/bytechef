@@ -13,8 +13,10 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import MoveConnectedUsersImpact from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersImpact';
 import MoveConnectedUsersResult from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersResult';
-import {formatSkippedLine} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import {formatSkippedReason} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
 import {useMemo, useState} from 'react';
+
+import type {SkippedUserDisplayI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersSkippedList';
 
 type ConnectedUserIdType = number | string;
 
@@ -117,10 +119,14 @@ const MoveConnectedUsersDialogContent = ({
         [connectedUsers]
     );
 
-    const toSkippedLine = (skippedUser: MoveConnectedUsersSkippedI): string => {
+    const toSkippedUser = (skippedUser: MoveConnectedUsersSkippedI): SkippedUserDisplayI => {
         const connectedUserId = String(skippedUser.connectedUserId);
 
-        return formatSkippedLine(labelByConnectedUserId.get(connectedUserId) || connectedUserId, skippedUser);
+        return {
+            label: labelByConnectedUserId.get(connectedUserId) || connectedUserId,
+            reason: formatSkippedReason(skippedUser),
+            workflowLabels: skippedUser.workflowLabels,
+        };
     };
 
     const canMove = !!targetId && selectedConnectedUserIds.length > 0 && !moving && !previewLoading;
@@ -167,7 +173,7 @@ const MoveConnectedUsersDialogContent = ({
                 </DialogHeader>
 
                 {result ? (
-                    <MoveConnectedUsersResult result={result} toSkippedLine={toSkippedLine} />
+                    <MoveConnectedUsersResult result={result} toSkippedUser={toSkippedUser} />
                 ) : (
                     <div className="flex flex-col gap-4">
                         <fieldset className="space-y-2 border-0 p-0">
@@ -193,7 +199,7 @@ const MoveConnectedUsersDialogContent = ({
                             mcpServerCount={mcpServerCount}
                             previewError={previewError}
                             previewSkipped={previewSkipped}
-                            toSkippedLine={toSkippedLine}
+                            toSkippedUser={toSkippedUser}
                         />
 
                         <Input

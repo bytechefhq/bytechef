@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Alert, AlertDescription} from '@/components/ui/alert';
 import {
     Dialog,
     DialogContent,
@@ -11,14 +12,16 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import MoveConnectedUsersImpact from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersImpact';
 import MoveConnectedUsersResult from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersResult';
-import {formatSkippedLine} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import {formatSkippedReason} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
+import {AlertTriangleIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
 import type {
     MoveConnectedUsersResultI,
     MoveConnectedUsersSkippedI,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
+import type {SkippedUserDisplayI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersSkippedList';
 
 const UNMOVABLE_SKIP_REASONS = ['ALREADY_ON_TARGET', 'NOT_ON_SOURCE'];
 
@@ -109,14 +112,14 @@ const UpgradeConnectedUsersDialogView = ({
     const canUpgrade =
         !!targetId && !!impact && !noConnectedUserWouldMove && !previewLoading && !previewError && !upgrading;
 
-    const toSkippedLine = (skippedUser: MoveConnectedUsersSkippedI): string => {
+    const toSkippedUser = (skippedUser: MoveConnectedUsersSkippedI): SkippedUserDisplayI => {
         const connectedUserId = String(skippedUser.connectedUserId);
 
-        return formatSkippedLine(
-            labelByConnectedUserId.get(connectedUserId) || connectedUserId,
-            skippedUser,
-            notOnSourceReason
-        );
+        return {
+            label: labelByConnectedUserId.get(connectedUserId) || connectedUserId,
+            reason: formatSkippedReason(skippedUser, notOnSourceReason),
+            workflowLabels: skippedUser.workflowLabels,
+        };
     };
 
     const handleClose = () => {
@@ -155,7 +158,7 @@ const UpgradeConnectedUsersDialogView = ({
                 </DialogHeader>
 
                 {result ? (
-                    <MoveConnectedUsersResult result={result} toSkippedLine={toSkippedLine} />
+                    <MoveConnectedUsersResult result={result} toSkippedUser={toSkippedUser} />
                 ) : (
                     <div className="flex flex-col gap-4">
                         <fieldset className="space-y-2 border-0 p-0">
@@ -204,19 +207,23 @@ const UpgradeConnectedUsersDialogView = ({
                             </Select>
                         </fieldset>
 
+                        {noConnectedUserWouldMove && (
+                            <Alert variant="warning">
+                                <AlertTriangleIcon />
+
+                                <AlertDescription>
+                                    None of the selected users would move to this configuration.
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
                         <MoveConnectedUsersImpact
                             impact={impact?.workflows}
                             mcpServerCount={impact?.mcpServerCount}
                             previewError={previewError}
                             previewSkipped={impact?.skipped}
-                            toSkippedLine={toSkippedLine}
+                            toSkippedUser={toSkippedUser}
                         />
-
-                        {noConnectedUserWouldMove && (
-                            <p className="text-sm text-content-neutral-secondary">
-                                None of the selected users would move to this configuration.
-                            </p>
-                        )}
                     </div>
                 )}
 

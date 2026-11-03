@@ -1,7 +1,9 @@
-import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import MoveConnectedUsersDialog from '../MoveConnectedUsersDialog';
+
+const getSkippedItems = () => within(screen.getByRole('list', {name: 'Skipped users'})).getAllByRole('listitem');
 
 const connectedUsers = [
     {connectedUserId: '1', email: 'jane@example.com', externalId: 'ext-1', name: 'Jane'},
@@ -138,13 +140,35 @@ describe('MoveConnectedUsersDialog', () => {
             ],
         });
 
-        expect(screen.getByText('Jane: the target has no Sync, Report')).toBeInTheDocument();
+        const skippedItem = getSkippedItems()[0];
+
+        expect(within(skippedItem).getByText('Jane')).toBeInTheDocument();
+        expect(
+            within(skippedItem).getByText("The target configuration doesn't have these workflows:")
+        ).toBeInTheDocument();
+    });
+
+    it('renders each workflow label as its own chip', () => {
+        renderDialog({
+            previewSkipped: [
+                {connectedUserId: '1', reason: 'TARGET_LACKS_REFERENCED_WORKFLOWS', workflowLabels: ['Sync', 'Report']},
+            ],
+        });
+
+        const skippedItem = getSkippedItems()[0];
+
+        expect(within(skippedItem).getByText('Sync')).toBeInTheDocument();
+        expect(within(skippedItem).getByText('Report')).toBeInTheDocument();
+        expect(within(skippedItem).queryByText('Sync, Report')).not.toBeInTheDocument();
     });
 
     it('labels a skipped user by id when the user is not in the list', () => {
         renderDialog({previewSkipped: [{connectedUserId: 99, reason: 'NOT_ON_SOURCE', workflowLabels: []}]});
 
-        expect(screen.getByText('99: no longer on this configuration')).toBeInTheDocument();
+        const skippedItem = getSkippedItems()[0];
+
+        expect(within(skippedItem).getByText('99')).toBeInTheDocument();
+        expect(within(skippedItem).getByText('No longer on this configuration')).toBeInTheDocument();
     });
 
     it('shows a loading state until the connected users arrive', () => {
@@ -161,16 +185,27 @@ describe('MoveConnectedUsersDialog', () => {
     });
 
     it.each([
-        ['TARGET_LACKS_REFERENCED_WORKFLOWS', ['Sync', 'Report'], 'Jane: the target has no Sync, Report'],
-        ['TARGET_LACKS_ENABLED_WORKFLOWS', ['Sync', 'Report'], 'Jane: the target has no enabled Sync, Report'],
-        ['CONNECTION_MISMATCH', [], 'Jane: the target uses a different authorization type'],
-        ['NOT_ON_SOURCE', [], 'Jane: no longer on this configuration'],
-        ['MOVE_FAILED', [], 'Jane: the move failed, try again'],
-        ['SOMETHING_NEW', [], 'Jane: SOMETHING_NEW'],
-    ])('explains the %s skip reason', (reason, workflowLabels, expectedLine) => {
+        [
+            'TARGET_LACKS_REFERENCED_WORKFLOWS',
+            ['Sync', 'Report'],
+            "The target configuration doesn't have these workflows:",
+        ],
+        [
+            'TARGET_LACKS_ENABLED_WORKFLOWS',
+            ['Sync', 'Report'],
+            "These workflows aren't enabled on the target configuration:",
+        ],
+        ['CONNECTION_MISMATCH', [], 'The target configuration uses a different authorization type'],
+        ['NOT_ON_SOURCE', [], 'No longer on this configuration'],
+        ['MOVE_FAILED', [], 'The move failed. Try again.'],
+        ['SOMETHING_NEW', [], 'SOMETHING_NEW'],
+    ])('explains the %s skip reason', (reason, workflowLabels, expectedReason) => {
         renderDialog({previewSkipped: [{connectedUserId: '1', reason, workflowLabels}]});
 
-        expect(screen.getByText(expectedLine)).toBeInTheDocument();
+        const skippedItem = getSkippedItems()[0];
+
+        expect(within(skippedItem).getByText('Jane')).toBeInTheDocument();
+        expect(within(skippedItem).getByText(expectedReason)).toBeInTheDocument();
     });
 
     it('reports moved, needs-attention and skipped users', async () => {
@@ -193,8 +228,14 @@ describe('MoveConnectedUsersDialog', () => {
         });
 
         expect(onMove).toHaveBeenCalledWith('10', ['1', '2']);
-        expect(screen.getByText('Jane: the target has no Sync, Report')).toBeInTheDocument();
-        expect(screen.getByText('Bob: Already on this configuration')).toBeInTheDocument();
+        const [janeItem, bobItem] = getSkippedItems();
+
+        expect(within(janeItem).getByText('Jane')).toBeInTheDocument();
+        expect(
+            within(janeItem).getByText("The target configuration doesn't have these workflows:")
+        ).toBeInTheDocument();
+        expect(within(bobItem).getByText('Bob')).toBeInTheDocument();
+        expect(within(bobItem).getByText('Already on this configuration')).toBeInTheDocument();
     });
 
     it('disables Move while the move preview loads', async () => {

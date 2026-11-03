@@ -1,3 +1,7 @@
+import MoveConnectedUsersSkippedList, {
+    type SkippedUserDisplayI,
+} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersSkippedList';
+
 import type {
     MoveConnectedUsersResultI,
     MoveConnectedUsersSkippedI,
@@ -5,20 +9,18 @@ import type {
 
 interface MoveConnectedUsersResultProps {
     result: MoveConnectedUsersResultI;
-    toSkippedLine: (skippedUser: MoveConnectedUsersSkippedI) => string;
+    toSkippedUser: (skippedUser: MoveConnectedUsersSkippedI) => SkippedUserDisplayI;
 }
 
-const MoveConnectedUsersResult = ({result, toSkippedLine}: MoveConnectedUsersResultProps) => (
+const MoveConnectedUsersResult = ({result, toSkippedUser}: MoveConnectedUsersResultProps) => (
     <div className="flex flex-col gap-2">
         <p className="text-sm font-medium">
             {`${result.movedConnectedUserIds.length} moved, ${result.needsAttentionConnectedUserIds.length} need attention`}
         </p>
 
-        {result.skipped.map((skippedUser, index) => (
-            <p className="text-sm text-content-neutral-secondary" key={`${skippedUser.connectedUserId}-${index}`}>
-                {toSkippedLine(skippedUser)}
-            </p>
-        ))}
+        {result.skipped.length > 0 && (
+            <MoveConnectedUsersSkippedList skippedUsers={result.skipped.map(toSkippedUser)} />
+        )}
     </div>
 );
 
