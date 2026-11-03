@@ -11,7 +11,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {Plus} from 'lucide-react';
 import {Dispatch, SetStateAction, type UIEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {type ColSpanArgs, Column, RowsChangeData} from 'react-data-grid';
+import {type CellMouseArgs, type CellMouseEvent, type ColSpanArgs, Column, RowsChangeData} from 'react-data-grid';
 
 import BottomLoader from '../components/BottomLoader';
 import {
@@ -428,6 +428,19 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         });
     }, [dataTable?.id, environmentId, insertRowMutation]);
 
+    const handleCellClick = useCallback(
+        ({row}: CellMouseArgs<GridRowType, SummaryRowType>, event: CellMouseEvent) => {
+            if (row.id !== '-1') {
+                return;
+            }
+
+            event.preventGridDefault();
+
+            handleAddRow();
+        },
+        [handleAddRow]
+    );
+
     const localRowCount = localRows.length;
 
     const gridColumns: Column<GridRowType, SummaryRowType>[] = useMemo(
@@ -493,6 +506,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     return {
         gridColumns,
         gridRowsWithAdd,
+        handleCellClick,
         handleGridScroll,
         handleRowsChange,
         handleSelectedRowsChange,
