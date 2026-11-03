@@ -36,6 +36,11 @@ public class RemoteConnectedUserProjectConfigurationServiceClient implements Con
     }
 
     @Override
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void deleteByConfigurationId(long configurationId) {
         throw new UnsupportedOperationException();
     }

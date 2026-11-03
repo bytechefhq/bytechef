@@ -76,6 +76,11 @@ public class ConnectedUserProjectConfigurationServiceImpl implements ConnectedUs
     }
 
     @Override
+    public void delete(long id) {
+        connectedUserProjectConfigurationRepository.deleteById(id);
+    }
+
+    @Override
     public void deleteByConfigurationId(long configurationId) {
         connectedUserProjectConfigurationRepository.deleteByConfigurationId(configurationId);
     }

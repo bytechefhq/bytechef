@@ -35,6 +35,9 @@ public class AutomationWorkflowProjectConfigurationErrorType extends AbstractErr
     public static final AutomationWorkflowProjectConfigurationErrorType CONFIGURATION_PROJECT_MISMATCH =
         new AutomationWorkflowProjectConfigurationErrorType(106);
 
+    public static final AutomationWorkflowProjectConfigurationErrorType CONFIGURATION_IN_USE =
+        new AutomationWorkflowProjectConfigurationErrorType(107);
+
     private AutomationWorkflowProjectConfigurationErrorType(int errorKey) {
         super(AutomationWorkflowProjectConfiguration.class, errorKey);
     }

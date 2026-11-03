@@ -14,6 +14,7 @@ import com.bytechef.automation.configuration.security.SkipAutomationAuthorizatio
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,6 +40,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,17 +125,36 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     /**
-     * Deletes the reference workflows and the reference deployment of each connected user in the project. Workflow
-     * copies are left alone. Call inside a transaction: each user's connected user project stays locked until it ends.
+     * Deletes the reference workflows, the reference deployment and the configuration assignment of each connected user
+     * still assigned to the configuration. Workflow copies are left alone. The assignment is read again after the
+     * user's connected user projects are locked, so a user moved to another configuration after the ids were read keeps
+     * the references of that configuration. Call inside a transaction: each user's connected user project stays locked
+     * until it ends.
      *
      * @param automationWorkflowProjectId the automation workflow project id
-     * @param connectedUserIds            the connected user ids
+     * @param configurationId             the automation workflow project configuration id
+     * @param connectedUserIds            the ids of the connected users assigned to the configuration
      */
-    public void deleteReferenceDeployments(long automationWorkflowProjectId, Collection<Long> connectedUserIds) {
+    public void deleteReferenceDeployments(
+        long automationWorkflowProjectId, long configurationId, Collection<Long> connectedUserIds) {
+
         Set<String> automationWorkflowUuids = getAutomationWorkflowUuids(automationWorkflowProjectId);
 
         for (long connectedUserId : getSortedDistinct(connectedUserIds)) {
             lockConnectedUserProjects(connectedUserId);
+
+            Optional<ConnectedUserProjectConfiguration> assignmentOptional =
+                connectedUserProjectConfigurationService.fetchAssignment(connectedUserId, automationWorkflowProjectId);
+
+            if (assignmentOptional.isEmpty()) {
+                continue;
+            }
+
+            ConnectedUserProjectConfiguration assignment = assignmentOptional.get();
+
+            if (!Objects.equals(assignment.getConfigurationId(), configurationId)) {
+                continue;
+            }
 
             connectedUserProjectWorkflowRepository.deleteAll(getReferences(connectedUserId, automationWorkflowUuids));
 
@@ -145,11 +167,13 @@ public class ConnectedUserReferenceRolloutManager {
 
                 connectedUserReferenceDeploymentManager.deleteDeployment(referenceDeployment.getProjectDeploymentId());
             }
+
+            connectedUserProjectConfigurationService.delete(Validate.notNull(assignment.getId(), "id"));
         }
     }
 
     /**
-     * Counts the reference workflows {@link #deleteReferenceDeployments(long, Collection)} would delete.
+     * Counts the reference workflows {@link #deleteReferenceDeployments(long, long, Collection)} would delete.
      *
      * @param automationWorkflowProjectId the automation workflow project id
      * @param connectedUserIds            the connected user ids
@@ -547,10 +571,15 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     private void lockConnectedUserProjects(long connectedUserId) {
-        for (ConnectedUserProject connectedUserProject : connectedUserProjectService
-            .getConnectedUserConnectedUserProjects(connectedUserId)) {
+        List<Long> connectedUserProjectIds = connectedUserProjectService
+            .getConnectedUserConnectedUserProjects(connectedUserId)
+            .stream()
+            .map(ConnectedUserProject::getId)
+            .sorted()
+            .toList();
 
-            connectedUserProjectService.lockConnectedUserProject(connectedUserProject.getId());
+        for (long connectedUserProjectId : connectedUserProjectIds) {
+            connectedUserProjectService.lockConnectedUserProject(connectedUserProjectId);
         }
     }
 

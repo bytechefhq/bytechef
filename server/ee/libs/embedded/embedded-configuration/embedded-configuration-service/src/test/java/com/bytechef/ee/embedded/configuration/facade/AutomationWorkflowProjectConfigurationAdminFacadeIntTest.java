@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +37,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
@@ -99,6 +101,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 
@@ -198,7 +201,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
 
-    @Autowired
+    @MockitoSpyBean
     private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
 
     @Autowired
@@ -477,6 +480,33 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             .toList())
                 .containsExactly(
                     new AutomationWorkflowProjectConfigurationDeletedEvent(projectId, ENVIRONMENT_ID, configurationId));
+    }
+
+    @Test
+    void testDeleteConfigurationInUseRestoresEnabledConfiguration() {
+        long projectId = createPublishedProject("Delete In Use", 1);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        doReturn(List.of(new ConnectedUserProjectConfiguration(Long.MAX_VALUE, projectId, configurationId)))
+            .when(connectedUserProjectConfigurationService)
+            .getAssignments(configurationId);
+
+        applicationEvents.clear();
+
+        assertThatThrownBy(() -> automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(configurationId))
+            .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                configurationException.getErrorKey()).isEqualTo(
+                    AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_IN_USE.getErrorKey()));
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfiguration(configurationId)
+            .enabled()).isTrue();
+        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
+            .toList())
+                .containsExactly(
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID, configurationId));
+        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationDeletedEvent.class)).isEmpty();
     }
 
     @Test

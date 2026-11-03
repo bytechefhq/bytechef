@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -1783,6 +1784,95 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
+    void testDeleteKeepsReferencesOfUserMovedAwayAfterTheAssignmentsWereRead() {
+        DeleteFixture fixture = createDeleteFixture("Delete Moved Away");
+
+        long projectId = fixture.automationWorkflowProjectId();
+        long configurationAId = fixture.configurationA()
+            .getId();
+
+        List<Long> staleConnectedUserIds = connectedUserProjectConfigurationService.getAssignments(configurationAId)
+            .stream()
+            .map(ConnectedUserProjectConfiguration::getConnectedUserId)
+            .toList();
+
+        assertThat(staleConnectedUserIds).contains(fixture.firstConnectedUserId());
+
+        ConfigurationMoveResultDTO moveResult = automationWorkflowProjectConfigurationAdminFacade.moveConnectedUsers(
+            configurationAId, fixture.configurationB()
+                .getId(),
+            List.of(fixture.firstConnectedUserId()));
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(fixture.firstConnectedUserId());
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.executeWithoutResult(
+            status -> connectedUserReferenceRolloutManager.deleteReferenceDeployments(
+                projectId, configurationAId, staleConnectedUserIds));
+
+        assertThat(connectedUserProjectWorkflowRepository.findById(fixture.firstReference()
+            .getId())).isPresent();
+        assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            fixture.firstConnectedUserId(), projectId)).isPresent();
+        assertThat(fetchDeploymentRow(fixture.firstReference()).isEnabled()).isTrue();
+        assertThat(getAssignedConfigurationId(fixture.firstConnectedUserId(), projectId))
+            .isEqualTo(fixture.configurationB()
+                .getId());
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(fixture.secondConnectedUserId(), projectId))
+            .isEmpty();
+    }
+
+    @Test
+    void testSelfServePickedBeforeADeleteDisablesTheConfigurationLandsOnAnother() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Self-Serve Race");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration remainingConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Remaining", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration deletedConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Deleted", null, 1, true, true);
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+            createConnectedUser(), Environment.PRODUCTION);
+
+        TransactionTemplate requiresNewTransactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        requiresNewTransactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        AtomicBoolean disableOnFirstEvaluation = new AtomicBoolean(true);
+
+        doAnswer(invocation -> {
+            if (disableOnFirstEvaluation.getAndSet(false)) {
+                requiresNewTransactionTemplate.executeWithoutResult(
+                    status -> automationWorkflowProjectConfigurationService.updateEnabled(
+                        deletedConfiguration.getId(), false));
+            }
+
+            return true;
+        }).when(embeddedPermissionEvaluator)
+            .evaluate(any(), any());
+
+        assertThat(automationWorkflowProjectConfigurationResolver.resolveAndAssign(
+            connectedUser, automationWorkflowProjectId))
+                .get()
+                .extracting(AutomationWorkflowProjectConfiguration::getId)
+                .isEqualTo(remainingConfiguration.getId());
+
+        automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(deletedConfiguration.getId());
+
+        assertThat(getAssignedConfigurationId(connectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(remainingConfiguration.getId());
+        assertThat(automationWorkflowProjectConfigurationService.getConfigurations(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID))
+                .extracting(AutomationWorkflowProjectConfiguration::getId)
+                .containsExactly(remainingConfiguration.getId());
+    }
+
+    @Test
     void testGetDeleteImpact() {
         DeleteFixture fixture = createDeleteFixture("Delete Impact");
 
@@ -2061,6 +2151,46 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .satisfies(row -> {
                 assertThat(row.isEnabled()).isTrue();
                 assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#target"));
+            });
+    }
+
+    @Test
+    void testMoveImpactListsAnInputOnlyTheSourceProvides() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Move Impact Source Provided Input");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            sourceConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#source"));
+
+        ConnectedUser firstConnectedUser = assignNewConnectedUser(automationWorkflowProjectId, sourceConfiguration);
+        ConnectedUser secondConnectedUser = assignNewConnectedUser(automationWorkflowProjectId, sourceConfiguration);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            firstConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        ConfigurationMoveImpactDTO moveImpact = automationWorkflowProjectConfigurationAdminFacade.getMoveImpact(
+            sourceConfiguration.getId(), targetConfiguration.getId(),
+            List.of(firstConnectedUser.getId(), secondConnectedUser.getId()));
+
+        assertThat(moveImpact.skipped()).isEmpty();
+        assertThat(moveImpact.workflows())
+            .singleElement()
+            .satisfies(workflow -> {
+                assertThat(workflow.workflowUuid()).isEqualTo(workflowUuid);
+                assertThat(workflow.label()).isEqualTo("Post");
+                assertThat(workflow.newRequiredInputs()).containsExactly("channel");
+                assertThat(workflow.newRequiredConnections()).isEmpty();
+                assertThat(workflow.affectedConnectedUserCount()).isEqualTo(1);
             });
     }
 
