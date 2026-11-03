@@ -30,6 +30,7 @@ import {
     ServerCogIcon,
     ServerIcon,
     Settings2Icon,
+    SlidersHorizontalIcon,
     SquareActivityIcon,
     SquareIcon,
     Table2Icon,
@@ -136,7 +137,7 @@ const embeddedNavigation: NavigationType[] = [
     },
     {
         href: '/embedded/automation-configurations',
-        icon: Settings2Icon,
+        icon: SlidersHorizontalIcon,
         name: 'Automation Configurations',
     },
     {href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
