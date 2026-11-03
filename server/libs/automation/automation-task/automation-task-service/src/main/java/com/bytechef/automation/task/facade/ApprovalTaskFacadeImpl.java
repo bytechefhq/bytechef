@@ -92,6 +92,8 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin() or " +
+        "hasPermission(@approvalTaskJobResolver.getJobId(#approvalTask.jobResumeId), 'Job', 'DEPLOYMENT_EDIT')")
     public ApprovalTask createApprovalTask(ApprovalTask approvalTask) {
         String jobResumeIdString = approvalTask.getJobResumeId();
 
