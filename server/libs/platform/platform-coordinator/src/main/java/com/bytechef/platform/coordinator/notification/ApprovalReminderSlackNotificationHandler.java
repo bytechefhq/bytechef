@@ -41,9 +41,17 @@ public class ApprovalReminderSlackNotificationHandler implements SlackNotificati
 
     @Override
     public String getText(NotificationHandlerContext notificationHandlerContext) {
-        return ":hourglass_flowing_sand: " + messageSource.getMessage(
+        String text = ":hourglass_flowing_sand: " + messageSource.getMessage(
             "email." + notificationHandlerContext.getEventType() + ".content",
             ApprovalReminderEmailNotificationHandler.getMessageArguments(notificationHandlerContext),
             Locale.getDefault());
+
+        String details = notificationHandlerContext.toDetailsText();
+
+        if (details.isEmpty()) {
+            return text;
+        }
+
+        return text + "\n" + details;
     }
 }
