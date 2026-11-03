@@ -209,6 +209,47 @@ public class ConnectedUserReferenceRolloutManager {
         }
     }
 
+    /**
+     * Applies the configuration state of the deployment's connected user to every reference of the deployment, the same
+     * way {@link #applyConfigurationState(long, long)} does, but inside the caller's transaction, so it sees what the
+     * caller has not committed yet, such as a new assignment. A failing reference fails the call.
+     *
+     * @param projectDeploymentId       the reference deployment id
+     * @param removedProvidedInputNames the provided input names to take off the rows, keyed by automation workflow uuid
+     * @return the references of the deployment that are not dangling, or empty when the deployment no longer exists
+     */
+    public List<ConnectedUserProjectWorkflow> applyDeploymentConfigurationState(
+        long projectDeploymentId, Map<String, Set<String>> removedProvidedInputNames) {
+
+        Optional<ProjectDeployment> projectDeploymentOptional = connectedUserReferenceDeploymentManager.fetchDeployment(
+            projectDeploymentId);
+
+        if (projectDeploymentOptional.isEmpty()) {
+            return List.of();
+        }
+
+        ProjectDeployment projectDeployment = projectDeploymentOptional.get();
+
+        Optional<Long> connectedUserIdOptional = fetchConnectedUserId(projectDeployment);
+
+        if (connectedUserIdOptional.isEmpty()) {
+            return List.of();
+        }
+
+        long connectedUserId = connectedUserIdOptional.get();
+
+        List<ConnectedUserProjectWorkflow> references = getReferences(projectDeploymentId)
+            .stream()
+            .filter(reference -> !reference.isDangling())
+            .toList();
+
+        for (ConnectedUserProjectWorkflow reference : references) {
+            applyConfigurationState(projectDeployment, connectedUserId, reference, removedProvidedInputNames);
+        }
+
+        return references;
+    }
+
     public void rollOut(long automationWorkflowProjectId, long environmentId) {
         rollOut(automationWorkflowProjectId, environmentId, Map.of());
     }
