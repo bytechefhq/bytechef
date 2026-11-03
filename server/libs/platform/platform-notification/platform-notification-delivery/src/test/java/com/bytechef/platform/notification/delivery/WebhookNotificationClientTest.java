@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -168,6 +169,26 @@ class WebhookNotificationClientTest {
 
         assertThat(headers.getFirst("X-ByteChef-Signature")).isEqualTo(
             "t=" + timestamp + ",v1=" + WebhookNotificationClient.sign("s3cret", timestamp + ".{\"a\":1}"));
+    }
+
+    @Test
+    void testPostUsesSuppliedDeliveryIdAndTimestampInHeadersAndSignature() {
+        Instant timestamp = Instant.parse("2026-11-03T10:00:00Z");
+        WebhookDelivery webhookDelivery = delivery(url).eventType("job.status")
+            .secret("s3cret")
+            .deliveryId("d-1")
+            .timestamp(timestamp)
+            .build();
+
+        webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst());
+
+        Headers headers = receivedHeaders.get();
+
+        assertThat(headers.getFirst("X-ByteChef-Delivery")).isEqualTo("d-1");
+        assertThat(headers.getFirst("X-ByteChef-Timestamp")).isEqualTo("1793700000000");
+        assertThat(headers.getFirst("X-ByteChef-Signature")).isEqualTo(
+            "t=1793700000000,v1=" + WebhookNotificationClient.sign("s3cret", "1793700000000.{\"a\":1}"));
     }
 
     @Test

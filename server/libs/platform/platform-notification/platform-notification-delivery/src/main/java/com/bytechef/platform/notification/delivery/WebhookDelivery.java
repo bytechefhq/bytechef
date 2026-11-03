@@ -17,6 +17,7 @@
 package com.bytechef.platform.notification.delivery;
 
 import com.bytechef.tenant.TenantContext;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ import org.jspecify.annotations.Nullable;
 public record WebhookDelivery(
     String source, String description, String tenantId, String url, @Nullable String eventType,
     Map<String, String> headers, @Nullable String secret, boolean validateUrl, List<WebhookPayload> payloads,
-    WebhookRetry retry) {
+    WebhookRetry retry, @Nullable String deliveryId, @Nullable Instant timestamp) {
 
     public WebhookDelivery {
         requireNotBlank(source, "source");
@@ -76,6 +77,8 @@ public record WebhookDelivery(
         private boolean validateUrl = true;
         private final List<WebhookPayload> payloads = new ArrayList<>();
         private WebhookRetry retry = WebhookRetry.none();
+        private @Nullable String deliveryId;
+        private @Nullable Instant timestamp;
 
         private Builder(String source, String url) {
             this.source = source;
@@ -137,9 +140,22 @@ public record WebhookDelivery(
             return this;
         }
 
+        public Builder deliveryId(@Nullable String deliveryId) {
+            this.deliveryId = deliveryId;
+
+            return this;
+        }
+
+        public Builder timestamp(@Nullable Instant timestamp) {
+            this.timestamp = timestamp;
+
+            return this;
+        }
+
         public WebhookDelivery build() {
             return new WebhookDelivery(
-                source, description, tenantId, url, eventType, headers, secret, validateUrl, payloads, retry);
+                source, description, tenantId, url, eventType, headers, secret, validateUrl, payloads, retry,
+                deliveryId, timestamp);
         }
     }
 }
