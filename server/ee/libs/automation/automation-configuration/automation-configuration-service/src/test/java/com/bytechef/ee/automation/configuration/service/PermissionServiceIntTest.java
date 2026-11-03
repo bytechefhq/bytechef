@@ -107,6 +107,7 @@ class PermissionServiceIntTest {
     private static final String CONNECTED_USER_EXTERNAL_ID = "external-user-1";
     private static final long DEPLOYMENT_OWNER_SKILL_ID = 200L;
     private static final long OTHER_USER_SKILL_ID = 100L;
+    private static final String EMBEDDED_VIEW = "EMBEDDED_VIEW";
     private static final long USER_ID = 2L;
 
     @Autowired
@@ -912,6 +913,120 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testTwoResolversForOneTypeChainUntilOneKnowsTheOwner() {
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID)).thenReturn(Set.of(EMBEDDED_VIEW));
+
+        PermissionService resourcePermissionService = createPermissionService(
+            List.of(resolver("Connection", ResourceOwner.unknown()),
+                resolver("Connection", ResourceOwner.ofEmbedded())),
+            List.of(), embeddedScopeCacheService);
+
+        assertThat(resourcePermissionService.hasResourceScope(1L, "Connection", EMBEDDED_VIEW)).isTrue();
+    }
+
+    @Test
+    void testAnEmbeddedOwnerWithAnEnvironmentIsCheckedInThatEnvironment() {
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of(EMBEDDED_VIEW));
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.PRODUCTION)).thenReturn(Set.of());
+
+        PermissionService resourcePermissionService = createPermissionService(
+            List.of(resolver("Connection", ResourceOwner.ofEmbedded())),
+            List.of(environmentResolver("Connection", Optional.of(Environment.PRODUCTION))), embeddedScopeCacheService);
+
+        assertThat(resourcePermissionService.hasResourceScope(1L, "Connection", EMBEDDED_VIEW)).isFalse();
+    }
+
+    @Test
+    void testAnEmbeddedOwnerWithoutAnEnvironmentUsesTheUnawareAnswer() {
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID)).thenReturn(Set.of(EMBEDDED_VIEW));
+
+        PermissionService resourcePermissionService = createPermissionService(
+            List.of(resolver("Connection", ResourceOwner.ofEmbedded())),
+            List.of(environmentResolver("Connection", Optional.empty())), embeddedScopeCacheService);
+
+        assertThat(resourcePermissionService.hasResourceScope(1L, "Connection", EMBEDDED_VIEW)).isTrue();
+    }
+
+    @Test
+    void testEveryResolverUnknownDeniesWithoutThrowing() {
+        addMember(WorkspaceRole.ADMIN);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            List.of(resolver("Connection", ResourceOwner.unknown()), resolver("Connection", ResourceOwner.unknown())),
+            List.of(), mock(EmbeddedScopeCacheService.class));
+
+        assertThat(resourcePermissionService.hasResourceScope(1L, "Connection", EMBEDDED_VIEW)).isFalse();
+    }
+
+    @Test
+    void testAnEnvironmentResolverThatThrowsDenies() {
+        addMember(WorkspaceRole.EDITOR);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            List.of(
+                resolver("Connection", ResourceOwner.unknown()),
+                resolver("Connection", ResourceOwner.ofWorkspace(workspaceId))),
+            List.of(environmentResolver("Connection", Optional.empty()), throwingEnvironmentResolver("Connection")),
+            mock(EmbeddedScopeCacheService.class));
+
+        assertThat(resourcePermissionService.hasResourceScope(1L, "Connection", "WORKFLOW_DELETE")).isFalse();
+    }
+
+    @Test
+    void testAnEmbeddedOwnerIsCheckedInTheNamedEnvironment() {
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.STAGING))
+            .thenReturn(Set.of(EMBEDDED_VIEW));
+
+        PermissionService resourcePermissionService = createPermissionService(
+            List.of(resolver("Connection", ResourceOwner.ofEmbedded())), List.of(), embeddedScopeCacheService);
+
+        assertThat(
+            resourcePermissionService.hasResourceScopeInEnvironment(
+                1L, "Connection", EMBEDDED_VIEW, Environment.STAGING))
+                    .isTrue();
+    }
+
+    @Test
+    void testIsResourceOwnerComparesTheOwnerOfAnEmbeddedResource() {
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("ApiKey", ResourceOwner.ofEmbedded(USER_ID)));
+
+        assertThat(resourcePermissionService.isResourceOwner("ApiKey", 1L)).isTrue();
+    }
+
+    @Test
+    void testAnEmbeddedOwnerIsDeniedByResourceRole() {
+        addMember(WorkspaceRole.ADMIN);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("KnowledgeBase", ResourceOwner.ofEmbedded()));
+
+        assertThat(resourcePermissionService.hasResourceRole(1L, "KnowledgeBase", "VIEWER")).isFalse();
+    }
+
+    @Test
+    void testAnEmbeddedConnectionIsDeniedInAWorkspace() {
+        addMember(WorkspaceRole.ADMIN);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            List.of(resolver("Connection", ResourceOwner.ofEmbedded())),
+            List.of(environmentResolver("Connection", Optional.of(Environment.PRODUCTION))),
+            mock(EmbeddedScopeCacheService.class));
+
+        assertThat(resourcePermissionService.canUseConnectionInWorkspace(1L, workspaceId, Environment.PRODUCTION))
+            .isFalse();
+    }
+
+    @Test
     void testIsResourceOwnerMatchAllows() {
         PermissionService resourcePermissionService = createPermissionService(
             resolver("ApiKey", ResourceOwner.ofUser(USER_ID)));
@@ -1067,6 +1182,18 @@ class PermissionServiceIntTest {
             customRoleId, "Custom Role " + customRoleId);
     }
 
+    private PermissionService createPermissionService(
+        List<ResourceOwnershipResolver> resourceOwnershipResolvers,
+        List<ResourceEnvironmentResolver> resourceEnvironmentResolvers,
+        EmbeddedScopeCacheService embeddedScopeCacheService) {
+
+        return new PermissionServiceImpl(
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            embeddedScopeCacheService, mock(EmbeddedUserRepository.class));
+    }
+
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
@@ -1148,12 +1275,44 @@ class PermissionServiceIntTest {
                 new UsernamePasswordAuthenticationToken(login, "n/a", List.of(new SimpleGrantedAuthority(authority))));
     }
 
+    private static ResourceEnvironmentResolver throwingEnvironmentResolver(String resourceType) {
+        return new ResourceEnvironmentResolver() {
+
+            @Override
+            public String resourceType() {
+                return resourceType;
+            }
+
+            @Override
+            public Optional<Environment> fetchEnvironment(Serializable id) {
+                throw new IllegalStateException("boom");
+            }
+        };
+    }
+
     private static AiSkill aiSkill(String createdBy) {
         AiSkill aiSkill = new AiSkill();
 
         aiSkill.setCreatedBy(createdBy);
 
         return aiSkill;
+    }
+
+    private static ResourceEnvironmentResolver environmentResolver(
+        String resourceType, Optional<Environment> environment) {
+
+        return new ResourceEnvironmentResolver() {
+
+            @Override
+            public String resourceType() {
+                return resourceType;
+            }
+
+            @Override
+            public Optional<Environment> fetchEnvironment(Serializable id) {
+                return environment;
+            }
+        };
     }
 
     private static ResourceOwnershipResolver resolver(String resourceType, ResourceOwner resourceOwner) {

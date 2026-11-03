@@ -14,6 +14,7 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -69,8 +70,8 @@ public class PermissionServiceImpl implements PermissionService {
     private final ProjectRepository projectRepository;
     private final WorkspaceScopeCacheService workspaceScopeCacheService;
     private final WorkspaceUserRepository workspaceUserRepository;
-    private final Map<String, ResourceEnvironmentResolver> resourceEnvironmentResolvers;
-    private final Map<String, ResourceOwnershipResolver> resourceOwnershipResolvers;
+    private final Map<String, List<ResourceEnvironmentResolver>> resourceEnvironmentResolvers;
+    private final Map<String, List<ResourceOwnershipResolver>> resourceOwnershipResolvers;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
@@ -93,10 +94,10 @@ public class PermissionServiceImpl implements PermissionService {
         this.workspaceScopeCacheService = workspaceScopeCacheService;
         this.workspaceUserRepository = workspaceUserRepository;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
-            .collect(Collectors.toMap(ResourceOwnershipResolver::resourceType, Function.identity()));
+            .collect(Collectors.groupingBy(ResourceOwnershipResolver::resourceType));
 
         this.resourceEnvironmentResolvers = resourceEnvironmentResolvers.stream()
-            .collect(Collectors.toMap(ResourceEnvironmentResolver::resourceType, Function.identity()));
+            .collect(Collectors.groupingBy(ResourceEnvironmentResolver::resourceType));
     }
 
     @Override
@@ -304,41 +305,34 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        ResourceOwnershipResolver resourceOwnershipResolver = resourceOwnershipResolvers.get(resourceType);
-
-        if (resourceOwnershipResolver == null) {
+        if (!resourceOwnershipResolvers.containsKey(resourceType)) {
             return false;
         }
 
-        OptionalLong workspaceId = resourceOwnershipResolver.resolveOwner(id)
-            .workspaceId();
+        ResourceOwner resourceOwner = resolveOwner(resourceType, id);
 
-        if (workspaceId.isEmpty()) {
+        OptionalLong workspaceId = resourceOwner.workspaceId();
+
+        if (!resourceOwner.embedded() && workspaceId.isEmpty()) {
             return false;
         }
 
-        // A resource that lives in an environment is checked against the role the caller holds THERE. Without this,
-        // a member who is viewer in Production would still pass a by-id check on a Production deployment, because the
-        // environment-unaware check unions the environments they can reach. A type with no resolver, or a resolver
-        // that reports no environment, keeps the environment-unaware check. A resolver that fails denies: falling back
-        // would answer the check from that union.
-        ResourceEnvironmentResolver resourceEnvironmentResolver = resourceEnvironmentResolvers.get(resourceType);
+        Optional<Environment> environment;
 
-        if (resourceEnvironmentResolver != null) {
-            Optional<Environment> environment;
+        try {
+            environment = resolveEnvironment(resourceType, id);
+        } catch (RuntimeException exception) {
+            log.error("Denying {} on {} id={}: resolving its environment failed", scope, resourceType, id, exception);
 
-            try {
-                environment = resourceEnvironmentResolver.fetchEnvironment(id);
-            } catch (RuntimeException exception) {
-                log.error(
-                    "Denying {} on {} id={}: resolving its environment failed", scope, resourceType, id, exception);
+            return false;
+        }
 
-                return false;
-            }
+        if (resourceOwner.embedded()) {
+            return environment.isPresent() ? hasEmbeddedScope(scope, environment.get()) : hasEmbeddedScope(scope);
+        }
 
-            if (environment.isPresent()) {
-                return hasWorkspaceScope(workspaceId.getAsLong(), scope, environment.get());
-            }
+        if (environment.isPresent()) {
+            return hasWorkspaceScope(workspaceId.getAsLong(), scope, environment.get());
         }
 
         return hasWorkspaceScope(workspaceId.getAsLong(), scope);
@@ -369,14 +363,17 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        ResourceOwnershipResolver resourceOwnershipResolver = resourceOwnershipResolvers.get(resourceType);
-
-        if (resourceOwnershipResolver == null) {
+        if (!resourceOwnershipResolvers.containsKey(resourceType)) {
             return false;
         }
 
-        OptionalLong workspaceId = resourceOwnershipResolver.resolveOwner(id)
-            .workspaceId();
+        ResourceOwner resourceOwner = resolveOwner(resourceType, id);
+
+        if (resourceOwner.embedded()) {
+            return hasEmbeddedScope(scope, environment);
+        }
+
+        OptionalLong workspaceId = resourceOwner.workspaceId();
 
         if (workspaceId.isEmpty()) {
             return false;
@@ -395,16 +392,39 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        ResourceOwnershipResolver resourceOwnershipResolver = resourceOwnershipResolvers.get(resourceType);
-
-        if (resourceOwnershipResolver == null) {
+        if (!resourceOwnershipResolvers.containsKey(resourceType)) {
             return false;
         }
 
-        OptionalLong ownerUserId = resourceOwnershipResolver.resolveOwner(id)
-            .ownerUserId();
+        OptionalLong ownerUserId = resolveOwner(resourceType, id).ownerUserId();
 
         return ownerUserId.isPresent() && isCurrentUser(ownerUserId.getAsLong());
+    }
+
+    private ResourceOwner resolveOwner(String resourceType, Serializable id) {
+        for (ResourceOwnershipResolver resourceOwnershipResolver : resourceOwnershipResolvers.get(resourceType)) {
+            ResourceOwner resourceOwner = resourceOwnershipResolver.resolveOwner(id);
+
+            if (!resourceOwner.isUnknown()) {
+                return resourceOwner;
+            }
+        }
+
+        return ResourceOwner.unknown();
+    }
+
+    private Optional<Environment> resolveEnvironment(String resourceType, Serializable id) {
+        for (ResourceEnvironmentResolver resourceEnvironmentResolver : resourceEnvironmentResolvers
+            .getOrDefault(resourceType, List.of())) {
+
+            Optional<Environment> environment = resourceEnvironmentResolver.fetchEnvironment(id);
+
+            if (environment.isPresent()) {
+                return environment;
+            }
+        }
+
+        return Optional.empty();
     }
 
     @Override
@@ -417,14 +437,11 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        ResourceOwnershipResolver resourceOwnershipResolver = resourceOwnershipResolvers.get(resourceType);
-
-        if (resourceOwnershipResolver == null) {
+        if (!resourceOwnershipResolvers.containsKey(resourceType)) {
             return false;
         }
 
-        OptionalLong workspaceId = resourceOwnershipResolver.resolveOwner(id)
-            .workspaceId();
+        OptionalLong workspaceId = resolveOwner(resourceType, id).workspaceId();
 
         if (workspaceId.isEmpty()) {
             return false;
@@ -562,15 +579,12 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        ResourceOwnershipResolver connectionOwnershipResolver = resourceOwnershipResolvers.get(CONNECTION);
-        ResourceEnvironmentResolver connectionEnvironmentResolver = resourceEnvironmentResolvers.get(CONNECTION);
-
-        if (connectionOwnershipResolver == null || connectionEnvironmentResolver == null) {
+        if (!resourceOwnershipResolvers.containsKey(CONNECTION)
+            || !resourceEnvironmentResolvers.containsKey(CONNECTION)) {
             return false;
         }
 
-        OptionalLong connectionWorkspaceId = connectionOwnershipResolver.resolveOwner(connectionId)
-            .workspaceId();
+        OptionalLong connectionWorkspaceId = resolveOwner(CONNECTION, connectionId).workspaceId();
 
         if (connectionWorkspaceId.isEmpty() || connectionWorkspaceId.getAsLong() != workspaceId) {
             return false;
@@ -579,7 +593,7 @@ public class PermissionServiceImpl implements PermissionService {
         Optional<Environment> connectionEnvironment;
 
         try {
-            connectionEnvironment = connectionEnvironmentResolver.fetchEnvironment(connectionId);
+            connectionEnvironment = resolveEnvironment(CONNECTION, connectionId);
         } catch (RuntimeException exception) {
             log.error("Denying connection id={}: resolving its environment failed", connectionId, exception);
 

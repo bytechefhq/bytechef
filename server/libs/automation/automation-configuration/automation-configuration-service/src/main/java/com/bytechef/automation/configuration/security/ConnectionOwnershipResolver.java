@@ -17,22 +17,30 @@
 package com.bytechef.automation.configuration.security;
 
 import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
  * Maps a connection to its owning workspace through the {@code workspace_connection} relation. Fails closed when the
- * connection is assigned to no workspace.
+ * connection is assigned to no workspace or is not an automation connection.
  *
  * @author Ivica Cardic
  */
 @Component
 public class ConnectionOwnershipResolver implements ResourceOwnershipResolver {
 
+    private final ConnectionService connectionService;
     private final WorkspaceConnectionRepository workspaceConnectionRepository;
 
     @SuppressFBWarnings("EI")
-    public ConnectionOwnershipResolver(WorkspaceConnectionRepository workspaceConnectionRepository) {
+    public ConnectionOwnershipResolver(
+        ConnectionService connectionService, WorkspaceConnectionRepository workspaceConnectionRepository) {
+
+        this.connectionService = connectionService;
         this.workspaceConnectionRepository = workspaceConnectionRepository;
     }
 
@@ -43,6 +51,14 @@ public class ConnectionOwnershipResolver implements ResourceOwnershipResolver {
 
     @Override
     public ResourceOwner resolveOwner(long id) {
+        Optional<Connection> connection = connectionService.fetchConnection(id);
+
+        if (connection.isEmpty() || connection.get()
+            .getType() != PlatformType.AUTOMATION) {
+
+            return ResourceOwner.unknown();
+        }
+
         return workspaceConnectionRepository.findByConnectionId(id)
             .map(workspaceConnection -> ResourceOwner.ofWorkspace(workspaceConnection.getWorkspaceId()))
             .orElseGet(ResourceOwner::unknown);
