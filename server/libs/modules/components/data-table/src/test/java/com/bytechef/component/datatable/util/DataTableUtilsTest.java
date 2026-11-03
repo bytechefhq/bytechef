@@ -21,8 +21,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
@@ -38,6 +47,31 @@ import org.junit.jupiter.api.Test;
  * @author Ivica Cardic
  */
 class DataTableUtilsTest {
+
+    @Test
+    void testActionColumnOptionsOfferTheRowIdFirstAndFilterItBySearchText() throws Exception {
+        DataTableService dataTableService = mock(DataTableService.class);
+
+        when(dataTableService.listTables(0L)).thenReturn(
+            List.of(
+                new DataTableInfo(
+                    1L, "orders", null,
+                    List.of(new ColumnSpec("name", ColumnType.STRING), new ColumnSpec("open", ColumnType.BOOLEAN)),
+                    null)));
+
+        ActionDefinition.OptionsFunction<String> optionsFunction = DataTableUtils.getActionColumnOptions(
+            dataTableService);
+
+        Parameters inputParameters = MockParametersFactory.create(Map.of("table", "orders"));
+
+        assertEquals(
+            List.of("id", "name", "open"),
+            getOptionValues(optionsFunction.apply(inputParameters, null, null, null, null)));
+        assertEquals(
+            List.of("id"), getOptionValues(optionsFunction.apply(inputParameters, null, null, "I", null)));
+        assertEquals(
+            List.of("name"), getOptionValues(optionsFunction.apply(inputParameters, null, null, "nam", null)));
+    }
 
     @Test
     void testFlattenRowLiftsColumnValuesNextToId() {
@@ -256,5 +290,11 @@ class DataTableUtilsTest {
                 +
                 "values",
             illegalArgumentException.getMessage());
+    }
+
+    private static List<String> getOptionValues(List<? extends Option<String>> options) {
+        return options.stream()
+            .map(Option::getValue)
+            .toList();
     }
 }

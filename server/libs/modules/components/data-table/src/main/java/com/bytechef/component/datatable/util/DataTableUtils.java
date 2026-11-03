@@ -18,6 +18,7 @@ package com.bytechef.component.datatable.util;
 
 import static com.bytechef.component.datatable.constant.DataTableConstants.COLUMN;
 import static com.bytechef.component.datatable.constant.DataTableConstants.CONDITIONS;
+import static com.bytechef.component.datatable.constant.DataTableConstants.ID;
 import static com.bytechef.component.datatable.constant.DataTableConstants.OPERATION;
 import static com.bytechef.component.datatable.constant.DataTableConstants.TABLE;
 import static com.bytechef.component.datatable.constant.DataTableConstants.VALUE;
@@ -119,6 +120,10 @@ public final class DataTableUtils {
 
             List<Option<String>> columnNames = new ArrayList<>();
 
+            if (Objects.isNull(searchText) || Strings.CI.contains(ID, searchText)) {
+                columnNames.add(option(ID, ID));
+            }
+
             if (dataTableInfo != null && dataTableInfo.columns() != null) {
                 for (ColumnSpec columnSpec : dataTableInfo.columns()) {
                     if (Objects.nonNull(searchText) && !Strings.CI.contains(columnSpec.name(), searchText)) {
@@ -128,8 +133,6 @@ public final class DataTableUtils {
                     columnNames.add(option(columnSpec.name(), columnSpec.name()));
                 }
             }
-
-            // handle id column
 
             return columnNames;
         };
