@@ -31,11 +31,11 @@ type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automation
 
 interface AutomationWorkflowProjectConfigurationListItemProps {
     configuration: AutomationWorkflowProjectConfigurationType;
+    configurations?: AutomationWorkflowProjectConfigurationType[];
     environments: Environment[];
     onDelete: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationWorkflowProjectConfigurationType) => void;
-    otherConfigurations?: AutomationWorkflowProjectConfigurationType[];
     project: AutomationWorkflowProjectType;
 }
 
@@ -43,11 +43,11 @@ const formatCount = (count: number, noun: string): string => `${count} ${count =
 
 const AutomationWorkflowProjectConfigurationListItem = ({
     configuration,
+    configurations = [],
     environments,
     onDelete,
     onEdit,
     onUpdateVersion,
-    otherConfigurations = [],
     project,
 }: AutomationWorkflowProjectConfigurationListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -59,23 +59,32 @@ const AutomationWorkflowProjectConfigurationListItem = ({
 
     const enableConfigurationMutation = useEnableAutomationWorkflowProjectConfigurationMutation();
 
-    const {data: deleteImpactData} = useAutomationWorkflowProjectConfigurationDeleteImpactQuery(
-        {id: configuration.id},
-        {enabled: showDeleteDialog}
-    );
+    const {data: deleteImpactData, isError: deleteImpactError} =
+        useAutomationWorkflowProjectConfigurationDeleteImpactQuery({id: configuration.id}, {enabled: showDeleteDialog});
 
     const deleteImpact = deleteImpactData?.automationWorkflowProjectConfigurationDeleteImpact;
 
-    const moveTargetConfigurations = otherConfigurations.filter(
+    const moveTargetConfigurations = configurations.filter(
         (otherConfiguration) =>
             otherConfiguration.id !== configuration.id &&
             otherConfiguration.projectId === configuration.projectId &&
             otherConfiguration.environmentId === configuration.environmentId
     );
 
-    const deleteDescription = deleteImpact
-        ? `This deletes ${formatCount(deleteImpact.referenceWorkflowCount, 'workflow')} of ${formatCount(deleteImpact.connectedUserCount, 'user')}. Copies keep working. This cannot be undone.`
-        : 'Checking what this deletes...';
+    let deleteDescription = 'Checking what this deletes...';
+
+    if (deleteImpact) {
+        deleteDescription = `This deletes ${formatCount(deleteImpact.referenceWorkflowCount, 'workflow')} of ${formatCount(deleteImpact.connectedUserCount, 'user')}. Copies keep working. This cannot be undone.`;
+    } else if (deleteImpactError) {
+        deleteDescription = 'Could not load what this deletes.';
+    }
+
+    const moveUsersDisabledReason =
+        moveTargetConfigurations.length === 0
+            ? 'No other configuration in this environment'
+            : configuration.connectedUserCount === 0
+              ? 'No connected users on this configuration'
+              : undefined;
 
     const environmentName =
         environments.find((environment) => String(environment.id) === configuration.environmentId)?.name ||
@@ -231,7 +240,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                                         <span className="block">
                                             <DropdownMenuItem
                                                 aria-label="Move Users"
-                                                disabled={moveTargetConfigurations.length === 0}
+                                                disabled={!!moveUsersDisabledReason}
                                                 icon={<UsersIcon />}
                                                 label="Move Users…"
                                                 onClick={() => setShowMoveUsersDialog(true)}
@@ -239,10 +248,8 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                                         </span>
                                     </TooltipTrigger>
 
-                                    {moveTargetConfigurations.length === 0 && (
-                                        <TooltipContent side="left">
-                                            No other configuration in this environment
-                                        </TooltipContent>
+                                    {moveUsersDisabledReason && (
+                                        <TooltipContent side="left">{moveUsersDisabledReason}</TooltipContent>
                                     )}
                                 </Tooltip>
 
@@ -266,6 +273,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
             </CollapsibleContent>
 
             <AlertDialog
+                confirmDisabled={!deleteImpact}
                 description={deleteDescription}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={() => {

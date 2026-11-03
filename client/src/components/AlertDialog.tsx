@@ -11,6 +11,7 @@ interface AlertDialogProps {
     cancelLabel?: string;
     confirmButtonVariant?: ConfirmVariantType;
     confirmClassName?: string;
+    confirmDisabled?: boolean;
     confirmIcon?: ReactElement;
     confirmLabel?: string;
     description?: ReactNode;
@@ -25,6 +26,7 @@ const AlertDialog = ({
     cancelLabel = 'Cancel',
     confirmButtonVariant = 'destructive',
     confirmClassName,
+    confirmDisabled,
     confirmIcon,
     confirmLabel = 'Delete',
     description = 'This action cannot be undone. This will permanently delete data.',
@@ -52,7 +54,7 @@ const AlertDialog = ({
                     <Button
                         aria-label={ariaLabel}
                         className={confirmClassName}
-                        disabled={isPending}
+                        disabled={isPending || confirmDisabled}
                         icon={isPending ? <LoadingIcon /> : confirmIcon}
                         label={confirmLabel}
                         onClick={onConfirm}

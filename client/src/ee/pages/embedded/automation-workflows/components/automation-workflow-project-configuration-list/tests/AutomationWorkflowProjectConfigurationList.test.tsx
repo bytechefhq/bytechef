@@ -21,6 +21,10 @@ vi.mock('@/shared/queries/platform/environments.queries', () => ({
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useAutomationWorkflowProjectConfigurationDeleteImpactQuery: () => ({
+        data: {automationWorkflowProjectConfigurationDeleteImpact: {connectedUserCount: 0, referenceWorkflowCount: 0}},
+        isError: false,
+    }),
     useAutomationWorkflowProjectConfigurationsQuery: () => ({
         data: {automationWorkflowProjectConfigurations: mocks.configurations},
     }),
