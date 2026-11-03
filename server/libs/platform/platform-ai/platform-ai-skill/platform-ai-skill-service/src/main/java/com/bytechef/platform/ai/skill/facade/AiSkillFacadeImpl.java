@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -274,7 +273,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
-    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
+    @PreAuthorize("isAuthenticated()")
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public byte[] getAiSkillDownload(long id) {
         checkPlatformUser();
@@ -283,7 +282,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
-    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
+    @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public AiSkill getAiSkill(long id) {
         checkPlatformUser();
@@ -292,7 +291,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
-    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
+    @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public AiSkillDownload getAiSkillWithDownload(long id) {
         checkPlatformUser();
@@ -305,7 +304,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
-    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
+    @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public String getAiSkillFileContent(long id, String path) {
         checkPlatformUser();
@@ -349,7 +348,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
-    @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
+    @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public List<String> getAiSkillFilePaths(long id) {
         checkPlatformUser();
@@ -382,7 +381,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
-    @PostFilter("isTenantAdmin() or isResourceOwner(filterObject.id, 'AiSkill')")
+    @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public List<AiSkill> getAiSkills() {
         checkPlatformUser();
