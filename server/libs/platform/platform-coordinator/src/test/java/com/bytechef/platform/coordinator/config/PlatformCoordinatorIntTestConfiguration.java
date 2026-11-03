@@ -30,6 +30,8 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
+import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
@@ -38,6 +40,9 @@ import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
 import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
+import com.bytechef.encryption.Encryption;
+import com.bytechef.encryption.EncryptionImpl;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -90,6 +95,16 @@ import tools.jackson.databind.ObjectMapper;
 public class PlatformCoordinatorIntTestConfiguration {
 
     public static final String PUBLIC_URL = "http://localhost:5173";
+
+    @Bean
+    Encryption encryption(EncryptionKey encryptionKey) {
+        return new EncryptionImpl(encryptionKey);
+    }
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
 
     @Bean
     JobService jobService(JobRepository jobRepository) {
@@ -162,16 +177,20 @@ public class PlatformCoordinatorIntTestConfiguration {
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class PlatformCoordinatorIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
+        private final Encryption encryption;
         private final ObjectMapper objectMapper;
 
         @SuppressFBWarnings("EI")
-        public PlatformCoordinatorIntTestJdbcConfiguration(ObjectMapper objectMapper) {
+        public PlatformCoordinatorIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            this.encryption = encryption;
             this.objectMapper = objectMapper;
         }
 
         @Override
         protected List<?> userConverters() {
             return Arrays.asList(
+                new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
                 new ExecutionErrorToStringConverter(objectMapper),
                 new FileEntryToStringConverter(objectMapper),
                 new MapWrapperToStringConverter(objectMapper),

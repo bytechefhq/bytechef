@@ -125,6 +125,22 @@ class WebhookDeliveryTest {
     }
 
     @Test
+    void testToStringRedactsHeaderValuesAndSecret() {
+        WebhookDelivery webhookDelivery = WebhookDelivery.builder(
+            "source", "https://user:password@hooks.example.com:8443/path?token=URL-SECRET")
+            .description("description")
+            .headers(Map.of("Authorization", "Bearer header-value"))
+            .secret("whsec_signing-secret")
+            .payload("label", "{}")
+            .build();
+
+        String deliveryString = webhookDelivery.toString();
+
+        assertThat(deliveryString).contains("hooks.example.com", "Authorization", "[redacted]")
+            .doesNotContain("header-value", "whsec_signing-secret", "URL-SECRET", "password", "/path");
+    }
+
+    @Test
     void testRetryNoneMakesNoRetries() {
         assertThat(WebhookRetry.none()
             .maxRetries()).isEqualTo(0);

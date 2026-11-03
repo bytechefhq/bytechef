@@ -17,6 +17,8 @@
 package com.bytechef.platform.notification.handler;
 
 import com.bytechef.commons.util.JsonUtils;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,13 +26,16 @@ import java.util.regex.Pattern;
 /**
  * Renders the admin-defined webhook body template. Each {@code {{path}}} placeholder is replaced by the value at the
  * dotted path of the delivery summary, escaped as the content of a JSON string. The literal path {@code summary}
- * inserts the whole summary as raw JSON.
+ * inserts the whole summary as raw JSON. A template is valid only when it renders to JSON both for a fully populated
+ * summary and for a summary that holds only the fields every event carries.
  *
  * @author Ivica Cardic
  */
 public final class WebhookBodyTemplate {
 
     private static final int MAX_TEMPLATE_LENGTH = 10000;
+    private static final List<String> MINIMAL_SUMMARY_KEYS = List.of(
+        "eventType", "jobId", "jobName", "timestamp", "deliveryId");
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{\\{\\s*([A-Za-z0-9_.]+)\\s*}}");
     private static final String SUMMARY_PATH = "summary";
 
@@ -49,14 +54,32 @@ public final class WebhookBodyTemplate {
                 "Webhook body template must have at most %d characters".formatted(MAX_TEMPLATE_LENGTH));
         }
 
-        String rendered = render(template, NotificationHandlerContext.sample()
-            .toMap());
+        NotificationHandlerContext sampleContext = NotificationHandlerContext.sample();
+
+        Map<String, Object> sampleSummary = sampleContext.toMap();
+
+        Map<String, Object> minimalSummary = new LinkedHashMap<>();
+
+        for (String key : MINIMAL_SUMMARY_KEYS) {
+            minimalSummary.put(key, sampleSummary.get(key));
+        }
+
+        if (!rendersToValidJson(template, sampleSummary) || !rendersToValidJson(template, minimalSummary)) {
+            throw new IllegalArgumentException(
+                "Webhook body template must render to valid JSON for every event; quote optional fields");
+        }
+    }
+
+    private static boolean rendersToValidJson(String template, Map<String, Object> summary) {
+        String rendered = render(template, summary);
 
         try {
             JsonUtils.read(rendered);
         } catch (RuntimeException runtimeException) {
-            throw new IllegalArgumentException("Webhook body template must render to valid JSON");
+            return false;
         }
+
+        return true;
     }
 
     private static String resolve(String path, Map<String, Object> summary) {
