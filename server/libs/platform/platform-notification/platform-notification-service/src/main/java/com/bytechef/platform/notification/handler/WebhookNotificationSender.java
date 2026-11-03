@@ -20,6 +20,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.notification.delivery.WebhookDelivery;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.delivery.WebhookRetry;
+import com.bytechef.platform.notification.delivery.WebhookTestResult;
 import com.bytechef.platform.notification.domain.Notification;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
@@ -61,6 +62,40 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
                 "Notification " + notification.getId() + " has no webhook URL configured");
         }
 
+        WebhookDelivery webhookDelivery = buildDelivery(
+            notification, webhookNotificationHandler, notificationHandlerContext, url);
+
+        return webhookDeliveryService.submit(webhookDelivery)
+            .thenAccept(NotificationDeliveryOutcomes::requireAnySent);
+    }
+
+    @Override
+    public NotificationTestResult sendTest(
+        Notification notification, WebhookNotificationHandler webhookNotificationHandler,
+        NotificationHandlerContext notificationHandlerContext) {
+
+        String url = (String) notification.getSetting("webhook");
+
+        if (url == null || url.isBlank()) {
+            return NotificationTestResult.failed("Webhook URL is required");
+        }
+
+        WebhookDelivery webhookDelivery = buildDelivery(
+            notification, webhookNotificationHandler, notificationHandlerContext, url);
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(webhookDelivery);
+
+        String secret = webhookDelivery.secret();
+
+        return new NotificationTestResult(
+            webhookTestResult.success(), webhookTestResult.statusCode(), webhookTestResult.responseBody(),
+            webhookTestResult.error(), secret != null && !secret.isBlank());
+    }
+
+    private static WebhookDelivery buildDelivery(
+        Notification notification, WebhookNotificationHandler webhookNotificationHandler,
+        NotificationHandlerContext notificationHandlerContext, String url) {
+
         NotificationHandlerContext deliveryContext = notificationHandlerContext.withDeliveryId(
             String.valueOf(UUID.randomUUID()));
 
@@ -70,7 +105,7 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
             ? WebhookBodyTemplate.render(templateString, deliveryContext.toMap())
             : webhookNotificationHandler.getPayload(deliveryContext);
 
-        WebhookDelivery webhookDelivery = WebhookDelivery.builder("notification", url)
+        return WebhookDelivery.builder("notification", url)
             .headers(getHeaders(notification))
             .description("notification " + notification.getId() + " '" + notification.getName() + "'")
             .eventType("job.status")
@@ -81,9 +116,6 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
             .deliveryId(deliveryContext.getDeliveryId())
             .timestamp(notificationHandlerContext.getTimestamp())
             .build();
-
-        return webhookDeliveryService.submit(webhookDelivery)
-            .thenAccept(NotificationDeliveryOutcomes::requireAnySent);
     }
 
     private static Map<String, String> getHeaders(Notification notification) {

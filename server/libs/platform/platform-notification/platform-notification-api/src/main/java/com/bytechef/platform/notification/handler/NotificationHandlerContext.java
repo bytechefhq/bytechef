@@ -373,22 +373,20 @@ public class NotificationHandlerContext {
     }
 
     public NotificationHandlerContext withDeliveryId(String deliveryId) {
-        NotificationHandlerContext copy = new NotificationHandlerContext();
+        NotificationHandlerContext copy = copy();
 
-        copy.approvalExpiresAt = approvalExpiresAt;
-        copy.approvalFormUrl = approvalFormUrl;
-        copy.eventType = eventType;
-        copy.jobId = jobId;
-        copy.jobName = jobName;
         copy.deliveryId = deliveryId;
+
+        return copy;
+    }
+
+    /**
+     * Returns a copy of this context that differs only in its timestamp.
+     */
+    public NotificationHandlerContext withTimestamp(Instant timestamp) {
+        NotificationHandlerContext copy = copy();
+
         copy.timestamp = timestamp;
-        copy.source = source;
-        copy.environment = environment;
-        copy.executionUrl = executionUrl;
-        copy.job = job;
-        copy.workflow = workflow;
-        copy.project = project;
-        copy.error = error;
 
         return copy;
     }
@@ -411,6 +409,27 @@ public class NotificationHandlerContext {
     private WorkflowSummary workflow;
     private ProjectSummary project;
     private ErrorSummary error;
+
+    private NotificationHandlerContext copy() {
+        NotificationHandlerContext copy = new NotificationHandlerContext();
+
+        copy.approvalExpiresAt = approvalExpiresAt;
+        copy.approvalFormUrl = approvalFormUrl;
+        copy.eventType = eventType;
+        copy.jobId = jobId;
+        copy.jobName = jobName;
+        copy.deliveryId = deliveryId;
+        copy.timestamp = timestamp;
+        copy.source = source;
+        copy.environment = environment;
+        copy.executionUrl = executionUrl;
+        copy.job = job;
+        copy.workflow = workflow;
+        copy.project = project;
+        copy.error = error;
+
+        return copy;
+    }
 
     private static void putIfPresent(Map<String, Object> map, String key, Object value) {
         if (value != null) {
