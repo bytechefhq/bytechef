@@ -16,7 +16,6 @@ import {ChevronDownIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 
 import AutomationWorkflowProjectConfigurationDialog from '../automation-workflow-project-configuration-dialog/AutomationWorkflowProjectConfigurationDialog';
-import AutomationWorkflowProjectConfigurationCreateButton from '../automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationCreateButton';
 import AutomationWorkflowProjectConfigurationList from '../automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationList';
 import AutomationWorkflowProjectListItem from './AutomationWorkflowProjectListItem';
 import AutomationWorkflowProjectListItemTabs, {
@@ -155,10 +154,15 @@ const AutomationWorkflowProjectList = ({
                                       )
                                     : project.published &&
                                       project.configurationCount > 0 && (
-                                          <AutomationWorkflowProjectConfigurationCreateButton
+                                          <Button
+                                              aria-label="New Configuration"
                                               onClick={() => setConfigurationDialog({project})}
-                                              projectId={project.id}
-                                          />
+                                              size="sm"
+                                              variant="secondary"
+                                          >
+                                              <PlusIcon />
+                                              New Configuration
+                                          </Button>
                                       )
                             }
                             activeTab={activeTabs[project.id] || 'workflows'}

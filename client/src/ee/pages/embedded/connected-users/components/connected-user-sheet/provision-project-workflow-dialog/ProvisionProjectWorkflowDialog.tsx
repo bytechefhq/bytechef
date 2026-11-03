@@ -98,7 +98,21 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
     };
 
     const handleSave = ({workflows}: ProvisionProjectWorkflowFormI) => {
+        // Stopgap until the Configuration select lands: the preselected configuration, which the top-level
+        // workflows belong to, is the assigned one, else the self-serve one, else the first.
+        const preselectedConfiguration =
+            provisionableProject?.configurations.find(
+                (configuration) => configuration.id === provisionableProject.assignedConfigurationId
+            ) ||
+            provisionableProject?.configurations.find((configuration) => configuration.selfServe) ||
+            provisionableProject?.configurations[0];
+
+        if (!preselectedConfiguration) {
+            return;
+        }
+
         provisionConnectedUserProjectWorkflowsMutation.mutate({
+            configurationId: preselectedConfiguration.id,
             connectedUserId: connectedUserId.toString(),
             workflows: selectableWorkflows.map((workflow) => {
                 const inputs = workflows[workflow.workflowUuid]?.inputs || {};
