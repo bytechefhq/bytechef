@@ -88,7 +88,7 @@ public class WebhookDeliveryService {
     private final ObjectProvider<MeterRegistry> meterRegistryProvider;
     private final AsyncTaskExecutor webhookDeliveryExecutor;
     private final WebhookNotificationClient webhookNotificationClient;
-    private volatile Consumer<String> urlValidator = url -> UrlValidatorUtils.validate(url, Set.of());
+    private volatile Consumer<String> urlValidator;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI2"
@@ -104,6 +104,9 @@ public class WebhookDeliveryService {
             requireAtLeastOne(
                 webhookDeliveryProperties.getConcurrencyLimit(), "bytechef.webhook-delivery.concurrency-limit"),
             true);
+        Set<String> allowedHosts = Set.copyOf(webhookDeliveryProperties.getAllowedHosts());
+
+        this.urlValidator = url -> UrlValidatorUtils.validate(url, allowedHosts);
         this.maxPendingDeliveries = requireAtLeastOne(
             webhookDeliveryProperties.getMaxPendingDeliveries(), "bytechef.webhook-delivery.max-pending-deliveries");
         this.meterRegistryProvider = meterRegistryProvider;

@@ -325,6 +325,18 @@ class WebhookNotificationClientIntTest {
                 "text/plain, application/json, application/yaml, application/xml, text/xml, application/*+json, application/*+xml, */*");
     }
 
+    @Test
+    void testCustomAcceptHeaderIsPreserved() {
+        WebhookDelivery webhookDelivery = delivery(url).headers(Map.of("Accept", "application/vnd.example+json"))
+            .build();
+
+        webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst());
+
+        assertThat(receivedHeaders.get()
+            .get("Accept")).containsExactly("application/vnd.example+json");
+    }
+
     private void respondWith(String path, int status, String body) {
         httpServer.createContext(path, httpExchange -> {
             httpExchange.getRequestBody()

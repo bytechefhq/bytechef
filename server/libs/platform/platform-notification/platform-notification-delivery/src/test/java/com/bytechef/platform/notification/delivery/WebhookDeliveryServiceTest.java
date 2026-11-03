@@ -283,6 +283,39 @@ class WebhookDeliveryServiceTest {
     }
 
     @Test
+    void testAllowedHostsBypassThePrivateAddressCheck() throws Exception {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.WebhookDelivery webhookDeliveryProperties = applicationProperties.getWebhookDelivery();
+
+        webhookDeliveryProperties.setAllowedHosts(List.of("LOCALHOST"));
+        webhookDeliveryProperties.setConcurrencyLimit(2);
+        webhookDeliveryProperties.setMaxPendingDeliveries(2);
+
+        WebhookDeliveryService allowingWebhookDeliveryService = new WebhookDeliveryService(
+            new WebhookNotificationClient(), webhookDeliveryExecutor, applicationProperties,
+            meterRegistryProvider(meterRegistry));
+
+        WebhookDelivery validatedWebhookDelivery = WebhookDelivery.builder(SOURCE, url("/allowed"))
+            .description("test delivery")
+            .tenantId(TENANT_ID)
+            .validateUrl(true)
+            .payload("payload-0", "{\"index\":0}")
+            .build();
+
+        WebhookTestResult webhookTestResult = allowingWebhookDeliveryService.sendTest(validatedWebhookDelivery);
+
+        assertThat(webhookTestResult.success()).isTrue();
+        assertThat(webhookTestResult.statusCode()).isEqualTo(200);
+        assertThat(statuses(await(allowingWebhookDeliveryService.submit(validatedWebhookDelivery))))
+            .containsExactly(Status.SENT);
+        assertThat(receivedBodies.get("/allowed")).hasSize(2);
+
+        assertThat(webhookDeliveryService.sendTest(validatedWebhookDelivery)
+            .success()).isFalse();
+    }
+
+    @Test
     void testSendTestReportsConnectionError() throws Exception {
         WebhookDelivery webhookDelivery = WebhookDelivery.builder(SOURCE, closedPortUrl())
             .description("test delivery")
@@ -388,6 +421,31 @@ class WebhookDeliveryServiceTest {
         assertThat(webhookTestResult.success()).isFalse();
         assertThat(webhookTestResult.error()).doesNotContain("secret-value")
             .contains("IllegalArgumentException");
+    }
+
+    @Test
+    void testSendTestRestoresInterruptFlag() {
+        WebhookNotificationClient interruptedWebhookNotificationClient = new WebhookNotificationClient() {
+
+            @Override
+            public WebhookNotificationClient.WebhookResponse post(
+                WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
+
+                throw new IllegalStateException(new InterruptedException());
+            }
+        };
+
+        WebhookDeliveryService interruptedWebhookDeliveryService = createService(
+            interruptedWebhookNotificationClient, 2, 2, meterRegistryProvider(meterRegistry));
+
+        try {
+            WebhookTestResult webhookTestResult = interruptedWebhookDeliveryService.sendTest(delivery("/test", 1));
+
+            assertThat(webhookTestResult.success()).isFalse();
+            assertThat(Thread.interrupted()).isTrue();
+        } finally {
+            Thread.interrupted();
+        }
     }
 
     @Test

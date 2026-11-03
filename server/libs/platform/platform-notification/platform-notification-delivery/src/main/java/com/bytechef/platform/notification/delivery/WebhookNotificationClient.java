@@ -52,7 +52,7 @@ public class WebhookNotificationClient {
 
     private static final int CONNECT_TIMEOUT_MILLIS = 10_000;
     private static final int READ_TIMEOUT_MILLIS = 30_000;
-    private static final String ACCEPT_HEADER =
+    private static final String DEFAULT_ACCEPT_HEADER =
         "text/plain, application/json, application/yaml, application/xml, text/xml, application/*+json, application/*+xml, */*";
     private static final String HMAC_SHA256 = "HmacSHA256";
     private static final int MAX_BODY_BYTES = 4000;
@@ -101,6 +101,9 @@ public class WebhookNotificationClient {
 
         HttpHeaders httpHeaders = new HttpHeaders();
 
+        // Fixed default, matching what RestTemplate.exchange sent; a configured Accept header replaces it
+        httpHeaders.set(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER);
+
         for (Map.Entry<String, String> header : webhookDelivery.headers()
             .entrySet()) {
 
@@ -110,7 +113,6 @@ public class WebhookNotificationClient {
         }
 
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set(HttpHeaders.ACCEPT, ACCEPT_HEADER);
 
         Instant suppliedTimestamp = webhookDelivery.timestamp();
         String suppliedDeliveryId = webhookDelivery.deliveryId();

@@ -299,6 +299,9 @@ bytechef:
       # Token Meta echoes back when verifying the WhatsApp interactivity webhook
       verify-token:
   webhook-delivery:
+    # Hosts that notification webhook and Slack URLs may use even when they resolve to a private or loopback address
+    # (comma-separated, matched exactly). Empty blocks every private address.
+    allowed-hosts:
     # Outbound webhook POSTs (job status and task started webhooks, notification webhooks, Slack, approval reminders)
     # in flight at once across all endpoints; each endpoint receives one delivery at a time.
     concurrency-limit: 10
