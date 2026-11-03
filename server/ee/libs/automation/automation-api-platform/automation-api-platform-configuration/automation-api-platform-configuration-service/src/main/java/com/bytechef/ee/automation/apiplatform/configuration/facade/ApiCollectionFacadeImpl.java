@@ -142,6 +142,13 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @Audited(event = ApiCollectionAuditEvents.API_COLLECTION_ENDPOINT_CREATED, data = {
+        @AuditData(key = "apiCollectionEndpointId", value = "#result?.id"),
+        @AuditData(key = "apiCollectionId", value = "#apiCollectionEndpointDTO.apiCollectionId"),
+        @AuditData(key = "name", value = "#apiCollectionEndpointDTO.name"),
+        @AuditData(key = "httpMethod", value = "#apiCollectionEndpointDTO.httpMethod"),
+        @AuditData(key = "path", value = "#apiCollectionEndpointDTO.path")
+    })
     @PreAuthorize("hasPermission(#apiCollectionEndpointDTO.apiCollectionId, 'ApiCollection', 'API_PLATFORM_EDIT')")
     public ApiCollectionEndpointDTO createApiCollectionEndpoint(
         ApiCollectionEndpointDTO apiCollectionEndpointDTO) {
@@ -198,6 +205,9 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     // Removing one endpoint changes the collection, so it takes the edit scope; deleteApiCollection removes every
     // endpoint through the service directly and needs only the delete scope.
     @Override
+    @Audited(event = ApiCollectionAuditEvents.API_COLLECTION_ENDPOINT_DELETED, data = {
+        @AuditData(key = "apiCollectionEndpointId", value = "#id")
+    })
     @PreAuthorize("hasPermission(#id, 'ApiCollectionEndpoint', 'API_PLATFORM_EDIT')")
     public void deleteApiCollectionEndpoint(long id) {
         apiCollectionEndpointService.delete(id);
@@ -297,6 +307,10 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @Audited(event = ApiCollectionAuditEvents.API_COLLECTION_UPDATED, data = {
+        @AuditData(key = "apiCollectionId", value = "#apiCollectionDTO.id"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("hasPermission(#apiCollectionDTO.id, 'ApiCollection', 'API_PLATFORM_EDIT')")
     public ApiCollectionDTO updateApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
@@ -313,6 +327,12 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     // Keyed on the endpoint id, whose collection is read from the stored row: the update writes by id and ignores the
     // collection id in the request, so a guard on that id would check a collection the write never touches.
     @Override
+    @Audited(event = ApiCollectionAuditEvents.API_COLLECTION_ENDPOINT_UPDATED, data = {
+        @AuditData(key = "apiCollectionEndpointId", value = "#apiCollectionEndpointDTO.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "httpMethod", value = "#result?.httpMethod"),
+        @AuditData(key = "path", value = "#result?.path")
+    })
     @PreAuthorize("hasPermission(#apiCollectionEndpointDTO.id, 'ApiCollectionEndpoint', 'API_PLATFORM_EDIT')")
     public ApiCollectionEndpointDTO updateApiCollectionEndpoint(ApiCollectionEndpointDTO apiCollectionEndpointDTO) {
         ApiCollectionEndpoint apiCollectionEndpoint = apiCollectionEndpointDTO.toApiCollectionEndpoint();
