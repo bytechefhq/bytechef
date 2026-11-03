@@ -7,6 +7,7 @@ import AutomationWorkflowProjectConfigurationMoveUsersDialog from '../Automation
 
 const mocks = vi.hoisted(() => ({
     connectedUsers: undefined as unknown[] | undefined,
+    connectedUsersEnabled: undefined as boolean | undefined,
     connectedUsersError: false,
     moveMutateAsync: vi.fn(),
     moveVariables: [] as unknown[],
@@ -14,12 +15,19 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
-    useAutomationWorkflowProjectConfigurationConnectedUsersQuery: () => ({
-        data: mocks.connectedUsers
-            ? {automationWorkflowProjectConfigurationConnectedUsers: mocks.connectedUsers}
-            : undefined,
-        isError: mocks.connectedUsersError,
-    }),
+    useAutomationWorkflowProjectConfigurationConnectedUsersQuery: (
+        _variables: unknown,
+        options?: {enabled?: boolean}
+    ) => {
+        mocks.connectedUsersEnabled = options?.enabled;
+
+        return {
+            data: mocks.connectedUsers
+                ? {automationWorkflowProjectConfigurationConnectedUsers: mocks.connectedUsers}
+                : undefined,
+            isError: mocks.connectedUsersError,
+        };
+    },
     useAutomationWorkflowProjectConfigurationMoveImpactQuery: (
         variables: {connectedUserIds: string[]; targetId: string},
         options?: {enabled?: boolean}
@@ -96,6 +104,7 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
             {connectedUserId: '1', email: 'jane@example.com', externalId: 'ext-1', name: 'Jane'},
             {connectedUserId: '2', email: 'bob@example.com', externalId: 'ext-2', name: 'Bob'},
         ];
+        mocks.connectedUsersEnabled = undefined;
         mocks.connectedUsersError = false;
         mocks.moveVariables = [];
 
@@ -186,5 +195,37 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
             });
             expect(queryClient.invalidateQueries).toHaveBeenCalledWith({queryKey: ['connectedUserProjects']});
         });
+    });
+
+    it('uses the given connected users, selection and title without loading the users', async () => {
+        mocks.connectedUsers = undefined;
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <AutomationWorkflowProjectConfigurationMoveUsersDialog
+                    configuration={configuration}
+                    connectedUsers={[{connectedUserId: '7', externalId: 'ext-7'}]}
+                    initialSelectedConnectedUserIds={['7']}
+                    onClose={vi.fn()}
+                    targetConfigurations={[targetConfiguration]}
+                    title="Change configuration"
+                />
+            </QueryClientProvider>
+        );
+
+        expect(screen.getByRole('heading', {name: 'Change configuration'})).toBeInTheDocument();
+        expect(screen.getByText('ext-7')).toBeInTheDocument();
+        expect(mocks.connectedUsersEnabled).toBe(false);
+
+        await userEvent.click(screen.getByRole('combobox', {name: 'Target'}));
+        await userEvent.click(await screen.findByRole('option', {name: 'BETA · v2'}));
+
+        await waitFor(() =>
+            expect(mocks.moveVariables.at(-1)).toEqual({
+                connectedUserIds: ['7'],
+                sourceId: 'source',
+                targetId: 'target',
+            })
+        );
     });
 });

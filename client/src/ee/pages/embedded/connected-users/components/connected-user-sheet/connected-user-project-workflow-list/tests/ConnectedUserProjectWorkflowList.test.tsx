@@ -25,6 +25,18 @@ vi.mock('../ConnectedUserProjectWorkflowListItem', () => ({
     ),
 }));
 
+vi.mock('../ConnectedUserProjectConfigurationMenu', () => ({
+    default: ({
+        currentConfiguration,
+        projectId,
+    }: {
+        currentConfiguration: {configurationName: string};
+        projectId: string;
+    }) => (
+        <button type="button">{`Change configuration ${currentConfiguration.configurationName} ${projectId}`}</button>
+    ),
+}));
+
 vi.mock('@/components/ui/tooltip', () => ({
     Tooltip: ({children}: {children: React.ReactNode}) => <>{children}</>,
     TooltipContent: () => null,
@@ -164,5 +176,43 @@ describe('ConnectedUserProjectWorkflowList', () => {
 
         expect(within(otherGroup).getByText('1 workflow')).toBeInTheDocument();
         expect(within(otherGroup).getByText('No executions')).toBeInTheDocument();
+    });
+
+    it('project group shows configuration name and version and offers Change configuration', () => {
+        render(
+            <ConnectedUserProjectWorkflowList
+                configurations={[
+                    {
+                        configurationId: '51',
+                        configurationName: 'Default',
+                        configurationProjectVersion: 3,
+                        projectId: '10',
+                    },
+                ]}
+                connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
+                connectedUserProjectWorkflows={[
+                    {
+                        ...createConnectedUserProjectWorkflow('1', 'Greet on Request', {
+                            automationWorkflowUuid: 'template-greeting',
+                        }),
+                        projectId: '10',
+                    },
+                    createConnectedUserProjectWorkflow('3', 'Custom Workflow'),
+                ]}
+                workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
+            />
+        );
+
+        const playgroundGroup = screen.getByRole('region', {name: 'Automation Playground'});
+
+        expect(within(playgroundGroup).getByText('Default · v3')).toBeInTheDocument();
+        expect(
+            within(playgroundGroup).getByRole('button', {name: 'Change configuration Default 10'})
+        ).toBeInTheDocument();
+
+        const otherGroup = screen.getByRole('region', {name: 'Other'});
+
+        expect(within(otherGroup).queryByText(/· v/)).not.toBeInTheDocument();
+        expect(within(otherGroup).queryByRole('button', {name: /Change configuration/})).not.toBeInTheDocument();
     });
 });

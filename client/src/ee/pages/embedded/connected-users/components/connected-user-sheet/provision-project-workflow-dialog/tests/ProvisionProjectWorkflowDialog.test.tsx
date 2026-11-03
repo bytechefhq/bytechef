@@ -40,11 +40,13 @@ const WORKFLOWS = [
     {dangling: true, inputs: [], label: 'Broken', provisioned: true, workflowUuid: 'wf-3'},
 ];
 
+const BETA_WORKFLOWS = [{dangling: false, inputs: [], label: 'Beta only', provisioned: false, workflowUuid: 'wf-5'}];
+
 const PROJECTS = [
     {
         assignedConfigurationId: null,
         configurations: [
-            {id: '50', name: 'Beta', projectVersion: 2, selfServe: false, workflows: []},
+            {id: '50', name: 'Beta', projectVersion: 2, selfServe: false, workflows: BETA_WORKFLOWS},
             {id: '51', name: 'Default', projectVersion: 3, selfServe: true, workflows: WORKFLOWS},
         ],
         name: 'Onboarding',
@@ -54,10 +56,18 @@ const PROJECTS = [
     },
 ];
 
-const renderDialog = (onClose = vi.fn(), queryClient = new QueryClient()) => {
+const renderDialog = (
+    onClose = vi.fn(),
+    queryClient = new QueryClient(),
+    assignedConfigurations: Array<{configurationId: string; configurationName: string; projectId: string}> = []
+) => {
     const dialog = (
         <QueryClientProvider client={queryClient}>
-            <ProvisionProjectWorkflowDialog connectedUserId={7} onClose={onClose} />
+            <ProvisionProjectWorkflowDialog
+                assignedConfigurations={assignedConfigurations}
+                connectedUserId={7}
+                onClose={onClose}
+            />
         </QueryClientProvider>
     );
 
@@ -159,7 +169,17 @@ describe('ProvisionProjectWorkflowDialog', () => {
         const [project] = PROJECTS;
 
         hoisted.provisionableQuery.mockReturnValue({
-            data: {provisionableConnectedUserProjects: [{...project, workflows: [...project.workflows].reverse()}]},
+            data: {
+                provisionableConnectedUserProjects: [
+                    {
+                        ...project,
+                        configurations: project.configurations.map((configuration) => ({
+                            ...configuration,
+                            workflows: [...configuration.workflows].reverse(),
+                        })),
+                    },
+                ],
+            },
         });
 
         rerenderDialog();
@@ -193,5 +213,115 @@ describe('ProvisionProjectWorkflowDialog', () => {
             connectedUserId: '7',
             workflows: [{inputs: {'user.email': 'a@b.c'}, workflowUuid: 'wf-4'}],
         });
+    });
+
+    it('preselects the self-serve configuration', async () => {
+        renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+
+        expect(screen.getByLabelText('Configuration')).toHaveValue('51');
+    });
+
+    it('lists workflows of the selected configuration', async () => {
+        renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+
+        expect(screen.getByRole('checkbox', {name: 'Welcome'})).toBeInTheDocument();
+        expect(screen.queryByRole('checkbox', {name: 'Beta only'})).not.toBeInTheDocument();
+
+        await userEvent.selectOptions(screen.getByLabelText('Configuration'), '50');
+
+        expect(screen.getByRole('checkbox', {name: 'Beta only'})).toBeInTheDocument();
+        expect(screen.queryByRole('checkbox', {name: 'Welcome'})).not.toBeInTheDocument();
+    });
+
+    it('sends configurationId when provisioning', async () => {
+        renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+        await userEvent.selectOptions(screen.getByLabelText('Configuration'), '50');
+        await userEvent.click(screen.getByRole('checkbox', {name: 'Beta only'}));
+
+        await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.mutate).toHaveBeenCalledWith({
+            configurationId: '50',
+            connectedUserId: '7',
+            workflows: [{workflowUuid: 'wf-5'}],
+        });
+    });
+
+    it('locks the configuration for an assigned user', async () => {
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {provisionableConnectedUserProjects: [{...PROJECTS[0], assignedConfigurationId: '50'}]},
+        });
+
+        renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+
+        expect(screen.getByLabelText('Configuration')).toHaveValue('Beta · v2');
+        expect(screen.getByLabelText('Configuration')).toHaveAttribute('readonly');
+        expect(screen.getByText('Use Change configuration to move this user.')).toBeInTheDocument();
+        expect(screen.getByRole('checkbox', {name: 'Beta only'})).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('checkbox', {name: 'Beta only'}));
+
+        await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.mutate).toHaveBeenCalledWith({
+            configurationId: '50',
+            connectedUserId: '7',
+            workflows: [{workflowUuid: 'wf-5'}],
+        });
+    });
+
+    it('shows the assigned name and blocks provisioning when the assigned configuration is disabled', async () => {
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {provisionableConnectedUserProjects: [{...PROJECTS[0], assignedConfigurationId: '99'}]},
+        });
+
+        renderDialog(vi.fn(), new QueryClient(), [
+            {configurationId: '99', configurationName: 'Paused', projectId: '10'},
+        ]);
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+
+        expect(screen.getByLabelText('Configuration')).toHaveValue('Paused');
+        expect(screen.getByText(/this configuration is disabled/i)).toBeInTheDocument();
+        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+    });
+
+    it('falls back to a generic label when the disabled assigned configuration is unknown', async () => {
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {provisionableConnectedUserProjects: [{...PROJECTS[0], assignedConfigurationId: '99'}]},
+        });
+
+        renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+
+        expect(screen.getByLabelText('Configuration')).toHaveValue('Assigned configuration (disabled)');
+        expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+    });
+
+    it('says so and disables Save when no configuration is available and none is assigned', async () => {
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {provisionableConnectedUserProjects: [{...PROJECTS[0], configurations: []}]},
+        });
+
+        renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+
+        expect(screen.getByText('No configuration available for this user')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
     });
 });

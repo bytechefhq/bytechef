@@ -41,6 +41,17 @@ const ConnectedUserSheetPanelWorkflowList = ({connectedUserId}: {connectedUserId
         return <div className="py-4 text-sm text-muted-foreground">Loading...</div>;
     }
 
+    const connectedUserProjects = data?.connectedUserProjects ?? [];
+
+    const configurations = connectedUserProjects.flatMap(
+        (connectedUserProject) => connectedUserProject.automationProjectConfigurations
+    );
+
+    const connectedUser = {
+        connectedUserId: connectedUserId.toString(),
+        externalId: connectedUserProjects[0]?.connectedUser.externalId || connectedUserId.toString(),
+    };
+
     const connectedUserProjectWorkflows = (data?.connectedUserProjects ?? []).flatMap(
         (connectedUserProject) => connectedUserProject.connectedUserProjectWorkflows
     );
@@ -61,6 +72,8 @@ const ConnectedUserSheetPanelWorkflowList = ({connectedUserId}: {connectedUserId
 
             {connectedUserProjectWorkflows.length > 0 ? (
                 <ConnectedUserProjectWorkflowList
+                    configurations={configurations}
+                    connectedUser={connectedUser}
                     connectedUserProjectWorkflows={connectedUserProjectWorkflows}
                     workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
                 />
@@ -70,6 +83,7 @@ const ConnectedUserSheetPanelWorkflowList = ({connectedUserId}: {connectedUserId
 
             {showProvisionDialog && (
                 <ProvisionProjectWorkflowDialog
+                    assignedConfigurations={configurations}
                     connectedUserId={connectedUserId}
                     onClose={() => setShowProvisionDialog(false)}
                 />
