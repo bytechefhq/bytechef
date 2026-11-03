@@ -14,6 +14,7 @@ const hoisted = vi.hoisted(() => ({
     deleteIntegrationInstanceConfigurationMock: vi.fn(),
     integrationConfigurations: [] as unknown[] | undefined,
     integrationConfigurationsError: false,
+    integrationVersions: [] as unknown[],
     moveImpactQueryMock: vi.fn(),
     moveImpactResult: {data: undefined} as Record<string, unknown>,
     moveMutateAsyncMock: vi.fn(),
@@ -32,6 +33,10 @@ vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries'
 
         return {data: hoisted.integrationConfigurations, isError: hoisted.integrationConfigurationsError};
     },
+}));
+
+vi.mock('@/ee/shared/queries/embedded/integrationVersions.queries', () => ({
+    useGetIntegrationVersionsQuery: () => ({data: hoisted.integrationVersions}),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
@@ -420,5 +425,41 @@ describe('IntegrationInstanceConfigurationListItem Move Users', () => {
         await expect(
             screen.findByText('No other configuration in this environment', {}, {timeout: 1500})
         ).rejects.toThrow();
+    });
+});
+
+describe('IntegrationInstanceConfigurationListItem newer version', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+    });
+
+    afterEach(() => {
+        hoisted.integrationVersions = [];
+
+        resetAll();
+        vi.clearAllMocks();
+    });
+
+    it('should show the newer version hint when the integration published a later version', () => {
+        hoisted.integrationVersions = [
+            {status: 'PUBLISHED', version: 1},
+            {status: 'PUBLISHED', version: 2},
+            {status: 'DRAFT', version: 3},
+        ];
+
+        renderItem();
+
+        expect(screen.getByText('Newer version available')).toBeInTheDocument();
+    });
+
+    it('should not show the newer version hint when only a draft is newer', () => {
+        hoisted.integrationVersions = [
+            {status: 'PUBLISHED', version: 1},
+            {status: 'DRAFT', version: 2},
+        ];
+
+        renderItem();
+
+        expect(screen.queryByText('Newer version available')).not.toBeInTheDocument();
     });
 });

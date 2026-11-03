@@ -10,7 +10,7 @@ import {
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
 import IntegrationInstanceConfigurationListItemDropdownMenu from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItemDropdownMenu';
 import {useIntegrationInstanceConfigurationsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
-import {IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
+import {IntegrationInstanceConfiguration, IntegrationStatus, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {
     useDeleteIntegrationInstanceConfigurationMutation,
     useEnableIntegrationInstanceConfigurationMutation,
@@ -21,6 +21,7 @@ import {
     IntegrationInstanceConfigurationKeys,
     useGetIntegrationInstanceConfigurationsQuery,
 } from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -60,7 +61,20 @@ const IntegrationInstanceConfigurationListItem = ({
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
+    const {data: integrationVersions} = useGetIntegrationVersionsQuery(
+        integrationInstanceConfiguration.integrationId!,
+        integrationInstanceConfiguration.integrationId != null
+    );
+
     const workflowCount = integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows?.length ?? 0;
+
+    const lastPublishedIntegrationVersion = (integrationVersions ?? [])
+        .filter((integrationVersion) => integrationVersion.status === IntegrationStatus.Published)
+        .reduce((lastVersion, integrationVersion) => Math.max(lastVersion, integrationVersion.version ?? 0), 0);
+
+    const newerVersionAvailable =
+        integrationInstanceConfiguration.integrationVersion != null &&
+        lastPublishedIntegrationVersion > integrationInstanceConfiguration.integrationVersion;
 
     const {captureIntegrationInstanceConfigurationEnabled} = useAnalytics();
 
@@ -234,6 +248,8 @@ const IntegrationInstanceConfigurationListItem = ({
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
+                        {newerVersionAvailable && <Badge label="Newer version available" styleType="warning-outline" />}
+
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Badge
