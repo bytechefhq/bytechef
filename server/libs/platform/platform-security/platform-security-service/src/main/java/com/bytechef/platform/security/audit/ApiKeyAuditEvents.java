@@ -23,6 +23,7 @@ public final class ApiKeyAuditEvents {
 
     public static final String API_KEY_CREATED = "API_KEY_CREATED";
     public static final String API_KEY_DELETED = "API_KEY_DELETED";
+    public static final String API_KEY_UPDATED = "API_KEY_UPDATED";
 
     private ApiKeyAuditEvents() {
     }

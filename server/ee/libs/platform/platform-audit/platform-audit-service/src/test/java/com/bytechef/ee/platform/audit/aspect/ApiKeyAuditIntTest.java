@@ -173,6 +173,46 @@ class ApiKeyAuditIntTest {
         assertThat(findSingleEvent().getPrincipal()).isEqualTo("SYSTEM");
     }
 
+    @Test
+    void testUpdateRecordsTheNewNameAndThePlatformOfTheApiKey() {
+        long apiKeyId = saveApiKey(PlatformType.EMBEDDED);
+
+        ApiKey apiKey = new ApiKey();
+
+        apiKey.setId(apiKeyId);
+        apiKey.setName("renamed key");
+
+        apiKeyService.update(apiKey);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(ApiKeyAuditEvents.API_KEY_UPDATED);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("apiKeyId", String.valueOf(apiKeyId))
+            .containsEntry("name", "renamed key")
+            .containsEntry("type", "EMBEDDED");
+    }
+
+    @Test
+    void testUpdateOfAnUnknownApiKeyRecordsAnError() {
+        ApiKey apiKey = new ApiKey();
+
+        apiKey.setId(UNKNOWN_API_KEY_ID);
+        apiKey.setName("renamed key");
+
+        assertThatThrownBy(() -> apiKeyService.update(apiKey)).isInstanceOf(RuntimeException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(ApiKeyAuditEvents.API_KEY_UPDATED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("apiKeyId", String.valueOf(UNKNOWN_API_KEY_ID))
+            .containsKey("errorClass");
+    }
+
     private ApiKey createApiKey(PlatformType platformType) {
         ApiKey apiKey = new ApiKey();
 
