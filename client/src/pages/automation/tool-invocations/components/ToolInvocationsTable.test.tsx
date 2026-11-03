@@ -59,17 +59,19 @@ describe('ToolInvocationsTable', () => {
     });
 
     it.each([
-        ['SUCCESS', 'bg-success'],
-        ['ERROR', 'bg-destructive'],
-        ['TIMEOUT', 'bg-destructive'],
+        ['SUCCESS', 'text-content-success-primary'],
+        ['ERROR', 'text-content-destructive-primary'],
+        ['TIMEOUT', 'text-content-destructive-primary'],
+        ['APPROVAL_DENIED', 'text-content-warning-primary'],
+        ['RULE_BLOCKED', 'text-content-warning-primary'],
         ['CONNECTION_REQUIRED', 'bg-surface-neutral-secondary'],
         ['APPROVAL_REQUIRED', 'bg-surface-neutral-secondary'],
-        ['APPROVAL_DENIED', 'bg-surface-neutral-secondary'],
         ['SUSPENDED', 'bg-surface-neutral-secondary'],
     ])('colours the %s outcome with %s', (outcome, className) => {
         render(<ToolInvocationsTable toolInvocationLogs={[{...baseLog, outcome}]} />);
 
         expect(screen.getByText(outcome)).toHaveClass(className);
+        expect(screen.getByText(outcome)).toHaveClass('border-transparent');
     });
 
     it('shows only the component name when the call has no operation', () => {
