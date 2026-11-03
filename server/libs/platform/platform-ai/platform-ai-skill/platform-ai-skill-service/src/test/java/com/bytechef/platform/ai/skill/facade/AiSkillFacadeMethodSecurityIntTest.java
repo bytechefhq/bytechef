@@ -18,16 +18,20 @@ package com.bytechef.platform.ai.skill.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doReturn;
 
 import com.bytechef.platform.ai.skill.config.AiSkillIntTestConfiguration;
 import com.bytechef.platform.ai.skill.config.AiSkillMethodSecurityTestConfiguration;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.repository.AiSkillRepository;
+import com.bytechef.platform.ai.skill.service.AiSkillService;
+import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
@@ -39,11 +43,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @author Ivica Cardic
@@ -59,6 +65,9 @@ class AiSkillFacadeMethodSecurityIntTest {
 
     @Autowired
     private AiSkillRepository aiSkillRepository;
+
+    @MockitoSpyBean
+    private AiSkillService aiSkillService;
 
     @AfterEach
     void afterEach() {
@@ -121,6 +130,66 @@ class AiSkillFacadeMethodSecurityIntTest {
             .isInstanceOfAny(AccessDeniedException.class, AuthenticationCredentialsNotFoundException.class);
 
         assertThat(aiSkillRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void testAnonymousCallerIsDenied() {
+        AiSkill aiSkill = createSkillAs("alice", "alice-skill");
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(
+            new AnonymousAuthenticationToken("key", "anonymous",
+                List.of(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        assertThatThrownBy(() -> aiSkillFacade.createAiSkillFromInstructions("skill", null, "do it"))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(aiSkillFacade::getAiSkillTags).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillFacade.getAiSkill(aiSkill.getId())).isInstanceOf(AccessDeniedException.class);
+
+        assertThat(aiSkillRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void testOwnerlessSkillIsDenied() {
+        AiSkill aiSkill = createSkillAs("alice", "alice-skill");
+
+        AiSkill ownerlessAiSkill = aiSkillRepository.findById(aiSkill.getId())
+            .orElseThrow();
+
+        ownerlessAiSkill.setCreatedBy(null);
+
+        doReturn(Optional.of(ownerlessAiSkill)).when(aiSkillService)
+            .fetchAiSkill(aiSkill.getId());
+
+        authenticate("alice");
+
+        assertThatThrownBy(() -> aiSkillFacade.getAiSkill(aiSkill.getId())).isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testConnectedUserWhoseExternalIdIsAPlatformLoginIsRefusedEverySkillOperation() {
+        AiSkill aiSkill = createSkillAs("alice", "alice-skill");
+
+        long id = aiSkill.getId();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestNonPlatformUserAuthentication.of("alice"));
+
+        assertThatThrownBy(aiSkillFacade::getAiSkills).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillFacade.getAiSkill(id)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillFacade.deleteAiSkill(id)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillFacade.updateAiSkill(id, "renamed", null))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillFacade.createAiSkillFromInstructions("skill", null, "do it"))
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(aiSkillRepository.findAll())
+            .singleElement()
+            .extracting(AiSkill::getName)
+            .isEqualTo("alice-skill");
     }
 
     @Test
