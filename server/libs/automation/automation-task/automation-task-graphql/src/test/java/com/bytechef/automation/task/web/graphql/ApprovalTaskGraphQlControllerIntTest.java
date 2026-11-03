@@ -40,15 +40,18 @@ import com.bytechef.automation.task.domain.ApprovalTaskStatusException;
 import com.bytechef.automation.task.domain.PendingApproval;
 import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import com.bytechef.automation.task.facade.ApprovalTaskFacadeImpl;
+import com.bytechef.automation.task.security.ApprovalTaskJobResolver;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import com.bytechef.automation.task.web.graphql.ApprovalTaskGraphQlController.ApprovalTaskInput;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,7 +83,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = {
-    ApprovalTaskFacadeImpl.class, ApprovalTaskGraphQlController.class,
+    ApprovalTaskFacadeImpl.class, ApprovalTaskGraphQlController.class, ApprovalTaskJobResolver.class,
     ApprovalTaskGraphQlControllerIntTest.MethodSecurityConfiguration.class
 })
 @GraphQlTest(
@@ -275,6 +278,7 @@ class ApprovalTaskGraphQlControllerIntTest {
         private static final long APPROVAL_TASK_ID = 3L;
         private static final String BODY_REACHED = "body reached";
         private static final long CURRENT_USER_ID = 7L;
+        private static final long JOB_ID = 9L;
         private static final long OTHER_USER_ID = 8L;
 
         @Autowired
@@ -287,7 +291,13 @@ class ApprovalTaskGraphQlControllerIntTest {
         private ApprovalTaskService approvalTaskService;
 
         @Autowired
+        private ApprovalTokens approvalTokens;
+
+        @Autowired
         private PermissionService permissionService;
+
+        @Autowired
+        private PrincipalJobService principalJobService;
 
         @BeforeEach
         void beforeEach() {
@@ -322,6 +332,46 @@ class ApprovalTaskGraphQlControllerIntTest {
                 () -> approvalTaskGraphQlController.createApprovalTask(approvalTaskInput(null)), tenantAdmin);
 
             verify(permissionService).isTenantAdmin();
+            verifyNoMoreInteractions(permissionService);
+        }
+
+        @ParameterizedTest(name = "granted={0}")
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testCreateApprovalTaskForAJobRequiresDeploymentEditOnThatJob(boolean granted) {
+            String token = "signed-resume-token";
+
+            when(approvalTokens.resolveJobResumeId(token)).thenReturn(Optional.of(JobResumeId.of("public", JOB_ID)));
+            when(permissionService.hasResourceScope(JOB_ID, "Job", "DEPLOYMENT_EDIT")).thenReturn(granted);
+            when(principalJobService.getJobPrincipalId(anyLong(), any()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+
+            ApprovalTask approvalTask = ApprovalTask.builder()
+                .name("Approve the invoice")
+                .jobResumeId(token)
+                .build();
+
+            assertInvocationOutcome(() -> approvalTaskFacade.createApprovalTask(approvalTask), granted);
+
+            verify(permissionService).isTenantAdmin();
+            verify(permissionService).hasResourceScope(JOB_ID, "Job", "DEPLOYMENT_EDIT");
+            verifyNoMoreInteractions(permissionService);
+        }
+
+        @Test
+        void testCreateApprovalTaskWithAnUnresolvableTokenIsDeniedToANonAdmin() {
+            when(approvalTokens.resolveJobResumeId("forged")).thenReturn(Optional.empty());
+
+            ApprovalTask approvalTask = ApprovalTask.builder()
+                .name("Approve the invoice")
+                .jobResumeId("forged")
+                .build();
+
+            assertInvocationOutcome(() -> approvalTaskFacade.createApprovalTask(approvalTask), false);
+
+            verify(permissionService).isTenantAdmin();
+            verify(permissionService).hasResourceScope(-1L, "Job", "DEPLOYMENT_EDIT");
             verifyNoMoreInteractions(permissionService);
         }
 
