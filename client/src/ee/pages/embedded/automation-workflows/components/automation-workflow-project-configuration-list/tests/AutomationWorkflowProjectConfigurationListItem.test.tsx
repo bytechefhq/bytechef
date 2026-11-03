@@ -8,6 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import AutomationWorkflowProjectConfigurationListItem from '../AutomationWorkflowProjectConfigurationListItem';
 
 const mocks = vi.hoisted(() => ({
+    deleteImpact: {connectedUserCount: 3, referenceWorkflowCount: 2},
     enableConfigurationMutate: vi.fn(),
     enableWorkflowMutate: vi.fn(),
     invalidateQueries: vi.fn(),
@@ -15,6 +16,13 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useAutomationWorkflowProjectConfigurationConnectedUsersQuery: () => ({data: undefined}),
+    useAutomationWorkflowProjectConfigurationDeleteImpactQuery: (
+        _variables: unknown,
+        options?: {enabled?: boolean}
+    ) => ({
+        data: options?.enabled ? {automationWorkflowProjectConfigurationDeleteImpact: mocks.deleteImpact} : undefined,
+    }),
     useEnableAutomationWorkflowProjectConfigurationMutation: () => ({
         isPending: false,
         mutate: mocks.enableConfigurationMutate,
@@ -99,6 +107,7 @@ const renderItem = (
         configuration?: typeof configuration;
         onDelete?: () => void;
         onEdit?: () => void;
+        otherConfigurations?: (typeof configuration)[];
         onUpdateVersion?: () => void;
         project?: typeof project;
     } = {}
@@ -111,6 +120,7 @@ const renderItem = (
                 onDelete={overrides.onDelete ?? vi.fn()}
                 onEdit={overrides.onEdit ?? vi.fn()}
                 onUpdateVersion={overrides.onUpdateVersion ?? vi.fn()}
+                otherConfigurations={overrides.otherConfigurations}
                 project={overrides.project ?? project}
             />
         </TooltipProvider>
@@ -227,7 +237,7 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         expect(onUpdateVersion).toHaveBeenCalledTimes(1);
     });
 
-    it('explains that deleting a configuration pauses automations until it is recreated', async () => {
+    it('states how many workflows and users deleting the configuration removes', async () => {
         const user = userEvent.setup();
 
         renderItem();
@@ -236,12 +246,75 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         await user.click(await screen.findByRole('menuitem', {name: 'Delete Configuration'}));
 
         expect(
-            await screen.findByText(
-                "Connected users' automations from this environment are paused and come back if you recreate the configuration.",
-                {exact: false}
-            )
+            await screen.findByText('This deletes 2 workflows of 3 users. Copies keep working. This cannot be undone.')
         ).toBeInTheDocument();
-        expect(screen.queryByText(/cannot be undone/)).not.toBeInTheDocument();
+        expect(screen.queryByText(/paused/)).not.toBeInTheDocument();
+    });
+
+    it('shows the configuration name with the environment beside it', () => {
+        renderItem();
+
+        expect(screen.getByText('STAGING')).toBeInTheDocument();
+        expect(screen.getByText('Staging')).toBeInTheDocument();
+    });
+
+    it('shows the connected user count', () => {
+        renderItem({configuration: {...configuration, connectedUserCount: 3}});
+
+        expect(screen.getByText('3 users')).toBeInTheDocument();
+    });
+
+    it('uses the singular for one connected user', () => {
+        renderItem({configuration: {...configuration, connectedUserCount: 1}});
+
+        expect(screen.getByText('1 user')).toBeInTheDocument();
+    });
+
+    it('orders the menu as Edit, Update Project Version, Move Users, separator, Delete', async () => {
+        const user = userEvent.setup();
+
+        renderItem();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        const menu = await screen.findByRole('menu');
+
+        const entries = Array.from(menu.querySelectorAll('[role="menuitem"], [role="separator"]'));
+
+        expect(entries.map((entry) => entry.getAttribute('aria-label') || entry.getAttribute('role'))).toEqual([
+            'Edit Configuration',
+            'Update Project Version',
+            'Move Users',
+            'separator',
+            'Delete Configuration',
+        ]);
+        expect(within(menu).getByText('Move Users…')).toBeInTheDocument();
+    });
+
+    it('disables Move Users with a tooltip when there is no other configuration in the environment', async () => {
+        const user = userEvent.setup();
+
+        renderItem({otherConfigurations: [{...configuration, environmentId: '1', id: 'other'}]});
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        const moveUsersItem = await screen.findByRole('menuitem', {name: 'Move Users'});
+
+        expect(moveUsersItem).toHaveAttribute('aria-disabled', 'true');
+
+        await user.hover(moveUsersItem.parentElement as HTMLElement);
+
+        expect((await screen.findAllByText('No other configuration in this environment')).length).toBeGreaterThan(0);
+    });
+
+    it('enables Move Users when another configuration shares the environment', async () => {
+        const user = userEvent.setup();
+
+        renderItem({otherConfigurations: [{...configuration, id: 'other', name: 'BETA'}]});
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        expect(await screen.findByRole('menuitem', {name: 'Move Users'})).not.toHaveAttribute('aria-disabled', 'true');
     });
 
     it('shows the hidden from hub badge when the configuration is not visible in the hub', () => {

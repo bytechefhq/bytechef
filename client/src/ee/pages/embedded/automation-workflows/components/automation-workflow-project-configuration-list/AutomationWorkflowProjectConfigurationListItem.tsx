@@ -14,13 +14,15 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
+    useAutomationWorkflowProjectConfigurationDeleteImpactQuery,
     useEnableAutomationWorkflowProjectConfigurationMutation,
 } from '@/shared/middleware/graphql';
 import {Environment} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, EllipsisVerticalIcon, PencilIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
+import {ChevronDownIcon, EllipsisVerticalIcon, PencilIcon, RefreshCcwIcon, Trash2Icon, UsersIcon} from 'lucide-react';
 import {MouseEvent, useCallback, useRef, useState} from 'react';
 
+import AutomationWorkflowProjectConfigurationMoveUsersDialog from './AutomationWorkflowProjectConfigurationMoveUsersDialog';
 import AutomationWorkflowProjectConfigurationWorkflowList from './AutomationWorkflowProjectConfigurationWorkflowList';
 
 type AutomationWorkflowProjectConfigurationType =
@@ -33,8 +35,11 @@ interface AutomationWorkflowProjectConfigurationListItemProps {
     onDelete: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationWorkflowProjectConfigurationType) => void;
+    otherConfigurations?: AutomationWorkflowProjectConfigurationType[];
     project: AutomationWorkflowProjectType;
 }
+
+const formatCount = (count: number, noun: string): string => `${count} ${count === 1 ? noun : `${noun}s`}`;
 
 const AutomationWorkflowProjectConfigurationListItem = ({
     configuration,
@@ -42,15 +47,35 @@ const AutomationWorkflowProjectConfigurationListItem = ({
     onDelete,
     onEdit,
     onUpdateVersion,
+    otherConfigurations = [],
     project,
 }: AutomationWorkflowProjectConfigurationListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showMoveUsersDialog, setShowMoveUsersDialog] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const queryClient = useQueryClient();
 
     const enableConfigurationMutation = useEnableAutomationWorkflowProjectConfigurationMutation();
+
+    const {data: deleteImpactData} = useAutomationWorkflowProjectConfigurationDeleteImpactQuery(
+        {id: configuration.id},
+        {enabled: showDeleteDialog}
+    );
+
+    const deleteImpact = deleteImpactData?.automationWorkflowProjectConfigurationDeleteImpact;
+
+    const moveTargetConfigurations = otherConfigurations.filter(
+        (otherConfiguration) =>
+            otherConfiguration.id !== configuration.id &&
+            otherConfiguration.projectId === configuration.projectId &&
+            otherConfiguration.environmentId === configuration.environmentId
+    );
+
+    const deleteDescription = deleteImpact
+        ? `This deletes ${formatCount(deleteImpact.referenceWorkflowCount, 'workflow')} of ${formatCount(deleteImpact.connectedUserCount, 'user')}. Copies keep working. This cannot be undone.`
+        : 'Checking what this deletes...';
 
     const environmentName =
         environments.find((environment) => String(environment.id) === configuration.environmentId)?.name ||
@@ -93,8 +118,10 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center">
                             <span className="text-base font-semibold text-content-neutral-primary">
-                                {environmentName}
+                                {configuration.name}
                             </span>
+
+                            <span className="ml-2 text-sm text-content-neutral-secondary">{environmentName}</span>
                         </div>
 
                         <div className="mt-2 flex min-h-7 items-center">
@@ -109,6 +136,10 @@ const AutomationWorkflowProjectConfigurationListItem = ({
 
                                 <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]/configuration:rotate-180" />
                             </CollapsibleTrigger>
+
+                            <span className="mr-4 text-xs font-semibold text-muted-foreground">
+                                {formatCount(configuration.connectedUserCount, 'user')}
+                            </span>
                         </div>
                     </div>
 
@@ -195,6 +226,26 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                                     onClick={() => onUpdateVersion(configuration)}
                                 />
 
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span className="block">
+                                            <DropdownMenuItem
+                                                aria-label="Move Users"
+                                                disabled={moveTargetConfigurations.length === 0}
+                                                icon={<UsersIcon />}
+                                                label="Move Users…"
+                                                onClick={() => setShowMoveUsersDialog(true)}
+                                            />
+                                        </span>
+                                    </TooltipTrigger>
+
+                                    {moveTargetConfigurations.length === 0 && (
+                                        <TooltipContent side="left">
+                                            No other configuration in this environment
+                                        </TooltipContent>
+                                    )}
+                                </Tooltip>
+
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
@@ -215,7 +266,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
             </CollapsibleContent>
 
             <AlertDialog
-                description="Connected users' automations from this environment are paused and come back if you recreate the configuration. The project and its workflows are not affected."
+                description={deleteDescription}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={() => {
                     onDelete(configuration);
@@ -224,6 +275,14 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                 }}
                 open={showDeleteDialog}
             />
+
+            {showMoveUsersDialog && (
+                <AutomationWorkflowProjectConfigurationMoveUsersDialog
+                    configuration={configuration}
+                    onClose={() => setShowMoveUsersDialog(false)}
+                    targetConfigurations={moveTargetConfigurations}
+                />
+            )}
         </Collapsible>
     );
 };

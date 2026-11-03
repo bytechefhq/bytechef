@@ -69,6 +69,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
         error: null,
         isLoading: false,
     }),
+    useAutomationWorkflowProjectConfigurationDeleteImpactQuery: () => ({data: undefined}),
     useAutomationWorkflowProjectConfigurationsQuery: () => ({
         data: {automationWorkflowProjectConfigurations: hoisted.configurations},
     }),
