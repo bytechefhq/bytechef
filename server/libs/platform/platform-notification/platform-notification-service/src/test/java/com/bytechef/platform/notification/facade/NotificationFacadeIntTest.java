@@ -26,6 +26,7 @@ import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.dto.NotificationDTO;
 import com.bytechef.platform.notification.repository.NotificationRepository;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -365,10 +366,10 @@ public class NotificationFacadeIntTest {
 
         @Test
         public void testRejectsMoreThan20Headers() {
-            List<Map<String, Object>> headers = new java.util.ArrayList<>();
+            List<Map<String, Object>> headers = new ArrayList<>();
 
-            for (int i = 0; i < 21; i++) {
-                headers.add(Map.of("name", "X-Header-" + i, "value", "v"));
+            for (int headerIndex = 0; headerIndex < 21; headerIndex++) {
+                headers.add(Map.of("name", "X-Header-" + headerIndex, "value", "v"));
             }
 
             assertRejected(headers);

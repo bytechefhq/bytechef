@@ -33,6 +33,8 @@ class NotificationSecretSettingsTest {
     void testApplyMovesSecretKeysOutOfPlainSettings() {
         Notification target = new Notification();
 
+        target.setType(Notification.Type.WEBHOOK);
+
         Map<String, Object> incoming = new HashMap<>();
 
         incoming.put("webhook", "https://example.com/hook");
@@ -42,15 +44,15 @@ class NotificationSecretSettingsTest {
         NotificationSecretSettings.apply(target, incoming, null);
 
         assertThat(target.getSettings()).containsOnlyKeys("webhook");
-        assertThat(target.getSecretSettings())
-            .containsEntry("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X")
-            .containsKey("webhookHeaders");
+        assertThat(target.getSecretSettings()).containsOnlyKeys("webhookHeaders");
     }
 
     @Test
     void testApplyKeepsStoredHeaderValueWhenMasked() {
         Notification stored = storedWithHeaders(List.of(Map.of("name", "Authorization", "value", "token-1")));
         Notification target = new Notification();
+
+        target.setType(Notification.Type.WEBHOOK);
 
         NotificationSecretSettings.apply(
             target,
@@ -69,6 +71,8 @@ class NotificationSecretSettingsTest {
         Notification stored = storedWithHeaders(List.of(Map.of("name", "Authorization", "value", "token-1")));
         Notification target = new Notification();
 
+        target.setType(Notification.Type.WEBHOOK);
+
         NotificationSecretSettings.apply(
             target, Map.of("webhookHeaders", List.of(Map.of("name", "Authorization"))), stored);
 
@@ -80,6 +84,8 @@ class NotificationSecretSettingsTest {
         Notification stored = storedWithHeaders(
             List.of(Map.of("name", "Authorization", "value", "token-1"), Map.of("name", "X-Old", "value", "old")));
         Notification target = new Notification();
+
+        target.setType(Notification.Type.WEBHOOK);
 
         NotificationSecretSettings.apply(
             target, Map.of("webhookHeaders", List.of(Map.of("name", "Authorization", "value", "********"))), stored);
@@ -95,6 +101,8 @@ class NotificationSecretSettingsTest {
         stored.setSecretSettings(Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X"));
 
         Notification target = new Notification();
+
+        target.setType(Notification.Type.SLACK);
 
         NotificationSecretSettings.apply(target, Map.of("slackWebhookUrl", "********"), stored);
 
@@ -112,6 +120,8 @@ class NotificationSecretSettingsTest {
 
         Notification target = new Notification();
 
+        target.setType(Notification.Type.WEBHOOK);
+
         NotificationSecretSettings.apply(target, Map.of("webhook", "https://example.com/hook"), stored);
 
         assertThat(target.getSecretSettings()).containsEntry("webhookSecret", "whsec_abc");
@@ -121,30 +131,78 @@ class NotificationSecretSettingsTest {
     void testMaskedNeverContainsSecrets() {
         Notification notification = new Notification();
 
+        notification.setType(Notification.Type.WEBHOOK);
+
         notification.setSettings(Map.of("webhook", "https://example.com/hook"));
         notification.setSecretSettings(
             Map.of(
-                "slackWebhookUrl", "https://hooks.slack.com/services/T/B/X", "webhookSecret", "whsec_abc",
+                "webhookSecret", "whsec_abc",
                 "webhookHeaders", List.of(Map.of("name", "Authorization", "value", "token-1"))));
 
         Map<String, Object> masked = NotificationSecretSettings.masked(notification);
 
         assertThat(masked).doesNotContainKey("webhookSecret");
-        assertThat(masked).containsEntry("slackWebhookUrl", "********")
-            .containsEntry("webhook", "https://example.com/hook")
+        assertThat(masked).containsEntry("webhook", "https://example.com/hook")
             .containsEntry("webhookHeaders", List.of(Map.of("name", "Authorization", "value", "********")));
-        assertThat(masked.toString()).doesNotContain("token-1", "whsec_abc", "hooks.slack.com");
+        assertThat(masked.toString()).doesNotContain("token-1", "whsec_abc");
     }
 
     @Test
     void testMaskedCoversLegacySlackUrlInPlainSettings() {
         Notification notification = new Notification();
 
+        notification.setType(Notification.Type.SLACK);
+
         notification.setSettings(Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X"));
 
         Map<String, Object> masked = NotificationSecretSettings.masked(notification);
 
         assertThat(masked).containsEntry("slackWebhookUrl", "********");
+    }
+
+    @Test
+    void testApplyDropsSlackUrlWhenTypeChangesToWebhook() {
+        Notification stored = new Notification();
+
+        stored.setType(Notification.Type.SLACK);
+        stored.setSettings(Map.of());
+        stored.setSecretSettings(Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X"));
+
+        Notification target = new Notification();
+
+        target.setType(Notification.Type.WEBHOOK);
+
+        NotificationSecretSettings.apply(
+            target, Map.of("webhook", "https://example.com/hook", "slackWebhookUrl", "********"), stored);
+
+        assertThat(target.getSecretSettings()).doesNotContainKey("slackWebhookUrl");
+        assertThat(target.getSettings()).containsOnlyKeys("webhook");
+    }
+
+    @Test
+    void testApplyDropsWebhookSecretsWhenTypeChangesToSlack() {
+        Notification stored = storedWithHeaders(List.of(Map.of("name", "Authorization", "value", "token-1")));
+
+        stored.setType(Notification.Type.WEBHOOK);
+        stored.setSecretSettings(
+            Map.of(
+                "webhookSecret", "whsec_abc",
+                "webhookHeaders", List.of(Map.of("name", "Authorization", "value", "token-1"))));
+
+        Notification target = new Notification();
+
+        target.setType(Notification.Type.SLACK);
+
+        NotificationSecretSettings.apply(
+            target,
+            Map.of(
+                "slackWebhookUrl", "https://hooks.slack.com/services/T/B/X", "webhookHeaders",
+                List.of(Map.of("name", "Authorization", "value", "********"))),
+            stored);
+
+        assertThat(target.getSecretSettings()).containsOnlyKeys("slackWebhookUrl");
+        assertThat(NotificationSecretSettings.hasSigningSecret(target)).isFalse();
+        assertThat(NotificationSecretSettings.masked(target)).doesNotContainKey("webhookHeaders");
     }
 
     private static Notification storedWithHeaders(List<Map<String, Object>> headers) {

@@ -121,6 +121,9 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @Audited(event = NotificationAuditEvents.NOTIFICATION_SIGNING_SECRET_REGENERATED, data = {
+        @AuditData(key = "notificationId", value = "#id")
+    })
     public String regenerateSigningSecret(long id) {
         Notification notification = notificationService.getNotification(id);
 
@@ -176,7 +179,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
         return new NotificationDTO(
             notification, NotificationSecretSettings.masked(notification),
             notificationEventService.getNotificationEvents(notification.getNotificationEventIds()),
-            notification.getSetting(NotificationSecretSettings.SIGNING_SECRET_KEY) != null, signingSecret);
+            NotificationSecretSettings.hasSigningSecret(notification), signingSecret);
     }
 
     private void validateNotification(Notification notification) {
