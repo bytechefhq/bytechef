@@ -8,6 +8,12 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiSkillDetail from '../AiSkillDetail';
 
+const {canManageMock} = vi.hoisted(() => ({canManageMock: vi.fn(() => true)}));
+
+vi.mock('@/pages/automation/ai/skills/hooks/useCanManageAiSkill', () => ({
+    default: () => canManageMock(),
+}));
+
 const handleAddFile = vi.fn();
 const handleDelete = vi.fn();
 const handleRemoveFile = vi.fn();
@@ -68,6 +74,7 @@ describe('AiSkillDetail', () => {
         useCopilotPanelStore.setState({copilotPanelOpen: false});
         vi.clearAllMocks();
         aiSkillDetailHookMock.mockReset();
+        canManageMock.mockReturnValue(true);
     });
 
     it('closes the copilot panel when the detail view unmounts', () => {
@@ -128,6 +135,22 @@ describe('AiSkillDetail', () => {
 
             expect(handleDelete).toHaveBeenCalledTimes(1);
             expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+        });
+
+        it('lets the toolbar offer the write actions to a member who may manage the skill', () => {
+            render(<AiSkillDetail />);
+
+            expect(useAiSkillDetailToolbarStore.getState().canManage).toBe(true);
+        });
+
+        it('hides the file write controls from a member who may not manage the skill', () => {
+            canManageMock.mockReturnValue(false);
+
+            render(<AiSkillDetail />);
+
+            expect(screen.queryByRole('button', {name: 'Add file'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Remove notes.txt'})).not.toBeInTheDocument();
+            expect(useAiSkillDetailToolbarStore.getState().canManage).toBe(false);
         });
     });
 });
