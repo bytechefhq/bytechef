@@ -82,6 +82,7 @@ class AuditDataContractTest {
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
     private static final String TAGS = "tag assignment";
+    private static final String ROW_DATA = "data table rows";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
     private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
@@ -140,6 +141,14 @@ class AuditDataContractTest {
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
+        Map.entry("WorkspaceDataTableFacadeImpl.deleteRow", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.importCsv", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.insertRow", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.updateRow", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.updateTags", TAGS),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.deleteKnowledgeBaseDocument", DELEGATES),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseDocumentTags", TAGS),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseTags", TAGS),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.updateWorkspaceMcpServer", DELEGATES));

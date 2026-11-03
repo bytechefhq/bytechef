@@ -204,6 +204,9 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_DELETED, data = {
+        @AuditData(key = "knowledgeBaseDocumentChunkId", value = "#id")
+    })
     @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocumentChunk', 'KNOWLEDGE_BASE_EDIT')")
     public void deleteKnowledgeBaseDocumentChunk(long id) {
         knowledgeBaseDocumentChunkFacade.deleteKnowledgeBaseDocumentChunk(id);
@@ -259,12 +262,20 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_UPDATED, data = {
+        @AuditData(key = "knowledgeBaseId", value = "#id"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
     public KnowledgeBase updateKnowledgeBase(long id, KnowledgeBase knowledgeBase) {
         return knowledgeBaseService.updateKnowledgeBase(id, knowledgeBase);
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_UPDATED, data = {
+        @AuditData(key = "knowledgeBaseDocumentChunkId", value = "#id"),
+        @AuditData(key = "knowledgeBaseDocumentId", value = "#result?.knowledgeBaseDocumentId")
+    })
     @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocumentChunk', 'KNOWLEDGE_BASE_EDIT')")
     public KnowledgeBaseDocumentChunk updateKnowledgeBaseDocumentChunk(long id, String content) {
         return knowledgeBaseDocumentChunkFacade.updateKnowledgeBaseDocumentChunk(id, content);
