@@ -16,6 +16,7 @@
 
 package com.bytechef.atlas.execution.repository.memory;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,6 +24,7 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.tenant.TenantContext;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -219,6 +221,60 @@ class InMemoryContextRepositoryTest {
                 .getValue()
                 .getUrl()
                 .startsWith("http://b/"));
+        });
+    }
+
+    @Test
+    void testFindAllByStackIdAndClassnameIdReturnsEntriesOfEverySubStack() {
+        TenantContext.runWithTenantId("A", () -> {
+            FileEntry stackFileEntry = new FileEntry("stack", "http://a/stack");
+            FileEntry firstSubStackFileEntry = new FileEntry("subStack0", "http://a/subStack0");
+            FileEntry secondSubStackFileEntry = new FileEntry("subStack1", "http://a/subStack1");
+
+            repository.save(new Context(5L, Context.Classname.TASK_EXECUTION, stackFileEntry));
+            repository.save(new Context(5L, 0, Context.Classname.TASK_EXECUTION, firstSubStackFileEntry));
+            repository.save(new Context(5L, 1, Context.Classname.TASK_EXECUTION, secondSubStackFileEntry));
+            repository.save(
+                new Context(5L, Context.Classname.JOB, new FileEntry("otherClassname", "http://a/otherClassname")));
+            repository.save(
+                new Context(6L, Context.Classname.TASK_EXECUTION, new FileEntry("otherStack", "http://a/otherStack")));
+
+            List<Context> contexts = repository.findAllByStackIdAndClassnameId(
+                5L, Context.Classname.TASK_EXECUTION.ordinal());
+
+            assertThat(contexts)
+                .extracting(Context::getValue)
+                .containsExactlyInAnyOrder(stackFileEntry, firstSubStackFileEntry, secondSubStackFileEntry);
+        });
+
+        TenantContext.runWithTenantId(
+            "B", () -> assertThat(
+                repository.findAllByStackIdAndClassnameId(5L, Context.Classname.TASK_EXECUTION.ordinal()))
+                    .isEmpty());
+    }
+
+    @Test
+    void testDeleteAllByStackIdAndClassnameIdRemovesEverySubStack() {
+        TenantContext.runWithTenantId("A", () -> {
+            repository.save(new Context(5L, Context.Classname.TASK_EXECUTION, new FileEntry("stack", "http://a/s")));
+            repository.save(
+                new Context(5L, 0, Context.Classname.TASK_EXECUTION, new FileEntry("subStack0", "http://a/s0")));
+            repository.save(new Context(5L, Context.Classname.JOB, new FileEntry("job", "http://a/job")));
+
+            repository.deleteAllByStackIdAndClassnameId(5L, Context.Classname.TASK_EXECUTION.ordinal());
+
+            int taskExecutionClassnameId = Context.Classname.TASK_EXECUTION.ordinal();
+
+            assertThat(repository.findAllByStackIdAndClassnameId(5L, taskExecutionClassnameId)).isEmpty();
+            assertThat(repository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(5L, taskExecutionClassnameId))
+                .isEmpty();
+            assertThat(
+                repository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
+                    5L, 0, taskExecutionClassnameId))
+                        .isEmpty();
+            assertThat(
+                repository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(5L, Context.Classname.JOB.ordinal()))
+                    .isPresent();
         });
     }
 }
