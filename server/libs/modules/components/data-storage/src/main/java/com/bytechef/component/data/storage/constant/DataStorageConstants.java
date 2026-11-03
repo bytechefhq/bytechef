@@ -26,7 +26,6 @@ import java.util.List;
  */
 public class DataStorageConstants {
 
-    public static final String APPEND_LIST_AS_SINGLE_ITEM = "appendListAsSingleItem";
     public static final String DEFAULT_VALUE = "defaultValue";
     public static final String DEFAULT_VALUE_LABEL = "Default Value";
     public static final String INDEX = "index";
