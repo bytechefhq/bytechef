@@ -16,12 +16,14 @@
 
 package com.bytechef.platform.coordinator.config;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.coordinator.event.listener.ExecutionDataJobCompletionListener;
 import com.bytechef.platform.coordinator.event.listener.ExecutionDataJobDeletionListener;
 import com.bytechef.platform.coordinator.event.listener.NotificationJobStatusApplicationEventListener;
@@ -32,12 +34,15 @@ import com.bytechef.platform.coordinator.event.listener.WebhookTaskStartedApplic
 import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
 import com.bytechef.platform.coordinator.monitor.ApprovalExpiryMonitor;
 import com.bytechef.platform.coordinator.monitor.ApprovalNotificationMonitor;
+import com.bytechef.platform.coordinator.notification.NotificationHandlerContexts;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -100,12 +105,23 @@ public class PlatformCoordinatorConfiguration {
     }
 
     @Bean
+    NotificationHandlerContexts notificationHandlerContexts(
+        EnvironmentService environmentService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        PrincipalJobService principalJobService, TaskExecutionService taskExecutionService,
+        WorkflowService workflowService) {
+
+        return new NotificationHandlerContexts(
+            environmentService, jobPrincipalAccessorRegistry, principalJobService, publicUrl, taskExecutionService,
+            workflowService);
+    }
+
+    @Bean
     NotificationJobStatusApplicationEventListener jobStatusApplicationEventListener(
-        Optional<JobExecutionCounter> jobExecutionCounter) {
+        Optional<JobExecutionCounter> jobExecutionCounter, NotificationHandlerContexts notificationHandlerContexts) {
 
         return new NotificationJobStatusApplicationEventListener(
-            jobExecutionCounter.orElse(null), jobService, notificationHandlerRegistry, notificationSenderRegistry,
-            notificationService);
+            jobExecutionCounter.orElse(null), jobService, notificationHandlerContexts, notificationHandlerRegistry,
+            notificationSenderRegistry, notificationService);
     }
 
     @Bean
@@ -144,7 +160,8 @@ public class PlatformCoordinatorConfiguration {
 
     @Bean
     ApprovalNotificationMonitor approvalNotificationMonitor(
-        ObjectProvider<ApprovalTokens> approvalTokensObjectProvider, TaskExecutionService taskExecutionService,
+        ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
+        NotificationHandlerContexts notificationHandlerContexts, TaskExecutionService taskExecutionService,
         TenantService tenantService) {
 
         ApplicationProperties.Workflow.Execution.ApprovalEscalation approvalEscalation =
@@ -154,7 +171,8 @@ public class PlatformCoordinatorConfiguration {
         return new ApprovalNotificationMonitor(
             approvalTokensObjectProvider.getIfAvailable(),
             approvalEscalation.isEnabled() ? approvalEscalation.getAfter() : null, jobService,
-            notificationHandlerRegistry, notificationSenderRegistry, notificationService, publicUrl,
+            notificationHandlerContexts, notificationHandlerRegistry, notificationSenderRegistry, notificationService,
+            publicUrl,
             approvalReminder.isEnabled() ? approvalReminder.getLeadTime() : null, taskExecutionService,
             tenantService);
     }

@@ -23,6 +23,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.SuspendUtils;
+import com.bytechef.platform.coordinator.notification.NotificationHandlerContexts;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
@@ -64,6 +65,7 @@ public class ApprovalNotificationMonitor {
     private final Duration deliveryWaitTimeout;
     private final @Nullable Duration escalationAfter;
     private final JobService jobService;
+    private final NotificationHandlerContexts notificationHandlerContexts;
     private final @Nullable String publicUrl;
     private final @Nullable Duration reminderLeadTime;
     private final TaskExecutionService taskExecutionService;
@@ -72,20 +74,22 @@ public class ApprovalNotificationMonitor {
     @SuppressFBWarnings("EI")
     public ApprovalNotificationMonitor(
         @Nullable ApprovalTokens approvalTokens, @Nullable Duration escalationAfter, JobService jobService,
+        NotificationHandlerContexts notificationHandlerContexts,
         NotificationHandlerRegistry notificationHandlerRegistry,
         NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService,
         @Nullable String publicUrl, @Nullable Duration reminderLeadTime, TaskExecutionService taskExecutionService,
         TenantService tenantService) {
 
         this(
-            approvalTokens, escalationAfter, jobService, notificationHandlerRegistry, notificationSenderRegistry,
-            notificationService, publicUrl, reminderLeadTime, taskExecutionService, tenantService,
-            DELIVERY_WAIT_TIMEOUT);
+            approvalTokens, escalationAfter, jobService, notificationHandlerContexts, notificationHandlerRegistry,
+            notificationSenderRegistry, notificationService, publicUrl, reminderLeadTime, taskExecutionService,
+            tenantService, DELIVERY_WAIT_TIMEOUT);
     }
 
     @SuppressFBWarnings("EI")
     ApprovalNotificationMonitor(
         @Nullable ApprovalTokens approvalTokens, @Nullable Duration escalationAfter, JobService jobService,
+        NotificationHandlerContexts notificationHandlerContexts,
         NotificationHandlerRegistry notificationHandlerRegistry,
         NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService,
         @Nullable String publicUrl, @Nullable Duration reminderLeadTime, TaskExecutionService taskExecutionService,
@@ -97,6 +101,7 @@ public class ApprovalNotificationMonitor {
         this.deliveryWaitTimeout = deliveryWaitTimeout;
         this.escalationAfter = positiveOrNull(escalationAfter);
         this.jobService = jobService;
+        this.notificationHandlerContexts = notificationHandlerContexts;
         this.publicUrl = publicUrl;
         this.reminderLeadTime = positiveOrNull(reminderLeadTime);
         this.taskExecutionService = taskExecutionService;
@@ -264,12 +269,9 @@ public class ApprovalNotificationMonitor {
 
         Optional<String> formUrl = ApprovalFormUrls.buildFormUrl(publicUrl, jobResumeId, approvalTokens, expiresAt);
 
-        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
+        NotificationHandlerContext notificationHandlerContext = notificationHandlerContexts.builder(job, eventType)
             .approvalExpiresAt(expiresAt == null ? null : expiresAt.toString())
             .approvalFormUrl(formUrl.orElse(null))
-            .eventType(eventType)
-            .jobId(job.getId())
-            .jobName(job.getLabel())
             .build();
 
         return approvalNotificationDispatcher.dispatch(eventType, notificationHandlerContext, deliveryDeadlineNanos);

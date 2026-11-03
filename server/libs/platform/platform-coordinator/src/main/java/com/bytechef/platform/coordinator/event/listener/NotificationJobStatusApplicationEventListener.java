@@ -22,6 +22,7 @@ import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
+import com.bytechef.platform.coordinator.notification.NotificationHandlerContexts;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.handler.NotificationHandler;
@@ -45,6 +46,7 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
 
     private final @Nullable JobExecutionCounter jobExecutionCounter;
     private final JobService jobService;
+    private final NotificationHandlerContexts notificationHandlerContexts;
     private final NotificationHandlerRegistry notificationHandlerRegistry;
     private final NotificationSenderRegistry notificationSenderRegistry;
     private final NotificationService notificationService;
@@ -52,11 +54,13 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
     @SuppressFBWarnings("EI")
     public NotificationJobStatusApplicationEventListener(
         @Nullable JobExecutionCounter jobExecutionCounter, JobService jobService,
+        NotificationHandlerContexts notificationHandlerContexts,
         NotificationHandlerRegistry notificationHandlerRegistry,
         NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
 
         this.jobExecutionCounter = jobExecutionCounter;
         this.jobService = jobService;
+        this.notificationHandlerContexts = notificationHandlerContexts;
         this.notificationHandlerRegistry = notificationHandlerRegistry;
         this.notificationService = notificationService;
         this.notificationSenderRegistry = notificationSenderRegistry;
@@ -86,10 +90,14 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
                 return;
             }
 
-            NotificationHandlerContext notificationHandlerContext = getNotificationHandlerContext(
-                eventType, job);
-
             List<Notification> notifications = notificationService.getNotifications(eventType);
+
+            if (notifications.isEmpty()) {
+                return;
+            }
+
+            NotificationHandlerContext notificationHandlerContext = notificationHandlerContexts.builder(job, eventType)
+                .build();
 
             for (Notification notification : notifications) {
                 NotificationSender notificationSender = notificationSenderRegistry.getNotificationSender(
@@ -116,13 +124,4 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
             }
         }
     }
-
-    private NotificationHandlerContext getNotificationHandlerContext(NotificationEvent.Type eventType, Job job) {
-        return new NotificationHandlerContext.Builder()
-            .eventType(eventType)
-            .jobId(job.getId())
-            .jobName(job.getLabel())
-            .build();
-    }
-
 }
