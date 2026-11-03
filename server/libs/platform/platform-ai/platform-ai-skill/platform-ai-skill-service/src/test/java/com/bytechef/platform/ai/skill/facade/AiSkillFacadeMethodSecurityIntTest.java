@@ -77,8 +77,8 @@ class AiSkillFacadeMethodSecurityIntTest {
     }
 
     @ParameterizedTest(name = "{0}")
-    @MethodSource("byIdOperations")
-    void testByIdMethodRequiresResourceOwner(String methodName, BiConsumer<AiSkillFacade, Long> operation) {
+    @MethodSource("byIdWriteOperations")
+    void testByIdWriteMethodRequiresResourceOwner(String methodName, BiConsumer<AiSkillFacade, Long> operation) {
         AiSkill aiSkill = createSkillAs("alice", "alice-skill");
 
         long id = aiSkill.getId();
@@ -93,6 +93,18 @@ class AiSkillFacadeMethodSecurityIntTest {
 
         assertThat(persistedAiSkill.getName()).isEqualTo("alice-skill");
         assertThat(persistedAiSkill.getSkillFile()).isEqualTo(aiSkill.getSkillFile());
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("byIdReadOperations")
+    void testByIdReadMethodAdmitsAnyPlatformUser(String methodName, BiConsumer<AiSkillFacade, Long> operation) {
+        AiSkill aiSkill = createSkillAs("alice", "alice-skill");
+
+        long id = aiSkill.getId();
+
+        authenticate("bob");
+
+        operation.accept(aiSkillFacade, id);
     }
 
     @Test
@@ -166,7 +178,8 @@ class AiSkillFacadeMethodSecurityIntTest {
 
         authenticate("alice");
 
-        assertThatThrownBy(() -> aiSkillFacade.getAiSkill(aiSkill.getId())).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillFacade.deleteAiSkill(aiSkill.getId()))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
@@ -193,7 +206,7 @@ class AiSkillFacadeMethodSecurityIntTest {
     }
 
     @Test
-    void testGetAiSkillsIsFilteredToOwnedSkills() {
+    void testGetAiSkillsListsEverySkill() {
         createSkillAs("alice", "alice-skill");
         createSkillAs("bob", "bob-skill");
 
@@ -201,7 +214,7 @@ class AiSkillFacadeMethodSecurityIntTest {
 
         assertThat(aiSkillFacade.getAiSkills())
             .extracting(AiSkill::getName)
-            .containsExactly("alice-skill");
+            .containsExactlyInAnyOrder("alice-skill", "bob-skill");
 
         authenticate("root", "ROLE_ADMIN");
 
@@ -211,7 +224,7 @@ class AiSkillFacadeMethodSecurityIntTest {
     }
 
     @Test
-    void testGetAiSkillTagsReadsOnlyTheCallersSkills() {
+    void testGetAiSkillTagsListsTheTagsOfEverySkill() {
         AiSkill aliceAiSkill = createSkillAs("alice", "alice-skill");
         AiSkill bobAiSkill = createSkillAs("bob", "bob-skill");
 
@@ -227,20 +240,24 @@ class AiSkillFacadeMethodSecurityIntTest {
 
         assertThat(aiSkillFacade.getAiSkillTags())
             .extracting(Tag::getName)
-            .containsExactly("alice-tag");
+            .containsExactlyInAnyOrder("alice-tag", "bob-tag");
     }
 
-    static Stream<Arguments> byIdOperations() {
+    static Stream<Arguments> byIdReadOperations() {
+        return Stream.of(
+            byIdOperation("getAiSkill", (facade, id) -> facade.getAiSkill(id)),
+            byIdOperation("getAiSkillDownload", (facade, id) -> facade.getAiSkillDownload(id)),
+            byIdOperation("getAiSkillWithDownload", (facade, id) -> facade.getAiSkillWithDownload(id)),
+            byIdOperation("getAiSkillFileContent", (facade, id) -> facade.getAiSkillFileContent(id, "SKILL.md")),
+            byIdOperation("getAiSkillFilePaths", (facade, id) -> facade.getAiSkillFilePaths(id)));
+    }
+
+    static Stream<Arguments> byIdWriteOperations() {
         return Stream.of(
             byIdOperation(
                 "createAdditionalFilesInSkill",
                 (facade, id) -> facade.createAdditionalFilesInSkill(id, Map.of("notes.md", "x"))),
             byIdOperation("deleteAiSkill", (facade, id) -> facade.deleteAiSkill(id)),
-            byIdOperation("getAiSkill", (facade, id) -> facade.getAiSkill(id)),
-            byIdOperation("getAiSkillDownload", (facade, id) -> facade.getAiSkillDownload(id)),
-            byIdOperation("getAiSkillWithDownload", (facade, id) -> facade.getAiSkillWithDownload(id)),
-            byIdOperation("getAiSkillFileContent", (facade, id) -> facade.getAiSkillFileContent(id, "SKILL.md")),
-            byIdOperation("getAiSkillFilePaths", (facade, id) -> facade.getAiSkillFilePaths(id)),
             byIdOperation("removeFileInSkill", (facade, id) -> facade.removeFileInSkill(id, "notes.md")),
             byIdOperation("updateAiSkill", (facade, id) -> facade.updateAiSkill(id, "renamed", null)),
             byIdOperation("updateAiSkillTags",
