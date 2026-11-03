@@ -23,6 +23,7 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -35,7 +36,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -98,7 +98,7 @@ class McpAutomationWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testEnableFrontendUsesTheCurrentConnectedUser() {
         webTestClient
             .post()
@@ -111,7 +111,7 @@ class McpAutomationWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDisableFrontendUsesTheCurrentConnectedUser() {
         webTestClient
             .delete()
@@ -124,7 +124,7 @@ class McpAutomationWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "api-key-principal")
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testEnableUsesThePathExternalUser() {
         webTestClient
             .post()
@@ -137,7 +137,7 @@ class McpAutomationWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "api-key-principal")
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDisableUsesThePathExternalUser() {
         webTestClient
             .delete()
@@ -150,7 +150,7 @@ class McpAutomationWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testNotFoundWithoutReference() {
         doThrow(new McpAutomationWorkflowNotFoundException(WORKFLOW_UUID))
             .when(mcpAutomationWorkflowFacade)
@@ -165,7 +165,7 @@ class McpAutomationWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testMcpEnabledNullWhenNotOffered() {
         when(connectedUserProjectFacade.getConnectedUserProjectWorkflows(any(String.class), any()))
             .thenReturn(List.of(referenceDto(List.of())));
@@ -183,7 +183,7 @@ class McpAutomationWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testMcpEnabledReportedWhenOffered() {
         when(connectedUserProjectFacade.getConnectedUserProjectWorkflows(any(String.class), any()))
             .thenReturn(List.of(referenceDto(List.of())));
@@ -202,7 +202,7 @@ class McpAutomationWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testToolOnlyFlag() {
         when(connectedUserProjectFacade.getConnectedUserProjectWorkflows(any(String.class), any()))
             .thenReturn(

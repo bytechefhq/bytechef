@@ -13,7 +13,6 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
@@ -57,8 +56,7 @@ import tools.jackson.core.type.TypeReference;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
-class ConnectedUserProjectWorkflowManager {
+public class ConnectedUserProjectWorkflowManager {
     private static final String DEFAULT_DEFINITION = """
         {
             "label": "New Workflow",
@@ -123,7 +121,7 @@ class ConnectedUserProjectWorkflowManager {
 
         connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
 
-        List<Connection> connections = getOwnedConnections(connectedUserProject.getConnectedUserId(), environment);
+        List<Connection> connections = getEntitledConnections(connectedUserProject.getConnectedUserId(), environment);
         Map<String, ?> workflowMap = JsonUtils.readMap(effectiveDefinition);
 
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
@@ -173,17 +171,16 @@ class ConnectedUserProjectWorkflowManager {
             });
     }
 
-    private List<Connection> getOwnedConnections(long connectedUserId, Environment environment) {
-        List<Long> ownedConnectionIds = new ArrayList<>(
-            connectedUserConnectionMembership.getOwnedConnectionIds(connectedUserId, environment));
+    private List<Connection> getEntitledConnections(long connectedUserId, Environment environment) {
+        List<Long> connectionIds = new ArrayList<>(getEntitledConnectionIds(connectedUserId, environment));
 
-        if (ownedConnectionIds.isEmpty()) {
+        if (connectionIds.isEmpty()) {
             return List.of();
         }
 
-        return connectionService.getConnections(ownedConnectionIds)
+        return connectionService.getConnections(connectionIds)
             .stream()
-            .sorted(Comparator.comparingInt(connection -> ownedConnectionIds.indexOf(connection.getId())))
+            .sorted(Comparator.comparingInt(connection -> connectionIds.indexOf(connection.getId())))
             .toList();
     }
 
