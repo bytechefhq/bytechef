@@ -39,9 +39,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
- * Stops a job on the suspend one of its tasks asked for. A job waits on one suspend at a time: while it waits on one, a
- * suspend another branch asks for is queued and becomes the job's suspend once the one it waits on resumes.
- *
  * @author Ivica Cardic
  */
 public class JobSuspender {
