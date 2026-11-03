@@ -70,6 +70,34 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
     private GraphQlTester graphQlTester;
 
     @Test
+    void testAutomationWorkflowProjectConfigurationsOfAnEnvironment() {
+        AutomationWorkflowProjectConfigurationDTO configuration = new AutomationWorkflowProjectConfigurationDTO(
+            5L, 7L, 1L, "Standard", null, 1, true, true, 0, List.of(), Instant.parse("2026-10-28T10:00:00Z"), null);
+
+        when(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(7L, 1L))
+            .thenReturn(List.of(configuration));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurations(projectId: "7", environmentId: "1") {
+                        id
+                        environmentId
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectConfigurations[0].id")
+            .entity(String.class)
+            .isEqualTo("5")
+            .path("automationWorkflowProjectConfigurations[0].environmentId")
+            .entity(String.class)
+            .isEqualTo("1");
+
+        verify(automationWorkflowProjectConfigurationAdminFacade, never()).getConfigurations(7L);
+    }
+
+    @Test
     void testAutomationWorkflowProjectConfigurationsReturnsWorkflowsWithTheirSwitches() {
         AutomationWorkflowProjectConfigurationDTO configuration = new AutomationWorkflowProjectConfigurationDTO(
             5L, 7L, 0L, "Beta", "metadata['beta'] == 'true'", 2, true, false, 3,

@@ -45,6 +45,14 @@ public interface AutomationWorkflowProjectAdminFacade {
 
     List<AutomationWorkflowProjectDTO> getProjects();
 
+    /**
+     * Lists every automation workflow project, each with the number of its configurations in the environment.
+     *
+     * @param environmentId the environment whose configurations are counted
+     * @return the projects, sorted by name ignoring case
+     */
+    List<AutomationWorkflowProjectDTO> getProjects(long environmentId);
+
     List<AutomationWorkflowProjectTagDTO> getTags();
 
     int publishProject(long projectId, @Nullable String description);

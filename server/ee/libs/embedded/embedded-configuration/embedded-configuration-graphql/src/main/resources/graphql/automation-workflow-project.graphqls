@@ -48,7 +48,7 @@ type AutomationWorkflowProjectVersion {
 }
 
 extend type Query {
-    automationWorkflowProjects: [AutomationWorkflowProject!]!
+    automationWorkflowProjects(environmentId: ID): [AutomationWorkflowProject!]!
     automationWorkflowProjectCategories: [AutomationWorkflowProjectCategory!]!
     automationWorkflowProjectTags: [AutomationWorkflowProjectTag!]!
     automationWorkflowProjectVersions(id: ID!): [AutomationWorkflowProjectVersion!]!

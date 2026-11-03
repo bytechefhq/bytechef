@@ -39,6 +39,7 @@ import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectCo
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
@@ -145,6 +146,10 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     private static final String CONFIGURATION_NAME = "Default";
     private static final AtomicLong CONNECTED_USER_ID_SEQUENCE = new AtomicLong(1_000_000L);
     private static final long ENVIRONMENT_ID = 0L;
+
+    private static final long PRODUCTION_ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
+
+    private static final long STAGING_ENVIRONMENT_ID = Environment.STAGING.ordinal();
 
     private static final String CHANNEL_REQUIRED_DEFINITION = """
         {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
@@ -264,6 +269,49 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             .containsExactly(
                 tuple(firstConfigurationId, ENVIRONMENT_ID, "Standard", null),
                 tuple(secondConfigurationId, ENVIRONMENT_ID, "Beta", "metadata['beta'] == 'true'"));
+    }
+
+    @Test
+    void testGetConfigurationsOfOneEnvironment() {
+        long projectId = createPublishedProject("Per Environment", 1);
+
+        long developmentConfigurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Standard", null, 1, true, true);
+        long stagingConfigurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, STAGING_ENVIRONMENT_ID, "Standard", null, 1, true, true);
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId, ENVIRONMENT_ID))
+            .extracting(AutomationWorkflowProjectConfigurationDTO::id)
+            .containsExactly(developmentConfigurationId);
+        assertThat(
+            automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId, STAGING_ENVIRONMENT_ID))
+                .extracting(AutomationWorkflowProjectConfigurationDTO::id)
+                .containsExactly(stagingConfigurationId);
+        assertThat(
+            automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId, PRODUCTION_ENVIRONMENT_ID))
+                .isEmpty();
+    }
+
+    @Test
+    void testGetProjectsCountsTheConfigurationsOfOneEnvironment() {
+        long projectId = createPublishedProject("Counted Per Environment", 1);
+
+        automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Standard", null, 1, true, true);
+        automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Beta", null, 1, true, true);
+        automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, STAGING_ENVIRONMENT_ID, "Standard", null, 1, true, true);
+
+        assertThat(getConfigurationCount(automationWorkflowProjectFacade.getProjects(), projectId)).isEqualTo(3);
+        assertThat(getConfigurationCount(automationWorkflowProjectFacade.getProjects(ENVIRONMENT_ID), projectId))
+            .isEqualTo(2);
+        assertThat(
+            getConfigurationCount(automationWorkflowProjectFacade.getProjects(STAGING_ENVIRONMENT_ID), projectId))
+                .isEqualTo(1);
+        assertThat(
+            getConfigurationCount(automationWorkflowProjectFacade.getProjects(PRODUCTION_ENVIRONMENT_ID), projectId))
+                .isZero();
     }
 
     @Test
@@ -1388,6 +1436,14 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         return new ConnectedUserWorkflowReferenceDTO(
             automationWorkflowUuid, connectedUserId, "user-" + UUID.randomUUID(), environment, enabled, dangling, null,
             null, projectDeploymentId);
+    }
+
+    private static int getConfigurationCount(List<AutomationWorkflowProjectDTO> projects, long projectId) {
+        return projects.stream()
+            .filter(project -> project.id() == projectId)
+            .findFirst()
+            .orElseThrow()
+            .configurationCount();
     }
 
     private long createPublishedProject(String name, int publishedVersionCount) {

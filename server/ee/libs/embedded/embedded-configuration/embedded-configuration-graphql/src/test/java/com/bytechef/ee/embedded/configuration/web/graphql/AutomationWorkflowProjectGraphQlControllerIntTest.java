@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -97,6 +98,33 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
 
     @Autowired
     private GraphQlTester graphQlTester;
+
+    @Test
+    void testAutomationWorkflowProjectsOfAnEnvironmentCountsItsConfigurations() {
+        AutomationWorkflowProjectDTO project = new AutomationWorkflowProjectDTO(
+            1L, "Project One", null, null, List.of(), true, 2, 1, List.of(), null, true, 3, null);
+
+        when(automationWorkflowProjectFacade.getProjects(1L)).thenReturn(List.of(project));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjects(environmentId: "1") {
+                        id
+                        configurationCount
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjects[0].id")
+            .entity(String.class)
+            .isEqualTo("1")
+            .path("automationWorkflowProjects[0].configurationCount")
+            .entity(Integer.class)
+            .isEqualTo(3);
+
+        verify(automationWorkflowProjectFacade, never()).getProjects();
+    }
 
     @Test
     void testAutomationWorkflowProjectsReturnsListFromFacade() {

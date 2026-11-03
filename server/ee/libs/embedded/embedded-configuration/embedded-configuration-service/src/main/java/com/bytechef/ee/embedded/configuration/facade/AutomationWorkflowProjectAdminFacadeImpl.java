@@ -128,6 +128,11 @@ public class AutomationWorkflowProjectAdminFacadeImpl implements AutomationWorkf
     }
 
     @Override
+    public List<AutomationWorkflowProjectDTO> getProjects(long environmentId) {
+        return automationWorkflowProjectFacade.getProjects(environmentId);
+    }
+
+    @Override
     public List<AutomationWorkflowProjectTagDTO> getTags() {
         return automationWorkflowProjectFacade.getTags();
     }

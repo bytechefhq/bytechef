@@ -44,8 +44,12 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @QueryMapping
-    public List<AutomationWorkflowProjectDTO> automationWorkflowProjects() {
-        return automationWorkflowProjectFacade.getProjects();
+    public List<AutomationWorkflowProjectDTO> automationWorkflowProjects(@Argument @Nullable String environmentId) {
+        if (environmentId == null) {
+            return automationWorkflowProjectFacade.getProjects();
+        }
+
+        return automationWorkflowProjectFacade.getProjects(Long.parseLong(environmentId));
     }
 
     @QueryMapping

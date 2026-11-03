@@ -101,7 +101,7 @@ type ConfigurationMoveSkipped {
 }
 
 extend type Query {
-    automationWorkflowProjectConfigurations(projectId: ID!): [AutomationWorkflowProjectConfiguration!]!
+    automationWorkflowProjectConfigurations(projectId: ID!, environmentId: ID): [AutomationWorkflowProjectConfiguration!]!
     automationWorkflowProjectConfigurationWorkflowProvidableValues(id: ID!, workflowUuid: ID!): AutomationWorkflowProjectConfigurationWorkflowProvidableValues!
     automationWorkflowProjectConfigurationWorkflowInputOptions(id: ID!, workflowUuid: ID!, inputName: String!, propertyName: String!, connectionId: ID!, lookupDependsOnValues: Map, searchText: String): [AutomationWorkflowProjectConfigurationInputOption!]!
     automationWorkflowProjectConfigurationVersionImpact(id: ID!, projectVersion: Int!): AutomationWorkflowProjectConfigurationVersionImpact!

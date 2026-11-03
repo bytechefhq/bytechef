@@ -333,8 +333,18 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public List<AutomationWorkflowProjectDTO> getProjects() {
+        return getProjectsWithConfigurationCounts(null);
+    }
+
+    @Override
+    public List<AutomationWorkflowProjectDTO> getProjects(long environmentId) {
+        return getProjectsWithConfigurationCounts(environmentId);
+    }
+
+    private List<AutomationWorkflowProjectDTO> getProjectsWithConfigurationCounts(@Nullable Long environmentId) {
         Map<Long, AutomationWorkflowProject> automationWorkflowProjects = getAutomationWorkflowProjects();
-        Map<Long, Long> configurationCounts = getConfigurationCounts(automationWorkflowProjects.keySet());
+        Map<Long, Long> configurationCounts =
+            getConfigurationCounts(automationWorkflowProjects.keySet(), environmentId);
 
         return getAutomationWorkflowProjectProjects(automationWorkflowProjects.keySet())
             .stream()
@@ -671,9 +681,10 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .toList();
     }
 
-    private Map<Long, Long> getConfigurationCounts(Set<Long> projectIds) {
+    private Map<Long, Long> getConfigurationCounts(Set<Long> projectIds, @Nullable Long environmentId) {
         return automationWorkflowProjectConfigurationService.getConfigurations(projectIds)
             .stream()
+            .filter(configuration -> environmentId == null || configuration.getEnvironmentId() == environmentId)
             .collect(
                 Collectors.groupingBy(AutomationWorkflowProjectConfiguration::getProjectId, Collectors.counting()));
     }
