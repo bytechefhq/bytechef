@@ -251,6 +251,16 @@ clears the value, and a renamed header sent without a new value is refused with 
 `Header <name> has no saved value`. Placeholders such as `{{workflow.name}}` are not expanded in header values
 or in the URL; they are sent as written.
 
+Changing the webhook URL of a saved notification that has headers means entering every header value
+again, so a saved token is never sent to a new receiver. The dialog clears the saved values as soon as the
+URL differs from the saved one, and the "Enter a value" message asks for each. This applies to **Save** and
+to **Test**: a header sent as `********` or without a value is refused with
+`Re-enter header <name> to send to a new URL`, and a request that leaves out the headers is refused with
+`Re-enter the headers to send to a new URL`. A URL that differs only in surrounding spaces, in the case of
+the scheme or host, or by an explicit default port (`:80` for `http`, `:443` for `https`) counts as the same
+URL. Any other change, including to the path or query, counts as a new URL. Saving with a new URL keeps the
+signing secret.
+
 Only header values are stored encrypted. The webhook URL and the body template are stored and returned
 by the API in plain text, so put API keys and tokens in custom headers, not in the URL or the template.
 
@@ -392,7 +402,9 @@ and each test is recorded in the audit log as `NOTIFICATION_TESTED`.
   first, with the same rules as **Save**, and nothing is sent if it is invalid. A test never saves or
   changes the notification.
 - **Saved secrets are kept.** When you edit a saved notification, a header value or Slack URL that shows
-  as `********` is replaced by the saved value for the test, so you do not have to enter it again.
+  as `********` is replaced by the saved value for the test, so you do not have to enter it again. The
+  exception is a Webhook whose URL you changed: its header values must be entered again, as described in
+  [Custom headers](#custom-headers).
 - **The message is a sample.** It is a `JOB_FAILED` event with example values, such as the workflow
   `Example workflow` and the error `Example error: connection refused`. The timestamp is the time of the
   test, so a receiver that rejects old timestamps accepts it. It is not a run of one of your workflows.
@@ -407,16 +419,26 @@ and each test is recorded in the audit log as `NOTIFICATION_TESTED`.
   it, so its test goes out without an `X-ByteChef-Signature` header. The result says "Sent without a
   signature; save the notification to get a signing secret." A saved Webhook notification is signed with
   its stored secret. See [Verifying signatures](#verifying-signatures).
+- **A test to a changed URL is not signed.** When you test a saved Webhook notification with a URL that
+  differs from the saved one, the stored secret is not used, so a receiver you have not saved yet never
+  gets a signed request. The result says "Sent without a signature because the URL changed; save the
+  notification to sign with its secret." After you save, tests and deliveries to the new URL are signed.
+- **It can take a while.** A Webhook or Slack test waits up to 10 seconds to connect and up to 30 seconds
+  for each read, so a slow receiver can keep the test running for longer than 30 seconds. An Email test has
+  the same limits on the mail server: 10 seconds to connect and 30 seconds for each read and each write.
 
 While a test runs, the button is disabled and shows a spinner. The result appears below the form:
 
 | Result | What it shows |
 |---|---|
-| **Test sent** | For a Webhook, the line `HTTP <status>` and the start of the response body. An Email test shows no status. |
+| **Test sent** | For a Webhook, the line `HTTP <status>` and the start of the response body. Email and Slack tests show no status on success. |
 | **Test failed** | The reason, such as a URL that is not allowed, a timeout, or the receiver's `HTTP <status>` and response body. |
 
 The response body is cut to its first 1000 characters, with `…` added when it was longer. Error messages
-name the host only, never a header value, a signing secret or a Slack URL.
+name the host only. The result never shows a saved header value, the signing secret or the Slack URL: if
+the receiver echoes one back in its response or it appears in an error, it is replaced with `********`.
+Header values shorter than four characters are left as they are, so that common short words in a response
+are not masked.
 
 ## Delete a notification
 
