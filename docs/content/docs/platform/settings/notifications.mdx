@@ -80,7 +80,7 @@ but skipped, with a warning in the server log, while the deployment runs as Comm
 Email subject and body come from the platform's message bundle, parameterised with the workflow's
 label and the job id; the approval events also carry the approval's expiry time and a link to resolve
 it. A Slack message carries the same text as the email body, prefixed with an emoji. There is no
-per-notification template.
+per-notification template for Email and Slack; only Webhook has a [body template](#body-template).
 
 Email and Slack messages now end with the same details lines, one per line, each shown only when the
 value is known: `Workflow`, `Project` (with the version, for example `CRM (v3)`), `Environment`,
@@ -218,6 +218,7 @@ Every request carries these headers:
 | `X-ByteChef-Event` | `job.status` |
 | `X-ByteChef-Timestamp` | The send time, in milliseconds since the epoch. |
 | `X-ByteChef-Delivery` | A random UUID, unique per delivery. It equals `deliveryId` in the body. Use it to deduplicate. |
+| `X-ByteChef-Signature` | Only when the notification has a signing secret. See [Verifying signatures](#verifying-signatures). |
 
 The URL must use `http` or `https` and must resolve to a public address: loopback, private,
 link-local and carrier-grade NAT ranges are refused. Each request has a 10-second connect timeout and
@@ -225,9 +226,147 @@ a 30-second read timeout, and a `4xx` or `5xx` response counts as a failure. A f
 delivery is logged and not retried. For the two approval events, if every subscribed notification
 fails, the next approval sweep tries again.
 
+### Custom headers
+
+In the **Create Notification** or **Edit Notification** dialog, a Webhook notification has a **Headers**
+list. Click **Add header** to add a name and value pair, for example `Authorization: Bearer <token>`
+for a receiver that needs one. The headers are sent on every delivery.
+
+| Rule | Limit |
+|---|---|
+| Number of headers | At most 20. |
+| Header name | 1 to 256 characters. Letters, digits and the symbols `! # $ % & ' * + . ^ _ ~ -`, the backtick and the pipe character are allowed. |
+| Header value | At most 4096 characters. |
+| Uniqueness | Names must be unique, ignoring case. |
+
+These names are reserved and are refused, ignoring case: any name starting with `X-ByteChef-`, and
+`Content-Type`, `Content-Length`, `Host`, `Transfer-Encoding` and `Connection`. ByteChef always sends
+its own values for the reserved names, and skips a reserved name even if one is found in a stored
+notification.
+
+Header values are stored encrypted and are never returned by the API. When you reopen a notification,
+each saved value shows as `********` with the hint "Saved, leave unchanged to keep". Leave it alone and
+the stored value is kept. If you rename a saved header, its value is cleared, so you must enter the
+value again. Placeholders such as `{{workflow.name}}` are not expanded in header values or in the URL;
+they are sent as written.
+
+### Body template
+
+By default a Webhook notification sends the JSON body described in [Webhook requests](#webhook-requests).
+To send a different body, for example one in the shape a chat tool or ticketing system expects, enter a
+**Body template** in the dialog. Leave it empty to keep the default body.
+
+A template is JSON text with placeholders. A placeholder is `{{path}}`, where `path` is a dotted path
+into the default body, such as `{{workflow.name}}` or `{{error.message}}`. Spaces inside the braces are
+allowed, so `{{ jobId }}` works too. Use the field names from the tables above.
+
+- A value is inserted escaped for a JSON string, without surrounding quotes. Write the quotes yourself:
+  `"text": "{{workflow.name}}"`. Quotes, backslashes and line breaks in the value are escaped, so the
+  result stays valid JSON.
+- Numbers and booleans are inserted as text in the same way, so `"id": "{{jobId}}"` sends the string
+  `"1042"`.
+- A path that does not exist, or whose value is empty, renders as an empty string.
+- A path that points at an object or a list, such as `{{error}}`, renders as that object's JSON written
+  as escaped text, so it also belongs inside quotes.
+- `{{summary}}` is the one exception. It inserts the whole default body as raw JSON, so write it without
+  quotes: `"event": {{summary}}`.
+
+For example, this template:
+
+```json
+{
+  "text": "{{workflow.name}} failed in {{environment}}: {{error.message}}",
+  "jobId": "{{jobId}}",
+  "link": "{{executionUrl}}"
+}
+```
+
+sends this body for the `JOB_FAILED` event above:
+
+```json
+{
+  "text": "Sync new leads failed in PRODUCTION: 401 Unauthorized",
+  "jobId": "1042",
+  "link": "https://bytechef.example.com/automation/executions?id=1042"
+}
+```
+
+The template is checked when you save. It can have at most 10000 characters, and it must produce valid
+JSON when filled with sample data, otherwise the save is refused with the message "Webhook body template
+must render to valid JSON". A template changes only the body. The headers described above are still
+sent.
+
+### Verifying signatures
+
+A Webhook notification can sign each request so the receiver can prove it came from ByteChef.
+Signing needs a signing secret:
+
+- A new Webhook notification gets a secret when you save it. The **Signing Secret** dialog shows it
+  once, with a **Copy** button: "Copy this secret now. You won't be able to see it again."
+- Webhook notifications created before signing existed have no secret and are sent unsigned. Open the
+  notification and click **Generate signing secret**, then confirm.
+- To replace a secret, click **Regenerate signing secret** and confirm. The old secret stops working
+  immediately, so update your receiver with the new one.
+- The secret is stored encrypted and is never shown again or returned by the API.
+- Changing a notification's type drops the secrets of the old type, including its signing secret.
+
+When a secret exists, every request carries an `X-ByteChef-Signature` header:
+
+```
+X-ByteChef-Signature: t=1793801007512,v1=5f2b0c9e4d7a1b8c3e6f9a0d2c4b6e8f1a3c5e7092b4d6f8a1c3e5072b9d4f61
+```
+
+`t` is the same value as `X-ByteChef-Timestamp`, in milliseconds since the epoch. `v1` is the
+lowercase hexadecimal HMAC-SHA256 of the string `<t>.<raw request body>`, using the signing secret
+(the full `whsec_...` text) as the key. Compute it over the exact bytes received, before parsing the
+JSON. When a body template is set, the signed body is the rendered body.
+
+To verify a request, recompute the signature, compare it in constant time, and reject old timestamps to
+stop replays. In Node.js:
+
+```javascript
+const crypto = require('crypto');
+
+const FIVE_MINUTES_MS = 5 * 60 * 1000;
+
+function verifyByteChefSignature(rawBody, signatureHeader, secret) {
+  const parts = Object.fromEntries(
+    signatureHeader.split(',').map((part) => part.split('=', 2))
+  );
+  const timestamp = parts.t;
+  const received = parts.v1;
+
+  if (!timestamp || !received) {
+    return false;
+  }
+
+  if (Math.abs(Date.now() - Number(timestamp)) > FIVE_MINUTES_MS) {
+    return false;
+  }
+
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(`${timestamp}.${rawBody}`)
+    .digest('hex');
+
+  const expectedBuffer = Buffer.from(expected);
+  const receivedBuffer = Buffer.from(received);
+
+  return (
+    expectedBuffer.length === receivedBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
+  );
+}
+```
+
+`rawBody` must be the request body as received, for example `req.body.toString('utf8')` with
+`express.raw({type: 'application/json'})`, not a re-serialised object.
+
+Slack notification URLs are also stored encrypted now, and show as `********` when you edit a Slack
+notification.
+
 <Callout type="warn" title="Coming soon">
-    Signing webhook payloads with a shared secret (HMAC) and per-workspace scoping of a notification
-    are on the upcoming release track and are not yet available.
+    Per-workspace scoping of a notification is on the upcoming release track and is not yet available.
 </Callout>
 
 ## Delete a notification
