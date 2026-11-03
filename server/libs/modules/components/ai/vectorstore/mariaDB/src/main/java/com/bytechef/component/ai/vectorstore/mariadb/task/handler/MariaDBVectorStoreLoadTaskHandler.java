@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.mariadb.constant.MariaDBVect
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(MARIA_DB_VECTOR_STORE + "/v1/" + LOAD)
 public class MariaDBVectorStoreLoadTaskHandler extends AbstractTaskHandler {
 
-    public MariaDBVectorStoreLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(MARIA_DB_VECTOR_STORE, 1, LOAD, actionDefinitionFacade);
+    public MariaDBVectorStoreLoadTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(MARIA_DB_VECTOR_STORE, 1, LOAD, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

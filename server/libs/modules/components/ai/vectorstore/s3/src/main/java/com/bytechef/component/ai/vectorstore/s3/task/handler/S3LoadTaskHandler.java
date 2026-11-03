@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.s3.constant.S3Constants.S3_V
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(S3_VECTOR_STORE + "/v1/" + LOAD)
 public class S3LoadTaskHandler extends AbstractTaskHandler {
 
-    public S3LoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(S3_VECTOR_STORE, 1, LOAD, actionDefinitionFacade);
+    public S3LoadTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(S3_VECTOR_STORE, 1, LOAD, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

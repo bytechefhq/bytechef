@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.typesense.constant.Typesense
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(TYPESENSE + "/v1/" + LOAD)
 public class TypesenseLoadTaskHandler extends AbstractTaskHandler {
 
-    public TypesenseLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(TYPESENSE, 1, LOAD, actionDefinitionFacade);
+    public TypesenseLoadTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(TYPESENSE, 1, LOAD, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

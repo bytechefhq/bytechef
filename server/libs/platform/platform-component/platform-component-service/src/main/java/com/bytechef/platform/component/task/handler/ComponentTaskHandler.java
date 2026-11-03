@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.task.handler;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 
 /**
@@ -25,8 +26,9 @@ import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 public class ComponentTaskHandler extends AbstractTaskHandler {
 
     public ComponentTaskHandler(
-        String componentName, int componentVersion, String actionName, ActionDefinitionFacade actionDefinitionFacade) {
+        String componentName, int componentVersion, String actionName, ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
 
-        super(componentName, componentVersion, actionName, actionDefinitionFacade);
+        super(componentName, componentVersion, actionName, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }
