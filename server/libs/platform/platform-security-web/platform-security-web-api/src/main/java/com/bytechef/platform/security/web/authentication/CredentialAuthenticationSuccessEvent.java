@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.authentication;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.security.core.Authentication;
 
@@ -24,11 +25,25 @@ import org.springframework.security.core.Authentication;
  */
 public final class CredentialAuthenticationSuccessEvent extends ApplicationEvent {
 
+    private final @Nullable CredentialType credentialType;
+
     public CredentialAuthenticationSuccessEvent(Authentication authentication) {
+        this(authentication, null);
+    }
+
+    public CredentialAuthenticationSuccessEvent(
+        Authentication authentication, @Nullable CredentialType credentialType) {
+
         super(authentication);
+
+        this.credentialType = credentialType;
     }
 
     public Authentication getAuthentication() {
         return (Authentication) getSource();
+    }
+
+    public @Nullable CredentialType getCredentialType() {
+        return credentialType;
     }
 }

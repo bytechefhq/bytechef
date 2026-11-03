@@ -95,7 +95,8 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
     public void onApplicationEvent(CredentialAuthenticationSuccessEvent credentialAuthenticationSuccessEvent) {
         Authentication authentication = credentialAuthenticationSuccessEvent.getAuthentication();
 
-        String credentialType = getCredentialType(authentication);
+        String credentialType = getCredentialType(
+            authentication, credentialAuthenticationSuccessEvent.getCredentialType());
         PlatformType platformType = getPlatformType(authentication);
         String principal = getPrincipal(authentication);
         String tenantId = getTenantId(authentication);
@@ -197,7 +198,13 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
         return cache.asMap();
     }
 
-    private static String getCredentialType(Authentication authentication) {
+    private static String getCredentialType(
+        Authentication authentication, @Nullable CredentialType eventCredentialType) {
+
+        if (eventCredentialType != null) {
+            return eventCredentialType.getValue();
+        }
+
         if (authentication instanceof AbstractApiKeyAuthenticationToken abstractApiKeyAuthenticationToken) {
             CredentialType credentialType = abstractApiKeyAuthenticationToken.getCredentialType();
 

@@ -19,6 +19,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.web.authentication.CredentialAuthenticationSuccessEvent;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import com.bytechef.platform.security.web.authentication.TenantPrincipal;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
 import com.bytechef.tenant.TenantContext;
@@ -199,6 +200,23 @@ class CredentialUsageAuditListenerTest {
             .containsEntry("credentialType", "Jwt")
             .doesNotContainKeys("apiKeyId", "connectedUserId", "environmentId",
                 CustomAuditEventRepository.PLATFORM_DATA_KEY);
+    }
+
+    @Test
+    void testEventCredentialTypeTakesPrecedenceOverTheAuthenticationClass() {
+        CredentialUsageAuditListener credentialUsageAuditListener = createListener(Duration.ofHours(1));
+
+        Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(
+            new User("system_admin", "", List.of()), null, List.of());
+
+        credentialUsageAuditListener.onApplicationEvent(
+            new CredentialAuthenticationSuccessEvent(authentication, CredentialType.HTTP_BASIC));
+
+        assertThat(findAll()).singleElement()
+            .satisfies(auditEvent -> {
+                assertThat(auditEvent.getPrincipal()).isEqualTo("system_admin");
+                assertThat(auditEvent.getData()).containsEntry("credentialType", "HttpBasic");
+            });
     }
 
     @Test

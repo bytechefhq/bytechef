@@ -18,12 +18,15 @@ package com.bytechef.security.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.security.web.authentication.CredentialAuthenticationSuccessEvent;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
@@ -52,13 +55,21 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
+import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -435,6 +446,146 @@ class SecurityConfigurationIntTest {
                     return "ok";
                 }
             }
+        }
+    }
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @AutoConfigureMockMvc
+    @EnableConfigurationProperties(ApplicationProperties.class)
+    @SpringBootTest(
+        classes = {
+            SecurityConfiguration.class, ApplicationProperties.class, RememberMeKey.class,
+            ActuatorHttpBasic.ActuatorHttpBasicConfiguration.class
+        },
+        properties = {
+            "bytechef.security.system.username=" + ActuatorHttpBasic.SYSTEM_USERNAME,
+            "bytechef.security.system.password=" + ActuatorHttpBasic.SYSTEM_PASSWORD
+        })
+    class ActuatorHttpBasic {
+
+        private static final String SYSTEM_PASSWORD = "system-password";
+        private static final String SYSTEM_USERNAME = "system_admin";
+
+        @Autowired
+        private ApplicationEventRecorder applicationEventRecorder;
+
+        @MockitoBean
+        private AuthenticationFailureHandler authenticationFailureHandler;
+
+        @MockitoBean
+        private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+        @MockitoBean(name = "corsConfigurationSource")
+        private CorsConfigurationSource corsConfigurationSource;
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @MockitoBean
+        private RememberMeServices rememberMeServices;
+
+        @Test
+        void testSystemUserPublishesCredentialAuthenticationSuccessEventInsteadOfLogin() throws Exception {
+            applicationEventRecorder.clear();
+
+            mockMvc.perform(get("/actuator/probe").with(httpBasic(SYSTEM_USERNAME, SYSTEM_PASSWORD)))
+                .andExpect(status().isOk());
+
+            assertThat(applicationEventRecorder.getEvents(AbstractAuthenticationEvent.class)).isEmpty();
+            assertThat(applicationEventRecorder.getEvents(CredentialAuthenticationSuccessEvent.class))
+                .singleElement()
+                .satisfies(credentialAuthenticationSuccessEvent -> {
+                    Authentication authentication = credentialAuthenticationSuccessEvent.getAuthentication();
+
+                    assertThat(authentication).isInstanceOf(UsernamePasswordAuthenticationToken.class);
+                    assertThat(authentication.getName()).isEqualTo(SYSTEM_USERNAME);
+                    assertThat(credentialAuthenticationSuccessEvent.getCredentialType())
+                        .isEqualTo(CredentialType.HTTP_BASIC);
+                });
+        }
+
+        @Test
+        void testWrongSystemPasswordPublishesAuthenticationFailureEvent() throws Exception {
+            applicationEventRecorder.clear();
+
+            mockMvc.perform(get("/actuator/probe").with(httpBasic(SYSTEM_USERNAME, "wrong-password")))
+                .andExpect(status().isUnauthorized());
+
+            assertThat(applicationEventRecorder.getEvents(CredentialAuthenticationSuccessEvent.class)).isEmpty();
+            assertThat(applicationEventRecorder.getEvents(AuthenticationFailureBadCredentialsEvent.class))
+                .singleElement()
+                .satisfies(authenticationFailureBadCredentialsEvent -> {
+                    Authentication authentication = authenticationFailureBadCredentialsEvent.getAuthentication();
+
+                    assertThat(authentication.getName()).isEqualTo(SYSTEM_USERNAME);
+                });
+        }
+
+        @TestConfiguration
+        static class ActuatorHttpBasicConfiguration {
+
+            @Bean
+            ApplicationEventRecorder applicationEventRecorder() {
+                return new ApplicationEventRecorder();
+            }
+
+            @Bean
+            AuthenticationEventPublisher authenticationEventPublisher(
+                ApplicationEventPublisher applicationEventPublisher) {
+
+                return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
+            }
+
+            @Bean
+            List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors() {
+                return List.of();
+            }
+
+            @Bean
+            PasswordEncoder passwordEncoder() {
+                return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+            }
+
+            @Bean
+            List<SecurityConfigurerContributor> securityConfigurerContributors() {
+                return List.of();
+            }
+
+            @Bean
+            List<SpaWebFilterContributor> spaWebFilterContributors() {
+                return List.of();
+            }
+
+            @RestController
+            static class ActuatorProbeController {
+
+                @GetMapping("/actuator/probe")
+                String actuatorProbe() {
+                    return "ok";
+                }
+            }
+        }
+    }
+
+    static class ApplicationEventRecorder implements ApplicationListener<ApplicationEvent> {
+
+        private final List<ApplicationEvent> applicationEvents = new CopyOnWriteArrayList<>();
+
+        @Override
+        public void onApplicationEvent(ApplicationEvent applicationEvent) {
+            applicationEvents.add(applicationEvent);
+        }
+
+        void clear() {
+            applicationEvents.clear();
+        }
+
+        <T extends ApplicationEvent> List<T> getEvents(Class<T> eventClass) {
+            return applicationEvents.stream()
+                .filter(eventClass::isInstance)
+                .map(eventClass::cast)
+                .toList();
         }
     }
 
