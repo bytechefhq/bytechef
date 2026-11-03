@@ -16,6 +16,10 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +31,9 @@ import tools.jackson.databind.JsonNode;
  * @author Marko Kriskovic
  */
 class DisplayConditionEvaluator {
+
+    private static final Pattern ARRAY_INDEX_PATTERN = Pattern.compile("\\[(\\d+)]");
+    private static final String INDEX_PLACEHOLDER = "[index]";
 
     private static final Logger log = LoggerFactory.getLogger(DisplayConditionEvaluator.class);
 
@@ -55,13 +62,13 @@ class DisplayConditionEvaluator {
      * Evaluates display condition for array elements with index placeholder replacement.
      */
     static DisplayConditionResult evaluateForArrayElement(
-        @Nullable String displayCondition, int index, JsonNode rootParametersJsonNode) {
+        @Nullable String displayCondition, String arrayPath, int index, JsonNode rootParametersJsonNode) {
 
         if (displayCondition == null || displayCondition.isEmpty()) {
             return DisplayConditionResult.visible();
         }
 
-        String resolvedCondition = replaceIndexPlaceholder(displayCondition, index);
+        String resolvedCondition = replaceIndexPlaceholders(displayCondition, arrayPath, index);
 
         try {
             boolean shouldShow = WorkflowUtils.extractAndEvaluateCondition(resolvedCondition, rootParametersJsonNode);
@@ -90,8 +97,44 @@ class DisplayConditionEvaluator {
         return DisplayConditionResult.hidden();
     }
 
-    private static String replaceIndexPlaceholder(String condition, int index) {
-        return condition.replace("[index]", "[" + index + "]");
+    static List<Integer> getArrayIndexes(String propertyPath) {
+        List<Integer> indexes = new ArrayList<>();
+
+        Matcher matcher = ARRAY_INDEX_PATTERN.matcher(propertyPath);
+
+        while (matcher.find()) {
+            indexes.add(Integer.parseInt(matcher.group(1)));
+        }
+
+        return indexes;
+    }
+
+    private static String replaceIndexPlaceholders(String condition, String arrayPath, int index) {
+        List<Integer> indexes = getArrayIndexes(arrayPath);
+
+        indexes.add(index);
+
+        StringBuilder resolvedCondition = new StringBuilder();
+        int placeholderCount = 0;
+        int position = 0;
+        int placeholderPosition = condition.indexOf(INDEX_PLACEHOLDER);
+
+        while (placeholderPosition >= 0) {
+            int placeholderIndex = placeholderCount < indexes.size() ? indexes.get(placeholderCount) : index;
+
+            resolvedCondition.append(condition, position, placeholderPosition);
+            resolvedCondition.append('[');
+            resolvedCondition.append(placeholderIndex);
+            resolvedCondition.append(']');
+
+            placeholderCount++;
+            position = placeholderPosition + INDEX_PLACEHOLDER.length();
+            placeholderPosition = condition.indexOf(INDEX_PLACEHOLDER, position);
+        }
+
+        resolvedCondition.append(condition, position, condition.length());
+
+        return resolvedCondition.toString();
     }
 
     /**
