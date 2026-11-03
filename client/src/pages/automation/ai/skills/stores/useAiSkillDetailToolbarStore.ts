@@ -10,11 +10,13 @@ interface ToolbarHandlersI {
 export type ViewModeType = 'preview' | 'source';
 
 interface AiSkillDetailToolbarStateI {
+    canManage: boolean;
     canSave: boolean;
     canToggleView: boolean;
     handlers: ToolbarHandlersI | null;
     isSaving: boolean;
     resetToolbar: () => void;
+    setCanManage: (canManage: boolean) => void;
     setCanSave: (canSave: boolean) => void;
     setCanToggleView: (canToggleView: boolean) => void;
     setHandlers: (handlers: ToolbarHandlersI | null) => void;
@@ -24,12 +26,21 @@ interface AiSkillDetailToolbarStateI {
 }
 
 const useAiSkillDetailToolbarStore = create<AiSkillDetailToolbarStateI>((set) => ({
+    canManage: false,
     canSave: false,
     canToggleView: false,
     handlers: null,
     isSaving: false,
     resetToolbar: () =>
-        set({canSave: false, canToggleView: false, handlers: null, isSaving: false, viewMode: 'preview'}),
+        set({
+            canManage: false,
+            canSave: false,
+            canToggleView: false,
+            handlers: null,
+            isSaving: false,
+            viewMode: 'preview',
+        }),
+    setCanManage: (canManage) => set({canManage}),
     setCanSave: (canSave) => set({canSave}),
     setCanToggleView: (canToggleView) => set({canToggleView}),
     setHandlers: (handlers) => set({handlers}),
