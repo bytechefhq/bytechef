@@ -101,7 +101,7 @@ them:
 | `approvalExpiresAt` | string | Approval events. |
 | `approvalFormUrl` | string | Approval events. |
 | `timestamp` | string | Always. ISO-8601, for example `2026-11-03T10:00:00Z`. |
-| `deliveryId` | string | Always. One id per event, shared by every notification sent for that event. |
+| `deliveryId` | string | Always. Unique per delivery: each notification gets its own id, and the value equals the `X-ByteChef-Delivery` header. |
 | `source` | string | The job belongs to an automation project (`AUTOMATION`) or an embedded integration (`EMBEDDED`). |
 | `job.id` | number | The job exists. |
 | `job.name` | string | The job has a name. |
@@ -117,13 +117,13 @@ them:
 | `environment` | string | The environment could be resolved: `DEVELOPMENT`, `STAGING` or `PRODUCTION`. |
 | `error.taskName` | string | `JOB_FAILED` only, when a failed task was found. |
 | `error.taskType` | string | `JOB_FAILED` only, when a failed task was found. |
-| `error.message` | string | `JOB_FAILED` only. |
+| `error.message` | string | `JOB_FAILED` only, and only when the failing task's error has a message. |
 | `error.stackTrace` | string | `JOB_FAILED` only, when the error has a stack trace. Cut to 2000 characters. |
-| `executionUrl` | string | `bytechef.public-url` is set. Opens the execution. |
+| `executionUrl` | string | `bytechef.public-url` is set and the run's project or integration could be resolved. Opens the execution. |
 | `approval.expiresAt` | string | Approval events. Same value as `approvalExpiresAt`. |
 | `approval.formUrl` | string | Approval events. Same value as `approvalFormUrl`. |
 
-A field that has no value is left out of the body, not sent as `null`. If a lookup fails (for example
+A field that has no value is left out of the body, not sent as `null`. The one exception is `approvalExpiresAt` and `approvalFormUrl`, which are always present on approval events and can be `null`. If a lookup fails (for example
 the workflow was deleted), the field is left out and the notification is still sent.
 
 `deliveryId` is the same value as the `X-ByteChef-Delivery` header, and `timestamp` is the same moment
@@ -183,7 +183,7 @@ A `JOB_APPROVAL_EXPIRING` event. The two top-level approval fields come right af
   "jobId": 1043,
   "jobName": "Approve refund",
   "approvalExpiresAt": "2026-11-04T10:00:00Z",
-  "approvalFormUrl": "https://bytechef.example.com/approvals/resume/eyJ0b2tlbiI6Li4ufQ",
+  "approvalFormUrl": "https://bytechef.example.com/resume/eyJ0b2tlbiI6Li4ufQ",
   "timestamp": "2026-11-03T10:00:00Z",
   "deliveryId": "0b7d9a51-2c3e-4f60-8a71-5d4c3b2a1f09",
   "source": "AUTOMATION",
@@ -206,7 +206,7 @@ A `JOB_APPROVAL_EXPIRING` event. The two top-level approval fields come right af
   "executionUrl": "https://bytechef.example.com/automation/executions?id=1043",
   "approval": {
     "expiresAt": "2026-11-04T10:00:00Z",
-    "formUrl": "https://bytechef.example.com/approvals/resume/eyJ0b2tlbiI6Li4ufQ"
+    "formUrl": "https://bytechef.example.com/resume/eyJ0b2tlbiI6Li4ufQ"
   }
 }
 ```
@@ -217,7 +217,7 @@ Every request carries these headers:
 |---|---|
 | `X-ByteChef-Event` | `job.status` |
 | `X-ByteChef-Timestamp` | The send time, in milliseconds since the epoch. |
-| `X-ByteChef-Delivery` | A random UUID, one per event. Every notification sent for the same event gets the same value, and it equals `deliveryId` in the body. Use it to deduplicate. |
+| `X-ByteChef-Delivery` | A random UUID, unique per delivery. It equals `deliveryId` in the body. Use it to deduplicate. |
 
 The URL must use `http` or `https` and must resolve to a public address: loopback, private,
 link-local and carrier-grade NAT ranges are refused. Each request has a 10-second connect timeout and
