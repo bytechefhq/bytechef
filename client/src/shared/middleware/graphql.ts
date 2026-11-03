@@ -1151,6 +1151,14 @@ export type AutomationWorkflowProjectConfigurationMoveImpactQueryVariables = Exa
 
 export type AutomationWorkflowProjectConfigurationMoveImpactQuery = { automationWorkflowProjectConfigurationMoveImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
 
+export type AutomationWorkflowProjectConfigurationUpgradeImpactQueryVariables = Exact<{
+  targetId: string | number;
+  connectedUserIds: Array<string | number> | string | number;
+}>;
+
+
+export type AutomationWorkflowProjectConfigurationUpgradeImpactQuery = { automationWorkflowProjectConfigurationUpgradeImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
+
 export type AutomationWorkflowProjectConfigurationVersionImpactQueryVariables = Exact<{
   id: string | number;
   projectVersion: number;
@@ -1709,6 +1717,14 @@ export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables =
 
 
 export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutation = { updateMcpIntegrationInstanceConfigurationWorkflow: { id: string, enabled: boolean, mcpIntegrationInstanceConfigurationId: any, integrationInstanceConfigurationWorkflowId: any, parameters: any } | null };
+
+export type UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables = Exact<{
+  targetId: string | number;
+  connectedUserIds: Array<string | number> | string | number;
+}>;
+
+
+export type UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation = { upgradeAutomationWorkflowProjectConfigurationConnectedUsers: { movedConnectedUserIds: Array<string>, needsAttentionConnectedUserIds: Array<string>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
 
 export type AiDefaultModelQueryVariables = Exact<{
   environment: string | number;
@@ -6536,6 +6552,44 @@ export const useAutomationWorkflowProjectConfigurationMoveImpactQuery = <
   }
     )};
 
+export const AutomationWorkflowProjectConfigurationUpgradeImpactDocument = new TypedDocumentString(`
+    query automationWorkflowProjectConfigurationUpgradeImpact($targetId: ID!, $connectedUserIds: [ID!]!) {
+  automationWorkflowProjectConfigurationUpgradeImpact(
+    targetId: $targetId
+    connectedUserIds: $connectedUserIds
+  ) {
+    workflows {
+      workflowUuid
+      label
+      newRequiredInputs
+      newRequiredConnections
+      affectedConnectedUserCount
+    }
+    skipped {
+      connectedUserId
+      reason
+      workflowLabels
+    }
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectConfigurationUpgradeImpactQuery = <
+      TData = AutomationWorkflowProjectConfigurationUpgradeImpactQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectConfigurationUpgradeImpactQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectConfigurationUpgradeImpactQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectConfigurationUpgradeImpactQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectConfigurationUpgradeImpactQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectConfigurationUpgradeImpact', variables],
+    queryFn: fetcher<AutomationWorkflowProjectConfigurationUpgradeImpactQuery, AutomationWorkflowProjectConfigurationUpgradeImpactQueryVariables>(AutomationWorkflowProjectConfigurationUpgradeImpactDocument, variables),
+    ...options
+  }
+    )};
+
 export const AutomationWorkflowProjectConfigurationVersionImpactDocument = new TypedDocumentString(`
     query automationWorkflowProjectConfigurationVersionImpact($id: ID!, $projectVersion: Int!) {
   automationWorkflowProjectConfigurationVersionImpact(
@@ -8594,6 +8648,36 @@ export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
       {
     mutationKey: ['updateMcpIntegrationInstanceConfigurationWorkflow'],
     mutationFn: (variables?: UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables) => fetcher<UpdateMcpIntegrationInstanceConfigurationWorkflowMutation, UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables>(UpdateMcpIntegrationInstanceConfigurationWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpgradeAutomationWorkflowProjectConfigurationConnectedUsersDocument = new TypedDocumentString(`
+    mutation upgradeAutomationWorkflowProjectConfigurationConnectedUsers($targetId: ID!, $connectedUserIds: [ID!]!) {
+  upgradeAutomationWorkflowProjectConfigurationConnectedUsers(
+    targetId: $targetId
+    connectedUserIds: $connectedUserIds
+  ) {
+    movedConnectedUserIds
+    needsAttentionConnectedUserIds
+    skipped {
+      connectedUserId
+      reason
+      workflowLabels
+    }
+  }
+}
+    `);
+
+export const useUpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation, TError, UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables, TContext>) => {
+    
+    return useMutation<UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation, TError, UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables, TContext>(
+      {
+    mutationKey: ['upgradeAutomationWorkflowProjectConfigurationConnectedUsers'],
+    mutationFn: (variables?: UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables) => fetcher<UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation, UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables>(UpgradeAutomationWorkflowProjectConfigurationConnectedUsersDocument, variables)(),
     ...options
   }
     )};

@@ -1986,6 +1986,7 @@ export type Mutation = {
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
   updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
+  upgradeAutomationWorkflowProjectConfigurationConnectedUsers: ConfigurationMoveResult;
 };
 
 
@@ -2969,6 +2970,12 @@ export type MutationUpdateWorkspaceMcpToolEnabledArgs = {
   id: Scalars['ID']['input'];
 };
 
+
+export type MutationUpgradeAutomationWorkflowProjectConfigurationConnectedUsersArgs = {
+  connectedUserIds: Array<Scalars['ID']['input']>;
+  targetId: Scalars['ID']['input'];
+};
+
 export type NodeValidationIssue = {
   __typename?: 'NodeValidationIssue';
   kind: WorkflowIssueKind;
@@ -3352,6 +3359,7 @@ export type Query = {
   automationWorkflowProjectConfigurationConnectedUsers: Array<AutomationWorkflowProjectConfigurationConnectedUser>;
   automationWorkflowProjectConfigurationDeleteImpact: AutomationWorkflowProjectConfigurationDeleteImpact;
   automationWorkflowProjectConfigurationMoveImpact: AutomationWorkflowProjectConfigurationMoveImpact;
+  automationWorkflowProjectConfigurationUpgradeImpact: AutomationWorkflowProjectConfigurationMoveImpact;
   automationWorkflowProjectConfigurationVersionImpact: AutomationWorkflowProjectConfigurationVersionImpact;
   automationWorkflowProjectConfigurationWorkflowInputOptions: Array<AutomationWorkflowProjectConfigurationInputOption>;
   automationWorkflowProjectConfigurationWorkflowProvidableValues: AutomationWorkflowProjectConfigurationWorkflowProvidableValues;
@@ -3691,6 +3699,12 @@ export type QueryAutomationWorkflowProjectConfigurationDeleteImpactArgs = {
 export type QueryAutomationWorkflowProjectConfigurationMoveImpactArgs = {
   connectedUserIds: Array<Scalars['ID']['input']>;
   sourceId: Scalars['ID']['input'];
+  targetId: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectConfigurationUpgradeImpactArgs = {
+  connectedUserIds: Array<Scalars['ID']['input']>;
   targetId: Scalars['ID']['input'];
 };
 
