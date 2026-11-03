@@ -25,9 +25,11 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.worker.exception.TriggerExecutionException;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * @author Ivica Cardic
@@ -38,16 +40,19 @@ public abstract class AbstractTriggerHandler implements TriggerHandler {
     private final int componentVersion;
     private final String triggerName;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner;
 
     @SuppressFBWarnings("EI")
     public AbstractTriggerHandler(
         String componentName, int componentVersion, String triggerName,
-        TriggerDefinitionFacade triggerDefinitionFacade) {
+        TriggerDefinitionFacade triggerDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
 
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.triggerName = triggerName;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.jobPrincipalAuthenticationRunner = jobPrincipalAuthenticationRunner;
     }
 
     @Override
@@ -60,7 +65,7 @@ public abstract class AbstractTriggerHandler implements TriggerHandler {
         try {
             Optional<Long> firstConnectionId = CollectionUtils.findFirst(connectIdMap.values());
 
-            return triggerDefinitionFacade.executeTrigger(
+            Supplier<TriggerOutput> triggerSupplier = () -> triggerDefinitionFacade.executeTrigger(
                 componentName, componentVersion, triggerName, workflowExecutionId.getJobPrincipalId(),
                 workflowExecutionId.getWorkflowUuid(), triggerExecution.getId(), triggerExecution.getParameters(),
                 triggerExecution.getState(),
@@ -69,6 +74,10 @@ public abstract class AbstractTriggerHandler implements TriggerHandler {
                 MapUtils.getLong(triggerExecution.getMetadata(), MetadataConstants.ENVIRONMENT_ID),
                 workflowExecutionId.getType(),
                 MapUtils.getBoolean(triggerExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false));
+
+            return jobPrincipalAuthenticationRunner.run(
+                workflowExecutionId.getType(), workflowExecutionId.getJobPrincipalId(),
+                "trigger execution " + triggerExecution.getId(), triggerSupplier);
         } catch (Exception e) {
             throw new TriggerExecutionException(e.getMessage(), e);
         }
