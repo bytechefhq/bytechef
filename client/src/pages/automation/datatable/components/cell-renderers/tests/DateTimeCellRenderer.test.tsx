@@ -1,7 +1,10 @@
 import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import {format as formatDate} from 'date-fns';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {DateTimeCellRenderer, createDateTimeCellRenderer} from '../DateTimeCellRenderer';
+
+const toLocalDateTimeText = (isoValue: string) => formatDate(new Date(isoValue), 'yyyy-MM-dd HH:mm');
 
 beforeEach(() => {
     windowResizeObserver();
@@ -22,8 +25,7 @@ describe('DateTimeCellRenderer', () => {
                 />
             );
 
-            // The exact format depends on timezone, so we check for date part
-            expect(screen.getByText(/2023-06-15/)).toBeInTheDocument();
+            expect(screen.getByText(toLocalDateTimeText('2023-06-15T14:30:00Z'))).toBeInTheDocument();
         });
 
         it('should render empty string when value is null', () => {
@@ -48,7 +50,7 @@ describe('DateTimeCellRenderer', () => {
                 />
             );
 
-            expect(screen.getByText(/2023-12-25/)).toBeInTheDocument();
+            expect(screen.getByText(toLocalDateTimeText('2023-12-25T10:30:00+00:00'))).toBeInTheDocument();
         });
 
         it('should render empty for invalid datetime strings', () => {
@@ -69,7 +71,7 @@ describe('DateTimeCellRenderer', () => {
 
             render(<DateTimeRenderer row={{eventTime: '2024-01-15T09:00:00Z', id: '1'}} />);
 
-            expect(screen.getByText(/2024-01-15/)).toBeInTheDocument();
+            expect(screen.getByText(toLocalDateTimeText('2024-01-15T09:00:00Z'))).toBeInTheDocument();
         });
     });
 });
