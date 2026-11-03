@@ -147,6 +147,14 @@ describe('formatDateValue', () => {
         expect(formatDateValue('2024-01-15')).toBe('2024-01-15');
     });
 
+    it('keeps the calendar date of an ISO date-time at UTC midnight', () => {
+        expect(formatDateValue('2024-01-15T00:00:00.000+00:00')).toBe('2024-01-15');
+    });
+
+    it('keeps the UTC calendar date of epoch millis', () => {
+        expect(formatDateValue(Date.UTC(2024, 0, 15))).toBe('2024-01-15');
+    });
+
     it('returns empty string for empty value', () => {
         expect(formatDateValue('')).toBe('');
         expect(formatDateValue(null)).toBe('');
