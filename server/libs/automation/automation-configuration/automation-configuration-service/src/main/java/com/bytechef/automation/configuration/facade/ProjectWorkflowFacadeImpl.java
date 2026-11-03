@@ -165,6 +165,9 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @Audited(event = ProjectWorkflowAuditEvents.WORKFLOW_UNSHARED, data = {
+        @AuditData(key = "workflowId", value = "#workflowId")
+    })
     @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_DELETE', " + DEVELOPMENT + ")")
     public void deleteSharedWorkflow(String workflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
@@ -249,13 +252,18 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @Audited(event = ProjectWorkflowAuditEvents.WORKFLOW_EXPORTED, data = {
+        @AuditData(key = "workflowId", value = "#workflowId")
+    })
     @PreAuthorize("hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
-    @Transactional(readOnly = true)
     public Workflow exportWorkflow(String workflowId) {
         return workflowService.getWorkflow(workflowId);
     }
 
     @Override
+    @Audited(event = ProjectWorkflowAuditEvents.WORKFLOW_SHARED, data = {
+        @AuditData(key = "workflowId", value = "#workflowId")
+    })
     @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
     public void exportSharedWorkflow(String workflowId, String description) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -532,6 +540,12 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @Audited(event = ProjectWorkflowAuditEvents.WORKFLOW_TEMPLATE_IMPORTED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "templateId", value = "#id"),
+        @AuditData(key = "sharedWorkflow", value = "#sharedWorkflow"),
+        @AuditData(key = "projectWorkflowId", value = "#result")
+    })
     @PreAuthorize("hasResourceScopeInEnvironment(#projectId, 'Project', 'WORKFLOW_CREATE', " + DEVELOPMENT + ")")
     public long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow) {
         if (!sharedWorkflow) {

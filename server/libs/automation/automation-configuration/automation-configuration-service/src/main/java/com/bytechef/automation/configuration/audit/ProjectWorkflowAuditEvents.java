@@ -24,6 +24,10 @@ public final class ProjectWorkflowAuditEvents {
     public static final String WORKFLOW_CREATED = "WORKFLOW_CREATED";
     public static final String WORKFLOW_DELETED = "WORKFLOW_DELETED";
     public static final String WORKFLOW_DUPLICATED = "WORKFLOW_DUPLICATED";
+    public static final String WORKFLOW_EXPORTED = "WORKFLOW_EXPORTED";
+    public static final String WORKFLOW_SHARED = "WORKFLOW_SHARED";
+    public static final String WORKFLOW_TEMPLATE_IMPORTED = "WORKFLOW_TEMPLATE_IMPORTED";
+    public static final String WORKFLOW_UNSHARED = "WORKFLOW_UNSHARED";
     public static final String WORKFLOW_VERSION_RESTORED = "WORKFLOW_VERSION_RESTORED";
 
     private ProjectWorkflowAuditEvents() {
