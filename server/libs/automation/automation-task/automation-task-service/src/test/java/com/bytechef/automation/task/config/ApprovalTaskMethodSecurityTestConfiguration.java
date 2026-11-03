@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import java.io.Serializable;
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -44,11 +45,13 @@ public class ApprovalTaskMethodSecurityTestConfiguration {
     }
 
     @Bean
-    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(AuthorizationCheck authorizationCheck) {
+    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+        AuthorizationCheck authorizationCheck, ApplicationContext applicationContext) {
 
         ApprovalTaskMethodSecurityExpressionHandler approvalTaskMethodSecurityExpressionHandler =
             new ApprovalTaskMethodSecurityExpressionHandler(authorizationCheck);
 
+        approvalTaskMethodSecurityExpressionHandler.setApplicationContext(applicationContext);
         approvalTaskMethodSecurityExpressionHandler.setPermissionEvaluator(new PermissionEvaluator() {
 
             @Override

@@ -44,6 +44,11 @@ class TestWorkflowExecutorAuthorizationTest {
     }
 
     @Test
+    void testAttachingToATestNeedsTheWorkflowEditScopeOnTheTestJob() throws NoSuchMethodException {
+        assertThat(getGate("attach", long.class)).isEqualTo("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')");
+    }
+
+    @Test
     void testStoppingATestNeedsTheWorkflowEditScopeOnTheTestJob() throws NoSuchMethodException {
         assertThat(getGate("stop", long.class)).isEqualTo("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')");
     }
