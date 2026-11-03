@@ -18,6 +18,7 @@ package com.bytechef.platform.notification.delivery;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -134,12 +135,17 @@ public class WebhookNotificationClient {
         }
 
         try {
-            RequestCallback requestCallback = clientHttpRequest -> {
-                clientHttpRequest.getHeaders()
-                    .putAll(httpHeaders);
+            byte[] payloadBytes = payloadJson.getBytes(StandardCharsets.UTF_8);
 
-                clientHttpRequest.getBody()
-                    .write(payloadJson.getBytes(StandardCharsets.UTF_8));
+            RequestCallback requestCallback = clientHttpRequest -> {
+                HttpHeaders requestHeaders = clientHttpRequest.getHeaders();
+
+                requestHeaders.putAll(httpHeaders);
+                requestHeaders.setContentLength(payloadBytes.length);
+
+                OutputStream outputStream = clientHttpRequest.getBody();
+
+                outputStream.write(payloadBytes);
             };
             ResponseExtractor<WebhookResponse> responseExtractor = clientHttpResponse -> new WebhookResponse(
                 clientHttpResponse.getStatusCode()
