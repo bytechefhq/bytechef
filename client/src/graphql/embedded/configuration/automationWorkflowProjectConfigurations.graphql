@@ -1,5 +1,5 @@
-query automationWorkflowProjectConfigurations($projectId: ID!) {
-    automationWorkflowProjectConfigurations(projectId: $projectId) {
+query automationWorkflowProjectConfigurations($projectId: ID!, $environmentId: ID) {
+    automationWorkflowProjectConfigurations(projectId: $projectId, environmentId: $environmentId) {
         id
         projectId
         environmentId
