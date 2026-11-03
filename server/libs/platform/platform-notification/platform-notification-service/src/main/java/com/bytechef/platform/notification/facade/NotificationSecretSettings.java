@@ -57,9 +57,14 @@ final class NotificationSecretSettings {
             }
         }
 
+        boolean slack = target.getType() == Notification.Type.SLACK;
+        boolean webhook = target.getType() == Notification.Type.WEBHOOK;
+
         Object storedSlackUrl = stored == null ? null : stored.getSetting(SLACK_WEBHOOK_URL_KEY);
 
-        if (incoming.containsKey(SLACK_WEBHOOK_URL_KEY)) {
+        if (!slack) {
+            storedSlackUrl = null;
+        } else if (incoming.containsKey(SLACK_WEBHOOK_URL_KEY)) {
             Object slackUrl = incoming.get(SLACK_WEBHOOK_URL_KEY);
 
             if (MASK.equals(slackUrl)) {
@@ -75,7 +80,9 @@ final class NotificationSecretSettings {
 
         Object storedHeaders = stored == null ? null : stored.getSetting(WEBHOOK_HEADERS_KEY);
 
-        if (incoming.containsKey(WEBHOOK_HEADERS_KEY)) {
+        if (!webhook) {
+            storedHeaders = null;
+        } else if (incoming.containsKey(WEBHOOK_HEADERS_KEY)) {
             List<Map<String, Object>> headers = resolveHeaders(incoming.get(WEBHOOK_HEADERS_KEY), storedHeaders);
 
             if (!headers.isEmpty()) {
@@ -85,7 +92,7 @@ final class NotificationSecretSettings {
             secretSettings.put(WEBHOOK_HEADERS_KEY, storedHeaders);
         }
 
-        Object storedSigningSecret = stored == null ? null : stored.getSetting(SIGNING_SECRET_KEY);
+        Object storedSigningSecret = stored == null || !webhook ? null : stored.getSetting(SIGNING_SECRET_KEY);
 
         if (storedSigningSecret != null) {
             secretSettings.put(SIGNING_SECRET_KEY, storedSigningSecret);
@@ -109,13 +116,15 @@ final class NotificationSecretSettings {
             }
         }
 
-        if (notification.getSetting(SLACK_WEBHOOK_URL_KEY) != null) {
+        if (notification.getType() == Notification.Type.SLACK
+            && notification.getSetting(SLACK_WEBHOOK_URL_KEY) != null) {
             maskedSettings.put(SLACK_WEBHOOK_URL_KEY, MASK);
         }
 
         Object headers = notification.getSetting(WEBHOOK_HEADERS_KEY);
 
-        if (headers instanceof List<?> headerList && !headerList.isEmpty()) {
+        if (notification.getType() == Notification.Type.WEBHOOK && headers instanceof List<?> headerList &&
+            !headerList.isEmpty()) {
             List<Map<String, Object>> maskedHeaders = new ArrayList<>();
 
             for (Object header : headerList) {
@@ -133,6 +142,11 @@ final class NotificationSecretSettings {
         }
 
         return maskedSettings;
+    }
+
+    static boolean hasSigningSecret(Notification notification) {
+        return notification.getType() == Notification.Type.WEBHOOK &&
+            notification.getSetting(SIGNING_SECRET_KEY) != null;
     }
 
     private static List<Map<String, Object>> resolveHeaders(Object incomingHeaders, @Nullable Object storedHeaders) {
