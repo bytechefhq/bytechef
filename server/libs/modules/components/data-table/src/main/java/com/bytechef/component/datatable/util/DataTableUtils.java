@@ -218,7 +218,7 @@ public final class DataTableUtils {
             orConditions = inputParameters.getList(
                 CONDITIONS, new TypeReference<List<Map<String, Object>>>() {}, List.of());
         } catch (RuntimeException runtimeException) {
-            throw new IllegalArgumentException(
+            throw createIllegalArgumentException(
                 "OR Conditions must be a list of AND Condition lists, each holding condition objects: " +
                     runtimeException.getMessage(),
                 runtimeException);
@@ -247,7 +247,7 @@ public final class DataTableUtils {
                 try {
                     filters.add(toDataTableRowFilter(condition));
                 } catch (IllegalArgumentException illegalArgumentException) {
-                    throw new IllegalArgumentException(
+                    throw createIllegalArgumentException(
                         "Condition %d of OR Condition %d: %s".formatted(
                             conditionIndex + 1, groupIndex + 1, illegalArgumentException.getMessage()),
                         illegalArgumentException);
@@ -270,6 +270,14 @@ public final class DataTableUtils {
      * @return the parsed enum constant
      * @throws IllegalArgumentException if the value names no constant of the enum
      */
+    public static IllegalArgumentException createIllegalArgumentException(String message, Exception sourceException) {
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException(message);
+
+        illegalArgumentException.addSuppressed(sourceException);
+
+        return illegalArgumentException;
+    }
+
     public static <E extends Enum<E>> E toEnum(
         Class<E> enumClass, @Nullable Object value, E defaultValue, String label) {
 
@@ -290,7 +298,7 @@ public final class DataTableUtils {
                 .map(Enum::name)
                 .collect(Collectors.joining(", "));
 
-            throw new IllegalArgumentException(
+            throw createIllegalArgumentException(
                 "Unknown %s '%s'; expected one of %s".formatted(label, value, expectedNames), exception);
         }
     }

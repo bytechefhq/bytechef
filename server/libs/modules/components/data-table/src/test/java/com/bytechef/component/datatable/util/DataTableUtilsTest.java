@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -129,12 +130,16 @@ class DataTableUtilsTest {
                 IllegalArgumentException.class,
                 () -> DataTableUtils.getConditions(MockParametersFactory.create(Map.of("conditions", conditions))));
 
-            Throwable cause = illegalArgumentException.getCause();
+            Throwable[] suppressedExceptions = illegalArgumentException.getSuppressed();
 
             assertEquals(
                 "OR Conditions must be a list of AND Condition lists, each holding condition objects: " +
-                    cause.getMessage(),
+                    suppressedExceptions[0].getMessage(),
                 illegalArgumentException.getMessage());
+            assertEquals(
+                illegalArgumentException.getMessage(),
+                ExceptionUtils.getRootCause(illegalArgumentException)
+                    .getMessage());
         }
     }
 
@@ -166,6 +171,10 @@ class DataTableUtilsTest {
 
         assertTrue(unknownOperationException.getMessage()
             .startsWith("Condition 1 of OR Condition 1: Unknown Operation 'LIKE'; expected one of EQUALS"));
+        assertEquals(
+            unknownOperationException.getMessage(),
+            ExceptionUtils.getRootCause(unknownOperationException)
+                .getMessage());
 
         IllegalArgumentException emptyConditionException = assertThrows(
             IllegalArgumentException.class,

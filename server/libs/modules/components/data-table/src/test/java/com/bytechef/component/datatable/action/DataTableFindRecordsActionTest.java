@@ -38,6 +38,7 @@ import com.bytechef.platform.data.table.execution.domain.DataTableRowSort.Direct
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -155,6 +156,10 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
 
         assertEquals(
             "Unknown Sort Direction 'UP'; expected one of ASC, DESC", illegalArgumentException.getMessage());
+        assertEquals(
+            illegalArgumentException.getMessage(),
+            ExceptionUtils.getRootCause(illegalArgumentException)
+                .getMessage());
 
         IllegalArgumentException negativeLimitException = assertThrows(
             IllegalArgumentException.class,

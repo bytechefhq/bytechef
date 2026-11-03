@@ -478,8 +478,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     insertRowWithoutEvent(
                         baseName, physicalName, columnSpecs, rowValues.get(index), environmentId, ignoredColumnNames));
             } catch (IllegalArgumentException exception) {
-                throw new IllegalArgumentException(
-                    "Record %d: %s; no record was inserted".formatted(index + 1, exception.getMessage()), exception);
+                IllegalArgumentException illegalArgumentException = new IllegalArgumentException(
+                    "Record %d: %s; no record was inserted".formatted(index + 1, exception.getMessage()));
+
+                illegalArgumentException.addSuppressed(exception);
+
+                throw illegalArgumentException;
             } catch (DataIntegrityViolationException dataIntegrityViolationException) {
                 throw withRowPosition("Record " + (index + 1), "no record was inserted",
                     dataIntegrityViolationException);
@@ -511,8 +515,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .orElse(message)
             .strip();
 
-        return new DataIntegrityViolationException(
-            "%s: %s; %s".formatted(rowPosition, firstLine, outcome), dataIntegrityViolationException);
+        DataIntegrityViolationException positionedDataIntegrityViolationException = new DataIntegrityViolationException(
+            "%s: %s; %s".formatted(rowPosition, firstLine, outcome));
+
+        positionedDataIntegrityViolationException.addSuppressed(dataIntegrityViolationException);
+
+        return positionedDataIntegrityViolationException;
     }
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
