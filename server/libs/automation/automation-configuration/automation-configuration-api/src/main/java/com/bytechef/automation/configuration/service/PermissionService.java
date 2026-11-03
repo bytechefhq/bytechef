@@ -20,6 +20,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Central RBAC service backing the {@code @PreAuthorize} SpEL checks used across the automation tier (both the custom
@@ -255,6 +256,59 @@ public interface PermissionService {
      * @return the current user's scopes in {@code environment}, or an empty set if none / no current user
      */
     Set<String> getMyWorkspaceScopes(long workspaceId, Environment environment);
+
+    /**
+     * Evicts the cached embedded scope grants of a single user, forcing the next embedded scope check to recompute.
+     *
+     * @param userId the user whose cached embedded scopes are invalidated
+     */
+    void evictEmbeddedScopeCache(long userId);
+
+    /**
+     * Evicts the entire embedded scope cache for all users.
+     */
+    void evictAllEmbeddedScopeCache();
+
+    /**
+     * Returns whether the current user holds the embedded {@code scope} in at least one environment.
+     *
+     * @param scope the embedded scope name
+     * @return {@code true} if the current user holds {@code scope}
+     */
+    boolean hasEmbeddedScope(String scope);
+
+    /**
+     * Returns whether the current user holds the embedded {@code scope} in one environment.
+     *
+     * @param scope       the embedded scope name
+     * @param environment the environment the scope must apply to
+     * @return {@code true} if the current user holds {@code scope} in {@code environment}
+     */
+    boolean hasEmbeddedScope(String scope, Environment environment);
+
+    /**
+     * Returns whether the current user holds the embedded {@code scope} in every environment.
+     *
+     * @param scope the embedded scope name
+     * @return {@code true} if the current user holds {@code scope} in every environment
+     */
+    boolean hasEmbeddedScopeInEveryEnvironment(String scope);
+
+    /**
+     * Returns whether the current user is a member of the embedded side (a tenant admin always is).
+     *
+     * @return {@code true} if the current user is an embedded member
+     */
+    boolean isEmbeddedMember();
+
+    /**
+     * Returns the embedded scope names the current user holds, in one environment or, when {@code environment} is
+     * {@code null}, in at least one (all embedded scopes for a tenant admin).
+     *
+     * @param environment the environment the scopes must apply to, or {@code null} for any
+     * @return the current user's embedded scopes, or an empty set if none / no current user
+     */
+    Set<String> getMyEmbeddedScopes(@Nullable Environment environment);
 
     /**
      * Returns the current user's {@link WorkspaceRoleType} name in the workspace, or {@code null} if not a member.

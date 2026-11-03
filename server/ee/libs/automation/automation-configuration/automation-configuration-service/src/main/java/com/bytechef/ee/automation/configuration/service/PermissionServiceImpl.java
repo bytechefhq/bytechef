@@ -17,7 +17,9 @@ import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
+import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -34,6 +36,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -61,6 +64,8 @@ public class PermissionServiceImpl implements PermissionService {
 
     private final ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider;
     private final CurrentUserResolver currentUserResolver;
+    private final EmbeddedScopeCacheService embeddedScopeCacheService;
+    private final EmbeddedUserRepository embeddedUserRepository;
     private final PermissionScopeRegistry permissionScopeRegistry;
     private final ProjectService projectService;
     private final WorkspaceScopeCache workspaceScopeCache;
@@ -77,10 +82,13 @@ public class PermissionServiceImpl implements PermissionService {
         WorkspaceUserRepository workspaceUserRepository,
         List<ResourceOwnershipResolver> resourceOwnershipResolvers,
         List<ResourceEnvironmentResolver> resourceEnvironmentResolvers,
-        ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider) {
+        ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider,
+        EmbeddedScopeCacheService embeddedScopeCacheService, EmbeddedUserRepository embeddedUserRepository) {
 
         this.connectedUserAccessDeciderProvider = connectedUserAccessDeciderProvider;
         this.currentUserResolver = currentUserResolver;
+        this.embeddedScopeCacheService = embeddedScopeCacheService;
+        this.embeddedUserRepository = embeddedUserRepository;
         this.permissionScopeRegistry = permissionScopeRegistry;
         this.projectService = projectService;
         this.workspaceScopeCache = workspaceScopeCache;
@@ -671,6 +679,130 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void evictAllWorkspaceScopeCache() {
         workspaceScopeCache.evictAllWorkspaceScopeCache();
+    }
+
+    @Override
+    public boolean hasEmbeddedScope(String scope) {
+        return checkEmbeddedScope(scope, null);
+    }
+
+    @Override
+    public boolean hasEmbeddedScope(String scope, Environment environment) {
+        if (environment == null) {
+            return hasEmbeddedScopeInEveryEnvironment(scope);
+        }
+
+        return checkEmbeddedScope(scope, environment);
+    }
+
+    @Override
+    public boolean hasEmbeddedScopeInEveryEnvironment(String scope) {
+        if (isGovernedPrincipal()) {
+            return false;
+        }
+
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        OptionalLong userId = currentUserResolver.fetchCurrentUserId();
+
+        if (userId.isEmpty()) {
+            return false;
+        }
+
+        for (Environment environment : Environment.values()) {
+            Set<String> scopeNames = embeddedScopeCacheService.getEmbeddedScopes(userId.getAsLong(), environment);
+
+            if (!scopeNames.contains(scope)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean isEmbeddedMember() {
+        if (isGovernedPrincipal()) {
+            return false;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        OptionalLong userId = currentUserResolver.fetchCurrentUserId();
+
+        if (userId.isEmpty()) {
+            return false;
+        }
+
+        return embeddedUserRepository.existsByUserId(userId.getAsLong());
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Set<String> getMyEmbeddedScopes(@Nullable Environment environment) {
+        if (isGovernedPrincipal()) {
+            return Collections.emptySet();
+        }
+
+        if (isTenantAdmin()) {
+            return Set.copyOf(permissionScopeRegistry.getAllScopeNames(PermissionScopeSide.EMBEDDED));
+        }
+
+        OptionalLong userId = currentUserResolver.fetchCurrentUserId();
+
+        if (userId.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        if (environment == null) {
+            return Set.copyOf(embeddedScopeCacheService.getEmbeddedScopes(userId.getAsLong()));
+        }
+
+        return Set.copyOf(embeddedScopeCacheService.getEmbeddedScopes(userId.getAsLong(), environment));
+    }
+
+    @Override
+    public void evictEmbeddedScopeCache(long userId) {
+        embeddedScopeCacheService.evictEmbeddedScopeCache(userId);
+    }
+
+    @Override
+    public void evictAllEmbeddedScopeCache() {
+        embeddedScopeCacheService.evictAllEmbeddedScopeCache();
+    }
+
+    private boolean checkEmbeddedScope(String scope, @Nullable Environment environment) {
+        if (isGovernedPrincipal()) {
+            return false;
+        }
+
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        OptionalLong userId = currentUserResolver.fetchCurrentUserId();
+
+        if (userId.isEmpty()) {
+            return false;
+        }
+
+        Set<String> scopeNames = environment == null
+            ? embeddedScopeCacheService.getEmbeddedScopes(userId.getAsLong())
+            : embeddedScopeCacheService.getEmbeddedScopes(userId.getAsLong(), environment);
+
+        return scopeNames.contains(scope);
     }
 
     private boolean checkWorkspaceScope(long workspaceId, String scope, Environment environment) {
