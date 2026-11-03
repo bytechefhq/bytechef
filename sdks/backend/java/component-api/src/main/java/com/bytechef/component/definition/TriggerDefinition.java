@@ -707,6 +707,44 @@ public interface TriggerDefinition {
     }
 
     /**
+     * Validates each incoming webhook request before it is processed, with access to the connection parameters,
+     * allowing a webhook trigger to verify a request signature keyed with a connection credential.
+     *
+     * <p>
+     * The platform invokes only the seven-argument
+     * {@link #apply(Parameters, Parameters, HttpHeaders, HttpParameters, WebhookBody, WebhookMethod, TriggerContext)}.
+     * The inherited six-argument {@link WebhookValidateFunction#apply} is never called for this function and throws
+     * {@link UnsupportedOperationException}.
+     */
+    @FunctionalInterface
+    interface WebhookValidateWithConnectionFunction extends WebhookValidateFunction {
+
+        /**
+         * Validates the incoming webhook request.
+         *
+         * @param inputParameters      the trigger input parameters
+         * @param connectionParameters the connection parameters
+         * @param headers              the request headers
+         * @param parameters           the request query parameters
+         * @param body                 the request body
+         * @param method               the HTTP method of the request
+         * @param context              the trigger execution context
+         * @return the http status, 200 if validation is ok, 400, 401 or any other required status if validation fails
+         */
+        WebhookValidateResponse apply(
+            Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
+            HttpParameters parameters, WebhookBody body, WebhookMethod method, TriggerContext context);
+
+        @Override
+        default WebhookValidateResponse apply(
+            Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            WebhookMethod method, TriggerContext context) {
+
+            throw new UnsupportedOperationException("This webhook validate function needs connection parameters");
+        }
+    }
+
+    /**
      * Validates the webhook request received during the enable handshake, allowing a webhook trigger to confirm the
      * subscription before it is activated.
      */
