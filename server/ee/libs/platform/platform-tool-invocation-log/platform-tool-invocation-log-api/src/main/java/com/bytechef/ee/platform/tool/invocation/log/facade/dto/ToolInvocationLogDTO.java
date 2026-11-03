@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.tool.invocation.log.facade.dto;
 
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -15,5 +16,6 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record ToolInvocationLogDTO(ToolInvocationLog toolInvocationLog, @Nullable String workflowName) {
 }
