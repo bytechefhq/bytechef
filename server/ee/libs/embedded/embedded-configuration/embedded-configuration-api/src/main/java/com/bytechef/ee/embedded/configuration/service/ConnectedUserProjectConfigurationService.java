@@ -40,6 +40,8 @@ public interface ConnectedUserProjectConfigurationService {
     List<ConnectedUserProjectConfiguration> getAssignments(long configurationId);
 
     /**
+     * Returns the connected user's assignments.
+     *
      * @param connectedUserId the connected user id
      * @return the connected user's assignments, one per automation workflow project
      */

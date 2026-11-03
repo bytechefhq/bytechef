@@ -23,10 +23,6 @@ public final class AutomationWorkflowProjectConfigurationTestSupport {
     private AutomationWorkflowProjectConfigurationTestSupport() {
     }
 
-    /**
-     * Publishes the project and pins an enabled production configuration to the version just published, so that the
-     * production environment keeps seeing the latest published version.
-     */
     public static void publishAndPinProject(
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService, long projectId) {

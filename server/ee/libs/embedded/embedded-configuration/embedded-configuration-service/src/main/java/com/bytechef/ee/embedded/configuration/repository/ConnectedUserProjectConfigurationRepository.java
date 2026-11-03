@@ -48,10 +48,6 @@ public interface ConnectedUserProjectConfigurationRepository
 
     Optional<ConnectedUserProjectConfiguration> findByConnectedUserIdAndProjectId(long connectedUserId, long projectId);
 
-    /**
-     * @param configurationId the configuration id
-     * @param assignmentCount the number of assignments
-     */
     record ConfigurationAssignmentCount(long configurationId, long assignmentCount) {
     }
 }

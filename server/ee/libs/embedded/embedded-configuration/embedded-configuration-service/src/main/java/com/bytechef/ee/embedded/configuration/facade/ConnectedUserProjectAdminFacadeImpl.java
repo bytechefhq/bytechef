@@ -178,7 +178,6 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
-        // The assignment commits before the references, which keep committing one by one with their triggers.
         transactionTemplate.executeWithoutResult(
             transactionStatus -> assignConfiguration(connectedUser, configurationId, workflows));
 
@@ -199,13 +198,6 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
         }
     }
 
-    /**
-     * Locks the connected user's project, then assigns the connected user to the configuration (which locks the
-     * connected user), so the lock order matches the reference paths: connected user project, then connected user.
-     * Rejects a configuration the provisioning list does not offer the connected user, a configuration other than the
-     * one the connected user is already assigned to, and workflows the configuration does not release; a rejection
-     * rolls the assignment back.
-     */
     private void assignConfiguration(
         ConnectedUser connectedUser, long configurationId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows) {
 
@@ -254,13 +246,6 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
         }
     }
 
-    /**
-     * Returns the configuration from the same list the provisioning dialog shows: an enabled configuration in the
-     * connected user's environment of a published project whose permission expression the connected user passes.
-     *
-     * @throws ConfigurationException with {@code CONFIGURATION_PROJECT_MISMATCH} when the configuration is not one of
-     *                                them
-     */
     private ProvisionableAutomationWorkflowProjectDTO.Configuration getProvisionableConfiguration(
         ConnectedUser connectedUser, long projectId, long configurationId) {
 

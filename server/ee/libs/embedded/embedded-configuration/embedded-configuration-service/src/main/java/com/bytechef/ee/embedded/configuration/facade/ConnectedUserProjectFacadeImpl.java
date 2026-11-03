@@ -502,8 +502,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflows =
                     getConnectedUserProjectWorkflows(connectedUserProject, connectedUser.getEnvironment());
 
-                // The project is deployed only once the connected user copies a workflow, references run on the
-                // automation workflow project's deployment
                 ProjectDeployment projectDeployment = projectDeploymentService
                     .fetchProjectDeployment(connectedUserProject.getProjectId(), connectedUser.getEnvironment())
                     .orElse(null);
@@ -988,7 +986,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     private boolean isProjectDeploymentWorkflowEnabled(ProjectWorkflow projectWorkflow, Environment environment) {
-        // DRAFT status
         if (projectWorkflow.getProjectVersion() == 1) {
             return false;
         }
