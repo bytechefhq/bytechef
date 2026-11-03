@@ -68,6 +68,7 @@ Each configuration row carries an **Enabled** switch and an ellipsis (⋮) menu:
 - **Enable/Disable** -- flip the switch on the row to control whether the configuration's workflows execute.
 - **Edit** -- reopens the wizard to update tags, connections, or workflow settings.
 - **Update Integration Version** -- upgrade the configuration to a newer published version of the integration.
+- **Move Users…** -- move connected users to another configuration of the same integration and environment. See [Moving Users Between Configurations](#moving-users-between-configurations).
 - **Delete** -- remove the configuration entirely (confirmed via an alert dialog).
 
 Expand a configuration row to see its workflows. Each workflow has its own enable/disable switch and an **Edit** action that opens the **Edit Workflow** dialog, where you set that workflow's per-configuration input values and connections.
@@ -83,7 +84,28 @@ An environment can have more than one enabled configuration of the same integrat
 
 - **Self-serve users get the enabled configuration with the highest version.** When a connected user connects an integration on their own (through the Connect dialog, the integration marketplace, or the embedded API), ByteChef uses that one. If two enabled configurations have the same version, the most recently created one wins. The provisioning dialog marks it **Self-serve**.
 - **An admin can put a connected user on any enabled configuration.** [Provisioning an integration](/platform/embedded/monitor/connected-users#provisioning-an-integration) from the connected user's sheet lets you choose the configuration, so a customer can stay on an older version, or use a configuration with different settings.
+- **A configuration can limit who self-serve lands on it.** The configuration dialog has an optional **Assignment rule**, an expression with the same syntax as a [permission expression](/platform/embedded/build/permission-expressions). Empty means everyone. When a user connects on their own, only enabled configurations whose rule lets that user in are considered, and the highest version among them wins. The expression is checked once, when the instance is created. Provisioning by an admin and moving users ignore it, and the integration's own permission expression still decides whether the user sees the integration. For example, `metadata['beta'] == 'true'` keeps a configuration for flagged users. See [Permission Expressions](/platform/embedded/build/permission-expressions).
 - **Each instance keeps its own configuration.** A connected user's existing instances keep the configuration they were created on; enabling a newer configuration does not move them. The user's embedded UI shows each instance's own workflows and authorization.
+
+### Moving Users Between Configurations
+
+Use a move to put connected users on another configuration of the same integration and environment, for example to finish a migration to a newer version.
+
+1. Open the configuration's ⋮ menu and pick **Move Users…**. It is unavailable when the environment has no other configuration.
+2. Choose the users to move (all are selected by default, and you can search), pick the target configuration, and confirm. A disabled target is marked "(disabled)" in the list.
+
+The dialog previews the move before you confirm, and **Move** stays unavailable until the preview has loaded. If the preview cannot load, the dialog says so and you can still move. When MCP servers use either configuration, the dialog notes how many, because their tools follow the configuration each user lands on.
+
+To move one user, open them in [Connected Users](/platform/embedded/monitor/connected-users) and pick **Change configuration…** on the integration row. It also offers disabled configurations of the environment.
+
+A move keeps each instance's enabled state and inputs, matching workflows between the two configurations. A user is **skipped** and reported, and the rest still move, when:
+
+- the target does not have an enabled counterpart of a workflow the user has enabled, or
+- the target uses a different authorization type than the user's connection.
+
+A workflow the user had switched off, which has no counterpart in the target, is removed from the instance during the move.
+
+A user with several instances of the integration on the configuration can be **partly moved**: the instances that can move do, and the others stay. Such a user is listed both as skipped, with the reason, and as needing attention.
 
 ### Filtering Configurations
 
