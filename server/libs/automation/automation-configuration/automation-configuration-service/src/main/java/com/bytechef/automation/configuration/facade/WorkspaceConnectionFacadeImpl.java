@@ -34,7 +34,6 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -61,7 +60,6 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     private final ConnectionService connectionService;
     private final PermissionService permissionService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
-    private final TagService tagService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
 
@@ -78,12 +76,18 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         this.connectionService = connectionService;
         this.permissionService = permissionService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
-        this.tagService = tagService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREATED, data = {
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "connectionId", value = "#result"),
+        @AuditData(key = "name", value = "#connectionDTO.name"),
+        @AuditData(key = "componentName", value = "#connectionDTO.componentName"),
+        @AuditData(key = "environmentId", value = "#connectionDTO.environmentId")
+    })
     @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_CREATE', #connectionDTO.environmentId)")
     public long create(long workspaceId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
@@ -94,6 +98,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_DELETED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId")
+    })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE')")
     public void delete(long connectionId) {
         requireAutomationConnectionUnlessConnectedUser(connectionId);
@@ -179,6 +186,10 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "name", value = "#name")
+    })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
         requireAutomationConnectionUnlessConnectedUser(connectionId);
@@ -187,6 +198,10 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "name", value = "#name")
+    })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void update(
         long connectionId, String name, Map<String, ?> connectionParameters, List<Tag> tags, int version) {
