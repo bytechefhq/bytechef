@@ -45,10 +45,12 @@ public interface ConnectedUserProjectAdminFacade {
      *                        in the project, if any, since a change of configuration goes through a move
      * @param workflows       the workflows to provision
      * @throws com.bytechef.exception.ConfigurationException with {@code CONFIGURATION_PROJECT_MISMATCH} when the
-     *                                                       configuration belongs to another environment or the
+     *                                                       configuration is disabled, belongs to another environment
+     *                                                       or to a project not released to the connected user, or the
      *                                                       connected user is assigned to another configuration of the
      *                                                       project, and with {@code WORKFLOW_NOT_PROVISIONABLE} when
-     *                                                       the configuration does not release a workflow
+     *                                                       the workflows are empty or the configuration does not
+     *                                                       release one of them
      */
     void provisionProjectWorkflows(
         long connectedUserId, long configurationId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows);

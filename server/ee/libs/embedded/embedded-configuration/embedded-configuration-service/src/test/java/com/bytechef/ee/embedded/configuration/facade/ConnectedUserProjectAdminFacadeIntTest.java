@@ -693,6 +693,97 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .containsExactly(tuple(betaReleasedWorkflowUuid, true));
     }
 
+    @Test
+    void testProvisionOntoDisabledConfigurationThrowsAndAssignsNothing() {
+        givenSlackAutomationWorkflowEnvironment();
+        givenRealPermissionEvaluator();
+
+        long projectId = createProjectWithWorkflows("Provision Disabled", 1);
+
+        publishAndPinProject(projectId);
+
+        AutomationWorkflowProjectConfiguration alphaConfiguration = automationWorkflowProjectConfigurationService
+            .getConfiguration(getConfigurationId(projectId));
+
+        AutomationWorkflowProjectConfiguration disabledConfiguration = automationWorkflowProjectConfigurationService
+            .create(
+                projectId, Environment.PRODUCTION.ordinal(), "Disabled", null, alphaConfiguration.getProjectVersion(),
+                false, true);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        String workflowUuid = findProvisionableProject(
+            connectedUserProjectAdminFacade.getProvisionableProjects(connectedUser.getId()), projectId)
+                .workflows()
+                .getFirst()
+                .workflowUuid();
+
+        assertThatThrownBy(() -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(), disabledConfiguration.getId(),
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null))))
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                    configurationException.getErrorKey())
+                        .isEqualTo(AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH
+                            .getErrorKey()));
+
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(connectedUser.getId(), projectId))
+            .isEmpty();
+        assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
+    }
+
+    @Test
+    void testProvisionIntoProjectWhoseExpressionFailsThrowsAndAssignsNothing() {
+        givenSlackAutomationWorkflowEnvironment();
+        givenRealPermissionEvaluator();
+
+        long projectId = automationWorkflowProjectFacade.createProject(
+            "Provision Gated " + UUID.randomUUID(), "", null, List.of(), "metadata['beta'] == 'true'");
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            projectId, SLACK_WORKFLOW_DEFINITION, null);
+
+        publishAndPinProject(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        assertThat(connectedUserProjectAdminFacade.getProvisionableProjects(connectedUser.getId()))
+            .extracting(ProvisionableAutomationWorkflowProjectDTO::projectId)
+            .doesNotContain(projectId);
+
+        assertThatThrownBy(() -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(), getConfigurationId(projectId),
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null))))
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                    configurationException.getErrorKey())
+                        .isEqualTo(AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH
+                            .getErrorKey()));
+
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(connectedUser.getId(), projectId))
+            .isEmpty();
+        assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
+    }
+
+    @Test
+    void testProvisionWithNoWorkflowsThrows() {
+        givenSlackAutomationWorkflowEnvironment();
+        givenRealPermissionEvaluator();
+
+        long projectId = createProjectWithWorkflows("Provision Nothing", 1);
+
+        publishAndPinProject(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        assertThatThrownBy(() -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(), getConfigurationId(projectId), List.of()))
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                    configurationException.getErrorKey())
+                        .isEqualTo(ConnectedUserProjectWorkflowErrorType.WORKFLOW_NOT_PROVISIONABLE.getErrorKey()));
+
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(connectedUser.getId(), projectId))
+            .isEmpty();
+    }
+
     private AutomationWorkflowProjectConfiguration createBetaConfiguration(long projectId) {
         AutomationWorkflowProjectConfiguration alphaConfiguration = automationWorkflowProjectConfigurationService
             .getConfiguration(getConfigurationId(projectId));
