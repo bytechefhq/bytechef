@@ -40,6 +40,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
@@ -479,6 +480,11 @@ class ConnectionFacadeIntTest {
                 @Override
                 public Map<String, ?> getMetadataMap(long jobPrincipalId) {
                     return Map.of();
+                }
+
+                @Override
+                public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId) {
+                    return new JobPrincipalSummary(0, null, null, null);
                 }
 
                 @Override
