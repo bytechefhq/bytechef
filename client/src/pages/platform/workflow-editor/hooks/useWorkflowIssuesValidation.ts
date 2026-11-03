@@ -44,7 +44,7 @@ export default function useWorkflowIssuesValidation(): void {
                 (connection) =>
                     `${connection.workflowNodeName}|${connection.workflowConnectionKey}|${connection.connectionId}`
             )
-            .sort()
+            .sort((first, second) => first.localeCompare(second))
             .join(',');
     }, [workflowTestConfiguration?.connections, workflowTestConfigurationPending]);
 
