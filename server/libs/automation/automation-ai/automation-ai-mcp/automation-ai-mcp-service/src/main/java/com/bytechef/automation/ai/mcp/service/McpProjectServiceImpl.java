@@ -16,10 +16,13 @@
 
 package com.bytechef.automation.ai.mcp.service;
 
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvents;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.security.McpProjectWorkspaceGuard;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +59,11 @@ public class McpProjectServiceImpl implements McpProjectService {
     // server it is moving to, and the result must still keep server and project in one workspace. Nothing calls it
     // today; the guard keeps a future caller from creating the cross-workspace link createMcpProject refuses.
     @Override
+    @Audited(event = McpProjectAuditEvents.MCP_PROJECT_UPDATED, data = {
+        @AuditData(key = "mcpProjectId", value = "#mcpProject.id"),
+        @AuditData(key = "mcpServerId", value = "#mcpProject.mcpServerId"),
+        @AuditData(key = "projectDeploymentId", value = "#mcpProject.projectDeploymentId")
+    })
     @PreAuthorize("hasPermission(#mcpProject.id, 'McpProject', 'MCP_EDIT') and " +
         "hasPermission(#mcpProject.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpProject update(McpProject mcpProject) {
