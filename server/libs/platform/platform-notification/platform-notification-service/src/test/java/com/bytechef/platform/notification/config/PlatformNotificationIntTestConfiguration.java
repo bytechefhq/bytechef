@@ -17,6 +17,7 @@
 package com.bytechef.platform.notification.config;
 
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
@@ -91,6 +92,7 @@ public class PlatformNotificationIntTestConfiguration {
         protected List<?> userConverters() {
             return Arrays.asList(
                 new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
                 new MapWrapperToStringConverter(objectMapper),
                 new StringToMapWrapperConverter(objectMapper));
         }

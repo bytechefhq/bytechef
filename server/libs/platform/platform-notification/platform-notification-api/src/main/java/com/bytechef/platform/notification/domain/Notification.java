@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.notification.domain;
 
+import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.Instant;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Matija Petanjek
@@ -56,6 +58,9 @@ public class Notification {
 
     @Column
     private MapWrapper settings;
+
+    @Column("secret_settings")
+    private EncryptedMapWrapper secretSettings;
 
     @MappedCollection(idColumn = "notification_id")
     private Set<NotificationNotificationEvent> notificationEvents = new HashSet<>();
@@ -93,6 +98,29 @@ public class Notification {
 
     public Map<String, Object> getSettings() {
         return Collections.unmodifiableMap(settings.getMap());
+    }
+
+    public Map<String, Object> getSecretSettings() {
+        if (secretSettings == null) {
+            return Collections.emptyMap();
+        }
+
+        return Collections.unmodifiableMap(secretSettings.getMap());
+    }
+
+    /**
+     * Returns the value of a setting, looking in the encrypted secret settings first and in the plain settings second.
+     */
+    @Nullable
+    public Object getSetting(String key) {
+        Map<String, Object> secrets = getSecretSettings();
+
+        if (secrets.containsKey(key)) {
+            return secrets.get(key);
+        }
+
+        return settings == null ? null : settings.getMap()
+            .get(key);
     }
 
     public List<Long> getNotificationEventIds() {
@@ -135,6 +163,10 @@ public class Notification {
 
     public void setSettings(Map<String, ?> settings) {
         this.settings = new MapWrapper(settings);
+    }
+
+    public void setSecretSettings(Map<String, ?> secretSettings) {
+        this.secretSettings = new EncryptedMapWrapper(secretSettings);
     }
 
     public void setNotificationEventIds(List<Long> notificationEventIds) {
