@@ -120,6 +120,7 @@ class AuditDataContractTest {
         Map.entry("ConnectedUserConnectionFacadeImpl.updateIntegrationInstanceConnectionCredentials",
             RECORDED_BY_CALLER),
         Map.entry("ConnectionAdminFacadeImpl.updateConnectionTags", TAGS),
+        Map.entry("ConnectionReassignmentFacadeImpl.markConnectionsPendingReassignment", DELEGATES),
         Map.entry("CustomRoleFacadeImpl.createCustomRole", DELEGATES),
         Map.entry("CustomRoleFacadeImpl.deleteCustomRole", DELEGATES),
         Map.entry("CustomRoleFacadeImpl.updateCustomRole", DELEGATES),
