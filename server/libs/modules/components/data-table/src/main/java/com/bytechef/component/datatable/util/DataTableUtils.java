@@ -148,10 +148,12 @@ public final class DataTableUtils {
         return array(CONDITIONS)
             .label("OR Conditions")
             .placeholder("Add OR Condition")
+            .expressionEnabled(false)
             .items(
                 array()
                     .label("AND Condition")
                     .placeholder("Add AND Condition")
+                    .expressionEnabled(false)
                     .description("AND Condition array that contains the conditions a record must all meet")
                     .items(
                         object()

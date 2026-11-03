@@ -17,6 +17,7 @@
 package com.bytechef.component.datatable.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,8 +26,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ArrayProperty;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
@@ -47,6 +51,18 @@ import org.junit.jupiter.api.Test;
  * @author Ivica Cardic
  */
 class DataTableUtilsTest {
+
+    @Test
+    void testConditionsPropertyDisablesExpressionsOnTheOrAndAndConditionArrays() {
+        ModifiableArrayProperty conditionsProperty = DataTableUtils.conditionsProperty(mock(DataTableService.class));
+
+        List<? extends ValueProperty<?>> items = conditionsProperty.getItems();
+
+        ArrayProperty andConditionProperty = (ArrayProperty) items.getFirst();
+
+        assertFalse(conditionsProperty.getExpressionEnabled());
+        assertFalse(andConditionProperty.getExpressionEnabled());
+    }
 
     @Test
     void testActionColumnOptionsOfferTheRowIdFirstAndFilterItBySearchText() throws Exception {
