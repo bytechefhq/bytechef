@@ -8,6 +8,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-jackson")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:config:app-config"))
+    implementation(project(":server:libs:config:cache-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:libs:core:tenant:tenant-api"))

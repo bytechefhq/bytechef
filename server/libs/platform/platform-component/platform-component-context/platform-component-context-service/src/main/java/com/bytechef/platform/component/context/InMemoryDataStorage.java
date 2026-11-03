@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.ValueTagUtils;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -35,7 +36,7 @@ import org.springframework.cache.CacheManager;
  */
 class InMemoryDataStorage {
 
-    private static final String CACHE = InMemoryDataStorage.class.getName() + ".dataStorage";
+    static final String CACHE = InMemoryDataStorage.class.getName() + ".dataStorage";
 
     private final CacheManager cacheManager;
 
@@ -48,23 +49,27 @@ class InMemoryDataStorage {
     }
 
     public void delete(String componentName, DataStorageScope scope, String scopeId, String key) {
-        Map<String, Object> map = getValueMap(componentName, scope, scopeId);
+        Map<String, Object> valueMap = getValueMap(componentName, scope, scopeId);
 
-        map.remove(key);
+        if (valueMap.containsKey(key)) {
+            valueMap.remove(key);
+
+            putValueMap(componentName, scope, scopeId, valueMap);
+        }
     }
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> fetch(String componentName, DataStorageScope scope, String scopeId, String key) {
-        Map<String, Object> map = getValueMap(componentName, scope, scopeId);
+        Map<String, Object> valueMap = getValueMap(componentName, scope, scopeId);
 
-        return Optional.ofNullable((T) map.get(key));
+        return Optional.ofNullable((T) valueMap.get(key));
     }
 
     @SuppressWarnings("unchecked")
     public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key) {
-        Map<String, Object> map = getValueMap(componentName, scope, scopeId);
+        Map<String, Object> valueMap = getValueMap(componentName, scope, scopeId);
 
-        return (T) map.get(key);
+        return (T) valueMap.get(key);
     }
 
     @SuppressWarnings("unchecked")
@@ -81,9 +86,19 @@ class InMemoryDataStorage {
                 ComponentErrorType.DATA_STORAGE_SIZE_EXCEEDED);
         }
 
-        Map<String, Object> map = getValueMap(componentName, scope, scopeId);
+        Map<String, Object> valueMap = getValueMap(componentName, scope, scopeId);
 
-        map.put(key, value);
+        valueMap.put(key, value);
+
+        putValueMap(componentName, scope, scopeId, valueMap);
+    }
+
+    private Cache getCache() {
+        return Objects.requireNonNull(cacheManager.getCache(CACHE), CACHE);
+    }
+
+    private String getCacheKey(String componentName, DataStorageScope scope, String scopeId) {
+        return TenantCacheKeyUtils.getKey(workflowUuid, componentName, scope, scopeId);
     }
 
     private int getSizeInBytes(Object value) {
@@ -98,12 +113,24 @@ class InMemoryDataStorage {
         return JsonUtils.writeValueAsBytes(value).length;
     }
 
-    private Map<String, Object> getValueMap(
-        String componentName, DataStorageScope scope, String scopeId) {
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getValueMap(String componentName, DataStorageScope scope, String scopeId) {
+        Cache cache = getCache();
 
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE), CACHE);
+        Map<String, ?> taggedValueMap = cache.get(getCacheKey(componentName, scope, scopeId), Map.class);
 
-        return Objects.requireNonNull(
-            cache.get(TenantCacheKeyUtils.getKey(workflowUuid, componentName, scope, scopeId), HashMap::new));
+        if (taggedValueMap == null) {
+            return new HashMap<>();
+        }
+
+        return new HashMap<>(ValueTagUtils.untagMap(taggedValueMap));
+    }
+
+    private void putValueMap(
+        String componentName, DataStorageScope scope, String scopeId, Map<String, Object> valueMap) {
+
+        Cache cache = getCache();
+
+        cache.put(getCacheKey(componentName, scope, scopeId), ValueTagUtils.tag(valueMap));
     }
 }
