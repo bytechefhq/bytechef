@@ -3,6 +3,7 @@ import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} fro
 import {createTestQueryClientWrapper, screen, userEvent} from '@/shared/util/test-utils';
 import {render} from '@testing-library/react';
 import {ReactElement, ReactNode} from 'react';
+import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectList from '../components/automation-workflow-project-list/AutomationWorkflowProjectList';
@@ -18,13 +19,15 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     }),
 }));
 
-const renderWithProviders = (ui: ReactElement) => {
+const renderWithProviders = (ui: ReactElement, initialEntries = ['/embedded/automation-workflows']) => {
     const QueryClientWrapper = createTestQueryClientWrapper();
 
     const wrapper = ({children}: {children: ReactNode}) => (
-        <QueryClientWrapper>
-            <TooltipProvider>{children}</TooltipProvider>
-        </QueryClientWrapper>
+        <MemoryRouter initialEntries={initialEntries}>
+            <QueryClientWrapper>
+                <TooltipProvider>{children}</TooltipProvider>
+            </QueryClientWrapper>
+        </MemoryRouter>
     );
 
     return render(ui, {wrapper});
@@ -274,6 +277,29 @@ describe('AutomationWorkflowProjectList', () => {
         await user.click(liveTabs[liveTabs.length - 1]);
 
         expect(await screen.findByRole('button', {name: 'New Configuration'})).toBeEnabled();
+    });
+
+    it('opens the project on its Configurations tab from the projectId and tab parameters', () => {
+        const projects = [
+            makeProject({id: 'other', name: 'Other Project'}),
+            makeProject({
+                configurationCount: 1,
+                id: 'live',
+                lastPublishedVersion: 1,
+                name: 'Live Project',
+                published: true,
+            }),
+        ];
+
+        renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />, [
+            '/embedded/automation-workflows?projectId=live&tab=configurations',
+        ]);
+
+        const configurationsTabs = screen.getAllByRole('tab', {name: 'Configurations'});
+
+        expect(configurationsTabs).toHaveLength(1);
+        expect(configurationsTabs[0]).toHaveAttribute('aria-selected', 'true');
+        expect(screen.getByRole('button', {name: 'New Configuration'})).toBeInTheDocument();
     });
 
     it('expands a project to show its workflows and navigates on click', async () => {

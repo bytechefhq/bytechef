@@ -71,8 +71,6 @@ export function AppSidebar({navigation}: AppSidebarProps) {
 
     const isOnPath = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
-    // Projects and integrations (and their workflow editors) only exist in development, so leaving
-    // development moves the user to the environment-scoped deployments/configurations page instead.
     const handleEnvironmentChange = (environmentId: number) => {
         if (environmentId === DEVELOPMENT_ENVIRONMENT) {
             return;
@@ -82,6 +80,8 @@ export function AppSidebar({navigation}: AppSidebarProps) {
             navigate('/automation/deployments');
         } else if (isOnPath('/embedded/integrations')) {
             navigate('/embedded/configurations');
+        } else if (isOnPath('/embedded/automation-workflows')) {
+            navigate('/embedded/automation-configurations');
         }
     };
 

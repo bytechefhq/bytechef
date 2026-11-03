@@ -6,6 +6,7 @@ import AutomationWorkflowProjectConfigurationList from '../AutomationWorkflowPro
 
 const mocks = vi.hoisted(() => ({
     configurations: [] as unknown[],
+    configurationsVariables: undefined as unknown,
     deleteMutate: vi.fn(),
     invalidateQueries: vi.fn(),
 }));
@@ -25,9 +26,11 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         data: {automationWorkflowProjectConfigurationDeleteImpact: {connectedUserCount: 0, referenceWorkflowCount: 0}},
         isError: false,
     }),
-    useAutomationWorkflowProjectConfigurationsQuery: () => ({
-        data: {automationWorkflowProjectConfigurations: mocks.configurations},
-    }),
+    useAutomationWorkflowProjectConfigurationsQuery: (variables: unknown) => {
+        mocks.configurationsVariables = variables;
+
+        return {data: {automationWorkflowProjectConfigurations: mocks.configurations}};
+    },
     useDeleteAutomationWorkflowProjectConfigurationMutation: (options?: {onSuccess?: () => void}) => ({
         isPending: false,
         mutate: (variables: {id: string}) => {
@@ -79,6 +82,7 @@ const renderList = (onEdit = vi.fn(), projectOverrides: Partial<typeof project> 
     render(
         <TooltipProvider>
             <AutomationWorkflowProjectConfigurationList
+                environmentId={2}
                 onCreate={onCreate}
                 onEdit={onEdit}
                 onUpdateVersion={vi.fn()}
@@ -92,6 +96,13 @@ describe('AutomationWorkflowProjectConfigurationList', () => {
         windowResizeObserver();
 
         mocks.configurations = [];
+        mocks.configurationsVariables = undefined;
+    });
+
+    it('loads only the configurations of the given environment', () => {
+        renderList();
+
+        expect(mocks.configurationsVariables).toEqual({environmentId: '2', projectId: 'project-1'});
     });
 
     afterEach(() => {

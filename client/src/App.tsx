@@ -134,6 +134,11 @@ const embeddedNavigation: NavigationType[] = [
         icon: Workflow,
         name: 'Automations',
     },
+    {
+        href: '/embedded/automation-configurations',
+        icon: Settings2Icon,
+        name: 'Automation Configurations',
+    },
     {href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
     {
         href: '/embedded/connected-users',
@@ -237,7 +242,18 @@ function App() {
             return false;
         }
 
+        if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT && navItem.href === '/embedded/automation-workflows') {
+            return false;
+        }
+
         if (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && navItem.href === '/embedded/configurations') {
+            return false;
+        }
+
+        if (
+            currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
+            navItem.href === '/embedded/automation-configurations'
+        ) {
             return false;
         }
 

@@ -7,6 +7,7 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectTagsQuery,
@@ -14,6 +15,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {ChevronDownIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 
 import AutomationWorkflowProjectConfigurationDialog from '../automation-workflow-project-configuration-dialog/AutomationWorkflowProjectConfigurationDialog';
 import AutomationWorkflowProjectConfigurationList from '../automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationList';
@@ -57,7 +59,13 @@ const AutomationWorkflowProjectList = ({
     projects,
     tags,
 }: AutomationWorkflowProjectListProps) => {
-    const [activeTabs, setActiveTabs] = useState<Record<string, AutomationWorkflowProjectListItemTabType>>({});
+    const [searchParams] = useSearchParams();
+
+    const [activeTabs, setActiveTabs] = useState<Record<string, AutomationWorkflowProjectListItemTabType>>(() => {
+        const projectId = searchParams.get('projectId');
+
+        return projectId && searchParams.get('tab') === 'configurations' ? {[projectId]: 'configurations'} : {};
+    });
     const [configurationDialog, setConfigurationDialog] = useState<
         | {
               configuration?: AutomationWorkflowProjectConfigurationType;
@@ -66,7 +74,11 @@ const AutomationWorkflowProjectList = ({
           }
         | undefined
     >();
-    const [openProjectIds, setOpenProjectIds] = useState<Set<string>>(new Set());
+    const [openProjectIds, setOpenProjectIds] = useState<Set<string>>(() => {
+        const projectId = searchParams.get('projectId');
+
+        return new Set(projectId ? [projectId] : []);
+    });
 
     useEffect(() => {
         if (newlyCreatedProjectId) {
@@ -168,6 +180,7 @@ const AutomationWorkflowProjectList = ({
                             activeTab={activeTabs[project.id] || 'workflows'}
                             configurationsContent={
                                 <AutomationWorkflowProjectConfigurationList
+                                    environmentId={DEVELOPMENT_ENVIRONMENT}
                                     onCreate={() => setConfigurationDialog({project})}
                                     onEdit={(configuration) => setConfigurationDialog({configuration, project})}
                                     onUpdateVersion={(configuration) =>

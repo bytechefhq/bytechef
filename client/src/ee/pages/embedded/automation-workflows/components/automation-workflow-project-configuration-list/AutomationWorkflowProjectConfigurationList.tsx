@@ -17,6 +17,7 @@ type AutomationWorkflowProjectConfigurationType =
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 
 interface AutomationWorkflowProjectConfigurationListProps {
+    environmentId: number;
     onCreate: () => void;
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationWorkflowProjectConfigurationType) => void;
@@ -24,6 +25,7 @@ interface AutomationWorkflowProjectConfigurationListProps {
 }
 
 const AutomationWorkflowProjectConfigurationList = ({
+    environmentId,
     onCreate,
     onEdit,
     onUpdateVersion,
@@ -32,7 +34,10 @@ const AutomationWorkflowProjectConfigurationList = ({
     const queryClient = useQueryClient();
 
     const {data: environments} = useGetEnvironmentsQuery();
-    const {data: configurationsData} = useAutomationWorkflowProjectConfigurationsQuery({projectId: project.id});
+    const {data: configurationsData} = useAutomationWorkflowProjectConfigurationsQuery({
+        environmentId: String(environmentId),
+        projectId: project.id,
+    });
 
     const deleteConfigurationMutation = useDeleteAutomationWorkflowProjectConfigurationMutation({
         onSuccess: () => {
