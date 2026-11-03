@@ -9,6 +9,7 @@ import {
     MoveIntegrationInstanceConfigurationConnectedUsersRequest,
     UpdateIntegrationInstanceConfigurationTagsRequest,
     UpdateIntegrationTagsRequest,
+    UpgradeIntegrationInstanceConfigurationConnectedUsersRequest,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -149,6 +150,27 @@ export const useMoveIntegrationInstanceConfigurationConnectedUsersMutation = (
     useMutation({
         mutationFn: (request: MoveIntegrationInstanceConfigurationConnectedUsersRequest) => {
             return new IntegrationInstanceConfigurationApi().moveIntegrationInstanceConfigurationConnectedUsers(
+                request
+            );
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface UpgradeIntegrationInstanceConfigurationConnectedUsersMutationProps {
+    onSuccess?: (
+        result: ConfigurationMoveResult,
+        variables: UpgradeIntegrationInstanceConfigurationConnectedUsersRequest
+    ) => void;
+    onError?: (error: Error, variables: UpgradeIntegrationInstanceConfigurationConnectedUsersRequest) => void;
+}
+
+export const useUpgradeIntegrationInstanceConfigurationConnectedUsersMutation = (
+    mutationProps?: UpgradeIntegrationInstanceConfigurationConnectedUsersMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: UpgradeIntegrationInstanceConfigurationConnectedUsersRequest) => {
+            return new IntegrationInstanceConfigurationApi().upgradeIntegrationInstanceConfigurationConnectedUsers(
                 request
             );
         },
