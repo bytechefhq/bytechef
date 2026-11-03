@@ -127,6 +127,7 @@ class AuditDataContractTest {
         Map.entry("EditorLogFileStorageImpl.logsExist", EXISTENCE_CHECK),
         Map.entry("EmbeddedApiKeyFacadeImpl.createApiKey", DELEGATES),
         Map.entry("EmbeddedApiKeyFacadeImpl.deleteApiKey", DELEGATES),
+        Map.entry("EmbeddedApiKeyFacadeImpl.updateApiKey", DELEGATES),
         Map.entry("EmbeddedGettingStartedFacadeImpl.dismissEmbeddedGettingStarted", GETTING_STARTED_DISMISSAL),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
