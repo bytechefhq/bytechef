@@ -355,6 +355,8 @@ const PropertyComboBox = ({
         }));
     }, [workflowNodeOptions, clusterElementNodeOptions, clusterElementOptions, initialOptions]);
 
+    const refetchingWithoutOptions = (isRefetching || isClusterElementNodeOptionsRefetching) && !options.length;
+
     const currentOption = useMemo(
         () => (options as Array<ComboBoxItemType>)?.find((option) => String(option.value) === String(value)),
         [options, value]
@@ -600,13 +602,11 @@ const PropertyComboBox = ({
                                 </div>
                             )}
 
-                            {lookupDependsOnValues &&
-                                (isRefetching || isClusterElementNodeOptionsRefetching) &&
-                                !currentOption?.label && (
-                                    <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
-                                        <LoadingIcon /> Refetching...
-                                    </span>
-                                )}
+                            {lookupDependsOnValues && refetchingWithoutOptions && !currentOption?.label && (
+                                <span className={twMerge('flex items-center', leadingIcon && 'ml-9')}>
+                                    <LoadingIcon /> Refetching...
+                                </span>
+                            )}
 
                             {(lookupDependsOnValues && (isLoading || isClusterElementNodeOptionsLoading)) ||
                             isClusterElementOptionsLoading ? (
@@ -636,7 +636,7 @@ const PropertyComboBox = ({
                                             {currentOption?.label}
                                         </span>
                                     ) : (
-                                        !(isRefetching || isClusterElementNodeOptionsRefetching) && (
+                                        !refetchingWithoutOptions && (
                                             <span className={placeholderClassName}>
                                                 {defaultOptionLabel
                                                     ? `Default (${defaultOptionLabel})`

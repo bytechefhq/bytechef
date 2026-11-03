@@ -8,6 +8,7 @@ const hoisted = vi.hoisted(() => ({
     mockClusterElementOptionsQuery: vi.fn(),
     mockNodeDetailsPanelStore: vi.fn(),
     mockOnValueChange: vi.fn(),
+    mockWorkflowNodeOptionsQuery: vi.fn(),
 }));
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
@@ -30,11 +31,7 @@ vi.mock('@/shared/queries/platform/workflowNodeOptions.queries', () => ({
         isLoading: false,
         isRefetching: false,
     }),
-    useGetWorkflowNodeOptionsQuery: () => ({
-        data: undefined,
-        isLoading: false,
-        isRefetching: false,
-    }),
+    useGetWorkflowNodeOptionsQuery: () => hoisted.mockWorkflowNodeOptionsQuery(),
 }));
 
 vi.mock('react-inlinesvg', () => ({
@@ -64,6 +61,8 @@ beforeEach(() => {
     hoisted.mockClusterElementContext.mockReturnValue(undefined);
 
     hoisted.mockClusterElementOptionsQuery.mockReturnValue({data: undefined, isLoading: false});
+
+    hoisted.mockWorkflowNodeOptionsQuery.mockReturnValue({data: undefined, isLoading: false, isRefetching: false});
 });
 
 afterEach(() => {
@@ -426,6 +425,47 @@ describe('PropertyComboBox', () => {
             expect(screen.getByText('Alpha')).toBeInTheDocument();
             expect(screen.getByText('Beta')).toBeInTheDocument();
             expect(screen.getByText('Gamma')).toBeInTheDocument();
+        });
+    });
+
+    describe('workflow node options refetch', () => {
+        const lookupProps = {
+            ...defaultProps,
+            lookupDependsOnPaths: ['table'],
+            lookupDependsOnValues: ['orders'],
+            options: [],
+            optionsDataSource: {},
+            path: 'conditions[0][1].column',
+        };
+
+        it('keeps showing the placeholder while options it already loaded are refetched', () => {
+            hoisted.mockWorkflowNodeOptionsQuery.mockReturnValue({
+                data: [
+                    {label: 'customer', value: 'customer'},
+                    {label: 'qty', value: 'qty'},
+                ],
+                isLoading: false,
+                isRefetching: true,
+            });
+
+            render(<PropertyComboBox {...lookupProps} />);
+
+            expect(screen.queryByText('Refetching...')).not.toBeInTheDocument();
+            expect(screen.getByText('Select...')).toBeInTheDocument();
+            expect(screen.getByRole('combobox')).toBeEnabled();
+        });
+
+        it('shows refetching while no options have been loaded yet', () => {
+            hoisted.mockWorkflowNodeOptionsQuery.mockReturnValue({
+                data: undefined,
+                isLoading: false,
+                isRefetching: true,
+            });
+
+            render(<PropertyComboBox {...lookupProps} />);
+
+            expect(screen.getByText('Refetching...')).toBeInTheDocument();
+            expect(screen.queryByText('Select...')).not.toBeInTheDocument();
         });
     });
 
