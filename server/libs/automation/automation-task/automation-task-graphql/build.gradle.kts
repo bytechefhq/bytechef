@@ -19,4 +19,5 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
 }
