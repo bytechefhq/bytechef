@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -141,7 +142,7 @@ class ArrayPropertyValidator {
         StringBuilder warnings) {
 
         DisplayConditionResult displayConditionResult = DisplayConditionEvaluator.evaluateForArrayElement(
-            propertyInfo.displayCondition(), index, rootParametersJsonNode);
+            propertyInfo.displayCondition(), propertyPath, index, rootParametersJsonNode);
 
         if (!displayConditionResult.shouldShow()) {
             StringUtils.appendWithNewline(
@@ -153,7 +154,30 @@ class ArrayPropertyValidator {
     private static JsonNode createRootParametersJsonNode(JsonNode arrayValue, String propertyPath) {
         ObjectNode rootNode = com.bytechef.commons.util.JsonUtils.createObjectNode();
 
-        rootNode.set(propertyPath, arrayValue);
+        int bracketPosition = propertyPath.indexOf('[');
+
+        if (bracketPosition < 0) {
+            rootNode.set(propertyPath, arrayValue);
+
+            return rootNode;
+        }
+
+        List<Integer> indexes = DisplayConditionEvaluator.getArrayIndexes(propertyPath);
+        JsonNode nestedJsonNode = arrayValue;
+
+        for (int level = indexes.size() - 1; level >= 0; level--) {
+            ArrayNode parentArrayNode = rootNode.arrayNode();
+
+            for (int position = 0; position < indexes.get(level); position++) {
+                parentArrayNode.addNull();
+            }
+
+            parentArrayNode.add(nestedJsonNode);
+
+            nestedJsonNode = parentArrayNode;
+        }
+
+        rootNode.set(propertyPath.substring(0, bracketPosition), nestedJsonNode);
 
         return rootNode;
     }
@@ -385,7 +409,8 @@ class ArrayPropertyValidator {
         boolean isRequired = propertyInfo.required();
 
         DisplayConditionResult displayConditionResult = DisplayConditionEvaluator.evaluateForArrayElement(
-            propertyInfo.displayCondition(), index, rootParametersJsonNode);
+            propertyInfo.displayCondition(), elementPath.substring(0, elementPath.lastIndexOf('[')), index,
+            rootParametersJsonNode);
 
         if (displayConditionResult.shouldShow()) {
             if (isRequired && !elementJsonNode.has(fieldName)) {
