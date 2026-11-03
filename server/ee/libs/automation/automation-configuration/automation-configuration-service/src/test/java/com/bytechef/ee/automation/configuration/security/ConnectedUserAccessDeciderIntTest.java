@@ -75,6 +75,7 @@ import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissio
 import com.bytechef.ee.automation.configuration.security.scope.WorkspacePermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
+import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
@@ -477,7 +478,7 @@ class ConnectedUserAccessDeciderIntTest {
             ProjectOwnershipResolver.class,
             ProjectPermissionScopeProvider.class, ProjectServiceImpl.class, ProjectWorkflowServiceImpl.class,
             WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
-            WorkspaceScopeCacheService.class
+            WorkspaceScopeCacheService.class, EmbeddedScopeCacheService.class
         })
         static class ConnectedUserOwnershipConfiguration {
 
@@ -771,7 +772,7 @@ class ConnectedUserAccessDeciderIntTest {
             ProjectDeploymentWorkflowServiceImpl.class, ProjectOwnershipResolver.class,
             ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectServiceImpl.class,
             ProjectWorkflowCallback.class, ProjectWorkflowServiceImpl.class, WorkflowPermissionScopeProvider.class,
-            WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
+            WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class, EmbeddedScopeCacheService.class
         })
         static class ConnectedUserBuilderFlowConfiguration {
 

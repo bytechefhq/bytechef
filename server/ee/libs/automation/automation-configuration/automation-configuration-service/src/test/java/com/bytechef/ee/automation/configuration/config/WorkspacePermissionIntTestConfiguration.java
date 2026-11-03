@@ -26,9 +26,10 @@ import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScop
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolver;
+import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.user.repository.AuthorityRepository;
@@ -69,10 +70,11 @@ import tools.jackson.databind.ObjectMapper;
 @Import({
     A2aPermissionScopeProvider.class, ApiKeyPermissionScopeProvider.class, CacheConfiguration.class,
     ConnectionPermissionScopeProvider.class, CurrentUserResolver.class, DeploymentPermissionScopeProvider.class,
-    EmbeddedOwnerContributorsTestConfiguration.class, ExecutionPermissionScopeProvider.class,
-    LiquibaseConfiguration.class, McpPermissionScopeProvider.class, PermissionScopeRegistry.class,
-    PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class, ProjectCallback.class,
-    ProjectPermissionScopeProvider.class, ProjectWorkflowCallback.class, WorkflowPermissionScopeProvider.class,
+    EmbeddedOwnerContributorsTestConfiguration.class, EmbeddedScopeCacheService.class,
+    ExecutionPermissionScopeProvider.class, LiquibaseConfiguration.class, McpPermissionScopeProvider.class,
+    PermissionScopeRegistry.class, PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class,
+    ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectWorkflowCallback.class,
+    WorkflowPermissionScopeProvider.class,
     WorkspacePermissionIntTestConfiguration.WorkspacePermissionJdbcConfiguration.class,
     WorkspaceScopeCache.class, WorkspaceUserAuditMapper.class
 })
