@@ -20,11 +20,16 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.audit.AutomationWorkflowProjectAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDeleteImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
@@ -32,6 +37,10 @@ import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjec
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
@@ -62,11 +71,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @version ee
@@ -80,44 +95,64 @@ import org.springframework.transaction.annotation.Transactional;
 public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     implements AutomationWorkflowProjectConfigurationAdminFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(
+        AutomationWorkflowProjectConfigurationAdminFacadeImpl.class);
+
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
+    private final ConnectedUserProjectService connectedUserProjectService;
+    private final ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
+    private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
+    private final ConnectedUserService connectedUserService;
     private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
     private final ConnectionService connectionService;
     private final JobService jobService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
+    private final TransactionTemplate requiresNewTransactionTemplate;
     private final WorkflowConnectionSlot workflowConnectionSlot;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectConfigurationAdminFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher,
+        AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         ComponentDefinitionFacade componentDefinitionFacade, ComponentDefinitionService componentDefinitionService,
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService,
+        ConnectedUserProjectService connectedUserProjectService,
+        ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
+        ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
+        ConnectedUserService connectedUserService,
         ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
-        ConnectionService connectionService, JobService jobService, ProjectService projectService,
+        ConnectionService connectionService, JobService jobService,
+        PlatformTransactionManager platformTransactionManager, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
         WorkflowConnectionSlot workflowConnectionSlot, WorkflowService workflowService) {
 
         this.applicationEventPublisher = applicationEventPublisher;
+        this.automationWorkflowProjectConfigurationResolver = automationWorkflowProjectConfigurationResolver;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.componentDefinitionFacade = componentDefinitionFacade;
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserProjectConfigurationService = connectedUserProjectConfigurationService;
+        this.connectedUserProjectService = connectedUserProjectService;
+        this.connectedUserReferenceAttentionResolver = connectedUserReferenceAttentionResolver;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
+        this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
+        this.connectedUserService = connectedUserService;
         this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
         this.connectionService = connectionService;
         this.jobService = jobService;
@@ -125,6 +160,12 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         this.projectWorkflowService = projectWorkflowService;
         this.workflowConnectionSlot = workflowConnectionSlot;
         this.workflowService = workflowService;
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        this.requiresNewTransactionTemplate = transactionTemplate;
     }
 
     @Override
@@ -234,6 +275,29 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    public List<AutomationWorkflowProjectConfigurationConnectedUserDTO> getConfigurationConnectedUsers(long id) {
+        automationWorkflowProjectConfigurationService.getConfiguration(id);
+
+        List<Long> connectedUserIds = getAssignedConnectedUserIds(id)
+            .stream()
+            .sorted()
+            .toList();
+
+        if (connectedUserIds.isEmpty()) {
+            return List.of();
+        }
+
+        return connectedUserService.getConnectedUsers(connectedUserIds)
+            .stream()
+            .sorted(Comparator.comparing(ConnectedUser::getId))
+            .map(connectedUser -> new AutomationWorkflowProjectConfigurationConnectedUserDTO(
+                connectedUser.getId(), connectedUser.getExternalId(), connectedUser.getName(),
+                connectedUser.getEmail()))
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId) {
         List<AutomationWorkflowProjectConfiguration> configurations =
             automationWorkflowProjectConfigurationService.getConfigurations(projectId);
@@ -328,11 +392,98 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    public AutomationWorkflowProjectConfigurationVersionImpactDTO getMoveImpact(
+        long sourceId, long targetId, List<Long> connectedUserIds) {
+
+        AutomationWorkflowProjectConfiguration sourceConfiguration =
+            automationWorkflowProjectConfigurationService.getConfiguration(sourceId);
+        AutomationWorkflowProjectConfiguration targetConfiguration =
+            automationWorkflowProjectConfigurationService.getConfiguration(targetId);
+
+        validateSameProjectAndEnvironment(sourceConfiguration, targetConfiguration);
+
+        Set<Long> movedConnectedUserIds = new HashSet<>(connectedUserIds);
+
+        movedConnectedUserIds.retainAll(getAssignedConnectedUserIds(sourceId));
+
+        return getVersionImpact(sourceConfiguration, targetConfiguration.getProjectVersion(), movedConnectedUserIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(
         long configurationId, int projectVersion) {
 
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(configurationId);
+
+        return getVersionImpact(configuration, projectVersion, getAssignedConnectedUserIds(configurationId));
+    }
+
+    @Override
+    @Audited(
+        event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_CONNECTED_USERS_MOVED,
+        data = {
+            @AuditData(key = "sourceConfigurationId", value = "#sourceId"),
+            @AuditData(key = "targetConfigurationId", value = "#targetId"),
+            @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
+        })
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConfigurationMoveResultDTO moveConnectedUsers(long sourceId, long targetId, List<Long> connectedUserIds) {
+        if (sourceId == targetId) {
+            throw new IllegalArgumentException("The source and target configurations must differ");
+        }
+
+        AutomationWorkflowProjectConfiguration sourceConfiguration =
+            automationWorkflowProjectConfigurationService.getConfiguration(sourceId);
+        AutomationWorkflowProjectConfiguration targetConfiguration =
+            automationWorkflowProjectConfigurationService.getConfiguration(targetId);
+
+        validateSameProjectAndEnvironment(sourceConfiguration, targetConfiguration);
+
+        Map<String, Set<String>> removedProvidedInputNames = getRemovedProvidedInputNames(
+            sourceConfiguration, targetConfiguration);
+
+        List<Long> movedConnectedUserIds = new ArrayList<>();
+        List<Long> needsAttentionConnectedUserIds = new ArrayList<>();
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
+
+        for (long connectedUserId : getSortedDistinct(connectedUserIds)) {
+            MoveOutcome moveOutcome;
+
+            try {
+                moveOutcome = requiresNewTransactionTemplate.execute(
+                    status -> moveConnectedUser(
+                        connectedUserId, sourceConfiguration, targetConfiguration, removedProvidedInputNames));
+            } catch (RuntimeException exception) {
+                log.error(
+                    "Moving connected user id={} from configuration id={} to id={} failed", connectedUserId, sourceId,
+                    targetId, exception);
+
+                moveOutcome = MoveOutcome.skipped(
+                    connectedUserId, ConfigurationMoveResultDTO.Skipped.MOVE_FAILED, List.of());
+            }
+
+            Objects.requireNonNull(moveOutcome);
+
+            if (moveOutcome.skipped() != null) {
+                skipped.add(moveOutcome.skipped());
+
+                continue;
+            }
+
+            movedConnectedUserIds.add(connectedUserId);
+
+            if (moveOutcome.needsAttention()) {
+                needsAttentionConnectedUserIds.add(connectedUserId);
+            }
+        }
+
+        return new ConfigurationMoveResultDTO(movedConnectedUserIds, skipped, needsAttentionConnectedUserIds);
+    }
+
+    private AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(
+        AutomationWorkflowProjectConfiguration configuration, int projectVersion, Set<Long> connectedUserIds) {
 
         Map<String, ProjectWorkflow> currentProjectWorkflows = projectWorkflowService
             .getProjectWorkflows(configuration.getProjectId(), configuration.getProjectVersion())
@@ -374,7 +525,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         }
 
         Map<String, List<ConnectedUserWorkflowReferenceDTO>> referencesByWorkflowUuid = getTurnedOnReferences(
-            configuration,
+            configuration, connectedUserIds,
             workflowChanges.stream()
                 .map(WorkflowChange::workflowUuid)
                 .collect(Collectors.toSet()));
@@ -671,9 +822,9 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     private Map<String, List<ConnectedUserWorkflowReferenceDTO>> getTurnedOnReferences(
-        AutomationWorkflowProjectConfiguration configuration, Set<String> workflowUuids) {
+        AutomationWorkflowProjectConfiguration configuration, Set<Long> connectedUserIds, Set<String> workflowUuids) {
 
-        return getAssignedUsersReferences(configuration, workflowUuids)
+        return getUsersReferences(configuration, connectedUserIds, workflowUuids)
             .stream()
             .filter(reference -> reference.enabled() && !reference.dangling())
             .collect(Collectors.groupingBy(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid));
@@ -686,9 +837,16 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     private List<ConnectedUserWorkflowReferenceDTO> getAssignedUsersReferences(
         AutomationWorkflowProjectConfiguration configuration, Set<String> workflowUuids) {
 
-        Set<Long> assignedConnectedUserIds = getAssignedConnectedUserIds(configuration.getId());
+        return getUsersReferences(configuration, getAssignedConnectedUserIds(configuration.getId()), workflowUuids);
+    }
 
-        if (assignedConnectedUserIds.isEmpty() || workflowUuids.isEmpty()) {
+    /**
+     * Returns the references the given connected users hold to the workflows in the configuration's environment.
+     */
+    private List<ConnectedUserWorkflowReferenceDTO> getUsersReferences(
+        AutomationWorkflowProjectConfiguration configuration, Set<Long> connectedUserIds, Set<String> workflowUuids) {
+
+        if (connectedUserIds.isEmpty() || workflowUuids.isEmpty()) {
             return List.of();
         }
 
@@ -696,7 +854,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
             .stream()
-            .filter(reference -> assignedConnectedUserIds.contains(reference.connectedUserId()) &&
+            .filter(reference -> connectedUserIds.contains(reference.connectedUserId()) &&
                 Objects.equals(reference.environment(), environment.name()))
             .toList();
     }
@@ -805,6 +963,26 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     private void validateReferencedWorkflowsExistInVersion(
         AutomationWorkflowProjectConfiguration configuration, int targetProjectVersion) {
 
+        List<String> workflowLabels = getMissingReferencedWorkflowLabels(
+            configuration, getAssignedConnectedUserIds(configuration.getId()), targetProjectVersion);
+
+        if (workflowLabels.isEmpty()) {
+            return;
+        }
+
+        throw new ConfigurationException(
+            "Version %d lacks workflows connected users still use: %s. Turn them off in this configuration or remove them from those users first."
+                .formatted(targetProjectVersion, String.join(", ", workflowLabels)),
+            AutomationWorkflowProjectConfigurationErrorType.VERSION_LACKS_REFERENCED_WORKFLOWS);
+    }
+
+    /**
+     * Returns the sorted labels of the workflows of the configuration's project version that the given connected users
+     * still reference and the target project version lacks.
+     */
+    private List<String> getMissingReferencedWorkflowLabels(
+        AutomationWorkflowProjectConfiguration configuration, Set<Long> connectedUserIds, int targetProjectVersion) {
+
         List<ProjectWorkflow> currentProjectWorkflows = projectWorkflowService.getProjectWorkflows(
             configuration.getProjectId(), configuration.getProjectVersion());
 
@@ -818,7 +996,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .map(ProjectWorkflow::getUuidAsString)
             .collect(Collectors.toSet());
 
-        Set<String> missingWorkflowUuids = getAssignedUsersReferences(configuration, currentWorkflowUuids)
+        Set<String> missingWorkflowUuids = getUsersReferences(configuration, connectedUserIds, currentWorkflowUuids)
             .stream()
             .filter(reference -> !reference.dangling())
             .map(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid)
@@ -826,20 +1004,150 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .collect(Collectors.toSet());
 
         if (missingWorkflowUuids.isEmpty()) {
-            return;
+            return List.of();
         }
 
-        String workflowLabels = currentProjectWorkflows.stream()
+        return currentProjectWorkflows.stream()
             .filter(projectWorkflow -> missingWorkflowUuids.contains(projectWorkflow.getUuidAsString()))
             .map(projectWorkflow -> workflowService.getWorkflow(projectWorkflow.getWorkflowId())
                 .getLabel())
             .sorted()
-            .collect(Collectors.joining(", "));
+            .toList();
+    }
 
-        throw new ConfigurationException(
-            "Version %d lacks workflows connected users still use: %s. Turn them off in this configuration or remove them from those users first."
-                .formatted(targetProjectVersion, workflowLabels),
-            AutomationWorkflowProjectConfigurationErrorType.VERSION_LACKS_REFERENCED_WORKFLOWS);
+    private MoveOutcome moveConnectedUser(
+        long connectedUserId, AutomationWorkflowProjectConfiguration sourceConfiguration,
+        AutomationWorkflowProjectConfiguration targetConfiguration,
+        Map<String, Set<String>> removedProvidedInputNames) {
+
+        long projectId = sourceConfiguration.getProjectId();
+
+        Optional<ConnectedUser> connectedUserOptional = connectedUserService.fetchConnectedUser(connectedUserId);
+
+        if (connectedUserOptional.isEmpty()) {
+            return MoveOutcome.skipped(connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of());
+        }
+
+        // connected_user_project before connected_user, which resolver.assign locks
+        lockConnectedUserProjects(connectedUserId);
+
+        boolean onSource = connectedUserProjectConfigurationService.fetchAssignment(connectedUserId, projectId)
+            .map(assignment -> Objects.equals(assignment.getConfigurationId(), sourceConfiguration.getId()))
+            .orElse(false);
+
+        if (!onSource) {
+            return MoveOutcome.skipped(connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of());
+        }
+
+        List<String> missingWorkflowLabels = getMissingReferencedWorkflowLabels(
+            sourceConfiguration, Set.of(connectedUserId), targetConfiguration.getProjectVersion());
+
+        if (!missingWorkflowLabels.isEmpty()) {
+            return MoveOutcome.skipped(
+                connectedUserId, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,
+                missingWorkflowLabels);
+        }
+
+        automationWorkflowProjectConfigurationResolver.assign(
+            connectedUserOptional.get(), projectId, targetConfiguration.getId());
+
+        Optional<ConnectedUserReferenceDeployment> referenceDeploymentOptional =
+            connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(connectedUserId, projectId);
+
+        if (referenceDeploymentOptional.isEmpty()) {
+            return MoveOutcome.moved(connectedUserId, false);
+        }
+
+        ConnectedUserReferenceDeployment referenceDeployment = referenceDeploymentOptional.get();
+
+        long projectDeploymentId = referenceDeployment.getProjectDeploymentId();
+
+        connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(projectDeploymentId);
+
+        List<ConnectedUserProjectWorkflow> references =
+            connectedUserReferenceRolloutManager.applyDeploymentConfigurationState(
+                projectDeploymentId, removedProvidedInputNames);
+
+        return MoveOutcome.moved(connectedUserId, needsAttention(references));
+    }
+
+    /**
+     * A moved user needs attention when a workflow they keep turned on cannot run on the target, for example for a
+     * missing connection or input. A workflow the administrator turned off on the target is the administrator's
+     * decision, not something to fix, so it does not count.
+     */
+    private boolean needsAttention(List<ConnectedUserProjectWorkflow> references) {
+        return references.stream()
+            .filter(ConnectedUserProjectWorkflow::isEnabled)
+            .map(connectedUserReferenceAttentionResolver::resolve)
+            .map(ConnectedUserReferenceAttentionResolver.ReferenceState::attentionReason)
+            .anyMatch(attentionReason -> attentionReason != null &&
+                !Objects.equals(
+                    attentionReason, ConnectedUserReferenceAttentionResolver.TURNED_OFF_BY_ADMINISTRATOR));
+    }
+
+    private void lockConnectedUserProjects(long connectedUserId) {
+        List<Long> connectedUserProjectIds = connectedUserProjectService
+            .getConnectedUserConnectedUserProjects(connectedUserId)
+            .stream()
+            .map(ConnectedUserProject::getId)
+            .sorted()
+            .toList();
+
+        for (long connectedUserProjectId : connectedUserProjectIds) {
+            connectedUserProjectService.lockConnectedUserProject(connectedUserProjectId);
+        }
+    }
+
+    /**
+     * Returns, per workflow uuid, the inputs the source provides and the target does not, so that a move takes the
+     * source administrator's values off the moved users' rows.
+     */
+    private static Map<String, Set<String>> getRemovedProvidedInputNames(
+        AutomationWorkflowProjectConfiguration sourceConfiguration,
+        AutomationWorkflowProjectConfiguration targetConfiguration) {
+
+        Map<String, Set<String>> removedProvidedInputNames = new HashMap<>();
+
+        for (AutomationWorkflowProjectConfigurationWorkflow sourceConfigurationWorkflow : sourceConfiguration
+            .getWorkflows()) {
+
+            Set<String> inputNames = new HashSet<>(
+                getProvidedInputNames(sourceConfigurationWorkflow.getProvidedInputs()));
+
+            targetConfiguration.fetchWorkflow(sourceConfigurationWorkflow.getWorkflowUuid())
+                .ifPresent(targetConfigurationWorkflow -> inputNames.removeAll(
+                    getProvidedInputNames(targetConfigurationWorkflow.getProvidedInputs())));
+
+            if (!inputNames.isEmpty()) {
+                removedProvidedInputNames.put(
+                    String.valueOf(sourceConfigurationWorkflow.getWorkflowUuid()), Set.copyOf(inputNames));
+            }
+        }
+
+        return removedProvidedInputNames;
+    }
+
+    private static List<Long> getSortedDistinct(List<Long> connectedUserIds) {
+        return connectedUserIds.stream()
+            .distinct()
+            .sorted()
+            .toList();
+    }
+
+    private static void validateSameProjectAndEnvironment(
+        AutomationWorkflowProjectConfiguration sourceConfiguration,
+        AutomationWorkflowProjectConfiguration targetConfiguration) {
+
+        if (!Objects.equals(sourceConfiguration.getProjectId(), targetConfiguration.getProjectId()) ||
+            sourceConfiguration.getEnvironmentId() != targetConfiguration.getEnvironmentId()) {
+
+            throw new ConfigurationException(
+                "Configuration id=%s does not belong to project id=%s in environment id=%s".formatted(
+                    targetConfiguration.getId(), sourceConfiguration.getProjectId(),
+                    sourceConfiguration.getEnvironmentId()),
+                AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH);
+        }
     }
 
     private void validateProvidedConnections(
@@ -949,6 +1257,20 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             throw new ConfigurationException(
                 "Project id=%s version v=%s is not a published version".formatted(projectId, projectVersion),
                 AutomationWorkflowProjectConfigurationErrorType.PROJECT_VERSION_NOT_PUBLISHED);
+        }
+    }
+
+    private record MoveOutcome(
+        long connectedUserId, ConfigurationMoveResultDTO.@Nullable Skipped skipped, boolean needsAttention) {
+
+        static MoveOutcome moved(long connectedUserId, boolean needsAttention) {
+            return new MoveOutcome(connectedUserId, null, needsAttention);
+        }
+
+        static MoveOutcome skipped(long connectedUserId, String reason, List<String> workflowLabels) {
+            return new MoveOutcome(
+                connectedUserId, new ConfigurationMoveResultDTO.Skipped(connectedUserId, reason, workflowLabels),
+                false);
         }
     }
 
