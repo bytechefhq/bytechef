@@ -2,25 +2,46 @@ import Button from '@/components/Button/Button';
 import {Input} from '@/components/Input/Input';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {PlusIcon, Trash2Icon} from 'lucide-react';
+import {useEffect} from 'react';
 import {Control, useFieldArray, useFormContext} from 'react-hook-form';
 
 import {MASKED_VALUE, MAX_WEBHOOK_HEADERS, NotificationFormValuesType} from '../hooks/useNotifications';
 
 interface WebhookHeadersFieldProps {
     control: Control<NotificationFormValuesType, unknown, NotificationFormValuesType>;
+    /** Clears every saved (masked) header value so it must be entered again, e.g. after the webhook URL changed. */
+    requireHeaderValues?: boolean;
 }
 
 interface WebhookHeadersFormValuesI {
     settings: {webhookHeaders: Array<{name: string; value: string}>};
 }
 
-const WebhookHeadersField = ({control}: WebhookHeadersFieldProps) => {
+const WebhookHeadersField = ({control, requireHeaderValues = false}: WebhookHeadersFieldProps) => {
     const {getValues, setValue} = useFormContext<WebhookHeadersFormValuesI>();
 
     const {append, fields, remove} = useFieldArray({
         control: control as unknown as Control<WebhookHeadersFormValuesI>,
         name: 'settings.webhookHeaders',
     });
+
+    useEffect(() => {
+        if (!requireHeaderValues) {
+            return;
+        }
+
+        const webhookHeaders = getValues('settings.webhookHeaders');
+
+        if (!Array.isArray(webhookHeaders)) {
+            return;
+        }
+
+        webhookHeaders.forEach((webhookHeader, index) => {
+            if (webhookHeader?.value === MASKED_VALUE) {
+                setValue(`settings.webhookHeaders.${index}.value`, '');
+            }
+        });
+    }, [getValues, requireHeaderValues, setValue]);
 
     return (
         <fieldset className="space-y-2 border-0 p-0">

@@ -144,6 +144,40 @@ function validateUrlSetting({context, invalidMessage, requiredMessage, settingKe
     }
 }
 
+/**
+ * Mirrors the server: strips surrounding whitespace, lowercases the scheme and host and drops the default port,
+ * keeping the path and query exactly as given.
+ */
+export function normalizeWebhookUrl(url: unknown): string {
+    if (typeof url !== 'string') {
+        return '';
+    }
+
+    const strippedUrl = url.trim();
+    const urlMatch = /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\/([^/?#]*)([\s\S]*)$/.exec(strippedUrl);
+
+    if (!urlMatch) {
+        return strippedUrl;
+    }
+
+    const [, scheme, authority, pathQueryAndFragment] = urlMatch;
+    const lowerCaseScheme = scheme.toLowerCase();
+    const userInfoEnd = authority.lastIndexOf('@');
+    const userInfo = authority.slice(0, userInfoEnd + 1);
+    const hostAndPortMatch = /^(\[[^\]]*\]|[^:]*)(?::(\d+))?$/.exec(authority.slice(userInfoEnd + 1));
+
+    if (!hostAndPortMatch || !hostAndPortMatch[1]) {
+        return strippedUrl;
+    }
+
+    const [, host, port] = hostAndPortMatch;
+    const isDefaultPort =
+        (lowerCaseScheme === 'http' && port === '80') || (lowerCaseScheme === 'https' && port === '443');
+    const portSuffix = port && !isDefaultPort ? `:${port}` : '';
+
+    return `${lowerCaseScheme}://${userInfo}${host.toLowerCase()}${portSuffix}${pathQueryAndFragment}`;
+}
+
 function trimUrlSettings(settings: Record<string, unknown>): Notification['settings'] {
     const trimmedSettings: Record<string, unknown> = {...settings};
 

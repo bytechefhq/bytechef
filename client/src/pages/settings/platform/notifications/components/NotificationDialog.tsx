@@ -21,10 +21,14 @@ import {
 } from '@/shared/middleware/platform/notification';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {Loader2Icon} from 'lucide-react';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {UseFormReturn, useWatch} from 'react-hook-form';
 
-import useNotifications, {MASKED_VALUE, NotificationFormValuesType} from '../hooks/useNotifications';
+import useNotifications, {
+    MASKED_VALUE,
+    NotificationFormValuesType,
+    normalizeWebhookUrl,
+} from '../hooks/useNotifications';
 import NotificationTestResult from './NotificationTestResult';
 import WebhookHeadersField from './WebhookHeadersField';
 
@@ -62,20 +66,39 @@ const NotificationDialog = ({
     const {control, handleSubmit} = form;
 
     const notificationType = useWatch({control, name: 'type'});
+    const settings = useWatch({control, name: 'settings'});
 
-    async function handleTest() {
-        const isValid = await form.trigger();
+    const settingsKey = useMemo(() => JSON.stringify(settings ?? {}), [settings]);
 
-        if (!isValid) {
-            return;
+    const isSavedWebhookUrlChanged = useMemo(() => {
+        if (!selectedNotification?.id || selectedNotification.type !== NotificationTypeEnum.Webhook) {
+            return false;
         }
 
+        return normalizeWebhookUrl(settings?.webhook) !== normalizeWebhookUrl(selectedNotification.settings?.webhook);
+    }, [selectedNotification, settings]);
+
+    async function handleTest() {
         testRunRef.current += 1;
 
         const testRun = testRunRef.current;
 
         setIsTestPending(true);
         setTestResult(undefined);
+
+        const isValid = await form.trigger();
+
+        if (!isValid) {
+            if (testRun === testRunRef.current) {
+                setIsTestPending(false);
+            }
+
+            return;
+        }
+
+        if (testRun !== testRunRef.current) {
+            return;
+        }
 
         try {
             const result = await testNotification();
@@ -99,7 +122,7 @@ const NotificationDialog = ({
 
         setIsTestPending(false);
         setTestResult(undefined);
-    }, [isEditDialogOpen, notificationType]);
+    }, [isEditDialogOpen, notificationType, settingsKey]);
 
     return (
         <Dialog
@@ -311,7 +334,10 @@ const NotificationDialog = ({
 
                                 {notificationType === NotificationTypeEnum.Webhook && (
                                     <>
-                                        <WebhookHeadersField control={control} />
+                                        <WebhookHeadersField
+                                            control={control}
+                                            requireHeaderValues={isSavedWebhookUrlChanged}
+                                        />
 
                                         <FormField
                                             control={control}
