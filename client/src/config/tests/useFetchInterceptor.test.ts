@@ -299,6 +299,45 @@ describe('useFetchInterceptor', () => {
             });
         });
 
+        it('skips toast for a rejected lookup of a missing component definition', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {
+                    detail: "Component definition with name 'viber' and version '1' not found",
+                    title: 'Bad Request',
+                },
+                status: 400,
+                url: 'http://localhost/api/platform/internal/component-definitions/viber/versions/1',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('still toasts a server error on a component definition lookup', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: 'Boom', title: 'Internal Server Error'},
+                status: 500,
+                url: 'http://localhost/api/platform/internal/component-definitions/viber/versions/1',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalled();
+        });
+
         it('skips toast for approval-form read errors handled inline', async () => {
             renderHook(() => useFetchInterceptor());
 
