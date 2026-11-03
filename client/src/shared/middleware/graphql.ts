@@ -271,7 +271,7 @@ export type AiSkillQueryVariables = Exact<{
 }>;
 
 
-export type AiSkillQuery = { aiSkill: { id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any } };
+export type AiSkillQuery = { aiSkill: { id: string, name: string, description: string | null, createdBy: string | null, createdDate: any, lastModifiedDate: any } };
 
 export type AiSkillFileContentQueryVariables = Exact<{
   id: string | number;
@@ -296,7 +296,7 @@ export type AiSkillTagsQuery = { aiSkillTags: Array<{ id: string, name: string }
 export type AiSkillsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any, tags: Array<{ id: string, name: string }> }> };
+export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdBy: string | null, createdDate: any, lastModifiedDate: any, tags: Array<{ id: string, name: string }> }> };
 
 export type CreateAdditionalFilesInSkillMutationVariables = Exact<{
   id: string | number;
@@ -1092,6 +1092,11 @@ export type DataTableRowsPageQueryVariables = Exact<{
 
 export type DataTableRowsPageQuery = { dataTableRowsPage: { hasMore: boolean, nextOffset: number | null, items: Array<{ id: string, values: any }> } };
 
+export type DataTableStorageUsageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DataTableStorageUsageQuery = { dataTableStorageUsage: { limitBytes: any, percentage: number, unlimited: boolean, usedBytes: any } };
+
 export type DataTableTagsQueryVariables = Exact<{
   environmentId: string | number;
   workspaceId: string | number;
@@ -1351,6 +1356,66 @@ export type AutomationSearchQuery = { automationSearch: Array<
     | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { projectId: string, label: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
   > };
+
+export type CodeWorkflowSourceQueryVariables = Exact<{
+  projectId: string | number;
+}>;
+
+
+export type CodeWorkflowSourceQuery = { codeWorkflowSource: string };
+
+export type CreateCodeWorkflowMutationVariables = Exact<{
+  workspaceId: string | number;
+  name: string;
+  language: Types.CodeWorkflowLanguage;
+  description?: string | null | undefined;
+  categoryId?: string | number | null | undefined;
+  tags?: Array<string> | string | null | undefined;
+}>;
+
+
+export type CreateCodeWorkflowMutation = { createCodeWorkflow: string };
+
+export type UpdateCodeWorkflowSourceMutationVariables = Exact<{
+  projectId: string | number;
+  content: string;
+}>;
+
+
+export type UpdateCodeWorkflowSourceMutation = { updateCodeWorkflowSource: boolean };
+
+export type DeleteEmbeddedAiAutoMemoryMutationVariables = Exact<{
+  id: string | number;
+  principalType: Types.AiAutoMemoryPrincipalType;
+  principalId: string | number;
+  environment: number;
+}>;
+
+
+export type DeleteEmbeddedAiAutoMemoryMutation = { deleteEmbeddedAiAutoMemory: boolean };
+
+export type EmbeddedAiAutoMemoriesQueryVariables = Exact<{
+  environment: number;
+  connectedUserId?: string | number | null | undefined;
+  memoryType?: Types.AiAutoMemoryType | null | undefined;
+}>;
+
+
+export type EmbeddedAiAutoMemoriesQuery = { embeddedAiAutoMemories: Array<{ id: string, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, version: any, createdAt: any, updatedAt: any, principalType: Types.AiAutoMemoryPrincipalType, principalId: any, connectedUser: { id: string, name: string | null, email: string | null, externalId: string } | null, integration: { id: string, name: string | null, componentName: string | null } | null, automation: { id: string, name: string | null } | null }> };
+
+export type EmbeddedAiAutoMemoryConnectedUsersQueryVariables = Exact<{
+  environment: number;
+}>;
+
+
+export type EmbeddedAiAutoMemoryConnectedUsersQuery = { embeddedAiAutoMemoryConnectedUsers: Array<{ id: string, name: string | null, email: string | null, externalId: string, memoryCount: number }> };
+
+export type UpdateEmbeddedAiAutoMemoryMutationVariables = Exact<{
+  input: Types.UpdateEmbeddedAiAutoMemoryInput;
+}>;
+
+
+export type UpdateEmbeddedAiAutoMemoryMutation = { updateEmbeddedAiAutoMemory: { id: string, version: any } };
 
 export type AddEmbeddedUserMutationVariables = Exact<{
   userId: string | number;
@@ -2087,6 +2152,100 @@ export type SetEmbeddedUserEnvironmentRoleMutationVariables = Exact<{
 
 
 export type SetEmbeddedUserEnvironmentRoleMutation = { setEmbeddedUserEnvironmentRole: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, environment: Types.EnvironmentEnum | null } };
+
+export type ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQueryVariables = Exact<{
+  automationProjectConfigurationId: string | number;
+  workflowUuid: string;
+}>;
+
+
+export type ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQuery = { toolEligibleAutomationProjectConfigurationWorkflowProperties: Array<
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null, items: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any, properties: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
+    | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+   | null> | null };
+
+export type ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables = Exact<{
+  integrationInstanceConfigurationId: string | number;
+  workflowId: string;
+}>;
+
+
+export type ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery = { toolEligibleIntegrationInstanceConfigurationWorkflowProperties: Array<
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null, items: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any, properties: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
+    | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+   | null> | null };
 
 export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
   integrationInstanceConfigurationId: string | number;
@@ -4042,6 +4201,7 @@ export const AiSkillDocument = new TypedDocumentString(`
     id
     name
     description
+    createdBy
     createdDate
     lastModifiedDate
   }
@@ -4139,6 +4299,7 @@ export const AiSkillsDocument = new TypedDocumentString(`
     id
     name
     description
+    createdBy
     tags {
       id
       name
@@ -7802,6 +7963,201 @@ export const useAutomationSearchQuery = <
   }
     )};
 
+export const CodeWorkflowSourceDocument = new TypedDocumentString(`
+    query codeWorkflowSource($projectId: ID!) {
+  codeWorkflowSource(projectId: $projectId)
+}
+    `);
+
+export const useCodeWorkflowSourceQuery = <
+      TData = CodeWorkflowSourceQuery,
+      TError = unknown
+    >(
+      variables: CodeWorkflowSourceQueryVariables,
+      options?: Omit<UseQueryOptions<CodeWorkflowSourceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CodeWorkflowSourceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<CodeWorkflowSourceQuery, TError, TData>(
+      {
+    queryKey: ['codeWorkflowSource', variables],
+    queryFn: fetcher<CodeWorkflowSourceQuery, CodeWorkflowSourceQueryVariables>(CodeWorkflowSourceDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateCodeWorkflowDocument = new TypedDocumentString(`
+    mutation createCodeWorkflow($workspaceId: ID!, $name: String!, $language: CodeWorkflowLanguage!, $description: String, $categoryId: ID, $tags: [String!]) {
+  createCodeWorkflow(
+    workspaceId: $workspaceId
+    name: $name
+    language: $language
+    description: $description
+    categoryId: $categoryId
+    tags: $tags
+  )
+}
+    `);
+
+export const useCreateCodeWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateCodeWorkflowMutation, TError, CreateCodeWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<CreateCodeWorkflowMutation, TError, CreateCodeWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['createCodeWorkflow'],
+    mutationFn: (variables?: CreateCodeWorkflowMutationVariables) => fetcher<CreateCodeWorkflowMutation, CreateCodeWorkflowMutationVariables>(CreateCodeWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateCodeWorkflowSourceDocument = new TypedDocumentString(`
+    mutation updateCodeWorkflowSource($projectId: ID!, $content: String!) {
+  updateCodeWorkflowSource(projectId: $projectId, content: $content)
+}
+    `);
+
+export const useUpdateCodeWorkflowSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateCodeWorkflowSourceMutation, TError, UpdateCodeWorkflowSourceMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateCodeWorkflowSourceMutation, TError, UpdateCodeWorkflowSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['updateCodeWorkflowSource'],
+    mutationFn: (variables?: UpdateCodeWorkflowSourceMutationVariables) => fetcher<UpdateCodeWorkflowSourceMutation, UpdateCodeWorkflowSourceMutationVariables>(UpdateCodeWorkflowSourceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteEmbeddedAiAutoMemoryDocument = new TypedDocumentString(`
+    mutation deleteEmbeddedAiAutoMemory($id: ID!, $principalType: AiAutoMemoryPrincipalType!, $principalId: ID!, $environment: Int!) {
+  deleteEmbeddedAiAutoMemory(
+    id: $id
+    principalType: $principalType
+    principalId: $principalId
+    environment: $environment
+  )
+}
+    `);
+
+export const useDeleteEmbeddedAiAutoMemoryMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteEmbeddedAiAutoMemoryMutation, TError, DeleteEmbeddedAiAutoMemoryMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteEmbeddedAiAutoMemoryMutation, TError, DeleteEmbeddedAiAutoMemoryMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteEmbeddedAiAutoMemory'],
+    mutationFn: (variables?: DeleteEmbeddedAiAutoMemoryMutationVariables) => fetcher<DeleteEmbeddedAiAutoMemoryMutation, DeleteEmbeddedAiAutoMemoryMutationVariables>(DeleteEmbeddedAiAutoMemoryDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EmbeddedAiAutoMemoriesDocument = new TypedDocumentString(`
+    query embeddedAiAutoMemories($environment: Int!, $connectedUserId: ID, $memoryType: AiAutoMemoryType) {
+  embeddedAiAutoMemories(
+    environment: $environment
+    connectedUserId: $connectedUserId
+    memoryType: $memoryType
+  ) {
+    id
+    name
+    title
+    description
+    memoryType
+    content
+    environmentId
+    version
+    createdAt
+    updatedAt
+    principalType
+    principalId
+    connectedUser {
+      id
+      name
+      email
+      externalId
+    }
+    integration {
+      id
+      name
+      componentName
+    }
+    automation {
+      id
+      name
+    }
+  }
+}
+    `);
+
+export const useEmbeddedAiAutoMemoriesQuery = <
+      TData = EmbeddedAiAutoMemoriesQuery,
+      TError = unknown
+    >(
+      variables: EmbeddedAiAutoMemoriesQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedAiAutoMemoriesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedAiAutoMemoriesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedAiAutoMemoriesQuery, TError, TData>(
+      {
+    queryKey: ['embeddedAiAutoMemories', variables],
+    queryFn: fetcher<EmbeddedAiAutoMemoriesQuery, EmbeddedAiAutoMemoriesQueryVariables>(EmbeddedAiAutoMemoriesDocument, variables),
+    ...options
+  }
+    )};
+
+export const EmbeddedAiAutoMemoryConnectedUsersDocument = new TypedDocumentString(`
+    query embeddedAiAutoMemoryConnectedUsers($environment: Int!) {
+  embeddedAiAutoMemoryConnectedUsers(environment: $environment) {
+    id
+    name
+    email
+    externalId
+    memoryCount
+  }
+}
+    `);
+
+export const useEmbeddedAiAutoMemoryConnectedUsersQuery = <
+      TData = EmbeddedAiAutoMemoryConnectedUsersQuery,
+      TError = unknown
+    >(
+      variables: EmbeddedAiAutoMemoryConnectedUsersQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedAiAutoMemoryConnectedUsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedAiAutoMemoryConnectedUsersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedAiAutoMemoryConnectedUsersQuery, TError, TData>(
+      {
+    queryKey: ['embeddedAiAutoMemoryConnectedUsers', variables],
+    queryFn: fetcher<EmbeddedAiAutoMemoryConnectedUsersQuery, EmbeddedAiAutoMemoryConnectedUsersQueryVariables>(EmbeddedAiAutoMemoryConnectedUsersDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedAiAutoMemoryDocument = new TypedDocumentString(`
+    mutation updateEmbeddedAiAutoMemory($input: UpdateEmbeddedAiAutoMemoryInput!) {
+  updateEmbeddedAiAutoMemory(input: $input) {
+    id
+    version
+  }
+}
+    `);
+
+export const useUpdateEmbeddedAiAutoMemoryMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedAiAutoMemoryMutation, TError, UpdateEmbeddedAiAutoMemoryMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedAiAutoMemoryMutation, TError, UpdateEmbeddedAiAutoMemoryMutationVariables, TContext>(
+      {
+    mutationKey: ['updateEmbeddedAiAutoMemory'],
+    mutationFn: (variables?: UpdateEmbeddedAiAutoMemoryMutationVariables) => fetcher<UpdateEmbeddedAiAutoMemoryMutation, UpdateEmbeddedAiAutoMemoryMutationVariables>(UpdateEmbeddedAiAutoMemoryDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const AddEmbeddedUserDocument = new TypedDocumentString(`
     mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole!) {
   addEmbeddedUser(userId: $userId, role: $role) {
@@ -7813,10 +8169,6 @@ export const AddEmbeddedUserDocument = new TypedDocumentString(`
       email
       firstName
       lastName
-    }
-    automation {
-      id
-      name
     }
   }
 }
@@ -10600,6 +10952,336 @@ export const useSetEmbeddedUserEnvironmentRoleMutation = <
       {
     mutationKey: ['SetEmbeddedUserEnvironmentRole'],
     mutationFn: (variables?: SetEmbeddedUserEnvironmentRoleMutationVariables) => fetcher<SetEmbeddedUserEnvironmentRoleMutation, SetEmbeddedUserEnvironmentRoleMutationVariables>(SetEmbeddedUserEnvironmentRoleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ToolEligibleAutomationProjectConfigurationWorkflowPropertiesDocument = new TypedDocumentString(`
+    query toolEligibleAutomationProjectConfigurationWorkflowProperties($automationProjectConfigurationId: ID!, $workflowUuid: String!) {
+  toolEligibleAutomationProjectConfigurationWorkflowProperties(
+    automationProjectConfigurationId: $automationProjectConfigurationId
+    workflowUuid: $workflowUuid
+  ) {
+    advancedOption
+    description
+    displayCondition
+    expressionEnabled
+    hidden
+    name
+    required
+    type
+    ... on StringProperty {
+      controlType
+      defaultValue
+      label
+      maxLength
+      minLength
+      placeholder
+      regex
+    }
+    ... on IntegerProperty {
+      controlType
+      integerDefaultValue: defaultValue
+      label
+      placeholder
+    }
+    ... on NumberProperty {
+      controlType
+      label
+      numberDefaultValue: defaultValue
+      placeholder
+    }
+    ... on BooleanProperty {
+      booleanDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ArrayProperty {
+      arrayDefaultValue: defaultValue
+      controlType
+      items {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
+      label
+      placeholder
+    }
+    ... on ObjectProperty {
+      controlType
+      label
+      objectDefaultValue: defaultValue
+      placeholder
+      properties {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
+    }
+  }
+}
+    `);
+
+export const useToolEligibleAutomationProjectConfigurationWorkflowPropertiesQuery = <
+      TData = ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQuery,
+      TError = unknown
+    >(
+      variables: ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['toolEligibleAutomationProjectConfigurationWorkflowProperties', variables],
+    queryFn: fetcher<ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQuery, ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQueryVariables>(ToolEligibleAutomationProjectConfigurationWorkflowPropertiesDocument, variables),
+    ...options
+  }
+    )};
+
+export const ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesDocument = new TypedDocumentString(`
+    query toolEligibleIntegrationInstanceConfigurationWorkflowProperties($integrationInstanceConfigurationId: ID!, $workflowId: String!) {
+  toolEligibleIntegrationInstanceConfigurationWorkflowProperties(
+    integrationInstanceConfigurationId: $integrationInstanceConfigurationId
+    workflowId: $workflowId
+  ) {
+    advancedOption
+    description
+    displayCondition
+    expressionEnabled
+    hidden
+    name
+    required
+    type
+    ... on StringProperty {
+      controlType
+      defaultValue
+      label
+      maxLength
+      minLength
+      placeholder
+      regex
+    }
+    ... on IntegerProperty {
+      controlType
+      integerDefaultValue: defaultValue
+      label
+      placeholder
+    }
+    ... on NumberProperty {
+      controlType
+      label
+      numberDefaultValue: defaultValue
+      placeholder
+    }
+    ... on BooleanProperty {
+      booleanDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ArrayProperty {
+      arrayDefaultValue: defaultValue
+      controlType
+      items {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
+      label
+      placeholder
+    }
+    ... on ObjectProperty {
+      controlType
+      label
+      objectDefaultValue: defaultValue
+      placeholder
+      properties {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
+    }
+  }
+}
+    `);
+
+export const useToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery = <
+      TData = ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery,
+      TError = unknown
+    >(
+      variables: ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['toolEligibleIntegrationInstanceConfigurationWorkflowProperties', variables],
+    queryFn: fetcher<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables>(ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesDocument, variables),
     ...options
   }
     )};

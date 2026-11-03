@@ -334,6 +334,7 @@ export type AiProviderModel = {
 
 export type AiSkill = {
   __typename?: 'AiSkill';
+  createdBy?: Maybe<Scalars['String']['output']>;
   /** Epoch milliseconds (UTC) */
   createdDate?: Maybe<Scalars['Long']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -2192,6 +2193,7 @@ export type Mutation = {
   assignWorkspaceUserCustomRole: WorkspaceUser;
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
+  changeAutomationProjectConfigurationConnectedUserVersion: ConfigurationMoveResult;
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
   createAdditionalFilesInSkill: AiSkill;
@@ -2209,6 +2211,8 @@ export type Mutation = {
   createAutomationProjectCodeWorkflow: Scalars['ID']['output'];
   createAutomationProjectConfiguration: Scalars['ID']['output'];
   createAutomationProjectWorkflow: Scalars['ID']['output'];
+  createCodeWorkflow: Scalars['ID']['output'];
+  createCustomComponent: CustomComponent;
   /** Create a tenant-global custom role, assignable in every workspace. Requires tenant admin. */
   createCustomRole: CustomRole;
   createDataTable: Scalars['Boolean']['output'];
@@ -2255,6 +2259,11 @@ export type Mutation = {
   /** Delete a custom role. Fails if it is still assigned to any member. Requires tenant admin. */
   deleteCustomRole: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
+  /**
+   * Deletes an Embedded memory. Fails with NOT_FOUND when the owner holds no such memory in the environment or is not
+   * an Embedded owner. Admin only.
+   */
+  deleteEmbeddedAiAutoMemory: Scalars['Boolean']['output'];
   deleteEmbeddedApiKey?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -2402,10 +2411,16 @@ export type Mutation = {
    * Succeeding means the values were stored, not that they work.
    */
   updateConnectionCredentials: Scalars['Boolean']['output'];
+  updateCustomComponentSource: CustomComponent;
   /** Update a custom role. Requires tenant admin. */
   updateCustomRole: CustomRole;
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
+  /**
+   * Partial update of an Embedded memory. Fails with NOT_FOUND when the owner holds no such memory in the environment
+   * or is not an Embedded owner, and with CONFLICT when it changed since expectedVersion. Admin only.
+   */
+  updateEmbeddedAiAutoMemory: EmbeddedAiAutoMemory;
   updateEmbeddedApiKey?: Maybe<ApiKey>;
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
   updateEmbeddedMcpServer?: Maybe<McpServer>;
@@ -2486,6 +2501,14 @@ export type MutationCancelAiAgentEvalRunArgs = {
 
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationChangeAutomationProjectConfigurationConnectedUserVersionArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  sourceId: Scalars['ID']['input'];
+  targetId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -2616,6 +2639,22 @@ export type MutationCreateAutomationProjectWorkflowArgs = {
   definition?: InputMaybe<Scalars['String']['input']>;
   permissionExpression?: InputMaybe<Scalars['String']['input']>;
   projectId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateCodeWorkflowArgs = {
+  categoryId?: InputMaybe<Scalars['ID']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  language: CodeWorkflowLanguage;
+  name: Scalars['String']['input'];
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateCustomComponentArgs = {
+  language: CustomComponentLanguage;
+  name: Scalars['String']['input'];
 };
 
 
@@ -2821,6 +2860,14 @@ export type MutationDeleteCustomRoleArgs = {
 
 export type MutationDeleteDataTableRowArgs = {
   input: DeleteRowInput;
+};
+
+
+export type MutationDeleteEmbeddedAiAutoMemoryArgs = {
+  environment: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
+  principalId: Scalars['ID']['input'];
+  principalType: AiAutoMemoryPrincipalType;
 };
 
 
@@ -3457,6 +3504,12 @@ export type MutationUpdateConnectionCredentialsArgs = {
 };
 
 
+export type MutationUpdateCustomComponentSourceArgs = {
+  content: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateCustomRoleArgs = {
   id: Scalars['ID']['input'];
   input: UpdateCustomRoleInput;
@@ -3470,6 +3523,11 @@ export type MutationUpdateDataTableRowArgs = {
 
 export type MutationUpdateDataTableTagsArgs = {
   input: UpdateDataTableTagsInput;
+};
+
+
+export type MutationUpdateEmbeddedAiAutoMemoryArgs = {
+  input: UpdateEmbeddedAiAutoMemoryInput;
 };
 
 
@@ -4126,6 +4184,7 @@ export type Query = {
    * for the tenant-admin management view.
    */
   customRoles: Array<CustomRole>;
+  dataTableLinkOptions: Array<DataTableLinkOption>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
   dataTableStorageUsage: DataTableStorageUsage;
@@ -4136,6 +4195,13 @@ export type Query = {
   editorJobFileLogs: LogPage;
   editorJobFileLogsExist: Scalars['Boolean']['output'];
   editorTaskExecutionFileLogs: Array<LogEntry>;
+  /**
+   * Lists the memories of every Embedded integration instance and automation deployment in the environment (the Environment ordinal: 0
+   * DEVELOPMENT, 1 STAGING, 2 PRODUCTION). connectedUserId and memoryType narrow the list. Admin only.
+   */
+  embeddedAiAutoMemories: Array<EmbeddedAiAutoMemory>;
+  /** The connected users holding at least one memory in the environment. Admin only. */
+  embeddedAiAutoMemoryConnectedUsers: Array<EmbeddedAiAutoMemoryConnectedUser>;
   embeddedApiKey?: Maybe<ApiKey>;
   embeddedApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   embeddedGettingStarted: EmbeddedGettingStarted;
@@ -4726,8 +4792,22 @@ export type QueryCustomComponentDefinitionArgs = {
 };
 
 
+export type QueryCustomComponentSourceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type QueryCustomRolesArgs = {
   workspaceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryDataTableLinkOptionsArgs = {
+  columnName: Scalars['String']['input'];
+  environmentId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  tableId: Scalars['ID']['input'];
 };
 
 
@@ -4787,6 +4867,18 @@ export type QueryEditorJobFileLogsExistArgs = {
 export type QueryEditorTaskExecutionFileLogsArgs = {
   jobId: Scalars['ID']['input'];
   taskExecutionId: Scalars['ID']['input'];
+};
+
+
+export type QueryEmbeddedAiAutoMemoriesArgs = {
+  connectedUserId?: InputMaybe<Scalars['ID']['input']>;
+  environment: Scalars['Int']['input'];
+  memoryType?: InputMaybe<AiAutoMemoryType>;
+};
+
+
+export type QueryEmbeddedAiAutoMemoryConnectedUsersArgs = {
+  environment: Scalars['Int']['input'];
 };
 
 
@@ -5591,6 +5683,24 @@ export type UpdateCustomRoleInput = {
 export type UpdateDataTableTagsInput = {
   tableId: Scalars['ID']['input'];
   tags?: InputMaybe<Array<TagInput>>;
+};
+
+/**
+ * A partial update. An omitted field keeps the stored value; a blank description clears it, while a blank title or
+ * content is rejected.
+ */
+export type UpdateEmbeddedAiAutoMemoryInput = {
+  content?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  environment: Scalars['Int']['input'];
+  expectedVersion: Scalars['Long']['input'];
+  id: Scalars['ID']['input'];
+  memoryType?: InputMaybe<AiAutoMemoryType>;
+  /** The memory's principalId. */
+  principalId: Scalars['ID']['input'];
+  /** The memory's principalType. */
+  principalType: AiAutoMemoryPrincipalType;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateEmbeddedApiKeyInput = {
