@@ -69,6 +69,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -422,12 +423,20 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         validateSameProjectAndEnvironment(sourceConfiguration, targetConfiguration);
 
-        Set<Long> assignedConnectedUserIds = getAssignedConnectedUserIds(sourceId);
+        return getMoveImpact(
+            sourceConfiguration, targetConfiguration, getAssignedConnectedUserIds(sourceId),
+            getSortedDistinct(connectedUserIds));
+    }
+
+    private ConfigurationMoveImpactDTO getMoveImpact(
+        AutomationWorkflowProjectConfiguration sourceConfiguration,
+        AutomationWorkflowProjectConfiguration targetConfiguration, Set<Long> assignedConnectedUserIds,
+        List<Long> sortedConnectedUserIds) {
 
         Set<Long> sourceConnectedUserIds = new HashSet<>();
         List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
 
-        for (long connectedUserId : getSortedDistinct(connectedUserIds)) {
+        for (long connectedUserId : sortedConnectedUserIds) {
             if (!assignedConnectedUserIds.contains(connectedUserId)) {
                 skipped.add(
                     new ConfigurationMoveResultDTO.Skipped(
@@ -546,6 +555,43 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    public ConfigurationMoveImpactDTO getUpgradeImpact(long targetId, List<Long> connectedUserIds) {
+        AutomationWorkflowProjectConfiguration targetConfiguration =
+            automationWorkflowProjectConfigurationService.getConfiguration(targetId);
+
+        List<Long> sortedConnectedUserIds = getSortedDistinct(connectedUserIds);
+
+        List<UpgradeSource> upgradeSources = getUpgradeSources(targetConfiguration, sortedConnectedUserIds);
+
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>(
+            getUpgradeUnmatchedSkipped(targetConfiguration, upgradeSources, sortedConnectedUserIds));
+        Map<String, AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> workflowsByUuid =
+            new LinkedHashMap<>();
+
+        for (UpgradeSource upgradeSource : upgradeSources) {
+            ConfigurationMoveImpactDTO moveImpact = getMoveImpact(
+                upgradeSource.sourceConfiguration(), targetConfiguration,
+                Set.copyOf(upgradeSource.connectedUserIds()), upgradeSource.connectedUserIds());
+
+            for (AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow workflow : moveImpact.workflows()) {
+                workflowsByUuid.merge(
+                    workflow.workflowUuid(), workflow,
+                    AutomationWorkflowProjectConfigurationAdminFacadeImpl::mergeImpactWorkflows);
+            }
+
+            skipped.addAll(moveImpact.skipped());
+        }
+
+        List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> workflows = workflowsByUuid.values()
+            .stream()
+            .sorted(Comparator.comparing(AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow::label))
+            .toList();
+
+        return new ConfigurationMoveImpactDTO(workflows, sortSkipped(skipped));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(
         long configurationId, int projectVersion) {
 
@@ -576,6 +622,13 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         validateSameProjectAndEnvironment(sourceConfiguration, targetConfiguration);
 
+        return moveConnectedUsers(sourceConfiguration, targetConfiguration, getSortedDistinct(connectedUserIds));
+    }
+
+    private ConfigurationMoveResultDTO moveConnectedUsers(
+        AutomationWorkflowProjectConfiguration sourceConfiguration,
+        AutomationWorkflowProjectConfiguration targetConfiguration, List<Long> sortedConnectedUserIds) {
+
         Map<String, Set<String>> removedProvidedInputNames = getRemovedProvidedInputNames(
             sourceConfiguration, targetConfiguration);
 
@@ -583,7 +636,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         List<Long> needsAttentionConnectedUserIds = new ArrayList<>();
         List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
 
-        for (long connectedUserId : getSortedDistinct(connectedUserIds)) {
+        for (long connectedUserId : sortedConnectedUserIds) {
             MoveOutcome moveOutcome;
 
             try {
@@ -592,8 +645,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
                         connectedUserId, sourceConfiguration, targetConfiguration, removedProvidedInputNames));
             } catch (RuntimeException exception) {
                 log.error(
-                    "Moving connected user id={} from configuration id={} to id={} failed", connectedUserId, sourceId,
-                    targetId, exception);
+                    "Moving connected user id={} from configuration id={} to id={} failed", connectedUserId,
+                    sourceConfiguration.getId(), targetConfiguration.getId(), exception);
 
                 moveOutcome = MoveOutcome.skipped(
                     connectedUserId, ConfigurationMoveResultDTO.Skipped.MOVE_FAILED, List.of());
@@ -756,6 +809,124 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
                 updatedConfiguration.getProjectId(), updatedConfiguration.getEnvironmentId(),
                 updatedConfiguration.getId(), removedProvidedInputNames.isEmpty()
                     ? Map.of() : Map.of(workflowUuid, removedProvidedInputNames)));
+    }
+
+    @Override
+    @Audited(
+        event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CONFIGURATION_CONNECTED_USERS_UPGRADED,
+        data = {
+            @AuditData(key = "targetConfigurationId", value = "#targetId"),
+            @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
+        })
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConfigurationMoveResultDTO upgradeConnectedUsers(long targetId, List<Long> connectedUserIds) {
+        AutomationWorkflowProjectConfiguration targetConfiguration =
+            automationWorkflowProjectConfigurationService.getConfiguration(targetId);
+
+        List<Long> sortedConnectedUserIds = getSortedDistinct(connectedUserIds);
+
+        List<UpgradeSource> upgradeSources = getUpgradeSources(targetConfiguration, sortedConnectedUserIds);
+
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>(
+            getUpgradeUnmatchedSkipped(targetConfiguration, upgradeSources, sortedConnectedUserIds));
+        Set<Long> movedConnectedUserIds = new TreeSet<>();
+        Set<Long> needsAttentionConnectedUserIds = new TreeSet<>();
+
+        for (UpgradeSource upgradeSource : upgradeSources) {
+            ConfigurationMoveResultDTO moveResult = moveConnectedUsers(
+                upgradeSource.sourceConfiguration(), targetConfiguration, upgradeSource.connectedUserIds());
+
+            movedConnectedUserIds.addAll(moveResult.movedConnectedUserIds());
+            needsAttentionConnectedUserIds.addAll(moveResult.needsAttentionConnectedUserIds());
+            skipped.addAll(moveResult.skipped());
+        }
+
+        return new ConfigurationMoveResultDTO(
+            List.copyOf(movedConnectedUserIds), sortSkipped(skipped), List.copyOf(needsAttentionConnectedUserIds));
+    }
+
+    private List<UpgradeSource> getUpgradeSources(
+        AutomationWorkflowProjectConfiguration targetConfiguration, List<Long> sortedConnectedUserIds) {
+
+        List<AutomationWorkflowProjectConfiguration> sourceConfigurations =
+            automationWorkflowProjectConfigurationService
+                .getConfigurations(targetConfiguration.getProjectId(), targetConfiguration.getEnvironmentId())
+                .stream()
+                .filter(configuration -> !Objects.equals(configuration.getId(), targetConfiguration.getId()))
+                .sorted(Comparator.comparing(AutomationWorkflowProjectConfiguration::getId))
+                .toList();
+
+        List<UpgradeSource> upgradeSources = new ArrayList<>();
+
+        for (AutomationWorkflowProjectConfiguration sourceConfiguration : sourceConfigurations) {
+            Set<Long> assignedConnectedUserIds = getAssignedConnectedUserIds(sourceConfiguration.getId());
+
+            List<Long> sourceConnectedUserIds = sortedConnectedUserIds.stream()
+                .filter(assignedConnectedUserIds::contains)
+                .toList();
+
+            if (sourceConnectedUserIds.isEmpty()) {
+                continue;
+            }
+
+            upgradeSources.add(new UpgradeSource(sourceConfiguration, sourceConnectedUserIds));
+        }
+
+        return upgradeSources;
+    }
+
+    private List<ConfigurationMoveResultDTO.Skipped> getUpgradeUnmatchedSkipped(
+        AutomationWorkflowProjectConfiguration targetConfiguration, List<UpgradeSource> upgradeSources,
+        List<Long> sortedConnectedUserIds) {
+
+        Set<Long> sourceConnectedUserIds = upgradeSources.stream()
+            .flatMap(upgradeSource -> upgradeSource.connectedUserIds()
+                .stream())
+            .collect(Collectors.toSet());
+        Set<Long> targetConnectedUserIds = getAssignedConnectedUserIds(targetConfiguration.getId());
+
+        List<ConfigurationMoveResultDTO.Skipped> unmatchedSkipped = new ArrayList<>();
+
+        for (long connectedUserId : sortedConnectedUserIds) {
+            if (sourceConnectedUserIds.contains(connectedUserId)) {
+                continue;
+            }
+
+            String reason = targetConnectedUserIds.contains(connectedUserId)
+                ? ConfigurationMoveResultDTO.Skipped.ALREADY_ON_TARGET
+                : ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE;
+
+            unmatchedSkipped.add(new ConfigurationMoveResultDTO.Skipped(connectedUserId, reason, List.of()));
+        }
+
+        return unmatchedSkipped;
+    }
+
+    private static AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow mergeImpactWorkflows(
+        AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow workflow,
+        AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow otherWorkflow) {
+
+        Set<String> newRequiredInputs = new LinkedHashSet<>(workflow.newRequiredInputs());
+
+        newRequiredInputs.addAll(otherWorkflow.newRequiredInputs());
+
+        Set<String> newRequiredConnections = new TreeSet<>(workflow.newRequiredConnections());
+
+        newRequiredConnections.addAll(otherWorkflow.newRequiredConnections());
+
+        return new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+            workflow.workflowUuid(), workflow.label(), List.copyOf(newRequiredInputs),
+            List.copyOf(newRequiredConnections),
+            workflow.affectedConnectedUserCount() + otherWorkflow.affectedConnectedUserCount());
+    }
+
+    private static List<ConfigurationMoveResultDTO.Skipped> sortSkipped(
+        List<ConfigurationMoveResultDTO.Skipped> skipped) {
+
+        return skipped.stream()
+            .distinct()
+            .sorted(Comparator.comparingLong(ConfigurationMoveResultDTO.Skipped::connectedUserId))
+            .toList();
     }
 
     private List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot> toConnectionSlotDTOs(
@@ -1435,6 +1606,10 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
                 connectedUserId, new ConfigurationMoveResultDTO.Skipped(connectedUserId, reason, workflowLabels),
                 false);
         }
+    }
+
+    private record UpgradeSource(
+        AutomationWorkflowProjectConfiguration sourceConfiguration, List<Long> connectedUserIds) {
     }
 
     private record WorkflowChange(

@@ -110,6 +110,18 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
     ConfigurationMoveImpactDTO getMoveImpact(
         long sourceId, long targetId, List<Long> connectedUserIds);
 
+    /**
+     * Returns what upgrading the connected users to the target would change for them, whichever other configuration of
+     * the target's project and environment they are assigned to: the version impact of the target's project version,
+     * counting each of the given users once, whether the upgrade would move them or skip them because the target lacks
+     * a workflow they reference, and the users it would skip, with the reason. Reads only.
+     *
+     * @param targetId         the configuration the users would move to
+     * @param connectedUserIds the connected user ids
+     * @return the impact of the target's project version on the moved users, and the users the upgrade would skip
+     */
+    ConfigurationMoveImpactDTO getUpgradeImpact(long targetId, List<Long> connectedUserIds);
+
     AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(long configurationId, int projectVersion);
 
     /**
@@ -138,4 +150,16 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
      */
     void updateConfigurationWorkflow(
         long id, String workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs);
+
+    /**
+     * Moves the connected users to the target from whichever other configuration of the target's project and
+     * environment they are assigned to, like {@link #moveConnectedUsers(long, long, List)} does for one source. Users
+     * already on the target are skipped as already on the target, users on no configuration of the project and
+     * environment as not on a source.
+     *
+     * @param targetId         the configuration to move the users to
+     * @param connectedUserIds the connected user ids
+     * @return the moved, skipped and needs-attention connected users, each in connected user id order
+     */
+    ConfigurationMoveResultDTO upgradeConnectedUsers(long targetId, List<Long> connectedUserIds);
 }

@@ -2456,6 +2456,324 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
+    void testUpgradeConnectedUsersMovesUsersFromSeveralConfigurations() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Upgrade Several Sources");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration firstSourceConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "First Source", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration secondSourceConfiguration =
+            automationWorkflowProjectConfigurationService.create(
+                automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Second Source", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUser firstConnectedUser = assignNewConnectedUser(
+            automationWorkflowProjectId, firstSourceConfiguration);
+        ConnectedUser secondConnectedUser = assignNewConnectedUser(
+            automationWorkflowProjectId, secondSourceConfiguration);
+
+        ConnectedUserProjectWorkflow firstReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            firstConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            secondConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
+
+        ConfigurationMoveResultDTO upgradeResult =
+            automationWorkflowProjectConfigurationAdminFacade.upgradeConnectedUsers(
+                targetConfiguration.getId(), List.of(secondConnectedUser.getId(), firstConnectedUser.getId()));
+
+        assertThat(upgradeResult.movedConnectedUserIds()).containsExactly(
+            firstConnectedUser.getId(), secondConnectedUser.getId());
+        assertThat(upgradeResult.skipped()).isEmpty();
+        assertThat(upgradeResult.needsAttentionConnectedUserIds()).isEmpty();
+
+        for (ConnectedUserProjectWorkflow reference : List.of(firstReference, secondReference)) {
+            assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+                .getProjectVersion()).isEqualTo(2);
+            assertThat(fetchDeploymentRow(reference).getWorkflowId())
+                .isEqualTo(getWorkflowId(automationWorkflowProjectId, 2, workflowUuid));
+        }
+
+        assertThat(getAssignedConfigurationId(firstConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(targetConfiguration.getId());
+        assertThat(getAssignedConfigurationId(secondConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(targetConfiguration.getId());
+    }
+
+    @Test
+    void testUpgradeConnectedUsersSkipsUsersAlreadyOnTargetOrWithoutTheProject() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Upgrade Skips Target Users");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 1, true, true);
+
+        ConnectedUser sourceConnectedUser = assignNewConnectedUser(automationWorkflowProjectId, sourceConfiguration);
+        ConnectedUser targetConnectedUser = assignNewConnectedUser(automationWorkflowProjectId, targetConfiguration);
+        ConnectedUser unassignedConnectedUser = connectedUserService.getConnectedUser(
+            createConnectedUser(), Environment.PRODUCTION);
+
+        ConfigurationMoveResultDTO upgradeResult =
+            automationWorkflowProjectConfigurationAdminFacade.upgradeConnectedUsers(
+                targetConfiguration.getId(),
+                List.of(
+                    sourceConnectedUser.getId(), targetConnectedUser.getId(), unassignedConnectedUser.getId(),
+                    sourceConnectedUser.getId()));
+
+        assertThat(upgradeResult.movedConnectedUserIds()).containsExactly(sourceConnectedUser.getId());
+        assertThat(upgradeResult.skipped()).containsExactly(
+            new ConfigurationMoveResultDTO.Skipped(
+                targetConnectedUser.getId(), ConfigurationMoveResultDTO.Skipped.ALREADY_ON_TARGET, List.of()),
+            new ConfigurationMoveResultDTO.Skipped(
+                unassignedConnectedUser.getId(), ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
+        assertThat(upgradeResult.needsAttentionConnectedUserIds()).isEmpty();
+
+        assertThat(getAssignedConfigurationId(sourceConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(targetConfiguration.getId());
+        assertThat(getAssignedConfigurationId(targetConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(targetConfiguration.getId());
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(
+            unassignedConnectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+    }
+
+    @Test
+    void testUpgradeConnectedUsersIgnoresOtherEnvironmentsAndProjects() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Upgrade Environment Scope");
+        long otherAutomationWorkflowProjectId = createAutomationWorkflowProject("Upgrade Other Project");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(otherAutomationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(otherAutomationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration stagingConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, Environment.STAGING.ordinal(), "Staging", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration otherProjectConfiguration =
+            automationWorkflowProjectConfigurationService.create(
+                otherAutomationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Other", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 1, true, true);
+
+        String stagingExternalUserId = "rollout-user-" + UUID.randomUUID();
+
+        connectedUserService.createConnectedUser(stagingExternalUserId, Environment.STAGING);
+
+        ConnectedUser stagingConnectedUser = connectedUserService.getConnectedUser(
+            stagingExternalUserId, Environment.STAGING);
+
+        automationWorkflowProjectConfigurationResolver.assign(
+            stagingConnectedUser, automationWorkflowProjectId, stagingConfiguration.getId());
+
+        ConnectedUser otherProjectConnectedUser = assignNewConnectedUser(
+            otherAutomationWorkflowProjectId, otherProjectConfiguration);
+
+        ConfigurationMoveResultDTO upgradeResult =
+            automationWorkflowProjectConfigurationAdminFacade.upgradeConnectedUsers(
+                targetConfiguration.getId(),
+                List.of(stagingConnectedUser.getId(), otherProjectConnectedUser.getId()));
+
+        assertThat(upgradeResult.movedConnectedUserIds()).isEmpty();
+        assertThat(upgradeResult.skipped()).containsExactly(
+            new ConfigurationMoveResultDTO.Skipped(
+                stagingConnectedUser.getId(), ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()),
+            new ConfigurationMoveResultDTO.Skipped(
+                otherProjectConnectedUser.getId(), ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
+        assertThat(upgradeResult.needsAttentionConnectedUserIds()).isEmpty();
+
+        assertThat(getAssignedConfigurationId(stagingConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(stagingConfiguration.getId());
+        assertThat(getAssignedConfigurationId(otherProjectConnectedUser.getId(), otherAutomationWorkflowProjectId))
+            .isEqualTo(otherProjectConfiguration.getId());
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(
+            otherProjectConnectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+    }
+
+    @Test
+    void testUpgradeConnectedUsersSkipsTargetLackingReferencedWorkflows() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Upgrade Lacks Workflow");
+
+        String firstWorkflowUuid = addWorkflow(
+            automationWorkflowProjectId, LABELED_SLACK_WORKFLOW_DEFINITION.formatted("Send Digest"));
+        String secondWorkflowUuid = addWorkflow(
+            automationWorkflowProjectId, LABELED_SLACK_WORKFLOW_DEFINITION.formatted("Fetch Recent Emails"));
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration firstSourceConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "First Source", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration secondSourceConfiguration =
+            automationWorkflowProjectConfigurationService.create(
+                automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Second Source", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUser firstConnectedUser = assignNewConnectedUser(
+            automationWorkflowProjectId, firstSourceConfiguration);
+        ConnectedUser secondConnectedUser = assignNewConnectedUser(
+            automationWorkflowProjectId, secondSourceConfiguration);
+
+        ConnectedUserProjectWorkflow firstReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            firstConnectedUser.getExternalId(), secondWorkflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            secondConnectedUser.getExternalId(), firstWorkflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.deleteProjectWorkflow(secondWorkflowUuid);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
+
+        List<Long> connectedUserIds = List.of(firstConnectedUser.getId(), secondConnectedUser.getId());
+
+        ConfigurationMoveResultDTO.Skipped expectedSkipped = new ConfigurationMoveResultDTO.Skipped(
+            firstConnectedUser.getId(), ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,
+            List.of("Fetch Recent Emails"));
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getUpgradeImpact(
+            targetConfiguration.getId(), connectedUserIds)
+            .skipped()).containsExactly(expectedSkipped);
+
+        ConfigurationMoveResultDTO upgradeResult =
+            automationWorkflowProjectConfigurationAdminFacade.upgradeConnectedUsers(
+                targetConfiguration.getId(), connectedUserIds);
+
+        assertThat(upgradeResult.movedConnectedUserIds()).containsExactly(secondConnectedUser.getId());
+        assertThat(upgradeResult.skipped()).containsExactly(expectedSkipped);
+        assertThat(upgradeResult.needsAttentionConnectedUserIds()).isEmpty();
+
+        assertThat(getAssignedConfigurationId(firstConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(firstSourceConfiguration.getId());
+        assertThat(projectDeploymentService.getProjectDeployment(firstReference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+
+        assertThat(getAssignedConfigurationId(secondConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(targetConfiguration.getId());
+        assertThat(projectDeploymentService.getProjectDeployment(secondReference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
+    }
+
+    @Test
+    void testUpgradeConnectedUsersReportsUsersNeedingAttention() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Upgrade Attention");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration firstSourceConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "First Source", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration secondSourceConfiguration =
+            automationWorkflowProjectConfigurationService.create(
+                automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Second Source", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            firstSourceConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#source"));
+
+        ConnectedUser firstConnectedUser = assignNewConnectedUser(
+            automationWorkflowProjectId, firstSourceConfiguration);
+        ConnectedUser secondConnectedUser = assignNewConnectedUser(
+            automationWorkflowProjectId, secondSourceConfiguration);
+
+        ConnectedUserProjectWorkflow firstReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            firstConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        ConfigurationMoveResultDTO upgradeResult =
+            automationWorkflowProjectConfigurationAdminFacade.upgradeConnectedUsers(
+                targetConfiguration.getId(), List.of(firstConnectedUser.getId(), secondConnectedUser.getId()));
+
+        assertThat(upgradeResult.movedConnectedUserIds()).containsExactly(
+            firstConnectedUser.getId(), secondConnectedUser.getId());
+        assertThat(upgradeResult.skipped()).isEmpty();
+        assertThat(upgradeResult.needsAttentionConnectedUserIds()).containsExactly(firstConnectedUser.getId());
+        assertThat(fetchDeploymentRow(firstReference).isEnabled()).isFalse();
+        assertThat(getAssignedConfigurationId(secondConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(targetConfiguration.getId());
+    }
+
+    @Test
+    void testGetUpgradeImpactMergesSourcesAndCountsEachUserOnce() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Upgrade Impact");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration firstSourceConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "First Source", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration secondSourceConfiguration =
+            automationWorkflowProjectConfigurationService.create(
+                automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Second Source", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUser firstConnectedUser = assignNewConnectedUser(
+            automationWorkflowProjectId, firstSourceConfiguration);
+        ConnectedUser secondConnectedUser = assignNewConnectedUser(
+            automationWorkflowProjectId, secondSourceConfiguration);
+        ConnectedUser stayingConnectedUser = assignNewConnectedUser(
+            automationWorkflowProjectId, firstSourceConfiguration);
+
+        for (ConnectedUser connectedUser : List.of(firstConnectedUser, secondConnectedUser, stayingConnectedUser)) {
+            connectedUserWorkflowReferenceFacade.getOrCreateReference(
+                connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+        }
+
+        String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(
+            draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
+
+        ConnectedUser targetConnectedUser = assignNewConnectedUser(automationWorkflowProjectId, targetConfiguration);
+
+        ConfigurationMoveImpactDTO upgradeImpact = automationWorkflowProjectConfigurationAdminFacade.getUpgradeImpact(
+            targetConfiguration.getId(),
+            List.of(
+                secondConnectedUser.getId(), firstConnectedUser.getId(), firstConnectedUser.getId(),
+                targetConnectedUser.getId()));
+
+        assertThat(upgradeImpact.skipped()).containsExactly(
+            new ConfigurationMoveResultDTO.Skipped(
+                targetConnectedUser.getId(), ConfigurationMoveResultDTO.Skipped.ALREADY_ON_TARGET, List.of()));
+        assertThat(upgradeImpact.workflows())
+            .singleElement()
+            .satisfies(workflow -> {
+                assertThat(workflow.workflowUuid()).isEqualTo(workflowUuid);
+                assertThat(workflow.newRequiredInputs()).containsExactly("channel");
+                assertThat(workflow.newRequiredConnections()).isEmpty();
+                assertThat(workflow.affectedConnectedUserCount()).isEqualTo(2);
+            });
+        assertThat(getAssignedConfigurationId(firstConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(firstSourceConfiguration.getId());
+        assertThat(getAssignedConfigurationId(secondConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(secondSourceConfiguration.getId());
+    }
+
+    @Test
     void testGetConfigurationConnectedUsersListsAssignedUsersOnly() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Configuration Connected Users");
 
