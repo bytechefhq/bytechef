@@ -5,7 +5,10 @@ import BuyJobExecutionsPackageDialog from '../BuyJobExecutionsPackageDialog';
 
 const hoisted = vi.hoisted(() => ({
     mutate: vi.fn(),
+    toast: Object.assign(vi.fn(), {error: vi.fn()}),
 }));
+
+vi.mock('sonner', () => ({toast: hoisted.toast}));
 
 vi.mock('@/shared/mutations/platform/billing.mutations', () => ({
     useCreateJobExecutionsPackageCheckoutSessionMutation: () => ({isPending: false, mutate: hoisted.mutate}),
@@ -71,5 +74,26 @@ describe('BuyJobExecutionsPackageDialog', () => {
         await userEvent.type(input, '101');
 
         expect(confirm).toBeDisabled();
+    });
+
+    it('shows an error when checkout returns no url', async () => {
+        hoisted.mutate.mockImplementation((quantity, options) => options.onSuccess({}));
+
+        render(<BuyJobExecutionsPackageDialog onClose={vi.fn()} open />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Continue to checkout'}));
+
+        expect(hoisted.toast.error).toHaveBeenCalledWith('Failed to start checkout. Please try again.');
+        expect(window.location.href).toBe('');
+    });
+
+    it('calls onClose when the dialog is closed', async () => {
+        const onClose = vi.fn();
+
+        render(<BuyJobExecutionsPackageDialog onClose={onClose} open />);
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 });
