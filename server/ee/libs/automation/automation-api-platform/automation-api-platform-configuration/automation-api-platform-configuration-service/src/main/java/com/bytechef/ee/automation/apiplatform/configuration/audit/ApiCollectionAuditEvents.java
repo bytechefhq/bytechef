@@ -16,6 +16,10 @@ public final class ApiCollectionAuditEvents {
 
     public static final String API_COLLECTION_CREATED = "API_COLLECTION_CREATED";
     public static final String API_COLLECTION_DELETED = "API_COLLECTION_DELETED";
+    public static final String API_COLLECTION_ENDPOINT_CREATED = "API_COLLECTION_ENDPOINT_CREATED";
+    public static final String API_COLLECTION_ENDPOINT_DELETED = "API_COLLECTION_ENDPOINT_DELETED";
+    public static final String API_COLLECTION_ENDPOINT_UPDATED = "API_COLLECTION_ENDPOINT_UPDATED";
+    public static final String API_COLLECTION_UPDATED = "API_COLLECTION_UPDATED";
 
     private ApiCollectionAuditEvents() {
     }

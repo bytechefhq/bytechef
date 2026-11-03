@@ -7,9 +7,12 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.facade;
 
+import com.bytechef.ee.automation.apiplatform.configuration.audit.ApiClientAuditEvents;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiClient;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiClientService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,12 +39,19 @@ public class ApiClientFacadeImpl implements ApiClientFacade {
     }
 
     @Override
+    @Audited(event = ApiClientAuditEvents.API_CLIENT_CREATED, data = {
+        @AuditData(key = "apiClientId", value = "#apiClient.id"),
+        @AuditData(key = "name", value = "#apiClient.name")
+    })
     @PreAuthorize("isTenantAdmin()")
     public String createApiClient(ApiClient apiClient) {
         return apiClientService.create(apiClient);
     }
 
     @Override
+    @Audited(event = ApiClientAuditEvents.API_CLIENT_DELETED, data = {
+        @AuditData(key = "apiClientId", value = "#id")
+    })
     @PreAuthorize("isTenantAdmin()")
     public void deleteApiClient(long id) {
         apiClientService.delete(id);
@@ -62,6 +72,10 @@ public class ApiClientFacadeImpl implements ApiClientFacade {
     }
 
     @Override
+    @Audited(event = ApiClientAuditEvents.API_CLIENT_UPDATED, data = {
+        @AuditData(key = "apiClientId", value = "#apiClient.id"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("isTenantAdmin()")
     public ApiClient updateApiClient(ApiClient apiClient) {
         return apiClientService.update(apiClient);
