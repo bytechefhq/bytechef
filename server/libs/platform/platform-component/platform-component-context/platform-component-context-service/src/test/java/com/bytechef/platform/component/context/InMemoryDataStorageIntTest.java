@@ -18,6 +18,7 @@ package com.bytechef.platform.component.context;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.LocalDate;
@@ -37,7 +38,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-class InMemoryDataStorageTest {
+class InMemoryDataStorageIntTest {
 
     private static final String COMPONENT_NAME = "dataStorage";
     private static final String SCOPE_ID = "1";
@@ -120,11 +121,13 @@ class InMemoryDataStorageTest {
     private static Stream<Arguments> cacheManagers() {
         ConcurrentMapCacheManager storeByValueCacheManager = new ConcurrentMapCacheManager();
 
-        storeByValueCacheManager.setBeanClassLoader(InMemoryDataStorageTest.class.getClassLoader());
+        storeByValueCacheManager.setBeanClassLoader(InMemoryDataStorageIntTest.class.getClassLoader());
         storeByValueCacheManager.setStoreByValue(true);
 
+        CacheConfiguration cacheConfiguration = new CacheConfiguration();
+
         return Stream.of(
-            Arguments.of(new ConcurrentMapCacheManager()),
+            Arguments.of(cacheConfiguration.cacheManager()),
             Arguments.of(storeByValueCacheManager));
     }
 }
