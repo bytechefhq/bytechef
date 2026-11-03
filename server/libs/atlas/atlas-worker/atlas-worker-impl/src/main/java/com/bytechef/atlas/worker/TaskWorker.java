@@ -208,7 +208,7 @@ public class TaskWorker {
             // pre tasks
             executeSubTasks(Validate.notNull(taskExecution.getJobId(), "id"), taskExecution.getPre(), context);
 
-            taskExecution.evaluate(context, evaluator);
+            resolvePreTaskOutputs(taskExecution, context);
 
             TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
 
@@ -255,7 +255,7 @@ public class TaskWorker {
             // pre tasks
             executeSubTasks(Validate.notNull(taskExecution.getJobId(), "id"), taskExecution.getPre(), context);
 
-            taskExecution.evaluate(context, evaluator);
+            resolvePreTaskOutputs(taskExecution, context);
 
             TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
 
@@ -274,6 +274,19 @@ public class TaskWorker {
             // finalize tasks
             executeSubTasks(Validate.notNull(taskExecution.getJobId(), "id"), taskExecution.getFinalize(), context);
         }
+    }
+
+    /**
+     * The coordinator has already evaluated the task against the job context, so evaluate it again only to resolve the
+     * outputs of its pre tasks. Evaluating it again otherwise would parse text taken from earlier task outputs, such as
+     * a literal {@code ${...}}, as an expression.
+     */
+    private void resolvePreTaskOutputs(TaskExecution taskExecution, Map<String, Object> context) {
+        if (context.isEmpty()) {
+            return;
+        }
+
+        taskExecution.evaluate(context, evaluator);
     }
 
     private void executeSubTasks(

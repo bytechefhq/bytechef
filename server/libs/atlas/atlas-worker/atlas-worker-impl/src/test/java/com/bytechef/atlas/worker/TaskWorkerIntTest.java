@@ -280,6 +280,24 @@ class TaskWorkerIntTest {
     }
 
     @Test
+    void testParametersEvaluatedByTheCoordinatorAreNotEvaluatedAgain() {
+        String value = "Ignores malformed `${...}` expressions and reports `${var_1[0]}` as a missing task";
+
+        TaskExecution taskExecution = createTaskExecution(
+            Map.of(
+                NAME, "name",
+                TYPE, "var",
+                PARAMETERS, Map.of("value", value)));
+
+        sendTaskExecutionEvent(taskExecution);
+
+        TaskExecution completedTaskExecution = awaitCompletedTaskExecution(taskExecution);
+
+        assertThat(taskFileStorage.readTaskExecutionOutput(completedTaskExecution.getOutput())).isEqualTo(value);
+        assertThat(findFailedTaskExecution(taskExecution)).isEmpty();
+    }
+
+    @Test
     void testPostTaskRunsAfterTheTaskCompletes() {
         String tempDirectoryPath = createTempDirectoryPath();
 
