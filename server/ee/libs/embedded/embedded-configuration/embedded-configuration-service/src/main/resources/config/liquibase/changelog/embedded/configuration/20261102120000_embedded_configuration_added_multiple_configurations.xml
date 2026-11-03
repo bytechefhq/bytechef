@@ -209,4 +209,18 @@
             <sql>DROP INDEX uk_automation_workflow_project_configuration_name</sql>
         </rollback>
     </changeSet>
+
+    <!-- PostgreSQL truncates identifiers to 63 characters, so the constraint dropped by changeset 8 exists under its
+         truncated name. -->
+    <changeSet id="20261102120000-10" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <uniqueConstraintExists tableName="automation_workflow_project_configuration"
+                                    constraintName="uk_automation_workflow_project_configuration_project_environmen"/>
+        </preConditions>
+
+        <dropUniqueConstraint tableName="automation_workflow_project_configuration"
+                              constraintName="uk_automation_workflow_project_configuration_project_environmen"/>
+
+        <rollback/>
+    </changeSet>
 </databaseChangeLog>
