@@ -360,6 +360,25 @@ describe('SSO discovery', () => {
         await waitFor(() => expect(ssoDiscoveryCalls()).toHaveLength(1));
     });
 
+    it('should send the XSRF token with the SSO provider lookup', async () => {
+        mockApplicationInfoStore({edition: 'EE'});
+
+        document.cookie = 'XSRF-TOKEN=xsrf-token-value';
+
+        renderLoginPageAt('/login');
+
+        await userEvent.type(screen.getByLabelText('Email'), 'user@example.com');
+        await userEvent.tab();
+
+        await waitFor(() => expect(ssoDiscoveryCalls()).toHaveLength(1));
+
+        const [, requestInit] = ssoDiscoveryCalls()[0];
+
+        expect(new Headers(requestInit.headers).get('X-XSRF-TOKEN')).toBe('xsrf-token-value');
+
+        document.cookie = 'XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    });
+
     it('should not look up an SSO provider when the email field loses focus in the Community edition', async () => {
         mockApplicationInfoStore({edition: 'CE'});
 
