@@ -48,11 +48,6 @@ vi.mock('@tanstack/react-query', async (importOriginal) => ({
     useQueryClient: () => ({invalidateQueries: mocks.invalidateQueries}),
 }));
 
-const environments = [
-    {id: 1, name: 'Development'},
-    {id: 2, name: 'Staging'},
-];
-
 type AutomationWorkflowProjectConfigurationType =
     AutomationWorkflowProjectConfigurationsQuery['automationWorkflowProjectConfigurations'][number];
 
@@ -123,7 +118,6 @@ const renderItem = (
             <AutomationWorkflowProjectConfigurationListItem
                 configuration={overrides.configuration ?? configuration}
                 configurations={overrides.configurations}
-                environments={environments}
                 onDelete={overrides.onDelete ?? vi.fn()}
                 onEdit={overrides.onEdit ?? vi.fn()}
                 onUpdateVersion={overrides.onUpdateVersion ?? vi.fn()}
@@ -187,11 +181,11 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         expect(screen.getByRole('button', {name: 'Mailer'})).toBeInTheDocument();
 
-        await user.click(screen.getByText('Staging'));
+        await user.click(screen.getByText('STAGING'));
 
         expect(screen.queryByRole('button', {name: 'Mailer'})).not.toBeInTheDocument();
 
-        await user.click(screen.getByText('Staging'));
+        await user.click(screen.getByText('STAGING'));
 
         expect(screen.getByRole('button', {name: 'Mailer'})).toBeInTheDocument();
     });
@@ -260,11 +254,11 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         expect(screen.queryByText(/paused/)).not.toBeInTheDocument();
     });
 
-    it('shows the configuration name with the environment beside it', () => {
+    it('shows the configuration name without the environment', () => {
         renderItem();
 
         expect(screen.getByText('STAGING')).toBeInTheDocument();
-        expect(screen.getByText('Staging')).toBeInTheDocument();
+        expect(screen.queryByText('Staging')).not.toBeInTheDocument();
     });
 
     it('shows the connected user count', () => {

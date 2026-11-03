@@ -11,15 +11,6 @@ const mocks = vi.hoisted(() => ({
     invalidateQueries: vi.fn(),
 }));
 
-vi.mock('@/shared/queries/platform/environments.queries', () => ({
-    useGetEnvironmentsQuery: () => ({
-        data: [
-            {id: 1, name: 'Development'},
-            {id: 2, name: 'Staging'},
-        ],
-    }),
-}));
-
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useAutomationWorkflowProjectConfigurationDeleteImpactQuery: () => ({
@@ -136,12 +127,12 @@ describe('AutomationWorkflowProjectConfigurationList', () => {
         expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
     });
 
-    it('lists the configurations by environment name instead of the empty state', () => {
+    it('lists the configurations by name instead of the empty state', () => {
         mocks.configurations = [configuration];
 
         renderList();
 
-        expect(screen.getByText('Staging')).toBeInTheDocument();
+        expect(screen.getByText(configuration.name)).toBeInTheDocument();
         expect(screen.queryByText('No Configurations')).not.toBeInTheDocument();
     });
 
