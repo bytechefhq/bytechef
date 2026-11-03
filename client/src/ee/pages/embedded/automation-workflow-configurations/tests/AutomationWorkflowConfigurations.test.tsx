@@ -186,16 +186,28 @@ describe('AutomationWorkflowConfigurations', () => {
         expect(screen.getAllByRole('button', {name: 'New Configuration'}).length).toBeGreaterThan(0);
     });
 
-    it('shows only the project chosen in the sidebar', () => {
+    it('shows one empty list for a project chosen in the sidebar without configurations', () => {
         mocks.projects = [makeProject('live', 'Live Project', true, 1), makeProject('other', 'Other Project', true)];
 
         renderPage('/embedded/automation-configurations?projectId=other');
 
         expect(screen.getByText('Projects: Other Project')).toBeInTheDocument();
-        expect(screen.getByRole('region', {name: 'Other Project'})).toBeInTheDocument();
+        expect(screen.getByText('No Matching Configurations')).toBeInTheDocument();
+        expect(screen.getByText('Other Project has no configurations in this environment.')).toBeInTheDocument();
+        expect(screen.queryByRole('region', {name: 'Other Project'})).not.toBeInTheDocument();
         expect(screen.queryByRole('region', {name: 'Live Project'})).not.toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Create Configuration'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'New Configuration'})).not.toHaveAttribute('aria-haspopup');
+    });
+
+    it('shows the configurations of the project chosen in the sidebar', () => {
+        mocks.projects = [makeProject('live', 'Live Project', true, 1), makeProject('other', 'Other Project', true)];
+
+        renderPage('/embedded/automation-configurations?projectId=live');
+
+        expect(screen.getByText('Projects: Live Project')).toBeInTheDocument();
+        expect(screen.getByRole('region', {name: 'Live Project'})).toBeInTheDocument();
+        expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
     });
 
     it('sends the user to Automations in development when no project is published', async () => {

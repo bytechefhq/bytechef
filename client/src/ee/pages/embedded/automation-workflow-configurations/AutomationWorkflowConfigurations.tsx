@@ -68,7 +68,9 @@ const AutomationWorkflowConfigurations = () => {
         [publishedProjects]
     );
 
-    const listedProjects = selectedProject ? [selectedProject] : configuredProjects;
+    const listedProjects = selectedProject
+        ? configuredProjects.filter((project) => project.id === selectedProject.id)
+        : configuredProjects;
 
     const isFirstRun = !projectsIsLoading && publishedProjects.length === 0;
 
@@ -147,6 +149,12 @@ const AutomationWorkflowConfigurations = () => {
                             </section>
                         ))}
                     </div>
+                ) : selectedProject ? (
+                    <EmptyList
+                        icon={<Settings2Icon className="size-24 text-stroke-neutral-tertiary" />}
+                        message={`${selectedProject.name} has no configurations in this environment.`}
+                        title="No Matching Configurations"
+                    />
                 ) : projectId ? (
                     <EmptyList
                         icon={<Settings2Icon className="size-24 text-stroke-neutral-tertiary" />}
