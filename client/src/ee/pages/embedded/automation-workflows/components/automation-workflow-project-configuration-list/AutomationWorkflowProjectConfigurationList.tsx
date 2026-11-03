@@ -72,6 +72,9 @@ const AutomationWorkflowProjectConfigurationList = ({
                     }
                     onEdit={onEdit}
                     onUpdateVersion={onUpdateVersion}
+                    otherConfigurations={configurations.filter(
+                        (otherConfiguration) => otherConfiguration.id !== configuration.id
+                    )}
                     project={project}
                 />
             ))}
