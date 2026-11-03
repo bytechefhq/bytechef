@@ -1,5 +1,8 @@
 export const EMBEDDED_APP_EVENTS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/embedded/build/app-events';
 
+export const EMBEDDED_AUTOMATION_CONFIGURATIONS_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/embedded/build/automations#configurations';
+
 export const EMBEDDED_CONNECTED_USERS_DOCUMENTATION_URL =
     'https://docs.bytechef.io/platform/embedded/monitor/connected-users';
 
