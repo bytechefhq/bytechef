@@ -154,6 +154,15 @@ public class WebhookDeliveryService {
             return new WebhookTestResult(
                 false, webhookDeliveryException.getStatusCode(), webhookDeliveryException.getResponseBody(),
                 describe(webhookDeliveryException));
+        } catch (RuntimeException runtimeException) {
+            if (runtimeException.getCause() instanceof InterruptedException) {
+                Thread.currentThread()
+                    .interrupt();
+            }
+
+            return new WebhookTestResult(
+                false, null, null, "Test send failed (" + runtimeException.getClass()
+                    .getSimpleName() + ")");
         }
     }
 

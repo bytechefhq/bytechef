@@ -320,28 +320,74 @@ class WebhookDeliveryServiceTest {
 
     @Test
     void testSendTestDoesNotAffectEndpointState() throws Exception {
-        respondWith("/test", 500, 500, 500, 500, 500);
+        int testCount = EndpointState.MAX_CONSECUTIVE_FAILURES + 1;
 
-        for (int index = 0; index < 5; index++) {
+        Integer[] failureStatuses = new Integer[testCount];
+
+        Arrays.fill(failureStatuses, 500);
+
+        respondWith("/test", failureStatuses);
+
+        for (int index = 0; index < testCount; index++) {
             webhookDeliveryService.sendTest(delivery("/test", 1));
         }
 
         WebhookDeliveryOutcome outcome = await(webhookDeliveryService.submit(delivery("/test", 1)));
 
         assertThat(outcome.anySent()).isTrue();
-        assertThat(requestCount).hasValue(6);
+        assertThat(requestCount).hasValue(testCount + 1);
     }
 
     @Test
-    void testSendTestRecordsNoMetrics() {
-        respondWith("/test", 500);
+    void testSendTestRecordsNoMetrics() throws Exception {
+        respondWith("/test", 500, 500);
 
-        webhookDeliveryService.sendTest(delivery("/test", 1));
+        int meterCountBefore = meterRegistry.getMeters()
+            .size();
 
-        assertThat(meterRegistry.getMeters()).noneMatch(meter -> meter.measure()
-            .iterator()
-            .next()
-            .getValue() != 0);
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(delivery("/test", 1));
+
+        assertThat(webhookTestResult.success()).isFalse();
+        assertThat(meterRegistry.getMeters()).hasSize(meterCountBefore);
+        assertThat(unsentCount("failed")).isZero();
+
+        await(webhookDeliveryService.submit(delivery("/test", 1)));
+
+        assertThat(unsentCount("failed")).isEqualTo(1);
+    }
+
+    @Test
+    void testSendTestCapsMultiByteBody() {
+        respondWith("/test", 200);
+        responseBodies.put("/test", "é".repeat(3000));
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(delivery("/test", 1));
+
+        assertThat(webhookTestResult.responseBody()).hasSizeLessThanOrEqualTo(1001)
+            .endsWith("…")
+            .doesNotContain("\uFFFD");
+    }
+
+    @Test
+    void testSendTestMapsRuntimeExceptionWithoutLeakingMessage() {
+        WebhookNotificationClient throwingWebhookNotificationClient = new WebhookNotificationClient() {
+
+            @Override
+            public WebhookNotificationClient.WebhookResponse post(
+                WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
+
+                throw new IllegalArgumentException("secret-value");
+            }
+        };
+
+        WebhookDeliveryService throwingWebhookDeliveryService = createService(
+            throwingWebhookNotificationClient, 2, 2, meterRegistryProvider(meterRegistry));
+
+        WebhookTestResult webhookTestResult = throwingWebhookDeliveryService.sendTest(delivery("/test", 1));
+
+        assertThat(webhookTestResult.success()).isFalse();
+        assertThat(webhookTestResult.error()).doesNotContain("secret-value")
+            .contains("IllegalArgumentException");
     }
 
     @Test
