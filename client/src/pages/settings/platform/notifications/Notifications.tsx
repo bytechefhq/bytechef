@@ -33,6 +33,7 @@ const Notifications = () => {
         saveNotification,
         selectedNotification,
         signingSecret,
+        testNotification,
     } = useNotifications();
 
     return (
@@ -81,6 +82,7 @@ const Notifications = () => {
                     onRegenerateSigningSecret={regenerateSigningSecret}
                     saveNotification={saveNotification}
                     selectedNotification={selectedNotification}
+                    testNotification={testNotification}
                 />
             )}
 
