@@ -20,11 +20,13 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
+import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
@@ -447,10 +449,11 @@ class AiSkillFacadeIntTest {
 
             PermissionServiceImpl permissionService = new PermissionServiceImpl(
                 new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class),
-                mock(ProjectRepository.class), mock(WorkspaceScopeCacheService.class),
+                mock(ProjectRepository.class), mock(WorkspaceScopeCache.class),
                 mock(WorkspaceUserRepository.class),
                 List.of(new AiSkillOwnershipResolver(aiSkillService, userService)), List.of(),
-                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
 
             StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
 
