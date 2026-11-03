@@ -31,6 +31,7 @@ import useNotifications, {
 } from '../hooks/useNotifications';
 import NotificationTestResult from './NotificationTestResult';
 import WebhookHeadersField from './WebhookHeadersField';
+import WebhookPresetSelect from './WebhookPresetSelect';
 
 const WEBHOOK_PAYLOAD_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/settings/notifications#webhook-requests';
 
@@ -293,6 +294,8 @@ const NotificationDialog = ({
                                         )}
                                     />
                                 )}
+
+                                {notificationType === NotificationTypeEnum.Webhook && <WebhookPresetSelect />}
 
                                 {notificationType === NotificationTypeEnum.Webhook && (
                                     <FormField
