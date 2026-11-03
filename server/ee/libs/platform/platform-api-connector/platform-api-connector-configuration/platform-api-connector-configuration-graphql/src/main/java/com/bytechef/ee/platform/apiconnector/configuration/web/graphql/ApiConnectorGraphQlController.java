@@ -18,15 +18,12 @@ import com.bytechef.ee.platform.apiconnector.configuration.dto.ParameterDefiniti
 import com.bytechef.ee.platform.apiconnector.configuration.dto.RequestBodyDefinitionDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ResponseDefinitionDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorFacade;
-import com.bytechef.ee.platform.apiconnector.configuration.service.OpenApiSpecificationGenerator;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -42,14 +39,10 @@ import org.springframework.stereotype.Controller;
 public class ApiConnectorGraphQlController {
 
     private final ApiConnectorFacade apiConnectorFacade;
-    private final OpenApiSpecificationGenerator openApiSpecificationGenerator;
 
     @SuppressFBWarnings("EI")
-    public ApiConnectorGraphQlController(
-        ApiConnectorFacade apiConnectorFacade, OpenApiSpecificationGenerator openApiSpecificationGenerator) {
-
+    public ApiConnectorGraphQlController(ApiConnectorFacade apiConnectorFacade) {
         this.apiConnectorFacade = apiConnectorFacade;
-        this.openApiSpecificationGenerator = openApiSpecificationGenerator;
     }
 
     @QueryMapping
@@ -130,13 +123,8 @@ public class ApiConnectorGraphQlController {
     }
 
     @MutationMapping
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public GenerateSpecificationResponseRecord generateSpecification(@Argument GenerateSpecificationInput input) {
-        GenerateSpecificationRequestDTO requestDTO = toDTO(input);
-
-        String specification = openApiSpecificationGenerator.generate(requestDTO);
-
-        return new GenerateSpecificationResponseRecord(specification);
+        return new GenerateSpecificationResponseRecord(apiConnectorFacade.generateSpecification(toDTO(input)));
     }
 
     @MutationMapping
