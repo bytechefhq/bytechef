@@ -313,6 +313,18 @@ class WebhookNotificationClientIntTest {
             });
     }
 
+    @Test
+    void testPostSendsTheSameAcceptHeaderAsBefore() {
+        WebhookDelivery webhookDelivery = delivery(url).build();
+
+        webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst());
+
+        assertThat(receivedHeaders.get()
+            .getFirst("Accept")).isEqualTo(
+                "text/plain, application/json, application/yaml, application/xml, text/xml, application/*+json, application/*+xml, */*");
+    }
+
     private void respondWith(String path, int status, String body) {
         httpServer.createContext(path, httpExchange -> {
             httpExchange.getRequestBody()
