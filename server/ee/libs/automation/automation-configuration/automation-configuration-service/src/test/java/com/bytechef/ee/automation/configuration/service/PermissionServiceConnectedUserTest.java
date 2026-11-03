@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
+import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -69,7 +70,8 @@ class PermissionServiceConnectedUserTest {
         permissionService = new PermissionServiceImpl(
             currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(), List.of(),
-            beanFactory.getBeanProvider(ConnectedUserAccessDecider.class));
+            beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
     }
 
     @AfterEach
@@ -138,7 +140,8 @@ class PermissionServiceConnectedUserTest {
         PermissionServiceImpl permissionServiceWithoutDecider = new PermissionServiceImpl(
             currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(), List.of(),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
 
         assertThat(
             AutomationAuthorizationContext.callSkippingChecks(permissionServiceWithoutDecider::isAuthorizationSkipped))

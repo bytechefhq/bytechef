@@ -98,6 +98,10 @@ class PermissionScopeTypeTest {
         "@permissionService.hasResourceRole",
         "@permissionService.isResourceOwner",
         "hasAuthority",
+        "hasEmbeddedScope",
+        "hasEmbeddedScopeInEnvironment",
+        "hasEmbeddedScopeInEnvironmentId",
+        "hasEmbeddedScopeInEveryEnvironment",
         "hasPermission",
         "hasResourceScopeInEnvironment",
         "hasResourceScopeInEnvironmentId",
@@ -133,6 +137,10 @@ class PermissionScopeTypeTest {
      * <li>{@code hasPermission(target, 'SCOPE')} — second argument, the three-argument overload that reads the resource
      * type off the object.</li>
      * <li>{@code hasWorkspaceScopeInEveryEnvironment(workspaceId, 'SCOPE')} — second argument.</li>
+     * <li>{@code hasEmbeddedScope('SCOPE')} and {@code hasEmbeddedScopeInEveryEnvironment('SCOPE')} — the only
+     * argument.</li>
+     * <li>{@code hasEmbeddedScopeInEnvironment('SCOPE', environment)} and its {@code InEnvironmentId} sibling — first
+     * of two, each with its own pattern for the reason given below.</li>
      * <li>{@code hasWorkspaceScopeInEnvironment(workspaceId, 'SCOPE', environment)} — second of three.</li>
      * <li>{@code hasWorkspaceScopeInEnvironmentId(workspaceId, 'SCOPE', environmentId)} — second of three. Needs its
      * own pattern rather than sharing the one above: that pattern ends at a literal {@code (}, which the {@code Id}
@@ -157,6 +165,10 @@ class PermissionScopeTypeTest {
             "hasWorkflowScopeIfProjectWorkflowInEnvironmentId\\(\\s*[^,()]+?,\\s*" + SCOPE_GROUP + "\\s*,"),
         Pattern.compile("hasPermission\\(\\s*[^,()]+?,\\s*'[A-Za-z][A-Za-z0-9]*'\\s*,\\s*" + SCOPE_GROUP + "\\s*\\)"),
         Pattern.compile("hasPermission\\(\\s*[^,()]+?,\\s*" + SCOPE_GROUP + "\\s*\\)"),
+        Pattern.compile("hasEmbeddedScope\\(\\s*" + SCOPE_GROUP + "\\s*\\)"),
+        Pattern.compile("hasEmbeddedScopeInEveryEnvironment\\(\\s*" + SCOPE_GROUP + "\\s*\\)"),
+        Pattern.compile("hasEmbeddedScopeInEnvironment\\(\\s*" + SCOPE_GROUP + "\\s*,"),
+        Pattern.compile("hasEmbeddedScopeInEnvironmentId\\(\\s*" + SCOPE_GROUP + "\\s*,"),
         Pattern.compile("hasWorkspaceScopeInEveryEnvironment\\(\\s*[^,()]+?,\\s*" + SCOPE_GROUP + "\\s*\\)"),
         Pattern.compile("hasWorkspaceScopeInEnvironment\\(\\s*[^,()]+?,\\s*" + SCOPE_GROUP + "\\s*,"),
         Pattern.compile("hasWorkspaceScopeInEnvironmentId\\(\\s*[^,()]+?,\\s*" + SCOPE_GROUP + "\\s*,"),
