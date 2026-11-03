@@ -9,9 +9,11 @@ package com.bytechef.ee.automation.configuration.audit;
 
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
+import com.bytechef.ee.automation.configuration.facade.ConnectionReassignmentFacade.MarkPendingOutcome;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
+import com.bytechef.platform.audit.AuditOutcome;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -89,12 +91,25 @@ public class ConnectionAuditMapper implements AuditMapper {
             }
             case ConnectionAuditEvents.CONNECTION_ACCESS_GRANTED, ConnectionAuditEvents.CONNECTION_ACCESS_REVOKED ->
                 data.put("targetUserId", String.valueOf(auditInvocation.requireArgument("userId")));
+            case ConnectionAuditEvents.CONNECTION_PENDING_REASSIGNMENT -> putUserId(
+                data, "previousOwnerUserId", (String) auditInvocation.requireArgument("expectedOwnerLogin"));
             case ConnectionAuditEvents.CONNECTION_REASSIGNED -> putReassignment(data, auditInvocation);
             default -> {
             }
         }
 
         return data;
+    }
+
+    @Override
+    public boolean shouldRecord(AuditInvocation auditInvocation) {
+        if (!ConnectionAuditEvents.CONNECTION_PENDING_REASSIGNMENT.equals(auditInvocation.event()) ||
+            auditInvocation.outcome() != AuditOutcome.SUCCESS) {
+
+            return true;
+        }
+
+        return auditInvocation.result() != MarkPendingOutcome.SKIPPED;
     }
 
     private List<Long> getOwnedConnectionIds(AuditInvocation auditInvocation) {

@@ -19,7 +19,9 @@ public final class ConnectionAuditEvents {
     public static final String CONNECTION_CREATED = "CONNECTION_CREATED";
     public static final String CONNECTION_CREDENTIALS_UPDATED = "CONNECTION_CREDENTIALS_UPDATED";
     public static final String CONNECTION_DELETED = "CONNECTION_DELETED";
+    public static final String CONNECTION_PENDING_REASSIGNMENT = "CONNECTION_PENDING_REASSIGNMENT";
     public static final String CONNECTION_REASSIGNED = "CONNECTION_REASSIGNED";
+    public static final String CONNECTION_UPDATED = "CONNECTION_UPDATED";
     public static final String CONNECTION_VISIBILITY_CHANGED = "CONNECTION_VISIBILITY_CHANGED";
 
     private ConnectionAuditEvents() {
