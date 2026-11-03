@@ -30,6 +30,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -44,6 +45,9 @@ public class NotificationServiceIntTest {
 
     @MockitoBean
     private MailService mailService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private NotificationService notificationService;
@@ -80,5 +84,47 @@ public class NotificationServiceIntTest {
 
         assertThat(notifications).hasSize(1)
             .contains(notification);
+    }
+
+    @Test
+    public void testSecretSettingsAreStoredEncrypted() {
+        Notification notification = new Notification();
+
+        notification.setName("Secret Notification");
+        notification.setType(Notification.Type.WEBHOOK);
+        notification.setSettings(Map.of("webhook", "https://example.com/hook"));
+        notification.setSecretSettings(Map.of("webhookSecret", "whsec_abc"));
+        notification.setNotificationEventIds(List.of(1L));
+
+        notification = notificationService.create(notification);
+
+        Notification reloaded = notificationRepository.findById(notification.getId())
+            .orElseThrow();
+
+        assertThat(reloaded.getSecretSettings()).containsEntry("webhookSecret", "whsec_abc");
+        assertThat(reloaded.getSetting("webhookSecret")).isEqualTo("whsec_abc");
+
+        String rawSecretSettings = jdbcTemplate.queryForObject(
+            "SELECT secret_settings FROM notification WHERE id = ?", String.class, notification.getId());
+
+        assertThat(rawSecretSettings).isNotNull()
+            .doesNotContain("whsec_abc");
+    }
+
+    @Test
+    public void testLegacyRowWithoutSecretSettingsLoads() {
+        jdbcTemplate.update(
+            "INSERT INTO notification (name, type, settings, created_by, created_date, last_modified_by, " +
+                "last_modified_date, version, secret_settings) VALUES (?, ?, ?, ?, now(), ?, now(), 0, NULL)",
+            "Legacy", Notification.Type.SLACK.ordinal(), "{\"slackWebhookUrl\":\"https://hooks.slack.com/x\"}",
+            "system", "system");
+
+        Notification legacy = notificationRepository.findAll()
+            .iterator()
+            .next();
+
+        assertThat(legacy.getSecretSettings()).isEmpty();
+        assertThat(legacy.getSetting("slackWebhookUrl")).isEqualTo("https://hooks.slack.com/x");
+        assertThat(legacy.getSetting("missing")).isNull();
     }
 }

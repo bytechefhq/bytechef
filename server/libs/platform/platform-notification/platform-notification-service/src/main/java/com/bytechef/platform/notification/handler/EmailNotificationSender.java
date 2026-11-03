@@ -18,7 +18,6 @@ package com.bytechef.platform.notification.handler;
 
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.domain.Notification;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
 
@@ -45,9 +44,7 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
         Notification notification, EmailNotificationHandler emailNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
-        Map<String, Object> settings = notification.getSettings();
-
-        String email = (String) settings.get("email");
+        String email = (String) notification.getSetting("email");
 
         if (email == null || email.isBlank()) {
             throw new IllegalStateException(

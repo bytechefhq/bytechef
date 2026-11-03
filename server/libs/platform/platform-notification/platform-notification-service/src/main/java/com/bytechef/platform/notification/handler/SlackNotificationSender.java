@@ -49,9 +49,7 @@ public class SlackNotificationSender implements NotificationSender<SlackNotifica
         Notification notification, SlackNotificationHandler slackNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
-        Map<String, Object> settings = notification.getSettings();
-
-        String slackWebhookUrl = (String) settings.get("slackWebhookUrl");
+        String slackWebhookUrl = (String) notification.getSetting("slackWebhookUrl");
 
         if (slackWebhookUrl == null || slackWebhookUrl.isBlank()) {
             throw new IllegalStateException(

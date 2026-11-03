@@ -22,7 +22,6 @@ import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.delivery.WebhookRetry;
 import com.bytechef.platform.notification.domain.Notification;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
@@ -52,9 +51,7 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
         Notification notification, WebhookNotificationHandler webhookNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
-        Map<String, Object> settings = notification.getSettings();
-
-        String url = (String) settings.get("webhook");
+        String url = (String) notification.getSetting("webhook");
 
         if (url == null || url.isBlank()) {
             throw new IllegalStateException(
@@ -67,7 +64,7 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
         WebhookDelivery webhookDelivery = WebhookDelivery.builder("notification", url)
             .description("notification " + notification.getId() + " '" + notification.getName() + "'")
             .eventType("job.status")
-            .secret((String) settings.get("webhookSecret"))
+            .secret((String) notification.getSetting("webhookSecret"))
             .validateUrl(true)
             .payload(
                 String.valueOf(deliveryContext.getJobId()),
