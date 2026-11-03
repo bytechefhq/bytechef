@@ -8,8 +8,11 @@
 package com.bytechef.ee.platform.configuration.facade;
 
 import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.ee.platform.configuration.audit.GitConfigurationAuditEvents;
 import com.bytechef.ee.platform.configuration.dto.GitConfigurationDTO;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -61,6 +64,9 @@ public class GitConfigurationFacadeImpl implements GitConfigurationFacade {
     }
 
     @Override
+    @Audited(event = GitConfigurationAuditEvents.GIT_CONFIGURATION_SAVED, data = {
+        @AuditData(key = "workspaceId", value = "#workspaceId")
+    })
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MANAGE')")
     public void save(GitConfigurationDTO gitConfigurationDTO, long workspaceId) {
         fetchGitConfiguration(workspaceId).ifPresentOrElse(

@@ -18,6 +18,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.automation.configuration.audit.ProjectGitAuditEvents;
 import com.bytechef.ee.automation.configuration.domain.ProjectGitConfiguration;
 import com.bytechef.ee.automation.configuration.service.ProjectGitConfigurationService;
 import com.bytechef.ee.automation.configuration.service.ProjectGitService;
@@ -25,6 +26,8 @@ import com.bytechef.ee.automation.configuration.service.WorkspaceService;
 import com.bytechef.ee.platform.configuration.dto.GitConfigurationDTO;
 import com.bytechef.ee.platform.configuration.facade.GitConfigurationFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -76,6 +79,9 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     // has started, and not at all when the branch is empty, so they cannot stand in for one here. The publish requires
     // WORKFLOW_EDIT and PROJECT_PUBLISH on the project.
     @Override
+    @Audited(event = ProjectGitAuditEvents.PROJECT_GIT_PULLED, data = {
+        @AuditData(key = "projectId", value = "#projectId")
+    })
     @PreAuthorize("hasPermission(#projectId, 'Project', 'PROJECT_PULL')")
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     public void pullProjectFromGit(long projectId) {
@@ -155,6 +161,10 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     // role can hold one without the other. Push stays with editors because it writes to a branch of a repository an
     // administrator configured and changes nothing inside ByteChef; pull, which overwrites the project, is ADMIN.
     @Override
+    @Audited(event = ProjectGitAuditEvents.PROJECT_GIT_PUSHED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "commitId", value = "#result")
+    })
     @PreAuthorize("hasPermission(#projectId, 'Project', 'PROJECT_PUSH')")
     public String pushProjectToGit(long projectId, String commitMessage) {
         Project project = projectService.getProject(projectId);
@@ -180,6 +190,11 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     // The reads stay open: a branch name and an enabled flag are not sensitive, and the project list and the project
     // menu load them for every member.
     @Override
+    @Audited(event = ProjectGitAuditEvents.PROJECT_GIT_CONFIGURATION_SAVED, data = {
+        @AuditData(key = "projectId", value = "#projectGitConfiguration.projectId"),
+        @AuditData(key = "branch", value = "#projectGitConfiguration.branch"),
+        @AuditData(key = "enabled", value = "#projectGitConfiguration.enabled")
+    })
     @PreAuthorize("hasPermission(#projectGitConfiguration.projectId, 'Project', 'WORKSPACE_MANAGE')")
     public void saveProjectGitConfiguration(ProjectGitConfiguration projectGitConfiguration) {
         projectGitConfigurationService.save(projectGitConfiguration);
