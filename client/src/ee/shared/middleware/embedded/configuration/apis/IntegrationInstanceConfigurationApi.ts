@@ -34,6 +34,11 @@ import {
     ConfigurationMoveResultToJSON,
 } from '../models/ConfigurationMoveResult';
 import {
+    type ConfigurationUpgradeRequest,
+    ConfigurationUpgradeRequestFromJSON,
+    ConfigurationUpgradeRequestToJSON,
+} from '../models/ConfigurationUpgradeRequest';
+import {
     type CreateIntegrationInstanceConfigurationWorkflowJob200Response,
     CreateIntegrationInstanceConfigurationWorkflowJob200ResponseFromJSON,
     CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSON,
@@ -125,6 +130,17 @@ export interface GetIntegrationInstanceConfigurationMoveImpactRequest {
     configurationMoveRequest: ConfigurationMoveRequest;
 }
 
+export interface GetIntegrationInstanceConfigurationUpgradeImpactRequest {
+    /**
+     * The id of the target integration instance configuration.
+     */
+    id: number;
+    /**
+     * 
+     */
+    configurationUpgradeRequest: ConfigurationUpgradeRequest;
+}
+
 export interface GetIntegrationInstanceConfigurationsRequest {
     /**
      * The environment id.
@@ -179,6 +195,17 @@ export interface UpdateIntegrationInstanceConfigurationWorkflowRequest {
      * 
      */
     integrationInstanceConfigurationWorkflow: Omit<IntegrationInstanceConfigurationWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowUuid'>;
+}
+
+export interface UpgradeIntegrationInstanceConfigurationConnectedUsersRequest {
+    /**
+     * The id of the target integration instance configuration.
+     */
+    id: number;
+    /**
+     * 
+     */
+    configurationUpgradeRequest: ConfigurationUpgradeRequest;
 }
 
 /**
@@ -608,6 +635,63 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for getIntegrationInstanceConfigurationUpgradeImpact without sending the request
+     */
+    async getIntegrationInstanceConfigurationUpgradeImpactRequestOpts(requestParameters: GetIntegrationInstanceConfigurationUpgradeImpactRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getIntegrationInstanceConfigurationUpgradeImpact().'
+            );
+        }
+
+        if (requestParameters['configurationUpgradeRequest'] == null) {
+            throw new runtime.RequiredError(
+                'configurationUpgradeRequest',
+                'Required parameter "configurationUpgradeRequest" was null or undefined when calling getIntegrationInstanceConfigurationUpgradeImpact().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/integration-instance-configurations/{id}/upgrade-impact`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ConfigurationUpgradeRequestToJSON(requestParameters['configurationUpgradeRequest']),
+        };
+    }
+
+    /**
+     * Preview what upgrading connected users to an integration instance configuration would change.
+     * Preview upgrading connected users to an integration instance configuration
+     */
+    async getIntegrationInstanceConfigurationUpgradeImpactRaw(requestParameters: GetIntegrationInstanceConfigurationUpgradeImpactRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConfigurationMoveImpact>> {
+        const requestOptions = await this.getIntegrationInstanceConfigurationUpgradeImpactRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConfigurationMoveImpactFromJSON(jsonValue));
+    }
+
+    /**
+     * Preview what upgrading connected users to an integration instance configuration would change.
+     * Preview upgrading connected users to an integration instance configuration
+     */
+    async getIntegrationInstanceConfigurationUpgradeImpact(requestParameters: GetIntegrationInstanceConfigurationUpgradeImpactRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConfigurationMoveImpact> {
+        const response = await this.getIntegrationInstanceConfigurationUpgradeImpactRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for getIntegrationInstanceConfigurations without sending the request
      */
     async getIntegrationInstanceConfigurationsRequestOpts(requestParameters: GetIntegrationInstanceConfigurationsRequest): Promise<runtime.RequestOpts> {
@@ -837,6 +921,63 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      */
     async updateIntegrationInstanceConfigurationWorkflow(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for upgradeIntegrationInstanceConfigurationConnectedUsers without sending the request
+     */
+    async upgradeIntegrationInstanceConfigurationConnectedUsersRequestOpts(requestParameters: UpgradeIntegrationInstanceConfigurationConnectedUsersRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling upgradeIntegrationInstanceConfigurationConnectedUsers().'
+            );
+        }
+
+        if (requestParameters['configurationUpgradeRequest'] == null) {
+            throw new runtime.RequiredError(
+                'configurationUpgradeRequest',
+                'Required parameter "configurationUpgradeRequest" was null or undefined when calling upgradeIntegrationInstanceConfigurationConnectedUsers().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/integration-instance-configurations/{id}/upgrade`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ConfigurationUpgradeRequestToJSON(requestParameters['configurationUpgradeRequest']),
+        };
+    }
+
+    /**
+     * Upgrade connected users to an integration instance configuration.
+     * Upgrade connected users to an integration instance configuration
+     */
+    async upgradeIntegrationInstanceConfigurationConnectedUsersRaw(requestParameters: UpgradeIntegrationInstanceConfigurationConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConfigurationMoveResult>> {
+        const requestOptions = await this.upgradeIntegrationInstanceConfigurationConnectedUsersRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConfigurationMoveResultFromJSON(jsonValue));
+    }
+
+    /**
+     * Upgrade connected users to an integration instance configuration.
+     * Upgrade connected users to an integration instance configuration
+     */
+    async upgradeIntegrationInstanceConfigurationConnectedUsers(requestParameters: UpgradeIntegrationInstanceConfigurationConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConfigurationMoveResult> {
+        const response = await this.upgradeIntegrationInstanceConfigurationConnectedUsersRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

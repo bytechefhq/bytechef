@@ -12,10 +12,12 @@ All URIs are relative to */api/embedded/internal*
 | [**getIntegrationInstanceConfiguration**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfiguration) | **GET** /integration-instance-configurations/{id} | Get an integration instance configuration by id |
 | [**getIntegrationInstanceConfigurationConnectedUsers**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfigurationconnectedusers) | **GET** /integration-instance-configurations/{id}/connected-users | Get the connected users of an integration instance configuration |
 | [**getIntegrationInstanceConfigurationMoveImpact**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfigurationmoveimpact) | **POST** /integration-instance-configurations/{id}/move-impact | Preview moving connected users to another integration instance configuration |
+| [**getIntegrationInstanceConfigurationUpgradeImpact**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfigurationupgradeimpact) | **POST** /integration-instance-configurations/{id}/upgrade-impact | Preview upgrading connected users to an integration instance configuration |
 | [**getIntegrationInstanceConfigurations**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfigurations) | **GET** /integration-instance-configurations | Get integration instance configurations |
 | [**moveIntegrationInstanceConfigurationConnectedUsers**](IntegrationInstanceConfigurationApi.md#moveintegrationinstanceconfigurationconnectedusers) | **POST** /integration-instance-configurations/{id}/move | Move connected users to another integration instance configuration |
 | [**updateIntegrationInstanceConfiguration**](IntegrationInstanceConfigurationApi.md#updateintegrationinstanceconfiguration) | **PUT** /integration-instance-configurations/{id} | Update an existing integration instance configuration |
 | [**updateIntegrationInstanceConfigurationWorkflow**](IntegrationInstanceConfigurationApi.md#updateintegrationinstanceconfigurationworkflow) | **PUT** /integration-instance-configurations/{id}/workflows/{workflowId} | Update an existing integration instance configuration workflow |
+| [**upgradeIntegrationInstanceConfigurationConnectedUsers**](IntegrationInstanceConfigurationApi.md#upgradeintegrationinstanceconfigurationconnectedusers) | **POST** /integration-instance-configurations/{id}/upgrade | Upgrade connected users to an integration instance configuration |
 
 
 
@@ -570,6 +572,76 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## getIntegrationInstanceConfigurationUpgradeImpact
+
+> ConfigurationMoveImpact getIntegrationInstanceConfigurationUpgradeImpact(id, configurationUpgradeRequest)
+
+Preview upgrading connected users to an integration instance configuration
+
+Preview what upgrading connected users to an integration instance configuration would change.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationInstanceConfigurationApi,
+} from '';
+import type { GetIntegrationInstanceConfigurationUpgradeImpactRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationInstanceConfigurationApi();
+
+  const body = {
+    // number | The id of the target integration instance configuration.
+    id: 789,
+    // ConfigurationUpgradeRequest
+    configurationUpgradeRequest: ...,
+  } satisfies GetIntegrationInstanceConfigurationUpgradeImpactRequest;
+
+  try {
+    const data = await api.getIntegrationInstanceConfigurationUpgradeImpact(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of the target integration instance configuration. | [Defaults to `undefined`] |
+| **configurationUpgradeRequest** | [ConfigurationUpgradeRequest](ConfigurationUpgradeRequest.md) |  | |
+
+### Return type
+
+[**ConfigurationMoveImpact**](ConfigurationMoveImpact.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | What the upgrade would change. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## getIntegrationInstanceConfigurations
 
 > Array&lt;IntegrationInstanceConfiguration&gt; getIntegrationInstanceConfigurations(environmentId, integrationId, tagId, includeAllFields)
@@ -855,6 +927,76 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **204** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## upgradeIntegrationInstanceConfigurationConnectedUsers
+
+> ConfigurationMoveResult upgradeIntegrationInstanceConfigurationConnectedUsers(id, configurationUpgradeRequest)
+
+Upgrade connected users to an integration instance configuration
+
+Upgrade connected users to an integration instance configuration.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationInstanceConfigurationApi,
+} from '';
+import type { UpgradeIntegrationInstanceConfigurationConnectedUsersRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationInstanceConfigurationApi();
+
+  const body = {
+    // number | The id of the target integration instance configuration.
+    id: 789,
+    // ConfigurationUpgradeRequest
+    configurationUpgradeRequest: ...,
+  } satisfies UpgradeIntegrationInstanceConfigurationConnectedUsersRequest;
+
+  try {
+    const data = await api.upgradeIntegrationInstanceConfigurationConnectedUsers(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of the target integration instance configuration. | [Defaults to `undefined`] |
+| **configurationUpgradeRequest** | [ConfigurationUpgradeRequest](ConfigurationUpgradeRequest.md) |  | |
+
+### Return type
+
+[**ConfigurationMoveResult**](ConfigurationMoveResult.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The outcome of the upgrade. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

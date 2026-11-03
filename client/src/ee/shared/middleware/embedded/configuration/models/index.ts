@@ -13,6 +13,7 @@ export * from './ConfigurationMoveImpactWorkflow';
 export * from './ConfigurationMoveRequest';
 export * from './ConfigurationMoveResult';
 export * from './ConfigurationMoveSkipped';
+export * from './ConfigurationUpgradeRequest';
 export * from './ConnectedUserProjectWorkflow';
 export * from './Connection';
 export * from './ConnectionBase';

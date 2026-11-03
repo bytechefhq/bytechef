@@ -9,6 +9,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationConnec
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveImpactModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveResultModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationUpgradeRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
@@ -40,7 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T03:39:06.802257+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T16:14:51.079815+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "integration-instance-configuration", description = "the integration-instance-configuration API")
 public interface IntegrationInstanceConfigurationApi {
@@ -344,6 +345,50 @@ public interface IntegrationInstanceConfigurationApi {
     }
 
 
+    String PATH_GET_INTEGRATION_INSTANCE_CONFIGURATION_UPGRADE_IMPACT = "/integration-instance-configurations/{id}/upgrade-impact";
+    /**
+     * POST /integration-instance-configurations/{id}/upgrade-impact : Preview upgrading connected users to an integration instance configuration
+     * Preview what upgrading connected users to an integration instance configuration would change.
+     *
+     * @param id The id of the target integration instance configuration. (required)
+     * @param configurationUpgradeRequestModel  (required)
+     * @return What the upgrade would change. (status code 200)
+     */
+    @Operation(
+        operationId = "getIntegrationInstanceConfigurationUpgradeImpact",
+        summary = "Preview upgrading connected users to an integration instance configuration",
+        description = "Preview what upgrading connected users to an integration instance configuration would change.",
+        tags = { "integration-instance-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "What the upgrade would change.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ConfigurationMoveImpactModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = IntegrationInstanceConfigurationApi.PATH_GET_INTEGRATION_INSTANCE_CONFIGURATION_UPGRADE_IMPACT,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<ConfigurationMoveImpactModel> getIntegrationInstanceConfigurationUpgradeImpact(
+        @Parameter(name = "id", description = "The id of the target integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "ConfigurationUpgradeRequestModel", description = "", required = true) @Valid @RequestBody ConfigurationUpgradeRequestModel configurationUpgradeRequestModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"mcpServerCount\" : 0, \"skipped\" : [ { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] }, { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] } ], \"workflows\" : [ { \"affectedConnectedUserCount\" : 1, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" }, { \"affectedConnectedUserCount\" : 1, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
     String PATH_GET_INTEGRATION_INSTANCE_CONFIGURATIONS = "/integration-instance-configurations";
     /**
      * GET /integration-instance-configurations : Get integration instance configurations
@@ -496,6 +541,50 @@ public interface IntegrationInstanceConfigurationApi {
         @Parameter(name = "workflowId", description = "The id of an integration instance configuration workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") Long workflowId,
         @Parameter(name = "IntegrationInstanceConfigurationWorkflowModel", description = "", required = true) @Valid @RequestBody IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationWorkflowModel
     ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_UPGRADE_INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USERS = "/integration-instance-configurations/{id}/upgrade";
+    /**
+     * POST /integration-instance-configurations/{id}/upgrade : Upgrade connected users to an integration instance configuration
+     * Upgrade connected users to an integration instance configuration.
+     *
+     * @param id The id of the target integration instance configuration. (required)
+     * @param configurationUpgradeRequestModel  (required)
+     * @return The outcome of the upgrade. (status code 200)
+     */
+    @Operation(
+        operationId = "upgradeIntegrationInstanceConfigurationConnectedUsers",
+        summary = "Upgrade connected users to an integration instance configuration",
+        description = "Upgrade connected users to an integration instance configuration.",
+        tags = { "integration-instance-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The outcome of the upgrade.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ConfigurationMoveResultModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = IntegrationInstanceConfigurationApi.PATH_UPGRADE_INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USERS,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<ConfigurationMoveResultModel> upgradeIntegrationInstanceConfigurationConnectedUsers(
+        @Parameter(name = "id", description = "The id of the target integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "ConfigurationUpgradeRequestModel", description = "", required = true) @Valid @RequestBody ConfigurationUpgradeRequestModel configurationUpgradeRequestModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"movedConnectedUserIds\" : [ 0, 0 ], \"needsAttentionConnectedUserIds\" : [ 6, 6 ], \"skipped\" : [ { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] }, { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

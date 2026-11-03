@@ -27,6 +27,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/Configuratio
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConfigurationMoveRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConfigurationMoveResultModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConfigurationMoveSkippedModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConfigurationUpgradeRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConnectedUserProjectWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConnectionBaseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConnectionModel.java
