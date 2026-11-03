@@ -30,6 +30,7 @@ import getAvailableComponentVersions from '../utils/getAvailableComponentVersion
 import getNodeOperationDescription from '../utils/getNodeOperationDescription';
 import {resolveMainClusterRootName} from '../utils/resolveClusterRootId';
 import {DescriptionTabSkeleton, FieldsetSkeleton, PropertiesTabSkeleton} from './WorkflowEditorSkeletons';
+import WorkflowNodeDetailsPanelMissingDefinition from './WorkflowNodeDetailsPanelMissingDefinition';
 import {
     WorkflowNodeDetailsErrorI,
     getWorkflowNodeDetailsErrorsSummary,
@@ -98,6 +99,7 @@ const WorkflowNodeDetailsPanel = ({
         handleOperationSelectChange,
         handlePanelClose,
         handleVersionSelectChange,
+        missingDefinitionMessage,
         nodeDefinition,
         nodeTabs,
         operationDataMissing,
@@ -122,6 +124,16 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const nodeVersion = getNodeVersion(currentWorkflowNode);
+
+    const missingDefinitionOperations = useMemo(
+        () =>
+            missingDefinitionMessage
+                ? currentNode?.trigger
+                    ? currentComponentDefinition?.triggers
+                    : currentComponentDefinition?.actions
+                : undefined,
+        [currentComponentDefinition, currentNode?.trigger, missingDefinitionMessage]
+    );
 
     const availableVersions = useMemo(
         () => getAvailableComponentVersions({componentDefinitionVersions, nodeVersion}),
@@ -170,7 +182,27 @@ const WorkflowNodeDetailsPanel = ({
                 className="h-full"
                 key={`${currentNode?.workflowNodeName}-${currentNode?.operationName}`}
             >
-                {currentNode?.workflowNodeName && currentWorkflowNode && (
+                {currentNode?.workflowNodeName && missingDefinitionMessage && (
+                    <WorkflowNodeDetailsPanelMissingDefinition
+                        closeButton={closeButton}
+                        label={nodeLabel || currentNode.label}
+                        message={missingDefinitionMessage}
+                        onClose={onClose || handlePanelClose}
+                        operationSelect={
+                            !!missingDefinitionOperations?.length && (
+                                <CurrentOperationSelect
+                                    handleValueChange={handleOperationSelectChange}
+                                    operations={missingDefinitionOperations}
+                                    triggerSelect={currentNode.trigger}
+                                    value={currentOperationName}
+                                />
+                            )
+                        }
+                        workflowNodeName={currentNode.workflowNodeName}
+                    />
+                )}
+
+                {currentNode?.workflowNodeName && currentWorkflowNode && !missingDefinitionMessage && (
                     <div className="flex h-full flex-col divide-y divide-muted bg-background dark:bg-popover">
                         <header className="flex h-20 shrink-0 items-center justify-between p-4 text-lg font-medium">
                             <div className="flex min-w-0 flex-1 items-center gap-2">
