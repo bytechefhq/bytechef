@@ -49,7 +49,7 @@ const WebSearchProviderForm = ({environment, onClose, showCancel, webSearchProvi
 
     const updateWebSearchProviderMutation = useUpdateWebSearchProviderMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['webSearchProviders']});
+            void queryClient.invalidateQueries({queryKey: ['webSearchProviders']});
 
             onClose();
         },
