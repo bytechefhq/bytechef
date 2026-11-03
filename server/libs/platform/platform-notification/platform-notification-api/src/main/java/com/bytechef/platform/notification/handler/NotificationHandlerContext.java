@@ -17,11 +17,59 @@
 package com.bytechef.platform.notification.handler;
 
 import com.bytechef.platform.notification.domain.NotificationEvent;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Matija Petanjek
  */
 public class NotificationHandlerContext {
+
+    /**
+     * @param id
+     * @param name
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @param durationMillis
+     */
+    public record JobSummary(
+        Long id, String name, String status, Instant startDate, Instant endDate, Long durationMillis) {
+    }
+
+    /**
+     * @param id
+     * @param name
+     */
+    public record WorkflowSummary(String id, String name) {
+    }
+
+    /**
+     * @param id
+     * @param name
+     * @param version
+     */
+    public record ProjectSummary(Long id, String name, Integer version) {
+    }
+
+    /**
+     * @param taskName
+     * @param taskType
+     * @param message
+     * @param stackTrace
+     */
+    public record ErrorSummary(String taskName, String taskType, String message, String stackTrace) {
+    }
+
+    /**
+     * @param expiresAt
+     * @param formUrl
+     */
+    public record ApprovalSummary(String expiresAt, String formUrl) {
+    }
 
     public static class Builder {
 
@@ -33,6 +81,15 @@ public class NotificationHandlerContext {
             notificationHandlerContext.eventType = eventType;
             notificationHandlerContext.jobId = jobId;
             notificationHandlerContext.jobName = jobName;
+            notificationHandlerContext.deliveryId = deliveryId;
+            notificationHandlerContext.timestamp = timestamp;
+            notificationHandlerContext.source = source;
+            notificationHandlerContext.environment = environment;
+            notificationHandlerContext.executionUrl = executionUrl;
+            notificationHandlerContext.job = job;
+            notificationHandlerContext.workflow = workflow;
+            notificationHandlerContext.project = project;
+            notificationHandlerContext.error = error;
 
             return notificationHandlerContext;
         }
@@ -67,11 +124,74 @@ public class NotificationHandlerContext {
             return this;
         }
 
+        public Builder deliveryId(String deliveryId) {
+            this.deliveryId = deliveryId;
+
+            return this;
+        }
+
+        public Builder timestamp(Instant timestamp) {
+            this.timestamp = timestamp;
+
+            return this;
+        }
+
+        public Builder source(String source) {
+            this.source = source;
+
+            return this;
+        }
+
+        public Builder environment(String environment) {
+            this.environment = environment;
+
+            return this;
+        }
+
+        public Builder executionUrl(String executionUrl) {
+            this.executionUrl = executionUrl;
+
+            return this;
+        }
+
+        public Builder job(JobSummary job) {
+            this.job = job;
+
+            return this;
+        }
+
+        public Builder workflow(WorkflowSummary workflow) {
+            this.workflow = workflow;
+
+            return this;
+        }
+
+        public Builder project(ProjectSummary project) {
+            this.project = project;
+
+            return this;
+        }
+
+        public Builder error(ErrorSummary error) {
+            this.error = error;
+
+            return this;
+        }
+
         private String approvalExpiresAt;
         private String approvalFormUrl;
         private NotificationEvent.Type eventType;
         private Long jobId;
         private String jobName;
+        private String deliveryId;
+        private Instant timestamp;
+        private String source;
+        private String environment;
+        private String executionUrl;
+        private JobSummary job;
+        private WorkflowSummary workflow;
+        private ProjectSummary project;
+        private ErrorSummary error;
     }
 
     public String getApprovalExpiresAt() {
@@ -94,6 +214,173 @@ public class NotificationHandlerContext {
         return jobName;
     }
 
+    public String getDeliveryId() {
+        return deliveryId;
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public String getEnvironment() {
+        return environment;
+    }
+
+    public String getExecutionUrl() {
+        return executionUrl;
+    }
+
+    public JobSummary getJob() {
+        return job;
+    }
+
+    public WorkflowSummary getWorkflow() {
+        return workflow;
+    }
+
+    public ProjectSummary getProject() {
+        return project;
+    }
+
+    public ErrorSummary getError() {
+        return error;
+    }
+
+    public ApprovalSummary getApproval() {
+        if (approvalExpiresAt == null && approvalFormUrl == null) {
+            return null;
+        }
+
+        return new ApprovalSummary(approvalExpiresAt, approvalFormUrl);
+    }
+
+    /**
+     * Returns the default webhook body: the legacy keys first, followed by the summary sections that are present.
+     */
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
+
+        map.put("eventType", eventType == null ? null : eventType.name());
+        map.put("jobId", jobId);
+        map.put("jobName", jobName);
+
+        if (approvalExpiresAt != null) {
+            map.put("approvalExpiresAt", approvalExpiresAt);
+        }
+
+        if (approvalFormUrl != null) {
+            map.put("approvalFormUrl", approvalFormUrl);
+        }
+
+        Instant resolvedTimestamp = timestamp == null ? Instant.now() : timestamp;
+
+        map.put("timestamp", resolvedTimestamp.toString());
+
+        putIfPresent(map, "deliveryId", deliveryId);
+        putIfPresent(map, "source", source);
+
+        if (job != null) {
+            Map<String, Object> jobMap = new LinkedHashMap<>();
+
+            putIfPresent(jobMap, "id", job.id());
+            putIfPresent(jobMap, "name", job.name());
+            putIfPresent(jobMap, "status", job.status());
+            putIfPresent(jobMap, "startDate", job.startDate() == null ? null : job.startDate()
+                .toString());
+            putIfPresent(jobMap, "endDate", job.endDate() == null ? null : job.endDate()
+                .toString());
+            putIfPresent(jobMap, "durationMillis", job.durationMillis());
+
+            map.put("job", jobMap);
+        }
+
+        if (workflow != null) {
+            Map<String, Object> workflowMap = new LinkedHashMap<>();
+
+            putIfPresent(workflowMap, "id", workflow.id());
+            putIfPresent(workflowMap, "name", workflow.name());
+
+            map.put("workflow", workflowMap);
+        }
+
+        if (project != null) {
+            Map<String, Object> projectMap = new LinkedHashMap<>();
+
+            putIfPresent(projectMap, "id", project.id());
+            putIfPresent(projectMap, "name", project.name());
+            putIfPresent(projectMap, "version", project.version());
+
+            map.put("project", projectMap);
+        }
+
+        putIfPresent(map, "environment", environment);
+
+        if (error != null) {
+            Map<String, Object> errorMap = new LinkedHashMap<>();
+
+            putIfPresent(errorMap, "taskName", error.taskName());
+            putIfPresent(errorMap, "taskType", error.taskType());
+            putIfPresent(errorMap, "message", error.message());
+            putIfPresent(errorMap, "stackTrace", error.stackTrace());
+
+            map.put("error", errorMap);
+        }
+
+        putIfPresent(map, "executionUrl", executionUrl);
+
+        ApprovalSummary approval = getApproval();
+
+        if (approval != null) {
+            Map<String, Object> approvalMap = new LinkedHashMap<>();
+
+            putIfPresent(approvalMap, "expiresAt", approval.expiresAt());
+            putIfPresent(approvalMap, "formUrl", approval.formUrl());
+
+            map.put("approval", approvalMap);
+        }
+
+        return map;
+    }
+
+    /**
+     * Returns the human-readable detail lines shared by the email and chat handlers; empty when nothing is present.
+     */
+    public String toDetailsText() {
+        List<String> lines = new ArrayList<>();
+
+        if (workflow != null && workflow.name() != null) {
+            lines.add("Workflow: " + workflow.name());
+        }
+
+        if (project != null && project.name() != null) {
+            lines.add(
+                "Project: " + project.name() + (project.version() == null ? "" : " (v" + project.version() + ")"));
+        }
+
+        if (environment != null) {
+            lines.add("Environment: " + environment);
+        }
+
+        if (error != null && error.taskName() != null) {
+            lines.add(
+                "Failed task: " + error.taskName() + (error.taskType() == null ? "" : " (" + error.taskType() + ")"));
+        }
+
+        if (error != null && error.message() != null) {
+            lines.add("Error: " + error.message());
+        }
+
+        if (executionUrl != null) {
+            lines.add("Execution: " + executionUrl);
+        }
+
+        return String.join("\n", lines);
+    }
+
     private NotificationHandlerContext() {
 
     }
@@ -103,5 +390,19 @@ public class NotificationHandlerContext {
     private NotificationEvent.Type eventType;
     private Long jobId;
     private String jobName;
+    private String deliveryId;
+    private Instant timestamp;
+    private String source;
+    private String environment;
+    private String executionUrl;
+    private JobSummary job;
+    private WorkflowSummary workflow;
+    private ProjectSummary project;
+    private ErrorSummary error;
 
+    private static void putIfPresent(Map<String, Object> map, String key, Object value) {
+        if (value != null) {
+            map.put(key, value);
+        }
+    }
 }
