@@ -82,21 +82,134 @@ label and the job id; the approval events also carry the approval's expiry time 
 it. A Slack message carries the same text as the email body, prefixed with an emoji. There is no
 per-notification template.
 
+Email and Slack messages now end with the same details lines, one per line, each shown only when the
+value is known: `Workflow`, `Project` (with the version, for example `CRM (v3)`), `Environment`,
+`Failed task` (with the task type), `Error` and `Execution` (the link to the run).
+
 ### Webhook requests
 
-Each delivery is a single `POST` with a `Content-Type: application/json` body:
+Each delivery is a single `POST` with a `Content-Type: application/json` body. The body starts with the
+fields it has always had (`eventType`, `jobId`, `jobName`, `timestamp`, and on approval events
+`approvalExpiresAt` and `approvalFormUrl`). These are unchanged. A summary of the event is added beside
+them:
+
+| Field | Type | Present when |
+|---|---|---|
+| `eventType` | string | Always. |
+| `jobId` | number | Always. |
+| `jobName` | string | Always. |
+| `approvalExpiresAt` | string | Approval events. |
+| `approvalFormUrl` | string | Approval events. |
+| `timestamp` | string | Always. ISO-8601, for example `2026-11-03T10:00:00Z`. |
+| `deliveryId` | string | Always. One id per event, shared by every notification sent for that event. |
+| `source` | string | The job belongs to an automation project (`AUTOMATION`) or an embedded integration (`EMBEDDED`). |
+| `job.id` | number | The job exists. |
+| `job.name` | string | The job has a name. |
+| `job.status` | string | The job has a status, for example `FAILED`. |
+| `job.startDate` | string | The run has started. ISO-8601. |
+| `job.endDate` | string | The run has ended. ISO-8601. |
+| `job.durationMillis` | number | The run has started and ended. |
+| `workflow.id` | string | The job has a workflow. |
+| `workflow.name` | string | The workflow still exists. A deleted workflow still gives `workflow.id`. |
+| `project.id` | number | The project could be resolved. For an embedded job, the integration id. |
+| `project.name` | string | The project could be resolved. For an embedded job, the integration name. |
+| `project.version` | number | The project could be resolved. For an embedded job, the integration version. |
+| `environment` | string | The environment could be resolved: `DEVELOPMENT`, `STAGING` or `PRODUCTION`. |
+| `error.taskName` | string | `JOB_FAILED` only, when a failed task was found. |
+| `error.taskType` | string | `JOB_FAILED` only, when a failed task was found. |
+| `error.message` | string | `JOB_FAILED` only. |
+| `error.stackTrace` | string | `JOB_FAILED` only, when the error has a stack trace. Cut to 2000 characters. |
+| `executionUrl` | string | `bytechef.public-url` is set. Opens the execution. |
+| `approval.expiresAt` | string | Approval events. Same value as `approvalExpiresAt`. |
+| `approval.formUrl` | string | Approval events. Same value as `approvalFormUrl`. |
+
+A field that has no value is left out of the body, not sent as `null`. If a lookup fails (for example
+the workflow was deleted), the field is left out and the notification is still sent.
+
+`deliveryId` is the same value as the `X-ByteChef-Delivery` header, and `timestamp` is the same moment
+as the `X-ByteChef-Timestamp` header. The header is in milliseconds since the epoch, the body field is
+ISO-8601.
+
+`executionUrl` opens the execution in ByteChef: `<public-url>/automation/executions?id=<jobId>` for an
+automation run and `<public-url>/embedded/executions?id=<jobId>` for an embedded run. It is left out
+when `bytechef.public-url` is not set.
+
+Task inputs and outputs are never included. Open the execution through `executionUrl` to see them.
+
+A `JOB_FAILED` event from an automation run:
 
 ```json
 {
   "eventType": "JOB_FAILED",
   "jobId": 1042,
   "jobName": "Sync new leads",
-  "timestamp": "2026-11-02T14:03:27.512Z"
+  "timestamp": "2026-11-03T14:03:27.512Z",
+  "deliveryId": "6f1c2d3e-8a4b-4c5d-9e6f-7a8b9c0d1e2f",
+  "source": "AUTOMATION",
+  "job": {
+    "id": 1042,
+    "name": "Sync new leads",
+    "status": "FAILED",
+    "startDate": "2026-11-03T14:03:25.101Z",
+    "endDate": "2026-11-03T14:03:27.480Z",
+    "durationMillis": 2379
+  },
+  "workflow": {
+    "id": "wf-3a9f1c",
+    "name": "Sync new leads"
+  },
+  "project": {
+    "id": 7,
+    "name": "CRM",
+    "version": 3
+  },
+  "environment": "PRODUCTION",
+  "error": {
+    "taskName": "Create contact",
+    "taskType": "hubspot/v1/createContact",
+    "message": "401 Unauthorized",
+    "stackTrace": "com.bytechef.exception.ConfigurationException: 401 Unauthorized\n\tat ..."
+  },
+  "executionUrl": "https://bytechef.example.com/automation/executions?id=1042"
 }
 ```
 
-For `JOB_APPROVAL_EXPIRING` and `JOB_APPROVAL_ESCALATED` the body also includes `approvalExpiresAt` and
-`approvalFormUrl`.
+A `JOB_APPROVAL_EXPIRING` event. The two top-level approval fields come right after `jobName`, and the
+`approval` object comes last:
+
+```json
+{
+  "eventType": "JOB_APPROVAL_EXPIRING",
+  "jobId": 1043,
+  "jobName": "Approve refund",
+  "approvalExpiresAt": "2026-11-04T10:00:00Z",
+  "approvalFormUrl": "https://bytechef.example.com/approvals/resume/eyJ0b2tlbiI6Li4ufQ",
+  "timestamp": "2026-11-03T10:00:00Z",
+  "deliveryId": "0b7d9a51-2c3e-4f60-8a71-5d4c3b2a1f09",
+  "source": "AUTOMATION",
+  "job": {
+    "id": 1043,
+    "name": "Approve refund",
+    "status": "STARTED",
+    "startDate": "2026-11-02T10:00:00Z"
+  },
+  "workflow": {
+    "id": "wf-8d2e4b",
+    "name": "Approve refund"
+  },
+  "project": {
+    "id": 7,
+    "name": "CRM",
+    "version": 3
+  },
+  "environment": "PRODUCTION",
+  "executionUrl": "https://bytechef.example.com/automation/executions?id=1043",
+  "approval": {
+    "expiresAt": "2026-11-04T10:00:00Z",
+    "formUrl": "https://bytechef.example.com/approvals/resume/eyJ0b2tlbiI6Li4ufQ"
+  }
+}
+```
 
 Every request carries these headers:
 
@@ -104,7 +217,7 @@ Every request carries these headers:
 |---|---|
 | `X-ByteChef-Event` | `job.status` |
 | `X-ByteChef-Timestamp` | The send time, in milliseconds since the epoch. |
-| `X-ByteChef-Delivery` | A random UUID, unique per request. Use it to deduplicate. |
+| `X-ByteChef-Delivery` | A random UUID, one per event. Every notification sent for the same event gets the same value, and it equals `deliveryId` in the body. Use it to deduplicate. |
 
 The URL must use `http` or `https` and must resolve to a public address: loopback, private,
 link-local and carrier-grade NAT ranges are refused. Each request has a 10-second connect timeout and
