@@ -36,6 +36,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
+import com.bytechef.component.ai.agent.tool.AgentToolSuspensionStorage;
 import com.bytechef.component.ai.agent.tool.DeferredToolCallReplay;
 import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
@@ -424,8 +425,7 @@ public abstract class AbstractAiAgentChatAction {
         AgentToolSuspension agentToolSuspension;
 
         try {
-            agentToolSuspension = continueParameters.get(
-                AgentToolSuspension.CONTINUE_PARAMETER_KEY, AgentToolSuspension.class);
+            agentToolSuspension = AgentToolSuspensionStorage.fetch(continueParameters, context);
         } catch (RuntimeException exception) {
             throw new IllegalStateException(
                 "The resumed task's stored agent conversation (continue parameter '" +
@@ -608,7 +608,7 @@ public abstract class AbstractAiAgentChatAction {
 
         Map<String, Object> continueParameters = new HashMap<>(suspend.continueParameters());
 
-        continueParameters.put(AgentToolSuspension.CONTINUE_PARAMETER_KEY, agentToolSuspension);
+        AgentToolSuspensionStorage.put(continueParameters, agentToolSuspension, actionContextAware);
 
         actionContextAware.suspend(new ActionContext.Suspend(continueParameters, suspend.expiresAt()));
     }
