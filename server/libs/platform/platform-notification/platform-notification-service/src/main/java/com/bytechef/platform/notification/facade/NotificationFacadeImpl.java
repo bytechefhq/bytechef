@@ -17,15 +17,18 @@
 package com.bytechef.platform.notification.facade;
 
 import com.bytechef.platform.notification.domain.Notification;
+import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.dto.NotificationDTO;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationEventService;
 import com.bytechef.platform.notification.service.NotificationService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,6 +52,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public List<NotificationDTO> getNotifications() {
         return notificationService.getNotifications()
             .stream()
@@ -58,6 +62,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public NotificationDTO createNotification(Notification notification) {
         validateNotification(notification);
 
@@ -69,6 +74,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public NotificationDTO updateNotification(Notification notification) {
         validateNotification(notification);
 
@@ -77,6 +83,18 @@ public class NotificationFacadeImpl implements NotificationFacade {
         return new NotificationDTO(
             notification,
             notificationEventService.getNotificationEvents(notification.getNotificationEventIds()));
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void deleteNotification(long id) {
+        notificationService.delete(id);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public List<NotificationEvent> getNotificationEvents() {
+        return notificationEventService.getNotificationEvents();
     }
 
     private static boolean isHttpUrl(String value) {

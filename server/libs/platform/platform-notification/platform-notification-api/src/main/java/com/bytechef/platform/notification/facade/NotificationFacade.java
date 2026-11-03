@@ -17,6 +17,7 @@
 package com.bytechef.platform.notification.facade;
 
 import com.bytechef.platform.notification.domain.Notification;
+import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.dto.NotificationDTO;
 import java.util.List;
 
@@ -30,4 +31,8 @@ public interface NotificationFacade {
     NotificationDTO createNotification(Notification notification);
 
     NotificationDTO updateNotification(Notification notification);
+
+    void deleteNotification(long id);
+
+    List<NotificationEvent> getNotificationEvents();
 }

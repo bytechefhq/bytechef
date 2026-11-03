@@ -25,13 +25,21 @@ import com.bytechef.platform.notification.config.PlatformNotificationIntTestConf
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.dto.NotificationDTO;
 import com.bytechef.platform.notification.repository.NotificationRepository;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -39,7 +47,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = PlatformNotificationIntTestConfiguration.class,
+    classes = {
+        PlatformNotificationIntTestConfiguration.class, NotificationFacadeIntTest.MethodSecurityConfiguration.class
+    },
     properties = {
         "bytechef.webhook-delivery.concurrency-limit=10", "bytechef.webhook-delivery.max-pending-deliveries=1000"
     })
@@ -57,9 +67,72 @@ public class NotificationFacadeIntTest {
     @MockitoBean
     private WorkflowService workflowService;
 
+    @BeforeEach
+    public void beforeEach() {
+        authenticateAs(AuthorityConstants.ADMIN);
+    }
+
     @AfterEach
     public void afterEach() {
+        SecurityContextHolder.clearContext();
+
         notificationRepository.deleteAll();
+    }
+
+    @Test
+    public void testGetNotificationsRequiresAdmin() {
+        authenticateAs(AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> notificationFacade.getNotifications())
+            .isInstanceOf(AuthorizationDeniedException.class);
+    }
+
+    @Test
+    public void testCreateNotificationRequiresAdmin() {
+        authenticateAs(AuthorityConstants.USER);
+
+        Notification notification = createNotification(Notification.Type.EMAIL, Map.of("email", "john@email.com"));
+
+        assertThatThrownBy(() -> notificationFacade.createNotification(notification))
+            .isInstanceOf(AuthorizationDeniedException.class);
+
+        assertThat(notificationRepository.count()).isZero();
+    }
+
+    @Test
+    public void testUpdateNotificationRequiresAdmin() {
+        Notification notification = createNotification(Notification.Type.EMAIL, Map.of("email", "john@email.com"));
+
+        authenticateAs(AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> notificationFacade.updateNotification(notification))
+            .isInstanceOf(AuthorizationDeniedException.class);
+    }
+
+    @Test
+    public void testDeleteNotificationRequiresAdmin() {
+        authenticateAs(AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> notificationFacade.deleteNotification(1L))
+            .isInstanceOf(AuthorizationDeniedException.class);
+    }
+
+    @Test
+    public void testGetNotificationEventsRequiresAdmin() {
+        authenticateAs(AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> notificationFacade.getNotificationEvents())
+            .isInstanceOf(AuthorizationDeniedException.class);
+    }
+
+    @Test
+    public void testDeleteNotificationAsAdminDeletes() {
+        NotificationDTO notificationDTO = notificationFacade.createNotification(
+            createNotification(Notification.Type.EMAIL, Map.of("email", "john@email.com")));
+
+        notificationFacade.deleteNotification(notificationDTO.id());
+
+        assertThat(notificationFacade.getNotifications()).isEmpty();
     }
 
     @Test
@@ -111,6 +184,13 @@ public class NotificationFacadeIntTest {
             .orElseThrow();
 
         assertThat(storedNotification.getType()).isEqualTo(Notification.Type.EMAIL);
+    }
+
+    private static void authenticateAs(String authority) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                UsernamePasswordAuthenticationToken.authenticated(
+                    "test-" + authority, null, List.of(new SimpleGrantedAuthority(authority))));
     }
 
     private static Notification createNotification(Notification.Type type, Map<String, ?> settings) {
@@ -189,5 +269,10 @@ public class NotificationFacadeIntTest {
 
             assertThat(storedNotification.getSettings()).containsEntry("webhook", "https://example.com/hook");
         }
+    }
+
+    @EnableMethodSecurity
+    @TestConfiguration
+    static class MethodSecurityConfiguration {
     }
 }

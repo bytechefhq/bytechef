@@ -2,6 +2,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework:spring-web")
+    implementation("org.springframework.security:spring-security-core")
     implementation("org.apache.commons:commons-lang3")
     implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:core:commons:commons-util"))
@@ -12,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-notification:platform-notification-delivery"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
+    testImplementation("org.springframework.security:spring-security-config")
     testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
