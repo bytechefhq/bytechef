@@ -60,9 +60,7 @@ export default function useDateTimeCellEditor({
     const formattedMinutes = String(selectedDate.getMinutes()).padStart(2, '0');
 
     const handleCommit = () => {
-        const formattedValue = formatDate(selectedDate, 'yyyy-MM-dd HH:mm:ss');
-
-        onRowChange({...row, [columnName]: formattedValue}, true);
+        onRowChange({...row, [columnName]: selectedDate.toISOString()}, true);
         setIsPopoverOpen(false);
     };
 

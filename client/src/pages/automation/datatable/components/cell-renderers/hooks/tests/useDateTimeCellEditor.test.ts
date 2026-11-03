@@ -130,20 +130,32 @@ describe('useDateTimeCellEditor', () => {
     });
 
     describe('handleCommit', () => {
-        it('calls onRowChange with formatted datetime', () => {
+        it('calls onRowChange with the selected instant as an ISO string', () => {
             const {result} = renderHook(() => useDateTimeCellEditor(defaultProps));
+
+            const selectedDate = result.current.selectedDate;
 
             act(() => {
                 result.current.handleCommit();
             });
 
-            expect(mockOnRowChange).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    id: 'row-1',
-                    updatedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/),
-                }),
-                true
-            );
+            expect(mockOnRowChange).toHaveBeenCalledWith({id: 'row-1', updatedAt: selectedDate.toISOString()}, true);
+        });
+
+        it('commits a value that displays the same local time that was picked', () => {
+            const {result} = renderHook(() => useDateTimeCellEditor(defaultProps));
+
+            act(() => {
+                result.current.handleTimeChange({target: {value: '14:05'}} as ChangeEvent<HTMLInputElement>);
+            });
+
+            act(() => {
+                result.current.handleCommit();
+            });
+
+            const committedRow = mockOnRowChange.mock.calls[0][0];
+
+            expect(formatDateTimeValue(committedRow.updatedAt)).toBe('2024-01-15 14:05');
         });
 
         it('closes popover after commit', () => {
