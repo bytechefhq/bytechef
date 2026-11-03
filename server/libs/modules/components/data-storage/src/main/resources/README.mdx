@@ -37,6 +37,18 @@ Notes
 
 ---
 
+### Data Storage in the workflow editor
+
+Test runs in the workflow editor do not write to the database. They keep Data Storage values in the server's cache instead, so editor tests never change the data that deployed workflows use.
+
+- `CURRENT_EXECUTION` values disappear when the test run finishes, the same as in a deployed workflow.
+- `WORKFLOW`, `PRINCIPAL` and `ACCOUNT` values stay between test runs and expire 10 minutes after the last write to that scope. A list that a test appends to keeps growing with every run until it expires, so use `CURRENT_EXECUTION` for values that only one run needs.
+- The 400 KB limit per key applies in the editor too.
+- In an Enterprise Edition cluster with Redis, every coordinator shares these values, so the next test run sees them even when another coordinator runs it. See [Shared state caches](/platform/use-bytechef/self-hosted/configuration/node-roles#shared-state-caches).
+- A test run stops after 1,000 task executions. A loop over many items can reach this limit in the editor while the deployed workflow runs to the end.
+
+---
+
 ### Worked example: building and reading a list (heroes)
 
 Imagine a loop where you append three objects to a list under key `heroes`:
