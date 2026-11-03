@@ -312,8 +312,17 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     @Override
     @Transactional(readOnly = true)
     public List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId) {
-        List<AutomationWorkflowProjectConfiguration> configurations =
-            automationWorkflowProjectConfigurationService.getConfigurations(projectId);
+        return toDTOs(automationWorkflowProjectConfigurationService.getConfigurations(projectId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId, long environmentId) {
+        return toDTOs(automationWorkflowProjectConfigurationService.getConfigurations(projectId, environmentId));
+    }
+
+    private List<AutomationWorkflowProjectConfigurationDTO> toDTOs(
+        List<AutomationWorkflowProjectConfiguration> configurations) {
 
         Map<Long, Integer> connectedUserCounts = connectedUserProjectConfigurationService.countByConfigurationIds(
             configurations.stream()

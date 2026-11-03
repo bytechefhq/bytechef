@@ -54,6 +54,15 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
     List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId);
 
     /**
+     * Returns the project's configurations in the environment, in id order.
+     *
+     * @param projectId     the project id
+     * @param environmentId the environment id
+     * @return the configurations of the project in the environment
+     */
+    List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId, long environmentId);
+
+    /**
      * Returns the connections and inputs an administrator can provide for a workflow, with the values provided.
      *
      * @param configurationId the configuration id

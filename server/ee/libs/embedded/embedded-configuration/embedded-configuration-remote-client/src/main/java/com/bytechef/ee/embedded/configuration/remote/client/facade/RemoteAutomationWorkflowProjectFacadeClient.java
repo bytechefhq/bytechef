@@ -113,6 +113,11 @@ public class RemoteAutomationWorkflowProjectFacadeClient implements AutomationWo
     }
 
     @Override
+    public List<AutomationWorkflowProjectDTO> getProjects(long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<AutomationWorkflowProjectDTO> getPublishedProjects() {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
