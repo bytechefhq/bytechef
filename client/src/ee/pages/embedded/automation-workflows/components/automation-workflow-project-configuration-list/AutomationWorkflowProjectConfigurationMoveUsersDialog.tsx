@@ -22,13 +22,18 @@ import {useCallback, useMemo, useState} from 'react';
 type AutomationWorkflowProjectConfigurationType =
     AutomationWorkflowProjectConfigurationsQuery['automationWorkflowProjectConfigurations'][number];
 
+type ConfigurationReferenceType = Pick<AutomationWorkflowProjectConfigurationType, 'id' | 'name' | 'projectVersion'>;
+
 interface AutomationWorkflowProjectConfigurationMoveUsersDialogProps {
-    configuration: AutomationWorkflowProjectConfigurationType;
+    configuration: ConfigurationReferenceType;
+    connectedUsers?: Array<{connectedUserId: string; email?: string | null; externalId: string; name?: string | null}>;
+    initialSelectedConnectedUserIds?: string[];
     onClose: () => void;
-    targetConfigurations: AutomationWorkflowProjectConfigurationType[];
+    targetConfigurations: ConfigurationReferenceType[];
+    title?: string;
 }
 
-const formatConfigurationLabel = (configuration: AutomationWorkflowProjectConfigurationType): string =>
+const formatConfigurationLabel = (configuration: ConfigurationReferenceType): string =>
     `${configuration.name} · v${configuration.projectVersion}`;
 
 interface SkippedConnectedUserI {
@@ -39,19 +44,24 @@ interface SkippedConnectedUserI {
 
 const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
     configuration,
+    connectedUsers: presetConnectedUsers,
+    initialSelectedConnectedUserIds,
     onClose,
     targetConfigurations,
+    title = 'Move Users',
 }: AutomationWorkflowProjectConfigurationMoveUsersDialogProps) => {
     const [selection, setSelection] = useState<{connectedUserIds?: string[]; targetId?: string}>({});
 
     const queryClient = useQueryClient();
 
     const {data: connectedUsersData, isError: connectedUsersError} =
-        useAutomationWorkflowProjectConfigurationConnectedUsersQuery({
-            id: configuration.id,
-        });
+        useAutomationWorkflowProjectConfigurationConnectedUsersQuery(
+            {id: configuration.id},
+            {enabled: !presetConnectedUsers}
+        );
 
-    const connectedUsers = connectedUsersData?.automationWorkflowProjectConfigurationConnectedUsers;
+    const connectedUsers =
+        presetConnectedUsers || connectedUsersData?.automationWorkflowProjectConfigurationConnectedUsers;
 
     const {data: moveImpactData} = useAutomationWorkflowProjectConfigurationMoveImpactQuery(
         {
@@ -129,7 +139,7 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
             <Dialog onOpenChange={(open) => !open && onClose()} open>
                 <DialogContent showCloseButton>
                     <DialogHeader>
-                        <DialogTitle>Move Users</DialogTitle>
+                        <DialogTitle>{title}</DialogTitle>
 
                         <DialogDescription>
                             {connectedUsersError ? 'Could not load the connected users.' : 'Loading users...'}
@@ -150,13 +160,14 @@ const AutomationWorkflowProjectConfigurationMoveUsersDialog = ({
         <MoveConnectedUsersDialog
             connectedUsers={connectedUsers}
             impact={moveImpact?.workflows}
+            initialSelectedConnectedUserIds={initialSelectedConnectedUserIds}
             onClose={onClose}
             onMove={handleMove}
             onSelectionChange={(targetId, connectedUserIds) => setSelection({connectedUserIds, targetId})}
             previewSkipped={previewSkipped}
             sourceLabel={formatConfigurationLabel(configuration)}
             targets={targets}
-            title="Move Users"
+            title={title}
         />
     );
 };

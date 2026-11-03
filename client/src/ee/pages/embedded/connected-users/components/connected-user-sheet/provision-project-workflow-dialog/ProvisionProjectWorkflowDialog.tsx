@@ -26,20 +26,34 @@ interface ProvisionProjectWorkflowStateI {
 }
 
 interface ProvisionProjectWorkflowFormI {
+    configurationId: string;
     projectId: string;
     workflows: Record<string, ProvisionProjectWorkflowStateI>;
 }
 
+interface AssignedConfigurationI {
+    configurationId: string;
+    configurationName: string;
+    projectId: string;
+}
+
 interface ProvisionProjectWorkflowDialogProps {
+    assignedConfigurations?: AssignedConfigurationI[];
     connectedUserId: number;
     onClose: () => void;
 }
 
-const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionProjectWorkflowDialogProps) => {
+const ASSIGNED_CONFIGURATION_DISABLED_LABEL = 'Assigned configuration (disabled)';
+
+const ProvisionProjectWorkflowDialog = ({
+    assignedConfigurations,
+    connectedUserId,
+    onClose,
+}: ProvisionProjectWorkflowDialogProps) => {
     const queryClient = useQueryClient();
 
     const {handleSubmit, setValue, watch} = useForm<ProvisionProjectWorkflowFormI>({
-        defaultValues: {projectId: '', workflows: {}},
+        defaultValues: {configurationId: '', projectId: '', workflows: {}},
     });
 
     const {data} = useProvisionableConnectedUserProjectsQuery({connectedUserId: connectedUserId.toString()});
@@ -54,6 +68,7 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
         },
     });
 
+    const configurationId = watch('configurationId');
     const projectId = watch('projectId');
     const formWorkflows = watch('workflows');
 
@@ -64,16 +79,45 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
         [provisionableProjects, projectId]
     );
 
+    const assignedConfigurationId = provisionableProject?.assignedConfigurationId;
+
+    const selectedConfiguration = useMemo(
+        () =>
+            provisionableProject?.configurations.find(
+                (configuration) => configuration.id === (assignedConfigurationId || configurationId)
+            ),
+        [assignedConfigurationId, configurationId, provisionableProject]
+    );
+
+    const assignedConfigurationLabel = useMemo(() => {
+        if (!assignedConfigurationId) {
+            return undefined;
+        }
+
+        if (selectedConfiguration) {
+            return `${selectedConfiguration.name} · v${selectedConfiguration.projectVersion}`;
+        }
+
+        return (
+            assignedConfigurations?.find(
+                (assignedConfiguration) =>
+                    assignedConfiguration.projectId === projectId &&
+                    assignedConfiguration.configurationId === assignedConfigurationId
+            )?.configurationName || ASSIGNED_CONFIGURATION_DISABLED_LABEL
+        );
+    }, [assignedConfigurationId, assignedConfigurations, projectId, selectedConfiguration]);
+
     const selectableWorkflows = useMemo(
         () =>
-            (provisionableProject?.workflows || []).filter(
+            (selectedConfiguration?.workflows || []).filter(
                 (workflow) =>
                     !workflow.provisioned && !workflow.dangling && formWorkflows[workflow.workflowUuid]?.selected
             ),
-        [formWorkflows, provisionableProject]
+        [formWorkflows, selectedConfiguration]
     );
 
     const canSave =
+        !!selectedConfiguration &&
         selectableWorkflows.length > 0 &&
         selectableWorkflows.every((workflow) =>
             workflow.inputs.every(
@@ -82,6 +126,13 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
         );
 
     const handleProjectChange = (value: string) => {
+        const project = provisionableProjects?.find((provisionable) => provisionable.projectId === value);
+
+        const defaultConfiguration =
+            project?.configurations.find((configuration) => configuration.selfServe) ||
+            (project?.configurations.length === 1 ? project.configurations[0] : undefined);
+
+        setValue('configurationId', defaultConfiguration?.id || '');
         setValue('projectId', value);
         setValue('workflows', {});
     };
@@ -97,22 +148,18 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
         });
     };
 
-    const handleSave = ({workflows}: ProvisionProjectWorkflowFormI) => {
-        // Stopgap until the Configuration select lands: the preselected configuration, which the top-level
-        // workflows belong to, is the assigned one, else the self-serve one, else the first.
-        const preselectedConfiguration =
-            provisionableProject?.configurations.find(
-                (configuration) => configuration.id === provisionableProject.assignedConfigurationId
-            ) ||
-            provisionableProject?.configurations.find((configuration) => configuration.selfServe) ||
-            provisionableProject?.configurations[0];
+    const handleConfigurationChange = (value: string) => {
+        setValue('configurationId', value);
+        setValue('workflows', {});
+    };
 
-        if (!preselectedConfiguration) {
+    const handleSave = ({workflows}: ProvisionProjectWorkflowFormI) => {
+        if (!selectedConfiguration) {
             return;
         }
 
         provisionConnectedUserProjectWorkflowsMutation.mutate({
-            configurationId: preselectedConfiguration.id,
+            configurationId: selectedConfiguration.id,
             connectedUserId: connectedUserId.toString(),
             workflows: selectableWorkflows.map((workflow) => {
                 const inputs = workflows[workflow.workflowUuid]?.inputs || {};
@@ -161,7 +208,45 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
                         </fieldset>
                     )}
 
-                    {provisionableProject?.workflows.map((workflow) => {
+                    {provisionableProject &&
+                        (assignedConfigurationId ? (
+                            <fieldset className="space-y-2 border-0 p-0">
+                                <Label htmlFor="provision-configuration-id">Configuration</Label>
+
+                                <Input id="provision-configuration-id" readOnly value={assignedConfigurationLabel} />
+
+                                <p className="text-xs text-content-neutral-secondary">
+                                    {selectedConfiguration
+                                        ? 'Use Change configuration to move this user.'
+                                        : 'This configuration is disabled, so it cannot provision workflows. Use Change configuration to move this user.'}
+                                </p>
+                            </fieldset>
+                        ) : provisionableProject.configurations.length === 0 ? (
+                            <p className="text-sm text-content-neutral-secondary">
+                                No configuration available for this user
+                            </p>
+                        ) : (
+                            <fieldset className="space-y-2 border-0 p-0">
+                                <Label htmlFor="provision-configuration-id">Configuration</Label>
+
+                                <select
+                                    className="flex h-9 w-full rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-3 py-1 text-sm"
+                                    id="provision-configuration-id"
+                                    onChange={(event) => handleConfigurationChange(event.target.value)}
+                                    value={configurationId}
+                                >
+                                    <option value="">Select...</option>
+
+                                    {provisionableProject.configurations.map((configuration) => (
+                                        <option key={configuration.id} value={configuration.id}>
+                                            {`${configuration.name} · v${configuration.projectVersion}`}
+                                        </option>
+                                    ))}
+                                </select>
+                            </fieldset>
+                        ))}
+
+                    {selectedConfiguration?.workflows.map((workflow) => {
                         const label = workflow.label || workflow.workflowUuid;
                         const locked = workflow.provisioned || workflow.dangling;
                         const workflowState = formWorkflows[workflow.workflowUuid];

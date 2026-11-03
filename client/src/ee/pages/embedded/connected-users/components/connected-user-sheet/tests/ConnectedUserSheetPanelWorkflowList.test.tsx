@@ -60,7 +60,15 @@ describe('ConnectedUserSheetPanelWorkflowList', () => {
             isLoading: false,
         });
         hoisted.connectedUserProjectsQuery.mockReturnValue({
-            data: {connectedUserProjects: [{connectedUserProjectWorkflows: [{id: '1'}, {id: '2'}]}]},
+            data: {
+                connectedUserProjects: [
+                    {
+                        automationProjectConfigurations: [],
+                        connectedUser: {externalId: 'ext-1050'},
+                        connectedUserProjectWorkflows: [{id: '1'}, {id: '2'}],
+                    },
+                ],
+            },
             isLoading: false,
         });
     });

@@ -1,5 +1,8 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectedUserProjectConfigurationMenu, {
+    ConnectedUserCurrentConfigurationI,
+} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectConfigurationMenu';
 import ConnectedUserProjectWorkflowListItem, {
     ConnectedUserProjectWorkflowType,
     ConnectedUserWorkflowTemplateSourceI,
@@ -9,6 +12,7 @@ import {useMemo} from 'react';
 const OTHER_GROUP_NAME = 'Other';
 
 interface ConnectedUserProjectWorkflowGroupI {
+    configuration?: ConnectedUserCurrentConfigurationI & {projectId: string};
     connectedUserProjectWorkflows: ConnectedUserProjectWorkflowType[];
     projectName?: string;
 }
@@ -23,9 +27,13 @@ const getLastExecutionDate = (connectedUserProjectWorkflows: ConnectedUserProjec
 };
 
 const ConnectedUserProjectWorkflowList = ({
+    configurations,
+    connectedUser,
     connectedUserProjectWorkflows,
     workflowTemplateSourcesByWorkflowUuid,
 }: {
+    configurations?: Array<ConnectedUserCurrentConfigurationI & {projectId: string}>;
+    connectedUser?: {connectedUserId: string; externalId: string};
     connectedUserProjectWorkflows: ConnectedUserProjectWorkflowType[];
     workflowTemplateSourcesByWorkflowUuid: Map<string, ConnectedUserWorkflowTemplateSourceI>;
 }) => {
@@ -43,7 +51,13 @@ const ConnectedUserProjectWorkflowList = ({
 
             const groupKey = projectName ?? OTHER_GROUP_NAME;
 
-            const group = groupsByProjectName.get(groupKey) ?? {connectedUserProjectWorkflows: [], projectName};
+            const group = groupsByProjectName.get(groupKey) ?? {
+                configuration: configurations?.find(
+                    (configuration) => configuration.projectId === connectedUserProjectWorkflow.projectId
+                ),
+                connectedUserProjectWorkflows: [],
+                projectName,
+            };
 
             group.connectedUserProjectWorkflows.push(connectedUserProjectWorkflow);
 
@@ -57,7 +71,7 @@ const ConnectedUserProjectWorkflowList = ({
 
             return firstGroup.projectName.localeCompare(secondGroup.projectName);
         });
-    }, [connectedUserProjectWorkflows, workflowTemplateSourcesByWorkflowUuid]);
+    }, [configurations, connectedUserProjectWorkflows, workflowTemplateSourcesByWorkflowUuid]);
 
     return (
         <div>
@@ -78,6 +92,12 @@ const ConnectedUserProjectWorkflowList = ({
 
                                         <div className="flex min-h-7 items-center text-xs font-semibold text-muted-foreground">
                                             {workflowCount === 1 ? '1 workflow' : `${workflowCount} workflows`}
+
+                                            {group.configuration && (
+                                                <span className="ml-2 font-normal">
+                                                    {`${group.configuration.configurationName} · v${group.configuration.configurationProjectVersion}`}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </CollapsibleTrigger>
@@ -95,7 +115,15 @@ const ConnectedUserProjectWorkflowList = ({
                                         </Tooltip>
                                     </div>
 
-                                    <div aria-hidden="true" className="size-9 shrink-0" />
+                                    {group.configuration && connectedUser ? (
+                                        <ConnectedUserProjectConfigurationMenu
+                                            connectedUser={connectedUser}
+                                            currentConfiguration={group.configuration}
+                                            projectId={group.configuration.projectId}
+                                        />
+                                    ) : (
+                                        <div aria-hidden="true" className="size-9 shrink-0" />
+                                    )}
                                 </div>
                             </div>
 
