@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import JourneySteps, {type JourneyStepI} from '@/components/JourneySteps/JourneySteps';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
-import {ActivityIcon} from 'lucide-react';
+import {HammerIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 
@@ -69,7 +69,7 @@ const ToolInvocationsEmptyState = ({
         <EmptyState
             description={description}
             docsLink={{href: documentationUrl, label: 'How tool invocations work'}}
-            icon={<ActivityIcon />}
+            icon={<HammerIcon />}
             note={environmentScopeNote}
             title="No tool calls yet"
         >

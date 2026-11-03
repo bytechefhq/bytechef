@@ -16,7 +16,7 @@ import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {PlatformType} from '@/shared/middleware/graphql';
-import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
+import {HammerIcon, RefreshCwIcon} from 'lucide-react';
 import {ReactNode, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -208,7 +208,7 @@ export const ToolInvocations = ({
                     firstRunEmptyState
                 ) : (
                     <EmptyList
-                        icon={<ActivityIcon className="size-24 text-stroke-neutral-tertiary" />}
+                        icon={<HammerIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="No tool invocations match the current filter."
                         title="No Matching Tool Invocations"
                     />
