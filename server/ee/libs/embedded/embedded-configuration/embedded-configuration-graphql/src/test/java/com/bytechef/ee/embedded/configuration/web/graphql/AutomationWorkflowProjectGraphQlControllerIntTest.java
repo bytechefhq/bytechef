@@ -18,7 +18,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectAdminFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
@@ -94,7 +94,7 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
     private static final String WORKFLOW_UUID = "1f2e3d4c-5b6a-4789-8a9b-0c1d2e3f4a5b";
 
     @Autowired
-    private AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade;
+    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @Autowired
     private GraphQlTester graphQlTester;

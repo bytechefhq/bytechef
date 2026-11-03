@@ -12,7 +12,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCateg
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectAdminFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
@@ -34,11 +34,11 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnEEVersion
 public class AutomationWorkflowProjectGraphQlController {
 
-    private final AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade;
+    private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectGraphQlController(
-        AutomationWorkflowProjectAdminFacade automationWorkflowProjectFacade) {
+        AutomationWorkflowProjectFacade automationWorkflowProjectFacade) {
 
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
     }
