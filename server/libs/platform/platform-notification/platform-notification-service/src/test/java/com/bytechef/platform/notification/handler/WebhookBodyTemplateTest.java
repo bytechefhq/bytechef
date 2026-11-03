@@ -87,6 +87,31 @@ class WebhookBodyTemplateTest {
     }
 
     @Test
+    void testRenderKeepsDollarAndBackslashInValues() {
+        Map<String, Object> summary = new LinkedHashMap<>();
+
+        summary.put("message", "a$1\\b");
+
+        String rendered = WebhookBodyTemplate.render("{\"m\":\"{{message}}\"}", summary);
+
+        Map<?, ?> parsed = JsonUtils.read(rendered, Map.class);
+
+        assertThat(parsed.get("m")).isEqualTo("a$1\\b");
+    }
+
+    @Test
+    void testValidateRejectsUnquotedOptionalField() {
+        assertThatThrownBy(() -> WebhookBodyTemplate.validate("{\"d\": {{job.durationMillis}}}"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Webhook body template must render to valid JSON for every event; quote optional fields");
+    }
+
+    @Test
+    void testValidateAcceptsUnquotedJobId() {
+        WebhookBodyTemplate.validate("{\"id\": {{jobId}}}");
+    }
+
+    @Test
     void testValidateRejectsInvalidJson() {
         assertThatThrownBy(() -> WebhookBodyTemplate.validate("{\"a\": \"{{jobId}}\""))
             .isInstanceOf(IllegalArgumentException.class)

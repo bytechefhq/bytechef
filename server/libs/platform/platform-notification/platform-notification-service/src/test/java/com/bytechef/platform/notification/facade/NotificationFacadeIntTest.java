@@ -359,6 +359,64 @@ public class NotificationFacadeIntTest {
         }
 
         @Test
+        public void testRejectsHeaderValueWithLineBreak() {
+            Notification notification = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of(
+                    "webhook", "https://example.com/hook", "webhookHeaders",
+                    List.of(Map.of("name", "X-Test", "value", "token\r\nX-Injected: secret-value"))));
+
+            assertThatThrownBy(() -> notificationFacade.createNotification(notification))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Header X-Test value contains control characters")
+                .satisfies(exception -> assertThat(exception.getMessage()).doesNotContain("secret-value"));
+
+            assertThat(notificationRepository.count()).isZero();
+        }
+
+        @Test
+        public void testUpdateToWebhookGeneratesSigningSecretOnce() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(Notification.Type.EMAIL, Map.of("email", "john@email.com")));
+
+            assertThat(createdNotificationDTO.signingSecret()).isNull();
+
+            Notification update = createNotification(
+                Notification.Type.WEBHOOK, Map.of("webhook", "https://example.com/hook"));
+
+            update.setId(createdNotificationDTO.id());
+            update.setVersion(createdNotificationDTO.version());
+
+            NotificationDTO updatedNotificationDTO = notificationFacade.updateNotification(update);
+
+            assertThat(updatedNotificationDTO.signingSecret()).startsWith("whsec_");
+            assertThat(updatedNotificationDTO.hasSigningSecret()).isTrue();
+
+            Notification storedNotification = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            assertThat(storedNotification.getSetting("webhookSecret"))
+                .isEqualTo(updatedNotificationDTO.signingSecret());
+
+            Notification secondUpdate = createNotification(
+                Notification.Type.WEBHOOK, Map.of("webhook", "https://example.com/hook"));
+
+            secondUpdate.setId(createdNotificationDTO.id());
+            secondUpdate.setVersion(updatedNotificationDTO.version());
+
+            NotificationDTO secondUpdatedNotificationDTO = notificationFacade.updateNotification(secondUpdate);
+
+            assertThat(secondUpdatedNotificationDTO.signingSecret()).isNull();
+            assertThat(secondUpdatedNotificationDTO.hasSigningSecret()).isTrue();
+
+            Notification secondStoredNotification = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            assertThat(secondStoredNotification.getSetting("webhookSecret"))
+                .isEqualTo(updatedNotificationDTO.signingSecret());
+        }
+
+        @Test
         public void testRejectsTemplateThatIsNotValidJson() {
             Notification notification = createNotification(
                 Notification.Type.WEBHOOK,

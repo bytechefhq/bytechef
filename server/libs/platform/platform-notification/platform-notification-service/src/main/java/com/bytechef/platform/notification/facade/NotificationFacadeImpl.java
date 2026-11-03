@@ -113,9 +113,19 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
         NotificationSecretSettings.apply(notification, notification.getSettings(), storedNotification);
 
+        String signingSecret = null;
+
+        if (notification.getType() == Notification.Type.WEBHOOK &&
+            !NotificationSecretSettings.hasSigningSecret(notification)) {
+
+            signingSecret = WebhookSigningSecrets.generate();
+
+            putSecretSetting(notification, NotificationSecretSettings.SIGNING_SECRET_KEY, signingSecret);
+        }
+
         notification = notificationService.update(notification);
 
-        return toDTO(notification, null);
+        return toDTO(notification, signingSecret);
     }
 
     @Override
@@ -160,6 +170,16 @@ public class NotificationFacadeImpl implements NotificationFacade {
         secretSettings.put(key, value);
 
         notification.setSecretSettings(secretSettings);
+    }
+
+    private static boolean containsControlCharacter(String value) {
+        for (int index = 0; index < value.length(); index++) {
+            if (Character.isISOControl(value.charAt(index))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static boolean isHttpUrl(String value) {
@@ -261,11 +281,18 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
             Object value = headerMap.get("value");
 
-            if (value != null
-                && (!(value instanceof String valueString) || valueString.length() > MAX_HEADER_VALUE_LENGTH)) {
+            if (value == null) {
+                continue;
+            }
+
+            if (!(value instanceof String valueString) || valueString.length() > MAX_HEADER_VALUE_LENGTH) {
                 throw new IllegalArgumentException(
                     "Webhook header %s value must be a string of at most %d characters".formatted(
                         name, MAX_HEADER_VALUE_LENGTH));
+            }
+
+            if (containsControlCharacter(valueString)) {
+                throw new IllegalArgumentException("Header %s value contains control characters".formatted(name));
             }
         }
     }

@@ -17,6 +17,7 @@
 package com.bytechef.platform.notification.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.platform.notification.domain.Notification;
 import java.util.HashMap;
@@ -91,6 +92,68 @@ class NotificationSecretSettingsTest {
             target, Map.of("webhookHeaders", List.of(Map.of("name", "Authorization", "value", "********"))), stored);
 
         assertThat(headers(target)).containsExactly(Map.of("name", "Authorization", "value", "token-1"));
+    }
+
+    @Test
+    void testApplyRejectsMaskedHeaderWithoutStoredValue() {
+        Notification stored = storedWithHeaders(List.of(Map.of("name", "Authorization", "value", "token-1")));
+        Notification target = new Notification();
+
+        target.setType(Notification.Type.WEBHOOK);
+
+        assertThatThrownBy(
+            () -> NotificationSecretSettings.apply(
+                target, Map.of("webhookHeaders", List.of(Map.of("name", "X-Renamed", "value", "********"))), stored))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Header X-Renamed has no saved value");
+
+        assertThatThrownBy(
+            () -> NotificationSecretSettings.apply(
+                target, Map.of("webhookHeaders", List.of(Map.of("name", "X-New"))), null))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Header X-New has no saved value");
+    }
+
+    @Test
+    void testApplyTreatsBlankSlackUrlAsAbsent() {
+        Notification stored = new Notification();
+
+        stored.setSettings(Map.of());
+        stored.setSecretSettings(Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X"));
+
+        Notification target = new Notification();
+
+        target.setType(Notification.Type.SLACK);
+
+        NotificationSecretSettings.apply(target, Map.of("slackWebhookUrl", " "), stored);
+
+        assertThat(target.getSecretSettings()).containsEntry(
+            "slackWebhookUrl", "https://hooks.slack.com/services/T/B/X");
+
+        Notification blankStored = new Notification();
+
+        blankStored.setSettings(Map.of("slackWebhookUrl", ""));
+
+        Notification blankTarget = new Notification();
+
+        blankTarget.setType(Notification.Type.SLACK);
+
+        NotificationSecretSettings.apply(blankTarget, Map.of("slackWebhookUrl", ""), blankStored);
+
+        assertThat(blankTarget.getSecretSettings()).doesNotContainKey("slackWebhookUrl");
+    }
+
+    @Test
+    void testMaskedOmitsBlankSlackUrl() {
+        Notification notification = new Notification();
+
+        notification.setType(Notification.Type.SLACK);
+
+        notification.setSettings(Map.of("slackWebhookUrl", ""));
+
+        Map<String, Object> masked = NotificationSecretSettings.masked(notification);
+
+        assertThat(masked).doesNotContainKey("slackWebhookUrl");
     }
 
     @Test

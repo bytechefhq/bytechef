@@ -59,6 +59,18 @@ public record WebhookDelivery(
         return WebhookDeliveryMessages.host(url);
     }
 
+    /**
+     * Describes the delivery for logs without its secrets: the URL is reduced to its host, only header names are listed
+     * and the signing secret is redacted.
+     */
+    @Override
+    public String toString() {
+        return "WebhookDelivery[source=" + source + ", description=" + description + ", tenantId=" + tenantId +
+            ", host=" + host() + ", eventType=" + eventType + ", headerNames=" + headers.keySet() + ", secret=" +
+            (secret == null ? null : "[redacted]") + ", validateUrl=" + validateUrl + ", payloadCount=" +
+            payloads.size() + ", retry=" + retry + ", deliveryId=" + deliveryId + ", timestamp=" + timestamp + "]";
+    }
+
     private static void requireNotBlank(String value, String name) {
         Objects.requireNonNull(value, name);
 

@@ -44,7 +44,9 @@ final class NotificationSecretSettings {
 
     /**
      * Moves the secret keys of the incoming settings into the secret settings of the target. A secret sent back as the
-     * mask, or omitted, keeps the stored value. The signing secret is never taken from the incoming settings.
+     * mask, or omitted, keeps the stored value; a blank Slack URL counts as omitted. A masked or omitted header value
+     * without a stored header of the same name is rejected. The signing secret is never taken from the incoming
+     * settings.
      */
     static void apply(Notification target, Map<String, Object> incomingSettings, @Nullable Notification stored) {
         Map<String, Object> incoming = incomingSettings == null ? Map.of() : incomingSettings;
@@ -62,12 +64,16 @@ final class NotificationSecretSettings {
 
         Object storedSlackUrl = stored == null ? null : stored.getSetting(SLACK_WEBHOOK_URL_KEY);
 
+        if (isBlank(storedSlackUrl)) {
+            storedSlackUrl = null;
+        }
+
         if (!slack) {
             storedSlackUrl = null;
         } else if (incoming.containsKey(SLACK_WEBHOOK_URL_KEY)) {
             Object slackUrl = incoming.get(SLACK_WEBHOOK_URL_KEY);
 
-            if (MASK.equals(slackUrl)) {
+            if (MASK.equals(slackUrl) || isBlank(slackUrl)) {
                 slackUrl = storedSlackUrl;
             }
 
@@ -117,7 +123,7 @@ final class NotificationSecretSettings {
         }
 
         if (notification.getType() == Notification.Type.SLACK
-            && notification.getSetting(SLACK_WEBHOOK_URL_KEY) != null) {
+            && !isBlank(notification.getSetting(SLACK_WEBHOOK_URL_KEY))) {
             maskedSettings.put(SLACK_WEBHOOK_URL_KEY, MASK);
         }
 
@@ -149,6 +155,10 @@ final class NotificationSecretSettings {
             notification.getSetting(SIGNING_SECRET_KEY) != null;
     }
 
+    private static boolean isBlank(@Nullable Object value) {
+        return value == null || (value instanceof String string && string.isBlank());
+    }
+
     private static List<Map<String, Object>> resolveHeaders(Object incomingHeaders, @Nullable Object storedHeaders) {
         List<Map<String, Object>> resolvedHeaders = new ArrayList<>();
 
@@ -166,6 +176,10 @@ final class NotificationSecretSettings {
 
             if (value == null || MASK.equals(value)) {
                 value = findStoredHeaderValue(storedHeaders, name);
+
+                if (name != null && value == null) {
+                    throw new IllegalArgumentException("Header %s has no saved value".formatted(name));
+                }
             }
 
             if (name != null && value != null) {
