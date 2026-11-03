@@ -41,22 +41,33 @@ public final class CredentialAuthenticationEventPublisher implements Authenticat
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final @Nullable AuthenticationEventPublisher authenticationEventPublisher;
+    private final @Nullable CredentialType credentialType;
     private final FailureLogRateLimiter failureLogRateLimiter;
 
     public CredentialAuthenticationEventPublisher(
         ApplicationEventPublisher applicationEventPublisher,
         @Nullable AuthenticationEventPublisher authenticationEventPublisher) {
 
-        this(applicationEventPublisher, authenticationEventPublisher, Clock.systemUTC());
+        this(applicationEventPublisher, authenticationEventPublisher, null);
+    }
+
+    public CredentialAuthenticationEventPublisher(
+        ApplicationEventPublisher applicationEventPublisher,
+        @Nullable AuthenticationEventPublisher authenticationEventPublisher,
+        @Nullable CredentialType credentialType) {
+
+        this(applicationEventPublisher, authenticationEventPublisher, credentialType, Clock.systemUTC());
     }
 
     @SuppressFBWarnings("EI")
     CredentialAuthenticationEventPublisher(
         ApplicationEventPublisher applicationEventPublisher,
-        @Nullable AuthenticationEventPublisher authenticationEventPublisher, Clock clock) {
+        @Nullable AuthenticationEventPublisher authenticationEventPublisher,
+        @Nullable CredentialType credentialType, Clock clock) {
 
         this.applicationEventPublisher = applicationEventPublisher;
         this.authenticationEventPublisher = authenticationEventPublisher;
+        this.credentialType = credentialType;
         this.failureLogRateLimiter = new FailureLogRateLimiter(clock, FAILURE_LOG_INTERVAL);
     }
 
@@ -67,7 +78,8 @@ public final class CredentialAuthenticationEventPublisher implements Authenticat
         }
 
         try {
-            applicationEventPublisher.publishEvent(new CredentialAuthenticationSuccessEvent(authentication));
+            applicationEventPublisher
+                .publishEvent(new CredentialAuthenticationSuccessEvent(authentication, credentialType));
         } catch (RuntimeException exception) {
             OptionalLong suppressedFailures = failureLogRateLimiter.tryAcquire();
 

@@ -25,6 +25,7 @@ public enum CredentialType {
     AUTOMATION_API_KEY("AutomationApiKey"),
     EMBEDDED_API_KEY("EmbeddedApiKey"),
     EMBEDDED_MCP_SERVER_API_KEY("EmbeddedMcpServerApiKey"),
+    HTTP_BASIC("HttpBasic"),
     PLATFORM_API_KEY("PlatformApiKey");
 
     private final String value;

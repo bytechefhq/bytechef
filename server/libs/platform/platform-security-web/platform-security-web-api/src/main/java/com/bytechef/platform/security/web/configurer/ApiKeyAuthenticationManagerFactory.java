@@ -17,6 +17,7 @@
 package com.bytechef.platform.security.web.configurer;
 
 import com.bytechef.platform.security.web.authentication.CredentialAuthenticationEventPublisher;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -57,6 +58,12 @@ public final class ApiKeyAuthenticationManagerFactory {
     }
 
     public static @Nullable AuthenticationEventPublisher createAuthenticationEventPublisher(HttpSecurity http) {
+        return createAuthenticationEventPublisher(http, null);
+    }
+
+    public static @Nullable AuthenticationEventPublisher createAuthenticationEventPublisher(
+        HttpSecurity http, @Nullable CredentialType credentialType) {
+
         ApplicationContext applicationContext = http.getSharedObject(ApplicationContext.class);
 
         if (applicationContext == null) {
@@ -84,6 +91,7 @@ public final class ApiKeyAuthenticationManagerFactory {
             log.warn("No AuthenticationEventPublisher bean; API key authentication failures are not audited");
         }
 
-        return new CredentialAuthenticationEventPublisher(applicationContext, authenticationEventPublisher);
+        return new CredentialAuthenticationEventPublisher(
+            applicationContext, authenticationEventPublisher, credentialType);
     }
 }

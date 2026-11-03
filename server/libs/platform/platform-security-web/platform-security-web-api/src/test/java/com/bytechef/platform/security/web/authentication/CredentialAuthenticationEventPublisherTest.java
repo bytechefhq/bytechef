@@ -65,6 +65,24 @@ class CredentialAuthenticationEventPublisherTest {
     }
 
     @Test
+    void testSuccessCarriesTheConfiguredCredentialType() {
+        List<Object> events = new ArrayList<>();
+
+        CredentialAuthenticationEventPublisher credentialAuthenticationEventPublisher =
+            new CredentialAuthenticationEventPublisher(events::add, null, CredentialType.HTTP_BASIC);
+
+        credentialAuthenticationEventPublisher.publishAuthenticationSuccess(AUTHENTICATION);
+
+        assertThat(events)
+            .singleElement()
+            .isInstanceOfSatisfying(
+                CredentialAuthenticationSuccessEvent.class,
+                credentialAuthenticationSuccessEvent -> assertThat(
+                    credentialAuthenticationSuccessEvent.getCredentialType())
+                        .isEqualTo(CredentialType.HTTP_BASIC));
+    }
+
+    @Test
     void testAnonymousMcpAccessIsNotPublishedAsACredentialUse() {
         List<Object> events = new ArrayList<>();
 

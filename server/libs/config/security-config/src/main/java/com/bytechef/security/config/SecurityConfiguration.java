@@ -21,11 +21,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Security;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
 import com.bytechef.platform.security.web.config.Saml2LoginCustomizer;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
+import com.bytechef.platform.security.web.configurer.ApiKeyAuthenticationManagerFactory;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.CsrfCookieIssuingFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
@@ -46,8 +48,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -161,6 +165,17 @@ public class SecurityConfiguration {
 
         if (authenticationProvider != null) {
             http.authenticationProvider(authenticationProvider);
+
+            AuthenticationEventPublisher authenticationEventPublisher =
+                ApiKeyAuthenticationManagerFactory.createAuthenticationEventPublisher(
+                    http, CredentialType.HTTP_BASIC);
+
+            if (authenticationEventPublisher != null) {
+                AuthenticationManagerBuilder authenticationManagerBuilder =
+                    http.getSharedObject(AuthenticationManagerBuilder.class);
+
+                authenticationManagerBuilder.authenticationEventPublisher(authenticationEventPublisher);
+            }
         }
 
         return http.build();
