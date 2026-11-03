@@ -1,7 +1,7 @@
-import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
+import {Notification, NotificationTestResult, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {render, screen} from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useForm} from 'react-hook-form';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -23,6 +23,7 @@ interface NotificationDialogHarnessProps {
     saveNotification: (data: NotificationFormValuesType) => void;
     selectedNotification?: Notification;
     settings?: Record<string, unknown>;
+    testNotification?: () => Promise<NotificationTestResult>;
     type: NotificationTypeEnum;
 }
 
@@ -31,6 +32,7 @@ function NotificationDialogHarness({
     saveNotification,
     selectedNotification,
     settings = {},
+    testNotification = vi.fn(),
     type,
 }: NotificationDialogHarnessProps) {
     const form = useForm<NotificationFormValuesType>({
@@ -51,6 +53,7 @@ function NotificationDialogHarness({
             onRegenerateSigningSecret={onRegenerateSigningSecret}
             saveNotification={saveNotification}
             selectedNotification={selectedNotification}
+            testNotification={testNotification}
         />
     );
 }
@@ -312,5 +315,154 @@ describe('NotificationDialog', () => {
 
         expect(await screen.findByText('Enter a value')).toBeInTheDocument();
         expect(saveNotification).not.toHaveBeenCalled();
+    });
+
+    it('sends the current unsaved values on Test', async () => {
+        const testNotification = vi.fn().mockResolvedValue({signed: false, success: true});
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                testNotification={testNotification}
+                type={NotificationTypeEnum.Slack}
+            />
+        );
+
+        await userEvent.type(screen.getByLabelText('Slack Webhook URL'), 'https://hooks.slack.com/services/T/B/X');
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+
+        expect(await screen.findByText('Test sent')).toBeInTheDocument();
+        expect(testNotification).toHaveBeenCalledTimes(1);
+    });
+
+    it('disables Test while a test is running', async () => {
+        const testNotification = vi.fn(() => new Promise<NotificationTestResult>(() => {}));
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                settings={{slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}}
+                testNotification={testNotification}
+                type={NotificationTypeEnum.Slack}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+
+        expect(screen.getByRole('button', {name: 'Test'})).toBeDisabled();
+    });
+
+    it('does not send a test when the form is invalid', async () => {
+        const testNotification = vi.fn();
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                testNotification={testNotification}
+                type={NotificationTypeEnum.Webhook}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+
+        expect(await screen.findByText('Webhook URL is required.')).toBeInTheDocument();
+        expect(testNotification).not.toHaveBeenCalled();
+    });
+
+    it('shows the unsigned note for an unsaved webhook', async () => {
+        const testNotification = vi.fn().mockResolvedValue({signed: false, statusCode: 200, success: true});
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                settings={{webhook: 'https://example.com/ingest'}}
+                testNotification={testNotification}
+                type={NotificationTypeEnum.Webhook}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+
+        expect(await screen.findByText('HTTP 200')).toBeInTheDocument();
+        expect(
+            screen.getByText('Sent without a signature; save the notification to get a signing secret.')
+        ).toBeInTheDocument();
+    });
+
+    it('clears the result when the type changes', async () => {
+        const testNotification = vi.fn().mockResolvedValue({signed: false, success: true});
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                settings={{slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}}
+                testNotification={testNotification}
+                type={NotificationTypeEnum.Slack}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+
+        expect(await screen.findByText('Test sent')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('combobox'));
+        await userEvent.click(screen.getByRole('option', {name: NotificationTypeEnum.Email}));
+
+        expect(screen.queryByText('Test sent')).not.toBeInTheDocument();
+    });
+
+    it('drops a result that resolves after the type changed', async () => {
+        let resolveTest: (result: NotificationTestResult) => void = () => {};
+
+        const testNotification = vi.fn(
+            () =>
+                new Promise<NotificationTestResult>((resolve) => {
+                    resolveTest = resolve;
+                })
+        );
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                settings={{slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}}
+                testNotification={testNotification}
+                type={NotificationTypeEnum.Slack}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+        await userEvent.click(screen.getByRole('combobox'));
+        await userEvent.click(screen.getByRole('option', {name: NotificationTypeEnum.Email}));
+
+        await act(async () => {
+            resolveTest({signed: false, success: true});
+        });
+
+        expect(screen.queryByText('Test sent')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Test'})).toBeEnabled();
+    });
+
+    it('clears the result when the test request is rejected', async () => {
+        const testNotification = vi
+            .fn()
+            .mockResolvedValueOnce({signed: false, success: true})
+            .mockRejectedValueOnce(new Error('Bad request'));
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                settings={{slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}}
+                testNotification={testNotification}
+                type={NotificationTypeEnum.Slack}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+
+        expect(await screen.findByText('Test sent')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+
+        await waitFor(() => expect(screen.queryByText('Test sent')).not.toBeInTheDocument());
     });
 });

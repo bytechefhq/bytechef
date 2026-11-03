@@ -3,6 +3,7 @@ import {
     useCreateNotificationMutation,
     useDeleteNotificationMutation,
     useRegenerateNotificationSigningSecretMutation,
+    useTestNotificationMutation,
     useUpdateNotificationMutation,
 } from '@/shared/mutations/platform/notifications.mutations';
 import {useGetNotificationEventsQuery} from '@/shared/queries/platform/notificationEvents.queries';
@@ -157,6 +158,26 @@ function trimUrlSettings(settings: Record<string, unknown>): Notification['setti
     return trimmedSettings as Notification['settings'];
 }
 
+interface BuildNotificationPayloadPropsI {
+    formValues: NotificationFormValuesType;
+    latestNotification?: Notification;
+    selectedNotification?: Notification;
+}
+
+function buildNotificationPayload({
+    formValues,
+    latestNotification,
+    selectedNotification,
+}: BuildNotificationPayloadPropsI): Notification {
+    return {
+        ...selectedNotification,
+        ...formValues,
+        ...{notificationEventIds: formValues.notificationEventIds.map((id: string) => Number(id))},
+        settings: trimUrlSettings(formValues.settings),
+        version: latestNotification?.version ?? selectedNotification?.version,
+    };
+}
+
 const emptyFormValues = {
     name: '',
     notificationEventIds: [],
@@ -219,6 +240,8 @@ export default function useNotifications() {
         },
     });
 
+    const testNotificationMutation = useTestNotificationMutation();
+
     function regenerateSigningSecret(notificationId: number) {
         regenerateNotificationSigningSecretMutation.mutate(notificationId);
     }
@@ -259,20 +282,24 @@ export default function useNotifications() {
         reset();
     }
 
-    function saveNotification() {
-        const formValues = getValues();
-
+    function getNotificationPayload(): Notification {
         const latestNotification = notificationsData?.find(
             (notification) => notification.id === selectedNotification?.id
         );
 
-        const updatedFormData = {
-            ...selectedNotification,
-            ...formValues,
-            ...{notificationEventIds: formValues.notificationEventIds.map((id: string) => Number(id))},
-            settings: trimUrlSettings(formValues.settings),
-            version: latestNotification?.version ?? selectedNotification?.version,
-        };
+        return buildNotificationPayload({
+            formValues: getValues(),
+            latestNotification,
+            selectedNotification,
+        });
+    }
+
+    function testNotification() {
+        return testNotificationMutation.mutateAsync(getNotificationPayload());
+    }
+
+    function saveNotification() {
+        const updatedFormData = getNotificationPayload();
 
         if (selectedNotification?.id) {
             updateNotificationMutation.mutate(updatedFormData);
@@ -377,5 +404,6 @@ export default function useNotifications() {
         selectedNotification: currentNotification,
         setSelectedNotification,
         signingSecret,
+        testNotification,
     };
 }

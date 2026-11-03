@@ -14,12 +14,18 @@ import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
-import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
+import {
+    Notification,
+    NotificationTestResult as NotificationTestResultType,
+    NotificationTypeEnum,
+} from '@/shared/middleware/platform/notification';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useState} from 'react';
+import {Loader2Icon} from 'lucide-react';
+import {useEffect, useRef, useState} from 'react';
 import {UseFormReturn, useWatch} from 'react-hook-form';
 
 import useNotifications, {MASKED_VALUE, NotificationFormValuesType} from '../hooks/useNotifications';
+import NotificationTestResult from './NotificationTestResult';
 import WebhookHeadersField from './WebhookHeadersField';
 
 const WEBHOOK_PAYLOAD_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/settings/notifications#webhook-requests';
@@ -31,6 +37,7 @@ interface NotificationDialogProps {
     onRegenerateSigningSecret?: (notificationId: number) => void;
     saveNotification: (data: NotificationFormValuesType) => void;
     selectedNotification?: Notification;
+    testNotification: () => Promise<NotificationTestResultType>;
 }
 
 const NotificationDialog = ({
@@ -40,8 +47,13 @@ const NotificationDialog = ({
     onRegenerateSigningSecret,
     saveNotification,
     selectedNotification,
+    testNotification,
 }: NotificationDialogProps) => {
     const [isRegenerateConfirmOpen, setIsRegenerateConfirmOpen] = useState(false);
+    const [isTestPending, setIsTestPending] = useState(false);
+    const [testResult, setTestResult] = useState<NotificationTestResultType | undefined>(undefined);
+
+    const testRunRef = useRef(0);
 
     const isEnterpriseEdition = useApplicationInfoStore((state) => state.application?.edition === EditionType.EE);
 
@@ -50,6 +62,44 @@ const NotificationDialog = ({
     const {control, handleSubmit} = form;
 
     const notificationType = useWatch({control, name: 'type'});
+
+    async function handleTest() {
+        const isValid = await form.trigger();
+
+        if (!isValid) {
+            return;
+        }
+
+        testRunRef.current += 1;
+
+        const testRun = testRunRef.current;
+
+        setIsTestPending(true);
+        setTestResult(undefined);
+
+        try {
+            const result = await testNotification();
+
+            if (testRun === testRunRef.current) {
+                setTestResult(result);
+            }
+        } catch {
+            if (testRun === testRunRef.current) {
+                setTestResult(undefined);
+            }
+        } finally {
+            if (testRun === testRunRef.current) {
+                setIsTestPending(false);
+            }
+        }
+    }
+
+    useEffect(() => {
+        testRunRef.current += 1;
+
+        setIsTestPending(false);
+        setTestResult(undefined);
+    }, [isEditDialogOpen, notificationType]);
 
     return (
         <Dialog
@@ -303,10 +353,23 @@ const NotificationDialog = ({
                                             )}
                                     </>
                                 )}
+
+                                {testResult && (
+                                    <NotificationTestResult notificationType={notificationType} result={testResult} />
+                                )}
                             </DialogBody>
 
                             <DialogFooter>
                                 <DialogCancelButton />
+
+                                <Button
+                                    disabled={isTestPending}
+                                    icon={isTestPending ? <Loader2Icon className="animate-spin" /> : undefined}
+                                    label="Test"
+                                    onClick={handleTest}
+                                    type="button"
+                                    variant="outline"
+                                />
 
                                 <Button label="Save" type="submit" />
                             </DialogFooter>

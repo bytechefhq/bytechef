@@ -4,14 +4,23 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useNotifications, {notificationFormSchema} from '../useNotifications';
 
-const {createNotificationMutate, mutationOptions, notificationsQueryState, regenerateMutate, updateNotificationMutate} =
-    vi.hoisted(() => ({
-        createNotificationMutate: vi.fn(),
-        mutationOptions: {} as Record<string, ((result: unknown, variables?: number) => void) | undefined>,
-        notificationsQueryState: {data: [] as unknown[]},
-        regenerateMutate: vi.fn(),
-        updateNotificationMutate: vi.fn(),
-    }));
+const {
+    createNotificationMutate,
+    invalidateQueries,
+    mutationOptions,
+    notificationsQueryState,
+    regenerateMutate,
+    testNotificationMutateAsync,
+    updateNotificationMutate,
+} = vi.hoisted(() => ({
+    createNotificationMutate: vi.fn(),
+    invalidateQueries: vi.fn(),
+    mutationOptions: {} as Record<string, ((result: unknown, variables?: number) => void) | undefined>,
+    notificationsQueryState: {data: [] as unknown[]},
+    regenerateMutate: vi.fn(),
+    testNotificationMutateAsync: vi.fn(),
+    updateNotificationMutate: vi.fn(),
+}));
 
 vi.mock('@/shared/queries/platform/notificationEvents.queries', () => ({
     useGetNotificationEventsQuery: vi.fn(() => ({
@@ -46,6 +55,7 @@ vi.mock('@/shared/mutations/platform/notifications.mutations', () => ({
             return {mutate: regenerateMutate};
         }
     ),
+    useTestNotificationMutation: vi.fn(() => ({isPending: false, mutateAsync: testNotificationMutateAsync})),
     useUpdateNotificationMutation: vi.fn((options?: {onSuccess?: (result: unknown) => void}) => {
         mutationOptions.update = options?.onSuccess;
 
@@ -58,7 +68,7 @@ vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
 }));
 
 vi.mock('@tanstack/react-query', () => ({
-    useQueryClient: vi.fn(() => ({invalidateQueries: vi.fn()})),
+    useQueryClient: vi.fn(() => ({invalidateQueries})),
 }));
 
 const baseValues = {
@@ -403,5 +413,59 @@ describe('notificationFormSchema', () => {
     it('does not require a Webhook URL for other notification types', () => {
         expect(webhookUrlIssues({email: 'ops@example.com'}, 'EMAIL')).toEqual([]);
         expect(webhookUrlIssues({slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}, 'SLACK')).toEqual([]);
+    });
+});
+
+describe('useNotifications testing a notification', () => {
+    const storedNotification = {
+        hasSigningSecret: true,
+        id: 7,
+        name: 'Failures',
+        notificationEvents: [{id: 1}],
+        settings: {webhook: 'https://example.com/ingest', webhookHeaders: [{name: 'Authorization', value: '********'}]},
+        type: NotificationTypeEnum.Webhook,
+        version: 3,
+    };
+
+    beforeEach(() => {
+        notificationsQueryState.data = [{...storedNotification, version: 4}];
+
+        invalidateQueries.mockClear();
+        testNotificationMutateAsync.mockReset();
+        testNotificationMutateAsync.mockResolvedValue({signed: true, success: true});
+    });
+
+    it('sends the same payload as saving, without invalidating or closing', async () => {
+        const {result} = renderHook(() => useNotifications());
+
+        act(() => {
+            result.current.openEditDialog(storedNotification as never);
+        });
+
+        act(() => {
+            result.current.form.setValue('settings', {
+                webhook: '  https://example.com/edited  ',
+                webhookHeaders: [{name: 'Authorization', value: '********'}],
+            });
+        });
+
+        await act(async () => {
+            await result.current.testNotification();
+        });
+
+        act(() => {
+            result.current.saveNotification();
+        });
+
+        expect(testNotificationMutateAsync).toHaveBeenCalledWith(
+            expect.objectContaining({
+                id: 7,
+                settings: expect.objectContaining({webhook: 'https://example.com/edited'}),
+                version: 4,
+            })
+        );
+        expect(testNotificationMutateAsync.mock.calls[0][0]).toEqual(updateNotificationMutate.mock.calls.at(-1)?.[0]);
+        expect(invalidateQueries).not.toHaveBeenCalled();
+        expect(result.current.isEditDialogOpen).toBe(true);
     });
 });
