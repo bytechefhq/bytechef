@@ -27,6 +27,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.cache.RedisCacheWriter.RedisCacheWriterConfigurer;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 
@@ -102,7 +104,8 @@ public class CacheInvalidationConfiguration {
             .prefixCacheNameWith(SHARED_CACHE_KEY_PREFIX)
             .serializeValuesWith(SerializationPair.fromSerializer(new JsonCacheValueRedisSerializer()));
 
-        RedisCacheManager redisCacheManager = RedisCacheManager.builder(redisConnectionFactory)
+        RedisCacheManager redisCacheManager = RedisCacheManager
+            .builder(RedisCacheWriter.create(redisConnectionFactory, RedisCacheWriterConfigurer::immediateWrites))
             .cacheDefaults(redisCacheConfiguration)
             .build();
 
