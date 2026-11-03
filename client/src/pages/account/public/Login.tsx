@@ -10,6 +10,7 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {getCookie} from '@/shared/util/cookie-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {EyeIcon, EyeOffIcon, ShieldCheckIcon} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
@@ -125,7 +126,7 @@ const Login = () => {
         try {
             const response = await fetch('/api/sso/discover', {
                 body: JSON.stringify({email}),
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/json', 'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''},
                 method: 'POST',
                 signal: AbortSignal.any([abortController.signal, AbortSignal.timeout(5000)]),
             });
