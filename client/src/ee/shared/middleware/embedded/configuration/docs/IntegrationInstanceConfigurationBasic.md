@@ -18,6 +18,7 @@ Name | Type
 `lastModifiedBy` | string
 `lastModifiedDate` | Date
 `name` | string
+`permissionExpression` | string
 `authorizationType` | [AuthorizationType](AuthorizationType.md)
 
 ## Example
@@ -38,6 +39,7 @@ const example = {
   "lastModifiedBy": null,
   "lastModifiedDate": null,
   "name": null,
+  "permissionExpression": null,
   "authorizationType": null,
 } satisfies IntegrationInstanceConfigurationBasic
 

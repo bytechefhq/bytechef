@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T02:20:55.684519+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationInstanceConfigurationModel {
 
   private @Nullable String createdBy;
@@ -60,6 +60,8 @@ public class IntegrationInstanceConfigurationModel {
   private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
+
+  private @Nullable String permissionExpression;
 
   private @Nullable AuthorizationTypeModel authorizationType;
 
@@ -319,6 +321,27 @@ public class IntegrationInstanceConfigurationModel {
     this.name = name;
   }
 
+  public IntegrationInstanceConfigurationModel permissionExpression(@Nullable String permissionExpression) {
+    this.permissionExpression = permissionExpression;
+    return this;
+  }
+
+  /**
+   * The expression a connected user's metadata must satisfy to use an integration instance configuration.
+   * @return permissionExpression
+   */
+  
+  @Schema(name = "permissionExpression", description = "The expression a connected user's metadata must satisfy to use an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("permissionExpression")
+  public @Nullable String getPermissionExpression() {
+    return permissionExpression;
+  }
+
+  @JsonProperty("permissionExpression")
+  public void setPermissionExpression(@Nullable String permissionExpression) {
+    this.permissionExpression = permissionExpression;
+  }
+
   public IntegrationInstanceConfigurationModel authorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
     return this;
@@ -547,6 +570,7 @@ public class IntegrationInstanceConfigurationModel {
         Objects.equals(this.lastModifiedBy, integrationInstanceConfiguration.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationInstanceConfiguration.lastModifiedDate) &&
         Objects.equals(this.name, integrationInstanceConfiguration.name) &&
+        Objects.equals(this.permissionExpression, integrationInstanceConfiguration.permissionExpression) &&
         Objects.equals(this.authorizationType, integrationInstanceConfiguration.authorizationType) &&
         Objects.equals(this.connectionAuthorizationParameters, integrationInstanceConfiguration.connectionAuthorizationParameters) &&
         Objects.equals(this.connectionConnectionParameters, integrationInstanceConfiguration.connectionConnectionParameters) &&
@@ -559,7 +583,7 @@ public class IntegrationInstanceConfigurationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environmentId, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, authorizationType, connectionAuthorizationParameters, connectionConnectionParameters, connectionParameters, integration, integrationInstanceConfigurationWorkflows, tags, version);
+    return Objects.hash(createdBy, createdDate, description, enabled, environmentId, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, permissionExpression, authorizationType, connectionAuthorizationParameters, connectionConnectionParameters, connectionParameters, integration, integrationInstanceConfigurationWorkflows, tags, version);
   }
 
   @Override
@@ -577,6 +601,7 @@ public class IntegrationInstanceConfigurationModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    permissionExpression: ").append(toIndentedString(permissionExpression)).append("\n");
     sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
     sb.append("    connectionAuthorizationParameters: ").append(toIndentedString(connectionAuthorizationParameters)).append("\n");
     sb.append("    connectionConnectionParameters: ").append(toIndentedString(connectionConnectionParameters)).append("\n");

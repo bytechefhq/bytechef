@@ -93,6 +93,10 @@ export interface IntegrationInstanceConfiguration {
      */
     name: string;
     /**
+     * The expression a connected user's metadata must satisfy to use an integration instance configuration.
+     */
+    permissionExpression?: string;
+    /**
      * 
      */
     authorizationType?: AuthorizationType;
@@ -157,6 +161,7 @@ export function IntegrationInstanceConfigurationFromJSONTyped(json: any, ignoreD
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
+        'permissionExpression': json['permissionExpression'] == null ? undefined : json['permissionExpression'],
         'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
         'connectionAuthorizationParameters': json['connectionAuthorizationParameters'] == null ? undefined : json['connectionAuthorizationParameters'],
         'connectionConnectionParameters': json['connectionConnectionParameters'] == null ? undefined : json['connectionConnectionParameters'],
@@ -185,6 +190,7 @@ export function IntegrationInstanceConfigurationToJSONTyped(value?: Omit<Integra
         'integrationId': value['integrationId'],
         'integrationVersion': value['integrationVersion'],
         'name': value['name'],
+        'permissionExpression': value['permissionExpression'],
         'authorizationType': AuthorizationTypeToJSON(value['authorizationType']),
         'connectionParameters': value['connectionParameters'],
         'integration': IntegrationBasicToJSON(value['integration']),

@@ -10,7 +10,10 @@ All URIs are relative to */api/embedded/internal*
 | [**enableIntegrationInstanceConfiguration**](IntegrationInstanceConfigurationApi.md#enableintegrationinstanceconfiguration) | **PATCH** /integration-instance-configurations/{id}/enable/{enable} | Enable/disable an integration instance configuration |
 | [**enableIntegrationInstanceConfigurationWorkflow**](IntegrationInstanceConfigurationApi.md#enableintegrationinstanceconfigurationworkflow) | **PATCH** /integration-instance-configurations/{id}/workflows/{workflowId}/enable/{enable} | Enable/disable a workflow of an integration instance configuration |
 | [**getIntegrationInstanceConfiguration**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfiguration) | **GET** /integration-instance-configurations/{id} | Get an integration instance configuration by id |
+| [**getIntegrationInstanceConfigurationConnectedUsers**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfigurationconnectedusers) | **GET** /integration-instance-configurations/{id}/connected-users | Get the connected users of an integration instance configuration |
+| [**getIntegrationInstanceConfigurationMoveImpact**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfigurationmoveimpact) | **POST** /integration-instance-configurations/{id}/move-impact | Preview moving connected users to another integration instance configuration |
 | [**getIntegrationInstanceConfigurations**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfigurations) | **GET** /integration-instance-configurations | Get integration instance configurations |
+| [**moveIntegrationInstanceConfigurationConnectedUsers**](IntegrationInstanceConfigurationApi.md#moveintegrationinstanceconfigurationconnectedusers) | **POST** /integration-instance-configurations/{id}/move | Move connected users to another integration instance configuration |
 | [**updateIntegrationInstanceConfiguration**](IntegrationInstanceConfigurationApi.md#updateintegrationinstanceconfiguration) | **PUT** /integration-instance-configurations/{id} | Update an existing integration instance configuration |
 | [**updateIntegrationInstanceConfigurationWorkflow**](IntegrationInstanceConfigurationApi.md#updateintegrationinstanceconfigurationworkflow) | **PUT** /integration-instance-configurations/{id}/workflows/{workflowId} | Update an existing integration instance configuration workflow |
 
@@ -430,6 +433,143 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## getIntegrationInstanceConfigurationConnectedUsers
+
+> Array&lt;ConfigurationConnectedUser&gt; getIntegrationInstanceConfigurationConnectedUsers(id)
+
+Get the connected users of an integration instance configuration
+
+Get the connected users that have an integration instance on an integration instance configuration.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationInstanceConfigurationApi,
+} from '';
+import type { GetIntegrationInstanceConfigurationConnectedUsersRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationInstanceConfigurationApi();
+
+  const body = {
+    // number | The id of an integration instance configuration.
+    id: 789,
+  } satisfies GetIntegrationInstanceConfigurationConnectedUsersRequest;
+
+  try {
+    const data = await api.getIntegrationInstanceConfigurationConnectedUsers(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of an integration instance configuration. | [Defaults to `undefined`] |
+
+### Return type
+
+[**Array&lt;ConfigurationConnectedUser&gt;**](ConfigurationConnectedUser.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The connected users of the integration instance configuration. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getIntegrationInstanceConfigurationMoveImpact
+
+> ConfigurationMoveImpact getIntegrationInstanceConfigurationMoveImpact(id, configurationMoveRequest)
+
+Preview moving connected users to another integration instance configuration
+
+Preview what moving connected users from an integration instance configuration to another one would change.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationInstanceConfigurationApi,
+} from '';
+import type { GetIntegrationInstanceConfigurationMoveImpactRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationInstanceConfigurationApi();
+
+  const body = {
+    // number | The id of the source integration instance configuration.
+    id: 789,
+    // ConfigurationMoveRequest
+    configurationMoveRequest: ...,
+  } satisfies GetIntegrationInstanceConfigurationMoveImpactRequest;
+
+  try {
+    const data = await api.getIntegrationInstanceConfigurationMoveImpact(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of the source integration instance configuration. | [Defaults to `undefined`] |
+| **configurationMoveRequest** | [ConfigurationMoveRequest](ConfigurationMoveRequest.md) |  | |
+
+### Return type
+
+[**ConfigurationMoveImpact**](ConfigurationMoveImpact.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | What the move would change. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## getIntegrationInstanceConfigurations
 
 > Array&lt;IntegrationInstanceConfiguration&gt; getIntegrationInstanceConfigurations(environmentId, integrationId, tagId, includeAllFields)
@@ -502,6 +642,76 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The list of integration instance configurations. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## moveIntegrationInstanceConfigurationConnectedUsers
+
+> ConfigurationMoveResult moveIntegrationInstanceConfigurationConnectedUsers(id, configurationMoveRequest)
+
+Move connected users to another integration instance configuration
+
+Move connected users from an integration instance configuration to another one.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationInstanceConfigurationApi,
+} from '';
+import type { MoveIntegrationInstanceConfigurationConnectedUsersRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationInstanceConfigurationApi();
+
+  const body = {
+    // number | The id of the source integration instance configuration.
+    id: 789,
+    // ConfigurationMoveRequest
+    configurationMoveRequest: ...,
+  } satisfies MoveIntegrationInstanceConfigurationConnectedUsersRequest;
+
+  try {
+    const data = await api.moveIntegrationInstanceConfigurationConnectedUsers(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of the source integration instance configuration. | [Defaults to `undefined`] |
+| **configurationMoveRequest** | [ConfigurationMoveRequest](ConfigurationMoveRequest.md) |  | |
+
+### Return type
+
+[**ConfigurationMoveResult**](ConfigurationMoveResult.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The outcome of the move. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

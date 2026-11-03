@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationBasic", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfigurationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T02:20:55.684519+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationInstanceConfigurationBasicModel {
 
   private @Nullable String createdBy;
@@ -52,6 +52,8 @@ public class IntegrationInstanceConfigurationBasicModel {
   private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
+
+  private @Nullable String permissionExpression;
 
   private @Nullable AuthorizationTypeModel authorizationType;
 
@@ -297,6 +299,27 @@ public class IntegrationInstanceConfigurationBasicModel {
     this.name = name;
   }
 
+  public IntegrationInstanceConfigurationBasicModel permissionExpression(@Nullable String permissionExpression) {
+    this.permissionExpression = permissionExpression;
+    return this;
+  }
+
+  /**
+   * The expression a connected user's metadata must satisfy to use an integration instance configuration.
+   * @return permissionExpression
+   */
+  
+  @Schema(name = "permissionExpression", description = "The expression a connected user's metadata must satisfy to use an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("permissionExpression")
+  public @Nullable String getPermissionExpression() {
+    return permissionExpression;
+  }
+
+  @JsonProperty("permissionExpression")
+  public void setPermissionExpression(@Nullable String permissionExpression) {
+    this.permissionExpression = permissionExpression;
+  }
+
   public IntegrationInstanceConfigurationBasicModel authorizationType(@Nullable AuthorizationTypeModel authorizationType) {
     this.authorizationType = authorizationType;
     return this;
@@ -338,12 +361,13 @@ public class IntegrationInstanceConfigurationBasicModel {
         Objects.equals(this.lastModifiedBy, integrationInstanceConfigurationBasic.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationInstanceConfigurationBasic.lastModifiedDate) &&
         Objects.equals(this.name, integrationInstanceConfigurationBasic.name) &&
+        Objects.equals(this.permissionExpression, integrationInstanceConfigurationBasic.permissionExpression) &&
         Objects.equals(this.authorizationType, integrationInstanceConfigurationBasic.authorizationType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environmentId, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, authorizationType);
+    return Objects.hash(createdBy, createdDate, description, enabled, environmentId, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, permissionExpression, authorizationType);
   }
 
   @Override
@@ -361,6 +385,7 @@ public class IntegrationInstanceConfigurationBasicModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    permissionExpression: ").append(toIndentedString(permissionExpression)).append("\n");
     sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
     sb.append("}");
     return sb.toString();

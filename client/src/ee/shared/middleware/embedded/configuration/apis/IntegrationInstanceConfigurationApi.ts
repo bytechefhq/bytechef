@@ -14,6 +14,26 @@
 
 import * as runtime from '../runtime';
 import {
+    type ConfigurationConnectedUser,
+    ConfigurationConnectedUserFromJSON,
+    ConfigurationConnectedUserToJSON,
+} from '../models/ConfigurationConnectedUser';
+import {
+    type ConfigurationMoveImpact,
+    ConfigurationMoveImpactFromJSON,
+    ConfigurationMoveImpactToJSON,
+} from '../models/ConfigurationMoveImpact';
+import {
+    type ConfigurationMoveRequest,
+    ConfigurationMoveRequestFromJSON,
+    ConfigurationMoveRequestToJSON,
+} from '../models/ConfigurationMoveRequest';
+import {
+    type ConfigurationMoveResult,
+    ConfigurationMoveResultFromJSON,
+    ConfigurationMoveResultToJSON,
+} from '../models/ConfigurationMoveResult';
+import {
     type CreateIntegrationInstanceConfigurationWorkflowJob200Response,
     CreateIntegrationInstanceConfigurationWorkflowJob200ResponseFromJSON,
     CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSON,
@@ -87,6 +107,24 @@ export interface GetIntegrationInstanceConfigurationRequest {
     id: number;
 }
 
+export interface GetIntegrationInstanceConfigurationConnectedUsersRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
+    id: number;
+}
+
+export interface GetIntegrationInstanceConfigurationMoveImpactRequest {
+    /**
+     * The id of the source integration instance configuration.
+     */
+    id: number;
+    /**
+     * 
+     */
+    configurationMoveRequest: ConfigurationMoveRequest;
+}
+
 export interface GetIntegrationInstanceConfigurationsRequest {
     /**
      * The environment id.
@@ -104,6 +142,17 @@ export interface GetIntegrationInstanceConfigurationsRequest {
      * Use for including all fields or just basic ones.
      */
     includeAllFields?: boolean;
+}
+
+export interface MoveIntegrationInstanceConfigurationConnectedUsersRequest {
+    /**
+     * The id of the source integration instance configuration.
+     */
+    id: number;
+    /**
+     * 
+     */
+    configurationMoveRequest: ConfigurationMoveRequest;
 }
 
 export interface UpdateIntegrationInstanceConfigurationRequest {
@@ -455,6 +504,110 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for getIntegrationInstanceConfigurationConnectedUsers without sending the request
+     */
+    async getIntegrationInstanceConfigurationConnectedUsersRequestOpts(requestParameters: GetIntegrationInstanceConfigurationConnectedUsersRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getIntegrationInstanceConfigurationConnectedUsers().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/integration-instance-configurations/{id}/connected-users`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get the connected users that have an integration instance on an integration instance configuration.
+     * Get the connected users of an integration instance configuration
+     */
+    async getIntegrationInstanceConfigurationConnectedUsersRaw(requestParameters: GetIntegrationInstanceConfigurationConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConfigurationConnectedUser>>> {
+        const requestOptions = await this.getIntegrationInstanceConfigurationConnectedUsersRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConfigurationConnectedUserFromJSON));
+    }
+
+    /**
+     * Get the connected users that have an integration instance on an integration instance configuration.
+     * Get the connected users of an integration instance configuration
+     */
+    async getIntegrationInstanceConfigurationConnectedUsers(requestParameters: GetIntegrationInstanceConfigurationConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConfigurationConnectedUser>> {
+        const response = await this.getIntegrationInstanceConfigurationConnectedUsersRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getIntegrationInstanceConfigurationMoveImpact without sending the request
+     */
+    async getIntegrationInstanceConfigurationMoveImpactRequestOpts(requestParameters: GetIntegrationInstanceConfigurationMoveImpactRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getIntegrationInstanceConfigurationMoveImpact().'
+            );
+        }
+
+        if (requestParameters['configurationMoveRequest'] == null) {
+            throw new runtime.RequiredError(
+                'configurationMoveRequest',
+                'Required parameter "configurationMoveRequest" was null or undefined when calling getIntegrationInstanceConfigurationMoveImpact().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/integration-instance-configurations/{id}/move-impact`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ConfigurationMoveRequestToJSON(requestParameters['configurationMoveRequest']),
+        };
+    }
+
+    /**
+     * Preview what moving connected users from an integration instance configuration to another one would change.
+     * Preview moving connected users to another integration instance configuration
+     */
+    async getIntegrationInstanceConfigurationMoveImpactRaw(requestParameters: GetIntegrationInstanceConfigurationMoveImpactRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConfigurationMoveImpact>> {
+        const requestOptions = await this.getIntegrationInstanceConfigurationMoveImpactRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConfigurationMoveImpactFromJSON(jsonValue));
+    }
+
+    /**
+     * Preview what moving connected users from an integration instance configuration to another one would change.
+     * Preview moving connected users to another integration instance configuration
+     */
+    async getIntegrationInstanceConfigurationMoveImpact(requestParameters: GetIntegrationInstanceConfigurationMoveImpactRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConfigurationMoveImpact> {
+        const response = await this.getIntegrationInstanceConfigurationMoveImpactRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for getIntegrationInstanceConfigurations without sending the request
      */
     async getIntegrationInstanceConfigurationsRequestOpts(requestParameters: GetIntegrationInstanceConfigurationsRequest): Promise<runtime.RequestOpts> {
@@ -506,6 +659,63 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      */
     async getIntegrationInstanceConfigurations(requestParameters: GetIntegrationInstanceConfigurationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<IntegrationInstanceConfiguration>> {
         const response = await this.getIntegrationInstanceConfigurationsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for moveIntegrationInstanceConfigurationConnectedUsers without sending the request
+     */
+    async moveIntegrationInstanceConfigurationConnectedUsersRequestOpts(requestParameters: MoveIntegrationInstanceConfigurationConnectedUsersRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling moveIntegrationInstanceConfigurationConnectedUsers().'
+            );
+        }
+
+        if (requestParameters['configurationMoveRequest'] == null) {
+            throw new runtime.RequiredError(
+                'configurationMoveRequest',
+                'Required parameter "configurationMoveRequest" was null or undefined when calling moveIntegrationInstanceConfigurationConnectedUsers().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/integration-instance-configurations/{id}/move`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ConfigurationMoveRequestToJSON(requestParameters['configurationMoveRequest']),
+        };
+    }
+
+    /**
+     * Move connected users from an integration instance configuration to another one.
+     * Move connected users to another integration instance configuration
+     */
+    async moveIntegrationInstanceConfigurationConnectedUsersRaw(requestParameters: MoveIntegrationInstanceConfigurationConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConfigurationMoveResult>> {
+        const requestOptions = await this.moveIntegrationInstanceConfigurationConnectedUsersRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConfigurationMoveResultFromJSON(jsonValue));
+    }
+
+    /**
+     * Move connected users from an integration instance configuration to another one.
+     * Move connected users to another integration instance configuration
+     */
+    async moveIntegrationInstanceConfigurationConnectedUsers(requestParameters: MoveIntegrationInstanceConfigurationConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConfigurationMoveResult> {
+        const response = await this.moveIntegrationInstanceConfigurationConnectedUsersRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
