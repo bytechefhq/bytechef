@@ -2,6 +2,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {buildLoginPath} from '@/shared/auth/login-redirect-utils';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getCookie} from '@/shared/util/cookie-utils';
+import {isMissingDefinitionLookup} from '@/shared/util/missingDefinitionLookup';
 import {isAccessDeniedProblemDetail, readProblemDetail} from '@/shared/util/problem-detail-utils';
 import recordWorkflowNodeLookupResult from '@/shared/util/recordWorkflowNodeLookupResult';
 import {isInlineTestOutputGraphQlError, isInlineTestOutputUrl} from '@/shared/util/testOutputInlineErrors';
@@ -177,6 +178,10 @@ export default function useFetchInterceptor() {
                 }
 
                 if (recordWorkflowNodeLookupResult(response)) {
+                    return response;
+                }
+
+                if (isMissingDefinitionLookup(response.url, response.status)) {
                     return response;
                 }
 
