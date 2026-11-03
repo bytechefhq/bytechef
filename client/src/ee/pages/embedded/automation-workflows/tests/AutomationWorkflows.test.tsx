@@ -19,10 +19,6 @@ const renderWithProviders = (ui: ReactElement) => {
     return render(ui, {wrapper});
 };
 
-// ---------------------------------------------------------------------------
-// Hoisted mocks
-// ---------------------------------------------------------------------------
-
 const hoisted = vi.hoisted(() => {
     return {
         categories: [] as Array<{id: string; name: string}>,
@@ -153,10 +149,6 @@ vi.mock(import('@tanstack/react-query'), async (importOriginal) => {
         useQueryClient: () => ({invalidateQueries: vi.fn()}) as unknown as ReturnType<typeof actual.useQueryClient>,
     };
 });
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 beforeEach(() => {
     hoisted.categories = [];
@@ -314,7 +306,6 @@ describe('AutomationWorkflows', () => {
 
         renderWithProviders(<AutomationWorkflows />);
 
-        // The tag chip renders "sales" in a <span class="py-1"> inside the TagList
         const tagChipSpans = screen.getAllByText('sales');
         const tagChipSpan = tagChipSpans.find((element) => element.tagName === 'SPAN' && element.className === 'py-1');
 
