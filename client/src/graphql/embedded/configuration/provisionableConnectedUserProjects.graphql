@@ -3,6 +3,7 @@ query provisionableConnectedUserProjects($connectedUserId: ID!) {
         projectId
         name
         projectVersion
+        assignedConfigurationId
         workflows {
             workflowUuid
             label
@@ -14,6 +15,24 @@ query provisionableConnectedUserProjects($connectedUserId: ID!) {
             }
             provisioned
             dangling
+        }
+        configurations {
+            id
+            name
+            projectVersion
+            selfServe
+            workflows {
+                workflowUuid
+                label
+                inputs {
+                    name
+                    label
+                    type
+                    required
+                }
+                provisioned
+                dangling
+            }
         }
     }
 }

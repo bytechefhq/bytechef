@@ -1,0 +1,8 @@
+query automationWorkflowProjectConfigurationConnectedUsers($id: ID!) {
+    automationWorkflowProjectConfigurationConnectedUsers(id: $id) {
+        connectedUserId
+        externalId
+        name
+        email
+    }
+}
