@@ -1,3 +1,5 @@
+export const ALREADY_ON_TARGET_REASON = 'Already on this configuration';
+
 export const CONFIGURATIONS_LOAD_FAILED_REASON = "Couldn't load the configurations. Try again later.";
 
 export const NO_CONNECTED_USERS_REASON = 'No connected users on this configuration';
@@ -6,11 +8,14 @@ export const NO_OTHER_CONFIGURATION_REASON = 'No other configuration in this env
 
 export const formatSkippedLine = (
     label: string,
-    {reason, workflowLabels}: {reason: string; workflowLabels: string[]}
+    {reason, workflowLabels}: {reason: string; workflowLabels: string[]},
+    notOnSourceReason = 'no longer on this configuration'
 ): string => {
     const workflows = workflowLabels.join(', ');
 
     switch (reason) {
+        case 'ALREADY_ON_TARGET':
+            return `${label}: ${ALREADY_ON_TARGET_REASON}`;
         case 'TARGET_LACKS_REFERENCED_WORKFLOWS':
             return `${label}: the target has no ${workflows}`;
         case 'TARGET_LACKS_ENABLED_WORKFLOWS':
@@ -18,7 +23,7 @@ export const formatSkippedLine = (
         case 'CONNECTION_MISMATCH':
             return `${label}: the target uses a different authorization type`;
         case 'NOT_ON_SOURCE':
-            return `${label}: no longer on this configuration`;
+            return `${label}: ${notOnSourceReason}`;
         case 'MOVE_FAILED':
             return `${label}: the move failed, try again`;
         default:
