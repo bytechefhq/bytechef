@@ -333,6 +333,7 @@ export type AiProviderModel = {
 
 export type AiSkill = {
   __typename?: 'AiSkill';
+  createdBy?: Maybe<Scalars['String']['output']>;
   /** Epoch milliseconds (UTC) */
   createdDate?: Maybe<Scalars['Long']['output']>;
   description?: Maybe<Scalars['String']['output']>;

@@ -271,7 +271,7 @@ export type AiSkillQueryVariables = Exact<{
 }>;
 
 
-export type AiSkillQuery = { aiSkill: { id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any } };
+export type AiSkillQuery = { aiSkill: { id: string, name: string, description: string | null, createdBy: string | null, createdDate: any, lastModifiedDate: any } };
 
 export type AiSkillFileContentQueryVariables = Exact<{
   id: string | number;
@@ -296,7 +296,7 @@ export type AiSkillTagsQuery = { aiSkillTags: Array<{ id: string, name: string }
 export type AiSkillsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any, tags: Array<{ id: string, name: string }> }> };
+export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdBy: string | null, createdDate: any, lastModifiedDate: any, tags: Array<{ id: string, name: string }> }> };
 
 export type CreateAdditionalFilesInSkillMutationVariables = Exact<{
   id: string | number;
@@ -3735,6 +3735,7 @@ export const AiSkillDocument = new TypedDocumentString(`
     id
     name
     description
+    createdBy
     createdDate
     lastModifiedDate
   }
@@ -3832,6 +3833,7 @@ export const AiSkillsDocument = new TypedDocumentString(`
     id
     name
     description
+    createdBy
     tags {
       id
       name
