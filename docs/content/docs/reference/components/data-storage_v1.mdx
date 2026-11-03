@@ -39,7 +39,6 @@ Name: appendValueToList
 | value | Value | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The value to set under given key. | true |
 | value | Value | STRING | The value to set under given key. | true |
 | value | Value | TIME | The value to set under given key. | true |
-| appendListAsSingleItem | Append a List as a Single Item | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists. | false |
 
 #### Example JSON Structure
 ```json
@@ -50,8 +49,7 @@ Name: appendValueToList
     "scope" : "",
     "key" : "",
     "type" : "",
-    "value" : "00:00:00",
-    "appendListAsSingleItem" : false
+    "value" : "00:00:00"
   },
   "type" : "dataStorage/v1/appendValueToList"
 }
@@ -577,9 +575,6 @@ Set the Google Sheets “values”/“rows” parameter to `{script.rows}` and c
 ---
 
 #### FAQ
-
-Can I append a list as a single item?
-- Yes. In `Append Value to List`, set `appendListAsSingleItem: true` to push the entire list as one element instead of concatenating.
 
 How do deletes work?
 - Use `Delete Value` to remove any key, or `Delete Value from List` to remove by index within a stored list.
