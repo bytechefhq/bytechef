@@ -37,7 +37,7 @@ created yet."
 2. Enter a **Name** - required, up to 256 characters.
 3. Pick one or more **Events** from the multi-select. At least one is required.
 4. Choose a **Type**.
-5. Fill in the type's one delivery field.
+5. Fill in the type's fields.
    For a Webhook, you can also pick a **Preset** first, which fills in the URL, headers and body template
    for a vendor. See [Presets](#presets).
 6. Click **Save**.
@@ -223,7 +223,10 @@ Every request carries these headers:
 | `X-ByteChef-Signature` | Only when the notification has a signing secret. See [Verifying signatures](#verifying-signatures). |
 
 The URL must use `http` or `https` and must resolve to a public address: loopback, private,
-link-local and carrier-grade NAT ranges are refused. Each request has a 10-second connect timeout and
+link-local and carrier-grade NAT ranges are refused. On a self-hosted instance, to reach an internal
+receiver, list its host in `bytechef.webhook-delivery.allowed-hosts` (comma-separated, for example
+`alerts.internal,10.0.0.5`). A listed host must match the URL's host exactly and skips the address
+check. The same list applies to Slack notifications. Each request has a 10-second connect timeout and
 a 30-second read timeout, and a `4xx` or `5xx` response counts as a failure. A failed job-status
 delivery is logged and not retried. For the two approval events, if every subscribed notification
 fails, the next approval sweep tries again.
@@ -389,6 +392,10 @@ The body template:
 }
 ```
 
+Datadog groups events with the same `aggregation_key` into one alert. The preset keys on the job
+(`bytechef-job-{{jobId}}`), so use `bytechef-workflow-{{workflow.id}}` to group every run of a workflow
+instead.
+
 The template always sends `"status": "error"`. For a notification that subscribes to success events,
 such as `JOB_COMPLETED`, change it to `"status": "ok"`. The whole default body is sent under
 `attributes.custom`, so no detail is lost.
@@ -402,9 +409,14 @@ Sends one event to the New Relic Event API.
 | **Webhook URL** | `https://insights-collector.newrelic.com/v1/accounts/YOUR_ACCOUNT_ID/events` |
 | **Api-Key** header | Your New Relic license key. |
 
-Replace `YOUR_ACCOUNT_ID` with your account id. For an account in the EU region, use the host
-`insights-collector.eu01.nr-data.net` instead:
-`https://insights-collector.eu01.nr-data.net/v1/accounts/YOUR_ACCOUNT_ID/events`.
+Replace `YOUR_ACCOUNT_ID` with your account id. The host depends on your New Relic region:
+
+| Region | Host |
+|---|---|
+| US | `insights-collector.newrelic.com` |
+| EU | `insights-collector.eu01.nr-data.net` |
+| JP | `insights-collector.jp.nr-data.net` |
+| FedRAMP | `gov-insights-collector.newrelic.com` |
 
 The body template:
 
@@ -430,6 +442,19 @@ The body template:
 New Relic attributes must be flat, so the template has no nested objects. Every value is sent as a
 string, including `jobId`. The event type in New Relic is `ByteChefNotification`.
 
+A 200 from **Test** only means New Relic received the request. Events that are not valid are dropped
+later and reported as `NrIntegrationError`. To confirm the event arrived, run this NRQL query:
+
+```
+SELECT * FROM ByteChefNotification SINCE 10 minutes ago
+```
+
+If nothing shows, look for the reason with:
+
+```
+SELECT * FROM NrIntegrationError SINCE 10 minutes ago
+```
+
 #### Sentry via Custom
 
 Sentry is not a preset. Its current ingest format is a newline-delimited envelope, which one JSON
@@ -438,12 +463,14 @@ template cannot produce. You can still send an event to the older JSON `store` e
 
 | Field | Value |
 |---|---|
-| **Webhook URL** | `https://oORG_ID.ingest.sentry.io/api/PROJECT_ID/store/` |
+| **Webhook URL** | `https://YOUR_DSN_HOST/api/YOUR_PROJECT_ID/store/` |
 | **X-Sentry-Auth** header | `Sentry sentry_version=7, sentry_key=YOUR_PUBLIC_KEY` |
 
-Your Sentry DSN gives the three values. It has the form
-`https://<public_key>@o<org>.ingest.sentry.io/<project_id>`: use the public key for `YOUR_PUBLIC_KEY`, the
-number after `o` for `ORG_ID`, and the last part for `PROJECT_ID`.
+Your Sentry DSN gives the three values. It has the form `https://<public_key>@<host>/<project_id>`: use the
+public key for `YOUR_PUBLIC_KEY`, copy the host as is for `YOUR_DSN_HOST`, and use the last part for
+`YOUR_PROJECT_ID`. For the DSN `https://abc123@o123.ingest.us.sentry.io/456`, the URL is
+`https://o123.ingest.us.sentry.io/api/456/store/`. EU organizations have hosts like
+`o123.ingest.de.sentry.io`, and self-hosted Sentry uses its own host.
 
 The body template:
 
