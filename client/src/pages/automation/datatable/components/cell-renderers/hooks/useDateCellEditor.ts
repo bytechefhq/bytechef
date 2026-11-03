@@ -17,28 +17,33 @@ interface UseDateCellEditorI {
     isPopoverOpen: boolean;
 }
 
-const parseDate = (value: unknown): Date | undefined => {
-    if (!value) return undefined;
+const CALENDAR_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})/;
 
-    const date = new Date(String(value));
+const parseDate = (value: unknown): Date | undefined => {
+    if (value === null || value === undefined || value === '') return undefined;
+
+    if (typeof value === 'number') {
+        const utcDate = new Date(value);
+
+        if (isNaN(utcDate.getTime())) return undefined;
+
+        return new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate());
+    }
+
+    const calendarDateMatch = CALENDAR_DATE_PATTERN.exec(String(value));
+
+    if (!calendarDateMatch) return undefined;
+
+    const [, year, month, day] = calendarDateMatch;
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
 
     return isNaN(date.getTime()) ? undefined : date;
 };
 
 const formatDateValue = (value: unknown): string => {
-    if (!value) return '';
+    const date = parseDate(value);
 
-    try {
-        const date = new Date(String(value));
-
-        if (!isNaN(date.getTime())) {
-            return formatDate(date, 'yyyy-MM-dd');
-        }
-    } catch {
-        return String(value);
-    }
-
-    return '';
+    return date ? formatDate(date, 'yyyy-MM-dd') : '';
 };
 
 export default function useDateCellEditor({columnName, onRowChange, row}: UseDateCellEditorProps): UseDateCellEditorI {
