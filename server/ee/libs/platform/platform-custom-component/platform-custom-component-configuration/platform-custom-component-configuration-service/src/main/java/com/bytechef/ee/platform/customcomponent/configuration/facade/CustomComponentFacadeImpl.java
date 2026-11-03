@@ -80,6 +80,54 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     @Override
+    @Audited(event = CustomComponentAuditEvents.CUSTOM_COMPONENT_CREATED, data = {
+        @AuditData(key = "customComponentId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "version", value = "#result?.componentVersion"),
+        @AuditData(key = "language", value = "#language")
+    })
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public CustomComponent createEmptyCustomComponent(String name, Language language) {
+        validateComponentName(name);
+
+        if (language != Language.JAVASCRIPT) {
+            throw new ConfigurationException(
+                "Create-empty currently supports JavaScript only",
+                CustomComponentErrorType.LANGUAGE_NOT_SUPPORTED);
+        }
+
+        if (customComponentService.fetchLatestCustomComponent(name)
+            .isPresent()) {
+            throw new ConfigurationException(
+                "A custom component named '" + name + "' already exists",
+                CustomComponentErrorType.COMPONENT_ALREADY_EXISTS);
+        }
+
+        validateNotBuiltInComponentName(name);
+
+        String template = readTemplate(language).replace("__NAME__", name);
+
+        byte[] bytes = template.getBytes(StandardCharsets.UTF_8);
+
+        try {
+            ComponentDefinition componentDefinition = loadComponentDefinition(language, bytes);
+
+            FileEntry componentFileEntry = customComponentFileStorage.storeCustomComponentFile(
+                componentDefinition.getName() + "_" + componentDefinition.getVersion() + "." + language.getExtension(),
+                bytes);
+
+            return create(
+                language, componentDefinition, componentDefinition.getVersion(), componentFileEntry,
+                CustomComponent.Status.DRAFT, null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    @Audited(event = CustomComponentAuditEvents.CUSTOM_COMPONENT_DELETED, data = {
+        @AuditData(key = "customComponentId", value = "#id")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void delete(Long id) {
         CustomComponent customComponent = customComponentService.getCustomComponent(id);
@@ -90,6 +138,10 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     @Override
+    @Audited(event = CustomComponentAuditEvents.CUSTOM_COMPONENT_ENABLED_UPDATED, data = {
+        @AuditData(key = "customComponentId", value = "#id"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void enableCustomComponent(long id, boolean enable) {
         customComponentService.enableCustomComponent(id, enable);
