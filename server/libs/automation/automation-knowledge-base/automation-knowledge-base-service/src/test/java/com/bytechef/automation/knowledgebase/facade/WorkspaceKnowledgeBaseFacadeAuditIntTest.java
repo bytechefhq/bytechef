@@ -57,7 +57,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
         AutomationKnowledgeBaseIntTestConfiguration.class,
         WorkspaceKnowledgeBaseFacadeAuditIntTest.AuditConfiguration.class
     },
-    properties = "bytechef.edition=ee")
+    properties = {
+        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+    })
 @Import(PostgreSQLContainerConfiguration.class)
 class WorkspaceKnowledgeBaseFacadeAuditIntTest {
 

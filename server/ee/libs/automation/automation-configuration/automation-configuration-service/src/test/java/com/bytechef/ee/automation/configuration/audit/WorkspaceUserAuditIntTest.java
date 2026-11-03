@@ -55,7 +55,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = WorkspaceUserAuditIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(classes = WorkspaceUserAuditIntTest.Config.class, properties = {
+    "bytechef.edition=ee", "bytechef.audit.enabled=true"
+})
 class WorkspaceUserAuditIntTest {
 
     private static final long USER_ID = 2L;

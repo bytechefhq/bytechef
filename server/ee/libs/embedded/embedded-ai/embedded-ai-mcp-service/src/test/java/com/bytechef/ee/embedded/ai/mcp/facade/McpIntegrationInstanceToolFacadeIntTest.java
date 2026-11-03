@@ -81,7 +81,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
         EmbeddedMcpIntTestConfiguration.class,
         McpIntegrationInstanceToolFacadeIntTest.FacadeIntTestConfiguration.class
     },
-    properties = "bytechef.edition=ee")
+    properties = {
+        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+    })
 class McpIntegrationInstanceToolFacadeIntTest {
 
     private static final int INTEGRATION_VERSION = 6;

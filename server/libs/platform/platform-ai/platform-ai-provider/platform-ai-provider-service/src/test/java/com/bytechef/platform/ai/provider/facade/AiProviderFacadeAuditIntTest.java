@@ -63,7 +63,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
         AiProviderFacadeIntTest.AiProviderFacadeIntTestConfiguration.class,
         AiProviderFacadeAuditIntTest.AuditConfiguration.class
     },
-    properties = "bytechef.edition=ee")
+    properties = {
+        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+    })
 class AiProviderFacadeAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";

@@ -59,6 +59,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
     classes = IdentityProviderFacadeAuditIntTest.AuditConfiguration.class,
     properties = {
         "bytechef.edition=ee",
+        "bytechef.audit.enabled=true",
         "spring.liquibase.change-log=classpath:config/liquibase/platform-user-audit-testint.xml"
     })
 @Import(PostgreSQLContainerConfiguration.class)

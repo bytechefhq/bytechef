@@ -51,7 +51,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     classes = {
         EmbeddedMcpIntTestConfiguration.class, EmbeddedMcpServerFacadeAuditIntTest.AuditConfiguration.class
     },
-    properties = "bytechef.edition=ee")
+    properties = {
+        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+    })
 @MockitoBean(types = {
     ComponentDefinitionService.class, IntegrationInstanceConfigurationService.class, IntegrationService.class,
     McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceToolService.class,

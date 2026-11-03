@@ -59,7 +59,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     classes = {
         AutomationDataTableIntTestConfiguration.class, WorkspaceDataTableFacadeAuditIntTest.AuditConfiguration.class
     },
-    properties = "bytechef.edition=ee")
+    properties = {
+        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+    })
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = ProjectOwnershipService.class)
 class WorkspaceDataTableFacadeAuditIntTest {

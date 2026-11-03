@@ -70,7 +70,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     classes = {
         PlatformMcpIntTestConfiguration.class, McpServerAuditIntTest.AuditConfiguration.class
     },
-    properties = "bytechef.edition=ee")
+    properties = {
+        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+    })
 @MockitoBean(types = {
     MailService.class, WorkflowService.class
 })

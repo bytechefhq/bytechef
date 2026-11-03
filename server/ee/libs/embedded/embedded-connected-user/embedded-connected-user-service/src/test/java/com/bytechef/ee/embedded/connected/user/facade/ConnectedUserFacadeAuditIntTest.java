@@ -79,7 +79,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
         ConnectedUserFacadeAuditIntTest.AuditConfiguration.class
     },
     properties = {
-        "bytechef.edition=ee", "spring.liquibase.contexts=user,connection"
+        "bytechef.edition=ee", "bytechef.audit.enabled=true", "spring.liquibase.contexts=user,connection"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {

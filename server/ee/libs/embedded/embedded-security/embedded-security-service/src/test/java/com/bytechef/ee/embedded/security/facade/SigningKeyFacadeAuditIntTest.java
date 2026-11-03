@@ -63,6 +63,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     },
     properties = {
         "bytechef.edition=ee",
+        "bytechef.audit.enabled=true",
         "spring.liquibase.change-log=classpath:config/liquibase/embedded-security-audit-testint.xml",
         "spring.liquibase.contexts=configuration"
     })
