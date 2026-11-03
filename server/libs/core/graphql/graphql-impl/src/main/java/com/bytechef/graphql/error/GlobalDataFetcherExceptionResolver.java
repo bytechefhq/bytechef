@@ -46,6 +46,7 @@ import org.springframework.stereotype.Component;
  * <li>Any other {@link AbstractException} \u2192 {@code INTERNAL_ERROR} \u2014 uncorrectable runtime failure.</li>
  * <li>{@link GraphQlBadRequestException} \u2192 {@code BAD_REQUEST} \u2014 controller-thrown input-shape
  * validation.</li>
+ * <li>{@link IllegalArgumentException} \u2192 {@code BAD_REQUEST}, matching the REST handler.</li>
  * <li>{@link AccessDeniedException} \u2192 {@code FORBIDDEN}. Returns a generic message (never the detail) so error
  * shape cannot be used to enumerate resources the caller does not own.</li>
  * <li>{@link AuthenticationCredentialsNotFoundException} \u2192 {@code UNAUTHORIZED} \u2014 protected mutation invoked
@@ -103,6 +104,16 @@ class GlobalDataFetcherExceptionResolver extends DataFetcherExceptionResolverAda
                 .message(throwable.getMessage())
                 .errorType(ErrorType.BAD_REQUEST)
                 .extensions(extensions)
+                .build();
+        }
+
+        if (throwable instanceof IllegalArgumentException illegalArgumentException) {
+            log.error(illegalArgumentException.getMessage(), illegalArgumentException);
+
+            return GraphqlErrorBuilder
+                .newError(environment)
+                .message(illegalArgumentException.getMessage())
+                .errorType(ErrorType.BAD_REQUEST)
                 .build();
         }
 
