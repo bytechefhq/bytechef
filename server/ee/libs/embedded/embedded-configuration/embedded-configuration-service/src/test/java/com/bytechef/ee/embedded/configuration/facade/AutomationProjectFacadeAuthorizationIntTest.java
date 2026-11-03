@@ -9,22 +9,20 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.config.TenantAdminOnlyPermissionService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProject;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
-import com.bytechef.ee.embedded.configuration.security.SkipAutomationAuthorizationAspect;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -38,11 +36,9 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +64,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(
     classes = {
-        AutomationProjectFacadeImpl.class, SkipAutomationAuthorizationAspect.class,
+        AutomationProjectFacadeImpl.class,
         AutomationProjectFacadeAuthorizationIntTest.MethodSecurityConfiguration.class
     },
     properties = "bytechef.edition=ee")
@@ -76,9 +72,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     AutomationProjectConfigurationResolver.class, AutomationProjectConfigurationService.class,
     CategoryService.class, ConnectedUserReferenceDeploymentManager.class, ConnectedUserReferenceRolloutManager.class,
     ConnectedUserService.class, EmbeddedPermissionEvaluator.class, IntegrationInstanceConfigurationService.class,
-    IntegrationService.class, ProjectWorkflowFacade.class, ProjectWorkflowService.class, TagService.class,
-    WorkflowComponentResolver.class, WorkflowNodeTestOutputService.class, WorkflowPreDeleteListener.class,
-    WorkflowService.class, WorkflowTestConfigurationService.class
+    IntegrationService.class, ProjectWorkflowFacade.class, ProjectWorkflowService.class,
+    TagService.class, WorkflowComponentResolver.class, WorkflowNodeTestOutputService.class,
+    WorkflowPreDeleteListener.class, WorkflowService.class, WorkflowTestConfigurationService.class
 })
 class AutomationProjectFacadeAuthorizationIntTest {
 
@@ -153,20 +149,12 @@ class AutomationProjectFacadeAuthorizationIntTest {
     }
 
     @Test
-    void testGetPublishedProjectsRunsSkippingChecksWithoutTenantAdmin() {
-        AtomicBoolean skippingChecks = new AtomicBoolean();
-
-        when(automationProjectService.getAutomationProjects())
-            .thenAnswer(invocation -> {
-                skippingChecks.set(AutomationAuthorizationContext.isSkipChecks());
-
-                return List.of();
-            });
+    void testGetPublishedProjectsIsOpenToAnyAuthenticatedCaller() {
+        when(automationProjectService.getAutomationProjects()).thenReturn(List.of());
 
         authenticate(nonAdmin());
 
         assertThat(automationProjectFacade.getPublishedProjects()).isEmpty();
-        assertThat(skippingChecks).isTrue();
     }
 
     private static void authenticate(Authentication authentication) {
@@ -199,12 +187,7 @@ class AutomationProjectFacadeAuthorizationIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            PermissionService permissionService = mock(PermissionService.class);
-
-            when(permissionService.isTenantAdmin())
-                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
-
-            return permissionService;
+            return TenantAdminOnlyPermissionService.create();
         }
     }
 }

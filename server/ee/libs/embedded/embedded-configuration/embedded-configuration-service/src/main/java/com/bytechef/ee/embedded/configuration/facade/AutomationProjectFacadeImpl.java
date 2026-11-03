@@ -14,7 +14,6 @@ import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -412,7 +411,6 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     }
 
     @Override
-    @SkipAutomationAuthorization
     public List<AutomationProjectDTO> getPublishedProjects() {
         Map<Long, AutomationProject> automationProjects = getAutomationProjects();
 
@@ -423,7 +421,6 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     }
 
     @Override
-    @SkipAutomationAuthorization
     public List<AutomationProjectDTO> getPublishedProjects(String externalUserId, Environment environment) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
@@ -461,7 +458,6 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     }
 
     @Override
-    @SkipAutomationAuthorization
     public List<AutomationProjectConfigurationReleaseDTO> getPublishedProjectConfigurations(
         String externalUserId, Environment environment) {
 

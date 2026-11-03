@@ -14,7 +14,6 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -31,6 +30,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -53,7 +53,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
 class ConnectedUserReferenceDeploymentManager {
 
     private final AutomationProjectConfigurationResolver automationProjectConfigurationResolver;
@@ -99,9 +98,9 @@ class ConnectedUserReferenceDeploymentManager {
     public void deleteDeployment(long projectDeploymentId) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
 
-        projectDeploymentFacade.updateProjectDeployment(projectDeployment, List.of(), List.of());
+        asSystem(() -> projectDeploymentFacade.updateProjectDeployment(projectDeployment, List.of(), List.of()));
 
-        projectDeploymentFacade.deleteProjectDeployment(projectDeploymentId);
+        asSystem(() -> projectDeploymentFacade.deleteProjectDeployment(projectDeploymentId));
     }
 
     public Optional<ProjectDeploymentWorkflow> fetchRow(long projectDeploymentId, String automationUuid) {
@@ -243,7 +242,7 @@ class ConnectedUserReferenceDeploymentManager {
 
         projectDeployment.setProjectVersion(projectVersion);
 
-        projectDeploymentFacade.updateProjectDeployment(projectDeployment, rows, List.of());
+        asSystem(() -> projectDeploymentFacade.updateProjectDeployment(projectDeployment, rows, List.of()));
     }
 
     public void putWorkflow(long projectDeploymentId, String automationUuid, RowSpec rowSpec) {
@@ -272,8 +271,8 @@ class ConnectedUserReferenceDeploymentManager {
             ProjectDeploymentWorkflow existingRow = row.get();
 
             if (existingRow.isEnabled()) {
-                projectDeploymentFacade.enableProjectDeploymentWorkflow(
-                    projectDeploymentId, existingRow.getWorkflowId(), false);
+                asSystem(() -> projectDeploymentFacade.enableProjectDeploymentWorkflow(
+                    projectDeploymentId, existingRow.getWorkflowId(), false));
             }
 
             projectDeploymentWorkflowService.delete(existingRow.getId());
@@ -283,7 +282,7 @@ class ConnectedUserReferenceDeploymentManager {
             projectDeploymentId);
 
         if (remainingRows.isEmpty()) {
-            projectDeploymentFacade.deleteProjectDeployment(projectDeploymentId);
+            asSystem(() -> projectDeploymentFacade.deleteProjectDeployment(projectDeploymentId));
         }
     }
 
@@ -455,13 +454,13 @@ class ConnectedUserReferenceDeploymentManager {
                 .map(AutomationProjectConfiguration::getProjectVersion)
                 .orElseThrow(() -> newNotReleasedException(connectedUser.getId(), automationProjectId)));
 
-        long projectDeploymentId = projectDeploymentFacade.createProjectDeployment(
-            projectDeployment, List.of(), List.of());
+        long projectDeploymentId = SecurityUtils.runAsSystem(
+            () -> projectDeploymentFacade.createProjectDeployment(projectDeployment, List.of(), List.of()));
 
         connectedUserReferenceDeploymentService.create(
             connectedUser.getId(), automationProjectId, projectDeploymentId);
 
-        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+        asSystem(() -> projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true));
 
         return projectDeploymentId;
     }
@@ -563,7 +562,8 @@ class ConnectedUserReferenceDeploymentManager {
             }
 
             if (row.isEnabled()) {
-                projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, false);
+                asSystem(() -> projectDeploymentFacade.enableProjectDeploymentWorkflow(
+                    projectDeploymentId, workflowId, false));
 
                 row = projectDeploymentWorkflowService.getProjectDeploymentWorkflow(row.getId());
             }
@@ -598,7 +598,8 @@ class ConnectedUserReferenceDeploymentManager {
         }
 
         if (rowSpec.enabled()) {
-            projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, true);
+            asSystem(() -> projectDeploymentFacade.enableProjectDeploymentWorkflow(
+                projectDeploymentId, workflowId, true));
         }
     }
 
@@ -641,6 +642,20 @@ class ConnectedUserReferenceDeploymentManager {
                 .equals(Set.copyOf(resolved.connections()))
             &&
             (rowSpec.inputs() == null || Objects.equals(row.getInputs(), rowSpec.inputs()));
+    }
+
+    /**
+     * A reference deployment is a deployment of the tenant's automation workflow catalog project made for a connected
+     * user, not one of that user's own projects, so the ownership-based checks on {@link ProjectDeploymentFacade}
+     * refuse it to the connected user. The callers verify the reference belongs to the connected user and the template
+     * is published and visible to them before reaching this manager, so its deployment writes run as the system.
+     */
+    private static void asSystem(Runnable runnable) {
+        SecurityUtils.runAsSystem(() -> {
+            runnable.run();
+
+            return null;
+        });
     }
 
     public record ReferenceResolution(

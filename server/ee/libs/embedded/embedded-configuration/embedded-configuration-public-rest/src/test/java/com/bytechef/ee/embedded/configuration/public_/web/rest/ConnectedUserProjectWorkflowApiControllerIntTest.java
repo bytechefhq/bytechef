@@ -39,6 +39,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
@@ -66,7 +67,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -119,7 +119,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testCopyFrontendWorkflowTemplateReturnsWorkflowUuid() {
         String newWorkflowUuid = "new-workflow-uuid-999";
 
@@ -139,7 +139,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testCreateFrontendProjectWorkflowReturnsWorkflowUuidAsJsonString() {
         String newWorkflowUuid = "new-workflow-uuid-777";
 
@@ -163,7 +163,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testUpdateFrontendProjectWorkflowFromPromptForwardsTheSystemPrompt() {
         when(connectedUserProjectFacade.updateProjectWorkflow(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq("Post new leads to Slack"), eq("Use the sales channel"),
@@ -184,7 +184,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testUpdateProjectWorkflowFromPromptForwardsTheSystemPrompt() {
         when(connectedUserProjectFacade.updateProjectWorkflow(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq("Post new leads to Slack"), eq("Use the sales channel"),
@@ -205,7 +205,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testCopyFrontendWorkflowTemplateUnknownIdReturns404() {
         when(connectedUserProjectFacade.copyWorkflowTemplate(
             eq(EXTERNAL_USER_ID), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class)))
@@ -221,7 +221,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testCopyFrontendWorkflowTemplateHiddenTemplateIsIndistinguishableFromUnknownUuid() {
         when(connectedUserProjectFacade.copyWorkflowTemplate(
             eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class)))
@@ -239,7 +239,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProvisionUsesThePrincipalAsExternalUserId() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()), isNull()))
@@ -258,7 +258,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProvisionForwardsRequestedConnectionsFromTheBody() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)), isNull()))
@@ -277,7 +277,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProvisionForwardsInputsFromTheBody() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)),
@@ -299,7 +299,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProvisionTreatsEmptyInputsAsNotGiven() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()), isNull()))
@@ -318,7 +318,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProvisionMissingConnectionReturns409() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(any(), any(), any(), any(), any()))
             .thenThrow(new MissingConnectionException("slack"));
@@ -335,7 +335,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProvisionConnectionNotEntitledReturns400() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(any(), any(), any(), any(), any()))
             .thenThrow(new ConnectionNotEntitledException("slack", 12L));
@@ -350,7 +350,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProvisionHiddenTemplateIsIndistinguishableFromUnknownUuid() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class), any(), any()))
@@ -366,7 +366,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendDeprovisionDeletesTheReference() {
         webTestClient
             .delete()
@@ -380,7 +380,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProvisionConnectionWithoutIdReturns400() {
         webTestClient
             .post()
@@ -396,7 +396,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testExplicitProvisionCreatesAReference() {
         ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
 
@@ -418,7 +418,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testExplicitProvisionMissingConnectionReturns409() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()), isNull()))
@@ -437,7 +437,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testExplicitProvisionHiddenTemplateIsIndistinguishableFromUnknownUuid() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class), any(), any()))
@@ -453,7 +453,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testExplicitProvisionFailureOtherThanVisibilityIsNotReportedAsNotFound() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), any(), any()))
@@ -471,7 +471,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDeprovisionDeletesTheReference() {
         webTestClient
             .delete()
@@ -486,7 +486,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testEnableReferenceMissingConnectionReturns409() {
         doThrow(new MissingConnectionException("slack"))
             .when(connectedUserProjectFacade)
@@ -504,7 +504,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testEnableReferenceSucceeds() {
         when(connectedUserProjectFacade.enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any()))
             .thenReturn(null);
@@ -526,7 +526,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testEnableReferenceTurnedOffByAdministratorReportsTheAttentionReason() {
         when(connectedUserProjectFacade.enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any()))
             .thenReturn("TURNED_OFF_BY_ADMINISTRATOR");
@@ -545,7 +545,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testExternalUserEnableReferenceTurnedOffByAdministratorReportsTheAttentionReason() {
         when(connectedUserProjectFacade.enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any()))
             .thenReturn("TURNED_OFF_BY_ADMINISTRATOR");
@@ -564,7 +564,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDisableReferenceSucceeds() {
         when(
             connectedUserProjectFacade.enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(false), any()))
@@ -582,7 +582,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDisableReferenceMissingConnectionReturns409() {
         doThrow(new MissingConnectionException("slack"))
             .when(connectedUserProjectFacade)
@@ -600,7 +600,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testEnableReferenceMissingInputReturns409() {
         doThrow(new MissingInputException("channel"))
             .when(connectedUserProjectFacade)
@@ -618,7 +618,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testEnableInvalidWorkflowReturns409WithTheErrorCount() {
         doThrow(new InvalidWorkflowException(WORKFLOW_UUID, 2))
             .when(connectedUserProjectFacade)
@@ -636,7 +636,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testListingReportsAttentionReasonFromTheFacadeDto() {
         ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
 
@@ -665,7 +665,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testExplicitProvisionForwardsRequestedConnectionsFromTheBody() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)), isNull()))
@@ -685,7 +685,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testExplicitProvisionConnectionWithoutIdReturns400() {
         webTestClient
             .post()
@@ -702,7 +702,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testExternalUserEnableReferenceMissingInputReturns409() {
         doThrow(new MissingInputException("channel"))
             .when(connectedUserProjectFacade)
@@ -720,7 +720,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testUpdateFrontendProjectWorkflowInputsStoresTheSuppliedValues() {
         webTestClient
             .put()
@@ -744,7 +744,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testUpdateFrontendProjectWorkflowInputsMissingInputReturns409() {
         doThrow(new MissingInputException("channel"))
             .when(connectedUserProjectFacade)
@@ -764,7 +764,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testUpdateProjectWorkflowInputsMissingInputReturns409() {
         doThrow(new MissingInputException("channel"))
             .when(connectedUserProjectFacade)
@@ -784,7 +784,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testFrontendProvisionConnectionForAProvidedComponentReturns409() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(), eq(Map.of("slack", 12L)), any()))
@@ -806,7 +806,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testExplicitProvisionInputForAProvidedInputReturns409() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(), any(), eq(Map.of("channel", "#mine"))))
@@ -829,7 +829,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testUpdateFrontendProjectWorkflowInputsForAProvidedInputReturns409() {
         doThrow(new ProvidedValueLockedException("channel", ProvidedValueLockedException.Kind.INPUT))
             .when(connectedUserProjectFacade)
@@ -849,7 +849,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testUpdateProjectWorkflowInputsForAProvidedInputReturns409() {
         doThrow(new ProvidedValueLockedException("channel", ProvidedValueLockedException.Kind.INPUT))
             .when(connectedUserProjectFacade)
@@ -869,7 +869,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testListingMarksTheComponentsAndInputsTheConfigurationProvides() {
         ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
 

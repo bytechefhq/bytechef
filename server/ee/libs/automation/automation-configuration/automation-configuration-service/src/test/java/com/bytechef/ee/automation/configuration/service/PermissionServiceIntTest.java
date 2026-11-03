@@ -33,7 +33,6 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
@@ -966,8 +965,7 @@ class PermissionServiceIntTest {
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
             List.of(connectionEnvironmentResolver),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
-            new ApplicationProperties());
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
     }
 
     private void createCustomRole(long customRoleId) {
@@ -982,8 +980,7 @@ class PermissionServiceIntTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resourceOwnershipResolver), List.of(),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
-            new ApplicationProperties());
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
     }
 
     private ProjectDeployment renamedDeployment(long projectDeploymentId) {

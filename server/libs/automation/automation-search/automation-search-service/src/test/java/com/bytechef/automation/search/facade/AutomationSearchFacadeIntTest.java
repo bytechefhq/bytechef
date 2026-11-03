@@ -17,6 +17,7 @@
 package com.bytechef.automation.search.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacadeImpl;
@@ -29,6 +30,7 @@ import com.bytechef.automation.search.SearchResult;
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
 import com.bytechef.platform.user.callback.UserCallback;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
@@ -50,6 +52,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -159,6 +162,22 @@ class AutomationSearchFacadeIntTest {
         assertThat(workflowSearchAssetProvider.getWorkspaceIds()).containsExactly(workspace.getId());
         assertThat(results).containsExactlyInAnyOrder(
             new TestSearchResult(2L, SearchAssetType.CONNECTION), new TestSearchResult(3L, SearchAssetType.WORKFLOW));
+    }
+
+    @Test
+    void testSearchRefusesAConnectedUser() {
+        workspaceRepository.save(new Workspace("search-workspace"));
+
+        workflowSearchAssetProvider.setResults(List.of(new TestSearchResult(1L, SearchAssetType.WORKFLOW)));
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestNonPlatformUserAuthentication.of(LOGIN));
+
+        assertThatThrownBy(() -> automationSearchFacade.search("slack", 10))
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(connectionSearchAssetProvider.getWorkspaceIds()).isNull();
+        assertThat(workflowSearchAssetProvider.getWorkspaceIds()).isNull();
     }
 
     static class RecordingSearchAssetProvider implements SearchAssetProvider {
