@@ -2,6 +2,7 @@ import {
     ConfigurationConnectedUser,
     ConfigurationMoveImpact,
     ConfigurationMoveRequest,
+    ConfigurationUpgradeRequest,
     GetIntegrationInstanceConfigurationsRequest,
     IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationApi,
@@ -22,6 +23,11 @@ export const IntegrationInstanceConfigurationKeys = {
     integrationInstanceConfigurationMoveImpact: (id: number, request: ConfigurationMoveRequest) => [
         ...IntegrationInstanceConfigurationKeys.integrationInstanceConfiguration(id),
         'moveImpact',
+        request,
+    ],
+    integrationInstanceConfigurationUpgradeImpact: (id: number, request: ConfigurationUpgradeRequest) => [
+        ...IntegrationInstanceConfigurationKeys.integrationInstanceConfiguration(id),
+        'upgradeImpact',
         request,
     ],
     integrationInstanceConfiguration: (id: number) => [
@@ -69,6 +75,24 @@ export const useGetIntegrationInstanceConfigurationMoveImpactQuery = (
         queryFn: () =>
             new IntegrationInstanceConfigurationApi().getIntegrationInstanceConfigurationMoveImpact({
                 configurationMoveRequest,
+                id,
+            }),
+        enabled: enabled === undefined ? true : enabled,
+    });
+
+export const useGetIntegrationInstanceConfigurationUpgradeImpactQuery = (
+    id: number,
+    configurationUpgradeRequest: ConfigurationUpgradeRequest,
+    enabled?: boolean
+) =>
+    useQuery<ConfigurationMoveImpact, Error>({
+        queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurationUpgradeImpact(
+            id,
+            configurationUpgradeRequest
+        ),
+        queryFn: () =>
+            new IntegrationInstanceConfigurationApi().getIntegrationInstanceConfigurationUpgradeImpact({
+                configurationUpgradeRequest,
                 id,
             }),
         enabled: enabled === undefined ? true : enabled,
