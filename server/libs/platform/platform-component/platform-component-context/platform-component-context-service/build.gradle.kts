@@ -18,6 +18,9 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
+    testImplementation("io.lettuce:lettuce-core")
+    testImplementation("org.springframework.data:spring-data-redis")
+    testImplementation("org.testcontainers:junit-jupiter")
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-service"))
