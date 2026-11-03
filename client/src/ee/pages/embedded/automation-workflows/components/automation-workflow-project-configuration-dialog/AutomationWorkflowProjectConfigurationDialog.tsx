@@ -328,7 +328,9 @@ const AutomationWorkflowProjectConfigurationDialog = ({
                             <DialogCancelButton />
 
                             <Button
-                                disabled={isPending || nameTaken || !projectVersion || (!updateProjectVersion && !trimmedName)}
+                                disabled={
+                                    isPending || nameTaken || !projectVersion || (!updateProjectVersion && !trimmedName)
+                                }
                                 label="Save"
                                 type="submit"
                             />
