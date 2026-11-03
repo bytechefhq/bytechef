@@ -48,7 +48,11 @@ const RowIdCell = ({
             <div className="flex h-full w-full items-center justify-center">
                 <Button
                     icon={<Plus className="mr-1 size-4" />}
-                    onClick={onAddRow}
+                    onClick={(event) => {
+                        event.stopPropagation();
+
+                        onAddRow();
+                    }}
                     size="icon"
                     title="Add row"
                     variant="ghost"

@@ -29,6 +29,7 @@ const DataTable = () => {
     const {
         gridColumns,
         gridRowsWithAdd,
+        handleCellClick,
         handleGridScroll,
         handleRowsChange,
         handleSelectedRowsChange,
@@ -68,9 +69,11 @@ const DataTable = () => {
                         aria-description="Data Table"
                         bottomSummaryRows={[{}]}
                         columns={gridColumns}
+                        onCellClick={handleCellClick}
                         onRowsChange={handleRowsChange}
                         onScroll={handleGridScroll}
                         onSelectedRowsChange={handleSelectedRowsChange}
+                        rowClass={(row) => (row.id === '-1' ? 'cursor-pointer' : undefined)}
                         rowKeyGetter={(row) => row.id}
                         rows={gridRowsWithAdd}
                         selectedRows={selectedRows}
