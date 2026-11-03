@@ -133,6 +133,33 @@ ByteChef creates the connection, the integration instance on the chosen configur
 
 The instance is created in the connected user's own environment. Provisioning always adds a new instance, even when the user already has one for the same integration (for example, two accounts of the same service). The user's own embedded UI then shows that instance's configuration and workflows, not the self-serve one.
 
+### Upgrading Several Users at Once
+
+Use a batch upgrade to put many connected users on a newer configuration in one go, without opening each one.
+
+1. Tick the checkboxes of the users you want in the table. A bar appears above it with the count, for example "3 selected", and the buttons **Upgrade integration**, **Upgrade automation**, and **Clear**. **Clear** drops the selection.
+2. For an integration, click **Upgrade integration**, then pick one of the integrations the selected users have. Next pick the **Configuration** to move them to. Each configuration of the current environment is listed as its name and version, for example "Production Gmail · V3". Configurations with a version higher than the lowest one the selected users are on are marked **Newer version**.
+3. For an automation, click **Upgrade automation**, then pick a project that has configurations in the current environment. Next pick the **Configuration**. The one with the highest version is marked **Latest version**.
+4. Read the impact preview. It shows what changes for the workflows involved, such as new required inputs or connections, and which users will be skipped. **Upgrade** stays unavailable until the preview has loaded.
+5. Click **Upgrade**.
+
+When it finishes, the dialog shows how many users were moved and how many need attention, and lists each skipped user with a reason. The reasons you may see are:
+
+- **Already on this configuration**: nothing to do for that user.
+- **Doesn't have this integration** or **Doesn't have this project**: the user has no configuration of what you picked in this environment.
+- **The target has no** followed by workflow names: the target configuration lacks a workflow the user relies on.
+- **The target has no enabled** followed by workflow names: those workflows exist on the target but are not enabled.
+- **The target uses a different authorization type**: the user's connection cannot be carried over.
+- **The move failed, try again**: the move did not complete for that user.
+
+Skipped users are left exactly as they were.
+
+A few things to know:
+
+- **Versions belong to configurations, not to users.** A user has no version of their own. Upgrading a user means moving them onto another configuration, and that configuration has the newer version.
+- **Only the current environment.** Users and target configurations must be in the environment selected in the sidebar.
+- **Upgrading a whole configuration is separate.** **Update Integration Version** and **Upgrade Project Version** on a configuration still upgrade everyone on it. Use the batch upgrade when you only want to move some users. For moving everyone off one configuration, see [Moving Users Between Configurations](/platform/embedded/configure/instance-configurations#moving-users-between-configurations).
+
 ### Row actions menu
 
 Each table row has an ellipsis (⋮) menu with the same three actions available without opening the sheet:

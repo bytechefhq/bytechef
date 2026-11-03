@@ -114,6 +114,8 @@ Use a move to put chosen users on another configuration of the same project and 
 3. Pick the target configuration. The target can be disabled, in which case it is marked "(disabled)" and the moved users' references are switched off.
 4. Review the warnings (new required inputs or connections in the target version), then confirm. **Move** stays unavailable until the preview has loaded. If the preview cannot load, the dialog says so and you can still move.
 
+To move chosen users from the Connected Users page instead, see [Upgrading Several Users at Once](/platform/embedded/monitor/connected-users#upgrading-several-users-at-once).
+
 Moved users' references roll to the target's version, with provided values taken from the target. Their copies are not changed.
 
 A user is **skipped** when the target version does not have a workflow they still reference. The dialog lists these users, with the missing workflows, before you confirm, and the rest of the batch still moves. If a moved user is missing a connection or input, their reference is paused with a reason and the dialog counts how many need attention.
