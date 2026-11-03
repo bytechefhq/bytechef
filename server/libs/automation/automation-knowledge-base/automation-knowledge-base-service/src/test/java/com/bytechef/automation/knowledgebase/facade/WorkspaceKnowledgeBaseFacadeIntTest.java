@@ -37,6 +37,10 @@ import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvents;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentChunkRepository;
+import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentRepository;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -86,10 +90,19 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
+    private KnowledgeBaseDocumentChunkRepository knowledgeBaseDocumentChunkRepository;
+
+    @Autowired
+    private KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository;
+
+    @Autowired
     private KnowledgeBaseRepository knowledgeBaseRepository;
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @Autowired
+    private WorkspaceKnowledgeBaseDocumentFacade workspaceKnowledgeBaseDocumentFacade;
 
     @Autowired
     private WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
@@ -243,7 +256,144 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
             .containsEntry("knowledgeBaseId", String.valueOf(Long.MAX_VALUE));
     }
 
+    @Test
+    void testUpdateRecordsTheNewName() {
+        KnowledgeBase knowledgeBase = createKnowledgeBase();
+
+        workspaceKnowledgeBaseFacade.updateKnowledgeBase(knowledgeBase.getId(), newKnowledgeBase("Renamed articles"));
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(KnowledgeBaseAuditEvents.KB_UPDATED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("knowledgeBaseId", String.valueOf(knowledgeBase.getId()))
+            .containsEntry("name", "Renamed articles")
+            .doesNotContainKeys("dataError", "errorClass", "mapperError");
+
+        KnowledgeBase savedKnowledgeBase = knowledgeBaseRepository.findById(knowledgeBase.getId())
+            .orElseThrow();
+
+        assertThat(savedKnowledgeBase.getName()).isEqualTo("Renamed articles");
+    }
+
+    @Test
+    void testUpdateOfAnUnknownKnowledgeBaseRecordsAnError() {
+        KnowledgeBase renamedKnowledgeBase = newKnowledgeBase("Renamed articles");
+
+        assertThatThrownBy(
+            () -> workspaceKnowledgeBaseFacade.updateKnowledgeBase(Long.MAX_VALUE, renamedKnowledgeBase))
+                .isInstanceOf(NoSuchElementException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(KnowledgeBaseAuditEvents.KB_UPDATED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", NoSuchElementException.class.getName())
+            .containsEntry("knowledgeBaseId", String.valueOf(Long.MAX_VALUE))
+            .doesNotContainKey("name");
+    }
+
+    @Test
+    void testUpdateChunkRecordsTheChunkAndItsDocumentWithoutTheContent() {
+        KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = createChunk();
+
+        workspaceKnowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentChunk(
+            knowledgeBaseDocumentChunk.getId(), "confidential paragraph");
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_UPDATED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("knowledgeBaseDocumentChunkId", String.valueOf(knowledgeBaseDocumentChunk.getId()))
+            .containsEntry(
+                "knowledgeBaseDocumentId", String.valueOf(knowledgeBaseDocumentChunk.getKnowledgeBaseDocumentId()))
+            .doesNotContainValue("confidential paragraph")
+            .doesNotContainKeys("dataError", "errorClass");
+    }
+
+    @Test
+    void testUpdateOfAnUnknownChunkRecordsAnError() {
+        assertThatThrownBy(
+            () -> workspaceKnowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentChunk(Long.MAX_VALUE, "paragraph"))
+                .isExactlyInstanceOf(RuntimeException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_UPDATED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", RuntimeException.class.getName())
+            .containsEntry("knowledgeBaseDocumentChunkId", String.valueOf(Long.MAX_VALUE))
+            .doesNotContainKey("knowledgeBaseDocumentId");
+    }
+
+    @Test
+    void testDeleteChunkRecordsTheChunk() {
+        KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = createChunk();
+
+        workspaceKnowledgeBaseDocumentFacade.deleteKnowledgeBaseDocumentChunk(knowledgeBaseDocumentChunk.getId());
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_DELETED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("knowledgeBaseDocumentChunkId", String.valueOf(knowledgeBaseDocumentChunk.getId()))
+            .doesNotContainKeys("dataError", "errorClass");
+        assertThat(knowledgeBaseDocumentChunkRepository.findById(knowledgeBaseDocumentChunk.getId())).isEmpty();
+    }
+
+    @Test
+    void testDeleteOfAnUnknownChunkRecordsAnError() {
+        assertThatThrownBy(
+            () -> workspaceKnowledgeBaseDocumentFacade.deleteKnowledgeBaseDocumentChunk(Long.MAX_VALUE))
+                .isExactlyInstanceOf(RuntimeException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_DELETED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", RuntimeException.class.getName())
+            .containsEntry("knowledgeBaseDocumentChunkId", String.valueOf(Long.MAX_VALUE));
+    }
+
+    private KnowledgeBaseDocumentChunk createChunk() {
+        KnowledgeBase knowledgeBase = createKnowledgeBase();
+
+        KnowledgeBaseDocument knowledgeBaseDocument = new KnowledgeBaseDocument();
+
+        knowledgeBaseDocument.setKnowledgeBaseId(knowledgeBase.getId());
+        knowledgeBaseDocument.setName("handbook.txt");
+        knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_READY);
+
+        knowledgeBaseDocument = knowledgeBaseDocumentRepository.save(knowledgeBaseDocument);
+
+        KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = new KnowledgeBaseDocumentChunk();
+
+        knowledgeBaseDocumentChunk.setKnowledgeBaseDocumentId(knowledgeBaseDocument.getId());
+        knowledgeBaseDocumentChunk.setTextContent("first paragraph");
+
+        return knowledgeBaseDocumentChunkRepository.save(knowledgeBaseDocumentChunk);
+    }
+
+    private KnowledgeBase createKnowledgeBase() {
+        KnowledgeBase knowledgeBase = workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(
+            newKnowledgeBase("Support articles"), WORKSPACE_ID, DEVELOPMENT_ENVIRONMENT_ID);
+
+        persistenceAuditEventRepository.deleteAll();
+
+        return knowledgeBase;
+    }
+
     private void deleteKnowledgeBases() {
+        knowledgeBaseDocumentChunkRepository.deleteAll();
+        knowledgeBaseDocumentRepository.deleteAll();
         workspaceKnowledgeBaseRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
     }

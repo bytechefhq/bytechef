@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.data.table.audit;
+package com.bytechef.automation.data.table.audit;
 
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;

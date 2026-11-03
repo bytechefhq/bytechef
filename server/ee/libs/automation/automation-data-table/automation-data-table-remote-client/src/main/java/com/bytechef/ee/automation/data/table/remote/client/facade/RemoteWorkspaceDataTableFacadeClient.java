@@ -51,7 +51,7 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
-    public void dropTable(long dataTableId, long environmentId) {
+    public boolean dropTable(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

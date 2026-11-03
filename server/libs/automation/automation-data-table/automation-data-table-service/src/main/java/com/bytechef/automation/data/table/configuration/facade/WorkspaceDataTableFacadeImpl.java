@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.data.table.configuration.facade;
 
+import com.bytechef.automation.data.table.audit.DataTableAuditMapper;
 import com.bytechef.automation.data.table.configuration.domain.DataTableLinkOption;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.audit.AuditData;
@@ -103,6 +104,12 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_ADDED, data = {
+        @AuditData(key = "dataTableId", value = "#dataTableId"),
+        @AuditData(key = "columnName", value = "#columnSpec.name"),
+        @AuditData(key = "columnType", value = "#columnSpec.type"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
         dataTableService.addColumn(dataTableId, columnSpec, environmentId);
@@ -122,9 +129,13 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
-    public void dropTable(long dataTableId, long environmentId) {
-        dataTableService.dropTable(dataTableId, environmentId);
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_DELETED, mapper = DataTableAuditMapper.class, data = {
+        @AuditData(key = "dataTableId", value = "#dataTableId"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_DELETE')")
+    public boolean dropTable(long dataTableId, long environmentId) {
+        return dataTableService.dropTable(dataTableId, environmentId);
     }
 
     @Override
@@ -180,12 +191,23 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_REMOVED, data = {
+        @AuditData(key = "dataTableId", value = "#dataTableId"),
+        @AuditData(key = "columnName", value = "#columnName"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public void removeColumn(long dataTableId, String columnName, long environmentId) {
         dataTableService.removeColumn(dataTableId, columnName, environmentId);
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_RENAMED, data = {
+        @AuditData(key = "dataTableId", value = "#dataTableId"),
+        @AuditData(key = "fromColumnName", value = "#fromColumnName"),
+        @AuditData(key = "toColumnName", value = "#newName"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public void renameColumn(long dataTableId, String fromColumnName, String newName, long environmentId) {
         dataTableService.renameColumn(
@@ -193,6 +215,10 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_RENAMED, data = {
+        @AuditData(key = "dataTableId", value = "#dataTableId"),
+        @AuditData(key = "newName", value = "#newName")
+    })
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public void renameTable(long dataTableId, String newName) {
         dataTableService.renameTable(dataTableId, newName);
@@ -312,7 +338,10 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_EXPORTED, data = {
+        @AuditData(key = "dataTableId", value = "#dataTableId"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
     public String exportCsv(long dataTableId, long environmentId) {
         return dataTableRowService.exportCsv(dataTableId, environmentId);
