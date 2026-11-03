@@ -111,6 +111,19 @@ class NotificationHandlerContextsTest {
     }
 
     @Test
+    void testBuilderKeepsProjectWhenEnvironmentLookupFails() {
+        mockPrincipal(PlatformType.AUTOMATION, 7L);
+        when(jobPrincipalAccessor.getJobPrincipalSummary(7L)).thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
+        when(environmentService.getEnvironment(2L)).thenThrow(new IllegalStateException("boom"));
+
+        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+            .build();
+
+        assertEquals(new ProjectSummary(1L, "CRM", 3), context.getProject());
+        assertNull(context.getEnvironment());
+    }
+
+    @Test
     void testBuilderUsesEmbeddedExecutionsPathForEmbeddedJobs() {
         mockPrincipal(PlatformType.EMBEDDED, 9L);
         when(jobPrincipalAccessor.getJobPrincipalSummary(9L))
