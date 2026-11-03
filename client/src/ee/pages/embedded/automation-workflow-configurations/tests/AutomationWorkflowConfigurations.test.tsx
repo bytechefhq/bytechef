@@ -63,11 +63,19 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
             },
         };
     },
+    useAutomationWorkflowProjectVersionsQuery: () => ({
+        data: {
+            automationWorkflowProjectVersions: [
+                {description: null, publishedDate: null, status: 'PUBLISHED', version: 1},
+            ],
+        },
+    }),
     useAutomationWorkflowProjectsQuery: (variables: unknown) => {
         mocks.projectsVariables = variables;
 
         return {data: {automationWorkflowProjects: mocks.projects}, error: null, isLoading: false};
     },
+    useCreateAutomationWorkflowProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
     useDeleteAutomationWorkflowProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableAutomationWorkflowProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableAutomationWorkflowProjectConfigurationWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
@@ -122,6 +130,10 @@ describe('AutomationWorkflowConfigurations', () => {
 
         environmentStore.setState({currentEnvironmentId: 2});
 
+        Element.prototype.hasPointerCapture = vi.fn();
+        Element.prototype.releasePointerCapture = vi.fn();
+        Element.prototype.scrollIntoView = vi.fn();
+
         mocks.configurationsVariables = [];
         mocks.projects = [makeProject('live', 'Live Project', true, 1), makeProject('draft', 'Draft Project', false)];
         mocks.projectsVariables = undefined;
@@ -147,10 +159,11 @@ describe('AutomationWorkflowConfigurations', () => {
         expect(screen.queryByRole('region', {name: 'Other Project'})).not.toBeInTheDocument();
         expect(screen.queryByRole('region', {name: 'Draft Project'})).not.toBeInTheDocument();
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'New Configuration'})).toBeInTheDocument();
         expect(mocks.configurationsVariables).toContainEqual({environmentId: '2', projectId: 'live'});
     });
 
-    it('offers every published project from the New Configuration menu', async () => {
+    it('opens one dialog that offers every published project from New Configuration', async () => {
         mocks.projects = [
             makeProject('live', 'Live Project', true, 1),
             makeProject('other', 'Other Project', true),
@@ -161,7 +174,11 @@ describe('AutomationWorkflowConfigurations', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'New Configuration'}));
 
-        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual([
+        expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('combobox', {name: 'Project'}));
+
+        expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
             'Live Project',
             'Other Project',
         ]);
@@ -176,14 +193,19 @@ describe('AutomationWorkflowConfigurations', () => {
         expect(screen.queryByRole('tab', {name: 'Workflows'})).not.toBeInTheDocument();
     });
 
-    it('shows one empty state when no published project has a configuration in this environment', () => {
+    it('guides the user to the first configuration when no published project has one in this environment', async () => {
         mocks.projects = [makeProject('other', 'Other Project', true)];
 
         renderPage();
 
-        expect(screen.getByText('No configurations yet')).toBeInTheDocument();
+        expect(screen.getByText('Create your first configuration')).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: /How configurations work/})).toBeInTheDocument();
         expect(screen.queryByRole('region', {name: 'Other Project'})).not.toBeInTheDocument();
-        expect(screen.getAllByRole('button', {name: 'New Configuration'}).length).toBeGreaterThan(0);
+        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Create Configuration'}));
+
+        expect(screen.getByRole('combobox', {name: 'Project'})).toBeInTheDocument();
     });
 
     it('shows one empty list for a project chosen in the sidebar without configurations', () => {
@@ -215,7 +237,8 @@ describe('AutomationWorkflowConfigurations', () => {
 
         renderPage();
 
-        expect(screen.getByText('Publish a project to configure it')).toBeInTheDocument();
+        expect(screen.getByText('Create your first configuration')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('button', {name: 'Go to Automations'}));
 

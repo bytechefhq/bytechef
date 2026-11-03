@@ -1,13 +1,10 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
-import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import AutomationWorkflowExecutionsSheet from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-executions-sheet/AutomationWorkflowExecutionsSheet';
 import AutomationWorkflowProjectConfigurationDialog from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-dialog/AutomationWorkflowProjectConfigurationDialog';
 import AutomationWorkflowProjectConfigurationList from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationList';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
-import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -18,11 +15,12 @@ import {
     useAutomationWorkflowProjectsQuery,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ChevronDownIcon, Settings2Icon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {SlidersHorizontalIcon} from 'lucide-react';
+import {useCallback, useMemo, useState} from 'react';
 import {flushSync} from 'react-dom';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
+import AutomationWorkflowConfigurationsEmptyState from './AutomationWorkflowConfigurationsEmptyState';
 import AutomationWorkflowConfigurationsFilterTitle from './AutomationWorkflowConfigurationsFilterTitle';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
@@ -31,7 +29,7 @@ type AutomationWorkflowProjectConfigurationType =
 
 interface ConfigurationDialogStateI {
     configuration?: AutomationWorkflowProjectConfigurationType;
-    project: AutomationWorkflowProjectType;
+    project?: AutomationWorkflowProjectType;
     updateProjectVersion?: boolean;
 }
 
@@ -40,8 +38,6 @@ const AutomationWorkflowConfigurations = () => {
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setCurrentEnvironmentId = useEnvironmentStore((state) => state.setCurrentEnvironmentId);
-
-    const environmentScopeNote = useEnvironmentScopeNote('Configurations');
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -72,46 +68,35 @@ const AutomationWorkflowConfigurations = () => {
         ? configuredProjects.filter((project) => project.id === selectedProject.id)
         : configuredProjects;
 
-    const isFirstRun = !projectsIsLoading && publishedProjects.length === 0;
+    const isFirstRun = !projectsIsLoading && !projectId && configuredProjects.length === 0;
 
-    const newConfigurationButton = selectedProject ? (
+    const newConfigurationButton = (
         <Button label="New Configuration" onClick={() => setConfigurationDialog({project: selectedProject})} />
-    ) : (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button aria-label="New Configuration">
-                    New Configuration
-                    <ChevronDownIcon />
-                </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end">
-                {publishedProjects.map((project) => (
-                    <DropdownMenuItem key={project.id} onClick={() => setConfigurationDialog({project})}>
-                        {project.name}
-                    </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
-        </DropdownMenu>
     );
 
-    const handleGoToAutomations = () => {
+    const handleCreateConfiguration = useCallback(() => setConfigurationDialog({}), []);
+
+    const handleGoToAutomations = useCallback(() => {
         flushSync(() => setCurrentEnvironmentId(DEVELOPMENT_ENVIRONMENT));
 
         void navigate('/embedded/automation-workflows');
-    };
+    }, [navigate, setCurrentEnvironmentId]);
 
     return (
         <LayoutContainer
             header={
-                !isFirstRun && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={newConfigurationButton}
-                        title={<AutomationWorkflowConfigurationsFilterTitle projectName={selectedProject?.name} />}
-                    />
-                )
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    right={listedProjects.length > 0 && newConfigurationButton}
+                    title={
+                        isFirstRun ? (
+                            'Configurations'
+                        ) : (
+                            <AutomationWorkflowConfigurationsFilterTitle projectName={selectedProject?.name} />
+                        )
+                    }
+                />
             }
             leftSidebarBody={
                 <LeftSidebarFilterNav
@@ -151,31 +136,23 @@ const AutomationWorkflowConfigurations = () => {
                     </div>
                 ) : selectedProject ? (
                     <EmptyList
-                        icon={<Settings2Icon className="size-24 text-stroke-neutral-tertiary" />}
+                        button={newConfigurationButton}
+                        icon={<SlidersHorizontalIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message={`${selectedProject.name} has no configurations in this environment.`}
                         title="No Matching Configurations"
                     />
                 ) : projectId ? (
                     <EmptyList
-                        icon={<Settings2Icon className="size-24 text-stroke-neutral-tertiary" />}
+                        icon={<SlidersHorizontalIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="The selected project is not published."
                         title="No Matching Project"
                     />
-                ) : publishedProjects.length > 0 ? (
-                    <EmptyState
-                        actions={newConfigurationButton}
-                        description="A configuration runs a published version of an automation project for connected users in this environment."
-                        icon={<Settings2Icon />}
-                        note={environmentScopeNote}
-                        title="No configurations yet"
-                    />
                 ) : (
-                    <EmptyState
-                        actions={<Button label="Go to Automations" onClick={handleGoToAutomations} />}
-                        description="A configuration runs a published version of an automation project in this environment. Build and publish a project in the Development environment first."
-                        icon={<Settings2Icon />}
-                        note={environmentScopeNote}
-                        title="Publish a project to configure it"
+                    <AutomationWorkflowConfigurationsEmptyState
+                        hasProject={(projectsData?.automationWorkflowProjects ?? []).length > 0}
+                        hasPublishedProject={publishedProjects.length > 0}
+                        onCreateConfiguration={handleCreateConfiguration}
+                        onGoToAutomations={handleGoToAutomations}
                     />
                 )}
             </PageLoader>
@@ -185,6 +162,7 @@ const AutomationWorkflowConfigurations = () => {
                     configuration={configurationDialog.configuration}
                     onClose={() => setConfigurationDialog(undefined)}
                     project={configurationDialog.project}
+                    projects={publishedProjects}
                     updateProjectVersion={configurationDialog.updateProjectVersion}
                 />
             )}
