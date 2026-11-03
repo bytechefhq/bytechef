@@ -19,6 +19,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationConnec
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveImpactModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveResultModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationUpgradeRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
@@ -138,6 +139,19 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    public ResponseEntity<ConfigurationMoveImpactModel> getIntegrationInstanceConfigurationUpgradeImpact(
+        Long id, ConfigurationUpgradeRequestModel configurationUpgradeRequestModel) {
+
+        ConfigurationMoveImpactDTO configurationMoveImpactDTO = integrationInstanceConfigurationFacade.getUpgradeImpact(
+            id, configurationUpgradeRequestModel.getConnectedUserIds());
+
+        return ResponseEntity.ok(
+            Validate.notNull(
+                conversionService.convert(configurationMoveImpactDTO, ConfigurationMoveImpactModel.class),
+                "configurationMoveImpactModel"));
+    }
+
+    @Override
     public ResponseEntity<List<IntegrationInstanceConfigurationModel>> getIntegrationInstanceConfigurations(
         Long environmentId, Long integrationId, Long tagId, Boolean includeAllFields) {
 
@@ -156,6 +170,19 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
         ConfigurationMoveResultDTO configurationMoveResultDTO = integrationInstanceConfigurationFacade
             .moveConnectedUsers(
                 id, configurationMoveRequestModel.getTargetId(), configurationMoveRequestModel.getConnectedUserIds());
+
+        return ResponseEntity.ok(
+            Validate.notNull(
+                conversionService.convert(configurationMoveResultDTO, ConfigurationMoveResultModel.class),
+                "configurationMoveResultModel"));
+    }
+
+    @Override
+    public ResponseEntity<ConfigurationMoveResultModel> upgradeIntegrationInstanceConfigurationConnectedUsers(
+        Long id, ConfigurationUpgradeRequestModel configurationUpgradeRequestModel) {
+
+        ConfigurationMoveResultDTO configurationMoveResultDTO = integrationInstanceConfigurationFacade
+            .upgradeConnectedUsers(id, configurationUpgradeRequestModel.getConnectedUserIds());
 
         return ResponseEntity.ok(
             Validate.notNull(
