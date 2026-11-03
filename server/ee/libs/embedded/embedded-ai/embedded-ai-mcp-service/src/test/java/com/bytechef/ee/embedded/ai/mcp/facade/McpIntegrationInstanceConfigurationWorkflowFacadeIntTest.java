@@ -306,7 +306,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
         classes = {
             EmbeddedMcpIntTestConfiguration.class, AuditIntTest.AuditConfiguration.class
         },
-        properties = "bytechef.edition=ee")
+        properties = {
+            "bytechef.edition=ee", "bytechef.audit.enabled=true"
+        })
     @MockitoBean(types = {
         IntegrationInstanceConfigurationService.class, IntegrationInstanceConfigurationWorkflowService.class,
         IntegrationInstanceWorkflowService.class, IntegrationWorkflowService.class, PermissionService.class,

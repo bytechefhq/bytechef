@@ -77,7 +77,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     classes = {
         IntegrationIntTestConfiguration.class, ConnectionAdminFacadeIntTest.MethodSecurityConfiguration.class
     },
-    properties = "bytechef.workflow.repository.jdbc.enabled=true")
+    properties = {
+        "bytechef.workflow.repository.jdbc.enabled=true", "bytechef.audit.enabled=true"
+    })
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks
 class ConnectionAdminFacadeIntTest {

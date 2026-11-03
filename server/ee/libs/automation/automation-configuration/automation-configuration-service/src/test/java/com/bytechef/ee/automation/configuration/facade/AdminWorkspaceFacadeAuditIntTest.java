@@ -53,7 +53,9 @@ import org.springframework.security.core.context.SecurityContextImpl;
     classes = {
         WorkspacePermissionIntTestConfiguration.class, AdminWorkspaceFacadeAuditIntTest.AuditConfiguration.class
     },
-    properties = "bytechef.edition=ee")
+    properties = {
+        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+    })
 class AdminWorkspaceFacadeAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";

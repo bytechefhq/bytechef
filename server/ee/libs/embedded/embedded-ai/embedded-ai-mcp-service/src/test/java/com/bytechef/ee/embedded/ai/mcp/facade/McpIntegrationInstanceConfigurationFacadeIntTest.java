@@ -80,7 +80,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
         McpIntegrationInstanceConfigurationFacadeIntTest.McpIntegrationInstanceConfigurationFacadeIntTestConfiguration.class
     },
     properties = {
-        "bytechef.edition=ee", "bytechef.workflow.repository.jdbc.enabled=true"
+        "bytechef.edition=ee", "bytechef.audit.enabled=true", "bytechef.workflow.repository.jdbc.enabled=true"
     })
 class McpIntegrationInstanceConfigurationFacadeIntTest {
 

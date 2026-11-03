@@ -91,6 +91,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
     },
     properties = {
         "bytechef.edition=ee",
+        "bytechef.audit.enabled=true",
         "bytechef.workflow.repository.jdbc.enabled=true",
         "bytechef.webhook-url=/webhooks/{id}"
     })

@@ -70,7 +70,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
     classes = {
         KnowledgeBaseIntTestConfiguration.class, KnowledgeBaseAuditIntTest.AuditConfiguration.class
     },
-    properties = "bytechef.edition=ee")
+    properties = {
+        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+    })
 @Import(PostgreSQLContainerConfiguration.class)
 @KnowledgeBaseIntTestConfigurationSharedMocks
 class KnowledgeBaseAuditIntTest {

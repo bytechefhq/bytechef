@@ -138,6 +138,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
     },
     properties = {
         "bytechef.edition=EE",
+        "bytechef.audit.enabled=true",
         "bytechef.workflow.repository.jdbc.enabled=true",
         "bytechef.webhook-url=/webhooks/{id}",
         "spring.liquibase.contexts=configuration,user",
