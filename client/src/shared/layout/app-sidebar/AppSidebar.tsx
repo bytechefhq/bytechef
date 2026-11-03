@@ -77,11 +77,11 @@ export function AppSidebar({navigation}: AppSidebarProps) {
         }
 
         if (isOnPath('/automation/projects')) {
-            navigate('/automation/deployments');
+            void navigate('/automation/deployments');
         } else if (isOnPath('/embedded/integrations')) {
-            navigate('/embedded/configurations');
+            void navigate('/embedded/configurations');
         } else if (isOnPath('/embedded/automation-workflows')) {
-            navigate('/embedded/automation-configurations');
+            void navigate('/embedded/automation-configurations');
         }
     };
 
