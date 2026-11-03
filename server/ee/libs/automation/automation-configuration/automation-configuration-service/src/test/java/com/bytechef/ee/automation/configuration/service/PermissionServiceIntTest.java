@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
@@ -23,8 +24,10 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentReposit
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
+import com.bytechef.automation.configuration.security.ProjectDeploymentJobPrincipalAuthenticationResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
@@ -38,19 +41,31 @@ import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.ai.skill.domain.AiSkill;
+import com.bytechef.platform.ai.skill.security.AiSkillOwnershipResolver;
+import com.bytechef.platform.ai.skill.service.AiSkillService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.repository.UserRepository;
+import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.AuthorityServiceImpl;
+import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,9 +74,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
+import org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.AopTestUtils;
@@ -86,7 +104,12 @@ class PermissionServiceIntTest {
 
     private static final String LOGIN = "user";
     private static final String CONNECTED_USER_EXTERNAL_ID = "external-user-1";
+    private static final long DEPLOYMENT_OWNER_SKILL_ID = 200L;
+    private static final long OTHER_USER_SKILL_ID = 100L;
     private static final long USER_ID = 2L;
+
+    @Autowired
+    private AuthorityService authorityService;
 
     @Autowired
     private CurrentUserResolver currentUserResolver;
@@ -107,6 +130,9 @@ class PermissionServiceIntTest {
     private ProjectDeploymentRepository projectDeploymentRepository;
 
     @Autowired
+    private ProjectDeploymentService projectDeploymentService;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
@@ -120,6 +146,9 @@ class PermissionServiceIntTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
@@ -323,6 +352,8 @@ class PermissionServiceIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> permissionService.getMyWorkspaceRole(workspaceId))
             .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> permissionService.getMyWorkspaceScopes(workspaceId, Environment.PRODUCTION))
+            .isInstanceOf(AccessDeniedException.class);
 
         SecurityContextHolder.clearContext();
 
@@ -335,6 +366,34 @@ class PermissionServiceIntTest {
 
         assertThatCode(() -> permissionService.getMyWorkspaceScopes(workspaceId)).doesNotThrowAnyException();
         assertThatCode(() -> permissionService.getMyWorkspaceRole(workspaceId)).doesNotThrowAnyException();
+        assertThatCode(() -> permissionService.getMyWorkspaceScopes(workspaceId, Environment.PRODUCTION))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testScheduledRunIsDeniedDeletingAnotherUsersSkill() {
+        UnattendedRun unattendedRun = createUnattendedRun();
+
+        assertThatThrownBy(() -> unattendedRun.run(() -> unattendedRun.deleteAiSkill(OTHER_USER_SKILL_ID)))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testScheduledRunStartedUnderTheSchedulerSystemPrincipalIsDeniedDeletingAnotherUsersSkill() {
+        UnattendedRun unattendedRun = createUnattendedRun();
+
+        assertThatThrownBy(
+            () -> SecurityUtils.runAsSystem(
+                () -> unattendedRun.run(() -> unattendedRun.deleteAiSkill(OTHER_USER_SKILL_ID))))
+                    .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testScheduledRunMayDeleteTheDeploymentOwnersOwnSkill() {
+        UnattendedRun unattendedRun = createUnattendedRun();
+
+        assertThat(unattendedRun.run(() -> unattendedRun.deleteAiSkill(DEPLOYMENT_OWNER_SKILL_ID)))
+            .isEqualTo("deleted");
     }
 
     @Test
@@ -983,6 +1042,44 @@ class PermissionServiceIntTest {
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
     }
 
+    private UnattendedRun createUnattendedRun() {
+        long projectDeploymentId = saveDeployment(createProject(), Environment.DEVELOPMENT);
+
+        jdbcTemplate.update("UPDATE project_deployment SET created_by = ? WHERE id = ?", LOGIN, projectDeploymentId);
+
+        SecurityContextHolder.clearContext();
+
+        AiSkillService aiSkillService = mock(AiSkillService.class);
+
+        when(aiSkillService.fetchAiSkill(OTHER_USER_SKILL_ID)).thenReturn(Optional.of(aiSkill("admin")));
+        when(aiSkillService.fetchAiSkill(DEPLOYMENT_OWNER_SKILL_ID)).thenReturn(Optional.of(aiSkill(LOGIN)));
+
+        PermissionService aiSkillPermissionService = createPermissionService(
+            new AiSkillOwnershipResolver(aiSkillService, userService));
+
+        PreAuthorizeAuthorizationManager preAuthorizeAuthorizationManager = new PreAuthorizeAuthorizationManager();
+
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        preAuthorizeAuthorizationManager.setExpressionHandler(
+            new AutomationMethodSecurityExpressionHandler(
+                aiSkillPermissionService, beanFactory.getBeanProvider(MethodSecurityExpressionContributor.class)));
+
+        ProxyFactory proxyFactory = new ProxyFactory(new AiSkillOperations());
+
+        proxyFactory.setProxyTargetClass(true);
+        proxyFactory.addAdvisor(
+            AuthorizationManagerBeforeMethodInterceptor.preAuthorize(preAuthorizeAuthorizationManager));
+
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner = new JobPrincipalAuthenticationRunner(
+            List.of(
+                new ProjectDeploymentJobPrincipalAuthenticationResolver(
+                    authorityService, projectDeploymentService, userService)));
+
+        return new UnattendedRun(
+            (AiSkillOperations) proxyFactory.getProxy(), jobPrincipalAuthenticationRunner, projectDeploymentId);
+    }
+
     private ProjectDeployment renamedDeployment(long projectDeploymentId) {
         ProjectDeployment projectDeployment = projectDeploymentRepository.findById(projectDeploymentId)
             .orElseThrow();
@@ -1018,6 +1115,14 @@ class PermissionServiceIntTest {
                 new UsernamePasswordAuthenticationToken(login, "n/a", List.of(new SimpleGrantedAuthority(authority))));
     }
 
+    private static AiSkill aiSkill(String createdBy) {
+        AiSkill aiSkill = new AiSkill();
+
+        aiSkill.setCreatedBy(createdBy);
+
+        return aiSkill;
+    }
+
     private static ResourceOwnershipResolver resolver(String resourceType, ResourceOwner resourceOwner) {
         return new ResourceOwnershipResolver() {
 
@@ -1033,10 +1138,33 @@ class PermissionServiceIntTest {
         };
     }
 
+    static class AiSkillOperations {
+
+        @PreAuthorize("isResourceOwner(#id, 'AiSkill')")
+        @SuppressWarnings("PMD.UnusedFormalParameter")
+        public String deleteAiSkill(long id) {
+            return "deleted";
+        }
+    }
+
+    private record UnattendedRun(
+        AiSkillOperations aiSkillOperations, JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner,
+        long projectDeploymentId) {
+
+        String deleteAiSkill(long id) {
+            return aiSkillOperations.deleteAiSkill(id);
+        }
+
+        <T> T run(Supplier<T> supplier) {
+            return jobPrincipalAuthenticationRunner.run(
+                PlatformType.AUTOMATION, projectDeploymentId, "job 1", supplier);
+        }
+    }
+
     @TestConfiguration
     @Import({
-        ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
-        ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class
+        AuthorityServiceImpl.class, ProjectDeploymentEnvironmentResolver.class,
+        ProjectDeploymentOwnershipResolver.class, ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class
     })
     static class ProjectDeploymentConfiguration {
 
