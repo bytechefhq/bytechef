@@ -23,6 +23,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflo
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,7 @@ class IntegrationJobPrincipalAccessorIntTest {
     private IntegrationWorkflowService integrationWorkflowService;
 
     private long integrationId;
+    private String integrationName;
     private String workflowId;
     private String workflowUuid;
 
@@ -80,6 +82,7 @@ class IntegrationJobPrincipalAccessorIntTest {
         integration = integrationService.create(integration);
 
         integrationId = integration.getId();
+        integrationName = integration.getName();
         workflowId = "workflow-" + UUID.randomUUID();
 
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(integrationId, 1, workflowId);
@@ -158,6 +161,16 @@ class IntegrationJobPrincipalAccessorIntTest {
         Map<String, ?> inputMap = integrationJobPrincipalAccessor.getInputMap(integrationInstanceId, workflowUuid);
 
         assertThat(inputMap).isEqualTo(Map.of("apiKey", "config-key"));
+    }
+
+    @Test
+    void testGetJobPrincipalSummaryDescribesTheIntegration() {
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(true, true, Map.of());
+
+        long integrationInstanceId = createIntegrationInstance(integrationInstanceConfigurationId);
+
+        assertThat(integrationJobPrincipalAccessor.getJobPrincipalSummary(integrationInstanceId))
+            .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), integrationId, integrationName, 1));
     }
 
     private long createIntegrationInstance(long integrationInstanceConfigurationId) {

@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.instance.accessor;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
@@ -16,11 +17,13 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -38,6 +41,7 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
+    private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
 
     @SuppressFBWarnings("EI")
@@ -45,13 +49,14 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
-        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService) {
 
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
+        this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
     }
 
@@ -114,6 +119,28 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     @Override
     public Map<String, ?> getMetadataMap(long jobPrincipalId) {
         return Map.of();
+    }
+
+    @Override
+    public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(jobPrincipalId);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
+
+        Long integrationId = integrationInstanceConfiguration.getIntegrationId();
+
+        String integrationName = null;
+
+        if (integrationId != null) {
+            Integration integration = integrationService.getIntegration(integrationId);
+
+            integrationName = integration.getName();
+        }
+
+        return new JobPrincipalSummary(
+            integrationInstanceConfiguration.getEnvironmentId(), integrationId, integrationName,
+            integrationInstanceConfiguration.getIntegrationVersion());
     }
 
     @Override

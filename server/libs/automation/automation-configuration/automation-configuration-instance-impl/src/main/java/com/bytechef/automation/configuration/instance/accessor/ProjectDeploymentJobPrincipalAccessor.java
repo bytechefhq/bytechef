@@ -16,15 +16,18 @@
 
 package com.bytechef.automation.configuration.instance.accessor;
 
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -37,16 +40,18 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
 
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentJobPrincipalAccessor(
         ProjectDeploymentService projectDeploymentService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService) {
 
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
     }
 
@@ -92,6 +97,24 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(jobPrincipalId);
 
         return Map.of("projectVersion", projectDeployment.getProjectVersion());
+    }
+
+    @Override
+    public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId) {
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(jobPrincipalId);
+
+        Long projectId = projectDeployment.getProjectId();
+
+        String projectName = null;
+
+        if (projectId != null) {
+            projectName = projectService.fetchProject(projectId)
+                .map(Project::getName)
+                .orElse(null);
+        }
+
+        return new JobPrincipalSummary(
+            projectDeployment.getEnvironmentId(), projectId, projectName, projectDeployment.getProjectVersion());
     }
 
     @Override
