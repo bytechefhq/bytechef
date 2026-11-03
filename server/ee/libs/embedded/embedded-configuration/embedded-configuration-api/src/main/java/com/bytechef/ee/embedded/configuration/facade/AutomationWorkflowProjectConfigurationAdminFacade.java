@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfi
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDeleteImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import java.util.List;
 import java.util.Map;
@@ -88,15 +89,16 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
     AutomationWorkflowProjectConfigurationDeleteImpactDTO getDeleteImpact(long id);
 
     /**
-     * Returns what moving the connected users from the source to the target changes for them: the version impact of the
-     * target's project version, counting only those of the given users who are assigned to the source.
+     * Returns what moving the connected users from the source to the target would change for them: the version impact
+     * of the target's project version, counting only those of the given users the move would move, and the users it
+     * would skip, with the reason. Reads only.
      *
      * @param sourceId         the configuration the users are assigned to
      * @param targetId         the configuration they would move to
      * @param connectedUserIds the connected user ids
-     * @return the impact of the target's project version on those users
+     * @return the impact of the target's project version on the moved users, and the users the move would skip
      */
-    AutomationWorkflowProjectConfigurationVersionImpactDTO getMoveImpact(
+    ConfigurationMoveImpactDTO getMoveImpact(
         long sourceId, long targetId, List<Long> connectedUserIds);
 
     AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(long configurationId, int projectVersion);

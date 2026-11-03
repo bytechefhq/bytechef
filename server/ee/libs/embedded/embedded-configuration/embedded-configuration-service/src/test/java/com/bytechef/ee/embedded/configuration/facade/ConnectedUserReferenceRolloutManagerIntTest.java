@@ -59,6 +59,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflo
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDeleteImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
@@ -2271,6 +2272,57 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                     assertThat(workflow.newRequiredInputs()).containsExactly("channel");
                     assertThat(workflow.affectedConnectedUserCount()).isEqualTo(1);
                 });
+    }
+
+    @Test
+    void testMoveImpactListsUsersThatWouldBeSkipped() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Move Impact Skipped");
+
+        String firstWorkflowUuid = addWorkflow(
+            automationWorkflowProjectId, LABELED_SLACK_WORKFLOW_DEFINITION.formatted("Send Digest"));
+        String secondWorkflowUuid = addWorkflow(
+            automationWorkflowProjectId, LABELED_SLACK_WORKFLOW_DEFINITION.formatted("Fetch Recent Emails"));
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
+        AutomationWorkflowProjectConfiguration otherConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Other", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUser firstConnectedUser = assignNewConnectedUser(automationWorkflowProjectId, sourceConfiguration);
+        ConnectedUser secondConnectedUser = assignNewConnectedUser(automationWorkflowProjectId, sourceConfiguration);
+        ConnectedUser thirdConnectedUser = assignNewConnectedUser(automationWorkflowProjectId, otherConfiguration);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            firstConnectedUser.getExternalId(), secondWorkflowUuid, Environment.PRODUCTION);
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            secondConnectedUser.getExternalId(), firstWorkflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.deleteProjectWorkflow(secondWorkflowUuid);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
+            .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
+
+        ConfigurationMoveImpactDTO moveImpact = automationWorkflowProjectConfigurationAdminFacade.getMoveImpact(
+            sourceConfiguration.getId(), targetConfiguration.getId(),
+            List.of(firstConnectedUser.getId(), secondConnectedUser.getId(), thirdConnectedUser.getId()));
+
+        assertThat(moveImpact.skipped()).containsExactlyInAnyOrder(
+            new ConfigurationMoveResultDTO.Skipped(
+                firstConnectedUser.getId(), ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,
+                List.of("Fetch Recent Emails")),
+            new ConfigurationMoveResultDTO.Skipped(
+                thirdConnectedUser.getId(), ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
+        assertThat(moveImpact.skipped())
+            .extracting(ConfigurationMoveResultDTO.Skipped::connectedUserId)
+            .doesNotContain(secondConnectedUser.getId());
+        assertThat(getAssignedConfigurationId(firstConnectedUser.getId(), automationWorkflowProjectId))
+            .isEqualTo(sourceConfiguration.getId());
     }
 
     @Test
