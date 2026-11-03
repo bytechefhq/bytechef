@@ -26,6 +26,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -55,6 +56,9 @@ public interface ProjectDeploymentFacade {
         Collection<Long> projectDeploymentIds, ProjectDeploymentOwner projectDeploymentOwner);
 
     ProjectDeploymentDTO getProjectDeployment(long id);
+
+    List<ProjectDeployment> getProjectDeployments(
+        long workspaceId, Environment environment, @Nullable Long projectId, @Nullable Long tagId);
 
     ProjectDeploymentWorkflow getProjectDeploymentWorkflow(long projectDeploymentId, String workflowUuid);
 
