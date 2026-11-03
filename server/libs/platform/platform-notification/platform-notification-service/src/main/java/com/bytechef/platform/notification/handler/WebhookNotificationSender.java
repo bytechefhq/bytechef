@@ -22,6 +22,9 @@ import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.delivery.WebhookRetry;
 import com.bytechef.platform.notification.domain.Notification;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
@@ -61,14 +64,19 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
         NotificationHandlerContext deliveryContext = notificationHandlerContext.withDeliveryId(
             String.valueOf(UUID.randomUUID()));
 
+        Object template = notification.getSetting("webhookBodyTemplate");
+
+        String body = template instanceof String templateString && !templateString.isBlank()
+            ? WebhookBodyTemplate.render(templateString, deliveryContext.toMap())
+            : webhookNotificationHandler.getPayload(deliveryContext);
+
         WebhookDelivery webhookDelivery = WebhookDelivery.builder("notification", url)
+            .headers(getHeaders(notification))
             .description("notification " + notification.getId() + " '" + notification.getName() + "'")
             .eventType("job.status")
             .secret((String) notification.getSetting("webhookSecret"))
             .validateUrl(true)
-            .payload(
-                String.valueOf(deliveryContext.getJobId()),
-                webhookNotificationHandler.getPayload(deliveryContext))
+            .payload(String.valueOf(deliveryContext.getJobId()), body)
             .retry(WebhookRetry.none())
             .deliveryId(deliveryContext.getDeliveryId())
             .timestamp(notificationHandlerContext.getTimestamp())
@@ -76,5 +84,21 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
 
         return webhookDeliveryService.submit(webhookDelivery)
             .thenAccept(NotificationDeliveryOutcomes::requireAnySent);
+    }
+
+    private static Map<String, String> getHeaders(Notification notification) {
+        Map<String, String> headers = new LinkedHashMap<>();
+
+        if (notification.getSetting("webhookHeaders") instanceof List<?> headerList) {
+            for (Object header : headerList) {
+                if (header instanceof Map<?, ?> headerMap && headerMap.get("name") instanceof String name
+                    && headerMap.get("value") instanceof String value) {
+
+                    headers.put(name, value);
+                }
+            }
+        }
+
+        return headers;
     }
 }

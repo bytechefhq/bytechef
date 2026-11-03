@@ -28,6 +28,7 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -136,6 +137,28 @@ class WebhookNotificationClientIntTest {
         assertThat(headers.getFirst("X-Custom")).isEqualTo("custom-value");
         assertThat(headers.getFirst("X-ByteChef-Signature")).isNull();
         assertThat(receivedBody.get()).isEqualTo("{\"a\":1}");
+    }
+
+    @Test
+    void testCustomHeadersCannotOverrideFixedHeaders() {
+        Map<String, String> customHeaders = new LinkedHashMap<>();
+
+        customHeaders.put("X-ByteChef-Event", "evil");
+        customHeaders.put("Content-Type", "text/plain");
+        customHeaders.put("Authorization", "a");
+
+        WebhookDelivery webhookDelivery = delivery(url).eventType("job.status")
+            .headers(customHeaders)
+            .build();
+
+        webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst());
+
+        Headers headers = receivedHeaders.get();
+
+        assertThat(headers.get("X-ByteChef-Event")).containsExactly("job.status");
+        assertThat(headers.get("Content-Type")).containsExactly("application/json");
+        assertThat(headers.getFirst("Authorization")).isEqualTo("a");
     }
 
     @Test

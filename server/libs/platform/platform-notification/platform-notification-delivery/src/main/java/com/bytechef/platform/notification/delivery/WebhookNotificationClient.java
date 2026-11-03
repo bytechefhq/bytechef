@@ -90,6 +90,14 @@ public class WebhookNotificationClient {
 
         HttpHeaders httpHeaders = new HttpHeaders();
 
+        for (Map.Entry<String, String> header : webhookDelivery.headers()
+            .entrySet()) {
+
+            if (!WebhookReservedHeaders.isReserved(header.getKey())) {
+                httpHeaders.set(header.getKey(), header.getValue());
+            }
+        }
+
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
         Instant suppliedTimestamp = webhookDelivery.timestamp();
@@ -102,12 +110,6 @@ public class WebhookNotificationClient {
             httpHeaders.set("X-ByteChef-Timestamp", String.valueOf(timestamp));
             httpHeaders.set("X-ByteChef-Delivery",
                 suppliedDeliveryId == null ? String.valueOf(UUID.randomUUID()) : suppliedDeliveryId);
-        }
-
-        for (Map.Entry<String, String> header : webhookDelivery.headers()
-            .entrySet()) {
-
-            httpHeaders.set(header.getKey(), header.getValue());
         }
 
         String secret = webhookDelivery.secret();

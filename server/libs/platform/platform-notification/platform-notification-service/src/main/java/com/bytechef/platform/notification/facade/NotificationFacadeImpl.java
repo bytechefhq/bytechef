@@ -19,10 +19,12 @@ package com.bytechef.platform.notification.facade;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.notification.audit.NotificationAuditEvents;
+import com.bytechef.platform.notification.delivery.WebhookReservedHeaders;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.dto.NotificationDTO;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
+import com.bytechef.platform.notification.handler.WebhookBodyTemplate;
 import com.bytechef.platform.notification.service.NotificationEventService;
 import com.bytechef.platform.notification.service.NotificationService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -48,9 +50,6 @@ public class NotificationFacadeImpl implements NotificationFacade {
     private static final Pattern HEADER_NAME_PATTERN = Pattern.compile("^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,256}$");
     private static final int MAX_HEADER_COUNT = 20;
     private static final int MAX_HEADER_VALUE_LENGTH = 4096;
-    private static final String RESERVED_HEADER_PREFIX = "x-bytechef-";
-    private static final Set<String> RESERVED_HEADER_NAMES = Set.of(
-        "content-type", "content-length", "host", "transfer-encoding", "connection");
 
     private final NotificationEventService notificationEventService;
     private final NotificationSenderRegistry notificationSenderRegistry;
@@ -193,6 +192,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
         if (type == Notification.Type.WEBHOOK) {
             validateWebhookUrl(notification.getSettings());
             validateWebhookHeaders(notification.getSettings());
+            validateWebhookBodyTemplate(notification.getSettings());
         }
     }
 
@@ -205,6 +205,22 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
         if (!isHttpUrl(webhookUrlString)) {
             throw new IllegalArgumentException("Webhook URL must be an http or https URL");
+        }
+    }
+
+    private static void validateWebhookBodyTemplate(Map<String, Object> settings) {
+        Object template = settings.get("webhookBodyTemplate");
+
+        if (template == null) {
+            return;
+        }
+
+        if (!(template instanceof String templateString)) {
+            throw new IllegalArgumentException("Webhook body template must be a string");
+        }
+
+        if (!templateString.isBlank()) {
+            WebhookBodyTemplate.validate(templateString);
         }
     }
 
@@ -235,7 +251,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
             String lowerCaseName = name.toLowerCase(Locale.ROOT);
 
-            if (lowerCaseName.startsWith(RESERVED_HEADER_PREFIX) || RESERVED_HEADER_NAMES.contains(lowerCaseName)) {
+            if (WebhookReservedHeaders.isReserved(name)) {
                 throw new IllegalArgumentException("Webhook header name %s is reserved".formatted(name));
             }
 

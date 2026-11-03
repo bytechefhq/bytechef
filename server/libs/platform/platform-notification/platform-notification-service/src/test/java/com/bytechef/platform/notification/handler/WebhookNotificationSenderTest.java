@@ -33,6 +33,7 @@ import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.Payloa
 import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.Status;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.domain.Notification;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -40,12 +41,14 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Ivica Cardic
  */
 @Timeout(5)
+@ExtendWith(ObjectMapperSetupExtension.class)
 class WebhookNotificationSenderTest {
 
     private final NotificationHandlerContext notificationHandlerContext =
@@ -159,6 +162,72 @@ class WebhookNotificationSenderTest {
                 .getFirst()
                 .json()).isEqualTo("{\"deliveryId\":\"" + webhookDelivery.deliveryId() + "\"}");
         }
+    }
+
+    @Test
+    void testSendRendersTemplateWithDeliveryId() {
+        when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
+
+        Notification notification = createNotification(
+            Map.of("webhook", "https://example.com/hook", "webhookBodyTemplate", "{\"d\":\"{{deliveryId}}\"}"));
+
+        webhookNotificationSender.send(notification, webhookNotificationHandler, notificationHandlerContext);
+
+        ArgumentCaptor<WebhookDelivery> webhookDeliveryArgumentCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
+
+        verify(webhookDeliveryService).submit(webhookDeliveryArgumentCaptor.capture());
+
+        WebhookDelivery webhookDelivery = webhookDeliveryArgumentCaptor.getValue();
+
+        assertThat(webhookDelivery.payloads()
+            .getFirst()
+            .json()).isEqualTo("{\"d\":\"" + webhookDelivery.deliveryId() + "\"}");
+        verify(webhookNotificationHandler, never()).getPayload(any());
+    }
+
+    @Test
+    void testSendPassesHeadersInOrder() {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
+        when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
+
+        Notification notification = createNotification(Map.of("webhook", "https://example.com/hook"));
+
+        notification.setSecretSettings(
+            Map.of(
+                "webhookHeaders",
+                List.of(
+                    Map.of("name", "Z-First", "value", "1"), Map.of("name", "A-Second", "value", "2"),
+                    Map.of("name", "M-Third", "value", "3"))));
+
+        webhookNotificationSender.send(notification, webhookNotificationHandler, notificationHandlerContext);
+
+        ArgumentCaptor<WebhookDelivery> webhookDeliveryArgumentCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
+
+        verify(webhookDeliveryService).submit(webhookDeliveryArgumentCaptor.capture());
+
+        assertThat(webhookDeliveryArgumentCaptor.getValue()
+            .headers()
+            .keySet()).containsExactly("Z-First", "A-Second", "M-Third");
+    }
+
+    @Test
+    void testSendUsesDefaultBodyWhenTemplateBlank() {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{\"default\":true}");
+        when(webhookDeliveryService.submit(any())).thenReturn(CompletableFuture.completedFuture(sentOutcome()));
+
+        Notification notification = createNotification(
+            Map.of("webhook", "https://example.com/hook", "webhookBodyTemplate", "   "));
+
+        webhookNotificationSender.send(notification, webhookNotificationHandler, notificationHandlerContext);
+
+        ArgumentCaptor<WebhookDelivery> webhookDeliveryArgumentCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
+
+        verify(webhookDeliveryService).submit(webhookDeliveryArgumentCaptor.capture());
+
+        assertThat(webhookDeliveryArgumentCaptor.getValue()
+            .payloads()
+            .getFirst()
+            .json()).isEqualTo("{\"default\":true}");
     }
 
     @Test

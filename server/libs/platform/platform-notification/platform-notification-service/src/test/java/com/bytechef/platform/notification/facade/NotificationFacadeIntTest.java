@@ -359,6 +359,29 @@ public class NotificationFacadeIntTest {
         }
 
         @Test
+        public void testRejectsTemplateThatIsNotValidJson() {
+            Notification notification = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of("webhook", "https://example.com/hook", "webhookBodyTemplate", "{\"a\": \"{{jobId}}\""));
+
+            assertThatThrownBy(() -> notificationFacade.createNotification(notification))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("valid JSON");
+
+            assertThat(notificationRepository.count()).isZero();
+        }
+
+        @Test
+        public void testAcceptsTemplateWithSummary() {
+            NotificationDTO notificationDTO = notificationFacade.createNotification(
+                createNotification(
+                    Notification.Type.WEBHOOK,
+                    Map.of("webhook", "https://example.com/hook", "webhookBodyTemplate", "{\"s\": {{summary}}}")));
+
+            assertThat(notificationDTO.settings()).containsEntry("webhookBodyTemplate", "{\"s\": {{summary}}}");
+        }
+
+        @Test
         public void testRejectsReservedHeaderName() {
             assertRejected(List.of(Map.of("name", "X-ByteChef-Event", "value", "v")));
             assertRejected(List.of(Map.of("name", "content-type", "value", "v")));
