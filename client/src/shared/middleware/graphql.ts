@@ -1182,6 +1182,7 @@ export type AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery 
 
 export type AutomationWorkflowProjectConfigurationsQueryVariables = Exact<{
   projectId: string | number;
+  environmentId?: string | number | null | undefined;
 }>;
 
 
@@ -1216,7 +1217,9 @@ export type AutomationWorkflowProjectVersionsQueryVariables = Exact<{
 
 export type AutomationWorkflowProjectVersionsQuery = { automationWorkflowProjectVersions: Array<{ version: number, status: string, publishedDate: string | null, description: string | null }> };
 
-export type AutomationWorkflowProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+export type AutomationWorkflowProjectsQueryVariables = Exact<{
+  environmentId?: string | number | null | undefined;
+}>;
 
 
 export type AutomationWorkflowProjectsQuery = { automationWorkflowProjects: Array<{ id: string, name: string, description: string | null, categoryId: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion: number | null, permissionExpression: string | null, configurationCount: number, lastPublishedDate: string | null, workflowTemplates: Array<{ workflowUuid: string, workflowId: string, label: string | null, description: string | null, permissionExpression: string | null, lastModifiedDate: string | null, triggers: Array<{ name: string, title: string | null, icon: string | null }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> };
@@ -6651,8 +6654,11 @@ export const useAutomationWorkflowProjectConfigurationWorkflowProvidableValuesQu
     )};
 
 export const AutomationWorkflowProjectConfigurationsDocument = new TypedDocumentString(`
-    query automationWorkflowProjectConfigurations($projectId: ID!) {
-  automationWorkflowProjectConfigurations(projectId: $projectId) {
+    query automationWorkflowProjectConfigurations($projectId: ID!, $environmentId: ID) {
+  automationWorkflowProjectConfigurations(
+    projectId: $projectId
+    environmentId: $environmentId
+  ) {
     id
     projectId
     environmentId
@@ -6827,8 +6833,8 @@ export const useAutomationWorkflowProjectVersionsQuery = <
     )};
 
 export const AutomationWorkflowProjectsDocument = new TypedDocumentString(`
-    query automationWorkflowProjects {
-  automationWorkflowProjects {
+    query automationWorkflowProjects($environmentId: ID) {
+  automationWorkflowProjects(environmentId: $environmentId) {
     id
     name
     description

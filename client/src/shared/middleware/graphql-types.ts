@@ -3719,6 +3719,7 @@ export type QueryAutomationWorkflowProjectConfigurationWorkflowProvidableValuesA
 
 
 export type QueryAutomationWorkflowProjectConfigurationsArgs = {
+  environmentId?: InputMaybe<Scalars['ID']['input']>;
   projectId: Scalars['ID']['input'];
 };
 
@@ -3738,6 +3739,11 @@ export type QueryAutomationWorkflowProjectVersionWorkflowChangesArgs = {
 
 export type QueryAutomationWorkflowProjectVersionsArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectsArgs = {
+  environmentId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
