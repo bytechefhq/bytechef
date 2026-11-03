@@ -246,4 +246,25 @@ describe('NotificationDialog', () => {
             expect.anything()
         );
     });
+
+    it('requires a value after a stored header is renamed', async () => {
+        const saveNotification = vi.fn();
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={saveNotification}
+                settings={{
+                    webhook: 'https://example.com/ingest',
+                    webhookHeaders: [{name: 'Authorization', value: '********'}],
+                }}
+                type={NotificationTypeEnum.Webhook}
+            />
+        );
+
+        await userEvent.type(screen.getByLabelText('Header name'), '2');
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(await screen.findByText('Enter a value')).toBeInTheDocument();
+        expect(saveNotification).not.toHaveBeenCalled();
+    });
 });

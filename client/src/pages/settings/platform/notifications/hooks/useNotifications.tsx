@@ -101,6 +101,14 @@ function validateWebhookHeaders(webhookHeaders: unknown, context: z.RefinementCt
 
         seenNames.add(lowerCaseName);
 
+        if (!header?.value) {
+            context.addIssue({
+                code: 'custom',
+                message: 'Enter a value',
+                path: ['settings', 'webhookHeaders', index, 'value'],
+            });
+        }
+
         if ((header?.value ?? '').length > MAX_HEADER_VALUE_LENGTH) {
             context.addIssue({
                 code: 'custom',
@@ -160,6 +168,7 @@ export default function useNotifications() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedNotification, setSelectedNotification] = useState<Notification | undefined>(undefined);
+    const [regeneratedNotificationId, setRegeneratedNotificationId] = useState<number | undefined>(undefined);
     const [signingSecret, setSigningSecret] = useState<string | undefined>(undefined);
 
     const {
@@ -199,10 +208,12 @@ export default function useNotifications() {
     });
     const updateNotificationMutation = useUpdateNotificationMutation({onSuccess});
     const regenerateNotificationSigningSecretMutation = useRegenerateNotificationSigningSecretMutation({
-        onSuccess: (result) => {
+        onSuccess: (result, notificationId) => {
             queryClient.invalidateQueries({
                 queryKey: NotificationKeys,
             });
+
+            setRegeneratedNotificationId(notificationId);
 
             setSigningSecret(result.signingSecret);
         },
@@ -266,6 +277,14 @@ export default function useNotifications() {
 
         closeEditDialog();
     }
+
+    const currentNotification = useMemo(
+        () =>
+            selectedNotification && selectedNotification.id === regeneratedNotificationId
+                ? {...selectedNotification, hasSigningSecret: true}
+                : selectedNotification,
+        [regeneratedNotificationId, selectedNotification]
+    );
 
     const notificationEvents = useMemo(
         () =>
@@ -352,7 +371,7 @@ export default function useNotifications() {
         queryClient,
         regenerateSigningSecret,
         saveNotification,
-        selectedNotification,
+        selectedNotification: currentNotification,
         setSelectedNotification,
         signingSecret,
     };
