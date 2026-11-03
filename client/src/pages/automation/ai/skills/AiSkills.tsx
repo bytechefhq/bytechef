@@ -38,8 +38,9 @@ const AiSkills = () => {
     const searchQuery = useAiSkillsStore((state) => state.searchQuery);
     const setSearchQuery = useAiSkillsStore((state) => state.setSearchQuery);
 
-    const {canSave, canToggleView, handlers, isSaving, viewMode} = useAiSkillDetailToolbarStore(
+    const {canManage, canSave, canToggleView, handlers, isSaving, viewMode} = useAiSkillDetailToolbarStore(
         useShallow((state) => ({
+            canManage: state.canManage,
             canSave: state.canSave,
             canToggleView: state.canToggleView,
             handlers: state.handlers,
@@ -102,19 +103,21 @@ const AiSkills = () => {
                     </Tooltip>
                 )}
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            disabled={!canSave || isSaving}
-                            icon={<SaveIcon className="size-4" />}
-                            onClick={handlers.onSave}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
+                {canManage && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                disabled={!canSave || isSaving}
+                                icon={<SaveIcon className="size-4" />}
+                                onClick={handlers.onSave}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
 
-                    <TooltipContent>Save changes</TooltipContent>
-                </Tooltip>
+                        <TooltipContent>Save changes</TooltipContent>
+                    </Tooltip>
+                )}
 
                 {ff_4554 && (
                     <Tooltip>
@@ -149,14 +152,18 @@ const AiSkills = () => {
                             onClick={handlers.onDownload}
                         />
 
-                        <DropdownMenuSeparator />
+                        {canManage && (
+                            <>
+                                <DropdownMenuSeparator />
 
-                        <DropdownMenuItem
-                            icon={<Trash2Icon />}
-                            label="Delete Skill"
-                            onClick={handlers.onDelete}
-                            variant="destructive"
-                        />
+                                <DropdownMenuItem
+                                    icon={<Trash2Icon />}
+                                    label="Delete Skill"
+                                    onClick={handlers.onDelete}
+                                    variant="destructive"
+                                />
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

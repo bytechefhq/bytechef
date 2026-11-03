@@ -10,6 +10,7 @@ import useAiSkillDetail, {
     getFileLanguage,
     isMarkdownPath,
 } from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
+import useCanManageAiSkill from '@/pages/automation/ai/skills/hooks/useCanManageAiSkill';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import parseFrontmatter from '@/pages/automation/ai/skills/utils/parseFrontmatter';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
@@ -256,6 +257,7 @@ const AiSkillDetailRoute = () => {
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const setContext = useCopilotStore((state) => state.setContext);
 
+    const setCanManage = useAiSkillDetailToolbarStore((state) => state.setCanManage);
     const setCanSave = useAiSkillDetailToolbarStore((state) => state.setCanSave);
     const setCanToggleView = useAiSkillDetailToolbarStore((state) => state.setCanToggleView);
     const setHandlers = useAiSkillDetailToolbarStore((state) => state.setHandlers);
@@ -282,12 +284,18 @@ const AiSkillDetailRoute = () => {
         skill,
     } = useAiSkillDetail();
 
+    const canManage = useCanManageAiSkill(skill?.createdBy);
+
     useEffect(() => {
         setIsContentDirty(false);
         latestContentRef.current = '';
 
         setViewMode('preview');
     }, [selectedFilePath, setViewMode]);
+
+    useEffect(() => {
+        setCanManage(canManage);
+    }, [canManage, setCanManage]);
 
     useEffect(() => {
         setCanToggleView(selectedFilePath != null && isMarkdown);
@@ -345,23 +353,25 @@ const AiSkillDetailRoute = () => {
                     <div className="mb-1 flex items-center justify-between px-2">
                         <span className="text-xs font-medium text-content-neutral-tertiary uppercase">Files</span>
 
-                        <Button
-                            aria-label="Add file"
-                            className="h-auto rounded p-1 text-content-neutral-tertiary hover:text-content-neutral-secondary-hover"
-                            onClick={() => setShowAddFileDialog(true)}
-                            size="xs"
-                            type="button"
-                            variant="ghost"
-                        >
-                            <PlusIcon className="size-3.5" />
-                        </Button>
+                        {canManage && (
+                            <Button
+                                aria-label="Add file"
+                                className="h-auto rounded p-1 text-content-neutral-tertiary hover:text-content-neutral-secondary-hover"
+                                onClick={() => setShowAddFileDialog(true)}
+                                size="xs"
+                                type="button"
+                                variant="ghost"
+                            >
+                                <PlusIcon className="size-3.5" />
+                            </Button>
+                        )}
                     </div>
 
                     {fileTree.map((node) => (
                         <FileTreeNode
                             key={node.path}
                             node={node}
-                            onRemove={setFileToRemove}
+                            onRemove={canManage ? setFileToRemove : undefined}
                             onSelect={handleFileSelect}
                             selectedPath={selectedFilePath}
                         />
@@ -377,7 +387,7 @@ const AiSkillDetailRoute = () => {
                             setIsContentDirty(true);
                             latestContentRef.current = value ?? '';
                         }}
-                        readOnly={false}
+                        readOnly={!canManage}
                         selectedFilePath={selectedFilePath}
                         showMarkdownPreview={isMarkdown && viewMode === 'preview'}
                     />

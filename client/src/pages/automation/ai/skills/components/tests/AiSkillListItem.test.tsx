@@ -5,7 +5,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiSkillListItem from '../AiSkillListItem';
 
-const {navigateMock} = vi.hoisted(() => ({navigateMock: vi.fn()}));
+const {canManageMock, navigateMock} = vi.hoisted(() => ({
+    canManageMock: vi.fn<(createdBy?: string | null) => boolean>(() => true),
+    navigateMock: vi.fn(),
+}));
+
+vi.mock('@/pages/automation/ai/skills/hooks/useCanManageAiSkill', () => ({
+    default: (createdBy?: string | null) => canManageMock(createdBy),
+}));
 
 vi.mock('@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog', () => ({
     default: () => <div data-testid="delete-dialog" />,
@@ -16,7 +23,7 @@ vi.mock('@/pages/automation/ai/skills/components/AiSkillEditDialog', () => ({
 }));
 
 vi.mock('@/pages/automation/ai/skills/components/AiSkillListItemTagList', () => ({
-    default: () => <div data-testid="tag-list" />,
+    default: ({readOnly}: {readOnly?: boolean}) => <div data-read-only={String(!!readOnly)} data-testid="tag-list" />,
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
@@ -24,7 +31,13 @@ vi.mock('react-router-dom', async (importOriginal) => ({
     useNavigate: () => navigateMock,
 }));
 
-const skill = {description: 'Runbook for billing', id: '7', name: 'billing-runbook', tags: []} as unknown as AiSkill;
+const skill = {
+    createdBy: 'owner@localhost.com',
+    description: 'Runbook for billing',
+    id: '7',
+    name: 'billing-runbook',
+    tags: [],
+} as unknown as AiSkill;
 
 const renderListItem = () => {
     const deleteSkill = vi.fn().mockResolvedValue(undefined);
@@ -47,6 +60,8 @@ const openRowMenu = async () => {
 describe('AiSkillListItem', () => {
     beforeEach(() => {
         windowResizeObserver();
+
+        canManageMock.mockReturnValue(true);
     });
 
     afterEach(() => {
@@ -113,5 +128,26 @@ describe('AiSkillListItem', () => {
         await userEvent.click(screen.getByRole('menuitem', {name: 'Download'}));
 
         expect(navigateMock).not.toHaveBeenCalled();
+    });
+
+    it('checks whether the viewer may manage the skill by its creator', () => {
+        renderListItem();
+
+        expect(canManageMock).toHaveBeenCalledWith('owner@localhost.com');
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'false');
+    });
+
+    it('offers only Download and read-only tags to a member who may not manage the skill', async () => {
+        canManageMock.mockReturnValue(false);
+
+        renderListItem();
+
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'true');
+
+        await openRowMenu();
+
+        expect(screen.getByRole('menuitem', {name: 'Download'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Edit'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
     });
 });

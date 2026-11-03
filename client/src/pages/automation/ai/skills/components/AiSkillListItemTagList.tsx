@@ -5,6 +5,7 @@ import {useMemo} from 'react';
 import {toast} from 'sonner';
 
 interface AiSkillListItemTagListProps {
+    readOnly?: boolean;
     skillId: string;
     tags: Tag[];
 }
@@ -14,7 +15,7 @@ const convertTagToTagListFormat = (tag: Tag) => ({
     id: tag.id ? Number(tag.id) : undefined,
 });
 
-const AiSkillListItemTagList = ({skillId, tags}: AiSkillListItemTagListProps) => {
+const AiSkillListItemTagList = ({readOnly = false, skillId, tags}: AiSkillListItemTagListProps) => {
     const queryClient = useQueryClient();
 
     const {data: tagsData} = useAiSkillTagsQuery();
@@ -48,6 +49,7 @@ const AiSkillListItemTagList = ({skillId, tags}: AiSkillListItemTagListProps) =>
                 tags: newTags.map((tag) => ({id: tag.id ? String(tag.id) : undefined, name: tag.name})),
             })}
             id={+skillId}
+            readOnly={readOnly}
             remainingTags={remainingTags}
             tags={convertedTags}
             updateTagsMutation={updateTagsMutation}
