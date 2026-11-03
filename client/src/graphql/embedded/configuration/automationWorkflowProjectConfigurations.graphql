@@ -3,6 +3,9 @@ query automationWorkflowProjectConfigurations($projectId: ID!) {
         id
         projectId
         environmentId
+        name
+        permissionExpression
+        connectedUserCount
         projectVersion
         enabled
         automationHubVisible

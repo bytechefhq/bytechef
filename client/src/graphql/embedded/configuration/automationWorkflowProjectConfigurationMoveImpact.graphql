@@ -1,0 +1,16 @@
+query automationWorkflowProjectConfigurationMoveImpact($sourceId: ID!, $targetId: ID!, $connectedUserIds: [ID!]!) {
+    automationWorkflowProjectConfigurationMoveImpact(sourceId: $sourceId, targetId: $targetId, connectedUserIds: $connectedUserIds) {
+        workflows {
+            workflowUuid
+            label
+            newRequiredInputs
+            newRequiredConnections
+            affectedConnectedUserCount
+        }
+        skipped {
+            connectedUserId
+            reason
+            workflowLabels
+        }
+    }
+}

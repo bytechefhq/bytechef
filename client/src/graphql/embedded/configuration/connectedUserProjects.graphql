@@ -27,6 +27,12 @@ query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
                 }
             }
         }
+        automationProjectConfigurations {
+            projectId
+            configurationId
+            configurationName
+            configurationProjectVersion
+        }
         environmentId
         lastExecutionDate
         projectId

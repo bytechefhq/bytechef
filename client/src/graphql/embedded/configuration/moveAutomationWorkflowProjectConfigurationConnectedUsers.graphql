@@ -1,0 +1,11 @@
+mutation moveAutomationWorkflowProjectConfigurationConnectedUsers($sourceId: ID!, $targetId: ID!, $connectedUserIds: [ID!]!) {
+    moveAutomationWorkflowProjectConfigurationConnectedUsers(sourceId: $sourceId, targetId: $targetId, connectedUserIds: $connectedUserIds) {
+        movedConnectedUserIds
+        needsAttentionConnectedUserIds
+        skipped {
+            connectedUserId
+            reason
+            workflowLabels
+        }
+    }
+}
