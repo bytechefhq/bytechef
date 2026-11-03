@@ -111,6 +111,8 @@ const MoveConnectedUsersDialog = ({
 
         try {
             setResult(await onMove(targetId, selectedConnectedUserIds));
+        } catch {
+            setResult(undefined);
         } finally {
             setMoving(false);
         }
@@ -164,7 +166,7 @@ const MoveConnectedUsersDialog = ({
                                 role="alert"
                             >
                                 <p className="font-medium">
-                                    {`${impactItem.label}: affects ${impactItem.affectedConnectedUserCount} users`}
+                                    {`${impactItem.label}: affects ${impactItem.affectedConnectedUserCount} ${impactItem.affectedConnectedUserCount === 1 ? 'user' : 'users'}`}
                                 </p>
 
                                 {impactItem.newRequiredConnections.length > 0 && (
