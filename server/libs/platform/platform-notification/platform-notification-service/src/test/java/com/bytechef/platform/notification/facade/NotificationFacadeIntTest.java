@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -57,6 +58,9 @@ public class NotificationFacadeIntTest {
 
     @MockitoBean
     private MailService mailService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private NotificationFacade notificationFacade;
@@ -186,6 +190,66 @@ public class NotificationFacadeIntTest {
         assertThat(storedNotification.getType()).isEqualTo(Notification.Type.EMAIL);
     }
 
+    @Test
+    public void testRegenerateSigningSecretRequiresAdmin() {
+        authenticateAs(AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> notificationFacade.regenerateSigningSecret(1L))
+            .isInstanceOf(AuthorizationDeniedException.class);
+    }
+
+    @Test
+    public void testLegacySlackRowMovesUrlToSecretSettingsOnUpdate() {
+        String slackUrl = "https://hooks.slack.com/services/T/B/LEGACY";
+
+        jdbcTemplate.update(
+            "INSERT INTO notification (name, type, settings, created_by, created_date, last_modified_by, " +
+                "last_modified_date, version) VALUES ('Legacy', 2, ?, 'system', now(), 'system', now(), 1)",
+            "{\"slackWebhookUrl\":\"" + slackUrl + "\"}");
+
+        Long id = jdbcTemplate.queryForObject("SELECT id FROM notification WHERE name = 'Legacy'", Long.class);
+
+        NotificationDTO listedNotificationDTO = notificationFacade.getNotifications()
+            .getFirst();
+
+        assertThat(listedNotificationDTO.settings()).containsEntry("slackWebhookUrl", "********");
+        assertThat(listedNotificationDTO.settings()
+            .toString()).doesNotContain(slackUrl);
+
+        Notification update = createNotification(
+            Notification.Type.SLACK, Map.of("slackWebhookUrl", "********"));
+
+        update.setId(id);
+        update.setName("Renamed");
+        update.setVersion(1);
+
+        notificationFacade.updateNotification(update);
+
+        String rawSettings = jdbcTemplate.queryForObject(
+            "SELECT settings FROM notification WHERE id = ?", String.class, id);
+
+        assertThat(rawSettings).doesNotContain(slackUrl);
+
+        Notification storedNotification = notificationRepository.findById(id)
+            .orElseThrow();
+
+        assertThat(storedNotification.getSetting("slackWebhookUrl")).isEqualTo(slackUrl);
+    }
+
+    @Test
+    public void testGetMasksSlackUrl() {
+        String slackUrl = "https://hooks.slack.com/services/T/B/X";
+
+        notificationFacade.createNotification(
+            createNotification(Notification.Type.SLACK, Map.of("slackWebhookUrl", slackUrl)));
+
+        NotificationDTO notificationDTO = notificationFacade.getNotifications()
+            .getFirst();
+
+        assertThat(notificationDTO.settings()).containsEntry("slackWebhookUrl", "********");
+        assertThat(notificationDTO.signingSecret()).isNull();
+    }
+
     private static void authenticateAs(String authority) {
         SecurityContextHolder.getContext()
             .setAuthentication(
@@ -215,6 +279,119 @@ public class NotificationFacadeIntTest {
 
             assertThat(notificationDTO.type()).isEqualTo(Notification.Type.WEBHOOK);
             assertThat(notificationRepository.count()).isEqualTo(1);
+        }
+
+        @Test
+        public void testCreateWebhookReturnsSigningSecretOnce() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(Notification.Type.WEBHOOK, Map.of("webhook", "https://example.com/hook")));
+
+            assertThat(createdNotificationDTO.signingSecret()).startsWith("whsec_");
+            assertThat(createdNotificationDTO.hasSigningSecret()).isTrue();
+            assertThat(createdNotificationDTO.settings()).doesNotContainKey("webhookSecret");
+
+            NotificationDTO listedNotificationDTO = notificationFacade.getNotifications()
+                .getFirst();
+
+            assertThat(listedNotificationDTO.signingSecret()).isNull();
+            assertThat(listedNotificationDTO.hasSigningSecret()).isTrue();
+            assertThat(listedNotificationDTO.settings()).doesNotContainKey("webhookSecret");
+        }
+
+        @Test
+        public void testRegenerateSigningSecretReplacesIt() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(Notification.Type.WEBHOOK, Map.of("webhook", "https://example.com/hook")));
+
+            String regeneratedSecret = notificationFacade.regenerateSigningSecret(createdNotificationDTO.id());
+
+            assertThat(regeneratedSecret).startsWith("whsec_")
+                .isNotEqualTo(createdNotificationDTO.signingSecret());
+
+            Notification storedNotification = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            assertThat(storedNotification.getSetting("webhookSecret")).isEqualTo(regeneratedSecret);
+        }
+
+        @Test
+        public void testRegenerateSigningSecretRejectsNonWebhook() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(Notification.Type.EMAIL, Map.of("email", "john@email.com")));
+
+            assertThatThrownBy(() -> notificationFacade.regenerateSigningSecret(createdNotificationDTO.id()))
+                .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        public void testUpdateWithMaskedValuesKeepsSecrets() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(
+                    Notification.Type.WEBHOOK,
+                    Map.of(
+                        "webhook", "https://example.com/hook", "webhookHeaders",
+                        List.of(Map.of("name", "Authorization", "value", "token-1")))));
+
+            Notification update = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of(
+                    "webhook", "https://example.com/hook", "webhookHeaders",
+                    List.of(Map.of("name", "Authorization", "value", "********"))));
+
+            update.setId(createdNotificationDTO.id());
+            update.setName("Renamed");
+            update.setVersion(createdNotificationDTO.version());
+
+            NotificationDTO updatedNotificationDTO = notificationFacade.updateNotification(update);
+
+            assertThat(updatedNotificationDTO.name()).isEqualTo("Renamed");
+            assertThat(updatedNotificationDTO.signingSecret()).isNull();
+            assertThat(updatedNotificationDTO.hasSigningSecret()).isTrue();
+
+            Notification storedNotification = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            assertThat(storedNotification.getSetting("webhookSecret"))
+                .isEqualTo(createdNotificationDTO.signingSecret());
+            assertThat(storedNotification.getSetting("webhookHeaders"))
+                .isEqualTo(List.of(Map.of("name", "Authorization", "value", "token-1")));
+        }
+
+        @Test
+        public void testRejectsReservedHeaderName() {
+            assertRejected(List.of(Map.of("name", "X-ByteChef-Event", "value", "v")));
+            assertRejected(List.of(Map.of("name", "content-type", "value", "v")));
+        }
+
+        @Test
+        public void testRejectsMoreThan20Headers() {
+            List<Map<String, Object>> headers = new java.util.ArrayList<>();
+
+            for (int i = 0; i < 21; i++) {
+                headers.add(Map.of("name", "X-Header-" + i, "value", "v"));
+            }
+
+            assertRejected(headers);
+        }
+
+        @Test
+        public void testRejectsInvalidHeaderName() {
+            assertRejected(List.of(Map.of("name", "Bad Header", "value", "v")));
+        }
+
+        @Test
+        public void testRejectsDuplicateHeaderNamesIgnoringCase() {
+            assertRejected(List.of(Map.of("name", "X-Dup", "value", "a"), Map.of("name", "x-dup", "value", "b")));
+        }
+
+        private void assertRejected(List<Map<String, Object>> headers) {
+            Notification notification = createNotification(
+                Notification.Type.WEBHOOK, Map.of("webhook", "https://example.com/hook", "webhookHeaders", headers));
+
+            assertThatThrownBy(() -> notificationFacade.createNotification(notification))
+                .isInstanceOf(IllegalArgumentException.class);
+
+            assertThat(notificationRepository.count()).isZero();
         }
 
         @Test

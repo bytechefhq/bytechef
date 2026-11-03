@@ -23,6 +23,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -31,13 +32,22 @@ import java.util.Map;
 public record NotificationDTO(
     Long id, String name, Type type, Map<String, Object> settings, List<NotificationEvent> notificationEvents,
     List<Long> notificationEventIds,
-    String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate, int version) {
+    String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate, int version,
+    boolean hasSigningSecret, @Nullable String signingSecret) {
 
-    public NotificationDTO(Notification notification, List<NotificationEvent> notificationEvents) {
+    /**
+     * @param settings      the masked settings view, never the stored secrets
+     * @param signingSecret the signing secret, set only in the create response
+     */
+    public NotificationDTO(
+        Notification notification, Map<String, Object> settings, List<NotificationEvent> notificationEvents,
+        boolean hasSigningSecret, @Nullable String signingSecret) {
+
         this(
-            notification.getId(), notification.getName(), notification.getType(), notification.getSettings(),
+            notification.getId(), notification.getName(), notification.getType(), settings,
             notificationEvents, notification.getNotificationEventIds(), notification.getCreatedBy(),
             notification.getCreatedDate(),
-            notification.getLastModifiedBy(), notification.getLastModifiedDate(), notification.getVersion());
+            notification.getLastModifiedBy(), notification.getLastModifiedDate(), notification.getVersion(),
+            hasSigningSecret, signingSecret);
     }
 }

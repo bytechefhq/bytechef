@@ -29,8 +29,13 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +44,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class NotificationFacadeImpl implements NotificationFacade {
+
+    private static final Pattern HEADER_NAME_PATTERN = Pattern.compile("^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,256}$");
+    private static final int MAX_HEADER_COUNT = 20;
+    private static final int MAX_HEADER_VALUE_LENGTH = 4096;
+    private static final String RESERVED_HEADER_PREFIX = "x-bytechef-";
+    private static final Set<String> RESERVED_HEADER_NAMES = Set.of(
+        "content-type", "content-length", "host", "transfer-encoding", "connection");
 
     private final NotificationEventService notificationEventService;
     private final NotificationSenderRegistry notificationSenderRegistry;
@@ -59,8 +71,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     public List<NotificationDTO> getNotifications() {
         return notificationService.getNotifications()
             .stream()
-            .map(notification -> new NotificationDTO(
-                notification, notificationEventService.getNotificationEvents(notification.getNotificationEventIds())))
+            .map(notification -> toDTO(notification, null))
             .toList();
     }
 
@@ -74,11 +85,19 @@ public class NotificationFacadeImpl implements NotificationFacade {
     public NotificationDTO createNotification(Notification notification) {
         validateNotification(notification);
 
+        NotificationSecretSettings.apply(notification, notification.getSettings(), null);
+
+        String signingSecret = null;
+
+        if (notification.getType() == Notification.Type.WEBHOOK) {
+            signingSecret = WebhookSigningSecrets.generate();
+
+            putSecretSetting(notification, NotificationSecretSettings.SIGNING_SECRET_KEY, signingSecret);
+        }
+
         notification = notificationService.create(notification);
 
-        return new NotificationDTO(
-            notification,
-            notificationEventService.getNotificationEvents(notification.getNotificationEventIds()));
+        return toDTO(notification, signingSecret);
     }
 
     @Override
@@ -91,11 +110,31 @@ public class NotificationFacadeImpl implements NotificationFacade {
     public NotificationDTO updateNotification(Notification notification) {
         validateNotification(notification);
 
+        Notification storedNotification = notificationService.getNotification(notification.getId());
+
+        NotificationSecretSettings.apply(notification, notification.getSettings(), storedNotification);
+
         notification = notificationService.update(notification);
 
-        return new NotificationDTO(
-            notification,
-            notificationEventService.getNotificationEvents(notification.getNotificationEventIds()));
+        return toDTO(notification, null);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public String regenerateSigningSecret(long id) {
+        Notification notification = notificationService.getNotification(id);
+
+        if (notification.getType() != Notification.Type.WEBHOOK) {
+            throw new IllegalArgumentException("Only webhook notifications have a signing secret");
+        }
+
+        String signingSecret = WebhookSigningSecrets.generate();
+
+        putSecretSetting(notification, NotificationSecretSettings.SIGNING_SECRET_KEY, signingSecret);
+
+        notificationService.update(notification);
+
+        return signingSecret;
     }
 
     @Override
@@ -113,6 +152,14 @@ public class NotificationFacadeImpl implements NotificationFacade {
         return notificationEventService.getNotificationEvents();
     }
 
+    private static void putSecretSetting(Notification notification, String key, Object value) {
+        Map<String, Object> secretSettings = new HashMap<>(notification.getSecretSettings());
+
+        secretSettings.put(key, value);
+
+        notification.setSecretSettings(secretSettings);
+    }
+
     private static boolean isHttpUrl(String value) {
         try {
             URI uri = new URI(value.strip());
@@ -125,6 +172,13 @@ public class NotificationFacadeImpl implements NotificationFacade {
         }
     }
 
+    private NotificationDTO toDTO(Notification notification, String signingSecret) {
+        return new NotificationDTO(
+            notification, NotificationSecretSettings.masked(notification),
+            notificationEventService.getNotificationEvents(notification.getNotificationEventIds()),
+            notification.getSetting(NotificationSecretSettings.SIGNING_SECRET_KEY) != null, signingSecret);
+    }
+
     private void validateNotification(Notification notification) {
         Notification.Type type = notification.getType();
 
@@ -135,6 +189,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
         if (type == Notification.Type.WEBHOOK) {
             validateWebhookUrl(notification.getSettings());
+            validateWebhookHeaders(notification.getSettings());
         }
     }
 
@@ -147,6 +202,52 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
         if (!isHttpUrl(webhookUrlString)) {
             throw new IllegalArgumentException("Webhook URL must be an http or https URL");
+        }
+    }
+
+    private static void validateWebhookHeaders(Map<String, Object> settings) {
+        Object headers = settings.get(NotificationSecretSettings.WEBHOOK_HEADERS_KEY);
+
+        if (headers == null) {
+            return;
+        }
+
+        if (!(headers instanceof List<?> headerList)) {
+            throw new IllegalArgumentException("Webhook headers must be a list");
+        }
+
+        if (headerList.size() > MAX_HEADER_COUNT) {
+            throw new IllegalArgumentException("A webhook can have at most %d headers".formatted(MAX_HEADER_COUNT));
+        }
+
+        Set<String> names = new HashSet<>();
+
+        for (Object header : headerList) {
+            if (!(header instanceof Map<?, ?> headerMap) || !(headerMap.get("name") instanceof String name) ||
+                !HEADER_NAME_PATTERN.matcher(name)
+                    .matches()) {
+
+                throw new IllegalArgumentException("Webhook header name is not valid");
+            }
+
+            String lowerCaseName = name.toLowerCase(Locale.ROOT);
+
+            if (lowerCaseName.startsWith(RESERVED_HEADER_PREFIX) || RESERVED_HEADER_NAMES.contains(lowerCaseName)) {
+                throw new IllegalArgumentException("Webhook header name %s is reserved".formatted(name));
+            }
+
+            if (!names.add(lowerCaseName)) {
+                throw new IllegalArgumentException("Webhook header name %s is duplicated".formatted(name));
+            }
+
+            Object value = headerMap.get("value");
+
+            if (value != null
+                && (!(value instanceof String valueString) || valueString.length() > MAX_HEADER_VALUE_LENGTH)) {
+                throw new IllegalArgumentException(
+                    "Webhook header %s value must be a string of at most %d characters".formatted(
+                        name, MAX_HEADER_VALUE_LENGTH));
+            }
         }
     }
 }

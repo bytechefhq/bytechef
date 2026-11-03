@@ -32,6 +32,8 @@ public interface NotificationFacade {
 
     NotificationDTO updateNotification(Notification notification);
 
+    String regenerateSigningSecret(long id);
+
     void deleteNotification(long id);
 
     List<NotificationEvent> getNotificationEvents();
