@@ -19,6 +19,8 @@ package com.bytechef.platform.notification.delivery;
 import com.bytechef.tenant.TenantContext;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,7 +43,7 @@ public record WebhookDelivery(
         Objects.requireNonNull(payloads, "payloads");
         Objects.requireNonNull(retry, "retry");
 
-        headers = Map.copyOf(headers);
+        headers = Collections.unmodifiableMap(new LinkedHashMap<>(headers));
         payloads = List.copyOf(payloads);
 
         if (payloads.isEmpty()) {
@@ -104,7 +106,7 @@ public record WebhookDelivery(
         }
 
         public Builder headers(Map<String, String> headers) {
-            this.headers = Map.copyOf(headers);
+            this.headers = Collections.unmodifiableMap(new LinkedHashMap<>(headers));
 
             return this;
         }

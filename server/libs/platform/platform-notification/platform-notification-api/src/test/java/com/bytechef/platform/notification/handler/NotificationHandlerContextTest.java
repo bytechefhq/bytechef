@@ -74,6 +74,21 @@ class NotificationHandlerContextTest {
     }
 
     @Test
+    void testSampleFillsEverySection() {
+        NotificationHandlerContext sample = NotificationHandlerContext.sample();
+
+        Map<String, Object> map = sample.toMap();
+
+        for (String key : List.of(
+            "job", "workflow", "project", "environment", "error", "executionUrl", "source", "deliveryId")) {
+
+            assertTrue(map.containsKey(key), key);
+        }
+
+        assertEquals(NotificationEvent.Type.JOB_FAILED, sample.getEventType());
+    }
+
+    @Test
     void testWithDeliveryIdCopiesEveryOtherField() {
         NotificationHandlerContext context = new NotificationHandlerContext.Builder()
             .eventType(NotificationEvent.Type.JOB_FAILED)
