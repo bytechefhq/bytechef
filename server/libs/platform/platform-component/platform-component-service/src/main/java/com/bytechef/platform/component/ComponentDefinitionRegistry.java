@@ -754,11 +754,8 @@ public class ComponentDefinitionRegistry {
                     String.join(".", subProperties.subList(1, subProperties.size())),
                     dynamicPropertyProperties, inputParameters, connectionParameters, lookupDependsOnPaths, context);
             } else if (firstProperty instanceof ArrayProperty arrayProperty) {
-                List<? extends Property.ValueProperty<?>> items = arrayProperty.getItems();
-
-                if (items.getFirst() instanceof ObjectProperty objectProperty) {
-                    items = objectProperty.getProperties();
-                }
+                List<? extends Property.ValueProperty<?>> items = getArrayElementProperties(
+                    arrayProperty, subProperties.getFirst());
 
                 return getProperty(
                     String.join(".", subProperties.subList(1, subProperties.size())), items, inputParameters,
@@ -799,6 +796,30 @@ public class ComponentDefinitionRegistry {
                     curProperty -> Objects.equals(curProperty.getName(), subProperties.getLast()));
             }
         }
+    }
+
+    private static List<? extends Property.ValueProperty<?>> getArrayElementProperties(
+        ArrayProperty arrayProperty, String subPropertyName) {
+
+        List<? extends Property.ValueProperty<?>> items = arrayProperty.getItems();
+
+        long indexCount = subPropertyName.chars()
+            .filter(character -> character == '[')
+            .count();
+
+        for (long level = 1; level < indexCount; level++) {
+            if (items.isEmpty() || !(items.getFirst() instanceof ArrayProperty nestedArrayProperty)) {
+                break;
+            }
+
+            items = nestedArrayProperty.getItems();
+        }
+
+        if (!items.isEmpty() && items.getFirst() instanceof ObjectProperty objectProperty) {
+            items = objectProperty.getProperties();
+        }
+
+        return items;
     }
 
     private static String getFirstSubPropertyName(List<String> subProperties) {

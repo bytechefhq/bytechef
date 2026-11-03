@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -128,10 +129,39 @@ public class ComponentDefinitionRegistryTest {
         // TODO
     }
 
-    @Disabled
     @Test
-    public void testGetActionProperty() {
-        // TODO
+    public void testGetActionProperty() throws Exception {
+        ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(
+            () -> ComponentDsl.component("nestedLookup")
+                .title("Nested Lookup")
+                .actions(
+                    ComponentDsl.action("find")
+                        .title("Find")
+                        .properties(
+                            ComponentDsl.string("sortColumn"),
+                            ComponentDsl.array("filters")
+                                .items(
+                                    ComponentDsl.object()
+                                        .properties(ComponentDsl.string("field"))),
+                            ComponentDsl.array("conditions")
+                                .items(
+                                    ComponentDsl.array()
+                                        .items(
+                                            ComponentDsl.object()
+                                                .properties(
+                                                    ComponentDsl.string("column"),
+                                                    ComponentDsl.string("operation")))))
+                        .perform((ActionDefinition.PerformFunction) (
+                            inputParameters, connectionParameters, context) -> null)));
+
+        assertThat(getActionProperty(componentDefinitionRegistry, "sortColumn").getName())
+            .isEqualTo("sortColumn");
+        assertThat(getActionProperty(componentDefinitionRegistry, "filters[0].field").getName())
+            .isEqualTo("field");
+        assertThat(getActionProperty(componentDefinitionRegistry, "conditions[0][1].column").getName())
+            .isEqualTo("column");
+        assertThat(getActionProperty(componentDefinitionRegistry, "conditions[1][0].operation").getName())
+            .isEqualTo("operation");
     }
 
     @Disabled
@@ -534,5 +564,13 @@ public class ComponentDefinitionRegistryTest {
 
             assertThat(bulkLoadCount.get()).isOne();
         }
+    }
+
+    private static Property getActionProperty(
+        ComponentDefinitionRegistry componentDefinitionRegistry, String propertyName) throws Exception {
+
+        return componentDefinitionRegistry.getActionProperty(
+            "nestedLookup", 1, "find", propertyName, ParametersFactory.create(Map.of()),
+            ParametersFactory.create((ComponentConnection) null), Map.of(), Mockito.mock(ActionContext.class));
     }
 }
