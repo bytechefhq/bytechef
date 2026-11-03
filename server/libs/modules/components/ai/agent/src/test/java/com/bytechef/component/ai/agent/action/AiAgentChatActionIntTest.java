@@ -20,6 +20,10 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -51,6 +55,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.AiAgentComponentHandler;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
+import com.bytechef.component.ai.agent.tool.AgentToolSuspensionStorage;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -72,6 +77,7 @@ import com.bytechef.platform.component.test.config.ComponentTestIntConfiguration
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobResumeId;
@@ -95,11 +101,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
@@ -141,6 +149,7 @@ import tools.jackson.databind.ObjectMapper;
 class AiAgentChatActionIntTest {
 
     private static final String APPROVAL_TOOL_NAME = "requestApproval";
+    private static final long ENVIRONMENT_ID = 0L;
     private static final String FINAL_ANSWER = "The refund was approved and issued.";
     private static final long MODEL_CONNECTION_ID = 1L;
     private static final String QUESTION_WORKFLOW_ID = Base64.getEncoder()
@@ -150,6 +159,9 @@ class AiAgentChatActionIntTest {
 
     @Autowired
     private ConnectionService connectionService;
+
+    @Autowired
+    private DataStorage dataStorage;
 
     @Autowired
     private Environment environment;
@@ -170,6 +182,7 @@ class AiAgentChatActionIntTest {
     private WorkflowService workflowService;
 
     private final ApprovalTokens approvalTokens = new SigningApprovalTokens();
+    private final Map<String, Object> dataStorageValues = new ConcurrentHashMap<>();
 
     private ApplicationEventPublisher eventPublisher;
     private JobService jobService;
@@ -191,6 +204,18 @@ class AiAgentChatActionIntTest {
         connection.setParameters(Map.of());
 
         when(connectionService.getConnection(MODEL_CONNECTION_ID)).thenReturn(connection);
+
+        dataStorageValues.clear();
+
+        doAnswer(invocation -> {
+            dataStorageValues.put(getDataStorageEntryKey(invocation), invocation.getArgument(4));
+
+            return null;
+        }).when(dataStorage)
+            .put(anyString(), any(), anyString(), anyString(), any(), anyLong(), any());
+
+        when(dataStorage.fetch(anyString(), any(), anyString(), anyString(), anyLong(), any()))
+            .thenAnswer(invocation -> Optional.ofNullable(dataStorageValues.get(getDataStorageEntryKey(invocation))));
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
@@ -269,7 +294,13 @@ class AiAgentChatActionIntTest {
         Object suspendOutput = taskFileStorage.readTaskExecutionOutput(
             Objects.requireNonNull(suspendedTaskExecution.getOutput()));
 
-        assertThat(suspendOutput.toString()).contains(AgentToolSuspension.CONTINUE_PARAMETER_KEY);
+        assertThat(suspendOutput.toString())
+            .contains(AgentToolSuspensionStorage.DATA_STORAGE_KEY_CONTINUE_PARAMETER_KEY)
+            .doesNotContain(AgentToolSuspension.CONTINUE_PARAMETER_KEY)
+            .doesNotContain("call_1");
+        assertThat(dataStorageValues).hasSize(1);
+        assertThat(dataStorageValues.values()
+            .toString()).contains("call_1");
 
         JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeJob(
             getSignedResumeToken(suspendedJob), Map.of("approved", true));
@@ -564,6 +595,11 @@ class AiAgentChatActionIntTest {
         return jobResumeId;
     }
 
+    private static String getDataStorageEntryKey(InvocationOnMock invocation) {
+        return invocation.getArgument(0) + "/" + invocation.getArgument(1) + "/" + invocation.getArgument(2) + "/" +
+            invocation.getArgument(3);
+    }
+
     private static ApplicationEventPublisher createEventPublisher(AsyncMessageBroker asyncMessageBroker) {
         return event -> {
             MessageEvent<?> messageEvent = (MessageEvent<?>) event;
@@ -579,6 +615,7 @@ class AiAgentChatActionIntTest {
         @Override
         public TaskExecution process(TaskExecution taskExecution) {
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, Map.of("model_1", MODEL_CONNECTION_ID));
+            taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, ENVIRONMENT_ID);
             taskExecution.putMetadata(MetadataConstants.TYPE, PlatformType.AUTOMATION);
 
             return taskExecution;

@@ -44,8 +44,8 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 /**
  * A {@link ToolCallingManager} that lets a tool suspend the agent. A tool suspends by calling
  * {@link ActionContext#suspend} on the agent's action context and returning {@link ToolSuspension}'s suspended tool
- * result; this manager then stores the conversation and the pending tool call in the suspend's continue parameters
- * under {@link AgentToolSuspension#CONTINUE_PARAMETER_KEY}, which a suspending tool must not use, and ends the turn.
+ * result; this manager then stores the conversation and the pending tool call through
+ * {@link AgentToolSuspensionStorage}, whose continue parameter keys a suspending tool must not use, and ends the turn.
  *
  * <p>
  * When the model calls several tools in one round, they run one at a time, because a tool that suspends cannot be
@@ -102,10 +102,11 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
 
         Map<String, Object> continueParameters = new HashMap<>(suspend.continueParameters());
 
-        if (continueParameters.containsKey(AgentToolSuspension.CONTINUE_PARAMETER_KEY)) {
+        if (AgentToolSuspensionStorage.isStored(continueParameters)) {
             throw new IllegalStateException(
                 "The suspending tool's continue parameters already contain the reserved key '" +
-                    AgentToolSuspension.CONTINUE_PARAMETER_KEY + "'.");
+                    AgentToolSuspension.CONTINUE_PARAMETER_KEY + "' or '" +
+                    AgentToolSuspensionStorage.DATA_STORAGE_KEY_CONTINUE_PARAMETER_KEY + "'.");
         }
 
         String suspendedToolResult = ToolSuspension.getSuspendedToolResult(suspend);
@@ -114,13 +115,14 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
 
         ClusterElementCallRef suspendedCallRef = findSuspendedCall();
 
-        continueParameters.put(
-            AgentToolSuspension.CONTINUE_PARAMETER_KEY,
+        AgentToolSuspensionStorage.put(
+            continueParameters,
             new AgentToolSuspension(
                 ConversationState.from(conversation), suspendedToolCallId,
                 Objects.requireNonNull(suspendedToolResult, "suspendedToolResult"),
                 suspendedCallRef == null ? null : suspendedCallRef.id(),
-                suspendedCallRef == null ? null : suspendedCallRef.workflowNodeName()));
+                suspendedCallRef == null ? null : suspendedCallRef.workflowNodeName()),
+            actionContext);
 
         actionContext.suspend(new ActionContext.Suspend(continueParameters, suspend.expiresAt()));
 

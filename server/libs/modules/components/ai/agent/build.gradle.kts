@@ -27,6 +27,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-component:platform-component-test-int-support"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    testImplementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
     testImplementation(project(":server:libs:platform:platform-job-sync"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     testImplementation(testFixtures(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api")))
