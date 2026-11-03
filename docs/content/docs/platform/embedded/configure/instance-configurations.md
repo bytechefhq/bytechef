@@ -27,6 +27,7 @@ Each configuration in the list displays:
 - **Integration name** -- the name and icon of the underlying integration.
 - **Workflow count** -- number of workflows included in this configuration.
 - **Version** -- the published integration version deployed by this configuration.
+- **Newer version available** -- shown when the integration has a later published version than the one the configuration deploys. A newer draft does not count.
 - **Tags** -- assigned tags for organization and filtering.
 - **Enabled/Disabled status** -- whether the configuration is currently active.
 
