@@ -74,8 +74,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
@@ -487,52 +487,13 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         validateSameIntegrationAndEnvironment(sourceConfiguration, targetConfiguration);
 
-        MoveContext moveContext = getMoveContext(sourceConfiguration, targetConfiguration);
-
-        Map<Long, List<IntegrationInstance>> sourceInstancesByConnectedUserId = getInstancesByConnectedUserId(
-            sourceId);
-
-        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
-        List<WorkflowMapping> movingWorkflowMappings = new ArrayList<>();
-
-        for (long connectedUserId : getSortedDistinct(connectedUserIds)) {
-            List<IntegrationInstance> integrationInstances = sourceInstancesByConnectedUserId.getOrDefault(
-                connectedUserId, List.of());
-
-            if (integrationInstances.isEmpty()) {
-                skipped.add(
-                    new ConfigurationMoveResultDTO.Skipped(
-                        connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
-
-                continue;
-            }
-
-            List<WorkflowMapping> userWorkflowMappings = new ArrayList<>();
-            List<ConfigurationMoveResultDTO.Skipped> userSkipped = new ArrayList<>();
-            boolean eligible = false;
-
-            for (IntegrationInstance integrationInstance : integrationInstances) {
-                InstanceEvaluation instanceEvaluation = evaluateIntegrationInstance(integrationInstance, moveContext);
-
-                if (instanceEvaluation.skipped() == null) {
-                    eligible = true;
-
-                    userWorkflowMappings.addAll(instanceEvaluation.workflowMappings());
-                } else {
-                    userSkipped.add(instanceEvaluation.skipped());
-                }
-            }
-
-            if (eligible) {
-                movingWorkflowMappings.addAll(userWorkflowMappings);
-            }
-
-            addSkipped(skipped, userSkipped, eligible);
-        }
+        MoveEvaluation moveEvaluation = evaluateMove(
+            getMoveContext(sourceConfiguration, targetConfiguration), getInstancesByConnectedUserId(sourceId),
+            getSortedDistinct(connectedUserIds));
 
         return new ConfigurationMoveImpactDTO(
-            getMoveImpactWorkflows(movingWorkflowMappings, moveContext), skipped,
-            getMcpServerCount(sourceConfiguration, targetConfiguration));
+            getMoveImpactWorkflows(moveEvaluation.movingWorkflowMappings(), targetConfiguration),
+            moveEvaluation.skipped(), getMcpServerCount(List.of(sourceConfiguration, targetConfiguration)));
     }
 
     @Override
@@ -618,6 +579,44 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public ConfigurationMoveImpactDTO getUpgradeImpact(long targetId, List<Long> connectedUserIds) {
+        IntegrationInstanceConfiguration targetConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(targetId);
+
+        List<Long> sortedConnectedUserIds = getSortedDistinct(connectedUserIds);
+
+        List<UpgradeSource> upgradeSources = getUpgradeSources(targetConfiguration, sortedConnectedUserIds);
+
+        List<IntegrationInstanceConfiguration> exposedConfigurations = new ArrayList<>();
+        Set<Long> movingConnectedUserIds = new HashSet<>();
+        List<WorkflowMapping> movingWorkflowMappings = new ArrayList<>();
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
+
+        exposedConfigurations.add(targetConfiguration);
+
+        for (UpgradeSource upgradeSource : upgradeSources) {
+            MoveEvaluation moveEvaluation = evaluateMove(
+                upgradeSource.moveContext(), upgradeSource.instancesByConnectedUserId(),
+                upgradeSource.connectedUserIds());
+
+            exposedConfigurations.add(
+                upgradeSource.moveContext()
+                    .sourceConfiguration());
+            movingConnectedUserIds.addAll(moveEvaluation.movingConnectedUserIds());
+            movingWorkflowMappings.addAll(moveEvaluation.movingWorkflowMappings());
+            skipped.addAll(moveEvaluation.skipped());
+        }
+
+        skipped.addAll(getUpgradeUnmatchedSkipped(targetConfiguration, upgradeSources, sortedConnectedUserIds));
+
+        return new ConfigurationMoveImpactDTO(
+            getMoveImpactWorkflows(movingWorkflowMappings, targetConfiguration),
+            mergeUpgradeSkipped(skipped, movingConnectedUserIds), getMcpServerCount(exposedConfigurations));
+    }
+
+    @Override
     @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USERS_MOVED, data = {
         @AuditData(key = "sourceIntegrationInstanceConfigurationId", value = "#sourceId"),
         @AuditData(key = "targetIntegrationInstanceConfigurationId", value = "#targetId"),
@@ -637,68 +636,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         validateSameIntegrationAndEnvironment(sourceConfiguration, targetConfiguration);
 
-        MoveContext moveContext = getMoveContext(sourceConfiguration, targetConfiguration);
-
-        Map<Long, List<IntegrationInstance>> sourceInstancesByConnectedUserId = getInstancesByConnectedUserId(
-            sourceId);
-
-        List<Long> movedConnectedUserIds = new ArrayList<>();
-        List<Long> needsAttentionConnectedUserIds = new ArrayList<>();
-        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
-
-        for (long connectedUserId : getSortedDistinct(connectedUserIds)) {
-            List<IntegrationInstance> integrationInstances = sourceInstancesByConnectedUserId.getOrDefault(
-                connectedUserId, List.of());
-
-            if (integrationInstances.isEmpty()) {
-                skipped.add(
-                    new ConfigurationMoveResultDTO.Skipped(
-                        connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
-
-                continue;
-            }
-
-            boolean moved = false;
-            boolean needsAttention = false;
-            List<ConfigurationMoveResultDTO.Skipped> userSkipped = new ArrayList<>();
-
-            for (IntegrationInstance integrationInstance : integrationInstances) {
-                InstanceMoveOutcome instanceMoveOutcome;
-
-                try {
-                    instanceMoveOutcome = moveIntegrationInstance(integrationInstance.getId(), moveContext);
-                } catch (RuntimeException exception) {
-                    log.error(
-                        "Moving integration instance id={} of connected user id={} from configuration id={} to " +
-                            "id={} failed",
-                        integrationInstance.getId(), connectedUserId, sourceId, targetId, exception);
-
-                    instanceMoveOutcome = InstanceMoveOutcome.skipped(
-                        connectedUserId, ConfigurationMoveResultDTO.Skipped.MOVE_FAILED, List.of());
-                }
-
-                if (instanceMoveOutcome.skipped() == null) {
-                    moved = true;
-                    needsAttention = needsAttention || instanceMoveOutcome.needsAttention();
-                } else {
-                    userSkipped.add(instanceMoveOutcome.skipped());
-                }
-            }
-
-            addSkipped(skipped, userSkipped, moved);
-
-            if (!moved) {
-                continue;
-            }
-
-            movedConnectedUserIds.add(connectedUserId);
-
-            if (needsAttention || !userSkipped.isEmpty()) {
-                needsAttentionConnectedUserIds.add(connectedUserId);
-            }
-        }
-
-        return new ConfigurationMoveResultDTO(movedConnectedUserIds, skipped, needsAttentionConnectedUserIds);
+        return moveConnectedUsers(
+            getMoveContext(sourceConfiguration, targetConfiguration), getInstancesByConnectedUserId(sourceId),
+            getSortedDistinct(connectedUserIds));
     }
 
     @Override
@@ -758,6 +698,48 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             previousIntegrationInstanceConfigurationWorkflow, updatedIntegrationInstanceConfigurationWorkflow);
     }
 
+    @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USERS_UPGRADED, data = {
+        @AuditData(key = "targetIntegrationInstanceConfigurationId", value = "#targetId"),
+        @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
+    })
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConfigurationMoveResultDTO upgradeConnectedUsers(long targetId, List<Long> connectedUserIds) {
+        IntegrationInstanceConfiguration targetConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(targetId);
+
+        List<Long> sortedConnectedUserIds = getSortedDistinct(connectedUserIds);
+
+        List<UpgradeSource> upgradeSources = getUpgradeSources(targetConfiguration, sortedConnectedUserIds);
+
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>(
+            getUpgradeUnmatchedSkipped(targetConfiguration, upgradeSources, sortedConnectedUserIds));
+        Set<Long> movedConnectedUserIds = new TreeSet<>();
+        Set<Long> needsAttentionConnectedUserIds = new TreeSet<>();
+
+        for (UpgradeSource upgradeSource : upgradeSources) {
+            ConfigurationMoveResultDTO configurationMoveResultDTO = moveConnectedUsers(
+                upgradeSource.moveContext(), upgradeSource.instancesByConnectedUserId(),
+                upgradeSource.connectedUserIds());
+
+            movedConnectedUserIds.addAll(configurationMoveResultDTO.movedConnectedUserIds());
+            needsAttentionConnectedUserIds.addAll(configurationMoveResultDTO.needsAttentionConnectedUserIds());
+            skipped.addAll(configurationMoveResultDTO.skipped());
+        }
+
+        List<ConfigurationMoveResultDTO.Skipped> mergedSkipped = mergeUpgradeSkipped(skipped, movedConnectedUserIds);
+
+        for (ConfigurationMoveResultDTO.Skipped userSkipped : mergedSkipped) {
+            if (movedConnectedUserIds.contains(userSkipped.connectedUserId())) {
+                needsAttentionConnectedUserIds.add(userSkipped.connectedUserId());
+            }
+        }
+
+        return new ConfigurationMoveResultDTO(
+            List.copyOf(movedConnectedUserIds), mergedSkipped, List.copyOf(needsAttentionConnectedUserIds));
+    }
+
     private void addConfigurationsOfExistingInstances(
         Map<Long, Optional<IntegrationInstanceConfiguration>> configurationsByIntegrationId,
         List<IntegrationInstanceConfiguration> enabledIntegrationInstanceConfigurations, ConnectedUser connectedUser,
@@ -794,6 +776,192 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
     }
 
+    private MoveEvaluation evaluateMove(
+        MoveContext moveContext, Map<Long, List<IntegrationInstance>> sourceInstancesByConnectedUserId,
+        List<Long> sortedConnectedUserIds) {
+
+        List<Long> movingConnectedUserIds = new ArrayList<>();
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
+        List<WorkflowMapping> movingWorkflowMappings = new ArrayList<>();
+
+        for (long connectedUserId : sortedConnectedUserIds) {
+            List<IntegrationInstance> integrationInstances = sourceInstancesByConnectedUserId.getOrDefault(
+                connectedUserId, List.of());
+
+            if (integrationInstances.isEmpty()) {
+                skipped.add(
+                    new ConfigurationMoveResultDTO.Skipped(
+                        connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
+
+                continue;
+            }
+
+            List<WorkflowMapping> userWorkflowMappings = new ArrayList<>();
+            List<ConfigurationMoveResultDTO.Skipped> userSkipped = new ArrayList<>();
+            boolean eligible = false;
+
+            for (IntegrationInstance integrationInstance : integrationInstances) {
+                InstanceEvaluation instanceEvaluation = evaluateIntegrationInstance(integrationInstance, moveContext);
+
+                if (instanceEvaluation.skipped() == null) {
+                    eligible = true;
+
+                    userWorkflowMappings.addAll(instanceEvaluation.workflowMappings());
+                } else {
+                    userSkipped.add(instanceEvaluation.skipped());
+                }
+            }
+
+            if (eligible) {
+                movingConnectedUserIds.add(connectedUserId);
+                movingWorkflowMappings.addAll(userWorkflowMappings);
+            }
+
+            addSkipped(skipped, userSkipped, eligible);
+        }
+
+        return new MoveEvaluation(movingConnectedUserIds, movingWorkflowMappings, skipped);
+    }
+
+    private ConfigurationMoveResultDTO moveConnectedUsers(
+        MoveContext moveContext, Map<Long, List<IntegrationInstance>> sourceInstancesByConnectedUserId,
+        List<Long> sortedConnectedUserIds) {
+
+        IntegrationInstanceConfiguration sourceConfiguration = moveContext.sourceConfiguration();
+        IntegrationInstanceConfiguration targetConfiguration = moveContext.targetConfiguration();
+
+        List<Long> movedConnectedUserIds = new ArrayList<>();
+        List<Long> needsAttentionConnectedUserIds = new ArrayList<>();
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
+
+        for (long connectedUserId : sortedConnectedUserIds) {
+            List<IntegrationInstance> integrationInstances = sourceInstancesByConnectedUserId.getOrDefault(
+                connectedUserId, List.of());
+
+            if (integrationInstances.isEmpty()) {
+                skipped.add(
+                    new ConfigurationMoveResultDTO.Skipped(
+                        connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
+
+                continue;
+            }
+
+            boolean moved = false;
+            boolean needsAttention = false;
+            List<ConfigurationMoveResultDTO.Skipped> userSkipped = new ArrayList<>();
+
+            for (IntegrationInstance integrationInstance : integrationInstances) {
+                InstanceMoveOutcome instanceMoveOutcome;
+
+                try {
+                    instanceMoveOutcome = moveIntegrationInstance(integrationInstance.getId(), moveContext);
+                } catch (RuntimeException exception) {
+                    log.error(
+                        "Moving integration instance id={} of connected user id={} from configuration id={} to " +
+                            "id={} failed",
+                        integrationInstance.getId(), connectedUserId, sourceConfiguration.getId(),
+                        targetConfiguration.getId(), exception);
+
+                    instanceMoveOutcome = InstanceMoveOutcome.skipped(
+                        connectedUserId, ConfigurationMoveResultDTO.Skipped.MOVE_FAILED, List.of());
+                }
+
+                if (instanceMoveOutcome.skipped() == null) {
+                    moved = true;
+                    needsAttention = needsAttention || instanceMoveOutcome.needsAttention();
+                } else {
+                    userSkipped.add(instanceMoveOutcome.skipped());
+                }
+            }
+
+            addSkipped(skipped, userSkipped, moved);
+
+            if (!moved) {
+                continue;
+            }
+
+            movedConnectedUserIds.add(connectedUserId);
+
+            if (needsAttention || !userSkipped.isEmpty()) {
+                needsAttentionConnectedUserIds.add(connectedUserId);
+            }
+        }
+
+        return new ConfigurationMoveResultDTO(movedConnectedUserIds, skipped, needsAttentionConnectedUserIds);
+    }
+
+    private List<UpgradeSource> getUpgradeSources(
+        IntegrationInstanceConfiguration targetConfiguration, List<Long> sortedConnectedUserIds) {
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+                targetConfiguration.getEnvironment(), targetConfiguration.getIntegrationId(), null);
+
+        List<UpgradeSource> upgradeSources = new ArrayList<>();
+
+        for (IntegrationInstanceConfiguration sourceConfiguration : integrationInstanceConfigurations.stream()
+            .filter(configuration -> !Objects.equals(configuration.getId(), targetConfiguration.getId()))
+            .sorted(Comparator.comparing(IntegrationInstanceConfiguration::getId))
+            .toList()) {
+
+            Map<Long, List<IntegrationInstance>> sourceInstancesByConnectedUserId = getInstancesByConnectedUserId(
+                sourceConfiguration.getId());
+
+            List<Long> sourceConnectedUserIds = sortedConnectedUserIds.stream()
+                .filter(sourceInstancesByConnectedUserId::containsKey)
+                .toList();
+
+            if (sourceConnectedUserIds.isEmpty()) {
+                continue;
+            }
+
+            upgradeSources.add(
+                new UpgradeSource(
+                    getMoveContext(sourceConfiguration, targetConfiguration), sourceInstancesByConnectedUserId,
+                    sourceConnectedUserIds));
+        }
+
+        return upgradeSources;
+    }
+
+    private List<ConfigurationMoveResultDTO.Skipped> getUpgradeUnmatchedSkipped(
+        IntegrationInstanceConfiguration targetConfiguration, List<UpgradeSource> upgradeSources,
+        List<Long> sortedConnectedUserIds) {
+
+        Set<Long> sourceConnectedUserIds = upgradeSources.stream()
+            .flatMap(upgradeSource -> upgradeSource.connectedUserIds()
+                .stream())
+            .collect(Collectors.toSet());
+        Set<Long> targetConnectedUserIds = getInstancesByConnectedUserId(targetConfiguration.getId()).keySet();
+
+        List<ConfigurationMoveResultDTO.Skipped> unmatchedSkipped = new ArrayList<>();
+
+        for (long connectedUserId : sortedConnectedUserIds) {
+            if (sourceConnectedUserIds.contains(connectedUserId)) {
+                continue;
+            }
+
+            String reason = targetConnectedUserIds.contains(connectedUserId)
+                ? ConfigurationMoveResultDTO.Skipped.ALREADY_ON_TARGET
+                : ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE;
+
+            unmatchedSkipped.add(new ConfigurationMoveResultDTO.Skipped(connectedUserId, reason, List.of()));
+        }
+
+        return unmatchedSkipped;
+    }
+
+    private static List<ConfigurationMoveResultDTO.Skipped> mergeUpgradeSkipped(
+        List<ConfigurationMoveResultDTO.Skipped> skipped, Set<Long> movedConnectedUserIds) {
+
+        return skipped.stream()
+            .filter(userSkipped -> !movedConnectedUserIds.contains(userSkipped.connectedUserId()) ||
+                !Objects.equals(userSkipped.reason(), ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE))
+            .distinct()
+            .sorted(Comparator.comparingLong(ConfigurationMoveResultDTO.Skipped::connectedUserId))
+            .toList();
+    }
+
     private static void addSkipped(
         List<ConfigurationMoveResultDTO.Skipped> skipped, List<ConfigurationMoveResultDTO.Skipped> userSkipped,
         boolean partlyMoved) {
@@ -811,10 +979,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
     }
 
-    private int getMcpServerCount(
-        IntegrationInstanceConfiguration sourceConfiguration, IntegrationInstanceConfiguration targetConfiguration) {
-
-        return (int) Stream.of(sourceConfiguration.getId(), targetConfiguration.getId())
+    private int getMcpServerCount(List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
+        return (int) integrationInstanceConfigurations.stream()
+            .map(IntegrationInstanceConfiguration::getId)
             .flatMap(integrationInstanceConfigurationId -> mcpIntegrationInstanceConfigurationService
                 .getMcpIntegrationInstanceConfigurationsByIntegrationInstanceConfigurationId(
                     integrationInstanceConfigurationId)
@@ -1137,11 +1304,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     private List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> getMoveImpactWorkflows(
-        List<WorkflowMapping> movingWorkflowMappings, MoveContext moveContext) {
+        List<WorkflowMapping> movingWorkflowMappings, IntegrationInstanceConfiguration targetConfiguration) {
 
-        Integration integration = integrationService.getIntegration(
-            moveContext.targetConfiguration()
-                .getIntegrationId());
+        Integration integration = integrationService.getIntegration(targetConfiguration.getIntegrationId());
 
         Map<String, List<WorkflowMapping>> workflowMappingsByUuid = movingWorkflowMappings.stream()
             .filter(workflowMapping -> workflowMapping.integrationInstanceWorkflow()
@@ -1440,10 +1605,20 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         ConfigurationMoveResultDTO.@Nullable Skipped skipped, List<WorkflowMapping> workflowMappings) {
     }
 
+    private record MoveEvaluation(
+        List<Long> movingConnectedUserIds, List<WorkflowMapping> movingWorkflowMappings,
+        List<ConfigurationMoveResultDTO.Skipped> skipped) {
+    }
+
     private record MoveContext(
         IntegrationInstanceConfiguration sourceConfiguration, IntegrationInstanceConfiguration targetConfiguration,
         Map<String, IntegrationInstanceConfigurationWorkflow> targetWorkflowsByUuid,
         Map<String, String> workflowUuidsByWorkflowId) {
+    }
+
+    private record UpgradeSource(
+        MoveContext moveContext, Map<Long, List<IntegrationInstance>> instancesByConnectedUserId,
+        List<Long> connectedUserIds) {
     }
 
     private record WorkflowMapping(

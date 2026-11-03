@@ -51,6 +51,8 @@ public interface IntegrationInstanceConfigurationFacade {
 
     List<Tag> getIntegrationInstanceConfigurationTags();
 
+    ConfigurationMoveImpactDTO getUpgradeImpact(long targetId, List<Long> connectedUserIds);
+
     List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
         Long environmentId, Long integrationId, Long tagId, boolean includeAllFields);
 
@@ -63,4 +65,6 @@ public interface IntegrationInstanceConfigurationFacade {
 
     void updateIntegrationInstanceConfigurationWorkflow(
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow);
+
+    ConfigurationMoveResultDTO upgradeConnectedUsers(long targetId, List<Long> connectedUserIds);
 }
