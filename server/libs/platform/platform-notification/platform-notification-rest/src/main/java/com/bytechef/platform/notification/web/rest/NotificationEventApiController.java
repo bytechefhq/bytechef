@@ -19,6 +19,7 @@ package com.bytechef.platform.notification.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.notification.facade.NotificationFacade;
 import com.bytechef.platform.notification.web.rest.model.NotificationEventModel;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ public class NotificationEventApiController implements NotificationEventApi {
     private final ConversionService conversionService;
     private final NotificationFacade notificationFacade;
 
+    @SuppressFBWarnings("EI")
     public NotificationEventApiController(
         ConversionService conversionService, NotificationFacade notificationFacade) {
 
