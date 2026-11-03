@@ -357,6 +357,37 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     @Test
+    public void testGetProjectDeploymentsReturnsOnlyTheNonEmbeddedDeploymentsOfTheEnvironment() {
+        ProjectDTO automationWorkflowProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDTO plainProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDTO productionProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO automationWorkflowProjectDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), automationWorkflowProjectDTO);
+        ProjectDeploymentDTO plainDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), plainProjectDTO);
+
+        projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), productionProjectDTO);
+
+        ProjectDeploymentDTO productionDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeploymentForEnvironment(
+                workspace.getId(), productionProjectDTO, Environment.PRODUCTION);
+
+        renameProjectDeployment(automationWorkflowProjectDeploymentDTO.id(), "admin");
+        renameProjectDeployment(plainDeploymentDTO.id(), "plain");
+        renameProjectDeployment(productionDeploymentDTO.id(), "production");
+
+        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectDTO.id());
+
+        List<ProjectDeployment> projectDeployments = projectDeploymentFacade.getProjectDeployments(
+            workspace.getId(), Environment.DEVELOPMENT, null, null);
+
+        assertThat(projectDeployments).extracting(ProjectDeployment::getName)
+            .contains("plain")
+            .doesNotContain("admin", "production");
+    }
+
+    @Test
     public void testDeleteProjectDeploymentRemovesAllPrincipalJobsBeforeAnyJob() {
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDeploymentDTO projectDeploymentDTO =
