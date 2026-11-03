@@ -55,6 +55,8 @@ public interface IntegrationInstanceService {
 
     IntegrationInstance getIntegrationInstance(long id);
 
+    IntegrationInstance lockIntegrationInstance(long id);
+
     List<IntegrationInstance> getIntegrationInstanceConfigurationIntegrationInstances(
         List<Long> integrationInstanceConfigurationIds);
 
@@ -66,6 +68,8 @@ public interface IntegrationInstanceService {
         long connectedUserId, String workflowUuid, Environment environment);
 
     List<IntegrationInstance> getIntegrationInstances(long integrationInstanceConfigurationId);
+
+    IntegrationInstance updateIntegrationInstanceConfigurationId(long id, long integrationInstanceConfigurationId);
 
     void updateEnabled(long id, boolean enable);
 }

@@ -165,4 +165,16 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     public void updateEnabled(long id, boolean enable) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public IntegrationInstance updateIntegrationInstanceConfigurationId(
+        long id, long integrationInstanceConfigurationId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IntegrationInstance lockIntegrationInstance(long id) {
+        throw new UnsupportedOperationException();
+    }
 }

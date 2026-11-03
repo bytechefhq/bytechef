@@ -13,6 +13,8 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -21,11 +23,16 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.exception.IntegrationWorkflowErrorType;
+import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
@@ -55,20 +62,32 @@ import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @version ee
@@ -80,8 +99,11 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationInstanceConfigurationFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(IntegrationInstanceConfigurationFacadeImpl.class);
+
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
+    private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
     private final EnvironmentService environmentService;
     private final PrincipalJobFacade principalJobFacade;
     private final PrincipalJobService principalJobService;
@@ -94,8 +116,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
+    private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
+    private final TransactionTemplate requiresNewTransactionTemplate;
     private final TriggerExecutionService triggerExecutionService;
     private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
@@ -103,19 +127,24 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationFacadeImpl(
         ConnectedUserService connectedUserService, ConnectionService connectionService,
-        EnvironmentService environmentService, PrincipalJobFacade principalJobFacade,
+        EmbeddedPermissionEvaluator embeddedPermissionEvaluator, EnvironmentService environmentService,
+        PlatformTransactionManager platformTransactionManager, PrincipalJobFacade principalJobFacade,
         PrincipalJobService principalJobService, JobFacade jobFacade,
         IntegrationInstanceConfigurationDTOAssembler integrationInstanceConfigurationDTOAssembler,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
-        IntegrationWorkflowService integrationWorkflowService, OAuth2Service oAuth2Service, TagService tagService,
+        IntegrationWorkflowService integrationWorkflowService,
+        McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
+        OAuth2Service oAuth2Service,
+        TagService tagService,
         TriggerExecutionService triggerExecutionService, ComponentConnectionFacade componentConnectionFacade,
         WorkflowService workflowService) {
 
         this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
+        this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
         this.environmentService = environmentService;
         this.principalJobFacade = principalJobFacade;
         this.principalJobService = principalJobService;
@@ -128,11 +157,18 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
+        this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
         this.triggerExecutionService = triggerExecutionService;
         this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        this.requiresNewTransactionTemplate = transactionTemplate;
     }
 
     @Override
@@ -269,10 +305,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
 
         integrationInstanceConfigurationService.delete(id);
-
-// TODO find a way to delete ll tags not referenced anymore
-//        integration.getTagIds()
-//            .forEach(tagService::delete);
     }
 
     @Override
@@ -322,9 +354,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     @Override
     @Transactional(readOnly = true)
     public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfigurationIntegration(
-        long integrationId, boolean enabled, Environment environment) {
+        long integrationId, boolean enabled, Environment environment, @Nullable ConnectedUser connectedUser) {
 
-        return getIntegrationInstanceConfigurationIntegrations(true, environment)
+        return getIntegrationInstanceConfigurationIntegrations(true, environment, connectedUser)
             .stream()
             .filter(integrationInstanceConfigurationDTO -> {
                 IntegrationDTO integrationDTO = integrationInstanceConfigurationDTO.integration();
@@ -341,17 +373,28 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurationIntegrations(
-        boolean enabled, Environment environment) {
+        boolean enabled, Environment environment, @Nullable ConnectedUser connectedUser) {
 
         List<IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationDTOs = List.of();
 
+        List<IntegrationInstanceConfiguration> enabledIntegrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(environment, true);
+
         Map<Long, Optional<IntegrationInstanceConfiguration>> selfServeConfigurationsByIntegrationId =
-            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(environment, true)
-                .stream()
+            enabledIntegrationInstanceConfigurations.stream()
+                .filter(
+                    integrationInstanceConfiguration -> connectedUser == null || embeddedPermissionEvaluator.evaluate(
+                        integrationInstanceConfiguration.getPermissionExpression(), connectedUser))
                 .collect(
                     Collectors.groupingBy(
                         IntegrationInstanceConfiguration::getIntegrationId, LinkedHashMap::new,
                         Collectors.maxBy(IntegrationInstanceConfigurationServiceImpl.SELF_SERVE_ORDER)));
+
+        if (connectedUser != null) {
+            addConfigurationsOfExistingInstances(
+                selfServeConfigurationsByIntegrationId, enabledIntegrationInstanceConfigurations, connectedUser,
+                environment);
+        }
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             selfServeConfigurationsByIntegrationId.values()
@@ -402,6 +445,94 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationWorkflow -> workflowIds
                     .contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
             integrationWorkflows);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public List<IntegrationInstanceConfigurationConnectedUserDTO> getIntegrationInstanceConfigurationConnectedUsers(
+        long id) {
+
+        integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(id);
+
+        List<Long> connectedUserIds = integrationInstanceService.getIntegrationInstances(id)
+            .stream()
+            .map(IntegrationInstance::getConnectedUserId)
+            .distinct()
+            .sorted()
+            .toList();
+
+        if (connectedUserIds.isEmpty()) {
+            return List.of();
+        }
+
+        return connectedUserService.getConnectedUsers(connectedUserIds)
+            .stream()
+            .sorted(Comparator.comparing(ConnectedUser::getId))
+            .map(
+                connectedUser -> new IntegrationInstanceConfigurationConnectedUserDTO(
+                    connectedUser.getId(), connectedUser.getExternalId(), connectedUser.getName(),
+                    connectedUser.getEmail()))
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public ConfigurationMoveImpactDTO getMoveImpact(long sourceId, long targetId, List<Long> connectedUserIds) {
+        IntegrationInstanceConfiguration sourceConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(sourceId);
+        IntegrationInstanceConfiguration targetConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(targetId);
+
+        validateSameIntegrationAndEnvironment(sourceConfiguration, targetConfiguration);
+
+        MoveContext moveContext = getMoveContext(sourceConfiguration, targetConfiguration);
+
+        Map<Long, List<IntegrationInstance>> sourceInstancesByConnectedUserId = getInstancesByConnectedUserId(
+            sourceId);
+
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
+        List<WorkflowMapping> movingWorkflowMappings = new ArrayList<>();
+
+        for (long connectedUserId : getSortedDistinct(connectedUserIds)) {
+            List<IntegrationInstance> integrationInstances = sourceInstancesByConnectedUserId.getOrDefault(
+                connectedUserId, List.of());
+
+            if (integrationInstances.isEmpty()) {
+                skipped.add(
+                    new ConfigurationMoveResultDTO.Skipped(
+                        connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
+
+                continue;
+            }
+
+            List<WorkflowMapping> userWorkflowMappings = new ArrayList<>();
+            List<ConfigurationMoveResultDTO.Skipped> userSkipped = new ArrayList<>();
+            boolean eligible = false;
+
+            for (IntegrationInstance integrationInstance : integrationInstances) {
+                InstanceEvaluation instanceEvaluation = evaluateIntegrationInstance(integrationInstance, moveContext);
+
+                if (instanceEvaluation.skipped() == null) {
+                    eligible = true;
+
+                    userWorkflowMappings.addAll(instanceEvaluation.workflowMappings());
+                } else {
+                    userSkipped.add(instanceEvaluation.skipped());
+                }
+            }
+
+            if (eligible) {
+                movingWorkflowMappings.addAll(userWorkflowMappings);
+            }
+
+            addSkipped(skipped, userSkipped, eligible);
+        }
+
+        return new ConfigurationMoveImpactDTO(
+            getMoveImpactWorkflows(movingWorkflowMappings, moveContext), skipped,
+            getMcpServerCount(sourceConfiguration, targetConfiguration));
     }
 
     @Override
@@ -487,6 +618,90 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USERS_MOVED, data = {
+        @AuditData(key = "sourceIntegrationInstanceConfigurationId", value = "#sourceId"),
+        @AuditData(key = "targetIntegrationInstanceConfigurationId", value = "#targetId"),
+        @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
+    })
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConfigurationMoveResultDTO moveConnectedUsers(long sourceId, long targetId, List<Long> connectedUserIds) {
+        if (sourceId == targetId) {
+            throw new IllegalArgumentException("The source and target configurations must differ");
+        }
+
+        IntegrationInstanceConfiguration sourceConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(sourceId);
+        IntegrationInstanceConfiguration targetConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(targetId);
+
+        validateSameIntegrationAndEnvironment(sourceConfiguration, targetConfiguration);
+
+        MoveContext moveContext = getMoveContext(sourceConfiguration, targetConfiguration);
+
+        Map<Long, List<IntegrationInstance>> sourceInstancesByConnectedUserId = getInstancesByConnectedUserId(
+            sourceId);
+
+        List<Long> movedConnectedUserIds = new ArrayList<>();
+        List<Long> needsAttentionConnectedUserIds = new ArrayList<>();
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
+
+        for (long connectedUserId : getSortedDistinct(connectedUserIds)) {
+            List<IntegrationInstance> integrationInstances = sourceInstancesByConnectedUserId.getOrDefault(
+                connectedUserId, List.of());
+
+            if (integrationInstances.isEmpty()) {
+                skipped.add(
+                    new ConfigurationMoveResultDTO.Skipped(
+                        connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
+
+                continue;
+            }
+
+            boolean moved = false;
+            boolean needsAttention = false;
+            List<ConfigurationMoveResultDTO.Skipped> userSkipped = new ArrayList<>();
+
+            for (IntegrationInstance integrationInstance : integrationInstances) {
+                InstanceMoveOutcome instanceMoveOutcome;
+
+                try {
+                    instanceMoveOutcome = moveIntegrationInstance(integrationInstance.getId(), moveContext);
+                } catch (RuntimeException exception) {
+                    log.error(
+                        "Moving integration instance id={} of connected user id={} from configuration id={} to " +
+                            "id={} failed",
+                        integrationInstance.getId(), connectedUserId, sourceId, targetId, exception);
+
+                    instanceMoveOutcome = InstanceMoveOutcome.skipped(
+                        connectedUserId, ConfigurationMoveResultDTO.Skipped.MOVE_FAILED, List.of());
+                }
+
+                if (instanceMoveOutcome.skipped() == null) {
+                    moved = true;
+                    needsAttention = needsAttention || instanceMoveOutcome.needsAttention();
+                } else {
+                    userSkipped.add(instanceMoveOutcome.skipped());
+                }
+            }
+
+            addSkipped(skipped, userSkipped, moved);
+
+            if (!moved) {
+                continue;
+            }
+
+            movedConnectedUserIds.add(connectedUserId);
+
+            if (needsAttention || !userSkipped.isEmpty()) {
+                needsAttentionConnectedUserIds.add(connectedUserId);
+            }
+        }
+
+        return new ConfigurationMoveResultDTO(movedConnectedUserIds, skipped, needsAttentionConnectedUserIds);
+    }
+
+    @Override
     @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_UPDATED, data = {
         @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationDTO.id"),
         @AuditData(key = "integrationId", value = "#integrationInstanceConfigurationDTO.integrationId"),
@@ -541,6 +756,73 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         integrationInstanceFacade.updateIntegrationInstanceConfigurationWorkflowTriggers(
             previousIntegrationInstanceConfigurationWorkflow, updatedIntegrationInstanceConfigurationWorkflow);
+    }
+
+    private void addConfigurationsOfExistingInstances(
+        Map<Long, Optional<IntegrationInstanceConfiguration>> configurationsByIntegrationId,
+        List<IntegrationInstanceConfiguration> enabledIntegrationInstanceConfigurations, ConnectedUser connectedUser,
+        Environment environment) {
+
+        Map<Long, IntegrationInstanceConfiguration> enabledIntegrationInstanceConfigurationsById =
+            enabledIntegrationInstanceConfigurations.stream()
+                .collect(Collectors.toMap(IntegrationInstanceConfiguration::getId, configuration -> configuration));
+
+        List<IntegrationInstance> integrationInstances = integrationInstanceService
+            .getConnectedUserIntegrationInstances(Validate.notNull(connectedUser.getId(), "id"), environment)
+            .stream()
+            .sorted(Comparator.comparing(IntegrationInstance::getId, Comparator.reverseOrder()))
+            .toList();
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            IntegrationInstanceConfiguration integrationInstanceConfiguration =
+                enabledIntegrationInstanceConfigurationsById.get(
+                    integrationInstance.getIntegrationInstanceConfigurationId());
+
+            if (integrationInstanceConfiguration == null) {
+                continue;
+            }
+
+            Optional<IntegrationInstanceConfiguration> selfServeIntegrationInstanceConfiguration =
+                configurationsByIntegrationId.get(integrationInstanceConfiguration.getIntegrationId());
+
+            if (selfServeIntegrationInstanceConfiguration == null
+                || selfServeIntegrationInstanceConfiguration.isEmpty()) {
+                configurationsByIntegrationId.put(
+                    integrationInstanceConfiguration.getIntegrationId(),
+                    Optional.of(integrationInstanceConfiguration));
+            }
+        }
+    }
+
+    private static void addSkipped(
+        List<ConfigurationMoveResultDTO.Skipped> skipped, List<ConfigurationMoveResultDTO.Skipped> userSkipped,
+        boolean partlyMoved) {
+
+        if (userSkipped.isEmpty()) {
+            return;
+        }
+
+        if (partlyMoved) {
+            userSkipped.stream()
+                .distinct()
+                .forEach(skipped::add);
+        } else {
+            skipped.add(userSkipped.getFirst());
+        }
+    }
+
+    private int getMcpServerCount(
+        IntegrationInstanceConfiguration sourceConfiguration, IntegrationInstanceConfiguration targetConfiguration) {
+
+        return (int) Stream.of(sourceConfiguration.getId(), targetConfiguration.getId())
+            .flatMap(integrationInstanceConfigurationId -> mcpIntegrationInstanceConfigurationService
+                .getMcpIntegrationInstanceConfigurationsByIntegrationInstanceConfigurationId(
+                    integrationInstanceConfigurationId)
+                .stream())
+            .map(McpIntegrationInstanceConfiguration::getMcpServerId)
+            .filter(Objects::nonNull)
+            .distinct()
+            .count();
     }
 
     private void checkIntegrationInstanceConfigurationWorkflows(
@@ -704,24 +986,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationId);
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
-            List<ComponentConnection> requiredComponentConnections = CollectionUtils.concat(
-                WorkflowTrigger.of(workflow)
-                    .stream()
-                    .flatMap(workflowTrigger -> CollectionUtils.stream(
-                        componentConnectionFacade.getComponentConnections(workflowTrigger)))
-                    .filter(ComponentConnection::required)
-                    .toList(),
-                workflow.getTasks(true)
-                    .stream()
-                    .flatMap(workflowTask -> CollectionUtils.stream(
-                        componentConnectionFacade.getComponentConnections(workflowTask)))
-                    .filter(ComponentConnection::required)
-                    .toList());
-
-            requiredComponentConnections = requiredComponentConnections.stream()
-                .filter(workflowConnection -> !Objects.equals(
-                    workflowConnection.componentName(), integration.getComponentName()))
-                .toList();
+            List<ComponentConnection> requiredComponentConnections = getRequiredComponentConnections(
+                workflow, integration);
 
             List<String> workflowNodeNames = requiredComponentConnections.stream()
                 .map(ComponentConnection::workflowNodeName)
@@ -773,6 +1039,353 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return integrationInstanceConfigurationWorkflow;
     }
 
+    private Map<Long, List<IntegrationInstance>>
+        getInstancesByConnectedUserId(long integrationInstanceConfigurationId) {
+        return integrationInstanceService.getIntegrationInstances(integrationInstanceConfigurationId)
+            .stream()
+            .collect(Collectors.groupingBy(IntegrationInstance::getConnectedUserId));
+    }
+
+    private MoveContext getMoveContext(
+        IntegrationInstanceConfiguration sourceConfiguration, IntegrationInstanceConfiguration targetConfiguration) {
+
+        Map<String, String> workflowUuidsByWorkflowId = new HashMap<>();
+
+        for (IntegrationWorkflow integrationWorkflow : integrationWorkflowService.getIntegrationWorkflows(
+            sourceConfiguration.getIntegrationId())) {
+
+            workflowUuidsByWorkflowId.put(integrationWorkflow.getWorkflowId(), integrationWorkflow.getUuidAsString());
+        }
+
+        Map<String, IntegrationInstanceConfigurationWorkflow> targetWorkflowsByUuid = new HashMap<>();
+
+        for (IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow : integrationInstanceConfigurationWorkflowService
+            .getIntegrationInstanceConfigurationWorkflows(targetConfiguration.getId())) {
+
+            String workflowUuid = workflowUuidsByWorkflowId.get(
+                integrationInstanceConfigurationWorkflow.getWorkflowId());
+
+            if (workflowUuid != null) {
+                targetWorkflowsByUuid.put(workflowUuid, integrationInstanceConfigurationWorkflow);
+            }
+        }
+
+        return new MoveContext(sourceConfiguration, targetConfiguration, targetWorkflowsByUuid,
+            workflowUuidsByWorkflowId);
+    }
+
+    private List<WorkflowMapping>
+        getWorkflowMappings(IntegrationInstance integrationInstance, MoveContext moveContext) {
+        List<WorkflowMapping> workflowMappings = new ArrayList<>();
+
+        for (IntegrationInstanceWorkflow integrationInstanceWorkflow : integrationInstanceWorkflowService
+            .getIntegrationInstanceWorkflows(integrationInstance.getId())) {
+
+            IntegrationInstanceConfigurationWorkflow sourceWorkflow =
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                    integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+            String workflowUuid = moveContext.workflowUuidsByWorkflowId()
+                .get(sourceWorkflow.getWorkflowId());
+
+            workflowMappings.add(
+                new WorkflowMapping(
+                    integrationInstance.getConnectedUserId(), integrationInstanceWorkflow, sourceWorkflow,
+                    moveContext.targetWorkflowsByUuid()
+                        .get(workflowUuid),
+                    workflowUuid));
+        }
+
+        return workflowMappings;
+    }
+
+    private ConfigurationMoveResultDTO.@Nullable Skipped getSkipped(
+        long connectedUserId, List<WorkflowMapping> workflowMappings, MoveContext moveContext) {
+
+        List<String> missingWorkflowLabels = workflowMappings.stream()
+            .filter(workflowMapping -> workflowMapping.integrationInstanceWorkflow()
+                .isEnabled())
+            .filter(workflowMapping -> !workflowMapping.hasEnabledTargetWorkflow())
+            .map(this::getWorkflowLabel)
+            .distinct()
+            .sorted()
+            .toList();
+
+        if (!missingWorkflowLabels.isEmpty()) {
+            return new ConfigurationMoveResultDTO.Skipped(
+                connectedUserId, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_ENABLED_WORKFLOWS,
+                missingWorkflowLabels);
+        }
+
+        if (moveContext.sourceConfiguration()
+            .getAuthorizationType() != moveContext.targetConfiguration()
+                .getAuthorizationType()) {
+
+            return new ConfigurationMoveResultDTO.Skipped(
+                connectedUserId, ConfigurationMoveResultDTO.Skipped.CONNECTION_MISMATCH, List.of());
+        }
+
+        return null;
+    }
+
+    private String getWorkflowLabel(WorkflowMapping workflowMapping) {
+        Workflow workflow = workflowService.getWorkflow(
+            workflowMapping.sourceWorkflow()
+                .getWorkflowId());
+
+        return StringUtils.isBlank(workflow.getLabel()) ? workflowMapping.workflowUuid() : workflow.getLabel();
+    }
+
+    private List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> getMoveImpactWorkflows(
+        List<WorkflowMapping> movingWorkflowMappings, MoveContext moveContext) {
+
+        Integration integration = integrationService.getIntegration(
+            moveContext.targetConfiguration()
+                .getIntegrationId());
+
+        Map<String, List<WorkflowMapping>> workflowMappingsByUuid = movingWorkflowMappings.stream()
+            .filter(workflowMapping -> workflowMapping.integrationInstanceWorkflow()
+                .isEnabled())
+            .filter(workflowMapping -> workflowMapping.targetWorkflow() != null)
+            .collect(Collectors.groupingBy(WorkflowMapping::workflowUuid));
+
+        List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> impactedWorkflows = new ArrayList<>();
+
+        for (Map.Entry<String, List<WorkflowMapping>> entry : workflowMappingsByUuid.entrySet()) {
+            List<WorkflowMapping> workflowMappings = entry.getValue();
+
+            IntegrationInstanceConfigurationWorkflow targetWorkflow = Objects.requireNonNull(
+                workflowMappings.getFirst()
+                    .targetWorkflow());
+
+            Workflow workflow = workflowService.getWorkflow(targetWorkflow.getWorkflowId());
+
+            Set<String> providedConnectionNodeNames = targetWorkflow.getConnections()
+                .stream()
+                .map(IntegrationInstanceConfigurationWorkflowConnection::getWorkflowNodeName)
+                .collect(Collectors.toSet());
+
+            List<String> newRequiredConnections = getRequiredComponentConnections(workflow, integration)
+                .stream()
+                .filter(componentConnection -> !providedConnectionNodeNames.contains(
+                    componentConnection.workflowNodeName()))
+                .map(ComponentConnection::componentName)
+                .distinct()
+                .sorted()
+                .toList();
+
+            Set<String> newRequiredInputs = new HashSet<>();
+            Set<Long> affectedConnectedUserIds = new HashSet<>();
+
+            for (WorkflowMapping workflowMapping : workflowMappings) {
+                Set<String> providedInputNames = new HashSet<>(
+                    workflowMapping.integrationInstanceWorkflow()
+                        .getInputs()
+                        .keySet());
+
+                providedInputNames.addAll(targetWorkflow.getInputs()
+                    .keySet());
+
+                List<String> missingInputNames = workflow.getInputs()
+                    .stream()
+                    .filter(Workflow.Input::required)
+                    .map(Workflow.Input::name)
+                    .filter(inputName -> !providedInputNames.contains(inputName))
+                    .toList();
+
+                newRequiredInputs.addAll(missingInputNames);
+
+                if (!missingInputNames.isEmpty() || !newRequiredConnections.isEmpty()) {
+                    affectedConnectedUserIds.add(workflowMapping.connectedUserId());
+                }
+            }
+
+            if (!affectedConnectedUserIds.isEmpty()) {
+                impactedWorkflows.add(
+                    new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                        entry.getKey(),
+                        StringUtils.isBlank(workflow.getLabel()) ? entry.getKey() : workflow.getLabel(),
+                        newRequiredInputs.stream()
+                            .sorted()
+                            .toList(),
+                        newRequiredConnections, affectedConnectedUserIds.size()));
+            }
+        }
+
+        impactedWorkflows.sort(
+            Comparator.comparing(AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow::label));
+
+        return impactedWorkflows;
+    }
+
+    private InstanceEvaluation evaluateIntegrationInstance(
+        IntegrationInstance integrationInstance, MoveContext moveContext) {
+
+        long connectedUserId = integrationInstance.getConnectedUserId();
+
+        if (!Objects.equals(
+            integrationInstance.getIntegrationInstanceConfigurationId(), moveContext.sourceConfiguration()
+                .getId())) {
+
+            return new InstanceEvaluation(
+                new ConfigurationMoveResultDTO.Skipped(
+                    connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()),
+                List.of());
+        }
+
+        List<WorkflowMapping> workflowMappings = getWorkflowMappings(integrationInstance, moveContext);
+
+        return new InstanceEvaluation(getSkipped(connectedUserId, workflowMappings, moveContext), workflowMappings);
+    }
+
+    private InstanceMoveOutcome moveIntegrationInstance(long integrationInstanceId, MoveContext moveContext) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstanceId);
+
+        long connectedUserId = integrationInstance.getConnectedUserId();
+
+        IntegrationInstanceConfiguration sourceConfiguration = moveContext.sourceConfiguration();
+        IntegrationInstanceConfiguration targetConfiguration = moveContext.targetConfiguration();
+
+        InstanceEvaluation instanceEvaluation = evaluateIntegrationInstance(integrationInstance, moveContext);
+
+        if (instanceEvaluation.skipped() != null) {
+            return new InstanceMoveOutcome(instanceEvaluation.skipped(), false);
+        }
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        boolean triggersActive = integrationInstance.isEnabled() && connectedUser.isEnabled() &&
+            sourceConfiguration.isEnabled();
+
+        ConfigurationMoveResultDTO.Skipped remapSkipped;
+
+        try {
+            if (triggersActive) {
+                integrationInstanceFacade.enableIntegrationInstanceWorkflowTriggers(integrationInstanceId, false);
+            }
+
+            remapSkipped = requiresNewTransactionTemplate.execute(status -> {
+                IntegrationInstance lockedIntegrationInstance = integrationInstanceService.lockIntegrationInstance(
+                    integrationInstanceId);
+
+                InstanceEvaluation lockedInstanceEvaluation = evaluateIntegrationInstance(
+                    lockedIntegrationInstance, moveContext);
+
+                if (lockedInstanceEvaluation.skipped() != null) {
+                    return lockedInstanceEvaluation.skipped();
+                }
+
+                remapIntegrationInstance(
+                    integrationInstanceId, targetConfiguration.getId(), lockedInstanceEvaluation.workflowMappings());
+
+                return null;
+            });
+        } catch (RuntimeException exception) {
+            if (triggersActive) {
+                restoreTriggers(integrationInstanceId);
+            }
+
+            throw exception;
+        }
+
+        if (remapSkipped != null) {
+            if (triggersActive) {
+                restoreTriggers(integrationInstanceId);
+            }
+
+            return new InstanceMoveOutcome(remapSkipped, false);
+        }
+
+        boolean needsAttention = false;
+
+        if (integrationInstance.isEnabled() && connectedUser.isEnabled() && targetConfiguration.isEnabled()) {
+            try {
+                integrationInstanceFacade.enableIntegrationInstanceWorkflowTriggers(integrationInstanceId, true);
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Enabling the triggers of moved integration instance id={} failed", integrationInstanceId,
+                    exception);
+
+                needsAttention = true;
+            }
+        }
+
+        return new InstanceMoveOutcome(null, needsAttention);
+    }
+
+    private void remapIntegrationInstance(
+        long integrationInstanceId, long targetConfigurationId, List<WorkflowMapping> workflowMappings) {
+
+        for (WorkflowMapping workflowMapping : workflowMappings) {
+            IntegrationInstanceWorkflow integrationInstanceWorkflow = workflowMapping.integrationInstanceWorkflow();
+            IntegrationInstanceConfigurationWorkflow targetWorkflow = workflowMapping.targetWorkflow();
+
+            if (targetWorkflow == null) {
+                integrationInstanceWorkflowService.delete(integrationInstanceWorkflow.getId());
+            } else {
+                integrationInstanceWorkflowService.updateIntegrationInstanceConfigurationWorkflowId(
+                    integrationInstanceWorkflow.getId(), targetWorkflow.getId());
+            }
+        }
+
+        integrationInstanceService.updateIntegrationInstanceConfigurationId(
+            integrationInstanceId, targetConfigurationId);
+    }
+
+    private void restoreTriggers(long integrationInstanceId) {
+        try {
+            integrationInstanceFacade.enableIntegrationInstanceWorkflowTriggers(integrationInstanceId, true);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Restoring the triggers of integration instance id={} after a failed move failed",
+                integrationInstanceId, exception);
+        }
+    }
+
+    private static List<Long> getSortedDistinct(List<Long> connectedUserIds) {
+        return connectedUserIds.stream()
+            .distinct()
+            .sorted()
+            .toList();
+    }
+
+    private static void validateSameIntegrationAndEnvironment(
+        IntegrationInstanceConfiguration sourceConfiguration, IntegrationInstanceConfiguration targetConfiguration) {
+
+        if (!Objects.equals(sourceConfiguration.getIntegrationId(), targetConfiguration.getIntegrationId()) ||
+            sourceConfiguration.getEnvironment() != targetConfiguration.getEnvironment()) {
+
+            throw new ConfigurationException(
+                "Integration instance configuration id=%s does not belong to integration id=%s in environment=%s"
+                    .formatted(
+                        targetConfiguration.getId(), sourceConfiguration.getIntegrationId(),
+                        sourceConfiguration.getEnvironment()),
+                IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_MISMATCH);
+        }
+    }
+
+    private List<ComponentConnection> getRequiredComponentConnections(Workflow workflow, Integration integration) {
+        List<ComponentConnection> requiredComponentConnections = CollectionUtils.concat(
+            WorkflowTrigger.of(workflow)
+                .stream()
+                .flatMap(workflowTrigger -> CollectionUtils.stream(
+                    componentConnectionFacade.getComponentConnections(workflowTrigger)))
+                .filter(ComponentConnection::required)
+                .toList(),
+            workflow.getTasks(true)
+                .stream()
+                .flatMap(workflowTask -> CollectionUtils.stream(
+                    componentConnectionFacade.getComponentConnections(workflowTask)))
+                .filter(ComponentConnection::required)
+                .toList());
+
+        return requiredComponentConnections.stream()
+            .filter(workflowConnection -> !Objects.equals(
+                workflowConnection.componentName(), integration.getComponentName()))
+            .toList();
+    }
+
     private List<String> getWorkflowIds(IntegrationInstanceConfiguration integrationInstanceConfiguration) {
         return integrationInstanceConfiguration.getIntegrationVersion() == null
             ? List.of()
@@ -791,8 +1404,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
             validateIntegrationInstanceConfigurationWorkflowConnections(
                 integrationInstanceConfigurationWorkflowConnections, workflow);
-//            validateIntegrationInstanceConfigurationWorkflowInputs(
-//                integrationInstanceConfigurationWorkflow.getInputs(), workflow);
         }
     }
 
@@ -817,12 +1428,33 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
     }
 
-//    private void validateIntegrationInstanceConfigurationWorkflowInputs(Map<String, ?> inputs, Workflow workflow) {
-//        for (Workflow.Input input : workflow.getInputs()) {
-//            if (input.required()) {
-//                Assert.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
-//                Assert.hasText((String) inputs.get(input.name()), "Missing required param: " + input.name());
-//            }
-//        }
-//    }
+    private record InstanceMoveOutcome(ConfigurationMoveResultDTO.@Nullable Skipped skipped, boolean needsAttention) {
+
+        private static InstanceMoveOutcome skipped(long connectedUserId, String reason, List<String> workflowLabels) {
+            return new InstanceMoveOutcome(
+                new ConfigurationMoveResultDTO.Skipped(connectedUserId, reason, workflowLabels), false);
+        }
+    }
+
+    private record InstanceEvaluation(
+        ConfigurationMoveResultDTO.@Nullable Skipped skipped, List<WorkflowMapping> workflowMappings) {
+    }
+
+    private record MoveContext(
+        IntegrationInstanceConfiguration sourceConfiguration, IntegrationInstanceConfiguration targetConfiguration,
+        Map<String, IntegrationInstanceConfigurationWorkflow> targetWorkflowsByUuid,
+        Map<String, String> workflowUuidsByWorkflowId) {
+    }
+
+    private record WorkflowMapping(
+        long connectedUserId, IntegrationInstanceWorkflow integrationInstanceWorkflow,
+        IntegrationInstanceConfigurationWorkflow sourceWorkflow,
+        @Nullable IntegrationInstanceConfigurationWorkflow targetWorkflow, String workflowUuid) {
+
+        private boolean hasEnabledTargetWorkflow() {
+            IntegrationInstanceConfigurationWorkflow enabledTargetWorkflow = targetWorkflow;
+
+            return enabledTargetWorkflow != null && enabledTargetWorkflow.isEnabled();
+        }
+    }
 }

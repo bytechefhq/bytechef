@@ -29,6 +29,9 @@ public interface IntegrationInstanceRepository
 
     List<IntegrationInstance> findAllByConnectedUserId(long connectedUserId);
 
+    @Query("SELECT * FROM integration_instance WHERE id = :id FOR UPDATE")
+    Optional<IntegrationInstance> findByIdForUpdate(@Param("id") long id);
+
     @Query("""
         SELECT DISTINCT integration_instance.* FROM integration_instance
         JOIN integration_instance_configuration on integration_instance.integration_instance_configuration_id = integration_instance_configuration.id

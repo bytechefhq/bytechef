@@ -65,15 +65,11 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
     }
 
     @Override
-    public IntegrationInstanceConfiguration getIntegrationIntegrationInstanceConfiguration(
-        long id, Environment environment, boolean enabled) {
+    public List<IntegrationInstanceConfiguration> getEnabledIntegrationInstanceConfigurations(
+        long integrationId, Environment environment) {
 
-        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
-            integrationInstanceConfigurationRepository.findAllByIntegrationIdAndEnvironmentAndEnabled(
-                id, environment.ordinal(), enabled);
-
-        return OptionalUtils.get(integrationInstanceConfigurations.stream()
-            .max(SELF_SERVE_ORDER));
+        return integrationInstanceConfigurationRepository.findAllByIntegrationIdAndEnvironmentAndEnabled(
+            integrationId, environment.ordinal(), true);
     }
 
     @Override
@@ -151,6 +147,8 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
         curIntegrationInstanceConfiguration.setIntegrationVersion(
             integrationInstanceConfiguration.getIntegrationVersion());
         curIntegrationInstanceConfiguration.setName(integrationInstanceConfiguration.getName());
+        curIntegrationInstanceConfiguration.setPermissionExpression(
+            integrationInstanceConfiguration.getPermissionExpression());
         curIntegrationInstanceConfiguration.setTagIds(integrationInstanceConfiguration.getTagIds());
         curIntegrationInstanceConfiguration.setVersion(integrationInstanceConfiguration.getVersion());
 

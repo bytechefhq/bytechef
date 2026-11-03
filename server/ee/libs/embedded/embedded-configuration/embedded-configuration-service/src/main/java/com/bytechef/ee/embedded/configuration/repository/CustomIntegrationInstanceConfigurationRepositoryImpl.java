@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -99,6 +100,15 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
                     integrationInstanceConfiguration.setIntegrationId(rs.getLong("integration_id"));
                     integrationInstanceConfiguration.setIntegrationVersion(rs.getInt("integration_version"));
                     integrationInstanceConfiguration.setName(rs.getString("name"));
+
+                    int authorizationType = rs.getInt("authorization_type");
+
+                    if (!rs.wasNull()) {
+                        integrationInstanceConfiguration.setAuthorizationType(
+                            AuthorizationType.values()[authorizationType]);
+                    }
+
+                    integrationInstanceConfiguration.setPermissionExpression(rs.getString("permission_expression"));
                     integrationInstanceConfiguration.setVersion(rs.getInt("version"));
 
                     return integrationInstanceConfiguration;

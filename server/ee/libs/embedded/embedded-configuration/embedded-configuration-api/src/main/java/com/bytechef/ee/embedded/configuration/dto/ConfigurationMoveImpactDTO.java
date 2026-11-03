@@ -13,9 +13,10 @@ import java.util.List;
 /**
  * What moving connected users from one configuration to another would change, shown before the move is confirmed.
  *
- * @param workflows the workflows of the target's version that need new required inputs or connections, with the number
- *                  of the moved users affected
- * @param skipped   the requested connected users the move would leave in place, with the reason
+ * @param workflows      the workflows of the target's version that need new required inputs or connections, with the
+ *                       number of the moved users affected
+ * @param skipped        the requested connected users the move would leave in place, with the reason
+ * @param mcpServerCount the number of distinct MCP servers that expose the source or the target configuration
  *
  * @version ee
  *
@@ -24,5 +25,12 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record ConfigurationMoveImpactDTO(
     List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> workflows,
-    List<ConfigurationMoveResultDTO.Skipped> skipped) {
+    List<ConfigurationMoveResultDTO.Skipped> skipped, int mcpServerCount) {
+
+    public ConfigurationMoveImpactDTO(
+        List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> workflows,
+        List<ConfigurationMoveResultDTO.Skipped> skipped) {
+
+        this(workflows, skipped, 0);
+    }
 }

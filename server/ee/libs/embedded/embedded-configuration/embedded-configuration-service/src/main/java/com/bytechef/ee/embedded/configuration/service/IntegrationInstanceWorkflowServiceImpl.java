@@ -130,4 +130,16 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
         integrationInstanceWorkflowRepository.save(integrationInstanceWorkflow);
     }
 
+    @Override
+    public void updateIntegrationInstanceConfigurationWorkflowId(
+        long id, long integrationInstanceConfigurationWorkflowId) {
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow = integrationInstanceWorkflowRepository.findById(id)
+            .orElseThrow();
+
+        integrationInstanceWorkflow.setIntegrationInstanceConfigurationWorkflowId(
+            integrationInstanceConfigurationWorkflowId);
+
+        integrationInstanceWorkflowRepository.save(integrationInstanceWorkflow);
+    }
 }

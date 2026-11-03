@@ -15,7 +15,11 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionIntegrationInstanceWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
@@ -57,7 +61,9 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
-@WebMvcTest(IntegrationInstanceApiController.class)
+@WebMvcTest({
+    IntegrationInstanceApiController.class, IntegrationInstanceConfigurationApiController.class
+})
 @EmbeddedConfigurationRestConfigurationSharedMocks
 class IntegrationInstanceApiControllerIntTest {
 
@@ -196,6 +202,104 @@ class IntegrationInstanceApiControllerIntTest {
             .isEqualTo(true)
             .jsonPath("$[0].integrationInstanceConfigurations[0].redirectUri")
             .isEqualTo("https://app.example.com/callback");
+    }
+
+    @Test
+    void testGetIntegrationInstanceConfigurationConnectedUsersMapsTheConnectedUsers() {
+        when(integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationConnectedUsers(5L))
+            .thenReturn(
+                List.of(
+                    new IntegrationInstanceConfigurationConnectedUserDTO(
+                        7L, "external-7", "Alice", "alice@example.com")));
+
+        this.webTestClient
+            .get()
+            .uri("/internal/integration-instance-configurations/5/connected-users")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$[0].connectedUserId")
+            .isEqualTo(7)
+            .jsonPath("$[0].externalId")
+            .isEqualTo("external-7")
+            .jsonPath("$[0].name")
+            .isEqualTo("Alice")
+            .jsonPath("$[0].email")
+            .isEqualTo("alice@example.com");
+    }
+
+    @Test
+    void testGetIntegrationInstanceConfigurationMoveImpactPassesBodyToTheFacade() {
+        when(integrationInstanceConfigurationFacade.getMoveImpact(5L, 6L, List.of(1L, 2L)))
+            .thenReturn(
+                new ConfigurationMoveImpactDTO(
+                    List.of(
+                        new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                            "uuid-1", "Cron", List.of("cronExpression"), List.of("slack"), 1)),
+                    List.of(
+                        new ConfigurationMoveResultDTO.Skipped(
+                            2L, ConfigurationMoveResultDTO.Skipped.CONNECTION_MISMATCH, List.of()))));
+
+        this.webTestClient
+            .post()
+            .uri("/internal/integration-instance-configurations/5/move-impact")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("""
+                {"targetId":6,"connectedUserIds":[1,2]}""")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.workflows[0].workflowUuid")
+            .isEqualTo("uuid-1")
+            .jsonPath("$.workflows[0].newRequiredInputs[0]")
+            .isEqualTo("cronExpression")
+            .jsonPath("$.workflows[0].newRequiredConnections[0]")
+            .isEqualTo("slack")
+            .jsonPath("$.workflows[0].affectedConnectedUserCount")
+            .isEqualTo(1)
+            .jsonPath("$.skipped[0].connectedUserId")
+            .isEqualTo(2)
+            .jsonPath("$.skipped[0].reason")
+            .isEqualTo("CONNECTION_MISMATCH");
+    }
+
+    @Test
+    void testMoveIntegrationInstanceConfigurationConnectedUsersPassesBodyToTheFacade() {
+        when(integrationInstanceConfigurationFacade.moveConnectedUsers(5L, 6L, List.of(1L, 2L)))
+            .thenReturn(
+                new ConfigurationMoveResultDTO(
+                    List.of(1L),
+                    List.of(
+                        new ConfigurationMoveResultDTO.Skipped(
+                            2L, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_ENABLED_WORKFLOWS,
+                            List.of("Cron"))),
+                    List.of(1L)));
+
+        this.webTestClient
+            .post()
+            .uri("/internal/integration-instance-configurations/5/move")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("""
+                {"targetId":6,"connectedUserIds":[1,2]}""")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.movedConnectedUserIds[0]")
+            .isEqualTo(1)
+            .jsonPath("$.needsAttentionConnectedUserIds[0]")
+            .isEqualTo(1)
+            .jsonPath("$.skipped[0].connectedUserId")
+            .isEqualTo(2)
+            .jsonPath("$.skipped[0].reason")
+            .isEqualTo("TARGET_LACKS_ENABLED_WORKFLOWS")
+            .jsonPath("$.skipped[0].workflowLabels[0]")
+            .isEqualTo("Cron");
+
+        verify(integrationInstanceConfigurationFacade).moveConnectedUsers(5L, 6L, List.of(1L, 2L));
     }
 
     private static ProvisionableIntegrationDTO getProvisionableIntegration() {

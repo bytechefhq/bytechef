@@ -8,10 +8,15 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -27,23 +32,29 @@ public interface IntegrationInstanceConfigurationFacade {
 
     void deleteIntegrationInstanceConfiguration(long id);
 
+    ConfigurationMoveImpactDTO getMoveImpact(long sourceId, long targetId, List<Long> connectedUserIds);
+
     void enableIntegrationInstanceConfiguration(long id, boolean enable);
 
     void enableIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId, boolean enable);
 
     IntegrationInstanceConfigurationDTO getIntegrationInstanceConfigurationIntegration(
-        long integrationId, boolean enabled, Environment environment);
+        long integrationId, boolean enabled, Environment environment, @Nullable ConnectedUser connectedUser);
 
     List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurationIntegrations(
-        boolean enabled, Environment environment);
+        boolean enabled, Environment environment, @Nullable ConnectedUser connectedUser);
 
     IntegrationInstanceConfigurationDTO getIntegrationInstanceConfiguration(long id);
+
+    List<IntegrationInstanceConfigurationConnectedUserDTO> getIntegrationInstanceConfigurationConnectedUsers(long id);
 
     List<Tag> getIntegrationInstanceConfigurationTags();
 
     List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
         Long environmentId, Long integrationId, Long tagId, boolean includeAllFields);
+
+    ConfigurationMoveResultDTO moveConnectedUsers(long sourceId, long targetId, List<Long> connectedUserIds);
 
     void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO);

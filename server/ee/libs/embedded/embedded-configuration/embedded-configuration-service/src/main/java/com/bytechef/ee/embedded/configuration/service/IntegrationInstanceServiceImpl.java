@@ -162,6 +162,12 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    public IntegrationInstance lockIntegrationInstance(long id) {
+        return integrationInstanceRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new IllegalArgumentException("Integration instance not found"));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<IntegrationInstance> getIntegrationInstanceConfigurationIntegrationInstances(
         List<Long> integrationInstanceConfigurationIds) {
@@ -219,5 +225,16 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
         integrationInstance.setEnabled(enable);
 
         integrationInstanceRepository.save(integrationInstance);
+    }
+
+    @Override
+    public IntegrationInstance updateIntegrationInstanceConfigurationId(
+        long id, long integrationInstanceConfigurationId) {
+
+        IntegrationInstance integrationInstance = getIntegrationInstance(id);
+
+        integrationInstance.setIntegrationInstanceConfigurationId(integrationInstanceConfigurationId);
+
+        return integrationInstanceRepository.save(integrationInstance);
     }
 }
