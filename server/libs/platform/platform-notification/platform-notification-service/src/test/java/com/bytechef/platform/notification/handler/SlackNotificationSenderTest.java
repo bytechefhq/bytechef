@@ -212,6 +212,17 @@ class SlackNotificationSenderTest {
         verify(webhookDeliveryService, never()).sendTest(any());
     }
 
+    @Test
+    void testSendTestReportsMissingUrl() {
+        NotificationTestResult notificationTestResult = slackNotificationSender.sendTest(
+            createNotification(Map.of("slackWebhookUrl", "  ")), slackNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("Slack webhook URL is required");
+
+        verify(webhookDeliveryService, never()).sendTest(any());
+    }
+
     private static WebhookDeliveryOutcome sentOutcome() {
         return new WebhookDeliveryOutcome(List.of(new PayloadResult("1", Status.SENT)), null, null, null);
     }
