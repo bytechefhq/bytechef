@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import AutomationWorkflowExecutionsSheet from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-executions-sheet/AutomationWorkflowExecutionsSheet';
 import AutomationWorkflowProjectConfigurationDialog from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-dialog/AutomationWorkflowProjectConfigurationDialog';
 import AutomationWorkflowProjectConfigurationList from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationList';
@@ -17,10 +18,12 @@ import {
     useAutomationWorkflowProjectsQuery,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {PlusIcon, Settings2Icon} from 'lucide-react';
+import {ChevronDownIcon, Settings2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {flushSync} from 'react-dom';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+
+import AutomationWorkflowConfigurationsFilterTitle from './AutomationWorkflowConfigurationsFilterTitle';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 type AutomationWorkflowProjectConfigurationType =
@@ -58,14 +61,37 @@ const AutomationWorkflowConfigurations = () => {
         [projectsData]
     );
 
-    const filteredProjects = useMemo(
-        () => (projectId ? publishedProjects.filter((project) => project.id === projectId) : publishedProjects),
-        [projectId, publishedProjects]
-    );
-
     const selectedProject = projectId ? publishedProjects.find((project) => project.id === projectId) : undefined;
 
+    const configuredProjects = useMemo(
+        () => publishedProjects.filter((project) => project.configurationCount > 0),
+        [publishedProjects]
+    );
+
+    const listedProjects = selectedProject ? [selectedProject] : configuredProjects;
+
     const isFirstRun = !projectsIsLoading && publishedProjects.length === 0;
+
+    const newConfigurationButton = selectedProject ? (
+        <Button label="New Configuration" onClick={() => setConfigurationDialog({project: selectedProject})} />
+    ) : (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button aria-label="New Configuration">
+                    New Configuration
+                    <ChevronDownIcon />
+                </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+                {publishedProjects.map((project) => (
+                    <DropdownMenuItem key={project.id} onClick={() => setConfigurationDialog({project})}>
+                        {project.name}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
 
     const handleGoToAutomations = () => {
         flushSync(() => setCurrentEnvironmentId(DEVELOPMENT_ENVIRONMENT));
@@ -80,7 +106,8 @@ const AutomationWorkflowConfigurations = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        title={selectedProject ? selectedProject.name : 'All Projects'}
+                        right={newConfigurationButton}
+                        title={<AutomationWorkflowConfigurationsFilterTitle projectName={selectedProject?.name} />}
                     />
                 )
             }
@@ -97,34 +124,16 @@ const AutomationWorkflowConfigurations = () => {
                     title="Projects"
                 />
             }
-            leftSidebarHeader={<Header position="sidebar" title="Automation Configurations" />}
+            leftSidebarHeader={<Header position="sidebar" title="Configurations" />}
             leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[projectsError]} loading={projectsIsLoading}>
-                {filteredProjects.length > 0 ? (
-                    <div className="flex w-full flex-col gap-2 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
-                        {filteredProjects.map((project) => (
-                            <section
-                                aria-label={project.name}
-                                className="rounded border border-border/50 p-3"
-                                key={project.id}
-                            >
-                                <div className="mb-2 flex items-center justify-between">
-                                    <h2 className="text-base font-semibold">{project.name}</h2>
-
-                                    {project.configurationCount > 0 && (
-                                        <Button
-                                            aria-label={`New Configuration for ${project.name}`}
-                                            onClick={() => setConfigurationDialog({project})}
-                                            size="sm"
-                                            variant="secondary"
-                                        >
-                                            <PlusIcon />
-                                            New Configuration
-                                        </Button>
-                                    )}
-                                </div>
+                {listedProjects.length > 0 ? (
+                    <div className="w-full divide-y divide-border/50 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
+                        {listedProjects.map((project) => (
+                            <section aria-label={project.name} className="py-3" key={project.id}>
+                                <h2 className="mb-2 text-base font-semibold">{project.name}</h2>
 
                                 <AutomationWorkflowProjectConfigurationList
                                     environmentId={currentEnvironmentId}
@@ -143,6 +152,14 @@ const AutomationWorkflowConfigurations = () => {
                         icon={<Settings2Icon className="size-24 text-stroke-neutral-tertiary" />}
                         message="The selected project is not published."
                         title="No Matching Project"
+                    />
+                ) : publishedProjects.length > 0 ? (
+                    <EmptyState
+                        actions={newConfigurationButton}
+                        description="A configuration runs a published version of an automation project for connected users in this environment."
+                        icon={<Settings2Icon />}
+                        note={environmentScopeNote}
+                        title="No configurations yet"
                     />
                 ) : (
                     <EmptyState
