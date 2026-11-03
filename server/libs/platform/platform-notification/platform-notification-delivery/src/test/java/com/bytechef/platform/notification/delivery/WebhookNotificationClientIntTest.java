@@ -337,6 +337,27 @@ class WebhookNotificationClientIntTest {
             .get("Accept")).containsExactly("application/vnd.example+json");
     }
 
+    @Test
+    void testPostSendsContentLengthAndNoChunkedEncoding() {
+        String payloadJson = "{\"name\":\"caf\u00e9 r\u00e9sum\u00e9\"}";
+        WebhookDelivery webhookDelivery = WebhookDelivery.builder("test", url)
+            .tenantId("tenant")
+            .description("test delivery")
+            .payload("body", payloadJson)
+            .build();
+
+        webhookNotificationClient.post(webhookDelivery, webhookDelivery.payloads()
+            .getFirst());
+
+        Headers headers = receivedHeaders.get();
+        byte[] payloadBytes = payloadJson.getBytes(StandardCharsets.UTF_8);
+
+        assertThat(payloadBytes.length).isGreaterThan(payloadJson.length());
+        assertThat(headers.getFirst("Content-Length")).isEqualTo(String.valueOf(payloadBytes.length));
+        assertThat(headers.getFirst("Transfer-Encoding")).isNull();
+        assertThat(receivedBody.get()).isEqualTo(payloadJson);
+    }
+
     private void respondWith(String path, int status, String body) {
         httpServer.createContext(path, httpExchange -> {
             httpExchange.getRequestBody()
