@@ -34,8 +34,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -194,7 +196,7 @@ public final class TaskExecution
         Set<String> deferredKeys = DeferredEvaluationParameterKeys.forTaskType(workflowTask.getType());
 
         if (deferredKeys.isEmpty()) {
-            Map<String, Object> map = evaluator.evaluate(workflowTask.toMap(), context);
+            Map<String, Object> map = copyContainers(evaluator.evaluate(workflowTask.toMap(), context));
 
             setWorkflowTask(new WorkflowTask(map));
         } else {
@@ -217,7 +219,7 @@ public final class TaskExecution
 
             taskMap.put(WorkflowConstants.PARAMETERS, parametersForEvaluation);
 
-            Map<String, Object> evaluatedMap = new HashMap<>(evaluator.evaluate(taskMap, context));
+            Map<String, Object> evaluatedMap = copyContainers(evaluator.evaluate(taskMap, context));
 
             Map<String, Object> evaluatedParameters = new HashMap<>(
                 (Map<String, Object>) evaluatedMap.get(WorkflowConstants.PARAMETERS));
@@ -230,6 +232,31 @@ public final class TaskExecution
         }
 
         return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T copyContainers(T value) {
+        if (value instanceof Map<?, ?> map) {
+            Map<Object, Object> copiedMap = new LinkedHashMap<>();
+
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                copiedMap.put(entry.getKey(), copyContainers(entry.getValue()));
+            }
+
+            return (T) copiedMap;
+        }
+
+        if (value instanceof List<?> list) {
+            List<Object> copiedList = new ArrayList<>(list.size());
+
+            for (Object item : list) {
+                copiedList.add(copyContainers(item));
+            }
+
+            return (T) copiedList;
+        }
+
+        return value;
     }
 
     @Override

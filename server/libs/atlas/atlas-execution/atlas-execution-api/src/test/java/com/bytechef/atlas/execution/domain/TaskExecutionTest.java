@@ -24,6 +24,7 @@ import com.bytechef.atlas.configuration.domain.DeferredEvaluationParameterKeys;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -193,6 +194,69 @@ class TaskExecutionTest {
         assertEquals(
             "resolved", parameters.get("iteratee"),
             "Non-registered task types should have all parameters evaluated");
+    }
+
+    @Test
+    void testChangingEvaluatedParametersLeavesTheReferencedContextValueUnchanged() {
+        Map<String, Object> context = createContextWithPrecedingOutput();
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(
+                        WorkflowConstants.NAME, "dataMapper_1",
+                        WorkflowConstants.TYPE, "dataMapper/v1/renameKeys",
+                        WorkflowConstants.PARAMETERS, Map.of("input", "${action_1}"))))
+            .build();
+
+        taskExecution.evaluate(context, EVALUATOR);
+
+        changeInput(taskExecution);
+
+        assertEquals(createContextWithPrecedingOutput(), context);
+    }
+
+    @Test
+    void testChangingEvaluatedParametersOfATaskWithDeferredKeysLeavesTheReferencedContextValueUnchanged() {
+        Map<String, Object> context = createContextWithPrecedingOutput();
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(
+                        WorkflowConstants.NAME, "condition_1",
+                        WorkflowConstants.TYPE, "condition/v1",
+                        WorkflowConstants.PARAMETERS, Map.of("input", "${action_1}", "caseTrue", List.of()))))
+            .build();
+
+        taskExecution.evaluate(context, EVALUATOR);
+
+        changeInput(taskExecution);
+
+        assertEquals(createContextWithPrecedingOutput(), context);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void changeInput(TaskExecution taskExecution) {
+        Map<String, Object> input = (Map<String, Object>) taskExecution.getParameters()
+            .get("input");
+
+        input.put("total", input.remove("amount"));
+
+        ((List<Object>) input.get("items")).add("third");
+    }
+
+    private static Map<String, Object> createContextWithPrecedingOutput() {
+        Map<String, Object> output = new LinkedHashMap<>();
+
+        output.put("amount", 10);
+        output.put("items", new ArrayList<>(List.of("first", "second")));
+
+        Map<String, Object> context = new LinkedHashMap<>();
+
+        context.put("action_1", output);
+
+        return context;
     }
 
     private static class TestEvaluator implements Evaluator {

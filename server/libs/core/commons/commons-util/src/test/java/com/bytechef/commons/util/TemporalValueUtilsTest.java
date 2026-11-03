@@ -17,7 +17,9 @@
 package com.bytechef.commons.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -88,5 +90,42 @@ public class TemporalValueUtilsTest {
 
         assertEquals(ZoneOffset.UTC, normalized.getZone());
         assertEquals(Instant.parse("2026-08-26T00:00:00Z"), normalized.toInstant());
+    }
+
+    @Test
+    public void testNormalizeSharingUnchangedReturnsUnchangedMapsAndListsThemselves() {
+        Map<String, Object> record = Map.of("name", "first", "fees", List.of(Map.of("amount", 10)));
+        List<Object> records = List.of(record, "second");
+        Map<String, Object> context = Map.of("records", records, "count", 2);
+
+        assertSame(context, TemporalValueUtils.normalizeSharingUnchanged(context));
+        assertSame(records, TemporalValueUtils.normalizeSharingUnchanged(records));
+    }
+
+    @Test
+    public void testNormalizeSharingUnchangedCopiesOnlyThePathToAChangedValue() {
+        Map<String, Object> unchangedRecord = Map.of("name", "first");
+        Map<String, Object> changedRecord = Map.of("createdDate", Instant.parse("2026-08-26T00:00:00Z"));
+        Map<String, Object> context = Map.of("records", List.of(unchangedRecord, changedRecord));
+
+        Object normalizedContext = TemporalValueUtils.normalizeSharingUnchanged(context);
+
+        assertNotSame(context, normalizedContext);
+        assertEquals(TemporalValueUtils.normalize(context), normalizedContext);
+
+        List<?> normalizedRecords = (List<?>) ((Map<?, ?>) normalizedContext).get("records");
+
+        assertSame(unchangedRecord, normalizedRecords.get(0));
+        assertEquals(Map.of("createdDate", EXPECTED), normalizedRecords.get(1));
+    }
+
+    @Test
+    public void testNormalizeSharingUnchangedCopiesMapsWithNonStringKeys() {
+        Map<Object, Object> map = Map.of(1, "one");
+
+        Object normalizedMap = TemporalValueUtils.normalizeSharingUnchanged(map);
+
+        assertNotSame(map, normalizedMap);
+        assertEquals(Map.of("1", "one"), normalizedMap);
     }
 }
