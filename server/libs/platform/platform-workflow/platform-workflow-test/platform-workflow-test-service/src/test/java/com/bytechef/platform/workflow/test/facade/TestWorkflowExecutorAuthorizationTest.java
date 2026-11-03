@@ -38,9 +38,15 @@ class TestWorkflowExecutorAuthorizationTest {
 
     @Test
     void testStartingATestNeedsTheWorkflowEditScopeInTheRequestedEnvironment() throws NoSuchMethodException {
-        assertThat(getGate("executeAsync", String.class, Map.class, long.class, Consumer.class, Function.class,
-            BiConsumer.class, Consumer.class)).isEqualTo(IN_REQUESTED_ENVIRONMENT);
-        assertThat(getGate("executeSync", String.class, Map.class, long.class)).isEqualTo(IN_REQUESTED_ENVIRONMENT);
+        assertThat(getGate("executeAsync", String.class, Map.class, String.class, long.class, Consumer.class,
+            Function.class, BiConsumer.class, Consumer.class)).isEqualTo(IN_REQUESTED_ENVIRONMENT);
+        assertThat(getGate("executeSync", String.class, Map.class, String.class, long.class))
+            .isEqualTo(IN_REQUESTED_ENVIRONMENT);
+    }
+
+    @Test
+    void testAttachingToATestNeedsTheWorkflowEditScopeOnTheTestJob() throws NoSuchMethodException {
+        assertThat(getGate("attach", long.class)).isEqualTo("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')");
     }
 
     @Test

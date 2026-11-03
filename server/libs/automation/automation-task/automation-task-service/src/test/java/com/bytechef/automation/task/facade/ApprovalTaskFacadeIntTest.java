@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -39,6 +40,7 @@ import com.bytechef.automation.task.config.ApprovalTaskMethodSecurityTestConfigu
 import com.bytechef.automation.task.config.AutomationTaskIntTestConfiguration;
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.domain.PendingApproval;
+import com.bytechef.automation.task.security.ApprovalTaskJobResolver;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -64,6 +66,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -299,7 +302,7 @@ class ApprovalTaskFacadeIntTest {
 
     @Nested
     @Import({
-        ApprovalTaskMethodSecurityTestConfiguration.class,
+        ApprovalTaskJobResolver.class, ApprovalTaskMethodSecurityTestConfiguration.class,
         ApprovalTaskFacadeIntTest.MethodSecurityFacadeConfiguration.class
     })
     class MethodSecurity {
@@ -401,15 +404,39 @@ class ApprovalTaskFacadeIntTest {
 
         @Test
         void testRunCreatesItsApprovalTaskWithoutAnAdmin() {
-            SecurityContextHolder.clearContext();
-
             long jobId = saveJob(Job.Status.STOPPED, null);
+
+            when(authorizationCheck.hasPermission(jobId, "Job", "DEPLOYMENT_EDIT")).thenReturn(true);
 
             ApprovalTask approvalTask = securedApprovalTaskFacade.createApprovalTask(approvalTask(jobResumeId(jobId)));
 
             assertThat(approvalTaskService.getApprovalTask(Objects.requireNonNull(approvalTask.getId())))
                 .extracting(ApprovalTask::getEnvironment)
                 .isEqualTo(Environment.DEVELOPMENT);
+        }
+
+        @Test
+        void testRunWithoutDeploymentEditOnItsJobCannotCreateItsApprovalTask() {
+            long jobId = saveJob(Job.Status.STOPPED, null);
+
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.createApprovalTask(approvalTask(signedToken(jobId))));
+
+            verify(authorizationCheck).hasPermission(jobId, "Job", "DEPLOYMENT_EDIT");
+
+            assertThat(approvalTaskService.countApprovalTasks()).isZero();
+        }
+
+        @Test
+        void testUnauthenticatedRunCannotCreateItsApprovalTask() {
+            SecurityContextHolder.clearContext();
+
+            long jobId = saveJob(Job.Status.STOPPED, null);
+
+            assertThatThrownBy(() -> securedApprovalTaskFacade.createApprovalTask(approvalTask(jobResumeId(jobId))))
+                .isInstanceOfAny(AccessDeniedException.class, AuthenticationCredentialsNotFoundException.class);
+
+            assertThat(approvalTaskService.countApprovalTasks()).isZero();
         }
 
         private static ApprovalTask manualApprovalTask(String name) {
