@@ -1539,27 +1539,48 @@ public class ProjectFacadeIntTest {
         assertThat(projectDTO.name()).isEqualTo("Updated Name");
     }
 
-    /**
-     * Calls every guarded {@link ProjectFacadeImpl} method through the real method-security interceptor, backed by the
-     * production {@code AutomationMethodSecurityExpressionHandler} and {@code AutomationPermissionEvaluator}. Each
-     * denial withholds only the scope the guard needs while granting every other one, and each allowed case grants only
-     * that scope and proves the body ran.
-     * <p>
-     * Duplicating is a create: the body calls {@code projectService.create} and
-     * {@code projectWorkflowService.addWorkflow}, and {@code ProjectServiceImpl.create} carries no gate of its own, so
-     * the guard on {@code duplicateProject} is the only barrier. It named {@code WORKFLOW_VIEW} alone — a read scope —
-     * which let a view-only member create a project and its workflows by duplicating any project they could open,
-     * bypassing the {@code PROJECT_CREATE} that {@code createProject}, {@code importProject} and
-     * {@code importProjectTemplate} all demand.
-     * <p>
-     * The guard is a conjunction, so every combination is asserted rather than only the denial. Holding the read alone
-     * must not create; holding the create alone must not reach a project the caller cannot read; holding both must
-     * pass.
-     * <p>
-     * Only the outcome and the scopes actually consulted are asserted, never the order the two halves are evaluated in:
-     * SpEL {@code and} short-circuits, so pinning which half runs first would redden a harmless reordering of an
-     * expression that admits exactly the same principals either way.
-     */
+    private void backdateProjectLastModifiedDate(long projectId) {
+        projectRepository.updateLastModified(projectId, "earlier@localhost.com", EARLIER_DATE);
+    }
+
+    private Workflow getFirstWorkflow(long projectId, int projectVersion) {
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectId, projectVersion);
+
+        ProjectWorkflow projectWorkflow = projectWorkflows.getFirst();
+
+        return workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+    }
+
+    private ProjectDTO getProjectDTO(long projectId) {
+        return projectFacade.getProject(projectId);
+    }
+
+    private ProjectDTO getListedProjectDTO(long projectId) {
+        List<ProjectDTO> projectDTOs = projectFacade.getProjects(null, null, null, null);
+
+        return projectDTOs.stream()
+            .filter(projectDTO -> projectDTO.id() == projectId)
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private Project getProject(long projectId) {
+        return projectRepository.findById(projectId)
+            .orElseThrow();
+    }
+
+    private static Instant getPublishedDate(Project project, int version) {
+        return project.fetchProjectVersion(version)
+            .map(ProjectVersion::getPublishedDate)
+            .orElseThrow();
+    }
+
+    private Workflow getWorkflow(ProjectWorkflowDTO projectWorkflowDTO) {
+        return workflowRepository.findById(projectWorkflowDTO.getId())
+            .orElseThrow();
+    }
+
     @Nested
     @Import({
         MethodSecurityEnforcement.Config.class, PostgreSQLContainerConfiguration.class
@@ -1569,9 +1590,9 @@ public class ProjectFacadeIntTest {
         private static final String BODY_REACHED = "body reached";
         private static final Set<String> GUARDED_METHOD_NAMES = Set.of(
             "createProject", "deleteProject", "deleteProjectVersion", "deleteSharedProject", "duplicateProject",
-            "exportProject", "exportSharedProject", "getProject", "getProjects", "getWorkspaceProjectWorkflows",
-            "getWorkspaceProjects", "importProject", "importProjectTemplate", "publishProject", "restoreProjectVersion",
-            "updateProject");
+            "exportProject", "exportSharedProject", "getNonSystemProjects", "getProject", "getProjectEntity",
+            "getProjects", "getWorkspaceProjectWorkflows", "getWorkspaceProjects", "importProject",
+            "importProjectTemplate", "publishProject", "restoreProjectVersion", "updateProject");
         private static final String PROJECT_CREATE = "PROJECT_CREATE";
         private static final String PROJECT_DELETE = "PROJECT_DELETE";
         private static final long PROJECT_ID = 42L;
@@ -1605,6 +1626,7 @@ public class ProjectFacadeIntTest {
                 .thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.create(any(Project.class))).thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.getProject(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.getProjects()).thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.getProjects(any(), any(), any(), any(), any(), any()))
                 .thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.getWorkspaceProjectIds(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
@@ -1789,6 +1811,36 @@ public class ProjectFacadeIntTest {
             grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
 
             assertBodyReached(() -> projectFacade.getProject(PROJECT_ID));
+        }
+
+        @Test
+        void testGetProjectEntityDeniesWithoutTheViewScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertDenied(() -> projectFacade.getProjectEntity(PROJECT_ID));
+        }
+
+        @Test
+        void testGetProjectEntityAllowsWithTheViewScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertBodyReached(() -> projectFacade.getProjectEntity(PROJECT_ID));
+        }
+
+        @Test
+        void testGetNonSystemProjectsDeniesANonAdminHoldingEveryResourceScope() {
+            when(permissionService.hasResourceScope(any(), anyString(), anyString())).thenReturn(true);
+
+            assertDenied(() -> projectFacade.getNonSystemProjects());
+
+            verify(permissionService).isTenantAdmin();
+        }
+
+        @Test
+        void testGetNonSystemProjectsAllowsATenantAdmin() {
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+
+            assertBodyReached(() -> projectFacade.getNonSystemProjects());
         }
 
         @Test

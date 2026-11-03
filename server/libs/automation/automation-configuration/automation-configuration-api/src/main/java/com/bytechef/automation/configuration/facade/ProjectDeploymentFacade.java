@@ -26,6 +26,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -55,6 +56,13 @@ public interface ProjectDeploymentFacade {
         Collection<Long> projectDeploymentIds, ProjectDeploymentOwner projectDeploymentOwner);
 
     ProjectDeploymentDTO getProjectDeployment(long id);
+
+    /**
+     * Returns the project deployments of a workspace in one environment, optionally narrowed to a project or a tag, as
+     * stored: system projects included and no related data joined.
+     */
+    List<ProjectDeployment> getProjectDeployments(
+        long workspaceId, Environment environment, @Nullable Long projectId, @Nullable Long tagId);
 
     /**
      * Returns the deployment workflow of the given project deployment that runs the workflow identified by its UUID.
