@@ -24,27 +24,41 @@ import org.jspecify.annotations.Nullable;
 public class WebhookDeliveryException extends RuntimeException {
 
     private final @Nullable Integer statusCode;
+    private final @Nullable String responseBody;
 
     public WebhookDeliveryException(String message, @Nullable Integer statusCode) {
         super(message);
 
         this.statusCode = statusCode;
+        this.responseBody = null;
     }
 
     public WebhookDeliveryException(String message, @Nullable Integer statusCode, @Nullable Throwable cause) {
+        this(message, statusCode, cause, null);
+    }
+
+    public WebhookDeliveryException(
+        String message, @Nullable Integer statusCode, @Nullable Throwable cause, @Nullable String responseBody) {
+
         super(message, cause);
 
         this.statusCode = statusCode;
+        this.responseBody = responseBody;
     }
 
     public WebhookDeliveryException(String message, Throwable cause) {
         super(message, cause);
 
         this.statusCode = null;
+        this.responseBody = null;
     }
 
     public @Nullable Integer getStatusCode() {
         return statusCode;
+    }
+
+    public @Nullable String getResponseBody() {
+        return responseBody;
     }
 
     public boolean isRetryable() {

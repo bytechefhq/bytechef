@@ -17,6 +17,7 @@
 package com.bytechef.platform.notification.delivery;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -27,7 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.http.HttpEntity;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
@@ -35,7 +36,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -50,6 +53,8 @@ public class WebhookNotificationClient {
     private static final int CONNECT_TIMEOUT_MILLIS = 10_000;
     private static final int READ_TIMEOUT_MILLIS = 30_000;
     private static final String HMAC_SHA256 = "HmacSHA256";
+    private static final int MAX_BODY_BYTES = 4000;
+    private static final int MAX_BODY_CHARACTERS = 1000;
 
     private final RestTemplate restTemplate;
 
@@ -76,14 +81,18 @@ public class WebhookNotificationClient {
 
                 HttpStatusCode statusCode = clientHttpResponse.getStatusCode();
 
+                String responseBody = readBody(clientHttpResponse);
+
                 throw new RestClientResponseException(
                     "HTTP " + statusCode.value(), statusCode, clientHttpResponse.getStatusText(),
-                    clientHttpResponse.getHeaders(), null, null);
+                    clientHttpResponse.getHeaders(), responseBody == null ? null : responseBody.getBytes(
+                        StandardCharsets.UTF_8),
+                    StandardCharsets.UTF_8);
             }
         });
     }
 
-    public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
+    public WebhookResponse post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
         URI uri = toUri(restTemplate, webhookDelivery.url());
         String host = uri.getHost();
         String payloadJson = webhookPayload.json();
@@ -120,17 +129,65 @@ public class WebhookNotificationClient {
         }
 
         try {
-            restTemplate.exchange(uri, HttpMethod.POST, new HttpEntity<>(payloadJson, httpHeaders), String.class);
+            RequestCallback requestCallback = clientHttpRequest -> {
+                clientHttpRequest.getHeaders()
+                    .putAll(httpHeaders);
+
+                clientHttpRequest.getBody()
+                    .write(payloadJson.getBytes(StandardCharsets.UTF_8));
+            };
+            ResponseExtractor<WebhookResponse> responseExtractor = clientHttpResponse -> new WebhookResponse(
+                clientHttpResponse.getStatusCode()
+                    .value(),
+                readBody(clientHttpResponse));
+
+            WebhookResponse webhookResponse = restTemplate.execute(
+                uri, HttpMethod.POST, requestCallback, responseExtractor);
+
+            if (webhookResponse == null) {
+                throw new WebhookDeliveryException("Failed to deliver webhook to " + host, null, null);
+            }
+
+            return webhookResponse;
         } catch (RestClientResponseException restClientResponseException) {
             int statusCode = restClientResponseException.getStatusCode()
                 .value();
 
+            String responseBody = restClientResponseException.getResponseBodyAsByteArray().length == 0
+                ? null : restClientResponseException.getResponseBodyAsString(StandardCharsets.UTF_8);
+
             throw new WebhookDeliveryException(
                 "Webhook delivery to " + host + " returned HTTP " + statusCode, statusCode,
-                restClientResponseException);
+                restClientResponseException, responseBody);
         } catch (RestClientException restClientException) {
             throw new WebhookDeliveryException("Failed to deliver webhook to " + host, null, restClientException);
         }
+    }
+
+    private static @Nullable String readBody(ClientHttpResponse clientHttpResponse) throws IOException {
+        byte[] bodyBytes;
+
+        try (InputStream inputStream = clientHttpResponse.getBody()) {
+            bodyBytes = inputStream.readNBytes(MAX_BODY_BYTES);
+        }
+
+        if (bodyBytes.length == 0) {
+            return null;
+        }
+
+        String body = new String(bodyBytes, StandardCharsets.UTF_8);
+
+        if (body.length() <= MAX_BODY_CHARACTERS) {
+            return body;
+        }
+
+        int end = MAX_BODY_CHARACTERS;
+
+        if (Character.isHighSurrogate(body.charAt(end - 1))) {
+            end--;
+        }
+
+        return body.substring(0, end) + "…";
     }
 
     private static URI toUri(RestTemplate restTemplate, String url) {
@@ -169,5 +226,12 @@ public class WebhookNotificationClient {
         } catch (NoSuchAlgorithmException | InvalidKeyException exception) {
             throw new IllegalStateException("Unable to compute webhook signature", exception);
         }
+    }
+
+    /**
+     * @param statusCode the HTTP status of the receiver
+     * @param body       the response body, capped at 1000 characters, or {@code null} when empty
+     */
+    public record WebhookResponse(int statusCode, @Nullable String body) {
     }
 }
