@@ -5182,6 +5182,12 @@ public class ApplicationProperties {
     public static class WebhookDelivery {
 
         /**
+         * Hosts that notification webhook and Slack URLs may use even when they resolve to a private or loopback
+         * address, matched exactly and ignoring case
+         */
+        private List<String> allowedHosts = List.of();
+
+        /**
          * Outbound webhook POSTs allowed at the same time across all endpoints, each of which receives one delivery at
          * a time; must be at least 1
          */
@@ -5193,12 +5199,20 @@ public class ApplicationProperties {
          */
         private int maxPendingDeliveries;
 
+        public List<String> getAllowedHosts() {
+            return allowedHosts;
+        }
+
         public int getConcurrencyLimit() {
             return concurrencyLimit;
         }
 
         public int getMaxPendingDeliveries() {
             return maxPendingDeliveries;
+        }
+
+        public void setAllowedHosts(List<String> allowedHosts) {
+            this.allowedHosts = allowedHosts == null ? List.of() : List.copyOf(allowedHosts);
         }
 
         public void setConcurrencyLimit(int concurrencyLimit) {
