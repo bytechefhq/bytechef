@@ -29,6 +29,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfi
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDeleteImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationDeletedEvent;
@@ -392,9 +393,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
-    public AutomationWorkflowProjectConfigurationVersionImpactDTO getMoveImpact(
-        long sourceId, long targetId, List<Long> connectedUserIds) {
-
+    public ConfigurationMoveImpactDTO getMoveImpact(long sourceId, long targetId, List<Long> connectedUserIds) {
         AutomationWorkflowProjectConfiguration sourceConfiguration =
             automationWorkflowProjectConfigurationService.getConfiguration(sourceId);
         AutomationWorkflowProjectConfiguration targetConfiguration =
@@ -402,11 +401,37 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         validateSameProjectAndEnvironment(sourceConfiguration, targetConfiguration);
 
-        Set<Long> movedConnectedUserIds = new HashSet<>(connectedUserIds);
+        Set<Long> assignedConnectedUserIds = getAssignedConnectedUserIds(sourceId);
 
-        movedConnectedUserIds.retainAll(getAssignedConnectedUserIds(sourceId));
+        Set<Long> sourceConnectedUserIds = new HashSet<>();
+        List<ConfigurationMoveResultDTO.Skipped> skipped = new ArrayList<>();
 
-        return getVersionImpact(sourceConfiguration, targetConfiguration.getProjectVersion(), movedConnectedUserIds);
+        for (long connectedUserId : getSortedDistinct(connectedUserIds)) {
+            if (!assignedConnectedUserIds.contains(connectedUserId)) {
+                skipped.add(
+                    new ConfigurationMoveResultDTO.Skipped(
+                        connectedUserId, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of()));
+
+                continue;
+            }
+
+            sourceConnectedUserIds.add(connectedUserId);
+
+            List<String> missingWorkflowLabels = getMissingReferencedWorkflowLabels(
+                sourceConfiguration, Set.of(connectedUserId), targetConfiguration.getProjectVersion());
+
+            if (!missingWorkflowLabels.isEmpty()) {
+                skipped.add(
+                    new ConfigurationMoveResultDTO.Skipped(
+                        connectedUserId, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,
+                        missingWorkflowLabels));
+            }
+        }
+
+        AutomationWorkflowProjectConfigurationVersionImpactDTO versionImpact = getVersionImpact(
+            sourceConfiguration, targetConfiguration.getProjectVersion(), sourceConnectedUserIds);
+
+        return new ConfigurationMoveImpactDTO(versionImpact.workflows(), skipped);
     }
 
     @Override
