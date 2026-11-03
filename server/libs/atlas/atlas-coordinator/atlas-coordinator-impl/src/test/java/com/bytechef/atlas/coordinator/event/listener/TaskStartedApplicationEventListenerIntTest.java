@@ -22,40 +22,70 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.configuration.domain.Task;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.coordinator.TaskCoordinatorIntTest;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.repository.JobRepository;
+import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.jackson.config.JacksonConfiguration;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Map;
+import java.util.Objects;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-class TaskStartedApplicationEventListenerTest {
+@SpringBootTest(
+    classes = TaskCoordinatorIntTest.CoordinatorIntTestConfiguration.class,
+    properties = "bytechef.workflow.repository.classpath.enabled=true")
+@Import({
+    JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
+})
+class TaskStartedApplicationEventListenerIntTest {
 
-    private static final long JOB_ID = 4567L;
-    private static final long TASK_EXECUTION_ID = 12L;
+    @Autowired
+    private JobRepository jobRepository;
 
-    private final JobService jobService = mock(JobService.class);
+    @Autowired
+    private JobService jobService;
+
+    @Autowired
+    private TaskExecutionRepository taskExecutionRepository;
+
+    @Autowired
+    private TaskExecutionService taskExecutionService;
+
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
-    private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
-    private final TaskStartedApplicationEventListener taskStartedApplicationEventListener =
-        new TaskStartedApplicationEventListener(taskExecutionService, taskDispatcher, jobService);
+
+    private TaskStartedApplicationEventListener taskStartedApplicationEventListener;
+
+    @BeforeEach
+    void beforeEach() {
+        taskStartedApplicationEventListener = new TaskStartedApplicationEventListener(
+            taskExecutionService, taskDispatcher, jobService);
+    }
 
     @Test
     void testTaskOfStartedJobIsMarkedStarted() {
         TaskExecution taskExecution = startTask(TaskExecution.Status.CREATED, Job.Status.STARTED, Map.of());
 
         assertThat(taskExecution.getStatus()).isEqualTo(TaskExecution.Status.STARTED);
+        assertThat(taskExecution.getStartDate()).isNotNull();
 
         verify(taskDispatcher, never()).dispatch(any());
     }
@@ -72,7 +102,9 @@ class TaskStartedApplicationEventListenerTest {
 
     @Test
     void testTaskOfStoppedJobIsCancelled() {
-        startTask(TaskExecution.Status.CREATED, Job.Status.STOPPED, Map.of());
+        TaskExecution taskExecution = startTask(TaskExecution.Status.CREATED, Job.Status.STOPPED, Map.of());
+
+        assertThat(taskExecution.getStatus()).isEqualTo(TaskExecution.Status.CREATED);
 
         verify(taskDispatcher).dispatch(isA(CancelControlTask.class));
     }
@@ -88,23 +120,28 @@ class TaskStartedApplicationEventListenerTest {
     private TaskExecution startTask(
         TaskExecution.Status taskExecutionStatus, Job.Status jobStatus, Map<String, Object> jobMetadata) {
 
-        TaskExecution taskExecution = new TaskExecution();
-
-        taskExecution.setId(TASK_EXECUTION_ID);
-        taskExecution.setJobId(JOB_ID);
-        taskExecution.setStatus(taskExecutionStatus);
-
-        Job job = new Job(JOB_ID);
+        Job job = new Job();
 
         job.setMetadata(jobMetadata);
         job.setStatus(jobStatus);
+        job.setWorkflowId("aGVsbG8x");
 
-        when(taskExecutionService.getTaskExecution(TASK_EXECUTION_ID)).thenReturn(taskExecution);
-        when(taskExecutionService.update(any(TaskExecution.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(jobService.getTaskExecutionJob(TASK_EXECUTION_ID)).thenReturn(job);
+        job = jobRepository.save(job);
 
-        taskStartedApplicationEventListener.onApplicationEvent(new TaskStartedApplicationEvent(TASK_EXECUTION_ID));
+        TaskExecution taskExecution = TaskExecution.builder()
+            .jobId(Objects.requireNonNull(job.getId()))
+            .status(taskExecutionStatus)
+            .taskNumber(1)
+            .workflowTask(new WorkflowTask(Map.of("name", "task1", "type", "noop/v1/noop")))
+            .build();
 
-        return taskExecution;
+        taskExecution = taskExecutionRepository.save(taskExecution);
+
+        long taskExecutionId = Objects.requireNonNull(taskExecution.getId());
+
+        taskStartedApplicationEventListener.onApplicationEvent(new TaskStartedApplicationEvent(taskExecutionId));
+
+        return taskExecutionRepository.findById(taskExecutionId)
+            .orElseThrow();
     }
 }
