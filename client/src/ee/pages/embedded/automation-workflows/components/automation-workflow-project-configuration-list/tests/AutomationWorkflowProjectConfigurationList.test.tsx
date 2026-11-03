@@ -58,11 +58,14 @@ const project = {
 
 const configuration = {
     automationHubVisible: true,
+    connectedUserCount: 0,
     enabled: true,
     environmentId: '2',
     id: 'configuration-1',
     lastExecutionDate: null,
     lastModifiedDate: null,
+    name: 'STAGING',
+    permissionExpression: null,
     projectId: 'project-1',
     projectVersion: 2,
     workflows: [],

@@ -21,29 +21,36 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     useProvisionableConnectedUserProjectsQuery: hoisted.provisionableQuery,
 }));
 
+const WORKFLOWS = [
+    {
+        dangling: false,
+        inputs: [{label: 'Name', name: 'name', required: true, type: 'string'}],
+        label: 'Welcome',
+        provisioned: false,
+        workflowUuid: 'wf-1',
+    },
+    {
+        dangling: false,
+        inputs: [{label: 'Email', name: 'user.email', required: true, type: 'string'}],
+        label: 'Dotted',
+        provisioned: false,
+        workflowUuid: 'wf-4',
+    },
+    {dangling: false, inputs: [], label: 'Already there', provisioned: true, workflowUuid: 'wf-2'},
+    {dangling: true, inputs: [], label: 'Broken', provisioned: true, workflowUuid: 'wf-3'},
+];
+
 const PROJECTS = [
     {
+        assignedConfigurationId: null,
+        configurations: [
+            {id: '50', name: 'Beta', projectVersion: 2, selfServe: false, workflows: []},
+            {id: '51', name: 'Default', projectVersion: 3, selfServe: true, workflows: WORKFLOWS},
+        ],
         name: 'Onboarding',
         projectId: '10',
         projectVersion: 3,
-        workflows: [
-            {
-                dangling: false,
-                inputs: [{label: 'Name', name: 'name', required: true, type: 'string'}],
-                label: 'Welcome',
-                provisioned: false,
-                workflowUuid: 'wf-1',
-            },
-            {
-                dangling: false,
-                inputs: [{label: 'Email', name: 'user.email', required: true, type: 'string'}],
-                label: 'Dotted',
-                provisioned: false,
-                workflowUuid: 'wf-4',
-            },
-            {dangling: false, inputs: [], label: 'Already there', provisioned: true, workflowUuid: 'wf-2'},
-            {dangling: true, inputs: [], label: 'Broken', provisioned: true, workflowUuid: 'wf-3'},
-        ],
+        workflows: WORKFLOWS,
     },
 ];
 
@@ -129,6 +136,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
         expect(hoisted.mutate).toHaveBeenCalledWith({
+            configurationId: '51',
             connectedUserId: '7',
             workflows: [{inputs: {name: 'x'}, workflowUuid: 'wf-1'}],
         });
@@ -163,6 +171,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
         expect(hoisted.mutate).toHaveBeenCalledWith({
+            configurationId: '51',
             connectedUserId: '7',
             workflows: [{inputs: {name: 'x'}, workflowUuid: 'wf-1'}],
         });
@@ -180,6 +189,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
         expect(hoisted.mutate).toHaveBeenCalledWith({
+            configurationId: '51',
             connectedUserId: '7',
             workflows: [{inputs: {'user.email': 'a@b.c'}, workflowUuid: 'wf-4'}],
         });

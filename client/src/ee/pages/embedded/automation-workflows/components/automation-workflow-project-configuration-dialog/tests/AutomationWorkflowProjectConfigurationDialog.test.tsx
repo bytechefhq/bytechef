@@ -68,11 +68,14 @@ const project = {
 
 const existingConfiguration = {
     automationHubVisible: true,
+    connectedUserCount: 0,
     enabled: true,
     environmentId: '2',
     id: 'configuration-1',
     lastExecutionDate: null,
     lastModifiedDate: null,
+    name: 'PRODUCTION',
+    permissionExpression: null,
     projectId: 'project-1',
     projectVersion: 3,
     workflows: [],
@@ -120,12 +123,16 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             automationHubVisible: true,
             enabled: false,
             environmentId: '2',
+            name: 'PRODUCTION',
+            permissionExpression: null,
             projectId: 'project-1',
             projectVersion: 3,
         });
     });
 
-    it('does not create a second configuration in an environment that already has one', () => {
+    it('creates a second configuration in the same environment with a name and permission expression', async () => {
+        const user = userEvent.setup();
+
         mocks.configurations.current = [existingConfiguration];
 
         render(
@@ -134,7 +141,57 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             </TooltipProvider>
         );
 
-        expect(screen.getByText('This project already has a configuration in Staging.')).toBeInTheDocument();
+        expect(screen.getByLabelText('Name')).toHaveValue('');
+
+        await user.type(screen.getByLabelText('Name'), 'Beta');
+        await user.click(screen.getByLabelText('Permission expression'));
+        await user.paste("metadata['beta'] == 'true'");
+
+        await user.click(screen.getByRole('combobox', {name: 'Version'}));
+        await user.click(await screen.findByRole('option', {name: 'V3'}));
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(mocks.createMutate).toHaveBeenCalledTimes(1));
+
+        expect(mocks.createMutate.mock.calls[0][0]).toEqual({
+            automationHubVisible: true,
+            enabled: false,
+            environmentId: '2',
+            name: 'Beta',
+            permissionExpression: "metadata['beta'] == 'true'",
+            projectId: 'project-1',
+            projectVersion: 3,
+        });
+    });
+
+    it('shows the permission expression placeholder and help text', () => {
+        render(
+            <TooltipProvider>
+                <AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />
+            </TooltipProvider>
+        );
+
+        expect(screen.getByPlaceholderText("e.g. metadata['beta'] == 'true'")).toBeInTheDocument();
+        expect(
+            screen.getByText('Who self-serve can place on this configuration. Empty means everyone.')
+        ).toBeInTheDocument();
+    });
+
+    it('rejects a duplicate name in the same environment', async () => {
+        const user = userEvent.setup();
+
+        mocks.configurations.current = [existingConfiguration];
+
+        render(
+            <TooltipProvider>
+                <AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />
+            </TooltipProvider>
+        );
+
+        await user.type(screen.getByLabelText('Name'), '  production ');
+
+        expect(screen.getByText('A configuration named production already exists in Staging.')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
     });
 
@@ -172,7 +229,7 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
         );
     });
 
-    it('edits an existing configuration without offering the environment or version', async () => {
+    it('edit sends the name and permission expression without offering the environment or version', async () => {
         const user = userEvent.setup();
 
         const onClose = vi.fn();
@@ -197,6 +254,11 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
 
         await user.click(screen.getByRole('switch', {name: 'Show in Automation Hub'}));
 
+        await user.clear(screen.getByLabelText('Name'));
+        await user.type(screen.getByLabelText('Name'), 'Renamed');
+        await user.click(screen.getByLabelText('Permission expression'));
+        await user.paste("metadata['beta'] == 'true'");
+
         await user.click(screen.getByRole('button', {name: 'Save'}));
 
         await waitFor(() => expect(mocks.updateMutate).toHaveBeenCalledTimes(1));
@@ -205,6 +267,8 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             automationHubVisible: false,
             enabled: true,
             id: 'configuration-1',
+            name: 'Renamed',
+            permissionExpression: "metadata['beta'] == 'true'",
             projectVersion: 3,
         });
         expect(mocks.createMutate).not.toHaveBeenCalled();
@@ -241,6 +305,8 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             automationHubVisible: false,
             enabled: true,
             id: 'configuration-1',
+            name: 'PRODUCTION',
+            permissionExpression: null,
             projectVersion: 3,
         });
     });
@@ -248,17 +314,7 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
     it('warns that moving to an older version disconnects automations it lacks', async () => {
         const user = userEvent.setup();
 
-        const configuration = {
-            automationHubVisible: true,
-            enabled: true,
-            environmentId: '2',
-            id: 'configuration-1',
-            lastExecutionDate: null,
-            lastModifiedDate: null,
-            projectId: 'project-1',
-            projectVersion: 3,
-            workflows: [],
-        };
+        const configuration = existingConfiguration;
 
         render(
             <TooltipProvider>

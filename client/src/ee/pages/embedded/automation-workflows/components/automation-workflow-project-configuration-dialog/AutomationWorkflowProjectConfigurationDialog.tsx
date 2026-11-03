@@ -11,8 +11,12 @@ import {
 } from '@/components/Dialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import Switch from '@/components/Switch/Switch';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
+import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
@@ -46,6 +50,8 @@ const AutomationWorkflowProjectConfigurationDialog = ({
     updateProjectVersion = false,
 }: AutomationWorkflowProjectConfigurationDialogProps) => {
     const [automationHubVisible, setAutomationHubVisible] = useState(configuration?.automationHubVisible ?? true);
+    const [enteredName, setEnteredName] = useState<string | undefined>(configuration?.name);
+    const [permissionExpression, setPermissionExpression] = useState(configuration?.permissionExpression ?? '');
     const [projectVersion, setProjectVersion] = useState(
         (updateProjectVersion ? project.lastPublishedVersion : configuration?.projectVersion)?.toString() ??
             project.lastPublishedVersion?.toString() ??
@@ -81,12 +87,6 @@ const AutomationWorkflowProjectConfigurationDialog = ({
 
     const environmentId = configuration?.environmentId ?? String(currentEnvironmentId);
 
-    const environmentTaken =
-        !configuration &&
-        (configurationsData?.automationWorkflowProjectConfigurations ?? []).some(
-            (existingConfiguration) => existingConfiguration.environmentId === environmentId
-        );
-
     const publishedVersions = useMemo(
         () =>
             (versionsData?.automationWorkflowProjectVersions ?? []).filter(
@@ -97,6 +97,24 @@ const AutomationWorkflowProjectConfigurationDialog = ({
 
     const environmentName =
         (environments ?? []).find((environment) => String(environment.id) === environmentId)?.name || environmentId;
+
+    const environmentHasConfiguration = (configurationsData?.automationWorkflowProjectConfigurations ?? []).some(
+        (existingConfiguration) => existingConfiguration.environmentId === environmentId
+    );
+
+    const name =
+        enteredName ?? (environmentHasConfiguration ? '' : ENVIRONMENT_CONFIGS[currentEnvironmentId]?.label || '');
+
+    const trimmedName = name.trim();
+
+    const nameTaken =
+        trimmedName !== '' &&
+        (configurationsData?.automationWorkflowProjectConfigurations ?? []).some(
+            (existingConfiguration) =>
+                existingConfiguration.environmentId === environmentId &&
+                existingConfiguration.id !== configuration?.id &&
+                existingConfiguration.name.trim().toLowerCase() === trimmedName.toLowerCase()
+        );
 
     const isPending = createConfigurationMutation.isPending || updateConfigurationMutation.isPending;
 
@@ -145,6 +163,8 @@ const AutomationWorkflowProjectConfigurationDialog = ({
                     automationHubVisible,
                     enabled: configuration.enabled,
                     id: configuration.id,
+                    name: trimmedName,
+                    permissionExpression: permissionExpression.trim() || null,
                     projectVersion: Number(projectVersion),
                 },
                 {onSuccess}
@@ -155,6 +175,8 @@ const AutomationWorkflowProjectConfigurationDialog = ({
                     automationHubVisible,
                     enabled: false,
                     environmentId,
+                    name: trimmedName,
+                    permissionExpression: permissionExpression.trim() || null,
                     projectId: project.id,
                     projectVersion: Number(projectVersion),
                 },
@@ -170,12 +192,43 @@ const AutomationWorkflowProjectConfigurationDialog = ({
             <div>
                 <Badge label={environmentName} styleType="outline-outline" weight="semibold" />
             </div>
+        </fieldset>
+    );
 
-            {environmentTaken && (
-                <p className="text-sm text-content-warning-primary">
-                    This project already has a configuration in {environmentName}.
+    const nameFieldset = (
+        <fieldset className="flex flex-col gap-2 border-0 p-0">
+            <Label htmlFor="configurationName">Name</Label>
+
+            <Input
+                aria-invalid={nameTaken}
+                id="configurationName"
+                onChange={(event) => setEnteredName(event.target.value)}
+                value={name}
+            />
+
+            {nameTaken && (
+                <p className="text-sm text-content-destructive-primary">
+                    {`A configuration named ${trimmedName} already exists in ${environmentName}.`}
                 </p>
             )}
+        </fieldset>
+    );
+
+    const permissionExpressionFieldset = (
+        <fieldset className="flex flex-col gap-2 border-0 p-0">
+            <Label htmlFor="configurationPermissionExpression">Permission expression</Label>
+
+            <Textarea
+                id="configurationPermissionExpression"
+                onChange={(event) => setPermissionExpression(event.target.value)}
+                placeholder="e.g. metadata['beta'] == 'true'"
+                rows={3}
+                value={permissionExpression}
+            />
+
+            <p className="text-sm text-content-neutral-secondary">
+                Who self-serve can place on this configuration. Empty means everyone.
+            </p>
         </fieldset>
     );
 
@@ -239,9 +292,13 @@ const AutomationWorkflowProjectConfigurationDialog = ({
                         />
 
                         <DialogBody>
+                            {!updateProjectVersion && nameFieldset}
+
                             {(!configuration || updateProjectVersion) && versionFieldset}
 
                             {environmentBadgeFieldset}
+
+                            {!updateProjectVersion && permissionExpressionFieldset}
 
                             {!updateProjectVersion && (
                                 <div className="flex items-center gap-1.5">
@@ -271,7 +328,7 @@ const AutomationWorkflowProjectConfigurationDialog = ({
                             <DialogCancelButton />
 
                             <Button
-                                disabled={isPending || environmentTaken || !projectVersion}
+                                disabled={isPending || nameTaken || !projectVersion || (!updateProjectVersion && !trimmedName)}
                                 label="Save"
                                 type="submit"
                             />
