@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationWorkflowProjectDTO;
@@ -24,9 +25,31 @@ public interface ConnectedUserProjectAdminFacade {
 
     void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable);
 
+    /**
+     * @param connectedUserId the connected user id
+     * @return the configuration the connected user is assigned to in each automation workflow project, in project id
+     *         order
+     */
+    List<ConnectedUserAutomationProjectConfigurationDTO> getConnectedUserProjectConfigurations(long connectedUserId);
+
     List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment);
 
     List<ProvisionableAutomationWorkflowProjectDTO> getProvisionableProjects(long connectedUserId);
 
-    void provisionProjectWorkflows(long connectedUserId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows);
+    /**
+     * Assigns the connected user to the configuration, whatever its permission expression says, and provisions the
+     * workflows the configuration releases.
+     *
+     * @param connectedUserId the connected user id
+     * @param configurationId the configuration id; must be the configuration the connected user is already assigned to
+     *                        in the project, if any, since a change of configuration goes through a move
+     * @param workflows       the workflows to provision
+     * @throws com.bytechef.exception.ConfigurationException with {@code CONFIGURATION_PROJECT_MISMATCH} when the
+     *                                                       configuration belongs to another environment or the
+     *                                                       connected user is assigned to another configuration of the
+     *                                                       project, and with {@code WORKFLOW_NOT_PROVISIONABLE} when
+     *                                                       the configuration does not release a workflow
+     */
+    void provisionProjectWorkflows(
+        long connectedUserId, long configurationId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows);
 }

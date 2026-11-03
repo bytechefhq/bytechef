@@ -7,7 +7,7 @@ extend type Mutation {
     deleteConnectedUserProjectWorkflow(id: ID!): Boolean
     enableConnectedUserProjectWorkflow(id: ID!, enable: Boolean!): Boolean
     provisionConnectedUserProjectWorkflows(
-        connectedUserId: ID!, workflows: [ProvisionConnectedUserProjectWorkflowInput!]!
+        connectedUserId: ID!, configurationId: ID!, workflows: [ProvisionConnectedUserProjectWorkflowInput!]!
     ): Boolean
 }
 
@@ -19,11 +19,19 @@ type ConnectedUserProject {
     projectId: ID!
     connectedUserProjectWorkflows: [ConnectedUserProjectWorkflow!]!
     projectVersion: Int
+    automationProjectConfigurations: [ConnectedUserAutomationProjectConfiguration!]!
     createdBy: String
     createdDate: String
     lastModifiedBy: String
     lastModifiedDate: String
     version: Int
+}
+
+type ConnectedUserAutomationProjectConfiguration {
+    projectId: ID!
+    configurationId: ID!
+    configurationName: String!
+    configurationProjectVersion: Int!
 }
 
 type ConnectedUserProjectWorkflow {
@@ -50,6 +58,16 @@ type ProvisionableConnectedUserProject {
     projectId: ID!
     name: String!
     projectVersion: Int!
+    workflows: [ProvisionableConnectedUserProjectWorkflow!]!
+    configurations: [ProvisionableConnectedUserProjectConfiguration!]!
+    assignedConfigurationId: ID
+}
+
+type ProvisionableConnectedUserProjectConfiguration {
+    id: ID!
+    name: String!
+    projectVersion: Int!
+    selfServe: Boolean!
     workflows: [ProvisionableConnectedUserProjectWorkflow!]!
 }
 

@@ -44,6 +44,8 @@ public interface ConnectedUserProjectConfigurationRepository
 
     List<ConnectedUserProjectConfiguration> findAllByConfigurationId(long configurationId);
 
+    List<ConnectedUserProjectConfiguration> findAllByConnectedUserId(long connectedUserId);
+
     Optional<ConnectedUserProjectConfiguration> findByConnectedUserIdAndProjectId(long connectedUserId, long projectId);
 
     /**

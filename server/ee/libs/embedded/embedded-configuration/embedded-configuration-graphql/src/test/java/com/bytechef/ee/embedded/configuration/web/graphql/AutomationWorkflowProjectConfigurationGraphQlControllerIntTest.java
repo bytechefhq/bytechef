@@ -17,9 +17,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDeleteImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
@@ -68,7 +72,7 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
     @Test
     void testAutomationWorkflowProjectConfigurationsReturnsWorkflowsWithTheirSwitches() {
         AutomationWorkflowProjectConfigurationDTO configuration = new AutomationWorkflowProjectConfigurationDTO(
-            5L, 7L, 0L, "DEVELOPMENT", null, 2, true, false, 0,
+            5L, 7L, 0L, "Beta", "metadata['beta'] == 'true'", 2, true, false, 3,
             List.of(
                 new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-one", "workflow-id-one", "One", true,
                     null, Map.of("openai", 42L), Map.of("channel", "general")),
@@ -86,6 +90,9 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
                         id
                         projectId
                         environmentId
+                        name
+                        permissionExpression
+                        connectedUserCount
                         projectVersion
                         enabled
                         automationHubVisible
@@ -105,6 +112,15 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
             .path("automationWorkflowProjectConfigurations[0].id")
             .entity(String.class)
             .isEqualTo("5")
+            .path("automationWorkflowProjectConfigurations[0].name")
+            .entity(String.class)
+            .isEqualTo("Beta")
+            .path("automationWorkflowProjectConfigurations[0].permissionExpression")
+            .entity(String.class)
+            .isEqualTo("metadata['beta'] == 'true'")
+            .path("automationWorkflowProjectConfigurations[0].connectedUserCount")
+            .entity(Integer.class)
+            .isEqualTo(3)
             .path("automationWorkflowProjectConfigurations[0].projectVersion")
             .entity(Integer.class)
             .isEqualTo(2)
@@ -349,16 +365,180 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
     }
 
     @Test
+    void testAutomationWorkflowProjectConfigurationDeleteImpactReturnsTheCounts() {
+        when(automationWorkflowProjectConfigurationAdminFacade.getDeleteImpact(5L))
+            .thenReturn(new AutomationWorkflowProjectConfigurationDeleteImpactDTO(3, 7));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurationDeleteImpact(id: "5") {
+                        connectedUserCount
+                        referenceWorkflowCount
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectConfigurationDeleteImpact.connectedUserCount")
+            .entity(Integer.class)
+            .isEqualTo(3)
+            .path("automationWorkflowProjectConfigurationDeleteImpact.referenceWorkflowCount")
+            .entity(Integer.class)
+            .isEqualTo(7);
+    }
+
+    @Test
+    void testAutomationWorkflowProjectConfigurationConnectedUsersReturnsTheAssignedUsers() {
+        when(automationWorkflowProjectConfigurationAdminFacade.getConfigurationConnectedUsers(5L))
+            .thenReturn(
+                List.of(
+                    new AutomationWorkflowProjectConfigurationConnectedUserDTO(
+                        21L, "external-21", "Jane", "jane@example.com"),
+                    new AutomationWorkflowProjectConfigurationConnectedUserDTO(22L, "external-22", null, null)));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurationConnectedUsers(id: "5") {
+                        connectedUserId
+                        externalId
+                        name
+                        email
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectConfigurationConnectedUsers[*].connectedUserId")
+            .entityList(String.class)
+            .containsExactly("21", "22")
+            .path("automationWorkflowProjectConfigurationConnectedUsers[0].externalId")
+            .entity(String.class)
+            .isEqualTo("external-21")
+            .path("automationWorkflowProjectConfigurationConnectedUsers[0].name")
+            .entity(String.class)
+            .isEqualTo("Jane")
+            .path("automationWorkflowProjectConfigurationConnectedUsers[0].email")
+            .entity(String.class)
+            .isEqualTo("jane@example.com")
+            .path("automationWorkflowProjectConfigurationConnectedUsers[1].name")
+            .valueIsNull()
+            .path("automationWorkflowProjectConfigurationConnectedUsers[1].email")
+            .valueIsNull();
+    }
+
+    @Test
+    void testAutomationWorkflowProjectConfigurationMoveImpactReturnsWorkflowsAndSkippedUsers() {
+        when(automationWorkflowProjectConfigurationAdminFacade.getMoveImpact(5L, 6L, List.of(21L, 22L)))
+            .thenReturn(
+                new ConfigurationMoveImpactDTO(
+                    List.of(
+                        new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                            "uuid-one", "Notify Slack", List.of("channel"), List.of("jira"), 1)),
+                    List.of(
+                        new ConfigurationMoveResultDTO.Skipped(
+                            22L, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,
+                            List.of("Sync Leads")))));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurationMoveImpact(
+                        sourceId: "5", targetId: "6", connectedUserIds: ["21", "22"]) {
+                        workflows {
+                            workflowUuid
+                            label
+                            newRequiredInputs
+                            newRequiredConnections
+                            affectedConnectedUserCount
+                        }
+                        skipped {
+                            connectedUserId
+                            reason
+                            workflowLabels
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectConfigurationMoveImpact.workflows[0].workflowUuid")
+            .entity(String.class)
+            .isEqualTo("uuid-one")
+            .path("automationWorkflowProjectConfigurationMoveImpact.workflows[0].newRequiredInputs")
+            .entityList(String.class)
+            .containsExactly("channel")
+            .path("automationWorkflowProjectConfigurationMoveImpact.workflows[0].newRequiredConnections")
+            .entityList(String.class)
+            .containsExactly("jira")
+            .path("automationWorkflowProjectConfigurationMoveImpact.workflows[0].affectedConnectedUserCount")
+            .entity(Integer.class)
+            .isEqualTo(1)
+            .path("automationWorkflowProjectConfigurationMoveImpact.skipped[0].connectedUserId")
+            .entity(String.class)
+            .isEqualTo("22")
+            .path("automationWorkflowProjectConfigurationMoveImpact.skipped[0].reason")
+            .entity(String.class)
+            .isEqualTo("TARGET_LACKS_REFERENCED_WORKFLOWS")
+            .path("automationWorkflowProjectConfigurationMoveImpact.skipped[0].workflowLabels")
+            .entityList(String.class)
+            .containsExactly("Sync Leads");
+    }
+
+    @Test
+    void testMoveAutomationWorkflowProjectConfigurationConnectedUsersReturnsTheResult() {
+        when(automationWorkflowProjectConfigurationAdminFacade.moveConnectedUsers(5L, 6L, List.of(21L, 22L, 23L)))
+            .thenReturn(
+                new ConfigurationMoveResultDTO(
+                    List.of(21L, 23L),
+                    List.of(
+                        new ConfigurationMoveResultDTO.Skipped(
+                            22L, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of())),
+                    List.of(23L)));
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    moveAutomationWorkflowProjectConfigurationConnectedUsers(
+                        sourceId: "5", targetId: "6", connectedUserIds: ["21", "22", "23"]) {
+                        movedConnectedUserIds
+                        needsAttentionConnectedUserIds
+                        skipped {
+                            connectedUserId
+                            reason
+                            workflowLabels
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("moveAutomationWorkflowProjectConfigurationConnectedUsers.movedConnectedUserIds")
+            .entityList(String.class)
+            .containsExactly("21", "23")
+            .path("moveAutomationWorkflowProjectConfigurationConnectedUsers.needsAttentionConnectedUserIds")
+            .entityList(String.class)
+            .containsExactly("23")
+            .path("moveAutomationWorkflowProjectConfigurationConnectedUsers.skipped[0].connectedUserId")
+            .entity(String.class)
+            .isEqualTo("22")
+            .path("moveAutomationWorkflowProjectConfigurationConnectedUsers.skipped[0].reason")
+            .entity(String.class)
+            .isEqualTo("NOT_ON_SOURCE")
+            .path("moveAutomationWorkflowProjectConfigurationConnectedUsers.skipped[0].workflowLabels")
+            .entityList(String.class)
+            .hasSize(0);
+    }
+
+    @Test
     void testCreateAutomationWorkflowProjectConfigurationDelegatesAndReturnsId() {
-        when(automationWorkflowProjectConfigurationAdminFacade.createConfiguration(7L, 0L, "DEVELOPMENT", null, 2, true,
-            false))
+        when(automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            7L, 0L, "Beta", "metadata['beta'] == 'true'", 2, true, false))
                 .thenReturn(11L);
 
         this.graphQlTester
             .document("""
                 mutation {
                     createAutomationWorkflowProjectConfiguration(
-                        projectId: "7", environmentId: "0", projectVersion: 2, enabled: true,
+                        projectId: "7", environmentId: "0", name: "Beta",
+                        permissionExpression: "metadata['beta'] == 'true'", projectVersion: 2, enabled: true,
                         automationHubVisible: false)
                 }
                 """)
@@ -366,6 +546,45 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
             .path("createAutomationWorkflowProjectConfiguration")
             .entity(String.class)
             .isEqualTo("11");
+    }
+
+    @Test
+    void testCreateAutomationWorkflowProjectConfigurationWithoutPermissionExpressionPassesNull() {
+        when(automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            7L, 0L, "Alpha", null, 2, true, true))
+                .thenReturn(12L);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    createAutomationWorkflowProjectConfiguration(
+                        projectId: "7", environmentId: "0", name: "Alpha", projectVersion: 2, enabled: true,
+                        automationHubVisible: true)
+                }
+                """)
+            .execute()
+            .path("createAutomationWorkflowProjectConfiguration")
+            .entity(String.class)
+            .isEqualTo("12");
+    }
+
+    @Test
+    void testUpdateAutomationWorkflowProjectConfigurationPassesNameAndPermissionExpression() {
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateAutomationWorkflowProjectConfiguration(
+                        id: "5", name: "Gamma", permissionExpression: "metadata['gamma'] == 'true'",
+                        projectVersion: 3, enabled: false, automationHubVisible: true)
+                }
+                """)
+            .execute()
+            .path("updateAutomationWorkflowProjectConfiguration")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(automationWorkflowProjectConfigurationAdminFacade).updateConfiguration(
+            5L, "Gamma", "metadata['gamma'] == 'true'", 3, false, true);
     }
 
     @Test

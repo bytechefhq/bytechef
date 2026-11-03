@@ -49,4 +49,9 @@ public class RemoteConnectedUserProjectConfigurationServiceClient implements Con
     public List<ConnectedUserProjectConfiguration> getAssignments(long configurationId) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public List<ConnectedUserProjectConfiguration> getConnectedUserAssignments(long connectedUserId) {
+        throw new UnsupportedOperationException();
+    }
 }

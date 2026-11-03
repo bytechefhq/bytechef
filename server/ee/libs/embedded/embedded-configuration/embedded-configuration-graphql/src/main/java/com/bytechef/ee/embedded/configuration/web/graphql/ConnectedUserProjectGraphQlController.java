@@ -8,18 +8,22 @@
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectAdminFacade;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -72,12 +76,23 @@ public class ConnectedUserProjectGraphQlController {
         return true;
     }
 
+    @SchemaMapping(typeName = "ConnectedUserProject")
+    public List<ConnectedUserAutomationProjectConfigurationDTO> automationProjectConfigurations(
+        ConnectedUserProjectDTO connectedUserProject) {
+
+        ConnectedUser connectedUser = connectedUserProject.connectedUser();
+
+        return connectedUserProjectFacade.getConnectedUserProjectConfigurations(
+            Objects.requireNonNull(connectedUser.getId()));
+    }
+
     @MutationMapping
     public boolean provisionConnectedUserProjectWorkflows(
-        @Argument long connectedUserId, @Argument List<ProvisionConnectedUserProjectWorkflowInput> workflows) {
+        @Argument long connectedUserId, @Argument long configurationId,
+        @Argument List<ProvisionConnectedUserProjectWorkflowInput> workflows) {
 
         connectedUserProjectFacade.provisionProjectWorkflows(
-            connectedUserId,
+            connectedUserId, configurationId,
             workflows.stream()
                 .map(workflow -> new ProvisionConnectedUserProjectWorkflowDTO(
                     workflow.workflowUuid(), workflow.inputs()))

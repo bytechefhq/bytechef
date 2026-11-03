@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCategoryDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationReleaseDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
@@ -123,6 +124,13 @@ public class RemoteAutomationWorkflowProjectFacadeClient implements AutomationWo
 
     @Override
     public List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<AutomationWorkflowProjectConfigurationReleaseDTO> getPublishedProjectConfigurations(
+        String externalUserId, Environment environment) {
+
         throw new UnsupportedOperationException();
     }
 

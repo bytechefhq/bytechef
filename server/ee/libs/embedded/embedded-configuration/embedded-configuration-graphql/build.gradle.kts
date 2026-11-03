@@ -8,11 +8,11 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
-    testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 }

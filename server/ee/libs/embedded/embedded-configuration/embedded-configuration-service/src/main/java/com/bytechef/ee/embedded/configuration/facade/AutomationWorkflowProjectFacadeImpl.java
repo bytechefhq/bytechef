@@ -24,6 +24,7 @@ import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectCo
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCategoryDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationReleaseDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
@@ -388,6 +389,53 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         }
 
         return projects;
+    }
+
+    @Override
+    public List<AutomationWorkflowProjectConfigurationReleaseDTO> getPublishedProjectConfigurations(
+        String externalUserId, Environment environment) {
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
+
+        Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment, connectedUser);
+
+        Map<Long, AutomationWorkflowProject> automationWorkflowProjects = getAutomationWorkflowProjects();
+
+        List<AutomationWorkflowProjectConfigurationReleaseDTO> releases = new ArrayList<>();
+
+        for (Project project : getAutomationWorkflowProjectProjects(automationWorkflowProjects.keySet())) {
+            AutomationWorkflowProject automationWorkflowProject = automationWorkflowProjects.get(project.getId());
+
+            if (!embeddedPermissionEvaluator.evaluate(
+                automationWorkflowProject.getPermissionExpression(), connectedUser)) {
+
+                continue;
+            }
+
+            List<AutomationWorkflowProjectConfiguration> configurations =
+                automationWorkflowProjectConfigurationService.getConfigurations(
+                    project.getId(), connectedUser.getEnvironmentId());
+
+            for (AutomationWorkflowProjectConfiguration configuration : configurations) {
+                if (!configuration.isEnabled()) {
+                    continue;
+                }
+
+                AutomationWorkflowProjectDTO projectDTO = toPublishedDTO(
+                    project, automationWorkflowProject, configuration.getProjectVersion(),
+                    configuration.isAutomationHubVisible(),
+                    projectWorkflow -> automationWorkflowProjectConfigurationService.isWorkflowEnabled(
+                        configuration, projectWorkflow.getUuid()));
+
+                releases.add(
+                    new AutomationWorkflowProjectConfigurationReleaseDTO(
+                        configuration.getId(), configuration.getName(),
+                        filterWorkflowTemplates(
+                            projectDTO, connectedUser, integrationIdsByComponentName, configuration)));
+            }
+        }
+
+        return releases;
     }
 
     @Override

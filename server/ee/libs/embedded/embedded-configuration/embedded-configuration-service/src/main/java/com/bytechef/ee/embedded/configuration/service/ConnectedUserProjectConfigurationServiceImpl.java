@@ -92,4 +92,10 @@ public class ConnectedUserProjectConfigurationServiceImpl implements ConnectedUs
     public List<ConnectedUserProjectConfiguration> getAssignments(long configurationId) {
         return connectedUserProjectConfigurationRepository.findAllByConfigurationId(configurationId);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConnectedUserProjectConfiguration> getConnectedUserAssignments(long connectedUserId) {
+        return connectedUserProjectConfigurationRepository.findAllByConnectedUserId(connectedUserId);
+    }
 }
