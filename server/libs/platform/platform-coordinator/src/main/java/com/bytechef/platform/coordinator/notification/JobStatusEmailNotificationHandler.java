@@ -42,12 +42,19 @@ public class JobStatusEmailNotificationHandler implements EmailNotificationHandl
 
     @Override
     public String getContent(NotificationHandlerContext notificationHandlerContext) {
-        return messageSource.getMessage(
+        String message = messageSource.getMessage(
             "email." + notificationHandlerContext.getEventType() + ".content",
             new Object[] {
                 notificationHandlerContext.getJobName(), notificationHandlerContext.getJobId()
             },
             Locale.getDefault());
+        String details = notificationHandlerContext.toDetailsText();
+
+        if (details.isEmpty()) {
+            return message;
+        }
+
+        return message + "\n\n" + details;
     }
 
     @Override

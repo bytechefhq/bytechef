@@ -44,11 +44,19 @@ public class JobStatusSlackNotificationHandler implements SlackNotificationHandl
         String icon = notificationHandlerContext.getEventType() == Type.JOB_FAILED
             ? ":rotating_light:" : ":information_source:";
 
-        return icon + " " + messageSource.getMessage(
+        String text = icon + " " + messageSource.getMessage(
             "email." + notificationHandlerContext.getEventType() + ".content",
             new Object[] {
                 notificationHandlerContext.getJobName(), notificationHandlerContext.getJobId()
             },
             Locale.getDefault());
+
+        String details = notificationHandlerContext.toDetailsText();
+
+        if (details.isEmpty()) {
+            return text;
+        }
+
+        return text + "\n" + details;
     }
 }

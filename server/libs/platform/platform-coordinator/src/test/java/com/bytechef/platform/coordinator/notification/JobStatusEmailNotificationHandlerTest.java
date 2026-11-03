@@ -51,6 +51,26 @@ class JobStatusEmailNotificationHandlerTest {
             .isEqualTo("Job Daily sync (ID: 42) was stopped.");
     }
 
+    @Test
+    void testContentAppendsDetailsWhenPresent() {
+        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
+            .environment("PRODUCTION")
+            .error(new NotificationHandlerContext.ErrorSummary("Send email", "email/v1/send", "boom", null))
+            .eventType(Type.JOB_FAILED)
+            .executionUrl("https://x/automation/executions?id=42")
+            .jobId(42L)
+            .jobName("Daily sync")
+            .project(new NotificationHandlerContext.ProjectSummary(3L, "CRM", 3))
+            .workflow(new NotificationHandlerContext.WorkflowSummary("wf1", "Daily sync"))
+            .build();
+
+        assertThat(jobStatusEmailNotificationHandler.getContent(notificationHandlerContext))
+            .isEqualTo(
+                "Job Daily sync (ID: 42) execution failed.\n\nWorkflow: Daily sync\nProject: CRM (v3)\n" +
+                    "Environment: PRODUCTION\nFailed task: Send email (email/v1/send)\nError: boom\n" +
+                    "Execution: https://x/automation/executions?id=42");
+    }
+
     @ParameterizedTest
     @MethodSource("handledTypes")
     void testEveryHandledTypeHasEmailText(Type type) {

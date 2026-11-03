@@ -41,9 +41,17 @@ public class ApprovalEscalationSlackNotificationHandler implements SlackNotifica
 
     @Override
     public String getText(NotificationHandlerContext notificationHandlerContext) {
-        return ":rotating_light: " + messageSource.getMessage(
+        String text = ":rotating_light: " + messageSource.getMessage(
             "email." + notificationHandlerContext.getEventType() + ".content",
             ApprovalEscalationEmailNotificationHandler.getMessageArguments(notificationHandlerContext),
             Locale.getDefault());
+
+        String details = notificationHandlerContext.toDetailsText();
+
+        if (details.isEmpty()) {
+            return text;
+        }
+
+        return text + "\n" + details;
     }
 }

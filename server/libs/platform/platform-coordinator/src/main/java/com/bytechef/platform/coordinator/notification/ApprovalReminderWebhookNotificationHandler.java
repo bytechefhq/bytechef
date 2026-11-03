@@ -21,9 +21,6 @@ import com.bytechef.platform.notification.domain.NotificationEvent.Type;
 import com.bytechef.platform.notification.handler.NotificationEventType;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.WebhookNotificationHandler;
-import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,18 +34,6 @@ public class ApprovalReminderWebhookNotificationHandler implements WebhookNotifi
 
     @Override
     public String getPayload(NotificationHandlerContext notificationHandlerContext) {
-        Map<String, Object> payload = new LinkedHashMap<>();
-
-        payload.put("eventType", String.valueOf(notificationHandlerContext.getEventType()));
-        payload.put("jobId", notificationHandlerContext.getJobId());
-        payload.put("jobName", notificationHandlerContext.getJobName());
-        payload.put("approvalExpiresAt", notificationHandlerContext.getApprovalExpiresAt());
-        payload.put("approvalFormUrl", notificationHandlerContext.getApprovalFormUrl());
-
-        Instant now = Instant.now();
-
-        payload.put("timestamp", now.toString());
-
-        return JsonUtils.write(payload);
+        return JsonUtils.write(notificationHandlerContext.toMap());
     }
 }

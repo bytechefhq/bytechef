@@ -43,6 +43,7 @@ class ApprovalReminderEmailNotificationHandlerTest {
             .approvalExpiresAt("2026-10-17T13:39:23Z")
             .approvalFormUrl(FORM_URL)
             .eventType(NotificationEvent.Type.JOB_APPROVAL_EXPIRING)
+            .executionUrl("https://x/automation/executions?id=4")
             .jobId(4L)
             .jobName("Order approval")
             .build();
@@ -51,5 +52,7 @@ class ApprovalReminderEmailNotificationHandlerTest {
 
         assertThat(content.lines())
             .contains(FORM_URL);
+        assertThat(content)
+            .contains("Execution: https://x/automation/executions?id=4");
     }
 }
