@@ -56,4 +56,7 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
+
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 }

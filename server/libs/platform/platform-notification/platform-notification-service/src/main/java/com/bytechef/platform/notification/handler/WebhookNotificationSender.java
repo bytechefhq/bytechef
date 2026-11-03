@@ -23,6 +23,7 @@ import com.bytechef.platform.notification.delivery.WebhookRetry;
 import com.bytechef.platform.notification.delivery.WebhookTestResult;
 import com.bytechef.platform.notification.domain.Notification;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,9 +88,17 @@ public class WebhookNotificationSender implements NotificationSender<WebhookNoti
 
         String secret = webhookDelivery.secret();
 
+        List<String> secretValues = new ArrayList<>(webhookDelivery.headers()
+            .values());
+
+        secretValues.add(secret);
+
+        TestSendRedaction testSendRedaction = TestSendRedaction.of(secretValues);
+
         return new NotificationTestResult(
-            webhookTestResult.success(), webhookTestResult.statusCode(), webhookTestResult.responseBody(),
-            webhookTestResult.error(), secret != null && !secret.isBlank());
+            webhookTestResult.success(), webhookTestResult.statusCode(),
+            testSendRedaction.redact(webhookTestResult.responseBody()),
+            testSendRedaction.redact(webhookTestResult.error()), secret != null && !secret.isBlank());
     }
 
     private static WebhookDelivery buildDelivery(

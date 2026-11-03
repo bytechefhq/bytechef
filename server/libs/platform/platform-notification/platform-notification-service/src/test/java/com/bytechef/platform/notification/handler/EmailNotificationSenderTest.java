@@ -159,6 +159,30 @@ class EmailNotificationSenderTest {
         assertThat(notificationTestResult.error()).isEqualTo("Email address is required");
     }
 
+    @Test
+    void testSendTestCollapsesAndCapsErrorText() {
+        when(emailNotificationHandler.getSubject(notificationHandlerContext)).thenReturn("Subject");
+        when(emailNotificationHandler.getContent(notificationHandlerContext)).thenReturn("Content");
+
+        String message = ("line one\n\tline two   " + "x".repeat(50) + "\r\n").repeat(14)
+            .substring(0, 1000);
+
+        doThrow(new MailSendException(message)).when(mailService)
+            .sendEmailNow(anyString(), anyString(), anyString(), anyBoolean());
+
+        String error = emailNotificationSender.sendTest(
+            createNotification(Map.of("email", "approver@example.com")), emailNotificationHandler,
+            notificationHandlerContext)
+            .error();
+
+        assertThat(message).hasSize(1000)
+            .contains("\n");
+        assertThat(error).hasSize(201)
+            .startsWith("MailSendException: line one line two xxx")
+            .endsWith("\u2026")
+            .doesNotContain("\n", "\r", "\t", "  ");
+    }
+
     private static Notification createNotification(Map<String, Object> settings) {
         Notification notification = new Notification();
 

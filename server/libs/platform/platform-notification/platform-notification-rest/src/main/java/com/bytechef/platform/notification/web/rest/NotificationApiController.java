@@ -25,6 +25,7 @@ import com.bytechef.platform.notification.web.rest.model.NotificationSigningSecr
 import com.bytechef.platform.notification.web.rest.model.NotificationTestResultModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,15 +83,22 @@ public class NotificationApiController implements NotificationApi {
     }
 
     @Override
-    public ResponseEntity<NotificationTestResultModel> testNotification(NotificationModel notificationModel) {
+    public ResponseEntity<NotificationTestResultModel> testNotification(
+        NotificationModel notificationModel, @Nullable Long notificationId) {
+
         NotificationTestResult notificationTestResult = notificationFacade.testNotification(
-            conversionService.convert(notificationModel, Notification.class));
+            conversionService.convert(notificationModel.id(notificationId), Notification.class));
+
+        String unsignedReason = notificationTestResult.unsignedReason();
 
         return ResponseEntity.ok(
             new NotificationTestResultModel(notificationTestResult.success(), notificationTestResult.signed())
                 .statusCode(notificationTestResult.statusCode())
                 .responseBody(notificationTestResult.responseBody())
-                .error(notificationTestResult.error()));
+                .error(notificationTestResult.error())
+                .unsignedReason(
+                    unsignedReason == null ? null : NotificationTestResultModel.UnsignedReasonEnum.fromValue(
+                        unsignedReason)));
     }
 
     @Override
