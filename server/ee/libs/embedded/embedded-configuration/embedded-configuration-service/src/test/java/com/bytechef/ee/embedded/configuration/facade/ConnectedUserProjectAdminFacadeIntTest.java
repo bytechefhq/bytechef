@@ -32,22 +32,27 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -174,6 +179,9 @@ class ConnectedUserProjectAdminFacadeIntTest {
 
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
+
+    @Autowired
+    private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
 
     @MockitoSpyBean
     private ConnectedUserProjectService connectedUserProjectService;
@@ -359,7 +367,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .workflowUuid();
 
         connectedUserProjectAdminFacade.provisionProjectWorkflows(
-            connectedUser.getId(),
+            connectedUser.getId(), getConfigurationId(projectId),
             List.of(
                 new ProvisionConnectedUserProjectWorkflowDTO(firstWorkflowUuid, null),
                 new ProvisionConnectedUserProjectWorkflowDTO(secondWorkflowUuid, null)));
@@ -405,7 +413,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
             configuration.getId(), turnedOffWorkflowUuid, false);
 
         assertThatThrownBy(() -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
-            connectedUser.getId(),
+            connectedUser.getId(), configuration.getId(),
             List.of(
                 new ProvisionConnectedUserProjectWorkflowDTO(validWorkflowUuid, null),
                 new ProvisionConnectedUserProjectWorkflowDTO(turnedOffWorkflowUuid, null))))
@@ -415,6 +423,8 @@ class ConnectedUserProjectAdminFacadeIntTest {
                                 .getErrorKey()));
 
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(connectedUser.getId(), projectId))
+            .isEmpty();
     }
 
     @Test
@@ -441,7 +451,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
                 anyString(), eq(failingWorkflowUuid), any(Environment.class), anyMap(), any());
 
         assertThatThrownBy(() -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
-            connectedUser.getId(),
+            connectedUser.getId(), getConfigurationId(projectId),
             List.of(
                 new ProvisionConnectedUserProjectWorkflowDTO(firstWorkflowUuid, null),
                 new ProvisionConnectedUserProjectWorkflowDTO(failingWorkflowUuid, null))))
@@ -478,10 +488,11 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .workflowUuid();
 
         connectedUserProjectAdminFacade.provisionProjectWorkflows(
-            connectedUser.getId(),
-            List.of(
-                new ProvisionConnectedUserProjectWorkflowDTO(needsConnectionWorkflowUuid, null),
-                new ProvisionConnectedUserProjectWorkflowDTO(standaloneWorkflowUuid, null)));
+            connectedUser.getId(), getConfigurationId(needsConnectionProjectId),
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(needsConnectionWorkflowUuid, null)));
+        connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(), getConfigurationId(standaloneProjectId),
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(standaloneWorkflowUuid, null)));
 
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId()))
             .extracting(ConnectedUserProjectWorkflow::getAutomationWorkflowUuid)
@@ -509,17 +520,203 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .workflowUuid();
 
         connectedUserProjectAdminFacade.provisionProjectWorkflows(
-            connectedUser.getId(),
+            connectedUser.getId(), getConfigurationId(projectId),
             List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, Map.of("channel", "#alerts"))));
 
         assertThat(findProjectWorkflow(connectedUser, workflowUuid).inputValues())
             .isEqualTo(Map.of("channel", "#alerts"));
 
         connectedUserProjectAdminFacade.provisionProjectWorkflows(
-            connectedUser.getId(), List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null)));
+            connectedUser.getId(), getConfigurationId(projectId),
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null)));
 
         assertThat(findProjectWorkflow(connectedUser, workflowUuid).inputValues())
             .isEqualTo(Map.of("channel", "#alerts"));
+    }
+
+    @Test
+    void testProvisionAssignsTheChosenConfigurationIgnoringItsExpression() {
+        givenSlackAutomationWorkflowEnvironment();
+        givenRealPermissionEvaluator();
+
+        long projectId = createProjectWithWorkflows("Provision Beta", 1);
+
+        publishAndPinProject(projectId);
+
+        AutomationWorkflowProjectConfiguration betaConfiguration = createBetaConfiguration(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        String workflowUuid = findProvisionableProject(
+            connectedUserProjectAdminFacade.getProvisionableProjects(connectedUser.getId()), projectId)
+                .workflows()
+                .getFirst()
+                .workflowUuid();
+
+        connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(), betaConfiguration.getId(),
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null)));
+
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(connectedUser.getId(), projectId))
+            .map(ConnectedUserProjectConfiguration::getConfigurationId)
+            .contains(betaConfiguration.getId());
+        assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId()))
+            .extracting(ConnectedUserProjectWorkflow::getAutomationWorkflowUuid,
+                ConnectedUserProjectWorkflow::isEnabled)
+            .containsExactly(tuple(workflowUuid, true));
+        assertThat(connectedUserProjectAdminFacade.getConnectedUserProjectConfigurations(connectedUser.getId()))
+            .containsExactly(
+                new ConnectedUserAutomationProjectConfigurationDTO(
+                    projectId, betaConfiguration.getId(), "Beta", betaConfiguration.getProjectVersion()));
+    }
+
+    @Test
+    void testProvisionWithDifferentConfigurationForAssignedUserThrows() {
+        givenSlackAutomationWorkflowEnvironment();
+        givenRealPermissionEvaluator();
+
+        long projectId = createProjectWithWorkflows("Provision Reassign", 1);
+
+        publishAndPinProject(projectId);
+
+        long alphaConfigurationId = getConfigurationId(projectId);
+
+        AutomationWorkflowProjectConfiguration betaConfiguration = createBetaConfiguration(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        String workflowUuid = findProvisionableProject(
+            connectedUserProjectAdminFacade.getProvisionableProjects(connectedUser.getId()), projectId)
+                .workflows()
+                .getFirst()
+                .workflowUuid();
+
+        connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(), alphaConfigurationId,
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null)));
+
+        assertThatThrownBy(() -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(), betaConfiguration.getId(),
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null))))
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                    configurationException.getErrorKey())
+                        .isEqualTo(AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH
+                            .getErrorKey()));
+
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(connectedUser.getId(), projectId))
+            .map(ConnectedUserProjectConfiguration::getConfigurationId)
+            .contains(alphaConfigurationId);
+
+        connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(), alphaConfigurationId,
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null)));
+
+        assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId()))
+            .extracting(ConnectedUserProjectWorkflow::getAutomationWorkflowUuid)
+            .containsExactly(workflowUuid);
+    }
+
+    @Test
+    void testProvisionableProjectsListEveryEnabledConfigurationAndMarkSelfServe() {
+        givenSlackAutomationWorkflowEnvironment();
+        givenRealPermissionEvaluator();
+
+        long projectId = createProjectWithWorkflows("Provisionable Configurations", 2);
+
+        publishAndPinProject(projectId);
+
+        long alphaConfigurationId = getConfigurationId(projectId);
+
+        AutomationWorkflowProjectConfiguration betaConfiguration = createBetaConfiguration(projectId);
+
+        automationWorkflowProjectConfigurationService.create(
+            projectId, Environment.PRODUCTION.ordinal(), "Disabled", null, betaConfiguration.getProjectVersion(),
+            false, true);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        List<String> workflowUuids = findProvisionableProject(
+            connectedUserProjectAdminFacade.getProvisionableProjects(connectedUser.getId()), projectId)
+                .workflows()
+                .stream()
+                .map(ProvisionableAutomationWorkflowProjectDTO.Workflow::workflowUuid)
+                .toList();
+
+        String betaTurnedOffWorkflowUuid = workflowUuids.getFirst();
+        String betaReleasedWorkflowUuid = workflowUuids.getLast();
+
+        automationWorkflowProjectConfigurationAdminFacade.enableConfigurationWorkflow(
+            betaConfiguration.getId(), betaTurnedOffWorkflowUuid, false);
+
+        ProvisionableAutomationWorkflowProjectDTO provisionableProject = findProvisionableProject(
+            connectedUserProjectAdminFacade.getProvisionableProjects(connectedUser.getId()), projectId);
+
+        assertThat(provisionableProject.assignedConfigurationId()).isNull();
+        assertThat(provisionableProject.configurations())
+            .extracting(
+                ProvisionableAutomationWorkflowProjectDTO.Configuration::id,
+                ProvisionableAutomationWorkflowProjectDTO.Configuration::selfServe)
+            .containsExactly(tuple(alphaConfigurationId, true), tuple(betaConfiguration.getId(), false));
+        assertThat(provisionableProject.configurations()
+            .getLast()
+            .workflows())
+                .extracting(ProvisionableAutomationWorkflowProjectDTO.Workflow::workflowUuid)
+                .containsExactly(betaReleasedWorkflowUuid);
+        assertThat(provisionableProject.workflows())
+            .extracting(ProvisionableAutomationWorkflowProjectDTO.Workflow::workflowUuid)
+            .containsExactlyInAnyOrderElementsOf(workflowUuids);
+
+        ConnectedUser betaConnectedUser = connectedUserService.createConnectedUser(
+            "beta-user-" + UUID.randomUUID(), Environment.PRODUCTION, null, null, Map.of("beta", "true"));
+
+        assertThat(
+            findProvisionableProject(
+                connectedUserProjectAdminFacade.getProvisionableProjects(betaConnectedUser.getId()), projectId)
+                    .configurations())
+                        .extracting(
+                            ProvisionableAutomationWorkflowProjectDTO.Configuration::id,
+                            ProvisionableAutomationWorkflowProjectDTO.Configuration::selfServe)
+                        .containsExactly(tuple(alphaConfigurationId, false), tuple(betaConfiguration.getId(), true));
+
+        connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(), betaConfiguration.getId(),
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(betaReleasedWorkflowUuid, null)));
+
+        ProvisionableAutomationWorkflowProjectDTO assignedProvisionableProject = findProvisionableProject(
+            connectedUserProjectAdminFacade.getProvisionableProjects(connectedUser.getId()), projectId);
+
+        assertThat(assignedProvisionableProject.assignedConfigurationId()).isEqualTo(betaConfiguration.getId());
+        assertThat(assignedProvisionableProject.workflows())
+            .extracting(
+                ProvisionableAutomationWorkflowProjectDTO.Workflow::workflowUuid,
+                ProvisionableAutomationWorkflowProjectDTO.Workflow::provisioned)
+            .containsExactly(tuple(betaReleasedWorkflowUuid, true));
+    }
+
+    private AutomationWorkflowProjectConfiguration createBetaConfiguration(long projectId) {
+        AutomationWorkflowProjectConfiguration alphaConfiguration = automationWorkflowProjectConfigurationService
+            .getConfiguration(getConfigurationId(projectId));
+
+        return automationWorkflowProjectConfigurationService.create(
+            projectId, Environment.PRODUCTION.ordinal(), "Beta", "metadata['beta'] == 'true'",
+            alphaConfiguration.getProjectVersion(), true, true);
+    }
+
+    private void givenRealPermissionEvaluator() {
+        EmbeddedPermissionEvaluator realEmbeddedPermissionEvaluator = new EmbeddedPermissionEvaluator(
+            SpelEvaluator.create());
+
+        when(embeddedPermissionEvaluator.evaluate(any(), any()))
+            .thenAnswer(invocation -> realEmbeddedPermissionEvaluator.evaluate(
+                invocation.getArgument(0), invocation.getArgument(1)));
+    }
+
+    private long getConfigurationId(long projectId) {
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .getConfigurations(projectId, Environment.PRODUCTION.ordinal())
+            .getFirst();
+
+        return Objects.requireNonNull(configuration.getId());
     }
 
     private ConnectedUserProjectWorkflowDTO findProjectWorkflow(ConnectedUser connectedUser, String workflowUuid) {

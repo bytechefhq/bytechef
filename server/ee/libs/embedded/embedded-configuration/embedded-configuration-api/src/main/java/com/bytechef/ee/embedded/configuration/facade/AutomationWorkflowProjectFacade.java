@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCategoryDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationReleaseDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
@@ -53,6 +54,18 @@ public interface AutomationWorkflowProjectFacade {
     List<AutomationWorkflowProjectDTO> getPublishedProjects();
 
     List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment);
+
+    /**
+     * Lists every enabled configuration in the connected user's environment of each published project the connected
+     * user may see, whatever the configuration's permission expression says, with the project as that configuration
+     * releases it to the connected user. Projects come in name order and each project's configurations in id order.
+     *
+     * @param externalUserId the connected user's external id
+     * @param environment    the connected user's environment
+     * @return the project releases, one per configuration
+     */
+    List<AutomationWorkflowProjectConfigurationReleaseDTO> getPublishedProjectConfigurations(
+        String externalUserId, Environment environment);
 
     default void publishProject(long projectId) {
         publishProject(projectId, null);

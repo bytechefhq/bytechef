@@ -374,7 +374,8 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
 
         assertThatThrownBy(
             () -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
-                Long.MAX_VALUE, List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null))))
+                Long.MAX_VALUE, Long.MAX_VALUE,
+                List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null))))
                     .isInstanceOf(RuntimeException.class);
 
         assertThat(
@@ -382,6 +383,7 @@ class AutomationWorkflowProjectAdminFacadeAuditIntTest {
                 .getData())
                     .containsEntry("result", "ERROR")
                     .containsEntry("connectedUserId", String.valueOf(Long.MAX_VALUE))
+                    .containsEntry("configurationId", String.valueOf(Long.MAX_VALUE))
                     .containsEntry("workflowUuids", "[" + workflowUuid + "]");
 
         assertThatThrownBy(() -> connectedUserProjectAdminFacade.enableProjectWorkflow(Long.MAX_VALUE, true))

@@ -8,14 +8,17 @@
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDeleteImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -80,21 +83,38 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
         return automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(Long.parseLong(id), projectVersion);
     }
 
+    @QueryMapping
+    public List<AutomationWorkflowProjectConfigurationConnectedUserDTO>
+        automationWorkflowProjectConfigurationConnectedUsers(@Argument String id) {
+
+        return automationWorkflowProjectConfigurationAdminFacade.getConfigurationConnectedUsers(Long.parseLong(id));
+    }
+
+    @QueryMapping
+    public AutomationWorkflowProjectConfigurationDeleteImpactDTO automationWorkflowProjectConfigurationDeleteImpact(
+        @Argument String id) {
+
+        return automationWorkflowProjectConfigurationAdminFacade.getDeleteImpact(Long.parseLong(id));
+    }
+
+    @QueryMapping
+    public ConfigurationMoveImpactDTO automationWorkflowProjectConfigurationMoveImpact(
+        @Argument String sourceId, @Argument String targetId, @Argument List<String> connectedUserIds) {
+
+        return automationWorkflowProjectConfigurationAdminFacade.getMoveImpact(
+            Long.parseLong(sourceId), Long.parseLong(targetId), toLongs(connectedUserIds));
+    }
+
     @MutationMapping
     public String createAutomationWorkflowProjectConfiguration(
-        @Argument String projectId, @Argument String environmentId, @Argument int projectVersion,
-        @Argument boolean enabled, @Argument boolean automationHubVisible) {
-
-        long parsedEnvironmentId = Long.parseLong(environmentId);
-
-        // The schema carries no name yet, so a configuration is named after its environment.
-        String name = parsedEnvironmentId >= 0 && parsedEnvironmentId < Environment.values().length
-            ? Environment.values()[(int) parsedEnvironmentId].name() : environmentId;
+        @Argument String projectId, @Argument String environmentId, @Argument String name,
+        @Argument @Nullable String permissionExpression, @Argument int projectVersion, @Argument boolean enabled,
+        @Argument boolean automationHubVisible) {
 
         return String.valueOf(
             automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
-                Long.parseLong(projectId), parsedEnvironmentId, name, null, projectVersion, enabled,
-                automationHubVisible));
+                Long.parseLong(projectId), Long.parseLong(environmentId), name, permissionExpression, projectVersion,
+                enabled, automationHubVisible));
     }
 
     @MutationMapping
@@ -122,19 +142,20 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
     }
 
     @MutationMapping
+    public ConfigurationMoveResultDTO moveAutomationWorkflowProjectConfigurationConnectedUsers(
+        @Argument String sourceId, @Argument String targetId, @Argument List<String> connectedUserIds) {
+
+        return automationWorkflowProjectConfigurationAdminFacade.moveConnectedUsers(
+            Long.parseLong(sourceId), Long.parseLong(targetId), toLongs(connectedUserIds));
+    }
+
+    @MutationMapping
     public boolean updateAutomationWorkflowProjectConfiguration(
-        @Argument String id, @Argument int projectVersion, @Argument boolean enabled,
-        @Argument boolean automationHubVisible) {
-
-        long configurationId = Long.parseLong(id);
-
-        // The schema carries no name or permission expression yet, so an update keeps the stored ones.
-        AutomationWorkflowProjectConfigurationDTO configuration =
-            automationWorkflowProjectConfigurationAdminFacade.getConfiguration(configurationId);
+        @Argument String id, @Argument String name, @Argument @Nullable String permissionExpression,
+        @Argument int projectVersion, @Argument boolean enabled, @Argument boolean automationHubVisible) {
 
         automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
-            configurationId, configuration.name(), configuration.permissionExpression(), projectVersion, enabled,
-            automationHubVisible);
+            Long.parseLong(id), name, permissionExpression, projectVersion, enabled, automationHubVisible);
 
         return true;
     }
@@ -149,6 +170,12 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
             providedInputs == null ? Map.of() : providedInputs);
 
         return true;
+    }
+
+    private static List<Long> toLongs(List<String> ids) {
+        return ids.stream()
+            .map(Long::parseLong)
+            .toList();
     }
 
     private static Map<String, Long> toConnectionIds(Map<String, Object> providedConnections) {
