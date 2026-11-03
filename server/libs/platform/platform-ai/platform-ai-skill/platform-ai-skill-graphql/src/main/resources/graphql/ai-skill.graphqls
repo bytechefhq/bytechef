@@ -26,6 +26,7 @@ type AiSkill {
     id: ID!
     name: String!
     description: String
+    createdBy: String
     tags: [Tag!]!
     "Epoch milliseconds (UTC)"
     createdDate: Long
