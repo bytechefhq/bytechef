@@ -268,11 +268,14 @@ public class NotificationHandlerContext {
         map.put("jobId", jobId);
         map.put("jobName", jobName);
 
-        if (approvalExpiresAt != null) {
+        boolean approvalEvent = eventType == NotificationEvent.Type.JOB_APPROVAL_EXPIRING
+            || eventType == NotificationEvent.Type.JOB_APPROVAL_ESCALATED;
+
+        if (approvalEvent || approvalExpiresAt != null) {
             map.put("approvalExpiresAt", approvalExpiresAt);
         }
 
-        if (approvalFormUrl != null) {
+        if (approvalEvent || approvalFormUrl != null) {
             map.put("approvalFormUrl", approvalFormUrl);
         }
 

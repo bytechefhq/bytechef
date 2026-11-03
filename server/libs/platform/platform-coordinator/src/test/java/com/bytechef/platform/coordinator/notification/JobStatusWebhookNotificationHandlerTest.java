@@ -76,4 +76,22 @@ class JobStatusWebhookNotificationHandlerTest {
         assertThat(((Map<?, ?>) payload.get("approval")).get("formUrl"))
             .isEqualTo("https://example.com/resume/v1.token");
     }
+
+    @Test
+    void testPayloadForApprovalEventKeepsNullApprovalKeysInJson() {
+        ApprovalReminderWebhookNotificationHandler approvalReminderWebhookNotificationHandler =
+            new ApprovalReminderWebhookNotificationHandler();
+
+        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
+            .approvalExpiresAt("2026-10-17T13:39:23Z")
+            .eventType(Type.JOB_APPROVAL_EXPIRING)
+            .jobId(4L)
+            .jobName("Order approval")
+            .build();
+
+        String payload = approvalReminderWebhookNotificationHandler.getPayload(notificationHandlerContext);
+
+        assertThat(payload)
+            .contains("\"approvalFormUrl\":null");
+    }
 }
