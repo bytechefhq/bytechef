@@ -1,0 +1,6 @@
+#### Things to know
+
+- Send one text to between 1 and 300 people in a single step. Each person must have written to your bot before.
+- Receivers that Viber could not reach are listed in `failed_list` in the output, with the reason for each. The step does not fail for those.
+- To address each person by name, use the placeholders `replace_me_with_receiver_id`, `replace_me_with_url_encoded_receiver_id` and `replace_me_with_user_name` in the text.
+- Get the IDs from the `user.id` value of a Viber trigger. To learn more, click [here](/reference/components/viber_v1#how-to-find-the-receiver-id).

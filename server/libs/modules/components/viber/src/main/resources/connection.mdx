@@ -1,0 +1,15 @@
+## Connection Setup
+
+### Get the Auth Token of your Viber bot
+
+1. In the Viber app, open your bot's chat and go to **More**, then **Settings**, then **Bots**, then **Edit Info**.
+2. Copy the value shown as **Your app key**. Viber also calls this the authentication token. Keep it secret. Account admins can also find it on the Viber Admin Panel.
+3. Paste the token into the **Auth Token** field of the ByteChef connection.
+
+Good to know:
+- Since February 2024, new Viber bots can only be created under Viber's commercial terms. If you do not have a bot yet, you need an existing bot or an agreement with Viber first.
+- Viber sends messages to your workflow through a webhook, and the webhook address must be a public HTTPS address with a trusted certificate. If you run ByteChef on your own computer, use a tunnel such as ngrok and set it as the public URL of your ByteChef instance.
+- A bot has a single webhook, so one bot can feed one enabled workflow at a time. To test a workflow in the editor while another workflow is deployed, use a second bot for testing.
+
+Helpful links:
+- Viber REST Bot API: https://developers.viber.com/docs/api/rest-bot-api/
