@@ -20,15 +20,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.config.PlatformNotificationIntTestConfiguration;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryTestSupport;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.dto.NotificationDTO;
+import com.bytechef.platform.notification.handler.NotificationTestResult;
 import com.bytechef.platform.notification.repository.NotificationRepository;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HexFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -68,6 +85,9 @@ public class NotificationFacadeIntTest {
 
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    private WebhookDeliveryService webhookDeliveryService;
 
     @MockitoBean
     private WorkflowService workflowService;
@@ -189,6 +209,16 @@ public class NotificationFacadeIntTest {
             .orElseThrow();
 
         assertThat(storedNotification.getType()).isEqualTo(Notification.Type.EMAIL);
+    }
+
+    @Test
+    public void testTestNotificationRequiresAdmin() {
+        authenticateAs(AuthorityConstants.USER);
+
+        Notification notification = createNotification(Notification.Type.EMAIL, Map.of("email", "john@email.com"));
+
+        assertThatThrownBy(() -> notificationFacade.testNotification(notification))
+            .isInstanceOf(AuthorizationDeniedException.class);
     }
 
     @Test
@@ -527,6 +557,206 @@ public class NotificationFacadeIntTest {
                 .orElseThrow();
 
             assertThat(storedNotification.getSettings()).containsEntry("webhook", "https://example.com/hook");
+        }
+    }
+
+    @Nested
+    @TestPropertySource(properties = "bytechef.edition=ee")
+    class EnterpriseEditionTestSendIntTest {
+
+        private final List<ReceivedRequest> receivedRequests = new CopyOnWriteArrayList<>();
+
+        private HttpServer httpServer;
+        private int responseStatus = 200;
+        private String responseBody = "ok";
+
+        @BeforeEach
+        public void beforeEach() throws IOException {
+            WebhookDeliveryTestSupport.allowLoopback(webhookDeliveryService);
+
+            httpServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+
+            httpServer.createContext("/", exchange -> {
+                byte[] requestBody = exchange.getRequestBody()
+                    .readAllBytes();
+
+                receivedRequests.add(
+                    new ReceivedRequest(
+                        new String(requestBody, StandardCharsets.UTF_8),
+                        exchange.getRequestHeaders()
+                            .entrySet()
+                            .stream()
+                            .collect(
+                                Collectors.toMap(
+                                    entry -> entry.getKey()
+                                        .toLowerCase(Locale.ROOT),
+                                    entry -> entry.getValue()
+                                        .getFirst(),
+                                    (first, second) -> first))));
+
+                byte[] responseBytes = responseBody.getBytes(StandardCharsets.UTF_8);
+
+                exchange.sendResponseHeaders(responseStatus, responseBytes.length);
+
+                try (OutputStream outputStream = exchange.getResponseBody()) {
+                    outputStream.write(responseBytes);
+                }
+            });
+
+            httpServer.start();
+        }
+
+        @AfterEach
+        public void afterEach() {
+            httpServer.stop(0);
+
+            WebhookDeliveryTestSupport.restoreDefaultUrlValidator(webhookDeliveryService);
+        }
+
+        @Test
+        @SuppressWarnings("unchecked")
+        public void testTestNotificationSendsSampleJobFailed() {
+            NotificationTestResult notificationTestResult = notificationFacade.testNotification(
+                createNotification(Notification.Type.WEBHOOK, Map.of("webhook", receiverUrl())));
+
+            assertThat(notificationTestResult.success()).isTrue();
+            assertThat(notificationTestResult.statusCode()).isEqualTo(200);
+            assertThat(receivedRequests).hasSize(1);
+
+            Map<String, Object> body = (Map<String, Object>) JsonUtils.read(receivedRequests.getFirst()
+                .body());
+
+            assertThat(body).containsEntry("eventType", "JOB_FAILED");
+
+            Map<String, Object> workflow = (Map<String, Object>) body.get("workflow");
+
+            assertThat(workflow).containsEntry("name", "Example workflow");
+        }
+
+        @Test
+        public void testTestNotificationUnsavedWebhookIsUnsigned() {
+            NotificationTestResult notificationTestResult = notificationFacade.testNotification(
+                createNotification(Notification.Type.WEBHOOK, Map.of("webhook", receiverUrl())));
+
+            assertThat(notificationTestResult.signed()).isFalse();
+            assertThat(receivedRequests).hasSize(1);
+            assertThat(receivedRequests.getFirst()
+                .headers()).doesNotContainKey("x-bytechef-signature");
+        }
+
+        @Test
+        public void testTestNotificationResolvesMaskedHeaderAndSecretFromStored() throws Exception {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(
+                    Notification.Type.WEBHOOK,
+                    Map.of(
+                        "webhook", receiverUrl(), "webhookHeaders",
+                        List.of(Map.of("name", "Authorization", "value", "token-1")))));
+
+            Notification notification = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of(
+                    "webhook", receiverUrl(), "webhookHeaders",
+                    List.of(Map.of("name", "Authorization", "value", "********"))));
+
+            notification.setId(createdNotificationDTO.id());
+
+            NotificationTestResult notificationTestResult = notificationFacade.testNotification(notification);
+
+            assertThat(notificationTestResult.success()).isTrue();
+            assertThat(notificationTestResult.signed()).isTrue();
+            assertThat(receivedRequests).hasSize(1);
+
+            ReceivedRequest receivedRequest = receivedRequests.getFirst();
+
+            assertThat(receivedRequest.headers()).containsEntry("authorization", "token-1");
+
+            Notification storedNotification = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            String signingSecret = (String) Objects.requireNonNull(storedNotification.getSetting("webhookSecret"));
+            String timestamp = receivedRequest.headers()
+                .get("x-bytechef-timestamp");
+
+            assertThat(receivedRequest.headers()
+                .get("x-bytechef-signature")).contains("v1="
+                    + hmacHex(signingSecret, timestamp + "." +
+                        receivedRequest.body()));
+        }
+
+        @Test
+        public void testTestNotificationValidatesLikeSave() {
+            Notification notification = createNotification(
+                Notification.Type.WEBHOOK,
+                Map.of(
+                    "webhook", receiverUrl(), "webhookHeaders",
+                    List.of(Map.of("name", "Content-Type", "value", "text/plain"))));
+
+            assertThatThrownBy(() -> notificationFacade.testNotification(notification))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Webhook header name Content-Type is reserved");
+
+            assertThat(receivedRequests).isEmpty();
+        }
+
+        @Test
+        public void testTestNotificationDoesNotPersist() {
+            NotificationDTO createdNotificationDTO = notificationFacade.createNotification(
+                createNotification(Notification.Type.WEBHOOK, Map.of("webhook", receiverUrl())));
+
+            Notification storedBefore = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            Map<String, Object> settingsBefore = Map.copyOf(storedBefore.getSettings());
+            Map<String, Object> secretSettingsBefore = Map.copyOf(storedBefore.getSecretSettings());
+
+            Notification edited = createNotification(
+                Notification.Type.WEBHOOK, Map.of("webhook", receiverUrl() + "edited"));
+
+            edited.setId(createdNotificationDTO.id());
+            edited.setName("Edited");
+
+            notificationFacade.testNotification(edited);
+
+            assertThat(notificationRepository.count()).isEqualTo(1);
+
+            Notification storedAfter = notificationRepository.findById(createdNotificationDTO.id())
+                .orElseThrow();
+
+            assertThat(storedAfter.getName()).isEqualTo("My Notification");
+            assertThat(storedAfter.getSettings()).isEqualTo(settingsBefore);
+            assertThat(storedAfter.getSecretSettings()).isEqualTo(secretSettingsBefore);
+            assertThat(storedAfter.getVersion()).isEqualTo(storedBefore.getVersion());
+        }
+
+        @Test
+        public void testTestNotificationReturnsReceiverError() {
+            responseStatus = 422;
+            responseBody = "bad";
+
+            NotificationTestResult notificationTestResult = notificationFacade.testNotification(
+                createNotification(Notification.Type.WEBHOOK, Map.of("webhook", receiverUrl())));
+
+            assertThat(notificationTestResult.success()).isFalse();
+            assertThat(notificationTestResult.statusCode()).isEqualTo(422);
+            assertThat(notificationTestResult.responseBody()).isEqualTo("bad");
+        }
+
+        private String receiverUrl() {
+            return "http://localhost:" + httpServer.getAddress()
+                .getPort() + "/hook";
+        }
+
+        private static String hmacHex(String secret, String data) throws Exception {
+            Mac mac = Mac.getInstance("HmacSHA256");
+
+            mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+
+            return HexFormat.of()
+                .formatHex(mac.doFinal(data.getBytes(StandardCharsets.UTF_8)));
+        }
+
+        private record ReceivedRequest(String body, Map<String, String> headers) {
         }
     }
 

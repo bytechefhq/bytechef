@@ -19,8 +19,10 @@ package com.bytechef.platform.notification.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.facade.NotificationFacade;
+import com.bytechef.platform.notification.handler.NotificationTestResult;
 import com.bytechef.platform.notification.web.rest.model.NotificationModel;
 import com.bytechef.platform.notification.web.rest.model.NotificationSigningSecretModel;
+import com.bytechef.platform.notification.web.rest.model.NotificationTestResultModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -77,6 +79,18 @@ public class NotificationApiController implements NotificationApi {
         return ResponseEntity.ok(
             new NotificationSigningSecretModel().signingSecret(
                 notificationFacade.regenerateSigningSecret(notificationId)));
+    }
+
+    @Override
+    public ResponseEntity<NotificationTestResultModel> testNotification(NotificationModel notificationModel) {
+        NotificationTestResult notificationTestResult = notificationFacade.testNotification(
+            conversionService.convert(notificationModel, Notification.class));
+
+        return ResponseEntity.ok(
+            new NotificationTestResultModel(notificationTestResult.success(), notificationTestResult.signed())
+                .statusCode(notificationTestResult.statusCode())
+                .responseBody(notificationTestResult.responseBody())
+                .error(notificationTestResult.error()));
     }
 
     @Override

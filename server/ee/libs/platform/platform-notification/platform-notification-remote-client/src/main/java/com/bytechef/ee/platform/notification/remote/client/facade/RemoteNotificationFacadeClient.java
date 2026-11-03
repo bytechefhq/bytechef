@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.notification.remote.client.facade;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.dto.NotificationDTO;
+import com.bytechef.platform.notification.handler.NotificationTestResult;
 import com.bytechef.platform.notification.facade.NotificationFacade;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,11 @@ public class RemoteNotificationFacadeClient implements NotificationFacade {
 
     @Override
     public void deleteNotification(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public NotificationTestResult testNotification(Notification notification) {
         throw new UnsupportedOperationException();
     }
 

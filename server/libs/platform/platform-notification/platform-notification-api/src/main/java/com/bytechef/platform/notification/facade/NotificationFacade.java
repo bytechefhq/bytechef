@@ -19,6 +19,7 @@ package com.bytechef.platform.notification.facade;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.dto.NotificationDTO;
+import com.bytechef.platform.notification.handler.NotificationTestResult;
 import java.util.List;
 
 /**
@@ -35,6 +36,8 @@ public interface NotificationFacade {
     String regenerateSigningSecret(long id);
 
     void deleteNotification(long id);
+
+    NotificationTestResult testNotification(Notification notification);
 
     List<NotificationEvent> getNotificationEvents();
 }
