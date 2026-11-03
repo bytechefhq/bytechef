@@ -1,6 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectList from '../AutomationWorkflowProjectList';
@@ -42,22 +43,24 @@ const project: AutomationWorkflowProjectType = {
 
 const renderList = (projectOverrides: Partial<AutomationWorkflowProjectType> = {}) =>
     render(
-        <TooltipProvider>
-            <AutomationWorkflowProjectList
-                newlyCreatedProjectId="project-1"
-                onCreateWorkflow={vi.fn()}
-                onDeleteProject={vi.fn()}
-                onDeleteWorkflow={vi.fn()}
-                onEditProject={vi.fn()}
-                onEditWorkflow={vi.fn()}
-                onImportWorkflow={vi.fn()}
-                onPublishProject={vi.fn()}
-                onSelectWorkflow={vi.fn()}
-                onUpdateTags={vi.fn()}
-                projects={[{...project, ...projectOverrides}]}
-                tags={[]}
-            />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <AutomationWorkflowProjectList
+                    newlyCreatedProjectId="project-1"
+                    onCreateWorkflow={vi.fn()}
+                    onDeleteProject={vi.fn()}
+                    onDeleteWorkflow={vi.fn()}
+                    onEditProject={vi.fn()}
+                    onEditWorkflow={vi.fn()}
+                    onImportWorkflow={vi.fn()}
+                    onPublishProject={vi.fn()}
+                    onSelectWorkflow={vi.fn()}
+                    onUpdateTags={vi.fn()}
+                    projects={[{...project, ...projectOverrides}]}
+                    tags={[]}
+                />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 
 describe('AutomationWorkflowProjectList', () => {

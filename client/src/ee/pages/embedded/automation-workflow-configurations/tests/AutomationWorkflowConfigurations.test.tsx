@@ -1,0 +1,185 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {
+    createTestQueryClientWrapper,
+    resetAll,
+    screen,
+    userEvent,
+    windowResizeObserver,
+} from '@/shared/util/test-utils';
+import {render} from '@testing-library/react';
+import {MemoryRouter, Route, Routes, useLocation} from 'react-router-dom';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import AutomationWorkflowConfigurations from '../AutomationWorkflowConfigurations';
+
+const mocks = vi.hoisted(() => ({
+    configurationsVariables: [] as unknown[],
+    projects: [] as unknown[],
+    projectsVariables: undefined as unknown,
+}));
+
+vi.mock(
+    '@/ee/pages/embedded/automation-workflows/components/automation-workflow-executions-sheet/AutomationWorkflowExecutionsSheet',
+    () => ({
+        default: () => null,
+    })
+);
+
+vi.mock('@/shared/queries/platform/environments.queries', () => ({
+    useGetEnvironmentsQuery: () => ({data: [{id: 2, name: 'Production'}]}),
+}));
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useAutomationWorkflowProjectConfigurationDeleteImpactQuery: () => ({
+        data: {automationWorkflowProjectConfigurationDeleteImpact: {connectedUserCount: 0, referenceWorkflowCount: 0}},
+        isError: false,
+    }),
+    useAutomationWorkflowProjectConfigurationsQuery: (variables: {environmentId: string; projectId: string}) => {
+        mocks.configurationsVariables.push(variables);
+
+        return {
+            data: {
+                automationWorkflowProjectConfigurations:
+                    variables.projectId === 'live'
+                        ? [
+                              {
+                                  automationHubVisible: true,
+                                  connectedUserCount: 0,
+                                  enabled: true,
+                                  environmentId: variables.environmentId,
+                                  id: 'configuration-1',
+                                  lastExecutionDate: null,
+                                  lastModifiedDate: null,
+                                  name: 'PRODUCTION',
+                                  permissionExpression: null,
+                                  projectId: 'live',
+                                  projectVersion: 1,
+                                  workflows: [],
+                              },
+                          ]
+                        : [],
+            },
+        };
+    },
+    useAutomationWorkflowProjectsQuery: (variables: unknown) => {
+        mocks.projectsVariables = variables;
+
+        return {data: {automationWorkflowProjects: mocks.projects}, error: null, isLoading: false};
+    },
+    useDeleteAutomationWorkflowProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useEnableAutomationWorkflowProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useEnableAutomationWorkflowProjectConfigurationWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useEnvironmentsQuery: () => ({data: undefined}),
+}));
+
+const makeProject = (id: string, name: string, published: boolean, configurationCount = 0) => ({
+    categoryId: null,
+    configurationCount,
+    description: null,
+    id,
+    lastPublishedDate: null,
+    lastPublishedVersion: published ? 1 : null,
+    name,
+    permissionExpression: null,
+    published,
+    tagIds: [],
+    version: 1,
+    workflowTemplates: [],
+});
+
+const LocationDisplay = () => {
+    const location = useLocation();
+
+    return <div data-testid="location">{`${location.pathname}${location.search}`}</div>;
+};
+
+const renderPage = (initialEntry = '/embedded/automation-configurations') => {
+    const QueryClientWrapper = createTestQueryClientWrapper();
+
+    return render(
+        <MemoryRouter initialEntries={[initialEntry]}>
+            <QueryClientWrapper>
+                <TooltipProvider>
+                    <Routes>
+                        <Route
+                            element={<AutomationWorkflowConfigurations />}
+                            path="/embedded/automation-configurations"
+                        />
+
+                        <Route element={<LocationDisplay />} path="/embedded/automation-workflows" />
+                    </Routes>
+                </TooltipProvider>
+            </QueryClientWrapper>
+        </MemoryRouter>
+    );
+};
+
+describe('AutomationWorkflowConfigurations', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+
+        environmentStore.setState({currentEnvironmentId: 2});
+
+        mocks.configurationsVariables = [];
+        mocks.projects = [makeProject('live', 'Live Project', true, 1), makeProject('draft', 'Draft Project', false)];
+        mocks.projectsVariables = undefined;
+    });
+
+    afterEach(() => {
+        resetAll();
+        vi.clearAllMocks();
+    });
+
+    it('lists the published projects with the configurations of the selected environment', () => {
+        renderPage();
+
+        expect(mocks.projectsVariables).toEqual({environmentId: '2'});
+        expect(screen.getByRole('region', {name: 'Live Project'})).toBeInTheDocument();
+        expect(screen.queryByRole('region', {name: 'Draft Project'})).not.toBeInTheDocument();
+        expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
+        expect(mocks.configurationsVariables).toContainEqual({environmentId: '2', projectId: 'live'});
+        expect(screen.getByRole('button', {name: 'New Configuration for Live Project'})).toBeInTheDocument();
+    });
+
+    it('offers no workflow or project editing', () => {
+        renderPage();
+
+        expect(
+            screen.queryByRole('button', {name: /New Project|New Workflow|Create Workflow/})
+        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('tab', {name: 'Workflows'})).not.toBeInTheDocument();
+    });
+
+    it('offers to create the first configuration of a published project without one in this environment', () => {
+        mocks.projects = [makeProject('other', 'Other Project', true)];
+
+        renderPage();
+
+        expect(screen.getByRole('button', {name: 'Create Configuration'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Configuration for Other Project'})).not.toBeInTheDocument();
+    });
+
+    it('shows only the project chosen in the sidebar', () => {
+        mocks.projects = [makeProject('live', 'Live Project', true, 1), makeProject('other', 'Other Project', true)];
+
+        renderPage('/embedded/automation-configurations?projectId=other');
+
+        expect(screen.getByRole('region', {name: 'Other Project'})).toBeInTheDocument();
+        expect(screen.queryByRole('region', {name: 'Live Project'})).not.toBeInTheDocument();
+    });
+
+    it('sends the user to Automations in development when no project is published', async () => {
+        mocks.projects = [makeProject('draft', 'Draft Project', false)];
+
+        renderPage();
+
+        expect(screen.getByText('Publish a project to configure it')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Go to Automations'}));
+
+        expect(environmentStore.getState().currentEnvironmentId).toBe(0);
+        expect(screen.getByTestId('location')).toHaveTextContent('/embedded/automation-workflows');
+    });
+});

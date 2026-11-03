@@ -1,4 +1,5 @@
 import ImportApp from '@/ImportApp';
+import DevelopmentAutomationWorkflowConfigurationsRedirect from '@/ee/pages/embedded/automation-workflow-configurations/DevelopmentAutomationWorkflowConfigurationsRedirect';
 import DevelopmentIntegrationInstanceConfigurationsRedirect from '@/ee/pages/embedded/integration-instance-configurations/DevelopmentIntegrationInstanceConfigurationsRedirect';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
@@ -92,6 +93,9 @@ const IdentityProvidersPage = lazy(
     () => import('@/ee/pages/settings/platform/identity-providers/IdentityProvidersPage')
 );
 const RegisteredClients = lazy(() => import('@/ee/pages/settings/platform/registered-clients/RegisteredClients'));
+const AutomationWorkflowConfigurations = lazy(
+    () => import('@/ee/pages/embedded/automation-workflow-configurations/AutomationWorkflowConfigurations')
+);
 const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
 const AutomationWorkflow = lazy(() => import('@/ee/pages/embedded/automation-workflow/AutomationWorkflow'));
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
@@ -1028,6 +1032,8 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
+                                    loader: async () =>
+                                        redirectOutsideDevelopmentEnvironment('/embedded/automation-configurations'),
                                     path: 'automation-workflows',
                                 },
                                 {
@@ -1040,7 +1046,23 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
+                                    loader: async () =>
+                                        redirectOutsideDevelopmentEnvironment('/embedded/automation-configurations'),
                                     path: 'automation-workflows/:workflowUuid/editor',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <DevelopmentAutomationWorkflowConfigurationsRedirect>
+                                                    <LazyLoadWrapper>
+                                                        <AutomationWorkflowConfigurations />
+                                                    </LazyLoadWrapper>
+                                                </DevelopmentAutomationWorkflowConfigurationsRedirect>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'automation-configurations',
                                 },
                                 {
                                     element: (

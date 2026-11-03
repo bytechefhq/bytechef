@@ -195,6 +195,22 @@ describe('AppSidebar', () => {
             expect(screen.getByTestId('location')).toHaveTextContent('/embedded/configurations');
         });
 
+        it('moves from automations to automation configurations when switching away from development', () => {
+            renderSidebar(true, '/embedded/automation-workflows');
+
+            fireEvent.click(screen.getByRole('button', {name: 'Switch to production'}));
+
+            expect(screen.getByTestId('location')).toHaveTextContent('/embedded/automation-configurations');
+        });
+
+        it('redirects the automation workflow editor to automation configurations when switching away from development', () => {
+            renderSidebar(true, '/embedded/automation-workflows/workflow-uuid/editor');
+
+            fireEvent.click(screen.getByRole('button', {name: 'Switch to production'}));
+
+            expect(screen.getByTestId('location')).toHaveTextContent('/embedded/automation-configurations');
+        });
+
         it('stays on environment-aware pages when switching environments', () => {
             renderSidebar(true, '/automation/connections');
 
