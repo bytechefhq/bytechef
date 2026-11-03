@@ -10,8 +10,15 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationConnectedUserModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveImpactModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveRequestModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveResultModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
@@ -101,6 +108,36 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    public ResponseEntity<List<ConfigurationConnectedUserModel>> getIntegrationInstanceConfigurationConnectedUsers(
+        Long id) {
+
+        List<IntegrationInstanceConfigurationConnectedUserDTO> integrationInstanceConfigurationConnectedUserDTOs =
+            integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationConnectedUsers(id);
+
+        return ResponseEntity.ok(
+            integrationInstanceConfigurationConnectedUserDTOs.stream()
+                .map(
+                    integrationInstanceConfigurationConnectedUserDTO -> Validate.notNull(
+                        conversionService.convert(
+                            integrationInstanceConfigurationConnectedUserDTO, ConfigurationConnectedUserModel.class),
+                        "configurationConnectedUserModel"))
+                .toList());
+    }
+
+    @Override
+    public ResponseEntity<ConfigurationMoveImpactModel> getIntegrationInstanceConfigurationMoveImpact(
+        Long id, ConfigurationMoveRequestModel configurationMoveRequestModel) {
+
+        ConfigurationMoveImpactDTO configurationMoveImpactDTO = integrationInstanceConfigurationFacade.getMoveImpact(
+            id, configurationMoveRequestModel.getTargetId(), configurationMoveRequestModel.getConnectedUserIds());
+
+        return ResponseEntity.ok(
+            Validate.notNull(
+                conversionService.convert(configurationMoveImpactDTO, ConfigurationMoveImpactModel.class),
+                "configurationMoveImpactModel"));
+    }
+
+    @Override
     public ResponseEntity<List<IntegrationInstanceConfigurationModel>> getIntegrationInstanceConfigurations(
         Long environmentId, Long integrationId, Long tagId, Boolean includeAllFields) {
 
@@ -110,6 +147,20 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
                 .stream()
                 .map(this::toIntegrationInstanceConfigurationModel)
                 .toList());
+    }
+
+    @Override
+    public ResponseEntity<ConfigurationMoveResultModel> moveIntegrationInstanceConfigurationConnectedUsers(
+        Long id, ConfigurationMoveRequestModel configurationMoveRequestModel) {
+
+        ConfigurationMoveResultDTO configurationMoveResultDTO = integrationInstanceConfigurationFacade
+            .moveConnectedUsers(
+                id, configurationMoveRequestModel.getTargetId(), configurationMoveRequestModel.getConnectedUserIds());
+
+        return ResponseEntity.ok(
+            Validate.notNull(
+                conversionService.convert(configurationMoveResultDTO, ConfigurationMoveResultModel.class),
+                "configurationMoveResultModel"));
     }
 
     @Override

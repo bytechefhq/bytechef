@@ -16,6 +16,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -28,6 +29,7 @@ public record IntegrationInstanceConfigurationDTO(
     Map<String, ?> connectionConnectionParameters, Map<String, ?> connectionParameters, String createdBy,
     Instant createdDate, String description, boolean enabled, Environment environment, Long id, String lastModifiedBy,
     Instant lastModifiedDate, IntegrationDTO integration, long integrationId, Integer integrationVersion, String name,
+    @Nullable String permissionExpression,
     List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows, List<Tag> tags,
     int version) {
 
@@ -42,7 +44,8 @@ public record IntegrationInstanceConfigurationDTO(
             integrationInstanceConfiguration.getLastModifiedDate(), null,
             integrationInstanceConfiguration.getIntegrationId(),
             integrationInstanceConfiguration.getIntegrationVersion(), integrationInstanceConfiguration.getName(),
-            List.of(), List.of(), integrationInstanceConfiguration.getVersion());
+            integrationInstanceConfiguration.getPermissionExpression(), List.of(), List.of(),
+            integrationInstanceConfiguration.getVersion());
     }
 
     public IntegrationInstanceConfigurationDTO(
@@ -61,6 +64,7 @@ public record IntegrationInstanceConfigurationDTO(
             integrationInstanceConfiguration.getLastModifiedDate(), integration,
             integrationInstanceConfiguration.getIntegrationId(),
             integrationInstanceConfiguration.getIntegrationVersion(), integrationInstanceConfiguration.getName(),
+            integrationInstanceConfiguration.getPermissionExpression(),
             CollectionUtils.sort(integrationInstanceWorkflows), tags, integrationInstanceConfiguration.getVersion());
     }
 
@@ -89,6 +93,7 @@ public record IntegrationInstanceConfigurationDTO(
             .integrationVersion(integrationVersion == null ? 0 : integrationVersion)
             .integrationInstanceConfigurationWorkflows(integrationInstanceConfigurationWorkflows)
             .name(name)
+            .permissionExpression(permissionExpression)
             .tags(tags)
             .authorizationType(authorizationType)
             .version(version);
@@ -105,6 +110,7 @@ public record IntegrationInstanceConfigurationDTO(
         integrationInstance.setIntegrationId(integrationId);
         integrationInstance.setIntegrationVersion(integrationVersion);
         integrationInstance.setName(name);
+        integrationInstance.setPermissionExpression(permissionExpression);
         integrationInstance.setTags(tags);
         integrationInstance.setAuthorizationType(authorizationType);
         integrationInstance.setVersion(version);
@@ -127,6 +133,7 @@ public record IntegrationInstanceConfigurationDTO(
         private int integrationVersion;
         private List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows;
         private String name;
+        private String permissionExpression;
         private List<Tag> tags;
         private AuthorizationType authorizationType;
         private int version;
@@ -220,6 +227,12 @@ public record IntegrationInstanceConfigurationDTO(
             return this;
         }
 
+        public Builder permissionExpression(@Nullable String permissionExpression) {
+            this.permissionExpression = permissionExpression;
+
+            return this;
+        }
+
         public Builder tags(List<Tag> tags) {
             this.tags = tags;
 
@@ -243,7 +256,7 @@ public record IntegrationInstanceConfigurationDTO(
                 authorizationType, Map.of(), Map.of(), connectionParameters, createdBy, createdDate, description,
                 enabled, environment, id,
                 lastModifiedBy, lastModifiedDate, integration, integrationId, integrationVersion,
-                name, integrationInstanceConfigurationWorkflows, tags, version);
+                name, permissionExpression, integrationInstanceConfigurationWorkflows, tags, version);
         }
     }
 }

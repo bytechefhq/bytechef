@@ -43,4 +43,6 @@ public interface IntegrationInstanceWorkflowService {
 
     void updateEnabled(Long id, boolean enabled);
 
+    void updateIntegrationInstanceConfigurationWorkflowId(long id, long integrationInstanceConfigurationWorkflowId);
+
 }

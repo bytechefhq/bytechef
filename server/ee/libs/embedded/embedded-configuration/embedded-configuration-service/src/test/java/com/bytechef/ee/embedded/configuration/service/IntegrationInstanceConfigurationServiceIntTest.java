@@ -99,7 +99,7 @@ class IntegrationInstanceConfigurationServiceIntTest {
     }
 
     @Test
-    void testGetIntegrationIntegrationInstanceConfigurationPicksTheHighestEnabledVersion() {
+    void testGetEnabledIntegrationInstanceConfigurationsPicksTheHighestEnabledVersion() {
         long integrationId = createIntegration();
 
         createEnabledConfiguration(integrationId, 1);
@@ -110,8 +110,11 @@ class IntegrationInstanceConfigurationServiceIntTest {
         createDisabledConfiguration(integrationId, 5);
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration =
-            integrationInstanceConfigurationService.getIntegrationIntegrationInstanceConfiguration(
-                integrationId, Environment.PRODUCTION, true);
+            integrationInstanceConfigurationService.getEnabledIntegrationInstanceConfigurations(
+                integrationId, Environment.PRODUCTION)
+                .stream()
+                .max(IntegrationInstanceConfigurationServiceImpl.SELF_SERVE_ORDER)
+                .orElseThrow();
 
         assertThat(integrationInstanceConfiguration.getId()).isEqualTo(version3Id);
     }
@@ -125,8 +128,11 @@ class IntegrationInstanceConfigurationServiceIntTest {
         long laterId = createEnabledConfiguration(integrationId, 2);
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration =
-            integrationInstanceConfigurationService.getIntegrationIntegrationInstanceConfiguration(
-                integrationId, Environment.PRODUCTION, true);
+            integrationInstanceConfigurationService.getEnabledIntegrationInstanceConfigurations(
+                integrationId, Environment.PRODUCTION)
+                .stream()
+                .max(IntegrationInstanceConfigurationServiceImpl.SELF_SERVE_ORDER)
+                .orElseThrow();
 
         assertThat(integrationInstanceConfiguration.getId()).isEqualTo(laterId);
     }

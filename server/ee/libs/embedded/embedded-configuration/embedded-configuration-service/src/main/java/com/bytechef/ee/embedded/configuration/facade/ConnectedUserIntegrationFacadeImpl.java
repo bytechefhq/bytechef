@@ -184,10 +184,26 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
-        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
-            .getIntegrationIntegrationInstanceConfiguration(integrationId, environment, true);
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = getSelfServeConfiguration(
+            integrationId, environment, connectedUser);
 
         return createIntegrationInstance(connectedUser, integrationInstanceConfiguration, connectionParameters);
+    }
+
+    private IntegrationInstanceConfiguration getSelfServeConfiguration(
+        long integrationId, Environment environment, ConnectedUser connectedUser) {
+
+        return integrationInstanceConfigurationService
+            .getEnabledIntegrationInstanceConfigurations(integrationId, environment)
+            .stream()
+            .filter(
+                integrationInstanceConfiguration -> embeddedPermissionEvaluator.evaluate(
+                    integrationInstanceConfiguration.getPermissionExpression(), connectedUser))
+            .max(IntegrationInstanceConfigurationServiceImpl.SELF_SERVE_ORDER)
+            .orElseThrow(() -> new ConfigurationException(
+                "No integration instance configuration of integration id=%s is available to the connected user"
+                    .formatted(integrationId),
+                IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_NOT_FOUND));
     }
 
     private IntegrationInstance createIntegrationInstance(
@@ -234,11 +250,11 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     public ConnectedUserIntegrationDTO getConnectedUserIntegration(
         String externalUserId, long integrationId, boolean enabled, Environment environment) {
 
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
+
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
             integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationIntegration(
-                integrationId, enabled, environment);
-
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
+                integrationId, enabled, environment, connectedUser);
 
         IntegrationDTO integrationDTO = integrationInstanceConfigurationDTO.integration();
 
@@ -320,7 +336,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
         return integrationInstanceConfigurationFacade
-            .getIntegrationInstanceConfigurationIntegrations(enabled, environment)
+            .getIntegrationInstanceConfigurationIntegrations(enabled, environment, connectedUser)
             .stream()
             .filter(integrationInstanceConfigurationDTO -> isIntegrationVisible(
                 integrationInstanceConfigurationDTO.integration(), connectedUser))
@@ -566,8 +582,12 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                 .sorted(IntegrationInstanceConfigurationServiceImpl.SELF_SERVE_ORDER)
                 .toList();
 
-        IntegrationInstanceConfiguration selfServeIntegrationInstanceConfiguration =
-            sortedIntegrationInstanceConfigurations.getLast();
+        Optional<IntegrationInstanceConfiguration> selfServeIntegrationInstanceConfigurationOptional =
+            sortedIntegrationInstanceConfigurations.stream()
+                .filter(
+                    integrationInstanceConfiguration -> embeddedPermissionEvaluator.evaluate(
+                        integrationInstanceConfiguration.getPermissionExpression(), connectedUser))
+                .max(IntegrationInstanceConfigurationServiceImpl.SELF_SERVE_ORDER);
 
         List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows;
         ConnectionDefinition connectionDefinition;
@@ -623,8 +643,11 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             provisionableConfigurations.add(
                 new ProvisionableIntegrationDTO.ProvisionableIntegrationInstanceConfiguration(
                     integrationInstanceConfigurationDTO,
-                    Objects.equals(
-                        integrationInstanceConfiguration.getId(), selfServeIntegrationInstanceConfiguration.getId()),
+                    selfServeIntegrationInstanceConfigurationOptional
+                        .map(selfServeIntegrationInstanceConfiguration -> Objects.equals(
+                            integrationInstanceConfiguration.getId(),
+                            selfServeIntegrationInstanceConfiguration.getId()))
+                        .orElse(false),
                     sharedConnectionParameterNames,
                     oAuth2 == null ? null : oAuth2.oAuth2AuthorizationParameters(),
                     oAuth2 == null ? null : oAuth2.redirectUri()));

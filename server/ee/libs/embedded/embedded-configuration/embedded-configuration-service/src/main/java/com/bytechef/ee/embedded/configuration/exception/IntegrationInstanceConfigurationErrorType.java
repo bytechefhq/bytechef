@@ -31,6 +31,8 @@ public class IntegrationInstanceConfigurationErrorType extends AbstractErrorType
         new IntegrationInstanceConfigurationErrorType(105);
     public static final IntegrationInstanceConfigurationErrorType WORKFLOW_NOT_IN_CONFIGURATION =
         new IntegrationInstanceConfigurationErrorType(106);
+    public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_MISMATCH =
+        new IntegrationInstanceConfigurationErrorType(107);
 
     private IntegrationInstanceConfigurationErrorType(int errorKey) {
         super(IntegrationInstanceConfiguration.class, errorKey);
