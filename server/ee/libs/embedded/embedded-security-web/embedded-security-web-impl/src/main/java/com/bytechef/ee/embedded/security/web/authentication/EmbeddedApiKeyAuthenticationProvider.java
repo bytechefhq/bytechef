@@ -51,7 +51,6 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
 
         if (secretKey != null) {
             ApiKey apiKey = apiKeyService.fetchApiKey(secretKey, environmentId)
-                .filter(curApiKey -> curApiKey.getType() == PlatformType.EMBEDDED)
                 .orElseThrow(() -> new BadCredentialsException("Invalid API key"));
 
             if (apiKey.getType() != PlatformType.EMBEDDED) {

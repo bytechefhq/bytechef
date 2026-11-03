@@ -23,6 +23,7 @@ import static org.mockito.Mockito.doReturn;
 import com.bytechef.platform.ai.skill.config.AiSkillIntTestConfiguration;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.repository.AiSkillRepository;
+import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -173,6 +174,29 @@ class AiSkillApiFacadeIntTest {
         authenticate("root", "ROLE_ADMIN");
 
         assertThat(aiSkillApiFacade.getAiSkills()).hasSize(2);
+    }
+
+    @Test
+    void testConnectedUserWhoseExternalIdIsAPlatformLoginIsRefusedEverySkillOperation() {
+        AiSkill aiSkill = createSkillAs("alice", "alice-skill");
+
+        long id = aiSkill.getId();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestNonPlatformUserAuthentication.of("alice"));
+
+        assertThatThrownBy(aiSkillApiFacade::getAiSkills).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillApiFacade.getAiSkill(id)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillApiFacade.deleteAiSkill(id)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillApiFacade.updateAiSkill(id, "renamed", null))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillApiFacade.createAiSkillFromInstructions("skill", null, "do it"))
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(aiSkillRepository.findAll())
+            .singleElement()
+            .extracting(AiSkill::getName)
+            .isEqualTo("alice-skill");
     }
 
     private AiSkill createSkillAs(String login, String name) {

@@ -69,7 +69,6 @@ public final class CopilotToolContextUtils {
                 .environmentId(environmentId)
                 .tenantId(tenantId)
                 .authentication(authentication)
-                .skipAutomationAuthorization(authentication != null && userId == null)
                 .build()
                 .toToolContext());
 

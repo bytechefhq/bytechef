@@ -658,7 +658,7 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
 
     private List<ToolCallback> getAutomationToolCallbacks(@Nullable String externalUserId) {
         return embeddedMcpToolFacade.getAutomationToolCallbacks(
-            mcpAutomationProjectConfiguration, externalUserId, Environment.PRODUCTION, TENANT_ID);
+            mcpAutomationProjectConfiguration, externalUserId, Environment.PRODUCTION, TENANT_ID, null);
     }
 
     private List<ExternalInvocationEvent> getExternalInvocationEvents() {

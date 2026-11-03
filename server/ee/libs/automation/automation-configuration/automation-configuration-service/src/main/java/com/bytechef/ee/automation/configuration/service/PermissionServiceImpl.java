@@ -16,8 +16,6 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.config.ApplicationProperties.Security.ConnectedUserAuthorizationMode;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -34,7 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -62,10 +59,8 @@ public class PermissionServiceImpl implements PermissionService {
     private static final String WORKFLOW = "Workflow";
     private static final String WORKFLOW_EDIT = "WORKFLOW_EDIT";
 
-    private final ApplicationProperties applicationProperties;
     private final ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider;
     private final CurrentUserResolver currentUserResolver;
-    private final Set<String> loggedWouldBeDenials = ConcurrentHashMap.newKeySet();
     private final PermissionScopeRegistry permissionScopeRegistry;
     private final ProjectService projectService;
     private final WorkspaceScopeCache workspaceScopeCache;
@@ -82,10 +77,8 @@ public class PermissionServiceImpl implements PermissionService {
         WorkspaceUserRepository workspaceUserRepository,
         List<ResourceOwnershipResolver> resourceOwnershipResolvers,
         List<ResourceEnvironmentResolver> resourceEnvironmentResolvers,
-        ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider,
-        ApplicationProperties applicationProperties) {
+        ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider) {
 
-        this.applicationProperties = applicationProperties;
         this.connectedUserAccessDeciderProvider = connectedUserAccessDeciderProvider;
         this.currentUserResolver = currentUserResolver;
         this.permissionScopeRegistry = permissionScopeRegistry;
@@ -162,7 +155,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean hasWorkspaceScope(long workspaceId, String scope) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decideWorkspace(workspaceId, scope), "Workspace:" + scope);
+            decider -> decider.decideWorkspace(workspaceId, scope));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -195,7 +188,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean hasWorkspaceScope(long workspaceId, String scope, Environment environment) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decideWorkspace(workspaceId, scope), "Workspace:" + scope);
+            decider -> decider.decideWorkspace(workspaceId, scope));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -234,7 +227,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decide(projectId, PROJECT, scope), PROJECT + ":" + scope);
+            decider -> decider.decide(projectId, PROJECT, scope));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -262,7 +255,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decideInEnvironment(projectId, PROJECT, scope, environment), PROJECT + ":" + scope);
+            decider -> decider.decideInEnvironment(projectId, PROJECT, scope, environment));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -290,7 +283,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean hasResourceScope(Serializable id, String resourceType, String scope) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decide(id, resourceType, scope), resourceType + ":" + scope);
+            decider -> decider.decide(id, resourceType, scope));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -355,8 +348,7 @@ public class PermissionServiceImpl implements PermissionService {
         Serializable id, String resourceType, String scope, Environment environment) {
 
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decideInEnvironment(id, resourceType, scope, environment),
-            resourceType + ":" + scope);
+            decider -> decider.decideInEnvironment(id, resourceType, scope, environment));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -437,7 +429,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decideWorkflow(workflowId, scope), WORKFLOW + ":" + scope);
+            decider -> decider.decideWorkflow(workflowId, scope));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -465,7 +457,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope, Environment environment) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decideWorkflow(workflowId, scope), WORKFLOW + ":" + scope);
+            decider -> decider.decideWorkflow(workflowId, scope));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -493,7 +485,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean hasWorkflowScopeIfProjectWorkflow(String workflowId, String scope, Environment environment) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decideWorkflow(workflowId, scope), WORKFLOW + ":" + scope);
+            decider -> decider.decideWorkflow(workflowId, scope));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -521,8 +513,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean canUseConnectionInWorkflow(long connectionId, String workflowId, Environment environment) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decideConnectionInWorkflow(decider, connectionId, workflowId),
-            "ConnectionInWorkflow:" + WORKFLOW_EDIT);
+            decider -> decideConnectionInWorkflow(decider, connectionId, workflowId));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -550,7 +541,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean canUseConnectionInWorkspace(long connectionId, long workspaceId, Environment environment) {
         Optional<Boolean> connectedUserDecision = decideForConnectedUser(
-            decider -> decider.decideWorkspace(workspaceId, CONNECTION_VIEW), "Workspace:" + CONNECTION_VIEW);
+            decider -> decider.decideWorkspace(workspaceId, CONNECTION_VIEW));
 
         if (connectedUserDecision.isPresent()) {
             return connectedUserDecision.get();
@@ -699,9 +690,7 @@ public class PermissionServiceImpl implements PermissionService {
         return scopeNames.contains(scope);
     }
 
-    private Optional<Boolean> decideForConnectedUser(
-        Function<ConnectedUserAccessDecider, Decision> decision, String subject) {
-
+    private Optional<Boolean> decideForConnectedUser(Function<ConnectedUserAccessDecider, Decision> decision) {
         ConnectedUserAccessDecider connectedUserAccessDecider = connectedUserAccessDeciderProvider.getIfAvailable();
 
         if (connectedUserAccessDecider == null) {
@@ -714,26 +703,7 @@ public class PermissionServiceImpl implements PermissionService {
             return Optional.empty();
         }
 
-        if (isConnectedUserAuthorizationEnforced()) {
-            return Optional.of(outcome == Decision.GRANT);
-        }
-
-        boolean skipped = AutomationAuthorizationContext.isSkipChecks();
-
-        if (outcome == Decision.DENY && skipped && loggedWouldBeDenials.add(subject)) {
-            log.warn("Connected-user authorization would deny {} (LOG mode; skip still applies)", subject);
-        } else if (outcome == Decision.DENY && !skipped && loggedWouldBeDenials.add(subject + ":outside-skip")) {
-            log.warn("Connected-user authorization denied {} outside skip mode (LOG mode)", subject);
-        }
-
-        return Optional.of(skipped || outcome == Decision.GRANT);
-    }
-
-    private boolean isConnectedUserAuthorizationEnforced() {
-        ApplicationProperties.Security security = applicationProperties.getSecurity();
-
-        return security != null
-            && security.getConnectedUserAuthorizationMode() == ConnectedUserAuthorizationMode.ENFORCE;
+        return Optional.of(outcome == Decision.GRANT);
     }
 
     private boolean isGovernedPrincipal() {

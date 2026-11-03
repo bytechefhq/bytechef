@@ -15,18 +15,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.bytechef.ee.embedded.connected.user.security.TestConnectedUserAuthentication;
 import com.bytechef.ee.embedded.execution.facade.ActionFacade;
 import com.bytechef.ee.embedded.execution.public_.web.rest.config.EmbeddedExecutionPublicRestTestConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -42,13 +45,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @Import(ActionApiController.class)
 @TestPropertySource(properties = "bytechef.edition=ee")
 @WebMvcTest(ActionApiController.class)
-@WithMockUser(username = ActionApiControllerIntTest.EXTERNAL_USER_ID)
 class ActionApiControllerIntTest {
-
-    static final String EXTERNAL_USER_ID = "external-user-1";
 
     private static final String ACTION_PATH =
         "/v1/{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}";
+    private static final String EXTERNAL_USER_ID = "external-user-1";
     private static final String REQUEST_BODY = "{\"input\":{\"uri\":\"https://example.com\"}}";
 
     @MockitoBean
@@ -62,7 +63,16 @@ class ActionApiControllerIntTest {
 
     @BeforeEach
     void beforeEach() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(TestConnectedUserAuthentication.of(EXTERNAL_USER_ID));
+
         when(environmentService.getEnvironment("DEVELOPMENT")).thenReturn(Environment.DEVELOPMENT);
+    }
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test

@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriUtils;
 
 /**
  * Authentication converter for embedded API key authentication.
@@ -43,6 +44,8 @@ import org.springframework.util.StringUtils;
  */
 class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
 
+    static final Pattern CONNECTED_USER_ONLY_PATH_PATTERN =
+        Pattern.compile("^/api/embedded/v\\d+/(?:app-events|workflows/[^/]+)/?$");
     static final Pattern EXTERNAL_USER_ID_PATTERN = Pattern.compile("^/api/embedded/v\\d+/([^/]+)(?:/.*)?$");
     static final Pattern JWT_TOKEN_PATTERN =
         Pattern.compile("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_.+/=]*$");
@@ -102,10 +105,30 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
                 environment.ordinal(), externalUserId, null, tenantKey.getTenantId(),
                 getConnectionDialogAllowedClaim(payload));
         } else {
-            String externalUserId = fetchPathExternalUserId(request);
+            String contextPath = request.getContextPath() == null ? "" : request.getContextPath();
+            String requestURI = request.getRequestURI();
 
-            if (externalUserId == null) {
+            String path = requestURI.substring(contextPath.length());
+
+            Matcher connectedUserOnlyPathMatcher = CONNECTED_USER_ONLY_PATH_PATTERN.matcher(path);
+
+            if (connectedUserOnlyPathMatcher.matches()) {
+                throw new BadCredentialsException("Non-JWT tokens are not accepted on this endpoint");
+            }
+
+            Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(path);
+
+            if (!matcher.matches()) {
                 throw new BadCredentialsException("externalUserId parameter is required");
+            }
+
+            String externalUserId;
+
+            try {
+                externalUserId = UriUtils.decode(matcher.group(1), StandardCharsets.UTF_8);
+            } catch (IllegalArgumentException illegalArgumentException) {
+                throw new BadCredentialsException("The external user id is not validly encoded",
+                    illegalArgumentException);
             }
 
             if (ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(externalUserId)) {

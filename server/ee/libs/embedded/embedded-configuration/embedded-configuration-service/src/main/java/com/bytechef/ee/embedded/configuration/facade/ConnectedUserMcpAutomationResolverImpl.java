@@ -11,7 +11,6 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
@@ -41,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
 public class ConnectedUserMcpAutomationResolverImpl implements ConnectedUserMcpAutomationResolver {
 
     private final AutomationProjectConfigurationService automationProjectConfigurationService;

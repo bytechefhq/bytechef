@@ -16,6 +16,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
@@ -77,9 +78,11 @@ import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -101,6 +104,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @version ee
@@ -198,7 +204,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     }
 
     public @Nullable ToolCallback getFunctionToolCallback(
-        McpTool mcpTool, @Nullable String externalUserId, Environment environment, String tenantId) {
+        McpTool mcpTool, @Nullable String externalUserId, Environment environment, String tenantId,
+        @Nullable Authentication authentication) {
+
         if (!mcpTool.isEnabled()) {
             return null;
         }
@@ -235,12 +243,14 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
             .builder(
                 toolName,
-                getClusterElementToolCallbackFunction(
-                    toolName, externalUserId, clusterElementDefinition.getComponentName(),
-                    clusterElementDefinition.getComponentVersion(),
-                    clusterElementDefinition.getName(), mcpTool.getParameters(),
-                    ToolParameterDefaultsUtils.collectPropertyDefaults(clusterElementDefinition.getProperties()),
-                    integrationId, mcpComponent.getMcpServerId(), environment, tenantId))
+                withCallerContext(
+                    getClusterElementToolCallbackFunction(
+                        toolName, externalUserId, clusterElementDefinition.getComponentName(),
+                        clusterElementDefinition.getComponentVersion(),
+                        clusterElementDefinition.getName(), mcpTool.getParameters(),
+                        ToolParameterDefaultsUtils.collectPropertyDefaults(clusterElementDefinition.getProperties()),
+                        integrationId, mcpComponent.getMcpServerId(), environment, tenantId),
+                    tenantId, authentication))
             .inputType(Map.class)
             .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -269,7 +279,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     public List<ToolCallback> getFunctionToolCallbacks(
         McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration, @Nullable String externalUserId,
-        Environment environment, String tenantId) {
+        Environment environment, String tenantId, @Nullable Authentication authentication) {
+
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         for (McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow : mcpIntegrationInstanceConfigurationWorkflowService
@@ -315,11 +326,13 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             ToolCallback toolCallback = createWorkflowToolCallback(
                 workflow, workflowParameters,
-                toolName -> getWorkflowToolCallbackFunction(
-                    toolName, externalUserId, integration.getComponentName(), integration.getId(),
-                    integrationInstanceConfigurationWorkflow, trigger.getName(), workflowParameters,
-                    ToolParameterDefaultsUtils.collectTriggerInputDefaults(trigger.getParameters()),
-                    mcpIntegrationInstanceConfiguration.getMcpServerId(), environment, tenantId));
+                toolName -> withCallerContext(
+                    getWorkflowToolCallbackFunction(
+                        toolName, externalUserId, integration.getComponentName(), integration.getId(),
+                        integrationInstanceConfigurationWorkflow, trigger.getName(), workflowParameters,
+                        ToolParameterDefaultsUtils.collectTriggerInputDefaults(trigger.getParameters()),
+                        mcpIntegrationInstanceConfiguration.getMcpServerId(), environment, tenantId),
+                    tenantId, authentication));
 
             toolCallbacks.add(EmbeddedMcpToolCallback.ofIntegration(toolCallback, integration.getId()));
         }
@@ -329,7 +342,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     public List<ToolCallback> getAutomationToolCallbacks(
         McpAutomationProjectConfiguration mcpAutomationProjectConfiguration, @Nullable String externalUserId,
-        Environment environment, String tenantId) {
+        Environment environment, String tenantId, @Nullable Authentication authentication) {
 
         if (externalUserId == null) {
             return List.of();
@@ -359,7 +372,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             try {
                 ToolCallback toolCallback = getAutomationToolCallback(
                     mcpAutomationProjectConfiguration, mcpAutomationProjectConfigurationWorkflow,
-                    connectedUserProjectWorkflowIds, externalUserId, connectedUserId, environment);
+                    connectedUserProjectWorkflowIds, externalUserId, connectedUserId, environment, tenantId,
+                    authentication);
 
                 if (toolCallback != null) {
                     toolCallbacks.add(toolCallback);
@@ -378,7 +392,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         McpAutomationProjectConfiguration mcpAutomationProjectConfiguration,
         McpAutomationProjectConfigurationWorkflow mcpAutomationProjectConfigurationWorkflow,
         Set<Long> connectedUserProjectWorkflowIds, String externalUserId, long connectedUserId,
-        Environment environment) {
+        Environment environment, String tenantId, @Nullable Authentication authentication) {
 
         Optional<CallableAutomationDTO> callableAutomationOptional = connectedUserMcpAutomationResolver
             .fetchCallableAutomation(
@@ -408,9 +422,11 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
         return createWorkflowToolCallback(
             workflow, workflowParameters,
-            toolName -> getAutomationToolCallbackFunction(
-                toolName, externalUserId, connectedUserId, callableAutomation, triggerName, workflowParameters,
-                triggerInputDefaults, mcpAutomationProjectConfiguration.getMcpServerId(), environment));
+            toolName -> withCallerContext(
+                getAutomationToolCallbackFunction(
+                    toolName, externalUserId, connectedUserId, callableAutomation, triggerName, workflowParameters,
+                    triggerInputDefaults, mcpAutomationProjectConfiguration.getMcpServerId(), environment),
+                tenantId, authentication));
     }
 
     private Function<Map<String, Object>, Object> getAutomationToolCallbackFunction(
@@ -822,6 +838,38 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
         return taskExecutionService.fetchLastJobTaskExecution(Objects.requireNonNull(job.getId()))
             .filter(taskExecution -> taskExecution.getStatus() == TaskExecution.Status.STARTED);
+    }
+
+    private static Function<Map<String, Object>, Object> withCallerContext(
+        Function<Map<String, Object>, Object> function, String tenantId, @Nullable Authentication authentication) {
+
+        return request -> {
+            String previousTenantId = TenantContext.getCurrentTenantId();
+
+            TenantContext.setCurrentTenantId(tenantId);
+
+            try {
+                if (authentication == null) {
+                    return runWithEmptySecurityContext(() -> function.apply(request));
+                }
+
+                return SecurityUtils.runAs(authentication, () -> function.apply(request));
+            } finally {
+                TenantContext.setCurrentTenantId(previousTenantId);
+            }
+        };
+    }
+
+    private static Object runWithEmptySecurityContext(Supplier<Object> supplier) {
+        SecurityContext previousSecurityContext = SecurityContextHolder.getContext();
+
+        SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext());
+
+        try {
+            return supplier.get();
+        } finally {
+            SecurityContextHolder.setContext(previousSecurityContext);
+        }
     }
 
     private boolean isToolEnabled(long integrationInstanceId, long mcpToolId) {

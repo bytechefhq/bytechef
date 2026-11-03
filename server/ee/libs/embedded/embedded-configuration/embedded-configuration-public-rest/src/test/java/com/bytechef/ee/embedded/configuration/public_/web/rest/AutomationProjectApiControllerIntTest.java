@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateD
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -46,8 +46,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 class AutomationProjectApiControllerIntTest {
 
     private static final String WORKFLOW_UUID = "workflow-uuid-001";
-    private static final long PROJECT_ID = 42L;
     private static final String EXTERNAL_USER_ID = "user@example.com";
+    private static final long PROJECT_ID = 42L;
 
     @MockitoBean
     private AutomationProjectFacade automationProjectFacade;
@@ -71,7 +71,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsReturnsPublishedProjectWithWorkflows() {
         ConnectedUserWorkflowTemplateDTO.Component componentDTO =
             new ConnectedUserWorkflowTemplateDTO.Component("gmail", "Gmail", "gmail-icon-svg");
@@ -114,7 +114,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsMarksTheComponentsTheConfigurationProvides() {
         ConnectedUserWorkflowTemplateDTO.Component openAiComponent =
             new ConnectedUserWorkflowTemplateDTO.Component("openAi", "OpenAI", "openai-icon-svg", true, null, true);
@@ -160,7 +160,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsListTheTriggerComponentsOfATemplateFirstAndOnce() {
         ConnectedUserWorkflowTemplateDTO.Component gmailComponent =
             new ConnectedUserWorkflowTemplateDTO.Component("gmail", "Gmail", "gmail-icon-svg", true, 7L);
@@ -197,7 +197,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsExposesTheComponentInputReferenceOfATemplateInput() {
         ConnectedUserWorkflowTemplateDTO workflowDTO = new ConnectedUserWorkflowTemplateDTO(
             WORKFLOW_UUID, "Slack digest", null, null, List.of(), List.of(),
@@ -234,7 +234,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsReturnsEmptyList() {
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of());
@@ -254,7 +254,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsUnpublishedProjectHasEmptyWorkflows() {
         AutomationProjectDTO unpublishedProjectDTO = new AutomationProjectDTO(
             PROJECT_ID + 1, "Draft Project", "A project with no published version", null, List.of(), false, 1, null,
@@ -282,7 +282,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendProjectsLeavesOutProjectsHiddenFromTheHub() {
         AutomationProjectDTO visibleProjectDTO = new AutomationProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
@@ -314,7 +314,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetProjectsLeavesOutProjectsHiddenFromTheHub() {
         AutomationProjectDTO visibleProjectDTO = new AutomationProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
@@ -342,7 +342,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetFrontendWorkflowTemplateReturnsATemplateOfAProjectHiddenFromTheHub() {
         givenPublishedProject(false);
 
@@ -369,7 +369,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetWorkflowTemplateReturnsATemplateOfAProjectListedInTheHub() {
         givenPublishedProject(true);
 
@@ -388,7 +388,7 @@ class AutomationProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetWorkflowTemplatesAnswerNotFoundForATemplateThatIsNotAvailableToTheConnectedUser() {
         givenPublishedProject(true);
 
