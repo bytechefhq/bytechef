@@ -136,6 +136,27 @@ public class WebhookDeliveryService {
         return outcomeFuture;
     }
 
+    public WebhookTestResult sendTest(WebhookDelivery webhookDelivery) {
+        List<WebhookPayload> payloads = webhookDelivery.payloads();
+
+        try {
+            if (webhookDelivery.validateUrl()) {
+                validateUrl(webhookDelivery.url());
+            }
+
+            WebhookNotificationClient.WebhookResponse webhookResponse = webhookNotificationClient.post(
+                webhookDelivery, payloads.getFirst());
+
+            return new WebhookTestResult(true, webhookResponse.statusCode(), webhookResponse.body(), null);
+        } catch (UrlNotAllowedException urlNotAllowedException) {
+            return new WebhookTestResult(false, null, null, urlNotAllowedException.getMessage());
+        } catch (WebhookDeliveryException webhookDeliveryException) {
+            return new WebhookTestResult(
+                false, webhookDeliveryException.getStatusCode(), webhookDeliveryException.getResponseBody(),
+                describe(webhookDeliveryException));
+        }
+    }
+
     @EventListener(ContextClosedEvent.class)
     public void onContextClosed() {
         int pendingDeliveryCount = endpointState.getPendingDeliveryCount();

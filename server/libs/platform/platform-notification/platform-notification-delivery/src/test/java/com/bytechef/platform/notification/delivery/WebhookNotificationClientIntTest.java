@@ -282,6 +282,57 @@ class WebhookNotificationClientIntTest {
         }
     }
 
+    @Test
+    void testPostReturnsStatusAndBody() {
+        respondWith("/answer", 202, "ok");
+
+        WebhookDelivery webhookDelivery = delivery(baseUrl() + "/answer").build();
+
+        WebhookNotificationClient.WebhookResponse webhookResponse = webhookNotificationClient.post(
+            webhookDelivery, webhookDelivery.payloads()
+                .getFirst());
+
+        assertThat(webhookResponse.statusCode()).isEqualTo(202);
+        assertThat(webhookResponse.body()).isEqualTo("ok");
+    }
+
+    @Test
+    void testErrorCarriesCappedResponseBody() {
+        respondWith("/answer", 400, "x".repeat(5000));
+
+        WebhookDelivery webhookDelivery = delivery(baseUrl() + "/answer").build();
+        WebhookPayload webhookPayload = webhookDelivery.payloads()
+            .getFirst();
+
+        assertThatThrownBy(() -> webhookNotificationClient.post(webhookDelivery, webhookPayload))
+            .isInstanceOfSatisfying(WebhookDeliveryException.class, webhookDeliveryException -> {
+                assertThat(webhookDeliveryException.getStatusCode()).isEqualTo(400);
+                assertThat(webhookDeliveryException.getResponseBody()).hasSize(1001)
+                    .endsWith("…");
+                assertThat(webhookDeliveryException.getMessage()).doesNotContain("xxx");
+            });
+    }
+
+    private void respondWith(String path, int status, String body) {
+        httpServer.createContext(path, httpExchange -> {
+            httpExchange.getRequestBody()
+                .readAllBytes();
+
+            byte[] responseBytes = body.getBytes(StandardCharsets.UTF_8);
+
+            httpExchange.sendResponseHeaders(status, responseBytes.length);
+
+            httpExchange.getResponseBody()
+                .write(responseBytes);
+            httpExchange.close();
+        });
+    }
+
+    private String baseUrl() {
+        return "http://localhost:" + httpServer.getAddress()
+            .getPort();
+    }
+
     private static WebhookDelivery.Builder delivery(String targetUrl) {
         return WebhookDelivery.builder("test", targetUrl)
             .tenantId("tenant")
