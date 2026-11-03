@@ -29,6 +29,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
@@ -70,9 +71,12 @@ import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionRe
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionServiceImpl;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
+import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcherDefinitionFactory;
+import com.bytechef.task.dispatcher.loop.LoopTaskDispatcherDefinitionFactory;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +110,7 @@ import tools.jackson.databind.ObjectMapper;
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
+    ConditionTaskDispatcherDefinitionFactory.class, LoopTaskDispatcherDefinitionFactory.class,
     JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class,
     TestWorkflowExecutorIntTestConfiguration.TestWorkflowExecutorIntTestJdbcConfiguration.class,
     WorkflowTestConfiguration.class
@@ -220,8 +225,25 @@ public class TestWorkflowExecutorIntTestConfiguration {
     }
 
     @Bean
-    TaskHandlerRegistry taskHandlerRegistry(TaskGates taskGates) {
+    WorkflowScopeDataStorage workflowScopeDataStorage() {
+        return new WorkflowScopeDataStorage();
+    }
+
+    @Bean
+    TaskHandlerRegistry taskHandlerRegistry(
+        TaskGates taskGates, WorkflowScopeDataStorage workflowScopeDataStorage) {
+
         Map<String, TaskHandler<?>> taskHandlers = Map.of(
+            "dataStorage/v1/appendValueToList", taskExecution -> {
+                workflowScopeDataStorage.append(
+                    MapUtils.getRequiredString(taskExecution.getParameters(), "key"),
+                    MapUtils.get(taskExecution.getParameters(), "value"));
+
+                return null;
+            },
+            "dataStorage/v1/getValue", taskExecution -> workflowScopeDataStorage.get(
+                MapUtils.getRequiredString(taskExecution.getParameters(), "key")),
+            "logger/v1/info", taskExecution -> null,
             COMPONENT_NAME + "/v1/block", taskExecution -> {
                 TaskGate taskGate = taskGates.get(MapUtils.getRequiredString(taskExecution.getParameters(), GATE));
 
@@ -252,6 +274,26 @@ public class TestWorkflowExecutorIntTestConfiguration {
     @Bean
     TempFileStorage tempFileStorage() {
         return mock(TempFileStorage.class);
+    }
+
+    @Bean
+    ComponentHandler dataStorageComponentHandler() {
+        return () -> ComponentDsl.component("dataStorage")
+            .title("Data Storage")
+            .actions(
+                ComponentDsl.action("appendValueToList")
+                    .title("Append Value to List"),
+                ComponentDsl.action("getValue")
+                    .title("Get Value"));
+    }
+
+    @Bean
+    ComponentHandler loggerComponentHandler() {
+        return () -> ComponentDsl.component("logger")
+            .title("Logger")
+            .actions(
+                ComponentDsl.action("info")
+                    .title("Info"));
     }
 
     @Bean
@@ -462,6 +504,42 @@ public class TestWorkflowExecutorIntTestConfiguration {
             }
 
             gates.clear();
+        }
+    }
+
+    public static final class WorkflowScopeDataStorage {
+
+        private static final int MAX_VALUE_SIZE_IN_BYTES = 409600;
+
+        private final Map<String, Object> values = new ConcurrentHashMap<>();
+
+        @SuppressWarnings("unchecked")
+        public void append(String key, Object value) {
+            List<Object> list;
+
+            if (values.get(key) instanceof List<?> currentList) {
+                list = (List<Object>) currentList;
+            } else {
+                list = new ArrayList<>();
+            }
+
+            list.add(value);
+
+            int size = JsonUtils.writeValueAsBytes(list).length;
+
+            if (size > MAX_VALUE_SIZE_IN_BYTES) {
+                throw new IllegalArgumentException("Value size exceeds 400KB limit per key. Actual: " + size);
+            }
+
+            values.put(key, list);
+        }
+
+        public Object get(String key) {
+            return values.get(key);
+        }
+
+        public void reset() {
+            values.clear();
         }
     }
 

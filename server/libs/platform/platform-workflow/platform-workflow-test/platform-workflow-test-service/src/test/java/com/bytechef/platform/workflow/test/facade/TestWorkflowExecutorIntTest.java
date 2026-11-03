@@ -51,6 +51,7 @@ import com.bytechef.platform.workflow.test.config.TestWorkflowExecutorIntTestCon
 import com.bytechef.platform.workflow.test.config.TestWorkflowExecutorIntTestConfiguration.EvaluationProbe;
 import com.bytechef.platform.workflow.test.config.TestWorkflowExecutorIntTestConfiguration.TaskGate;
 import com.bytechef.platform.workflow.test.config.TestWorkflowExecutorIntTestConfiguration.TaskGates;
+import com.bytechef.platform.workflow.test.config.TestWorkflowExecutorIntTestConfiguration.WorkflowScopeDataStorage;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -106,6 +107,9 @@ class TestWorkflowExecutorIntTest {
     private WorkflowService workflowService;
 
     @Autowired
+    private WorkflowScopeDataStorage workflowScopeDataStorage;
+
+    @Autowired
     private WorkflowTestConfigurationRepository workflowTestConfigurationRepository;
 
     @Autowired
@@ -115,6 +119,7 @@ class TestWorkflowExecutorIntTest {
     void afterEach() {
         evaluationProbe.reset();
         taskGates.reset();
+        workflowScopeDataStorage.reset();
 
         workflowNodeTestOutputRepository.deleteAll();
         workflowTestConfigurationRepository.deleteAll();
@@ -895,10 +900,130 @@ class TestWorkflowExecutorIntTest {
         assertThat(waitUntil(taskGate::isInterrupted)).isTrue();
     }
 
+    @Test
+    void executeSyncRepeatedlyOverLoopedRecordsReleasesTaskContextsOfDeletedJobs() {
+        String workflowId = createWorkflow(getRecordFilteringWorkflowDefinition());
+
+        Map<String, Object> inputs = new HashMap<>();
+
+        inputs.put("records", getDepositRecords(150));
+        inputs.put("targetBank", "Podravska");
+
+        for (int run = 1; run <= 4; run++) {
+            WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, inputs, ENVIRONMENT_ID);
+
+            JobDTO jobDTO = result.job();
+
+            assertThat(jobDTO.status()).isEqualTo(Job.Status.COMPLETED);
+            assertThat((List<?>) workflowScopeDataStorage.get("targetBank")).hasSize(run * 75);
+        }
+    }
+
+    @Test
+    void executeSyncOverLoopedRecordsSharesUnchangedContextValuesBetweenIterations() {
+        String workflowId = createWorkflow(getRecordFilteringWorkflowDefinition());
+
+        Map<String, Object> inputs = new HashMap<>();
+
+        inputs.put("records", getDepositRecords(400));
+        inputs.put("targetBank", "Podravska");
+
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, inputs, ENVIRONMENT_ID);
+
+        JobDTO jobDTO = result.job();
+
+        assertThat(jobDTO.status()).isEqualTo(Job.Status.COMPLETED);
+        assertThat((List<?>) workflowScopeDataStorage.get("targetBank")).hasSize(200);
+    }
+
+    private static List<Map<String, Object>> getDepositRecords(int count) {
+        List<Map<String, Object>> records = new ArrayList<>();
+
+        for (int index = 0; index < count; index++) {
+            String institutionName = index % 2 == 0 ? "Podravska banka d.d." : "Zagrebacka banka d.d.";
+
+            records.add(
+                Map.ofEntries(
+                    Map.entry("additionalFees", true),
+                    Map.entry("currency", "CHF"),
+                    Map.entry("externalReferenceCode", "a501fa1a-b0fe-f0c9-71ad-63dac018a9b" + index),
+                    Map.entry("fees", List.of(Map.of("amount", 10, "name", "Account fee"))),
+                    Map.entry("fixedInterestRate", 0.01),
+                    Map.entry("id", 93615 + index),
+                    Map.entry("institutionErc", "I-015"),
+                    Map.entry("institutionName", institutionName),
+                    Map.entry("name", ""),
+                    Map.entry("settlementPeriod", 3),
+                    Map.entry("typeErc", "DT-001"),
+                    Map.entry("typeName", "Orocena stednja s jednokratnom uplatom")));
+        }
+
+        return records;
+    }
+
     private String createWorkflow(String definition) {
         Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
         return Objects.requireNonNull(workflow.getId());
+    }
+
+    private static String getRecordFilteringWorkflowDefinition() {
+        return """
+            {
+                "tasks": [
+                    {
+                        "name": "loop_1",
+                        "type": "loop/v1",
+                        "parameters": {
+                            "loopForever": false,
+                            "items": "${records}",
+                            "iteratee": [
+                                {
+                                    "name": "condition_1",
+                                    "type": "condition/v1",
+                                    "parameters": {
+                                        "rawExpression": true,
+                                        "expression": "=contains(${loop_1.item.institutionName},${targetBank})",
+                                        "caseTrue": [
+                                            {
+                                                "name": "dataStorage_1",
+                                                "type": "dataStorage/v1/appendValueToList",
+                                                "parameters": {
+                                                    "scope": "WORKFLOW",
+                                                    "key": "targetBank",
+                                                    "type": "OBJECT",
+                                                    "value": "${loop_1.item}"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "dataStorage_2",
+                        "type": "dataStorage/v1/getValue",
+                        "parameters": {"key": "targetBank", "scope": "WORKFLOW", "type": "ARRAY"}
+                    },
+                    {
+                        "name": "loop_2",
+                        "type": "loop/v1",
+                        "parameters": {
+                            "loopForever": false,
+                            "items": "${dataStorage_2}",
+                            "iteratee": [
+                                {
+                                    "name": "logger_1",
+                                    "type": "logger/v1/info",
+                                    "parameters": {"text": "${loop_2.item}"}
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+            """;
     }
 
     private static String getEchoWorkflowDefinition() {
