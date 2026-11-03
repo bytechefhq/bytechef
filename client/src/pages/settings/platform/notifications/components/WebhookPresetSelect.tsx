@@ -1,7 +1,7 @@
 import AlertDialog from '@/components/AlertDialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
-import {useState} from 'react';
+import {useId, useState} from 'react';
 import {useFormContext} from 'react-hook-form';
 
 import {WEBHOOK_PRESETS, WebhookPresetI} from './webhookPresets';
@@ -16,6 +16,8 @@ interface WebhookPresetFormValuesI {
 
 const WebhookPresetSelect = () => {
     const [pendingPreset, setPendingPreset] = useState<WebhookPresetI | undefined>();
+
+    const presetSelectId = useId();
 
     const {getValues, setValue} = useFormContext<WebhookPresetFormValuesI>();
 
@@ -51,10 +53,10 @@ const WebhookPresetSelect = () => {
     return (
         <>
             <div className="space-y-2">
-                <Label htmlFor="webhook-preset">Preset</Label>
+                <Label htmlFor={presetSelectId}>Preset</Label>
 
                 <Select onValueChange={handleValueChange} value="">
-                    <SelectTrigger className="w-full" id="webhook-preset">
+                    <SelectTrigger className="w-full" id={presetSelectId}>
                         <SelectValue placeholder="Start from a preset" />
                     </SelectTrigger>
 
