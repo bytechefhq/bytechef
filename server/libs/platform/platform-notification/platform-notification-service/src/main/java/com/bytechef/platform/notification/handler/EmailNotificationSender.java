@@ -76,8 +76,15 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
                 email, emailNotificationHandler.getSubject(notificationHandlerContext),
                 emailNotificationHandler.getContent(notificationHandlerContext), emailNotificationHandler.isHtml());
         } catch (MailException | IllegalStateException exception) {
-            return NotificationTestResult.failed(exception.getClass()
-                .getSimpleName() + ": " + exception.getMessage());
+            String exceptionName = exception.getClass()
+                .getSimpleName();
+
+            return NotificationTestResult.failed(exceptionName + ": " + exception.getMessage());
+        } catch (RuntimeException exception) {
+            String exceptionName = exception.getClass()
+                .getSimpleName();
+
+            return NotificationTestResult.failed("Test send failed (" + exceptionName + ")");
         }
 
         return NotificationTestResult.sent(false);

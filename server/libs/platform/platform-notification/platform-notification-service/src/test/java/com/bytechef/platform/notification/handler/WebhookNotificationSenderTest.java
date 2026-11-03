@@ -373,6 +373,17 @@ class WebhookNotificationSenderTest {
         verify(webhookDeliveryService, never()).sendTest(any());
     }
 
+    @Test
+    void testSendTestReportsMissingUrl() {
+        NotificationTestResult notificationTestResult = webhookNotificationSender.sendTest(
+            createNotification(Map.of("webhook", "  ")), webhookNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("Webhook URL is required");
+
+        verify(webhookDeliveryService, never()).sendTest(any());
+    }
+
     private static WebhookDeliveryOutcome sentOutcome() {
         return new WebhookDeliveryOutcome(List.of(new PayloadResult("1", Status.SENT)), null, null, null);
     }

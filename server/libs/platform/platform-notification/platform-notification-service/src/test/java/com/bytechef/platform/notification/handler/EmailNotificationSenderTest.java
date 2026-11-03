@@ -136,6 +136,21 @@ class EmailNotificationSenderTest {
     }
 
     @Test
+    void testSendTestMapsUnexpectedExceptionWithoutMessage() {
+        when(emailNotificationHandler.getSubject(notificationHandlerContext)).thenReturn("Subject");
+        when(emailNotificationHandler.getContent(notificationHandlerContext))
+            .thenThrow(new IllegalArgumentException("secret-value"));
+
+        NotificationTestResult notificationTestResult = emailNotificationSender.sendTest(
+            createNotification(Map.of("email", "approver@example.com")), emailNotificationHandler,
+            notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("Test send failed (IllegalArgumentException)");
+        assertThat(notificationTestResult.error()).doesNotContain("secret-value");
+    }
+
+    @Test
     void testSendTestFailsWhenEmailMissing() {
         NotificationTestResult notificationTestResult = emailNotificationSender.sendTest(
             createNotification(Map.of()), emailNotificationHandler, notificationHandlerContext);

@@ -17,11 +17,13 @@
 package com.bytechef.platform.mail;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -315,6 +317,57 @@ class MailServiceIntTest {
         DataHandler dataHandler = message.getDataHandler();
 
         assertThat(dataHandler.getContentType()).isEqualTo("text/html;charset=UTF-8");
+    }
+
+    @Test
+    void testSendEmailNowThrowsWhenMailHostBlank() {
+        assertThatThrownBy(
+            () -> mailService.sendEmailNow("john.doe@example.com", "testSubject", "testContent", false))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Mail server is not configured");
+
+        verify(javaMailSender, never()).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void testSendEmailNowPropagatesSendFailure() {
+        Mail mail = applicationProperties.getMail();
+
+        mail.setHost("localhost");
+
+        try {
+            doThrow(new MailSendException("boom")).when(javaMailSender)
+                .send(any(MimeMessage.class));
+
+            assertThatThrownBy(
+                () -> mailService.sendEmailNow("john.doe@example.com", "testSubject", "testContent", false))
+                    .isInstanceOf(MailSendException.class)
+                    .hasMessageContaining("boom");
+        } finally {
+            mail.setHost(null);
+        }
+    }
+
+    @Test
+    void testSendEmailNowSends() throws Exception {
+        Mail mail = applicationProperties.getMail();
+
+        mail.setHost("localhost");
+
+        try {
+            mailService.sendEmailNow("john.doe@example.com", "testSubject", "<b>testContent</b>", true);
+
+            verify(javaMailSender).send(messageCaptor.capture());
+
+            MimeMessage message = messageCaptor.getValue();
+
+            assertThat(message.getSubject()).isEqualTo("testSubject");
+            assertThat(message.getAllRecipients()[0]).hasToString("john.doe@example.com");
+            assertThat(message.getDataHandler()
+                .getContentType()).isEqualTo("text/html;charset=UTF-8");
+        } finally {
+            mail.setHost(null);
+        }
     }
 
     @Test
