@@ -141,9 +141,9 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             </TooltipProvider>
         );
 
-        expect(screen.getByLabelText('Name')).toHaveValue('');
+        expect(screen.getByLabelText(/^Name/)).toHaveValue('');
 
-        await user.type(screen.getByLabelText('Name'), 'Beta');
+        await user.type(screen.getByLabelText(/^Name/), 'Beta');
         await user.click(screen.getByLabelText('Assignment rule'));
         await user.paste("metadata['beta'] == 'true'");
 
@@ -191,7 +191,7 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             </TooltipProvider>
         );
 
-        await user.type(screen.getByLabelText('Name'), '  production ');
+        await user.type(screen.getByLabelText(/^Name/), '  production ');
 
         expect(screen.getByText('A configuration named production already exists in Staging.')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
@@ -256,8 +256,8 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
 
         await user.click(screen.getByRole('switch', {name: 'Show in Automation Hub'}));
 
-        await user.clear(screen.getByLabelText('Name'));
-        await user.type(screen.getByLabelText('Name'), 'Renamed');
+        await user.clear(screen.getByLabelText(/^Name/));
+        await user.type(screen.getByLabelText(/^Name/), 'Renamed');
         await user.click(screen.getByLabelText('Assignment rule'));
         await user.paste("metadata['beta'] == 'true'");
 

@@ -9,6 +9,7 @@ import {
     DialogHeader,
     DialogMain,
 } from '@/components/Dialog';
+import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import Switch from '@/components/Switch/Switch';
 import {Input} from '@/components/ui/input';
@@ -39,32 +40,43 @@ type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automation
 interface AutomationWorkflowProjectConfigurationDialogProps {
     configuration?: AutomationWorkflowProjectConfigurationType;
     onClose: () => void;
-    project: AutomationWorkflowProjectType;
+    project?: AutomationWorkflowProjectType;
+    projects?: AutomationWorkflowProjectType[];
     updateProjectVersion?: boolean;
 }
 
 const AutomationWorkflowProjectConfigurationDialog = ({
     configuration,
     onClose,
-    project,
+    project: fixedProject,
+    projects = [],
     updateProjectVersion = false,
 }: AutomationWorkflowProjectConfigurationDialogProps) => {
     const [automationHubVisible, setAutomationHubVisible] = useState(configuration?.automationHubVisible ?? true);
     const [enteredName, setEnteredName] = useState<string | undefined>(configuration?.name);
     const [permissionExpression, setPermissionExpression] = useState(configuration?.permissionExpression ?? '');
-    const [projectVersion, setProjectVersion] = useState(
-        (updateProjectVersion ? project.lastPublishedVersion : configuration?.projectVersion)?.toString() ??
-            project.lastPublishedVersion?.toString() ??
-            ''
+    const [chosenProjectVersion, setChosenProjectVersion] = useState(
+        (updateProjectVersion ? fixedProject?.lastPublishedVersion : configuration?.projectVersion)?.toString() ?? ''
     );
+    const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(fixedProject?.id);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();
 
     const {data: environments} = useGetEnvironmentsQuery();
-    const {data: configurationsData} = useAutomationWorkflowProjectConfigurationsQuery({projectId: project.id});
-    const {data: versionsData} = useAutomationWorkflowProjectVersionsQuery({id: project.id});
+    const project = fixedProject ?? projects.find((projectItem) => projectItem.id === selectedProjectId);
+
+    const projectVersion = chosenProjectVersion || project?.lastPublishedVersion?.toString() || '';
+
+    const {data: configurationsData} = useAutomationWorkflowProjectConfigurationsQuery(
+        {projectId: project?.id ?? ''},
+        {enabled: !!project}
+    );
+    const {data: versionsData} = useAutomationWorkflowProjectVersionsQuery(
+        {id: project?.id ?? ''},
+        {enabled: !!project}
+    );
 
     const changesVersion =
         !!configuration && projectVersion !== '' && Number(projectVersion) !== configuration.projectVersion;
@@ -156,7 +168,16 @@ const AutomationWorkflowProjectConfigurationDialog = ({
         return warnings;
     }, [changesVersion, componentDefinitions, impactData, projectVersion]);
 
+    const handleSelectProject = (projectId: string) => {
+        setSelectedProjectId(projectId);
+        setChosenProjectVersion('');
+    };
+
     const handleSubmit = () => {
+        if (!project) {
+            return;
+        }
+
         if (configuration) {
             updateConfigurationMutation.mutate(
                 {
@@ -195,9 +216,35 @@ const AutomationWorkflowProjectConfigurationDialog = ({
         </fieldset>
     );
 
+    const projectFieldset = (
+        <fieldset className="flex flex-col gap-2 border-0 p-0">
+            <span className="text-sm font-medium">
+                Project
+                <RequiredMark />
+            </span>
+
+            <Select onValueChange={handleSelectProject} value={selectedProjectId}>
+                <SelectTrigger aria-label="Project">
+                    <SelectValue placeholder="Select project" />
+                </SelectTrigger>
+
+                <SelectContent>
+                    {projects.map((projectItem) => (
+                        <SelectItem key={projectItem.id} value={projectItem.id}>
+                            {projectItem.name}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </fieldset>
+    );
+
     const nameFieldset = (
         <fieldset className="flex flex-col gap-2 border-0 p-0">
-            <Label htmlFor="configurationName">Name</Label>
+            <Label className="gap-0" htmlFor="configurationName">
+                Name
+                <RequiredMark />
+            </Label>
 
             <Input
                 aria-invalid={nameTaken}
@@ -237,17 +284,25 @@ const AutomationWorkflowProjectConfigurationDialog = ({
         <fieldset className="flex flex-col gap-2 border-0 p-0">
             <span className="text-sm font-medium">Version</span>
 
-            <Select onValueChange={setProjectVersion} value={projectVersion}>
+            <Select disabled={!project} onValueChange={setChosenProjectVersion} value={projectVersion}>
                 <SelectTrigger aria-label="Version">
-                    <SelectValue placeholder="Select version" />
+                    <SelectValue placeholder={project ? 'Select version' : 'Select a project first'} />
                 </SelectTrigger>
 
                 <SelectContent>
-                    {publishedVersions.map((publishedVersion) => (
-                        <SelectItem key={publishedVersion.version} value={String(publishedVersion.version)}>
-                            {`V${publishedVersion.version}`}
-                        </SelectItem>
-                    ))}
+                    {publishedVersions.length > 0 ? (
+                        publishedVersions.map((publishedVersion) => (
+                            <SelectItem key={publishedVersion.version} value={String(publishedVersion.version)}>
+                                {`V${publishedVersion.version}`}
+                            </SelectItem>
+                        ))
+                    ) : (
+                        <p className="px-2 py-1.5 text-sm text-content-neutral-secondary">
+                            {versionsData
+                                ? 'This project has no published versions. Publish it in the Development environment first.'
+                                : 'Loading versions...'}
+                        </p>
+                    )}
                 </SelectContent>
             </Select>
 
@@ -288,11 +343,13 @@ const AutomationWorkflowProjectConfigurationDialog = ({
                             title={
                                 updateProjectVersion
                                     ? 'Upgrade Project Version'
-                                    : `${configuration ? 'Edit' : 'Create'} Configuration`
+                                    : `${configuration ? 'Edit' : 'New'} Configuration`
                             }
                         />
 
                         <DialogBody>
+                            {!fixedProject && projectFieldset}
+
                             {!updateProjectVersion && nameFieldset}
 
                             {(!configuration || updateProjectVersion) && versionFieldset}
@@ -330,7 +387,11 @@ const AutomationWorkflowProjectConfigurationDialog = ({
 
                             <Button
                                 disabled={
-                                    isPending || nameTaken || !projectVersion || (!updateProjectVersion && !trimmedName)
+                                    isPending ||
+                                    nameTaken ||
+                                    !project ||
+                                    !projectVersion ||
+                                    (!updateProjectVersion && !trimmedName)
                                 }
                                 label="Save"
                                 type="submit"
