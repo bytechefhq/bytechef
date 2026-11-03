@@ -19,7 +19,9 @@ package com.bytechef.component.infobip.util;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
 import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
+import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
+import static com.bytechef.component.infobip.constant.InfobipConstants.RESOURCE;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEMPLATE_NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -154,6 +156,30 @@ class InfobipUtilsTest {
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
+    }
+
+    @Test
+    void testGetWebhookEnableOutputForResource(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(CONFIGURATION_KEY, "abc"));
+
+        WebhookEnableOutput webhookEnableOutput = InfobipUtils.getWebhookEnableOutput(
+            RESOURCE, "OFFICIAL-ACCOUNT-ID-123", "VIBER_BOT", "keyword", "webhookUrl", mockedContext);
+
+        assertEquals(new WebhookEnableOutput(Map.of(CONFIGURATION_KEY, "abc"), null), webhookEnableOutput);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/resource-management/1/inbound-message-configurations", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of("channel", "VIBER_BOT", KEYWORD, "keyword", RESOURCE, "OFFICIAL-ACCOUNT-ID-123", "forwarding",
+                Map.of("type", "HTTP_FORWARD", "url", "webhookUrl")),
+            bodyArgumentCaptor.getValue());
     }
 
     @Test

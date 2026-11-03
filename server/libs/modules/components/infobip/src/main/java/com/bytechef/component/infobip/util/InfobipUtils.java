@@ -19,12 +19,18 @@ package com.bytechef.component.infobip.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
+import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
+import static com.bytechef.component.infobip.constant.InfobipConstants.DESTINATIONS;
 import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
 import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD;
+import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGES;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
+import static com.bytechef.component.infobip.constant.InfobipConstants.SENDER;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEMPLATE_NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
+import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
+import static com.bytechef.component.infobip.constant.InfobipConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -114,6 +120,19 @@ public class InfobipUtils {
     public static WebhookEnableOutput getWebhookEnableOutput(
         String number, String channel, String keyword, String webhookUrl, TriggerContext triggerContext) {
 
+        return getWebhookEnableOutput(NUMBER, number, channel, keyword, webhookUrl, triggerContext);
+    }
+
+    /**
+     * Creates an Infobip inbound message configuration that forwards messages to the given webhook URL.
+     *
+     * @param identifierKey the request field that identifies the receiving address: {@code number} for SMS and
+     *                      WhatsApp, {@code resource} for channels such as Viber Bots that use a sender ID
+     */
+    public static WebhookEnableOutput getWebhookEnableOutput(
+        String identifierKey, String identifier, String channel, String keyword, String webhookUrl,
+        TriggerContext triggerContext) {
+
         Map<String, Object> body =
             triggerContext.http(http -> http.post("/resource-management/1/inbound-message-configurations"))
                 .body(
@@ -127,7 +146,7 @@ public class InfobipUtils {
                                     put(KEYWORD, keyword);
                                 }
 
-                                put(NUMBER, number);
+                                put(identifierKey, identifier);
                             }
                         }))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -146,5 +165,25 @@ public class InfobipUtils {
             triggerContext.log(log -> log.debug(
                 "Infobip inbound message configuration {} no longer exists", configurationKey));
         }
+    }
+
+    /**
+     * Sends one Viber text message through an Infobip messages endpoint. Viber Bots and Viber Business Messages accept
+     * the same request body and return the same response, and differ only in the endpoint path.
+     */
+    public static Map<String, Object> sendViberTextMessage(
+        String path, Parameters inputParameters, ActionContext actionContext) {
+
+        Map<String, Object> message = Map.of(
+            SENDER, inputParameters.getRequiredString(SENDER),
+            DESTINATIONS, List.of(Map.of(TO, inputParameters.getRequiredString(TO))),
+            CONTENT, Map.of(TYPE, "TEXT", TEXT, inputParameters.getRequiredString(TEXT)));
+
+        return actionContext
+            .http(http -> http.post(path))
+            .body(Http.Body.of(MESSAGES, List.of(message)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
