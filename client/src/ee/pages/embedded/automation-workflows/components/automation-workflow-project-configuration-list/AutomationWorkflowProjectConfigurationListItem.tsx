@@ -21,7 +21,6 @@ import {
     useAutomationWorkflowProjectConfigurationDeleteImpactQuery,
     useEnableAutomationWorkflowProjectConfigurationMutation,
 } from '@/shared/middleware/graphql';
-import {Environment} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, EllipsisVerticalIcon, PencilIcon, RefreshCcwIcon, Trash2Icon, UsersIcon} from 'lucide-react';
 import {MouseEvent, useCallback, useRef, useState} from 'react';
@@ -36,7 +35,6 @@ type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automation
 interface AutomationWorkflowProjectConfigurationListItemProps {
     configuration: AutomationWorkflowProjectConfigurationType;
     configurations?: AutomationWorkflowProjectConfigurationType[];
-    environments: Environment[];
     onDelete: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationWorkflowProjectConfigurationType) => void;
@@ -48,7 +46,6 @@ const formatCount = (count: number, noun: string): string => `${count} ${count =
 const AutomationWorkflowProjectConfigurationListItem = ({
     configuration,
     configurations = [],
-    environments,
     onDelete,
     onEdit,
     onUpdateVersion,
@@ -90,10 +87,6 @@ const AutomationWorkflowProjectConfigurationListItem = ({
               ? NO_CONNECTED_USERS_REASON
               : undefined;
 
-    const environmentName =
-        environments.find((environment) => String(environment.id) === configuration.environmentId)?.name ||
-        configuration.environmentId;
-
     const newerVersionAvailable =
         project.lastPublishedVersion != null && project.lastPublishedVersion > configuration.projectVersion;
 
@@ -133,8 +126,6 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                             <span className="text-base font-semibold text-content-neutral-primary">
                                 {configuration.name}
                             </span>
-
-                            <span className="ml-2 text-sm text-content-neutral-secondary">{environmentName}</span>
                         </div>
 
                         <div className="mt-2 flex min-h-7 items-center">

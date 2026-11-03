@@ -6,7 +6,6 @@ import {
     useAutomationWorkflowProjectConfigurationsQuery,
     useDeleteAutomationWorkflowProjectConfigurationMutation,
 } from '@/shared/middleware/graphql';
-import {useGetEnvironmentsQuery} from '@/shared/queries/platform/environments.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {SlidersHorizontalIcon} from 'lucide-react';
 
@@ -33,7 +32,6 @@ const AutomationWorkflowProjectConfigurationList = ({
 }: AutomationWorkflowProjectConfigurationListProps) => {
     const queryClient = useQueryClient();
 
-    const {data: environments} = useGetEnvironmentsQuery();
     const {data: configurationsData} = useAutomationWorkflowProjectConfigurationsQuery({
         environmentId: String(environmentId),
         projectId: project.id,
@@ -71,7 +69,6 @@ const AutomationWorkflowProjectConfigurationList = ({
                 <AutomationWorkflowProjectConfigurationListItem
                     configuration={configuration}
                     configurations={configurations}
-                    environments={environments ?? []}
                     key={configuration.id}
                     onDelete={(configurationToDelete) =>
                         deleteConfigurationMutation.mutate({id: configurationToDelete.id})
