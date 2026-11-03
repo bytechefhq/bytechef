@@ -112,6 +112,8 @@ export default function buildWorkflowGraph({
                         operationName: type.split('/')[2],
                         taskDispatcher: isTaskDispatcher,
                         taskDispatcherId: isTaskDispatcher ? name : undefined,
+                        trigger: false,
+                        workflowNodeName: name,
                     },
                     id: name,
                     position: {x: 0, y: 0},
