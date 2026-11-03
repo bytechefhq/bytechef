@@ -15,11 +15,13 @@ import ConnectedUserTable from '@/ee/pages/embedded/connected-users/components/C
 import ConnectedUsersFilterTitle from '@/ee/pages/embedded/connected-users/components/ConnectedUsersFilterTitle';
 import ConnectedUsersSelectionBar from '@/ee/pages/embedded/connected-users/components/ConnectedUsersSelectionBar';
 import ConnectedUserSheet from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheet';
+import UpgradeConnectedUsersDialog from '@/ee/pages/embedded/connected-users/components/upgrade-connected-users-dialog/UpgradeConnectedUsersDialog';
 import {EMBEDDED_CONNECTED_USERS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {ComponentDefinitionBasic, Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserFromJSON, type CredentialStatus} from '@/ee/shared/middleware/embedded/connected-user';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
-import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {ConnectedUserKeys, useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
@@ -29,6 +31,7 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {cn} from '@/shared/util/cn-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {useQueryClient} from '@tanstack/react-query';
 import {format} from 'date-fns';
 import {CalendarIcon, UploadIcon, UsersIcon} from 'lucide-react';
 import {HTMLAttributes, useEffect, useMemo, useState} from 'react';
@@ -127,11 +130,13 @@ const ConnectedUsers = () => {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [importDialogOpen, setImportDialogOpen] = useState(false);
     const [selectedConnectedUserIds, setSelectedConnectedUserIds] = useState<number[]>([]);
-    const [, setUpgradeKind] = useState<'automation' | 'integration' | undefined>();
+    const [upgradeKind, setUpgradeKind] = useState<'automation' | 'integration' | undefined>();
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const navigate = useNavigate();
+
+    const queryClient = useQueryClient();
 
     const environmentScopeNote = useEnvironmentScopeNote('Connected users');
 
@@ -178,6 +183,11 @@ const ConnectedUsers = () => {
         return selectedConnectedUserIds.filter((connectedUserId) => visibleConnectedUserIds.has(connectedUserId));
     }, [connectedUsers, selectedConnectedUserIds]);
 
+    const selectedConnectedUsers = useMemo(
+        () => connectedUsers?.filter((connectedUser) => visibleSelectedConnectedUserIds.includes(connectedUser.id!)),
+        [connectedUsers, visibleSelectedConnectedUserIds]
+    );
+
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false});
 
     const hasActiveFilter = [
@@ -206,6 +216,19 @@ const ConnectedUsers = () => {
     }
 
     const searchParamsKey = searchParams.toString();
+
+    const handleUpgraded = () => {
+        void queryClient.invalidateQueries({queryKey: ConnectedUserKeys.connectedUsers});
+        void queryClient.invalidateQueries({
+            queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
+        });
+        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectConfigurations']});
+        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectConfigurationConnectedUsers']});
+        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+        void queryClient.invalidateQueries({queryKey: ['connectedUserProjects']});
+
+        setSelectedConnectedUserIds([]);
+    };
 
     const handleFilterConnectedUsers = (values: z.infer<typeof formSchema>) => {
         filter(values.search, values.credentialStatus, values.integrationId, values.createDateRange, pageNumber);
@@ -401,7 +424,7 @@ const ConnectedUsers = () => {
         >
             <PageLoader errors={[connectedUsersError]} loading={connectedUsersLoading}>
                 {connectedUsers && connectedUsers?.length > 0 ? (
-                    <>
+                    <div className="flex w-full flex-col">
                         <ConnectedUsersSelectionBar
                             count={visibleSelectedConnectedUserIds.length}
                             onClear={() => setSelectedConnectedUserIds([])}
@@ -414,7 +437,7 @@ const ConnectedUsers = () => {
                             onSelectionChange={setSelectedConnectedUserIds}
                             selectedConnectedUserIds={visibleSelectedConnectedUserIds}
                         />
-                    </>
+                    </div>
                 ) : hasActiveFilter ? (
                     <EmptyList
                         icon={<UsersIcon className="size-24 text-stroke-neutral-tertiary" />}
@@ -445,6 +468,15 @@ const ConnectedUsers = () => {
             </PageLoader>
 
             <ConnectedUserSheet />
+
+            {upgradeKind && selectedConnectedUsers && (
+                <UpgradeConnectedUsersDialog
+                    connectedUsers={selectedConnectedUsers}
+                    kind={upgradeKind}
+                    onClose={() => setUpgradeKind(undefined)}
+                    onUpgraded={handleUpgraded}
+                />
+            )}
 
             {createDialogOpen && <ConnectedUserCreateDialog onClose={() => setCreateDialogOpen(false)} />}
 

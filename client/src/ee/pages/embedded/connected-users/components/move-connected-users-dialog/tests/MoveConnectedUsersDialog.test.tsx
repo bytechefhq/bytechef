@@ -194,7 +194,7 @@ describe('MoveConnectedUsersDialog', () => {
 
         expect(onMove).toHaveBeenCalledWith('10', ['1', '2']);
         expect(screen.getByText('Jane: the target has no Sync, Report')).toBeInTheDocument();
-        expect(screen.getByText('Bob: ALREADY_ON_TARGET')).toBeInTheDocument();
+        expect(screen.getByText('Bob: Already on this configuration')).toBeInTheDocument();
     });
 
     it('disables Move while the move preview loads', async () => {

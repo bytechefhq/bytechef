@@ -205,7 +205,7 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Move'}));
 
         expect(await screen.findByText('1 moved, 0 need attention')).toBeInTheDocument();
-        expect(screen.getByText('Bob: ALREADY_ON_TARGET')).toBeInTheDocument();
+        expect(screen.getByText('Bob: Already on this configuration')).toBeInTheDocument();
         expect(mocks.moveMutateAsync).toHaveBeenCalledWith({
             connectedUserIds: ['1', '2'],
             sourceId: 'source',

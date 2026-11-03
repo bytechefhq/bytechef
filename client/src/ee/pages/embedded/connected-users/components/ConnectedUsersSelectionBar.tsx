@@ -19,7 +19,7 @@ const ConnectedUsersSelectionBar = ({
 
     return (
         <div className="flex items-center gap-2 px-4 pb-2">
-            <span className="text-sm font-medium">{`${count} selected`}</span>
+            <span className="text-sm font-medium whitespace-nowrap">{`${count} selected`}</span>
 
             <Button label="Upgrade integration" onClick={onUpgradeIntegration} size="sm" variant="outline" />
 
