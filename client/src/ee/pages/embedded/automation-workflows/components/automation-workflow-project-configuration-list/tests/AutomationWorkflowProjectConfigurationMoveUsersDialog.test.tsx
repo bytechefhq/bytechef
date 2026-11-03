@@ -1,9 +1,11 @@
 import {resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render} from '@testing-library/react';
+import {render, within} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectConfigurationMoveUsersDialog from '../AutomationWorkflowProjectConfigurationMoveUsersDialog';
+
+const getSkippedItems = () => within(screen.getByRole('list', {name: 'Skipped users'})).getAllByRole('listitem');
 
 const mocks = vi.hoisted(() => ({
     connectedUsers: undefined as unknown[] | undefined,
@@ -164,7 +166,13 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
         await userEvent.click(screen.getByRole('combobox', {name: 'Target'}));
         await userEvent.click(await screen.findByRole('option', {name: 'BETA · v2'}));
 
-        expect(await screen.findByText('Bob: the target has no Sync')).toBeInTheDocument();
+        const skippedItem = (await waitFor(() => getSkippedItems()))[0];
+
+        expect(within(skippedItem).getByText('Bob')).toBeInTheDocument();
+        expect(
+            within(skippedItem).getByText("The target configuration doesn't have these workflows:")
+        ).toBeInTheDocument();
+        expect(within(skippedItem).getByText('Sync')).toBeInTheDocument();
         expect(mocks.moveVariables.at(-1)).toEqual({
             connectedUserIds: ['1', '2'],
             sourceId: 'source',
@@ -205,7 +213,8 @@ describe('AutomationWorkflowProjectConfigurationMoveUsersDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Move'}));
 
         expect(await screen.findByText('1 moved, 0 need attention')).toBeInTheDocument();
-        expect(screen.getByText('Bob: Already on this configuration')).toBeInTheDocument();
+        expect(within(getSkippedItems()[0]).getByText('Bob')).toBeInTheDocument();
+        expect(screen.getByText('Already on this configuration')).toBeInTheDocument();
         expect(mocks.moveMutateAsync).toHaveBeenCalledWith({
             connectedUserIds: ['1', '2'],
             sourceId: 'source',

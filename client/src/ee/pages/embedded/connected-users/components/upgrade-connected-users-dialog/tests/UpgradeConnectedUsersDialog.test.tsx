@@ -1,9 +1,11 @@
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import UpgradeConnectedUsersDialog from '../UpgradeConnectedUsersDialog';
+
+const getSkippedItems = () => within(screen.getByRole('list', {name: 'Skipped users'})).getAllByRole('listitem');
 
 const mocks = vi.hoisted(() => ({
     automationImpactVariables: [] as unknown[],
@@ -264,7 +266,8 @@ describe('UpgradeConnectedUsersDialog', () => {
                 })
             );
 
-            expect(await screen.findByText('Bob: Already on this configuration')).toBeInTheDocument();
+            expect(await screen.findByText('Already on this configuration')).toBeInTheDocument();
+            expect(within(getSkippedItems()[0]).getByText('Bob')).toBeInTheDocument();
 
             await userEvent.click(screen.getByRole('button', {name: 'Upgrade'}));
 
@@ -276,7 +279,8 @@ describe('UpgradeConnectedUsersDialog', () => {
             );
 
             expect(await screen.findByText('1 moved, 0 need attention')).toBeInTheDocument();
-            expect(screen.getByText('Bob: Already on this configuration')).toBeInTheDocument();
+            expect(screen.getByText('Already on this configuration')).toBeInTheDocument();
+            expect(within(getSkippedItems()[0]).getByText('Bob')).toBeInTheDocument();
 
             await userEvent.click(screen.getAllByRole('button', {name: 'Close'}).at(-1)!);
 
@@ -520,7 +524,8 @@ describe('UpgradeConnectedUsersDialog', () => {
             );
 
             expect(await screen.findByText('1 moved, 0 need attention')).toBeInTheDocument();
-            expect(screen.getByText("Bob: Doesn't have this project")).toBeInTheDocument();
+            expect(screen.getByText("Doesn't have this project")).toBeInTheDocument();
+            expect(within(getSkippedItems()[0]).getByText('Bob')).toBeInTheDocument();
 
             await userEvent.click(screen.getAllByRole('button', {name: 'Close'}).at(-1)!);
 

@@ -1,3 +1,9 @@
+import {Alert, AlertDescription} from '@/components/ui/alert';
+import MoveConnectedUsersSkippedList, {
+    type SkippedUserDisplayI,
+} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersSkippedList';
+import {InfoIcon} from 'lucide-react';
+
 import type {MoveConnectedUsersSkippedI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
 
 interface MoveConnectedUsersImpactProps {
@@ -10,7 +16,7 @@ interface MoveConnectedUsersImpactProps {
     mcpServerCount?: number;
     previewError?: boolean;
     previewSkipped?: MoveConnectedUsersSkippedI[];
-    toSkippedLine: (skippedUser: MoveConnectedUsersSkippedI) => string;
+    toSkippedUser: (skippedUser: MoveConnectedUsersSkippedI) => SkippedUserDisplayI;
 }
 
 const MoveConnectedUsersImpact = ({
@@ -18,7 +24,7 @@ const MoveConnectedUsersImpact = ({
     mcpServerCount,
     previewError,
     previewSkipped,
-    toSkippedLine,
+    toSkippedUser,
 }: MoveConnectedUsersImpactProps) => (
     <>
         {impact?.map((impactItem) => (
@@ -38,9 +44,13 @@ const MoveConnectedUsersImpact = ({
         ))}
 
         {!!mcpServerCount && (
-            <p className="text-sm text-content-neutral-secondary">
-                {`${mcpServerCount} ${mcpServerCount === 1 ? 'MCP server uses' : 'MCP servers use'} one of these configurations. Their tools follow the configuration each user lands on.`}
-            </p>
+            <Alert variant="default">
+                <InfoIcon />
+
+                <AlertDescription>
+                    {`${mcpServerCount} ${mcpServerCount === 1 ? 'MCP server uses' : 'MCP servers use'} one of these configurations. Their tools follow the configuration each user lands on.`}
+                </AlertDescription>
+            </Alert>
         )}
 
         {previewError && (
@@ -50,12 +60,10 @@ const MoveConnectedUsersImpact = ({
         )}
 
         {!!previewSkipped?.length && (
-            <div className="space-y-1 text-sm text-content-neutral-secondary">
+            <div className="space-y-1 text-sm">
                 <p className="font-medium">Users that would be skipped</p>
 
-                {previewSkipped.map((skippedUser, index) => (
-                    <p key={`${skippedUser.connectedUserId}-${index}`}>{toSkippedLine(skippedUser)}</p>
-                ))}
+                <MoveConnectedUsersSkippedList skippedUsers={previewSkipped.map(toSkippedUser)} />
             </div>
         )}
     </>
