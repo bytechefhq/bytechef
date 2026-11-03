@@ -16,10 +16,6 @@
 
 package com.bytechef.platform.knowledgebase.service;
 
-import com.bytechef.platform.audit.AuditData;
-import com.bytechef.platform.audit.Audited;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvents;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
 import java.util.List;
@@ -69,10 +65,6 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
     }
 
     @Override
-    @Audited(event = KnowledgeBaseAuditEvents.KB_UPDATED, platform = PlatformType.AUTOMATION, data = {
-        @AuditData(key = "knowledgeBaseId", value = "#id"),
-        @AuditData(key = "name", value = "#result?.name")
-    })
     public KnowledgeBase updateKnowledgeBase(Long id, KnowledgeBase knowledgeBase) {
         KnowledgeBase existingKnowledgeBase = getKnowledgeBase(id);
 

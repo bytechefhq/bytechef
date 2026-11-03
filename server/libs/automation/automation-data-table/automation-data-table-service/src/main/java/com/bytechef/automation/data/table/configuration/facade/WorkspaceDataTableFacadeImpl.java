@@ -21,6 +21,7 @@ import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTab
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
+import com.bytechef.platform.data.table.audit.DataTableAuditMapper;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
@@ -69,6 +70,12 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_ADDED, data = {
+        @AuditData(key = "dataTableId", value = "#tableId"),
+        @AuditData(key = "columnName", value = "#columnSpec.name"),
+        @AuditData(key = "columnType", value = "#columnSpec.type"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
     public void addColumn(long tableId, ColumnSpec columnSpec, long environmentId) {
         dataTableService.addColumn(dataTableService.getBaseNameById(tableId), columnSpec, environmentId);
@@ -100,9 +107,13 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     // Keyed on the table id rather than the base name the service takes, because the base name encodes an environment
     // and is not what the relation is keyed on.
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_DELETED, mapper = DataTableAuditMapper.class, data = {
+        @AuditData(key = "dataTableId", value = "#tableId"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_DELETE', #environmentId)")
-    public void dropTable(long tableId, long environmentId) {
-        dataTableService.dropTable(dataTableService.getBaseNameById(tableId), environmentId);
+    public boolean dropTable(long tableId, long environmentId) {
+        return dataTableService.dropTable(dataTableService.getBaseNameById(tableId), environmentId);
     }
 
     @Override
@@ -129,8 +140,11 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_EXPORTED, data = {
+        @AuditData(key = "dataTableId", value = "#tableId"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_VIEW', #environmentId)")
-    @Transactional(readOnly = true)
     public String exportCsv(long tableId, long environmentId) {
         return dataTableRowService.exportCsv(dataTableService.getBaseNameById(tableId), environmentId);
     }
@@ -195,12 +209,23 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_REMOVED, data = {
+        @AuditData(key = "dataTableId", value = "#tableId"),
+        @AuditData(key = "columnName", value = "#columnName"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
     public void removeColumn(long tableId, String columnName, long environmentId) {
         dataTableService.removeColumn(dataTableService.getBaseNameById(tableId), columnName, environmentId);
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_RENAMED, data = {
+        @AuditData(key = "dataTableId", value = "#tableId"),
+        @AuditData(key = "fromColumnName", value = "#fromColumnName"),
+        @AuditData(key = "toColumnName", value = "#toColumnName"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
     public void renameColumn(long tableId, String fromColumnName, String toColumnName, long environmentId) {
         dataTableService.renameColumn(
@@ -208,6 +233,11 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_RENAMED, data = {
+        @AuditData(key = "dataTableId", value = "#tableId"),
+        @AuditData(key = "toBaseName", value = "#newBaseName"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
     @PreAuthorize("hasResourceScopeInEnvironmentId(#tableId, 'DataTable', 'DATA_TABLE_EDIT', #environmentId)")
     public void renameTable(long tableId, String newBaseName, long environmentId) {
         dataTableService.renameTable(dataTableService.getBaseNameById(tableId), newBaseName, environmentId);
