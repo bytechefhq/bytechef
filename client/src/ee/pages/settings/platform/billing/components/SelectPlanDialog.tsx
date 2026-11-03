@@ -3,23 +3,29 @@ import {Dialog, DialogBody, DialogContent, DialogHeader, DialogMain} from '@/com
 import {BillingApi, CheckoutSessionRequestPlanNameEnum} from '@/shared/middleware/platform/billing';
 import {useUpgradeSubscriptionMutation} from '@/shared/mutations/platform/billing.mutations';
 import {ArrowUpRightIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
-import PrepaidPlanChangeConfirmationDialog from './PrepaidPlanChangeConfirmationDialog';
-import PrepaidPlanTierCard from './PrepaidPlanTierCard';
+import PlanChangeConfirmationDialog from './PlanChangeConfirmationDialog';
+import PlanTierCard from './PlanTierCard';
 
 interface PendingPlanChangeI {
     name: string;
     nameEnum: CheckoutSessionRequestPlanNameEnum;
 }
 
-interface PrepaidSelectPlanDialogPropsI {
+export interface PlanUsageFeaturesI {
+    growth: string[];
+    starter: string[];
+}
+
+interface SelectPlanDialogPropsI {
     currentPlanName?: string;
     hasActiveSubscription: boolean;
     onClose: () => void;
     onUpgradeSuccess?: (isUpgrade: boolean, newPlanName: string) => void;
     open: boolean;
+    planUsageFeatures: PlanUsageFeaturesI;
 }
 
 const PLAN_TIERS: Record<string, number> = {
@@ -27,13 +33,12 @@ const PLAN_TIERS: Record<string, number> = {
     starter: 1,
 };
 
-const PLANS = [
+const getPlans = (planUsageFeatures: PlanUsageFeaturesI) => [
     {
         ctaLabel: 'Get Started',
         description: 'Perfect for individuals and small businesses.',
         features: [
-            'Price for 5000 workflow executions per month',
-            '+$5 per 1000 additional workflow executions',
+            ...planUsageFeatures.starter,
             'Unlimited workflows',
             '1 workspace',
             '1 user',
@@ -49,8 +54,7 @@ const PLANS = [
         description: 'Perfect for growing business.',
         disabled: true,
         features: [
-            'Price for 15000 workflow executions per month',
-            '+$5 per 1000 additional workflow executions',
+            ...planUsageFeatures.growth,
             'Everything in Starter +',
             '3 workspaces',
             'Unlimited users',
@@ -82,13 +86,14 @@ const PLANS = [
 
 const getPlanTier = (planName: string | undefined): number => PLAN_TIERS[planName?.toLowerCase() ?? ''] ?? 0;
 
-const PrepaidSelectPlanDialog = ({
+const SelectPlanDialog = ({
     currentPlanName,
     hasActiveSubscription,
     onClose,
     onUpgradeSuccess,
     open,
-}: PrepaidSelectPlanDialogPropsI) => {
+    planUsageFeatures,
+}: SelectPlanDialogPropsI) => {
     const [downgradeConfirmOpen, setDowngradeConfirmOpen] = useState(false);
     const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
     const [pendingDowngrade, setPendingDowngrade] = useState<PendingPlanChangeI | null>(null);
@@ -96,6 +101,8 @@ const PrepaidSelectPlanDialog = ({
     const [upgradeConfirmOpen, setUpgradeConfirmOpen] = useState(false);
 
     const {isPending: isUpgradeMutationPending, mutate: upgradeSubscription} = useUpgradeSubscriptionMutation();
+
+    const plans = useMemo(() => getPlans(planUsageFeatures), [planUsageFeatures]);
 
     const closeDowngradeConfirm = () => {
         setPendingDowngrade(null);
@@ -136,7 +143,7 @@ const PrepaidSelectPlanDialog = ({
 
     const handlePlanSelect = async (planName: string, planNameEnum: CheckoutSessionRequestPlanNameEnum | null) => {
         if (planNameEnum === null) {
-            window.open('https://bytechef.io/contact', '_blank');
+            window.open('https://bytechef.io/contact', '_blank', 'noopener,noreferrer');
 
             return;
         }
@@ -187,7 +194,9 @@ const PrepaidSelectPlanDialog = ({
                                 <Button
                                     icon={<ArrowUpRightIcon />}
                                     label="Compare plans"
-                                    onClick={() => window.open('https://bytechef.io/pricing', '_blank')}
+                                    onClick={() =>
+                                        window.open('https://bytechef.io/pricing', '_blank', 'noopener,noreferrer')
+                                    }
                                     variant="outline"
                                 />
                             }
@@ -195,8 +204,8 @@ const PrepaidSelectPlanDialog = ({
                         />
 
                         <DialogBody className="flex gap-4 space-y-0">
-                            {PLANS.map((plan) => (
-                                <PrepaidPlanTierCard
+                            {plans.map((plan) => (
+                                <PlanTierCard
                                     ctaLabel={loadingPlan === plan.name ? 'Loading…' : plan.ctaLabel}
                                     description={plan.description}
                                     disabled={'disabled' in plan && plan.disabled}
@@ -214,7 +223,7 @@ const PrepaidSelectPlanDialog = ({
                 </DialogContent>
             </Dialog>
 
-            <PrepaidPlanChangeConfirmationDialog
+            <PlanChangeConfirmationDialog
                 currentPlanName={currentPlanName}
                 direction="downgrade"
                 isPending={isUpgradeMutationPending}
@@ -232,7 +241,7 @@ const PrepaidSelectPlanDialog = ({
                 open={downgradeConfirmOpen}
             />
 
-            <PrepaidPlanChangeConfirmationDialog
+            <PlanChangeConfirmationDialog
                 currentPlanName={currentPlanName}
                 direction="upgrade"
                 isPending={isUpgradeMutationPending}
@@ -249,4 +258,4 @@ const PrepaidSelectPlanDialog = ({
     );
 };
 
-export default PrepaidSelectPlanDialog;
+export default SelectPlanDialog;

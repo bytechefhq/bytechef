@@ -1,7 +1,7 @@
-import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import PrepaidSelectPlanDialog from '../PrepaidSelectPlanDialog';
+import SelectPlanDialog from '../SelectPlanDialog';
 
 const hoisted = vi.hoisted(() => ({
     createCheckoutSession: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock('@/shared/middleware/platform/billing', () => ({
 
 vi.mock('sonner', () => ({toast: hoisted.toast}));
 
-vi.mock('../PrepaidPlanTierCard', () => ({
+vi.mock('../PlanTierCard', () => ({
     default: ({
         ctaLabel,
         features,
@@ -51,9 +51,25 @@ vi.mock('../PrepaidPlanTierCard', () => ({
 const onClose = vi.fn();
 const onUpgradeSuccess = vi.fn();
 
-const defaultProps = {hasActiveSubscription: false, onClose, onUpgradeSuccess, open: true};
+const meteredPlanUsageFeatures = {
+    growth: [],
+    starter: ['1000 job executions / month, then $1/1000 job executions'],
+};
 
-describe('PrepaidSelectPlanDialog', () => {
+const prepaidPlanUsageFeatures = {
+    growth: ['Price for 15000 workflow executions per month', '+$5 per 1000 additional workflow executions'],
+    starter: ['Price for 5000 workflow executions per month', '+$5 per 1000 additional workflow executions'],
+};
+
+const defaultProps = {
+    hasActiveSubscription: false,
+    onClose,
+    onUpgradeSuccess,
+    open: true,
+    planUsageFeatures: meteredPlanUsageFeatures,
+};
+
+describe('SelectPlanDialog', () => {
     const originalLocation = window.location;
 
     beforeEach(() => {
@@ -72,34 +88,42 @@ describe('PrepaidSelectPlanDialog', () => {
 
     describe('rendering', () => {
         it('should render the title and description', () => {
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+            render(<SelectPlanDialog {...defaultProps} />);
 
             expect(screen.getByRole('heading', {name: 'Select a plan'})).toBeInTheDocument();
             expect(screen.getByText('You can upgrade, downgrade, or cancel at any time.')).toBeInTheDocument();
         });
 
         it('should render the plan cards', () => {
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+            render(<SelectPlanDialog {...defaultProps} />);
 
             expect(screen.getAllByTestId('plan-tier-card')).toHaveLength(3);
         });
 
-        it('should show prepaid starter and growth copy', () => {
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+        it('should list the usage features first on the starter and growth plans', () => {
+            render(<SelectPlanDialog {...defaultProps} planUsageFeatures={prepaidPlanUsageFeatures} />);
 
-            expect(screen.getByText('Price for 5000 workflow executions per month')).toBeInTheDocument();
-            expect(screen.getByText('Price for 15000 workflow executions per month')).toBeInTheDocument();
+            const [starterCard, growthCard] = screen.getAllByTestId('plan-tier-card');
+
+            expect(within(starterCard).getAllByRole('listitem')[0]).toHaveTextContent(
+                'Price for 5000 workflow executions per month'
+            );
+            expect(within(growthCard).getAllByRole('listitem')[0]).toHaveTextContent(
+                'Price for 15000 workflow executions per month'
+            );
             expect(screen.getAllByText('+$5 per 1000 additional workflow executions')).toHaveLength(2);
-        });
-
-        it('should not show metered overage copy', () => {
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
-
             expect(screen.queryByText(/then \$1\/1000 job executions/)).not.toBeInTheDocument();
         });
 
+        it('should show the metered starter copy', () => {
+            render(<SelectPlanDialog {...defaultProps} />);
+
+            expect(screen.getByText('1000 job executions / month, then $1/1000 job executions')).toBeInTheDocument();
+            expect(screen.queryByText(/workflow executions per month/)).not.toBeInTheDocument();
+        });
+
         it('should not render when closed', () => {
-            render(<PrepaidSelectPlanDialog {...defaultProps} open={false} />);
+            render(<SelectPlanDialog {...defaultProps} open={false} />);
 
             expect(screen.queryByRole('heading', {name: 'Select a plan'})).not.toBeInTheDocument();
         });
@@ -109,7 +133,7 @@ describe('PrepaidSelectPlanDialog', () => {
         // The compare-plans action lives in the header's endContent slot, beside
         // the close button the family provides.
         it('should render the compare plans action and the close control', () => {
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+            render(<SelectPlanDialog {...defaultProps} />);
 
             expect(screen.getByRole('button', {name: 'Compare plans'})).toBeInTheDocument();
             expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
@@ -120,17 +144,17 @@ describe('PrepaidSelectPlanDialog', () => {
         it('should open the pricing page from compare plans', async () => {
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+            render(<SelectPlanDialog {...defaultProps} />);
 
             await user.click(screen.getByRole('button', {name: 'Compare plans'}));
 
-            expect(window.open).toHaveBeenCalledWith('https://bytechef.io/pricing', '_blank');
+            expect(window.open).toHaveBeenCalledWith('https://bytechef.io/pricing', '_blank', 'noopener,noreferrer');
         });
 
         it('should call onClose when the close button is clicked', async () => {
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+            render(<SelectPlanDialog {...defaultProps} />);
 
             await user.click(screen.getByRole('button', {name: 'Close'}));
 
@@ -140,11 +164,11 @@ describe('PrepaidSelectPlanDialog', () => {
         it('should open the contact page for the enterprise plan', async () => {
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+            render(<SelectPlanDialog {...defaultProps} />);
 
             await user.click(screen.getByRole('button', {name: 'Select Enterprise'}));
 
-            expect(window.open).toHaveBeenCalledWith('https://bytechef.io/contact', '_blank');
+            expect(window.open).toHaveBeenCalledWith('https://bytechef.io/contact', '_blank', 'noopener,noreferrer');
             expect(hoisted.createCheckoutSession).not.toHaveBeenCalled();
         });
     });
@@ -155,7 +179,7 @@ describe('PrepaidSelectPlanDialog', () => {
 
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+            render(<SelectPlanDialog {...defaultProps} />);
 
             await user.click(screen.getByRole('button', {name: 'Select Starter'}));
 
@@ -172,7 +196,7 @@ describe('PrepaidSelectPlanDialog', () => {
 
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+            render(<SelectPlanDialog {...defaultProps} />);
 
             await user.click(screen.getByRole('button', {name: 'Select Starter'}));
 
@@ -188,7 +212,7 @@ describe('PrepaidSelectPlanDialog', () => {
 
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} />);
+            render(<SelectPlanDialog {...defaultProps} />);
 
             await user.click(screen.getByRole('button', {name: 'Select Starter'}));
 
@@ -206,7 +230,7 @@ describe('PrepaidSelectPlanDialog', () => {
 
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} currentPlanName="Starter" hasActiveSubscription />);
+            render(<SelectPlanDialog {...defaultProps} currentPlanName="Starter" hasActiveSubscription />);
 
             await user.click(screen.getByRole('button', {name: 'Select Growth'}));
 
@@ -224,7 +248,7 @@ describe('PrepaidSelectPlanDialog', () => {
 
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} currentPlanName="Growth" hasActiveSubscription />);
+            render(<SelectPlanDialog {...defaultProps} currentPlanName="Growth" hasActiveSubscription />);
 
             await user.click(screen.getByRole('button', {name: 'Select Starter'}));
 
@@ -242,7 +266,7 @@ describe('PrepaidSelectPlanDialog', () => {
 
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} currentPlanName="Growth" hasActiveSubscription />);
+            render(<SelectPlanDialog {...defaultProps} currentPlanName="Growth" hasActiveSubscription />);
 
             await user.click(screen.getByRole('button', {name: 'Select Starter'}));
             await user.click(screen.getByRole('button', {name: 'Confirm downgrade'}));
@@ -255,7 +279,7 @@ describe('PrepaidSelectPlanDialog', () => {
         it('should keep the current plan when the upgrade confirmation is dismissed', async () => {
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} currentPlanName="Starter" hasActiveSubscription />);
+            render(<SelectPlanDialog {...defaultProps} currentPlanName="Starter" hasActiveSubscription />);
 
             await user.click(screen.getByRole('button', {name: 'Select Growth'}));
             await user.click(screen.getByRole('button', {name: 'Keep current plan'}));
@@ -267,7 +291,7 @@ describe('PrepaidSelectPlanDialog', () => {
         it('should keep the current plan when the downgrade confirmation is dismissed', async () => {
             const user = userEvent.setup();
 
-            render(<PrepaidSelectPlanDialog {...defaultProps} currentPlanName="Growth" hasActiveSubscription />);
+            render(<SelectPlanDialog {...defaultProps} currentPlanName="Growth" hasActiveSubscription />);
 
             await user.click(screen.getByRole('button', {name: 'Select Starter'}));
             await user.click(screen.getByRole('button', {name: 'Keep current plan'}));
