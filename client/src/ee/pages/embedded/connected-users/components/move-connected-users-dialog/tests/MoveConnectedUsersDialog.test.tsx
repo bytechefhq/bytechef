@@ -86,6 +86,37 @@ describe('MoveConnectedUsersDialog', () => {
         expect(screen.getByText('New required inputs: channel')).toBeInTheDocument();
     });
 
+    it('says "1 user" when the impact affects a single user', () => {
+        renderDialog({
+            impact: [
+                {
+                    affectedConnectedUserCount: 1,
+                    label: 'Sync contacts',
+                    newRequiredConnections: [],
+                    newRequiredInputs: [],
+                },
+            ],
+        });
+
+        expect(screen.getByText('Sync contacts: affects 1 user')).toBeInTheDocument();
+    });
+
+    it('keeps the dialog open and enabled for a retry when the move fails', async () => {
+        const onMove = vi.fn().mockRejectedValue(new Error('Move failed'));
+
+        renderDialog({onMove});
+
+        await chooseTarget('Beta · v2');
+        await userEvent.click(screen.getByRole('button', {name: 'Move'}));
+
+        await waitFor(() => {
+            expect(onMove).toHaveBeenCalledOnce();
+            expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
+        });
+
+        expect(screen.getByRole('combobox', {name: 'Target'})).toBeInTheDocument();
+    });
+
     it('shows users that would be skipped before moving', () => {
         renderDialog({
             previewSkipped: [
