@@ -1415,6 +1415,107 @@ class WorkflowNodeParameterFacadeIntTest {
         verify(actionDefinitionService, times(0)).isDynamicOutputDefined(anyString(), anyInt(), anyString());
     }
 
+    @Test
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    void testGetWorkflowNodeDisplayConditionsWhenPreviousNodeDefinitionsAreMissing() {
+        StringProperty typeProperty = mockRequiredStringProperty("type", null);
+        StringProperty valueProperty = mockRequiredStringProperty("value", "type == 'NUMBER'");
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn((List) List.of(typeProperty, valueProperty));
+        when(actionDefinitionService.getActionDefinition("var", 1, "set"))
+            .thenReturn(actionDefinition);
+        when(actionDefinitionService.getActionDefinition("viber", 1, "sendTextMessage"))
+            .thenThrow(
+                new IllegalArgumentException("Component definition with name 'viber' and version '1' not found"));
+        when(actionDefinitionService.getActionDefinition("infobip", 1, "sendViberBotTextMessage"))
+            .thenThrow(
+                new IllegalArgumentException(
+                    "The component 'infobip' does not contain the 'sendViberBotTextMessage' action."));
+        when(triggerDefinitionService.getTriggerDefinition("viber", 1, "newMessage"))
+            .thenThrow(
+                new IllegalArgumentException("Component definition with name 'viber' and version '1' not found"));
+
+        Map<String, Object> varTask = new HashMap<>();
+
+        varTask.put("name", "var_1");
+        varTask.put("type", "var/v1/set");
+        varTask.put("parameters", new HashMap<>(Map.of("type", "NUMBER")));
+        varTask.put("metadata", new HashMap<>());
+
+        String workflowId = createWorkflow(
+            Map.of(
+                "triggers", List.of(Map.of("name", "trigger_1", "type", "viber/v1/newMessage", "parameters", Map.of())),
+                "tasks", List.of(
+                    Map.of("name", "viber_1", "type", "viber/v1/sendTextMessage", "parameters", Map.of()),
+                    Map.of("name", "infobip_1", "type", "infobip/v1/sendViberBotTextMessage", "parameters", Map.of()),
+                    varTask)));
+
+        DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(
+            workflowId, "var_1", 0);
+
+        assertThat(result.displayConditions()).containsEntry("type == 'NUMBER'", true);
+        assertThat(result.missingRequiredProperties()).containsExactly("value");
+    }
+
+    @Test
+    void testGetWorkflowNodeDisplayConditionsReturnsEmptyResultWhenTheNodeActionIsMissing() {
+        when(actionDefinitionService.getActionDefinition("infobip", 1, "sendViberBotTextMessage"))
+            .thenThrow(
+                new IllegalArgumentException(
+                    "The component 'infobip' does not contain the 'sendViberBotTextMessage' action."));
+
+        String workflowId = createWorkflow(
+            Map.of(
+                "tasks", List.of(
+                    Map.of(
+                        "name", "infobip_1", "type", "infobip/v1/sendViberBotTextMessage", "parameters",
+                        Map.of("text", "hello")))));
+
+        DisplayConditionResultDTO result = workflowNodeParameterFacade.getWorkflowNodeDisplayConditions(
+            workflowId, "infobip_1", 0);
+
+        assertThat(result.displayConditions()).isEmpty();
+        assertThat(result.missingRequiredProperties()).isEmpty();
+    }
+
+    @Test
+    void testGetWorkflowNodeMissingRequiredPropertiesReturnsEmptySetWhenTheNodeComponentIsMissing() {
+        when(triggerDefinitionService.getTriggerDefinition("viber", 1, "newMessage"))
+            .thenThrow(
+                new IllegalArgumentException("Component definition with name 'viber' and version '1' not found"));
+
+        String workflowId = createWorkflow(
+            Map.of(
+                "triggers", List.of(Map.of("name", "trigger_1", "type", "viber/v1/newMessage", "parameters", Map.of())),
+                "tasks", List.of()));
+
+        assertThat(workflowNodeParameterFacade.getWorkflowNodeMissingRequiredProperties(workflowId, "trigger_1"))
+            .isEmpty();
+    }
+
+    @Test
+    void testUpdateWorkflowNodeParameterStillFailsWhenTheNodeActionIsMissing() {
+        when(actionDefinitionService.getActionDefinition("infobip", 1, "sendViberBotTextMessage"))
+            .thenThrow(
+                new IllegalArgumentException(
+                    "The component 'infobip' does not contain the 'sendViberBotTextMessage' action."));
+
+        String workflowId = createWorkflow(
+            Map.of(
+                "tasks", List.of(
+                    Map.of(
+                        "name", "infobip_1", "type", "infobip/v1/sendViberBotTextMessage", "parameters",
+                        Map.of("text", "hello")))));
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> workflowNodeParameterFacade.updateWorkflowNodeParameter(
+                workflowId, "infobip_1", "text", "bye", null, false, 0));
+    }
+
     private static StringProperty mockRequiredStringProperty(String name, String displayCondition) {
         StringProperty property = mock(StringProperty.class);
 

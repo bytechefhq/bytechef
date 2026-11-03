@@ -326,6 +326,156 @@ class WorkflowNodeOutputFacadeIntTest {
     }
 
     @Test
+    void testNodeWhoseActionDefinitionIsMissingDoesNotBreakTheOutputsOfTheNodesAfterIt() {
+        String workflowId = createWorkflow(tasksDefinition("action1", "action2", "action3"));
+
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("field1", "value1"), null));
+
+        when(actionDefinitionService.getActionDefinition("component", 1, "action2"))
+            .thenThrow(
+                new IllegalArgumentException("The component 'component' does not contain the 'action2' action."));
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action3", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1");
+
+        Map<String, ?> sampleOutputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+            workflowId, "action3", ENVIRONMENT_ID);
+
+        assertThat(sampleOutputs.get("action1")).isEqualTo(Map.of("field1", "value1"));
+    }
+
+    @Test
+    void testTriggerWhoseComponentDefinitionIsMissingDoesNotBreakTheOutputsOfTheNodesAfterIt() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "triggers": [
+                        {"name": "trigger_1", "type": "viber/v1/newMessage", "parameters": {}}
+                    ],
+                    "tasks": [
+                        {"name": "action1", "type": "component/v1/action1", "parameters": {}},
+                        {"name": "action2", "type": "component/v1/action2", "parameters": {}}
+                    ]
+                }
+                """);
+
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("field1", "value1"), null));
+
+        when(triggerDefinitionService.getTriggerDefinition("viber", 1, "newMessage"))
+            .thenThrow(
+                new IllegalArgumentException("Component definition with name 'viber' and version '1' not found"));
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action2", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1");
+    }
+
+    @Test
+    void testGetWorkflowNodeOutputReturnsNullWhenTheNodeActionDefinitionIsMissing() {
+        String workflowId = createWorkflow(tasksDefinition("action1"));
+
+        when(actionDefinitionService.getActionDefinition("component", 1, "action1"))
+            .thenThrow(
+                new IllegalArgumentException("The component 'component' does not contain the 'action1' action."));
+
+        assertThat(workflowNodeOutputFacade.getWorkflowNodeOutput(workflowId, "action1", ENVIRONMENT_ID)).isNull();
+    }
+
+    @Test
+    void testGetWorkflowNodeOutputReturnsNullWhenTheTriggerComponentDefinitionIsMissing() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "triggers": [
+                        {"name": "trigger_1", "type": "viber/v1/newMessage", "parameters": {}}
+                    ],
+                    "tasks": []
+                }
+                """);
+
+        when(triggerDefinitionService.getTriggerDefinition("viber", 1, "newMessage"))
+            .thenThrow(
+                new IllegalArgumentException("Component definition with name 'viber' and version '1' not found"));
+
+        assertThat(workflowNodeOutputFacade.getWorkflowNodeOutput(workflowId, "trigger_1", ENVIRONMENT_ID)).isNull();
+    }
+
+    @Test
+    void testTaskDispatcherWhoseDefinitionIsMissingDoesNotBreakTheOutputsOfTheNodesAfterIt() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "action1", "type": "component/v1/action1", "parameters": {}},
+                        {"name": "unknown1", "type": "unknown/v1", "parameters": {}},
+                        {"name": "action2", "type": "component/v1/action2", "parameters": {}}
+                    ]
+                }
+                """);
+
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("field1", "value1"), null));
+
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("unknown", 1))
+            .thenThrow(new IllegalArgumentException("Task dispatcher definition 'unknown' not found"));
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action2", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1");
+    }
+
+    @Test
+    void testOnlyTheNodesWhoseDefinitionIsMissingAreSkipped() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "triggers": [
+                        {"name": "trigger_1", "type": "viber/v1/newMessage", "parameters": {}},
+                        {"name": "trigger_2", "type": "infobip/v1/newMessage", "parameters": {}}
+                    ],
+                    "tasks": [
+                        {"name": "viber_1", "type": "viber/v1/sendTextMessage", "parameters": {}},
+                        {"name": "infobip_1", "type": "infobip/v1/sendViberBotTextMessage", "parameters": {}},
+                        {"name": "action1", "type": "component/v1/action1", "parameters": {}},
+                        {"name": "var_1", "type": "var/v1/set", "parameters": {}}
+                    ]
+                }
+                """);
+
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+
+        when(triggerDefinitionService.getTriggerDefinition("viber", 1, "newMessage"))
+            .thenThrow(
+                new IllegalArgumentException("Component definition with name 'viber' and version '1' not found"));
+        when(triggerDefinitionService.getTriggerDefinition("infobip", 1, "newMessage"))
+            .thenReturn(triggerDefinition);
+        when(triggerDefinition.getOutputResponse())
+            .thenReturn(new OutputResponse(null, Map.of("message", "hello"), null));
+        when(actionDefinitionService.getActionDefinition("viber", 1, "sendTextMessage"))
+            .thenThrow(
+                new IllegalArgumentException("Component definition with name 'viber' and version '1' not found"));
+        when(actionDefinitionService.getActionDefinition("infobip", 1, "sendViberBotTextMessage"))
+            .thenThrow(
+                new IllegalArgumentException(
+                    "The component 'infobip' does not contain the 'sendViberBotTextMessage' action."));
+
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("field1", "value1"), null));
+
+        Map<String, ?> sampleOutputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+            workflowId, "var_1", ENVIRONMENT_ID);
+
+        assertThat(sampleOutputs).containsOnlyKeys("trigger_2", "action1");
+        assertThat(sampleOutputs.get("trigger_2")).isEqualTo(Map.of("message", "hello"));
+        assertThat(sampleOutputs.get("action1")).isEqualTo(Map.of("field1", "value1"));
+    }
+
+    @Test
     void testSampleOutputsCachePreventsDuplicateComputation() {
         String workflowId = createWorkflow(tasksDefinition("action1", "action2", "action3"));
 

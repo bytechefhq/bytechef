@@ -59,6 +59,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -293,8 +294,11 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
-            workflowNodeName, null, null, definitionMap);
+        WorkflowNodeStructure workflowNodeStructure = fetchWorkflowNodeStructure(workflowNodeName, definitionMap);
+
+        if (workflowNodeStructure == null) {
+            return new DisplayConditionResultDTO(Map.of(), List.of());
+        }
 
         Set<String> keySet = workflowNodeStructure.parameterMap.keySet();
 
@@ -319,8 +323,11 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(
-            workflowNodeName, null, null, definitionMap);
+        WorkflowNodeStructure workflowNodeStructure = fetchWorkflowNodeStructure(workflowNodeName, definitionMap);
+
+        if (workflowNodeStructure == null) {
+            return Set.of();
+        }
 
         return Set.copyOf(workflowNodeStructure.missingRequiredProperties);
     }
@@ -726,6 +733,22 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                 checkDynamicPropertyType(property.getName(), dynamicPropertyTypesMap);
             }
+        }
+    }
+
+    private @Nullable WorkflowNodeStructure fetchWorkflowNodeStructure(
+        String workflowNodeName, Map<String, ?> definitionMap) {
+
+        try {
+            return getWorkflowNodeStructure(workflowNodeName, null, null, definitionMap);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            if (log.isDebugEnabled()) {
+                log.debug(
+                    "Definition of node {} is not available: {}", workflowNodeName,
+                    illegalArgumentException.getMessage());
+            }
+
+            return null;
         }
     }
 
