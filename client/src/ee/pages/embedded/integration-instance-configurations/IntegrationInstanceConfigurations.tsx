@@ -142,7 +142,7 @@ const IntegrationInstanceConfigurations = () => {
                                 tags={tags}
                             />
                         ) : (
-                            isFirstRun && 'Instance Configurations'
+                            isFirstRun && 'Configurations'
                         )
                     }
                 />
@@ -219,7 +219,7 @@ const IntegrationInstanceConfigurations = () => {
                     )}
                 </>
             }
-            leftSidebarHeader={<Header position="sidebar" title="Instance Configurations" />}
+            leftSidebarHeader={<Header position="sidebar" title="Configurations" />}
             leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
