@@ -696,6 +696,86 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /integration-instance-configurations/{id}/connected-users:
+    get:
+      description: "Get the connected users that have an integration instance on an integration instance configuration."
+      summary: "Get the connected users of an integration instance configuration"
+      tags:
+        - "integration-instance-configuration"
+      operationId: "getIntegrationInstanceConfigurationConnectedUsers"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The connected users of the integration instance configuration."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ConfigurationConnectedUser"
+  /integration-instance-configurations/{id}/move-impact:
+    post:
+      description: "Preview what moving connected users from an integration instance configuration to another one would change."
+      summary: "Preview moving connected users to another integration instance configuration"
+      tags:
+        - "integration-instance-configuration"
+      operationId: "getIntegrationInstanceConfigurationMoveImpact"
+      parameters:
+        - name: "id"
+          description: "The id of the source integration instance configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfigurationMoveRequest"
+        required: true
+      responses:
+        "200":
+          description: "What the move would change."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigurationMoveImpact"
+  /integration-instance-configurations/{id}/move:
+    post:
+      description: "Move connected users from an integration instance configuration to another one."
+      summary: "Move connected users to another integration instance configuration"
+      tags:
+        - "integration-instance-configuration"
+      operationId: "moveIntegrationInstanceConfigurationConnectedUsers"
+      parameters:
+        - name: "id"
+          description: "The id of the source integration instance configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfigurationMoveRequest"
+        required: true
+      responses:
+        "200":
+          description: "The outcome of the move."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigurationMoveResult"
   /integration-instance-configurations/{id}/enable/{enable}:
     patch:
       description: "Enable/disable an integration instance configuration."
@@ -1877,6 +1957,9 @@ components:
         name:
           description: "The name of an integration instance configuration."
           type: "string"
+        permissionExpression:
+          description: "The expression a connected user's metadata must satisfy to use an integration instance configuration."
+          type: "string"
         authorizationType:
           $ref: "../../../../../../libs/platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/AuthorizationType"
     IntegrationInstanceConfigurationWorkflow:
@@ -1954,6 +2037,139 @@ components:
         workflowNodeName:
           description: "The action/trigger name to which a connection belongs."
           type: "string"
+    ConfigurationConnectedUser:
+      description: "A connected user with an integration instance on a configuration."
+      type: "object"
+      required:
+        - "connectedUserId"
+        - "externalId"
+      properties:
+        connectedUserId:
+          description: "The id of the connected user."
+          type: "integer"
+          format: "int64"
+        email:
+          description: "The email of the connected user."
+          type: "string"
+        externalId:
+          description: "The external id of the connected user."
+          type: "string"
+        name:
+          description: "The name of the connected user."
+          type: "string"
+    ConfigurationMoveRequest:
+      description: "The target configuration and the connected users to move to it."
+      type: "object"
+      required:
+        - "connectedUserIds"
+        - "targetId"
+      properties:
+        connectedUserIds:
+          description: "The ids of the connected users to move."
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+        targetId:
+          description: "The id of the configuration to move the connected users to."
+          type: "integer"
+          format: "int64"
+    ConfigurationMoveSkipped:
+      description: "A connected user the move left where it was."
+      type: "object"
+      required:
+        - "connectedUserId"
+        - "reason"
+        - "workflowLabels"
+      properties:
+        connectedUserId:
+          description: "The id of the connected user."
+          type: "integer"
+          format: "int64"
+        reason:
+          description: "Why the connected user was left in place."
+          type: "string"
+        workflowLabels:
+          description: "The labels of the workflows the target lacks; empty for the other reasons."
+          type: "array"
+          items:
+            type: "string"
+    ConfigurationMoveResult:
+      description: "The outcome of moving connected users to another configuration."
+      type: "object"
+      required:
+        - "movedConnectedUserIds"
+        - "needsAttentionConnectedUserIds"
+        - "skipped"
+      properties:
+        movedConnectedUserIds:
+          description: "The ids of the connected users now assigned to the target."
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+        needsAttentionConnectedUserIds:
+          description: "The ids of the moved connected users whose turned-on workflows need attention on the target."
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+        skipped:
+          description: "The connected users left where they were, with the reason."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ConfigurationMoveSkipped"
+    ConfigurationMoveImpactWorkflow:
+      description: "A workflow of the target configuration that needs new required inputs or connections."
+      type: "object"
+      required:
+        - "affectedConnectedUserCount"
+        - "label"
+        - "newRequiredConnections"
+        - "newRequiredInputs"
+        - "workflowUuid"
+      properties:
+        affectedConnectedUserCount:
+          description: "The number of the moved connected users affected."
+          type: "integer"
+        label:
+          description: "The label of the workflow."
+          type: "string"
+        newRequiredConnections:
+          description: "The components of the new required connections."
+          type: "array"
+          items:
+            type: "string"
+        newRequiredInputs:
+          description: "The names of the new required inputs."
+          type: "array"
+          items:
+            type: "string"
+        workflowUuid:
+          description: "The uuid of the workflow."
+          type: "string"
+    ConfigurationMoveImpact:
+      description: "What moving connected users to another configuration would change."
+      type: "object"
+      required:
+        - "mcpServerCount"
+        - "skipped"
+        - "workflows"
+      properties:
+        mcpServerCount:
+          description: "The number of distinct MCP servers that expose the source or the target configuration."
+          type: "integer"
+          format: "int32"
+        skipped:
+          description: "The connected users the move would leave in place, with the reason."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ConfigurationMoveSkipped"
+        workflows:
+          description: "The workflows of the target that need new required inputs or connections."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ConfigurationMoveImpactWorkflow"
     IntegrationStatus:
       description: "The status of an integration."
       type: "string"
