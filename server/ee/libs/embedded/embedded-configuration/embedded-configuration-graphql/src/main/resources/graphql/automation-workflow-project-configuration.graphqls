@@ -108,6 +108,7 @@ extend type Query {
     automationWorkflowProjectConfigurationDeleteImpact(id: ID!): AutomationWorkflowProjectConfigurationDeleteImpact!
     automationWorkflowProjectConfigurationConnectedUsers(id: ID!): [AutomationWorkflowProjectConfigurationConnectedUser!]!
     automationWorkflowProjectConfigurationMoveImpact(sourceId: ID!, targetId: ID!, connectedUserIds: [ID!]!): AutomationWorkflowProjectConfigurationMoveImpact!
+    automationWorkflowProjectConfigurationUpgradeImpact(targetId: ID!, connectedUserIds: [ID!]!): AutomationWorkflowProjectConfigurationMoveImpact!
 }
 
 extend type Mutation {
@@ -117,5 +118,6 @@ extend type Mutation {
     enableAutomationWorkflowProjectConfiguration(id: ID!, enable: Boolean!): Boolean!
     enableAutomationWorkflowProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, enable: Boolean!): Boolean!
     moveAutomationWorkflowProjectConfigurationConnectedUsers(sourceId: ID!, targetId: ID!, connectedUserIds: [ID!]!): ConfigurationMoveResult!
+    upgradeAutomationWorkflowProjectConfigurationConnectedUsers(targetId: ID!, connectedUserIds: [ID!]!): ConfigurationMoveResult!
     updateAutomationWorkflowProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, providedConnections: Map, providedInputs: Map): Boolean!
 }

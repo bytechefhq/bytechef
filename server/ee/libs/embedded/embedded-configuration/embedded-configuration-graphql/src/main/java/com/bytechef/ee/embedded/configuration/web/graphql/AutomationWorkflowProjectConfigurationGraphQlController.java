@@ -103,6 +103,14 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
     }
 
     @QueryMapping
+    public ConfigurationMoveImpactDTO automationWorkflowProjectConfigurationUpgradeImpact(
+        @Argument String targetId, @Argument List<String> connectedUserIds) {
+
+        return automationWorkflowProjectConfigurationAdminFacade.getUpgradeImpact(
+            Long.parseLong(targetId), toLongs(connectedUserIds));
+    }
+
+    @QueryMapping
     public ConfigurationMoveImpactDTO automationWorkflowProjectConfigurationMoveImpact(
         @Argument String sourceId, @Argument String targetId, @Argument List<String> connectedUserIds) {
 
@@ -152,6 +160,14 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
 
         return automationWorkflowProjectConfigurationAdminFacade.moveConnectedUsers(
             Long.parseLong(sourceId), Long.parseLong(targetId), toLongs(connectedUserIds));
+    }
+
+    @MutationMapping
+    public ConfigurationMoveResultDTO upgradeAutomationWorkflowProjectConfigurationConnectedUsers(
+        @Argument String targetId, @Argument List<String> connectedUserIds) {
+
+        return automationWorkflowProjectConfigurationAdminFacade.upgradeConnectedUsers(
+            Long.parseLong(targetId), toLongs(connectedUserIds));
     }
 
     @MutationMapping

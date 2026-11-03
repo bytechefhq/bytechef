@@ -556,6 +556,111 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
     }
 
     @Test
+    void testAutomationWorkflowProjectConfigurationUpgradeImpactReturnsWorkflowsAndSkippedUsers() {
+        when(automationWorkflowProjectConfigurationAdminFacade.getUpgradeImpact(6L, List.of(21L, 22L)))
+            .thenReturn(
+                new ConfigurationMoveImpactDTO(
+                    List.of(
+                        new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                            "uuid-one", "Notify Slack", List.of("channel"), List.of("jira"), 1)),
+                    List.of(
+                        new ConfigurationMoveResultDTO.Skipped(
+                            22L, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,
+                            List.of("Sync Leads")))));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurationUpgradeImpact(
+                        targetId: "6", connectedUserIds: ["21", "22"]) {
+                        workflows {
+                            workflowUuid
+                            label
+                            newRequiredInputs
+                            newRequiredConnections
+                            affectedConnectedUserCount
+                        }
+                        skipped {
+                            connectedUserId
+                            reason
+                            workflowLabels
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectConfigurationUpgradeImpact.workflows[0].workflowUuid")
+            .entity(String.class)
+            .isEqualTo("uuid-one")
+            .path("automationWorkflowProjectConfigurationUpgradeImpact.workflows[0].newRequiredInputs")
+            .entityList(String.class)
+            .containsExactly("channel")
+            .path("automationWorkflowProjectConfigurationUpgradeImpact.workflows[0].newRequiredConnections")
+            .entityList(String.class)
+            .containsExactly("jira")
+            .path("automationWorkflowProjectConfigurationUpgradeImpact.workflows[0].affectedConnectedUserCount")
+            .entity(Integer.class)
+            .isEqualTo(1)
+            .path("automationWorkflowProjectConfigurationUpgradeImpact.skipped[0].connectedUserId")
+            .entity(String.class)
+            .isEqualTo("22")
+            .path("automationWorkflowProjectConfigurationUpgradeImpact.skipped[0].reason")
+            .entity(String.class)
+            .isEqualTo("TARGET_LACKS_REFERENCED_WORKFLOWS")
+            .path("automationWorkflowProjectConfigurationUpgradeImpact.skipped[0].workflowLabels")
+            .entityList(String.class)
+            .containsExactly("Sync Leads");
+
+        verify(automationWorkflowProjectConfigurationAdminFacade).getUpgradeImpact(6L, List.of(21L, 22L));
+    }
+
+    @Test
+    void testUpgradeAutomationWorkflowProjectConfigurationConnectedUsersReturnsTheResult() {
+        when(automationWorkflowProjectConfigurationAdminFacade.upgradeConnectedUsers(6L, List.of(21L, 22L, 23L)))
+            .thenReturn(
+                new ConfigurationMoveResultDTO(
+                    List.of(21L, 23L),
+                    List.of(
+                        new ConfigurationMoveResultDTO.Skipped(
+                            22L, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of())),
+                    List.of(23L)));
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    upgradeAutomationWorkflowProjectConfigurationConnectedUsers(
+                        targetId: "6", connectedUserIds: ["21", "22", "23"]) {
+                        movedConnectedUserIds
+                        needsAttentionConnectedUserIds
+                        skipped {
+                            connectedUserId
+                            reason
+                            workflowLabels
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("upgradeAutomationWorkflowProjectConfigurationConnectedUsers.movedConnectedUserIds")
+            .entityList(String.class)
+            .containsExactly("21", "23")
+            .path("upgradeAutomationWorkflowProjectConfigurationConnectedUsers.needsAttentionConnectedUserIds")
+            .entityList(String.class)
+            .containsExactly("23")
+            .path("upgradeAutomationWorkflowProjectConfigurationConnectedUsers.skipped[0].connectedUserId")
+            .entity(String.class)
+            .isEqualTo("22")
+            .path("upgradeAutomationWorkflowProjectConfigurationConnectedUsers.skipped[0].reason")
+            .entity(String.class)
+            .isEqualTo("NOT_ON_SOURCE")
+            .path("upgradeAutomationWorkflowProjectConfigurationConnectedUsers.skipped[0].workflowLabels")
+            .entityList(String.class)
+            .hasSize(0);
+
+        verify(automationWorkflowProjectConfigurationAdminFacade).upgradeConnectedUsers(6L, List.of(21L, 22L, 23L));
+    }
+
+    @Test
     void testCreateAutomationWorkflowProjectConfigurationDelegatesAndReturnsId() {
         when(automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
             7L, 0L, "Beta", "metadata['beta'] == 'true'", 2, true, false))
