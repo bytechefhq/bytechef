@@ -140,6 +140,54 @@ class CustomComponentAuditIntTest {
             .doesNotContainKey("dataError");
     }
 
+    @Test
+    void testEnableRecordsTheComponentAndItsNewState() {
+        customComponentFacade.enableCustomComponent(CUSTOM_COMPONENT_ID, false);
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType())
+            .isEqualTo(CustomComponentAuditEvents.CUSTOM_COMPONENT_ENABLED_UPDATED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("customComponentId", String.valueOf(CUSTOM_COMPONENT_ID))
+            .containsEntry("enabled", "false");
+    }
+
+    @Test
+    void testDeleteRecordsTheComponent() {
+        CustomComponent customComponent = new CustomComponent();
+
+        customComponent.setId(CUSTOM_COMPONENT_ID);
+
+        when(customComponentService.getCustomComponent(CUSTOM_COMPONENT_ID)).thenReturn(customComponent);
+
+        customComponentFacade.delete(CUSTOM_COMPONENT_ID);
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(CustomComponentAuditEvents.CUSTOM_COMPONENT_DELETED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("customComponentId", String.valueOf(CUSTOM_COMPONENT_ID));
+    }
+
+    @Test
+    void testDeleteOfAnUnknownComponentRecordsAnError() {
+        when(customComponentService.getCustomComponent(CUSTOM_COMPONENT_ID)).thenThrow(new IllegalArgumentException());
+
+        assertThatThrownBy(() -> customComponentFacade.delete(CUSTOM_COMPONENT_ID))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(CustomComponentAuditEvents.CUSTOM_COMPONENT_DELETED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("customComponentId", String.valueOf(CUSTOM_COMPONENT_ID))
+            .containsEntry("errorClass", IllegalArgumentException.class.getName());
+    }
+
     private PersistentAuditEvent findSingle() {
         Page<PersistentAuditEvent> page =
             persistenceAuditEventRepository.findAllFiltered(AuditEventFilter.empty(), PageRequest.of(0, 25));
