@@ -4,8 +4,10 @@ import {describe, expect, it, vi} from 'vitest';
 
 import useNotifications, {notificationFormSchema} from '../useNotifications';
 
-const {createNotificationMutate} = vi.hoisted(() => ({
+const {createNotificationMutate, mutationOptions, regenerateMutate} = vi.hoisted(() => ({
     createNotificationMutate: vi.fn(),
+    mutationOptions: {} as Record<string, ((result: unknown) => void) | undefined>,
+    regenerateMutate: vi.fn(),
 }));
 
 vi.mock('@/shared/queries/platform/notificationEvents.queries', () => ({
@@ -28,8 +30,17 @@ vi.mock('@/shared/queries/platform/notifications.queries', () => ({
 }));
 
 vi.mock('@/shared/mutations/platform/notifications.mutations', () => ({
-    useCreateNotificationMutation: vi.fn(() => ({mutate: createNotificationMutate})),
+    useCreateNotificationMutation: vi.fn((options?: {onSuccess?: (result: unknown) => void}) => {
+        mutationOptions.create = options?.onSuccess;
+
+        return {mutate: createNotificationMutate};
+    }),
     useDeleteNotificationMutation: vi.fn(() => ({mutate: vi.fn()})),
+    useRegenerateNotificationSigningSecretMutation: vi.fn((options?: {onSuccess?: (result: unknown) => void}) => {
+        mutationOptions.regenerate = options?.onSuccess;
+
+        return {mutate: regenerateMutate};
+    }),
     useUpdateNotificationMutation: vi.fn(() => ({mutate: vi.fn()})),
 }));
 
@@ -136,6 +147,101 @@ describe('useNotifications', () => {
         expect(createNotificationMutate).toHaveBeenCalledWith(
             expect.objectContaining({settings: {webhook: 'https://example.com/ingest'}})
         );
+    });
+});
+
+describe('useNotifications signing secret', () => {
+    it('opens the signing secret dialog after creating a webhook', () => {
+        const {result} = renderHook(() => useNotifications());
+
+        expect(result.current.signingSecret).toBeUndefined();
+
+        act(() => {
+            mutationOptions.create?.({id: 1, signingSecret: 'whsec_created'});
+        });
+
+        expect(result.current.signingSecret).toBe('whsec_created');
+
+        act(() => {
+            result.current.closeSigningSecretDialog();
+        });
+
+        expect(result.current.signingSecret).toBeUndefined();
+    });
+
+    it('does not open the signing secret dialog when none is returned', () => {
+        const {result} = renderHook(() => useNotifications());
+
+        act(() => {
+            mutationOptions.create?.({id: 1});
+        });
+
+        expect(result.current.signingSecret).toBeUndefined();
+    });
+
+    it('regenerates the signing secret', () => {
+        const {result} = renderHook(() => useNotifications());
+
+        act(() => {
+            result.current.regenerateSigningSecret(7);
+        });
+
+        expect(regenerateMutate).toHaveBeenCalledWith(7);
+
+        act(() => {
+            mutationOptions.regenerate?.({signingSecret: 'whsec_new'});
+        });
+
+        expect(result.current.signingSecret).toBe('whsec_new');
+    });
+});
+
+describe('notificationFormSchema header validation', () => {
+    function headerMessages(webhookHeaders: unknown) {
+        const result = notificationFormSchema.safeParse({
+            ...baseValues,
+            settings: {webhook: 'https://example.com/ingest', webhookHeaders},
+            type: 'WEBHOOK',
+        });
+
+        return result.success ? [] : result.error.issues.map((issue) => issue.message);
+    }
+
+    it('accepts valid headers', () => {
+        expect(headerMessages([{name: 'X-Api-Key', value: '********'}])).toEqual([]);
+    });
+
+    it('rejects more than 20 headers', () => {
+        const headers = Array.from({length: 21}, (_, index) => ({name: `X-H${index}`, value: 'v'}));
+
+        expect(headerMessages(headers)).toContain('At most 20 headers are allowed.');
+    });
+
+    it('rejects reserved, invalid and duplicate names', () => {
+        expect(headerMessages([{name: 'content-type', value: 'v'}])).toContain('This header name is reserved.');
+        expect(headerMessages([{name: 'bad name', value: 'v'}])).toContain('Enter a valid header name.');
+        expect(
+            headerMessages([
+                {name: 'X-A', value: 'v'},
+                {name: 'x-a', value: 'v'},
+            ])
+        ).toContain('Header names must be unique.');
+    });
+
+    it('rejects a value longer than 4096 characters', () => {
+        expect(headerMessages([{name: 'X-A', value: 'v'.repeat(4097)}])).toContain(
+            'Header value cannot be longer than 4096 characters.'
+        );
+    });
+
+    it('does not validate headers for a Slack notification', () => {
+        const result = notificationFormSchema.safeParse({
+            ...baseValues,
+            settings: {slackWebhookUrl: '********'},
+            type: 'SLACK',
+        });
+
+        expect(result.success).toBe(true);
     });
 });
 

@@ -1,3 +1,4 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {
     Dialog,
@@ -12,11 +13,14 @@ import {Input} from '@/components/Input/Input';
 import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Textarea} from '@/components/ui/textarea';
 import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useState} from 'react';
 import {UseFormReturn, useWatch} from 'react-hook-form';
 
-import useNotifications, {NotificationFormValuesType} from '../hooks/useNotifications';
+import useNotifications, {MASKED_VALUE, NotificationFormValuesType} from '../hooks/useNotifications';
+import WebhookHeadersField from './WebhookHeadersField';
 
 const WEBHOOK_PAYLOAD_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/settings/notifications#webhook-requests';
 
@@ -24,6 +28,7 @@ interface NotificationDialogProps {
     closeEditDialog: () => void;
     form: UseFormReturn<NotificationFormValuesType, unknown, NotificationFormValuesType>;
     isEditDialogOpen: boolean;
+    onRegenerateSigningSecret?: (notificationId: number) => void;
     saveNotification: (data: NotificationFormValuesType) => void;
     selectedNotification?: Notification;
 }
@@ -32,9 +37,12 @@ const NotificationDialog = ({
     closeEditDialog,
     form,
     isEditDialogOpen,
+    onRegenerateSigningSecret,
     saveNotification,
     selectedNotification,
 }: NotificationDialogProps) => {
+    const [isRegenerateConfirmOpen, setIsRegenerateConfirmOpen] = useState(false);
+
     const isEnterpriseEdition = useApplicationInfoStore((state) => state.application?.edition === EditionType.EE);
 
     const {isNotificationEventsLoading, notificationEvents, openEditDialog} = useNotifications();
@@ -194,8 +202,16 @@ const NotificationDialog = ({
                                                 <FormControl>
                                                     <Input
                                                         onChange={(event) => field.onChange(event.target.value)}
-                                                        placeholder="https://hooks.slack.com/services/..."
-                                                        value={(field.value as string) || ''}
+                                                        placeholder={
+                                                            field.value === MASKED_VALUE
+                                                                ? 'Saved, leave unchanged to keep'
+                                                                : 'https://hooks.slack.com/services/...'
+                                                        }
+                                                        value={
+                                                            field.value === MASKED_VALUE
+                                                                ? ''
+                                                                : (field.value as string) || ''
+                                                        }
                                                     />
                                                 </FormControl>
 
@@ -242,6 +258,49 @@ const NotificationDialog = ({
                                         )}
                                     />
                                 )}
+
+                                {notificationType === NotificationTypeEnum.Webhook && (
+                                    <>
+                                        <WebhookHeadersField control={control} />
+
+                                        <FormField
+                                            control={control}
+                                            name="settings.webhookBodyTemplate"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Body template</FormLabel>
+
+                                                    <FormControl>
+                                                        <Textarea
+                                                            className="font-mono text-xs md:text-xs"
+                                                            onChange={(event) => field.onChange(event.target.value)}
+                                                            placeholder="Optional. Leave empty to send the default JSON payload."
+                                                            rows={6}
+                                                            value={(field.value as string) || ''}
+                                                        />
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        {selectedNotification?.id && onRegenerateSigningSecret && (
+                                            <div>
+                                                <Button
+                                                    label={
+                                                        selectedNotification.hasSigningSecret
+                                                            ? 'Regenerate signing secret'
+                                                            : 'Generate signing secret'
+                                                    }
+                                                    onClick={() => setIsRegenerateConfirmOpen(true)}
+                                                    type="button"
+                                                    variant="outline"
+                                                />
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </DialogBody>
 
                             <DialogFooter>
@@ -253,6 +312,26 @@ const NotificationDialog = ({
                     </Form>
                 </DialogMain>
             </DialogContent>
+
+            {isRegenerateConfirmOpen && !!selectedNotification?.id && (
+                <AlertDialog
+                    confirmButtonVariant="default"
+                    confirmLabel={selectedNotification.hasSigningSecret ? 'Regenerate' : 'Generate'}
+                    description={
+                        selectedNotification.hasSigningSecret
+                            ? 'The current signing secret stops working immediately. Update your receiver with the new secret.'
+                            : 'A signing secret will be generated and shown once.'
+                    }
+                    onCancel={() => setIsRegenerateConfirmOpen(false)}
+                    onConfirm={() => {
+                        setIsRegenerateConfirmOpen(false);
+
+                        onRegenerateSigningSecret?.(selectedNotification.id!);
+                    }}
+                    open={isRegenerateConfirmOpen}
+                    title={`${selectedNotification.hasSigningSecret ? 'Regenerate' : 'Generate'} signing secret?`}
+                />
+            )}
         </Dialog>
     );
 };

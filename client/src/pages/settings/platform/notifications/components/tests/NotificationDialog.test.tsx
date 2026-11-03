@@ -90,7 +90,7 @@ describe('NotificationDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
         expect(saveNotification).toHaveBeenCalledWith(
-            expect.objectContaining({settings: {webhook: 'https://example.com/ingest'}}),
+            expect.objectContaining({settings: {webhook: 'https://example.com/ingest', webhookHeaders: []}}),
             expect.anything()
         );
     });
@@ -143,5 +143,107 @@ describe('NotificationDialog', () => {
         expect(screen.getByRole('option', {name: NotificationTypeEnum.Email})).toBeInTheDocument();
         expect(screen.getByRole('option', {name: NotificationTypeEnum.Slack})).toBeInTheDocument();
         expect(screen.queryByRole('option', {name: NotificationTypeEnum.Webhook})).not.toBeInTheDocument();
+    });
+
+    it('shows header and template fields only for Webhook', () => {
+        const {unmount} = render(
+            <NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />
+        );
+
+        expect(screen.getByRole('button', {name: 'Add header'})).toBeInTheDocument();
+        expect(screen.getByLabelText('Body template')).toBeInTheDocument();
+
+        unmount();
+
+        render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Slack} />);
+
+        expect(screen.queryByRole('button', {name: 'Add header'})).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Body template')).not.toBeInTheDocument();
+    });
+
+    it('saves webhook headers and body template under settings', async () => {
+        const saveNotification = vi.fn();
+
+        render(<NotificationDialogHarness saveNotification={saveNotification} type={NotificationTypeEnum.Webhook} />);
+
+        await userEvent.type(screen.getByLabelText('Webhook URL'), 'https://example.com/ingest');
+        await userEvent.click(screen.getByRole('button', {name: 'Add header'}));
+        await userEvent.type(screen.getByLabelText('Header name'), 'X-Api-Key');
+        await userEvent.type(screen.getByLabelText('Header value'), 'secret');
+        await userEvent.type(screen.getByLabelText('Body template'), 'plain');
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(saveNotification).toHaveBeenCalledWith(
+            expect.objectContaining({
+                settings: {
+                    webhook: 'https://example.com/ingest',
+                    webhookBodyTemplate: 'plain',
+                    webhookHeaders: [{name: 'X-Api-Key', value: 'secret'}],
+                },
+            }),
+            expect.anything()
+        );
+    });
+
+    it('sends ******** for an untouched masked header value', async () => {
+        const saveNotification = vi.fn();
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={saveNotification}
+                settings={{
+                    webhook: 'https://example.com/ingest',
+                    webhookHeaders: [{name: 'Authorization', value: '********'}],
+                }}
+                type={NotificationTypeEnum.Webhook}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(saveNotification).toHaveBeenCalledWith(
+            expect.objectContaining({
+                settings: expect.objectContaining({webhookHeaders: [{name: 'Authorization', value: '********'}]}),
+            }),
+            expect.anything()
+        );
+    });
+
+    it('rejects a reserved header name', async () => {
+        const saveNotification = vi.fn();
+
+        render(<NotificationDialogHarness saveNotification={saveNotification} type={NotificationTypeEnum.Webhook} />);
+
+        await userEvent.type(screen.getByLabelText('Webhook URL'), 'https://example.com/ingest');
+        await userEvent.click(screen.getByRole('button', {name: 'Add header'}));
+        await userEvent.type(screen.getByLabelText('Header name'), 'X-ByteChef-Event');
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(await screen.findByText('This header name is reserved.')).toBeInTheDocument();
+        expect(saveNotification).not.toHaveBeenCalled();
+    });
+
+    it('keeps a masked Slack URL without failing URL validation', async () => {
+        const saveNotification = vi.fn();
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={saveNotification}
+                settings={{slackWebhookUrl: '********'}}
+                type={NotificationTypeEnum.Slack}
+            />
+        );
+
+        expect(screen.getByLabelText('Slack Webhook URL')).toHaveAttribute(
+            'placeholder',
+            'Saved, leave unchanged to keep'
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(saveNotification).toHaveBeenCalledWith(
+            expect.objectContaining({settings: {slackWebhookUrl: '********'}}),
+            expect.anything()
+        );
     });
 });

@@ -2,6 +2,7 @@ import {Notification, NotificationEventTypeEnum, NotificationTypeEnum} from '@/s
 import {
     useCreateNotificationMutation,
     useDeleteNotificationMutation,
+    useRegenerateNotificationSigningSecretMutation,
     useUpdateNotificationMutation,
 } from '@/shared/mutations/platform/notifications.mutations';
 import {useGetNotificationEventsQuery} from '@/shared/queries/platform/notificationEvents.queries';
@@ -22,6 +23,14 @@ export type NotificationFormValuesType = {
     settings: Record<string, unknown>;
     type: NotificationTypeEnum;
 };
+
+export const MASKED_VALUE = '********';
+export const MAX_WEBHOOK_HEADERS = 20;
+
+const HEADER_NAME_PATTERN = /^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,256}$/;
+const MAX_HEADER_VALUE_LENGTH = 4096;
+const RESERVED_HEADER_NAMES = ['connection', 'content-length', 'content-type', 'host', 'transfer-encoding'];
+const RESERVED_HEADER_PREFIX = 'x-bytechef-';
 
 export const notificationFormSchema = z
     .object({
@@ -49,6 +58,8 @@ export const notificationFormSchema = z
                 settingKey: 'webhook',
                 value: settings.webhook,
             });
+
+            validateWebhookHeaders(settings.webhookHeaders, context);
         }
     });
 
@@ -60,7 +71,51 @@ interface ValidateUrlSettingPropsI {
     value: unknown;
 }
 
+function validateWebhookHeaders(webhookHeaders: unknown, context: z.RefinementCtx) {
+    if (!Array.isArray(webhookHeaders)) {
+        return;
+    }
+
+    if (webhookHeaders.length > MAX_WEBHOOK_HEADERS) {
+        context.addIssue({
+            code: 'custom',
+            message: `At most ${MAX_WEBHOOK_HEADERS} headers are allowed.`,
+            path: ['settings', 'webhookHeaders'],
+        });
+    }
+
+    const seenNames = new Set<string>();
+
+    webhookHeaders.forEach((header: {name?: string; value?: string}, index) => {
+        const name = (header?.name ?? '').trim();
+        const lowerCaseName = name.toLowerCase();
+        const namePath = ['settings', 'webhookHeaders', index, 'name'];
+
+        if (!HEADER_NAME_PATTERN.test(name)) {
+            context.addIssue({code: 'custom', message: 'Enter a valid header name.', path: namePath});
+        } else if (RESERVED_HEADER_NAMES.includes(lowerCaseName) || lowerCaseName.startsWith(RESERVED_HEADER_PREFIX)) {
+            context.addIssue({code: 'custom', message: 'This header name is reserved.', path: namePath});
+        } else if (seenNames.has(lowerCaseName)) {
+            context.addIssue({code: 'custom', message: 'Header names must be unique.', path: namePath});
+        }
+
+        seenNames.add(lowerCaseName);
+
+        if ((header?.value ?? '').length > MAX_HEADER_VALUE_LENGTH) {
+            context.addIssue({
+                code: 'custom',
+                message: `Header value cannot be longer than ${MAX_HEADER_VALUE_LENGTH} characters.`,
+                path: ['settings', 'webhookHeaders', index, 'value'],
+            });
+        }
+    });
+}
+
 function validateUrlSetting({context, invalidMessage, requiredMessage, settingKey, value}: ValidateUrlSettingPropsI) {
+    if (value === MASKED_VALUE) {
+        return;
+    }
+
     if (typeof value !== 'string' || value.trim() === '') {
         context.addIssue({
             code: 'custom',
@@ -105,6 +160,7 @@ export default function useNotifications() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedNotification, setSelectedNotification] = useState<Notification | undefined>(undefined);
+    const [signingSecret, setSigningSecret] = useState<string | undefined>(undefined);
 
     const {
         data: notificationsData,
@@ -132,8 +188,33 @@ export default function useNotifications() {
         closeEditDialog();
     };
 
-    const createNotificationMutation = useCreateNotificationMutation({onSuccess});
+    const createNotificationMutation = useCreateNotificationMutation({
+        onSuccess: (result) => {
+            onSuccess();
+
+            if (result?.signingSecret) {
+                setSigningSecret(result.signingSecret);
+            }
+        },
+    });
     const updateNotificationMutation = useUpdateNotificationMutation({onSuccess});
+    const regenerateNotificationSigningSecretMutation = useRegenerateNotificationSigningSecretMutation({
+        onSuccess: (result) => {
+            queryClient.invalidateQueries({
+                queryKey: NotificationKeys,
+            });
+
+            setSigningSecret(result.signingSecret);
+        },
+    });
+
+    function regenerateSigningSecret(notificationId: number) {
+        regenerateNotificationSigningSecretMutation.mutate(notificationId);
+    }
+
+    function closeSigningSecretDialog() {
+        setSigningSecret(undefined);
+    }
 
     const handleDeleteNotification = (notificationId: number) => {
         if (notificationId) {
@@ -254,6 +335,7 @@ export default function useNotifications() {
     return {
         closeDeleteDialog,
         closeEditDialog,
+        closeSigningSecretDialog,
         columns,
         deleteNotificationMutation,
         form,
@@ -268,8 +350,10 @@ export default function useNotifications() {
         openDeleteDialog,
         openEditDialog,
         queryClient,
+        regenerateSigningSecret,
         saveNotification,
         selectedNotification,
         setSelectedNotification,
+        signingSecret,
     };
 }
