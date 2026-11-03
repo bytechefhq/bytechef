@@ -1,4 +1,4 @@
-import {Notification, NotificationApi} from '@/shared/middleware/platform/notification';
+import {Notification, NotificationApi, NotificationSigningSecret} from '@/shared/middleware/platform/notification';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateNotificationMutationProps {
@@ -44,6 +44,24 @@ export const useUpdateNotificationMutation = (mutationProps?: UpdateNotification
             return new NotificationApi().updateNotification({
                 notification,
                 notificationId: notification.id!,
+            });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface RegenerateNotificationSigningSecretMutationProps {
+    onError?: (error: Error, variables: number) => void;
+    onSuccess?: (result: NotificationSigningSecret, variables: number) => void;
+}
+
+export const useRegenerateNotificationSigningSecretMutation = (
+    mutationProps?: RegenerateNotificationSigningSecretMutationProps
+) =>
+    useMutation<NotificationSigningSecret, Error, number>({
+        mutationFn: (notificationId: number) => {
+            return new NotificationApi().regenerateNotificationSigningSecret({
+                notificationId,
             });
         },
         onError: mutationProps?.onError,

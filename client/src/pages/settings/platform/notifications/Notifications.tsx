@@ -4,6 +4,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import NotificationDialog from '@/pages/settings/platform/notifications/components/NotificationDialog';
 import NotificationsTable from '@/pages/settings/platform/notifications/components/NotificationsTable';
+import SigningSecretDialog from '@/pages/settings/platform/notifications/components/SigningSecretDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -18,6 +19,7 @@ const Notifications = () => {
     const {
         closeDeleteDialog,
         closeEditDialog,
+        closeSigningSecretDialog,
         columns,
         form,
         handleDeleteNotification,
@@ -27,8 +29,10 @@ const Notifications = () => {
         notificationsData,
         notificationsError,
         openEditDialog,
+        regenerateSigningSecret,
         saveNotification,
         selectedNotification,
+        signingSecret,
     } = useNotifications();
 
     return (
@@ -74,10 +78,13 @@ const Notifications = () => {
                         >
                     }
                     isEditDialogOpen={isEditDialogOpen}
+                    onRegenerateSigningSecret={regenerateSigningSecret}
                     saveNotification={saveNotification}
                     selectedNotification={selectedNotification}
                 />
             )}
+
+            {signingSecret && <SigningSecretDialog onClose={closeSigningSecretDialog} signingSecret={signingSecret} />}
 
             {isDeleteDialogOpen && !!selectedNotification && (
                 <AlertDialog
