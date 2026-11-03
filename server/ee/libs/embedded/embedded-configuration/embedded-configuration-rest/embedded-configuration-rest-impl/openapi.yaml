@@ -776,6 +776,62 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConfigurationMoveResult"
+  /integration-instance-configurations/{id}/upgrade-impact:
+    post:
+      description: "Preview what upgrading connected users to an integration instance configuration would change."
+      summary: "Preview upgrading connected users to an integration instance configuration"
+      tags:
+        - "integration-instance-configuration"
+      operationId: "getIntegrationInstanceConfigurationUpgradeImpact"
+      parameters:
+        - name: "id"
+          description: "The id of the target integration instance configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfigurationUpgradeRequest"
+        required: true
+      responses:
+        "200":
+          description: "What the upgrade would change."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigurationMoveImpact"
+  /integration-instance-configurations/{id}/upgrade:
+    post:
+      description: "Upgrade connected users to an integration instance configuration."
+      summary: "Upgrade connected users to an integration instance configuration"
+      tags:
+        - "integration-instance-configuration"
+      operationId: "upgradeIntegrationInstanceConfigurationConnectedUsers"
+      parameters:
+        - name: "id"
+          description: "The id of the target integration instance configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfigurationUpgradeRequest"
+        required: true
+      responses:
+        "200":
+          description: "The outcome of the upgrade."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigurationMoveResult"
   /integration-instance-configurations/{id}/enable/{enable}:
     patch:
       description: "Enable/disable an integration instance configuration."
@@ -2074,6 +2130,18 @@ components:
           description: "The id of the configuration to move the connected users to."
           type: "integer"
           format: "int64"
+    ConfigurationUpgradeRequest:
+      description: "The connected users to upgrade to the target configuration."
+      type: "object"
+      required:
+        - "connectedUserIds"
+      properties:
+        connectedUserIds:
+          description: "The ids of the connected users to upgrade."
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
     ConfigurationMoveSkipped:
       description: "A connected user the move left where it was."
       type: "object"

@@ -28,6 +28,7 @@ docs/ConfigurationMoveImpactWorkflow.md
 docs/ConfigurationMoveRequest.md
 docs/ConfigurationMoveResult.md
 docs/ConfigurationMoveSkipped.md
+docs/ConfigurationUpgradeRequest.md
 docs/ConnectedUserProjectWorkflow.md
 docs/ConnectedUserProjectWorkflowApi.md
 docs/Connection.md
@@ -90,6 +91,7 @@ models/ConfigurationMoveImpactWorkflow.ts
 models/ConfigurationMoveRequest.ts
 models/ConfigurationMoveResult.ts
 models/ConfigurationMoveSkipped.ts
+models/ConfigurationUpgradeRequest.ts
 models/ConnectedUserProjectWorkflow.ts
 models/Connection.ts
 models/ConnectionBase.ts
