@@ -302,6 +302,76 @@ class IntegrationInstanceApiControllerIntTest {
         verify(integrationInstanceConfigurationFacade).moveConnectedUsers(5L, 6L, List.of(1L, 2L));
     }
 
+    @Test
+    void testGetIntegrationInstanceConfigurationUpgradeImpactPassesBodyToTheFacade() {
+        when(integrationInstanceConfigurationFacade.getUpgradeImpact(7L, List.of(1L, 2L)))
+            .thenReturn(
+                new ConfigurationMoveImpactDTO(
+                    List.of(
+                        new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                            "uuid-1", "Cron", List.of("cronExpression"), List.of("slack"), 1)),
+                    List.of(
+                        new ConfigurationMoveResultDTO.Skipped(
+                            2L, ConfigurationMoveResultDTO.Skipped.CONNECTION_MISMATCH, List.of()))));
+
+        this.webTestClient
+            .post()
+            .uri("/internal/integration-instance-configurations/7/upgrade-impact")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("""
+                {"connectedUserIds":[1,2]}""")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.workflows[0].workflowUuid")
+            .isEqualTo("uuid-1")
+            .jsonPath("$.workflows[0].newRequiredInputs[0]")
+            .isEqualTo("cronExpression")
+            .jsonPath("$.workflows[0].affectedConnectedUserCount")
+            .isEqualTo(1)
+            .jsonPath("$.skipped[0].connectedUserId")
+            .isEqualTo(2)
+            .jsonPath("$.skipped[0].reason")
+            .isEqualTo("CONNECTION_MISMATCH");
+
+        verify(integrationInstanceConfigurationFacade).getUpgradeImpact(7L, List.of(1L, 2L));
+    }
+
+    @Test
+    void testUpgradeIntegrationInstanceConfigurationConnectedUsersPassesBodyToTheFacade() {
+        when(integrationInstanceConfigurationFacade.upgradeConnectedUsers(7L, List.of(1L, 2L)))
+            .thenReturn(
+                new ConfigurationMoveResultDTO(
+                    List.of(1L),
+                    List.of(
+                        new ConfigurationMoveResultDTO.Skipped(
+                            2L, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_ENABLED_WORKFLOWS,
+                            List.of("Cron"))),
+                    List.of(1L)));
+
+        this.webTestClient
+            .post()
+            .uri("/internal/integration-instance-configurations/7/upgrade")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("""
+                {"connectedUserIds":[1,2]}""")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.movedConnectedUserIds[0]")
+            .isEqualTo(1)
+            .jsonPath("$.needsAttentionConnectedUserIds[0]")
+            .isEqualTo(1)
+            .jsonPath("$.skipped[0].connectedUserId")
+            .isEqualTo(2)
+            .jsonPath("$.skipped[0].reason")
+            .isEqualTo("TARGET_LACKS_ENABLED_WORKFLOWS");
+
+        verify(integrationInstanceConfigurationFacade).upgradeConnectedUsers(7L, List.of(1L, 2L));
+    }
+
     private static ProvisionableIntegrationDTO getProvisionableIntegration() {
         IntegrationDTO integrationDTO = IntegrationDTO.builder()
             .componentName("slack")
