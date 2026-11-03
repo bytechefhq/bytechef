@@ -52,4 +52,35 @@ describe('NotificationTestResult', () => {
         expect(screen.getByText('HTTP 200')).toBeInTheDocument();
         expect(screen.queryByText(/Sent without a signature/)).not.toBeInTheDocument();
     });
+
+    it('explains an unsigned webhook test without a signing secret', () => {
+        render(
+            <NotificationTestResult
+                notificationType={NotificationTypeEnum.Webhook}
+                result={{signed: false, statusCode: 200, success: true, unsignedReason: 'NO_SECRET'}}
+            />
+        );
+
+        expect(
+            screen.getByText('Sent without a signature; save the notification to get a signing secret.')
+        ).toBeInTheDocument();
+    });
+
+    it('explains an unsigned webhook test to a changed URL', () => {
+        render(
+            <NotificationTestResult
+                notificationType={NotificationTypeEnum.Webhook}
+                result={{signed: false, statusCode: 200, success: true, unsignedReason: 'URL_CHANGED'}}
+            />
+        );
+
+        expect(
+            screen.getByText(
+                'Sent without a signature because the URL changed; save the notification to sign with its secret.'
+            )
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByText('Sent without a signature; save the notification to get a signing secret.')
+        ).not.toBeInTheDocument();
+    });
 });

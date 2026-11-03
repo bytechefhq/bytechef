@@ -1,5 +1,6 @@
 import {
     NotificationTestResult as NotificationTestResultType,
+    NotificationTestResultUnsignedReasonEnum,
     NotificationTypeEnum,
 } from '@/shared/middleware/platform/notification';
 import {CheckCircle2Icon, XCircleIcon} from 'lucide-react';
@@ -46,7 +47,9 @@ const NotificationTestResult = ({notificationType, result}: NotificationTestResu
 
             {isUnsignedWebhook && (
                 <p className="text-content-neutral-secondary">
-                    Sent without a signature; save the notification to get a signing secret.
+                    {result.unsignedReason === NotificationTestResultUnsignedReasonEnum.UrlChanged
+                        ? 'Sent without a signature because the URL changed; save the notification to sign with its secret.'
+                        : 'Sent without a signature; save the notification to get a signing secret.'}
                 </p>
             )}
         </div>

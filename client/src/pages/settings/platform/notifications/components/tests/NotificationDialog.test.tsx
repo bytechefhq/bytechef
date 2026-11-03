@@ -1,7 +1,7 @@
 import {Notification, NotificationTestResult, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {act, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useForm} from 'react-hook-form';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -349,7 +349,7 @@ describe('NotificationDialog', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'Test'}));
 
-        expect(screen.getByRole('button', {name: 'Test'})).toBeDisabled();
+        await waitFor(() => expect(screen.getByRole('button', {name: 'Test'})).toBeDisabled());
     });
 
     it('does not send a test when the form is invalid', async () => {
@@ -464,5 +464,96 @@ describe('NotificationDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Test'}));
 
         await waitFor(() => expect(screen.queryByText('Test sent')).not.toBeInTheDocument());
+    });
+
+    it('clears the result when the settings change', async () => {
+        const testNotification = vi.fn().mockResolvedValue({signed: false, success: true});
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                settings={{slackWebhookUrl: 'https://hooks.slack.com/services/T/B/X'}}
+                testNotification={testNotification}
+                type={NotificationTypeEnum.Slack}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+
+        expect(await screen.findByText('Test sent')).toBeInTheDocument();
+
+        await userEvent.type(screen.getByLabelText('Slack Webhook URL'), 'Y');
+
+        expect(screen.queryByText('Test sent')).not.toBeInTheDocument();
+    });
+
+    it('requires the header values again when the URL of a saved webhook changes', async () => {
+        const saveNotification = vi.fn();
+        const settings = {
+            webhook: 'https://example.com/ingest',
+            webhookHeaders: [{name: 'Authorization', value: '********'}],
+        };
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={saveNotification}
+                selectedNotification={
+                    {
+                        hasSigningSecret: true,
+                        id: 7,
+                        name: 'Failures',
+                        settings,
+                        type: NotificationTypeEnum.Webhook,
+                    } as unknown as Notification
+                }
+                settings={settings}
+                type={NotificationTypeEnum.Webhook}
+            />
+        );
+
+        await userEvent.type(screen.getByLabelText('Webhook URL'), '/v2');
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(await screen.findByText('Enter a value')).toBeInTheDocument();
+        expect(saveNotification).not.toHaveBeenCalled();
+    });
+
+    it('keeps masked header values when the URL differs only in host case and default port', async () => {
+        const saveNotification = vi.fn();
+        const settings = {
+            webhook: 'https://example.com/ingest',
+            webhookHeaders: [{name: 'Authorization', value: '********'}],
+        };
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={saveNotification}
+                selectedNotification={
+                    {
+                        hasSigningSecret: true,
+                        id: 7,
+                        name: 'Failures',
+                        settings,
+                        type: NotificationTypeEnum.Webhook,
+                    } as unknown as Notification
+                }
+                settings={settings}
+                type={NotificationTypeEnum.Webhook}
+            />
+        );
+
+        fireEvent.change(screen.getByLabelText('Webhook URL'), {target: {value: ' HTTPS://Example.COM:443/ingest'}});
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() =>
+            expect(saveNotification).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    settings: expect.objectContaining({
+                        webhookHeaders: [{name: 'Authorization', value: '********'}],
+                    }),
+                }),
+                expect.anything()
+            )
+        );
     });
 });
