@@ -8,6 +8,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 const hoisted = vi.hoisted(() => ({
     automationWorkflowProjectsQuery: vi.fn(),
     connectedUserProjectsQuery: vi.fn(),
+    workflowListConnectedUsers: [] as unknown[],
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -32,25 +33,32 @@ vi.mock(
     '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowList',
     () => ({
         default: ({
+            connectedUser,
             connectedUserProjectWorkflows,
             workflowTemplateSourcesByWorkflowUuid,
         }: {
+            connectedUser: unknown;
             connectedUserProjectWorkflows: Array<{id: string}>;
             workflowTemplateSourcesByWorkflowUuid: Map<string, ConnectedUserWorkflowTemplateSourceI>;
-        }) => (
-            <div>
-                {`workflows ${connectedUserProjectWorkflows.map((workflow) => workflow.id).join(',')} templates ${[
-                    ...workflowTemplateSourcesByWorkflowUuid.entries(),
-                ]
-                    .map(([uuid, source]) => `${uuid}=${source.projectName}`)
-                    .join(',')}`}
-            </div>
-        ),
+        }) => {
+            hoisted.workflowListConnectedUsers.push(connectedUser);
+
+            return (
+                <div>
+                    {`workflows ${connectedUserProjectWorkflows.map((workflow) => workflow.id).join(',')} templates ${[
+                        ...workflowTemplateSourcesByWorkflowUuid.entries(),
+                    ]
+                        .map(([uuid, source]) => `${uuid}=${source.projectName}`)
+                        .join(',')}`}
+                </div>
+            );
+        },
     })
 );
 
 describe('ConnectedUserSheetPanelWorkflowList', () => {
     beforeEach(() => {
+        hoisted.workflowListConnectedUsers = [];
         hoisted.automationWorkflowProjectsQuery.mockReturnValue({
             data: {
                 automationWorkflowProjects: [
@@ -107,5 +115,22 @@ describe('ConnectedUserSheetPanelWorkflowList', () => {
         await userEvent.click(screen.getByRole('button', {name: 'New Workflow'}));
 
         expect(screen.getByText('provision dialog 1050')).toBeInTheDocument();
+    });
+
+    it('labels the connected user by name and email in the configuration menu', () => {
+        render(
+            <ConnectedUserSheetPanelWorkflowList
+                connectedUserEmail="jane@example.com"
+                connectedUserId={1050}
+                connectedUserName="Jane"
+            />
+        );
+
+        expect(hoisted.workflowListConnectedUsers.at(-1)).toEqual({
+            connectedUserId: '1050',
+            email: 'jane@example.com',
+            externalId: 'ext-1050',
+            name: 'Jane',
+        });
     });
 });

@@ -57,11 +57,13 @@ vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () 
 vi.mock('../IntegrationInstanceConfigurationDialogBasicStep', () => ({
     default: ({
         authorizations,
+        getValues,
         setCurIntegrationId,
         setCurIntegrationVersion,
         setValue,
     }: {
         authorizations?: {type: string}[];
+        getValues: (name: string) => unknown;
         setCurIntegrationId: (integrationId: number) => void;
         setCurIntegrationVersion: (integrationVersion: number) => void;
         setValue: (name: string, value: unknown) => void;
@@ -69,6 +71,10 @@ vi.mock('../IntegrationInstanceConfigurationDialogBasicStep', () => ({
         <div data-testid="basic-step">
             <span data-testid="basic-step-authorizations">
                 {authorizations?.map((authorization) => authorization.type).join(',')}
+            </span>
+
+            <span data-testid="basic-step-permission-expression">
+                {String(getValues('permissionExpression') ?? '')}
             </span>
 
             <button onClick={() => setValue('authorizationType', 'API_KEY')} type="button">
@@ -297,6 +303,37 @@ describe('IntegrationInstanceConfigurationDialog', () => {
         });
     });
 
+    describe('permission expression', () => {
+        it('should send the stored permission expression back when saving an edit', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{
+                        id: 1,
+                        integrationId: 2,
+                        integrationVersion: 1,
+                        name: 'Existing',
+                        permissionExpression: "metadata['beta'] == 'true'",
+                    }}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.getByTestId('basic-step-permission-expression')).toHaveTextContent(
+                "metadata['beta'] == 'true'"
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.updateMutate).toHaveBeenCalledWith(
+                    expect.objectContaining({permissionExpression: "metadata['beta'] == 'true'"})
+                )
+            );
+        });
+    });
+
     describe('version upgrade', () => {
         it('should title the dialog for a version upgrade', () => {
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} updateIntegrationVersion />);
@@ -328,7 +365,6 @@ describe('IntegrationInstanceConfigurationDialog', () => {
 
             await user.click(screen.getByRole('button', {name: 'Cancel'}));
 
-            // closeDialog defers onClose through a setTimeout so the form can reset first.
             await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
         });
 

@@ -144,7 +144,7 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
         expect(screen.getByLabelText('Name')).toHaveValue('');
 
         await user.type(screen.getByLabelText('Name'), 'Beta');
-        await user.click(screen.getByLabelText('Permission expression'));
+        await user.click(screen.getByLabelText('Assignment rule'));
         await user.paste("metadata['beta'] == 'true'");
 
         await user.click(screen.getByRole('combobox', {name: 'Version'}));
@@ -165,7 +165,7 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
         });
     });
 
-    it('shows the permission expression placeholder and help text', () => {
+    it('shows the assignment rule placeholder and help text', () => {
         render(
             <TooltipProvider>
                 <AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />
@@ -174,7 +174,9 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
 
         expect(screen.getByPlaceholderText("e.g. metadata['beta'] == 'true'")).toBeInTheDocument();
         expect(
-            screen.getByText('Who self-serve can place on this configuration. Empty means everyone.')
+            screen.getByText(
+                /^Which new users self-serve places on this configuration\. Checked once, when a user is first assigned\./
+            )
         ).toBeInTheDocument();
     });
 
@@ -256,7 +258,7 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
 
         await user.clear(screen.getByLabelText('Name'));
         await user.type(screen.getByLabelText('Name'), 'Renamed');
-        await user.click(screen.getByLabelText('Permission expression'));
+        await user.click(screen.getByLabelText('Assignment rule'));
         await user.paste("metadata['beta'] == 'true'");
 
         await user.click(screen.getByRole('button', {name: 'Save'}));

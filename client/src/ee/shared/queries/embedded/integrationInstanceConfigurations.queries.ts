@@ -1,4 +1,7 @@
 import {
+    ConfigurationConnectedUser,
+    ConfigurationMoveImpact,
+    ConfigurationMoveRequest,
     GetIntegrationInstanceConfigurationsRequest,
     IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationApi,
@@ -11,6 +14,15 @@ export const IntegrationInstanceConfigurationKeys = {
     filteredIntegrationInstanceConfigurations: (filters: GetIntegrationInstanceConfigurationsRequest) => [
         ...IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
         filters,
+    ],
+    integrationInstanceConfigurationConnectedUsers: (id: number) => [
+        ...IntegrationInstanceConfigurationKeys.integrationInstanceConfiguration(id),
+        'connectedUsers',
+    ],
+    integrationInstanceConfigurationMoveImpact: (id: number, request: ConfigurationMoveRequest) => [
+        ...IntegrationInstanceConfigurationKeys.integrationInstanceConfiguration(id),
+        'moveImpact',
+        request,
     ],
     integrationInstanceConfiguration: (id: number) => [
         ...IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
@@ -33,5 +45,31 @@ export const useGetIntegrationInstanceConfigurationsQuery = (
     useQuery<IntegrationInstanceConfiguration[], Error>({
         queryKey: IntegrationInstanceConfigurationKeys.filteredIntegrationInstanceConfigurations(filters),
         queryFn: () => new IntegrationInstanceConfigurationApi().getIntegrationInstanceConfigurations(filters),
+        enabled: enabled === undefined ? true : enabled,
+    });
+
+export const useGetIntegrationInstanceConfigurationConnectedUsersQuery = (id: number, enabled?: boolean) =>
+    useQuery<ConfigurationConnectedUser[], Error>({
+        queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurationConnectedUsers(id),
+        queryFn: () =>
+            new IntegrationInstanceConfigurationApi().getIntegrationInstanceConfigurationConnectedUsers({id}),
+        enabled: enabled === undefined ? true : enabled,
+    });
+
+export const useGetIntegrationInstanceConfigurationMoveImpactQuery = (
+    id: number,
+    configurationMoveRequest: ConfigurationMoveRequest,
+    enabled?: boolean
+) =>
+    useQuery<ConfigurationMoveImpact, Error>({
+        queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurationMoveImpact(
+            id,
+            configurationMoveRequest
+        ),
+        queryFn: () =>
+            new IntegrationInstanceConfigurationApi().getIntegrationInstanceConfigurationMoveImpact({
+                configurationMoveRequest,
+                id,
+            }),
         enabled: enabled === undefined ? true : enabled,
     });

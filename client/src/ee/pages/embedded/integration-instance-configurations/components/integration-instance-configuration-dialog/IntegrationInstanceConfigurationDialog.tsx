@@ -99,6 +99,7 @@ const IntegrationInstanceConfigurationDialog = ({
             integrationInstanceConfigurationWorkflows: [],
             integrationVersion: integrationInstanceConfiguration?.integrationVersion || undefined,
             name: integrationInstanceConfiguration?.name || undefined,
+            permissionExpression: integrationInstanceConfiguration?.permissionExpression || undefined,
             tags:
                 integrationInstanceConfiguration?.tags?.map((tag) => ({
                     ...tag,

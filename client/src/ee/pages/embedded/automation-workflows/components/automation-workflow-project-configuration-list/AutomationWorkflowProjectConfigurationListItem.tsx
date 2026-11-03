@@ -12,6 +12,10 @@ import Switch from '@/components/Switch/Switch';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
+    NO_CONNECTED_USERS_REASON,
+    NO_OTHER_CONFIGURATION_REASON,
+} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
     useAutomationWorkflowProjectConfigurationDeleteImpactQuery,
@@ -81,9 +85,9 @@ const AutomationWorkflowProjectConfigurationListItem = ({
 
     const moveUsersDisabledReason =
         moveTargetConfigurations.length === 0
-            ? 'No other configuration in this environment'
+            ? NO_OTHER_CONFIGURATION_REASON
             : configuration.connectedUserCount === 0
-              ? 'No connected users on this configuration'
+              ? NO_CONNECTED_USERS_REASON
               : undefined;
 
     const environmentName =

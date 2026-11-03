@@ -13,8 +13,6 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useMemo, useState} from 'react';
 
-const TARGET_LACKS_REFERENCED_WORKFLOWS = 'TARGET_LACKS_REFERENCED_WORKFLOWS';
-
 interface MoveConnectedUsersSkippedI {
     label: string;
     reason: string;
@@ -36,27 +34,47 @@ interface MoveConnectedUsersDialogProps {
         newRequiredInputs: string[];
     }>;
     initialSelectedConnectedUserIds?: string[];
+    mcpServerCount?: number;
     onClose: () => void;
     onMove: (targetId: string, connectedUserIds: string[]) => Promise<MoveConnectedUsersResultI>;
     onSelectionChange?: (targetId: string | undefined, connectedUserIds: string[]) => void;
+    previewError?: boolean;
+    previewLoading?: boolean;
     previewSkipped?: MoveConnectedUsersSkippedI[];
     sourceLabel: string;
     targets: Array<{id: string; label: string}>;
     title: string;
 }
 
-const formatSkippedLine = ({label, reason, workflowLabels}: MoveConnectedUsersSkippedI): string =>
-    reason === TARGET_LACKS_REFERENCED_WORKFLOWS
-        ? `${label}: ${workflowLabels.join(', ')} missing in the target version`
-        : `${label}: ${reason}`;
+const formatSkippedLine = ({label, reason, workflowLabels}: MoveConnectedUsersSkippedI): string => {
+    const workflows = workflowLabels.join(', ');
+
+    switch (reason) {
+        case 'TARGET_LACKS_REFERENCED_WORKFLOWS':
+            return `${label}: the target has no ${workflows}`;
+        case 'TARGET_LACKS_ENABLED_WORKFLOWS':
+            return `${label}: the target has no enabled ${workflows}`;
+        case 'CONNECTION_MISMATCH':
+            return `${label}: the target uses a different authorization type`;
+        case 'NOT_ON_SOURCE':
+            return `${label}: no longer on this configuration`;
+        case 'MOVE_FAILED':
+            return `${label}: the move failed, try again`;
+        default:
+            return `${label}: ${reason}`;
+    }
+};
 
 const MoveConnectedUsersDialog = ({
     connectedUsers,
     impact,
     initialSelectedConnectedUserIds,
+    mcpServerCount,
     onClose,
     onMove,
     onSelectionChange,
+    previewError,
+    previewLoading,
     previewSkipped,
     sourceLabel,
     targets,
@@ -84,7 +102,7 @@ const MoveConnectedUsersDialog = ({
         );
     }, [connectedUsers, search]);
 
-    const canMove = !!targetId && selectedConnectedUserIds.length > 0 && !moving;
+    const canMove = !!targetId && selectedConnectedUserIds.length > 0 && !moving && !previewLoading;
 
     const handleTargetChange = (value: string) => {
         setTargetId(value);
@@ -178,6 +196,18 @@ const MoveConnectedUsersDialog = ({
                                 )}
                             </div>
                         ))}
+
+                        {!!mcpServerCount && (
+                            <p className="text-sm text-content-neutral-secondary">
+                                {`${mcpServerCount} ${mcpServerCount === 1 ? 'MCP server uses' : 'MCP servers use'} one of these configurations. Their tools follow the configuration each user lands on.`}
+                            </p>
+                        )}
+
+                        {previewError && (
+                            <p className="text-sm text-content-destructive-primary" role="alert">
+                                Could not load the move preview.
+                            </p>
+                        )}
 
                         {!!previewSkipped?.length && (
                             <div className="space-y-1 text-sm text-content-neutral-secondary">

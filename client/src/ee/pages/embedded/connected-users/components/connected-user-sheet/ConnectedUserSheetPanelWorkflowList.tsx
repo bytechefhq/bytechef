@@ -7,7 +7,17 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PlusIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
-const ConnectedUserSheetPanelWorkflowList = ({connectedUserId}: {connectedUserId: number}) => {
+interface ConnectedUserSheetPanelWorkflowListProps {
+    connectedUserEmail?: string;
+    connectedUserId: number;
+    connectedUserName?: string;
+}
+
+const ConnectedUserSheetPanelWorkflowList = ({
+    connectedUserEmail,
+    connectedUserId,
+    connectedUserName,
+}: ConnectedUserSheetPanelWorkflowListProps) => {
     const [showProvisionDialog, setShowProvisionDialog] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -49,7 +59,9 @@ const ConnectedUserSheetPanelWorkflowList = ({connectedUserId}: {connectedUserId
 
     const connectedUser = {
         connectedUserId: connectedUserId.toString(),
+        email: connectedUserEmail,
         externalId: connectedUserProjects[0]?.connectedUser.externalId || connectedUserId.toString(),
+        name: connectedUserName,
     };
 
     const connectedUserProjectWorkflows = (data?.connectedUserProjects ?? []).flatMap(

@@ -110,18 +110,21 @@ describe('MoveConnectedUsersDialog', () => {
         const onClose = vi.fn();
         const onMove = vi.fn().mockRejectedValue(new Error('Move failed'));
 
-        renderDialog({onClose, onMove});
+        try {
+            renderDialog({onClose, onMove});
 
-        await chooseTarget('Beta · v2');
-        await userEvent.click(screen.getByRole('button', {name: 'Move'}));
+            await chooseTarget('Beta · v2');
+            await userEvent.click(screen.getByRole('button', {name: 'Move'}));
 
-        await waitFor(() => {
-            expect(onMove).toHaveBeenCalledOnce();
-            expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
-        });
+            await waitFor(() => {
+                expect(onMove).toHaveBeenCalledOnce();
+                expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
+            });
 
-        expect(screen.getByRole('combobox', {name: 'Target'})).toBeInTheDocument();
-        process.off('unhandledRejection', collectRejection);
+            expect(screen.getByRole('combobox', {name: 'Target'})).toBeInTheDocument();
+        } finally {
+            process.off('unhandledRejection', collectRejection);
+        }
 
         expect(unhandledRejections).toEqual([]);
         expect(onClose).not.toHaveBeenCalled();
@@ -135,7 +138,20 @@ describe('MoveConnectedUsersDialog', () => {
             ],
         });
 
-        expect(screen.getByText('Jane: Sync, Report missing in the target version')).toBeInTheDocument();
+        expect(screen.getByText('Jane: the target has no Sync, Report')).toBeInTheDocument();
+    });
+
+    it.each([
+        ['TARGET_LACKS_REFERENCED_WORKFLOWS', ['Sync', 'Report'], 'Jane: the target has no Sync, Report'],
+        ['TARGET_LACKS_ENABLED_WORKFLOWS', ['Sync', 'Report'], 'Jane: the target has no enabled Sync, Report'],
+        ['CONNECTION_MISMATCH', [], 'Jane: the target uses a different authorization type'],
+        ['NOT_ON_SOURCE', [], 'Jane: no longer on this configuration'],
+        ['MOVE_FAILED', [], 'Jane: the move failed, try again'],
+        ['SOMETHING_NEW', [], 'Jane: SOMETHING_NEW'],
+    ])('explains the %s skip reason', (reason, workflowLabels, expectedLine) => {
+        renderDialog({previewSkipped: [{label: 'Jane', reason, workflowLabels}]});
+
+        expect(screen.getByText(expectedLine)).toBeInTheDocument();
     });
 
     it('reports moved, needs-attention and skipped users', async () => {
@@ -158,7 +174,46 @@ describe('MoveConnectedUsersDialog', () => {
         });
 
         expect(onMove).toHaveBeenCalledWith('10', ['1', '2']);
-        expect(screen.getByText('Jane: Sync, Report missing in the target version')).toBeInTheDocument();
+        expect(screen.getByText('Jane: the target has no Sync, Report')).toBeInTheDocument();
         expect(screen.getByText('Bob: ALREADY_ON_TARGET')).toBeInTheDocument();
+    });
+
+    it('disables Move while the move preview loads', async () => {
+        renderDialog({previewLoading: true});
+
+        await chooseTarget('Beta · v2');
+
+        expect(screen.getByRole('button', {name: 'Move'})).toBeDisabled();
+    });
+
+    it('says when the move preview fails and still allows the move', async () => {
+        renderDialog({previewError: true});
+
+        await chooseTarget('Beta · v2');
+
+        expect(screen.getByText('Could not load the move preview.')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
+    });
+
+    it('notes the MCP servers that use either configuration', () => {
+        const {unmount} = renderDialog({mcpServerCount: 1});
+
+        expect(
+            screen.getByText(
+                '1 MCP server uses one of these configurations. Their tools follow the configuration each user lands on.'
+            )
+        ).toBeInTheDocument();
+
+        unmount();
+
+        renderDialog({mcpServerCount: 2});
+
+        expect(screen.getByText(/^2 MCP servers use one of these configurations\./)).toBeInTheDocument();
+    });
+
+    it('shows no MCP notice when no MCP server uses either configuration', () => {
+        renderDialog({mcpServerCount: 0});
+
+        expect(screen.queryByText(/MCP server/)).not.toBeInTheDocument();
     });
 });

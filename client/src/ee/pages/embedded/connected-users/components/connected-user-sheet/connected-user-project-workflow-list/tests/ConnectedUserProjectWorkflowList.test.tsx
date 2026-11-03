@@ -96,12 +96,18 @@ describe('ConnectedUserProjectWorkflowList', () => {
             <ConnectedUserProjectWorkflowList
                 connectedUserProjectWorkflows={[
                     createConnectedUserProjectWorkflow('1', 'Custom Workflow'),
-                    createConnectedUserProjectWorkflow('2', 'Daily standup reminder', {
-                        copiedFromWorkflowUuid: 'template-standup',
-                    }),
-                    createConnectedUserProjectWorkflow('3', 'Greet on Request', {
-                        automationWorkflowUuid: 'template-greeting',
-                    }),
+                    {
+                        ...createConnectedUserProjectWorkflow('2', 'Daily standup reminder', {
+                            copiedFromWorkflowUuid: 'template-standup',
+                        }),
+                        projectId: '20',
+                    },
+                    {
+                        ...createConnectedUserProjectWorkflow('3', 'Greet on Request', {
+                            automationWorkflowUuid: 'template-greeting',
+                        }),
+                        projectId: '10',
+                    },
                 ]}
                 workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
             />
@@ -212,6 +218,81 @@ describe('ConnectedUserProjectWorkflowList', () => {
 
         const otherGroup = screen.getByRole('region', {name: 'Other'});
 
+        expect(within(otherGroup).queryByText(/· v/)).not.toBeInTheDocument();
+        expect(within(otherGroup).queryByRole('button', {name: /Change configuration/})).not.toBeInTheDocument();
+    });
+    it('keeps two projects with the same name apart, each with its own configuration', () => {
+        const sameNameTemplateSources = new Map<string, ConnectedUserWorkflowTemplateSourceI>([
+            ['template-first', {projectName: 'Onboarding', workflowTemplate: createWorkflowTemplate('template-first')}],
+            [
+                'template-second',
+                {projectName: 'Onboarding', workflowTemplate: createWorkflowTemplate('template-second')},
+            ],
+        ]);
+
+        render(
+            <ConnectedUserProjectWorkflowList
+                configurations={[
+                    {
+                        configurationId: '51',
+                        configurationName: 'Alpha',
+                        configurationProjectVersion: 1,
+                        projectId: '10',
+                    },
+                    {configurationId: '61', configurationName: 'Beta', configurationProjectVersion: 2, projectId: '20'},
+                ]}
+                connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
+                connectedUserProjectWorkflows={[
+                    {
+                        ...createConnectedUserProjectWorkflow('1', 'First Workflow', {
+                            automationWorkflowUuid: 'template-first',
+                        }),
+                        projectId: '10',
+                    },
+                    {
+                        ...createConnectedUserProjectWorkflow('2', 'Second Workflow', {
+                            automationWorkflowUuid: 'template-second',
+                        }),
+                        projectId: '20',
+                    },
+                ]}
+                workflowTemplateSourcesByWorkflowUuid={sameNameTemplateSources}
+            />
+        );
+
+        const groups = screen.getAllByRole('region', {name: 'Onboarding'});
+
+        expect(groups).toHaveLength(2);
+        expect(within(groups[0]).getByText('Alpha · v1')).toBeInTheDocument();
+        expect(within(groups[0]).getByRole('button', {name: 'Change configuration Alpha 10'})).toBeInTheDocument();
+        expect(within(groups[1]).getByText('Beta · v2')).toBeInTheDocument();
+        expect(within(groups[1]).getByRole('button', {name: 'Change configuration Beta 20'})).toBeInTheDocument();
+    });
+
+    it('shows no configuration or menu on an Other group that mixes projects', () => {
+        render(
+            <ConnectedUserProjectWorkflowList
+                configurations={[
+                    {
+                        configurationId: '51',
+                        configurationName: 'Alpha',
+                        configurationProjectVersion: 1,
+                        projectId: '10',
+                    },
+                    {configurationId: '61', configurationName: 'Beta', configurationProjectVersion: 2, projectId: '20'},
+                ]}
+                connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
+                connectedUserProjectWorkflows={[
+                    {...createConnectedUserProjectWorkflow('1', 'First Custom Workflow'), projectId: '10'},
+                    {...createConnectedUserProjectWorkflow('2', 'Second Custom Workflow'), projectId: '20'},
+                ]}
+                workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
+            />
+        );
+
+        const otherGroup = screen.getByRole('region', {name: 'Other'});
+
+        expect(within(otherGroup).getByText('2 workflows')).toBeInTheDocument();
         expect(within(otherGroup).queryByText(/· v/)).not.toBeInTheDocument();
         expect(within(otherGroup).queryByRole('button', {name: /Change configuration/})).not.toBeInTheDocument();
     });
