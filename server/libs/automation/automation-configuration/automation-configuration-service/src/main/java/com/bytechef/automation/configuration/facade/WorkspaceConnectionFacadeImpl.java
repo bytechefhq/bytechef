@@ -81,6 +81,13 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREATED, data = {
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "connectionId", value = "#result"),
+        @AuditData(key = "name", value = "#connectionDTO.name"),
+        @AuditData(key = "componentName", value = "#connectionDTO.componentName"),
+        @AuditData(key = "environmentId", value = "#connectionDTO.environmentId")
+    })
     @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_CREATE', #connectionDTO.environmentId)")
     public long create(long workspaceId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
@@ -91,6 +98,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_DELETED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId")
+    })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE')")
     public void delete(long connectionId) {
         requireAutomation(connectionId);
@@ -176,6 +186,10 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "name", value = "#name")
+    })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
         requireAutomation(connectionId);
