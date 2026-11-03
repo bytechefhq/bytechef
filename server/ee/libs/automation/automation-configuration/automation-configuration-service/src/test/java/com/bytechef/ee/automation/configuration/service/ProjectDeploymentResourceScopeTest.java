@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironme
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
@@ -122,7 +123,8 @@ class ProjectDeploymentResourceScopeTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
     }
 
     private List<ResourceEnvironmentResolver> environmentResolvers() {
