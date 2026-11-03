@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstant
 import static com.bytechef.component.ai.vectorstore.milvus.constant.MilvusConstants.MILVUS;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(MILVUS + "/v1/" + QUERY)
 public class MilvusSearchTaskHandler extends AbstractTaskHandler {
 
-    public MilvusSearchTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(MILVUS, 1, QUERY, actionDefinitionFacade);
+    public MilvusSearchTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(MILVUS, 1, QUERY, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

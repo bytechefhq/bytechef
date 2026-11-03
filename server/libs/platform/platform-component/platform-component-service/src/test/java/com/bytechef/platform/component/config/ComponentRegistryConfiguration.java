@@ -36,6 +36,7 @@ import com.bytechef.platform.file.storage.EditorTempFileStorageImpl;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorageImpl;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -124,6 +125,11 @@ public class ComponentRegistryConfiguration {
     @Bean
     JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry() {
         return new JobPrincipalAccessorRegistry(List.of());
+    }
+
+    @Bean
+    JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner() {
+        return new JobPrincipalAuthenticationRunner(List.of());
     }
 
     @Bean
