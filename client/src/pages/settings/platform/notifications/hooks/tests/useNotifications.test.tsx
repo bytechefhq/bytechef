@@ -6,7 +6,7 @@ import useNotifications, {notificationFormSchema} from '../useNotifications';
 
 const {createNotificationMutate, mutationOptions, regenerateMutate} = vi.hoisted(() => ({
     createNotificationMutate: vi.fn(),
-    mutationOptions: {} as Record<string, ((result: unknown) => void) | undefined>,
+    mutationOptions: {} as Record<string, ((result: unknown, variables?: number) => void) | undefined>,
     regenerateMutate: vi.fn(),
 }));
 
@@ -36,11 +36,13 @@ vi.mock('@/shared/mutations/platform/notifications.mutations', () => ({
         return {mutate: createNotificationMutate};
     }),
     useDeleteNotificationMutation: vi.fn(() => ({mutate: vi.fn()})),
-    useRegenerateNotificationSigningSecretMutation: vi.fn((options?: {onSuccess?: (result: unknown) => void}) => {
-        mutationOptions.regenerate = options?.onSuccess;
+    useRegenerateNotificationSigningSecretMutation: vi.fn(
+        (options?: {onSuccess?: (result: unknown, variables?: number) => void}) => {
+            mutationOptions.regenerate = options?.onSuccess;
 
-        return {mutate: regenerateMutate};
-    }),
+            return {mutate: regenerateMutate};
+        }
+    ),
     useUpdateNotificationMutation: vi.fn(() => ({mutate: vi.fn()})),
 }));
 
@@ -196,6 +198,24 @@ describe('useNotifications signing secret', () => {
     });
 });
 
+describe('useNotifications signing secret state', () => {
+    it('marks the selected notification as having a signing secret after generating one', () => {
+        const {result} = renderHook(() => useNotifications());
+
+        act(() => {
+            result.current.openEditDialog({hasSigningSecret: false, id: 7, name: 'n'} as never);
+        });
+
+        expect(result.current.selectedNotification?.hasSigningSecret).toBe(false);
+
+        act(() => {
+            mutationOptions.regenerate?.({signingSecret: 'whsec_new'}, 7);
+        });
+
+        expect(result.current.selectedNotification?.hasSigningSecret).toBe(true);
+    });
+});
+
 describe('notificationFormSchema header validation', () => {
     function headerMessages(webhookHeaders: unknown) {
         const result = notificationFormSchema.safeParse({
@@ -226,6 +246,11 @@ describe('notificationFormSchema header validation', () => {
                 {name: 'x-a', value: 'v'},
             ])
         ).toContain('Header names must be unique.');
+    });
+
+    it('requires a value unless it is the masked placeholder', () => {
+        expect(headerMessages([{name: 'X-A', value: ''}])).toContain('Enter a value');
+        expect(headerMessages([{name: 'X-A', value: '********'}])).toEqual([]);
     });
 
     it('rejects a value longer than 4096 characters', () => {

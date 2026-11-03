@@ -46,4 +46,13 @@ describe('WebhookHeadersField', () => {
         expect(screen.getByLabelText('Header value')).toHaveAttribute('placeholder', 'Saved, leave unchanged to keep');
         expect(screen.getByLabelText('Header value')).toHaveValue('');
     });
+
+    it('clears the masked value when a stored header is renamed', async () => {
+        render(<Harness headers={[{name: 'Authorization', value: '********'}]} />);
+
+        await userEvent.type(screen.getByLabelText('Header name'), '2');
+
+        expect(screen.getByLabelText('Header value')).toHaveValue('');
+        expect(screen.getByLabelText('Header value')).toHaveAttribute('placeholder', 'Header value');
+    });
 });

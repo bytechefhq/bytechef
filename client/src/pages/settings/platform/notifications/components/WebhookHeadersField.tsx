@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import {Input} from '@/components/Input/Input';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {PlusIcon, Trash2Icon} from 'lucide-react';
-import {Control, useFieldArray} from 'react-hook-form';
+import {Control, useFieldArray, useFormContext} from 'react-hook-form';
 
 import {MASKED_VALUE, MAX_WEBHOOK_HEADERS, NotificationFormValuesType} from '../hooks/useNotifications';
 
@@ -15,6 +15,8 @@ interface WebhookHeadersFormValuesI {
 }
 
 const WebhookHeadersField = ({control}: WebhookHeadersFieldProps) => {
+    const {getValues, setValue} = useFormContext<WebhookHeadersFormValuesI>();
+
     const {append, fields, remove} = useFieldArray({
         control: control as unknown as Control<WebhookHeadersFormValuesI>,
         name: 'settings.webhookHeaders',
@@ -34,7 +36,18 @@ const WebhookHeadersField = ({control}: WebhookHeadersFieldProps) => {
                                 <FormLabel className="sr-only">Header name</FormLabel>
 
                                 <FormControl>
-                                    <Input {...field} aria-label="Header name" placeholder="Header name" />
+                                    <Input
+                                        {...field}
+                                        aria-label="Header name"
+                                        onChange={(event) => {
+                                            field.onChange(event.target.value);
+
+                                            if (getValues(`settings.webhookHeaders.${index}.value`) === MASKED_VALUE) {
+                                                setValue(`settings.webhookHeaders.${index}.value`, '');
+                                            }
+                                        }}
+                                        placeholder="Header name"
+                                    />
                                 </FormControl>
 
                                 <FormMessage />
