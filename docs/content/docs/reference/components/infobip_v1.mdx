@@ -189,6 +189,138 @@ Type: OBJECT
 
 
 
+### Send Viber Bot Text Message
+Name: sendViberBotTextMessage
+
+`Send a text message from your Viber bot to a single Viber user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sender | Viber Bot Sender | STRING | Sender ID of the Viber bot that Infobip set up for you. | true |
+| to | To | STRING | Viber user who receives the message. To reply, use the sender of the message received by the New Viber Bot Message trigger. | true |
+| text | Text | STRING | Content of the message being sent. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Viber Bot Text Message",
+  "name" : "sendViberBotTextMessage",
+  "parameters" : {
+    "sender" : "",
+    "to" : "",
+    "text" : ""
+  },
+  "type" : "infobip/v1/sendViberBotTextMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| bulkId | STRING | ID assigned to the request, used to fetch delivery reports and message logs. |
+| messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(messageId), &#123;INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)&#125;\(status), STRING\(destination)&#125;] </details> | Messages accepted by Infobip, one for each destination. |
+
+
+
+
+#### Output Example
+```json
+{
+  "bulkId" : "",
+  "messages" : [ {
+    "messageId" : "",
+    "status" : {
+      "groupId" : 1,
+      "groupName" : "",
+      "id" : 1,
+      "name" : "",
+      "description" : "",
+      "action" : ""
+    },
+    "destination" : ""
+  } ]
+}
+```
+
+
+
+
+### Send Viber Business Text Message
+Name: sendViberBusinessTextMessage
+
+`Send a Viber Business Messages text message to a single recipient.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sender | Viber Sender | STRING | Viber Business Messages sender that Infobip activated for you. | true |
+| to | To | STRING | Phone number of the recipient in international format. To reply, use the sender of the message received by the New Viber Business Message trigger. | true |
+| text | Text | STRING | Content of the message being sent. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Viber Business Text Message",
+  "name" : "sendViberBusinessTextMessage",
+  "parameters" : {
+    "sender" : "",
+    "to" : "",
+    "text" : ""
+  },
+  "type" : "infobip/v1/sendViberBusinessTextMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| bulkId | STRING | ID assigned to the request, used to fetch delivery reports and message logs. |
+| messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(messageId), &#123;INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)&#125;\(status), STRING\(destination)&#125;] </details> | Messages accepted by Infobip, one for each destination. |
+
+
+
+
+#### Output Example
+```json
+{
+  "bulkId" : "",
+  "messages" : [ {
+    "messageId" : "",
+    "status" : {
+      "groupId" : 1,
+      "groupName" : "",
+      "id" : 1,
+      "name" : "",
+      "description" : "",
+      "action" : ""
+    },
+    "destination" : ""
+  } ]
+}
+```
+
+
+
+
 ### Send Whatsapp Template Message
 Name: sendWhatsappTemplateMessage
 
@@ -407,6 +539,92 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "infobip/v1/newSMS"
 }
 ```
+#### Keyword Property
+
+To learn more about `keyword` property, click [here](/reference/components/infobip_v1#keywords).
+
+
+
+### New Viber Bot Message
+Name: newViberBotMessage
+
+`Triggers when a Viber user sends a message to your Viber bot.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sender | Viber Bot Sender | STRING | Sender ID of the Viber bot that Infobip set up for you. | true |
+| keyword | Keyword | STRING | Keywords are words at the beginning of the message text of the inbound message that are used to filter out specific messages received on a number. | false |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Viber Bot Message",
+  "name" : "newViberBotMessage",
+  "parameters" : {
+    "sender" : "",
+    "keyword" : ""
+  },
+  "type" : "infobip/v1/newViberBotMessage"
+}
+```
+#### Viber Bot Sender
+
+Use the sender ID of the Viber bot that Infobip set up for your account. Infobip creates Viber bots under Viber's commercial terms, so ask your Infobip account manager if you do not have one yet.
+
+The trigger output is the request Infobip forwards. Each item in `results` is one inbound event. The `sender` field holds the Viber user to reply to with the **Send Viber Bot Text Message** action.
+
+#### Keyword Property
+
+To learn more about `keyword` property, click [here](/reference/components/infobip_v1#keywords).
+
+
+
+### New Viber Business Message
+Name: newViberBusinessMessage
+
+`Triggers when a Viber user sends a message to your Viber Business Messages sender.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sender | Viber Sender | STRING | Viber Business Messages sender that Infobip activated for you. | true |
+| keyword | Keyword | STRING | Keywords are words at the beginning of the message text of the inbound message that are used to filter out specific messages received on a number. | false |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Viber Business Message",
+  "name" : "newViberBusinessMessage",
+  "parameters" : {
+    "sender" : "",
+    "keyword" : ""
+  },
+  "type" : "infobip/v1/newViberBusinessMessage"
+}
+```
+#### Viber Sender
+
+Use the Viber Business Messages sender that Infobip activated for your account.
+
+The trigger output is the request Infobip forwards. Each item in `results` is one inbound message. The `sender` field holds the phone number of the Viber user. Use it as **To** in the **Send Viber Business Text Message** action to reply.
+
 #### Keyword Property
 
 To learn more about `keyword` property, click [here](/reference/components/infobip_v1#keywords).
