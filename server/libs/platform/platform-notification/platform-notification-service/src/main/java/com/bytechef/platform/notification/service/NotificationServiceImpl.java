@@ -68,6 +68,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         curNotification.setName(notification.getName());
         curNotification.setNotificationEventIds(notification.getNotificationEventIds());
+        curNotification.setSecretSettings(notification.getSecretSettings());
         curNotification.setSettings(notification.getSettings());
         curNotification.setType(notification.getType());
         curNotification.setVersion(notification.getVersion());

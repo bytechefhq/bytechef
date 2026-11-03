@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.facade.NotificationFacade;
 import com.bytechef.platform.notification.web.rest.model.NotificationModel;
+import com.bytechef.platform.notification.web.rest.model.NotificationSigningSecretModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -69,6 +70,13 @@ public class NotificationApiController implements NotificationApi {
                 .stream()
                 .map(notification -> conversionService.convert(notification, NotificationModel.class))
                 .toList());
+    }
+
+    @Override
+    public ResponseEntity<NotificationSigningSecretModel> regenerateNotificationSigningSecret(Long notificationId) {
+        return ResponseEntity.ok(
+            new NotificationSigningSecretModel().signingSecret(
+                notificationFacade.regenerateSigningSecret(notificationId)));
     }
 
     @Override

@@ -38,6 +38,11 @@ public class RemoteNotificationFacadeClient implements NotificationFacade {
     }
 
     @Override
+    public String regenerateSigningSecret(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void deleteNotification(long id) {
         throw new UnsupportedOperationException();
     }

@@ -37,6 +37,7 @@ public interface NotificationMapper extends Converter<NotificationDTO, Notificat
     NotificationModel convert(NotificationDTO notificationDTO);
 
     @InheritInverseConfiguration
+    @Mapping(target = "secretSettings", ignore = true)
     @DelegatingConverter
     Notification invertConvert(NotificationModel notificationModel);
 }
