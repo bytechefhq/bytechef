@@ -19,6 +19,7 @@ package com.bytechef.platform.notification.handler;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext.ApprovalSummary;
@@ -50,6 +51,26 @@ class NotificationHandlerContextTest {
         assertEquals(List.of("eventType", "jobId", "jobName", "timestamp"), List.copyOf(map.keySet()));
         assertEquals("JOB_FAILED", map.get("eventType"));
         assertEquals("2026-11-03T10:00:00Z", map.get("timestamp"));
+    }
+
+    @Test
+    void testToMapKeepsNullApprovalKeysOnApprovalEvents() {
+        NotificationHandlerContext context = new NotificationHandlerContext.Builder()
+            .eventType(NotificationEvent.Type.JOB_APPROVAL_EXPIRING)
+            .jobId(42L)
+            .jobName("Daily sync")
+            .approvalExpiresAt("2026-11-04T10:00:00Z")
+            .timestamp(Instant.parse("2026-11-03T10:00:00Z"))
+            .build();
+
+        Map<String, Object> map = context.toMap();
+
+        assertEquals(
+            List.of("eventType", "jobId", "jobName", "approvalExpiresAt", "approvalFormUrl", "timestamp"),
+            List.copyOf(map.keySet())
+                .subList(0, 6));
+        assertTrue(map.containsKey("approvalFormUrl"));
+        assertNull(map.get("approvalFormUrl"));
     }
 
     @Test
