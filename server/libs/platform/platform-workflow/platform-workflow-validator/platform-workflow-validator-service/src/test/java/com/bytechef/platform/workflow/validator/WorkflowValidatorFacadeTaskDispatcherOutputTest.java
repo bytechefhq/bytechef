@@ -265,6 +265,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
             ComponentDsl.string("type"), ComponentDsl.string("value"));
         ActionDefinition loggerActionDefinition = actionDefinition(ComponentDsl.string("text"));
 
+        when(componentDefinitionService.hasComponentDefinition(any(), any())).thenReturn(true);
         when(actionDefinitionService.getActionDefinition("var", 1, "set")).thenReturn(varActionDefinition);
         when(actionDefinitionService.getActionDefinition("logger", 1, "info")).thenReturn(loggerActionDefinition);
         when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("map", 1))

@@ -58,6 +58,21 @@ class ValidationErrorUtils {
     /**
      * Creates a missing property error message.
      */
+    public static String missingComponent(String componentName, int componentVersion) {
+        return "Component '" + componentName + "' (version " + componentVersion + ") is not available";
+    }
+
+    public static String missingOperation(
+        String operationLabel, String operationName, String componentName, int componentVersion) {
+
+        return operationLabel + " '" + operationName + "' does not exist in component '" + componentName +
+            "' (version " + componentVersion + ")";
+    }
+
+    public static String missingTaskDispatcher(String taskDispatcherName, int taskDispatcherVersion) {
+        return "Task dispatcher '" + taskDispatcherName + "' (version " + taskDispatcherVersion + ") is not available";
+    }
+
     public static String missingConnection(String componentTitle) {
         return "Missing required connection: " + componentTitle;
     }

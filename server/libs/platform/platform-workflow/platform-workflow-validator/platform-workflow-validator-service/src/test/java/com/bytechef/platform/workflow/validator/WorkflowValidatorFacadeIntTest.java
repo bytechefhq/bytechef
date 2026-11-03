@@ -20,9 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
@@ -32,13 +35,19 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.NodeValidationIssue;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueKind;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueSeverity;
 import com.bytechef.platform.workflow.validator.exception.WorkflowValidatorErrorType;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +59,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 @SpringBootTest(classes = WorkflowValidatorFacadeIntTest.WorkflowValidatorIntTestConfiguration.class)
 class WorkflowValidatorFacadeIntTest {
 
@@ -256,6 +266,160 @@ class WorkflowValidatorFacadeIntTest {
             .asInstanceOf(type(ConfigurationException.class))
             .extracting(ConfigurationException::getErrorKey)
             .isEqualTo(WorkflowValidatorErrorType.RESERVED_NODE_NAME.getErrorKey());
+    }
+
+    @Test
+    void testValidateWorkflowReportsTaskWhoseComponentIsMissing() {
+        when(actionDefinitionService.getActionDefinition("viber", 1, "sendTextMessage"))
+            .thenReturn(mock(ActionDefinition.class));
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                """
+                    {"tasks": [{"name": "viber_1", "type": "viber/v1/sendTextMessage", "parameters": {}}]}
+                    """);
+
+        assertThat(workflowValidationResult.nodeIssues()).contains(
+            new NodeValidationIssue(
+                "viber_1", null, WorkflowIssueKind.OTHER, WorkflowIssueSeverity.ERROR,
+                "Component 'viber' (version 1) is not available"));
+    }
+
+    @Test
+    void testValidateWorkflowReportsTaskWhoseActionIsMissing() {
+        when(actionDefinitionService.getActionDefinition("infobip", 1, "sendViberBotTextMessage"))
+            .thenThrow(
+                new IllegalArgumentException(
+                    "The component 'infobip' does not contain the 'sendViberBotTextMessage' action."));
+        when(componentDefinitionService.hasComponentDefinition("infobip", 1)).thenReturn(true);
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                """
+                    {
+                        "tasks": [
+                            {"name": "infobip_1", "type": "infobip/v1/sendViberBotTextMessage", "parameters": {}}
+                        ]
+                    }
+                    """);
+
+        assertThat(workflowValidationResult.nodeIssues()).contains(
+            new NodeValidationIssue(
+                "infobip_1", null, WorkflowIssueKind.OTHER, WorkflowIssueSeverity.ERROR,
+                "Action 'sendViberBotTextMessage' does not exist in component 'infobip' (version 1)"));
+    }
+
+    @Test
+    void testValidateWorkflowReportsTriggerWhoseComponentIsMissing() {
+        when(triggerDefinitionService.getTriggerDefinition("viber", 1, "newMessage"))
+            .thenThrow(
+                new IllegalArgumentException("Component definition with name 'viber' and version '1' not found"));
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                """
+                    {
+                        "triggers": [{"name": "trigger_1", "type": "viber/v1/newMessage", "parameters": {}}],
+                        "tasks": []
+                    }
+                    """);
+
+        assertThat(workflowValidationResult.nodeIssues()).contains(
+            new NodeValidationIssue(
+                "trigger_1", null, WorkflowIssueKind.OTHER, WorkflowIssueSeverity.ERROR,
+                "Component 'viber' (version 1) is not available"));
+    }
+
+    @Test
+    void testValidateWorkflowReportsTriggerWhoseTriggerIsMissing() {
+        when(triggerDefinitionService.getTriggerDefinition("infobip", 1, "newViberBotMessage"))
+            .thenThrow(
+                new IllegalArgumentException(
+                    "The component 'infobip' does not contain the 'newViberBotMessage' trigger."));
+        when(componentDefinitionService.hasComponentDefinition("infobip", 1)).thenReturn(true);
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                """
+                    {
+                        "triggers": [{"name": "trigger_2", "type": "infobip/v1/newViberBotMessage", "parameters": {}}],
+                        "tasks": []
+                    }
+                    """);
+
+        assertThat(workflowValidationResult.nodeIssues()).contains(
+            new NodeValidationIssue(
+                "trigger_2", null, WorkflowIssueKind.OTHER, WorkflowIssueSeverity.ERROR,
+                "Trigger 'newViberBotMessage' does not exist in component 'infobip' (version 1)"));
+    }
+
+    @Test
+    void testValidateWorkflowReportsTaskDispatcherThatIsMissing() {
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("unknown", 1))
+            .thenThrow(new IllegalArgumentException("Task dispatcher definition 'unknown' not found"));
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                """
+                    {"tasks": [{"name": "unknown_1", "type": "unknown/v1", "parameters": {}}]}
+                    """);
+
+        assertThat(workflowValidationResult.nodeIssues()).contains(
+            new NodeValidationIssue(
+                "unknown_1", null, WorkflowIssueKind.OTHER, WorkflowIssueSeverity.ERROR,
+                "Task dispatcher 'unknown' (version 1) is not available"));
+    }
+
+    @Test
+    void testValidateWorkflowReportsNestedTaskWhoseComponentIsMissing() {
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("loop", 1))
+            .thenReturn(mock(TaskDispatcherDefinition.class));
+        when(actionDefinitionService.getActionDefinition("viber", 1, "sendTextMessage"))
+            .thenReturn(mock(ActionDefinition.class));
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                """
+                    {
+                        "tasks": [
+                            {
+                                "name": "loop_1",
+                                "type": "loop/v1",
+                                "parameters": {
+                                    "items": [],
+                                    "iteratee": [
+                                        {"name": "viber_1", "type": "viber/v1/sendTextMessage", "parameters": {}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                    """);
+
+        assertThat(workflowValidationResult.nodeIssues()).contains(
+            new NodeValidationIssue(
+                "viber_1", null, WorkflowIssueKind.OTHER, WorkflowIssueSeverity.ERROR,
+                "Component 'viber' (version 1) is not available"));
+        assertThat(workflowValidationResult.nodeIssues())
+            .noneMatch(nodeValidationIssue -> "loop_1".equals(nodeValidationIssue.nodeName()));
+    }
+
+    @Test
+    void testValidateWorkflowDoesNotReportNodesWhoseDefinitionsExist() {
+        when(actionDefinitionService.getActionDefinition("var", 1, "set")).thenReturn(mock(ActionDefinition.class));
+        when(componentDefinitionService.hasComponentDefinition("var", 1)).thenReturn(true);
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                """
+                    {"tasks": [{"name": "var_1", "type": "var/v1/set", "parameters": {}}]}
+                    """);
+
+        assertThat(workflowValidationResult.nodeIssues())
+            .noneMatch(nodeValidationIssue -> nodeValidationIssue.message()
+                .contains("not available") ||
+                nodeValidationIssue.message()
+                    .contains("does not exist in component"));
     }
 
     @Configuration
