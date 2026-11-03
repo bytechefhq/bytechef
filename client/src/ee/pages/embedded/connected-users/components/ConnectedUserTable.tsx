@@ -6,6 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
+import {Checkbox} from '@/components/ui/checkbox';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ConnectedUserDeleteDialog from '@/ee/pages/embedded/connected-users/components/ConnectedUserDeleteDialog';
 import CredentialsStatus from '@/ee/pages/embedded/connected-users/components/CredentialsStatus';
@@ -14,22 +15,25 @@ import {ConnectedUser, CredentialStatus} from '@/ee/shared/middleware/embedded/c
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
-import {coreTableFeatures} from '@/shared/util/table-features';
 import {useQueryClient} from '@tanstack/react-query';
-import {createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
+import {createColumnHelper, flexRender, rowSelectionFeature, tableFeatures, useTable} from '@tanstack/react-table';
 import {EllipsisVerticalIcon, EyeIcon, PowerIcon, PowerOffIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-const columnHelper = createColumnHelper<typeof coreTableFeatures, ConnectedUser>();
+const selectionTableFeatures = tableFeatures({rowSelectionFeature});
+
+const columnHelper = createColumnHelper<typeof selectionTableFeatures, ConnectedUser>();
 
 interface ConnectedUserTableProps {
     connectedUsers: ConnectedUser[];
+    onSelectionChange: (connectedUserIds: number[]) => void;
+    selectedConnectedUserIds: number[];
 }
 
-const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
+const ConnectedUserTable = ({connectedUsers, onSelectionChange, selectedConnectedUserIds}: ConnectedUserTableProps) => {
     const [currentConnectedUserId, setCurrentConnectedUserId] = useState(0);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -47,6 +51,33 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
     const columns = useMemo(
         () =>
             columnHelper.columns([
+                columnHelper.display({
+                    cell: (info) => (
+                        <Checkbox
+                            aria-label={`Select ${info.row.original.name || info.row.original.externalId || info.row.id}`}
+                            checked={info.row.getIsSelected()}
+                            onCheckedChange={(checked) => info.row.toggleSelected(checked === true)}
+                        />
+                    ),
+                    header: ({table}) => {
+                        let headerChecked: boolean | 'indeterminate' = false;
+
+                        if (table.getIsAllRowsSelected()) {
+                            headerChecked = true;
+                        } else if (table.getIsSomeRowsSelected()) {
+                            headerChecked = 'indeterminate';
+                        }
+
+                        return (
+                            <Checkbox
+                                aria-label="Select all"
+                                checked={headerChecked}
+                                onCheckedChange={(checked) => table.toggleAllRowsSelected(checked === true)}
+                            />
+                        );
+                    },
+                    id: 'select',
+                }),
                 columnHelper.accessor((row) => row.integrationInstances, {
                     cell: (info) => {
                         const integrationInstances = info.getValue() ?? [];
@@ -165,10 +196,28 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
         [componentDefinitions, connectedUsers]
     );
 
+    const rowSelection = useMemo(() => {
+        const selection: Record<string, true> = {};
+
+        for (const connectedUserId of selectedConnectedUserIds) {
+            selection[String(connectedUserId)] = true;
+        }
+
+        return selection;
+    }, [selectedConnectedUserIds]);
+
     const reactTable = useTable({
         columns,
         data: connectedUsers,
-        features: coreTableFeatures,
+        enableRowSelection: true,
+        features: selectionTableFeatures,
+        getRowId: (row) => String(row.id),
+        onRowSelectionChange: (updater) => {
+            const nextRowSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
+
+            onSelectionChange(Object.keys(nextRowSelection).map(Number));
+        },
+        state: {rowSelection},
     });
 
     const headerGroups = reactTable.getHeaderGroups();
@@ -200,7 +249,10 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                         <TableRow className="border-b-border/50" key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
                                 <TableHead
-                                    className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase"
+                                    className={twMerge(
+                                        'sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase',
+                                        header.id === 'select' && 'px-2'
+                                    )}
                                     key={header.id}
                                 >
                                     {!header.isPlaceholder &&
@@ -237,7 +289,9 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                                         )}
                                         key={cell.id}
                                         onClick={(event) => {
-                                            if (cell.id.endsWith('actions')) {
+                                            if (cell.id.endsWith('select')) {
+                                                event.stopPropagation();
+                                            } else if (cell.id.endsWith('actions')) {
                                                 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                                                 const target = event.target as any;
 

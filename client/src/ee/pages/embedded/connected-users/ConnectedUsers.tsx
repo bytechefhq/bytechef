@@ -13,6 +13,7 @@ import ConnectedUserCreateDialog from '@/ee/pages/embedded/connected-users/compo
 import ConnectedUserImportDialog from '@/ee/pages/embedded/connected-users/components/ConnectedUserImportDialog';
 import ConnectedUserTable from '@/ee/pages/embedded/connected-users/components/ConnectedUserTable';
 import ConnectedUsersFilterTitle from '@/ee/pages/embedded/connected-users/components/ConnectedUsersFilterTitle';
+import ConnectedUsersSelectionBar from '@/ee/pages/embedded/connected-users/components/ConnectedUsersSelectionBar';
 import ConnectedUserSheet from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheet';
 import {EMBEDDED_CONNECTED_USERS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {ComponentDefinitionBasic, Integration} from '@/ee/shared/middleware/embedded/configuration';
@@ -30,7 +31,7 @@ import {cn} from '@/shared/util/cn-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {format} from 'date-fns';
 import {CalendarIcon, UploadIcon, UsersIcon} from 'lucide-react';
-import {HTMLAttributes, useState} from 'react';
+import {HTMLAttributes, useEffect, useMemo, useState} from 'react';
 import {DateRange} from 'react-day-picker';
 import {useForm} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
@@ -125,6 +126,8 @@ const ConnectedUsers = () => {
 
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [importDialogOpen, setImportDialogOpen] = useState(false);
+    const [selectedConnectedUserIds, setSelectedConnectedUserIds] = useState<number[]>([]);
+    const [, setUpgradeKind] = useState<'automation' | 'integration' | undefined>();
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -169,6 +172,12 @@ const ConnectedUsers = () => {
         ConnectedUserFromJSON(connectedUser)
     );
 
+    const visibleSelectedConnectedUserIds = useMemo(() => {
+        const visibleConnectedUserIds = new Set(connectedUsers?.map((connectedUser) => connectedUser.id));
+
+        return selectedConnectedUserIds.filter((connectedUserId) => visibleConnectedUserIds.has(connectedUserId));
+    }, [connectedUsers, selectedConnectedUserIds]);
+
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false});
 
     const hasActiveFilter = [
@@ -196,6 +205,8 @@ const ConnectedUsers = () => {
         );
     }
 
+    const searchParamsKey = searchParams.toString();
+
     const handleFilterConnectedUsers = (values: z.infer<typeof formSchema>) => {
         filter(values.search, values.credentialStatus, values.integrationId, values.createDateRange, pageNumber);
     };
@@ -211,6 +222,10 @@ const ConnectedUsers = () => {
             pageNumber
         );
     };
+
+    useEffect(() => {
+        setSelectedConnectedUserIds((previousIds) => (previousIds.length ? [] : previousIds));
+    }, [currentEnvironmentId, searchParamsKey]);
 
     return (
         <LayoutContainer
@@ -386,7 +401,20 @@ const ConnectedUsers = () => {
         >
             <PageLoader errors={[connectedUsersError]} loading={connectedUsersLoading}>
                 {connectedUsers && connectedUsers?.length > 0 ? (
-                    <ConnectedUserTable connectedUsers={connectedUsers} />
+                    <>
+                        <ConnectedUsersSelectionBar
+                            count={visibleSelectedConnectedUserIds.length}
+                            onClear={() => setSelectedConnectedUserIds([])}
+                            onUpgradeAutomation={() => setUpgradeKind('automation')}
+                            onUpgradeIntegration={() => setUpgradeKind('integration')}
+                        />
+
+                        <ConnectedUserTable
+                            connectedUsers={connectedUsers}
+                            onSelectionChange={setSelectedConnectedUserIds}
+                            selectedConnectedUserIds={visibleSelectedConnectedUserIds}
+                        />
+                    </>
                 ) : hasActiveFilter ? (
                     <EmptyList
                         icon={<UsersIcon className="size-24 text-stroke-neutral-tertiary" />}
