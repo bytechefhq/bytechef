@@ -63,7 +63,7 @@ A published version reaches connected users only through a **configuration**. Op
 
 Each configuration row shows:
 
-- **Name** and, beside it, the **environment** (Development, Staging or Production). In an environment with one configuration, the name defaults to the environment name.
+- **Name** -- in an environment with one configuration, the name defaults to the environment name.
 - **Users** -- how many connected users are on this configuration.
 - **Version badge** -- `V<n>`, the published version the environment is pinned to.
 - **Newer version available** badge -- shown when a later version has been published than the one the configuration points at.
@@ -77,6 +77,7 @@ Expand a row to list the workflows of that version, each with its own switch. Tu
 
 **New Configuration** opens a dialog with:
 
+- **Project** -- required, shown only on the Automation Configurations page, where the dialog is not opened from a project. It lists the published projects; choosing one preselects its latest published version.
 - **Name** -- required. It must be unique for the project and environment (upper and lower case count as the same).
 - **Environment** -- the environment the configuration belongs to. It is fixed when you edit a configuration.
 - **Version** -- the published versions of the project. Pointing a configuration at an older version is allowed, which is how you roll an environment back.
@@ -191,7 +192,7 @@ Selecting an entry sets `?categoryId=` or `?tagId=` in the URL so the view is sh
 
 Projects and their workflows are shared by every environment, so you build and edit them only in **Development**. There, the **Configurations** tab of a project lists its Development configurations.
 
-In **Staging** and **Production**, the sidebar shows **Automation Configurations** instead of Automations, and the workflow editor is not available. The page lists each published project with its configurations in that environment. You can create, edit, turn on or off, move users between and delete configurations there, but not change a project or its workflows.
+In **Staging** and **Production**, the sidebar shows **Automation Configurations** instead of Automations, and the workflow editor is not available. The page lists the published projects that have configurations in that environment, each with its configurations. Pick a project in the left sidebar to show only its configurations. **New Configuration** in the header opens the configuration dialog with a **Project** field. When no project has a configuration in the environment yet, the page shows the steps to get there instead: create a project, publish a version, create a configuration. You can create, edit, turn on or off, move users between and delete configurations there, but not change a project or its workflows.
 
 Switching environment from the selector in the left sidebar (next to the user menu) moves you between the two pages.
 
