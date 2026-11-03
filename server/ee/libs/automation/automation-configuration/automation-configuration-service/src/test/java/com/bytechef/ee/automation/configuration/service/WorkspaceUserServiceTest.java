@@ -54,7 +54,7 @@ import org.springframework.security.access.AccessDeniedException;
  * Covers the last-admin guard, the self-demotion and self-promotion guards, the limit on granting more than the caller
  * holds, which row each workspace-wide operation reads now that a member may hold several, and cache eviction in
  * {@link WorkspaceUserServiceImpl}. {@code @PreAuthorize} enforcement is verified separately in
- * {@link PreAuthorizeAnnotationTest}.
+ * {@link WorkspaceUserServiceIntTest}.
  *
  * @version ee
  *
