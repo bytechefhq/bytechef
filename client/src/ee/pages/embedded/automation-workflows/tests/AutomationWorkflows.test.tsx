@@ -22,6 +22,7 @@ const renderWithProviders = (ui: ReactElement) => {
 const hoisted = vi.hoisted(() => {
     return {
         categories: [] as Array<{id: string; name: string}>,
+        categoriesIsLoading: false,
         configurations: [] as Array<{
             automationHubVisible: boolean;
             enabled: boolean;
@@ -63,7 +64,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useAutomationWorkflowProjectCategoriesQuery: () => ({
         data: {automationWorkflowProjectCategories: hoisted.categories},
         error: null,
-        isLoading: false,
+        isLoading: hoisted.categoriesIsLoading,
     }),
     useAutomationWorkflowProjectConfigurationDeleteImpactQuery: () => ({data: undefined}),
     useAutomationWorkflowProjectConfigurationsQuery: () => ({
@@ -152,6 +153,7 @@ vi.mock(import('@tanstack/react-query'), async (importOriginal) => {
 
 beforeEach(() => {
     hoisted.categories = [];
+    hoisted.categoriesIsLoading = false;
     hoisted.configurations = [];
     hoisted.createProjectMutate.mockReset();
     hoisted.createWorkflowMutate.mockReset();
@@ -254,8 +256,29 @@ describe('AutomationWorkflows', () => {
         renderWithProviders(<AutomationWorkflows />);
 
         expect(screen.getByText('Create your first project')).toBeInTheDocument();
-        expect(screen.getAllByText('Automation Workflows')).toHaveLength(1);
+        expect(screen.getAllByText('Automations')).toHaveLength(1);
         expect(screen.queryByRole('button', {name: /^new project$/i})).toBeNull();
+        expect(screen.queryByText('Categories')).toBeNull();
+    });
+
+    it('keeps the left sidebar hidden until the categories and tags have loaded', () => {
+        hoisted.categoriesIsLoading = true;
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-1',
+                lastPublishedVersion: null,
+                name: 'Loaded Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [],
+            },
+        ];
+
+        renderWithProviders(<AutomationWorkflows />);
+
+        expect(screen.getByText('Loaded Project')).toBeInTheDocument();
         expect(screen.queryByText('Categories')).toBeNull();
     });
 

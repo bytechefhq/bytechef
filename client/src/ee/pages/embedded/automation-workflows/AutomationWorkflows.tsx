@@ -64,11 +64,11 @@ const AutomationWorkflows = () => {
         isLoading: projectsIsLoading,
     } = useAutomationWorkflowProjectsQuery({environmentId: String(DEVELOPMENT_ENVIRONMENT)});
 
-    const initialLoadComplete = useInitialLoadComplete(projectsIsLoading);
-
     const {data: categoriesData, isLoading: categoriesIsLoading} = useAutomationWorkflowProjectCategoriesQuery();
 
     const {data: tagsData, isLoading: tagsIsLoading} = useAutomationWorkflowProjectTagsQuery();
+
+    const initialLoadComplete = useInitialLoadComplete(projectsIsLoading || categoriesIsLoading || tagsIsLoading);
 
     const categories = categoriesData?.automationWorkflowProjectCategories;
     const tags = tagsData?.automationWorkflowProjectTags;
@@ -322,7 +322,7 @@ const AutomationWorkflows = () => {
                         }
                     />
                 ) : (
-                    isFirstRun && <Header centerTitle={true} position="main" title="Automation Workflows" />
+                    isFirstRun && <Header centerTitle={true} position="main" title="Automations" />
                 )
             }
             leftSidebarBody={
@@ -334,7 +334,7 @@ const AutomationWorkflows = () => {
                     tagsIsLoading={tagsIsLoading}
                 />
             }
-            leftSidebarHeader={<Header title="Automation Workflows" />}
+            leftSidebarHeader={<Header title="Automations" />}
             leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
