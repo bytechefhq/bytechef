@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * @author Ivica Cardic
@@ -64,6 +65,7 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public Object executeAiAgentAction(
         String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
         List<Object> attachments) {
@@ -73,6 +75,7 @@ public class AiAgentTestFacadeImpl implements AiAgentTestFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     @SuppressWarnings("unchecked")
     public Object executeAiAgentAction(
         String workflowId, String workflowNodeName, long environmentId, String conversationId, String message,
