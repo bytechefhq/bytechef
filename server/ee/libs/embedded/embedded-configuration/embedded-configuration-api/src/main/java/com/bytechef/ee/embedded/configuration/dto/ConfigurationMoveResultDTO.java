@@ -30,9 +30,9 @@ public record ConfigurationMoveResultDTO(
      * A connected user the move left in place.
      *
      * @param connectedUserId the connected user id
-     * @param reason          {@link #NOT_ON_SOURCE}, {@link #TARGET_LACKS_REFERENCED_WORKFLOWS},
-     *                        {@link #TARGET_LACKS_ENABLED_WORKFLOWS}, {@link #CONNECTION_MISMATCH} or
-     *                        {@link #MOVE_FAILED}
+     * @param reason          {@link #NOT_ON_SOURCE}, {@link #ALREADY_ON_TARGET},
+     *                        {@link #TARGET_LACKS_REFERENCED_WORKFLOWS}, {@link #TARGET_LACKS_ENABLED_WORKFLOWS},
+     *                        {@link #CONNECTION_MISMATCH} or {@link #MOVE_FAILED}
      * @param workflowLabels  the labels of the referenced workflows the target lacks; empty for the other reasons
      *
      * @version ee
@@ -42,6 +42,7 @@ public record ConfigurationMoveResultDTO(
     @SuppressFBWarnings("EI")
     public record Skipped(long connectedUserId, String reason, List<String> workflowLabels) {
 
+        public static final String ALREADY_ON_TARGET = "ALREADY_ON_TARGET";
         public static final String CONNECTION_MISMATCH = "CONNECTION_MISMATCH";
         public static final String MOVE_FAILED = "MOVE_FAILED";
         public static final String NOT_ON_SOURCE = "NOT_ON_SOURCE";
