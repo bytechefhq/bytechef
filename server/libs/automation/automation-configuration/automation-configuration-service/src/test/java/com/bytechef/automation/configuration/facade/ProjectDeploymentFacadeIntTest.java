@@ -369,12 +369,12 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testGetProjectDeploymentsReturnsOnlyTheNonEmbeddedDeploymentsOfTheEnvironment() {
-        ProjectDTO automationWorkflowProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDTO automationProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDTO plainProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDTO productionProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
-        ProjectDeploymentDTO automationWorkflowProjectDeploymentDTO =
-            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), automationWorkflowProjectDTO);
+        ProjectDeploymentDTO automationProjectDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), automationProjectDTO);
         ProjectDeploymentDTO plainDeploymentDTO =
             projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), plainProjectDTO);
 
@@ -384,11 +384,11 @@ public class ProjectDeploymentFacadeIntTest {
             projectDeploymentFacadeHelper.createProjectDeploymentForEnvironment(
                 workspace.getId(), productionProjectDTO, Environment.PRODUCTION);
 
-        renameProjectDeployment(automationWorkflowProjectDeploymentDTO.id(), "admin");
+        renameProjectDeployment(automationProjectDeploymentDTO.id(), "admin");
         renameProjectDeployment(plainDeploymentDTO.id(), "plain");
         renameProjectDeployment(productionDeploymentDTO.id(), "production");
 
-        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectDTO.id());
+        testOwnerContributors.addAutomationProjectId(automationProjectDTO.id());
 
         List<ProjectDeployment> projectDeployments = projectDeploymentFacade.getProjectDeployments(
             workspace.getId(), Environment.DEVELOPMENT, null, null);
@@ -869,6 +869,11 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testCreateProjectDeploymentRejectsConnectionFromAnotherEnvironment() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+
         stubScheduleConnection(Environment.PRODUCTION);
 
         assertThatThrownBy(() -> createCronInputProjectDeployment(
@@ -879,6 +884,11 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testUpdateProjectDeploymentWorkflowRejectsConnectionFromAnotherEnvironment() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+
         stubScheduleConnection(Environment.DEVELOPMENT);
 
         long projectDeploymentId = createCronInputProjectDeployment(
