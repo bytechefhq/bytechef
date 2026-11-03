@@ -10,7 +10,7 @@ const connectedUsers = [
 
 const targets = [{id: '10', label: 'Beta · v2'}];
 
-const defaultResult = {movedCount: 0, needsAttentionCount: 0, skipped: []};
+const defaultResult = {movedConnectedUserIds: [], needsAttentionConnectedUserIds: [], skipped: []};
 
 const renderDialog = (props: Partial<React.ComponentProps<typeof MoveConnectedUsersDialog>> = {}) =>
     render(
@@ -134,11 +134,30 @@ describe('MoveConnectedUsersDialog', () => {
     it('shows users that would be skipped before moving', () => {
         renderDialog({
             previewSkipped: [
-                {label: 'Jane', reason: 'TARGET_LACKS_REFERENCED_WORKFLOWS', workflowLabels: ['Sync', 'Report']},
+                {connectedUserId: '1', reason: 'TARGET_LACKS_REFERENCED_WORKFLOWS', workflowLabels: ['Sync', 'Report']},
             ],
         });
 
         expect(screen.getByText('Jane: the target has no Sync, Report')).toBeInTheDocument();
+    });
+
+    it('labels a skipped user by id when the user is not in the list', () => {
+        renderDialog({previewSkipped: [{connectedUserId: 99, reason: 'NOT_ON_SOURCE', workflowLabels: []}]});
+
+        expect(screen.getByText('99: no longer on this configuration')).toBeInTheDocument();
+    });
+
+    it('shows a loading state until the connected users arrive', () => {
+        renderDialog({connectedUsers: undefined});
+
+        expect(screen.getByText('Loading users...')).toBeInTheDocument();
+        expect(screen.queryByRole('combobox', {name: 'Target'})).not.toBeInTheDocument();
+    });
+
+    it('says when the connected users fail to load', () => {
+        renderDialog({connectedUsers: undefined, connectedUsersError: true});
+
+        expect(screen.getByText('Could not load the connected users.')).toBeInTheDocument();
     });
 
     it.each([
@@ -149,18 +168,18 @@ describe('MoveConnectedUsersDialog', () => {
         ['MOVE_FAILED', [], 'Jane: the move failed, try again'],
         ['SOMETHING_NEW', [], 'Jane: SOMETHING_NEW'],
     ])('explains the %s skip reason', (reason, workflowLabels, expectedLine) => {
-        renderDialog({previewSkipped: [{label: 'Jane', reason, workflowLabels}]});
+        renderDialog({previewSkipped: [{connectedUserId: '1', reason, workflowLabels}]});
 
         expect(screen.getByText(expectedLine)).toBeInTheDocument();
     });
 
     it('reports moved, needs-attention and skipped users', async () => {
         const onMove = vi.fn().mockResolvedValue({
-            movedCount: 1,
-            needsAttentionCount: 1,
+            movedConnectedUserIds: [3],
+            needsAttentionConnectedUserIds: [4],
             skipped: [
-                {label: 'Jane', reason: 'TARGET_LACKS_REFERENCED_WORKFLOWS', workflowLabels: ['Sync', 'Report']},
-                {label: 'Bob', reason: 'ALREADY_ON_TARGET', workflowLabels: []},
+                {connectedUserId: 1, reason: 'TARGET_LACKS_REFERENCED_WORKFLOWS', workflowLabels: ['Sync', 'Report']},
+                {connectedUserId: 2, reason: 'ALREADY_ON_TARGET', workflowLabels: []},
             ],
         });
 

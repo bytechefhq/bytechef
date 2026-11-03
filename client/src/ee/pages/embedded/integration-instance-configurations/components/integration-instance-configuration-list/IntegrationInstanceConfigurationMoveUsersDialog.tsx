@@ -1,4 +1,3 @@
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import MoveConnectedUsersDialog, {
     MoveConnectedUsersResultI,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
@@ -27,12 +26,6 @@ interface IntegrationInstanceConfigurationMoveUsersDialogProps {
     onClose: () => void;
     targetConfigurations: TargetConfigurationType[];
     title?: string;
-}
-
-interface SkippedConnectedUserI {
-    connectedUserId: number;
-    reason: string;
-    workflowLabels: string[];
 }
 
 const formatConfigurationLabel = (configuration: ConfigurationReferenceType): string =>
@@ -82,7 +75,7 @@ const IntegrationInstanceConfigurationMoveUsersDialog = ({
 
     const dialogConnectedUsers = useMemo(
         () =>
-            (connectedUsers ?? []).map((connectedUser) => ({
+            connectedUsers?.map((connectedUser) => ({
                 ...connectedUser,
                 connectedUserId: String(connectedUser.connectedUserId),
             })),
@@ -98,71 +91,24 @@ const IntegrationInstanceConfigurationMoveUsersDialog = ({
         [targetConfigurations]
     );
 
-    const labelByConnectedUserId = useMemo(
-        () =>
-            new Map(
-                dialogConnectedUsers.map((connectedUser) => [
-                    connectedUser.connectedUserId,
-                    connectedUser.name || connectedUser.email || connectedUser.externalId,
-                ])
-            ),
-        [dialogConnectedUsers]
-    );
-
-    const toSkippedLines = useCallback(
-        (skippedUsers: SkippedConnectedUserI[]) =>
-            skippedUsers.map((skippedUser) => ({
-                label:
-                    labelByConnectedUserId.get(String(skippedUser.connectedUserId)) ||
-                    String(skippedUser.connectedUserId),
-                reason: skippedUser.reason,
-                workflowLabels: skippedUser.workflowLabels,
-            })),
-        [labelByConnectedUserId]
-    );
-
-    const previewSkipped = useMemo(() => toSkippedLines(moveImpact?.skipped ?? []), [moveImpact, toSkippedLines]);
-
     const {mutateAsync: moveConnectedUsers} = moveMutation;
 
     const handleMove = useCallback(
-        async (targetId: string, connectedUserIds: string[]): Promise<MoveConnectedUsersResultI> => {
-            const moveResult = await moveConnectedUsers({
+        (targetId: string, connectedUserIds: string[]): Promise<MoveConnectedUsersResultI> =>
+            moveConnectedUsers({
                 configurationMoveRequest: {
                     connectedUserIds: connectedUserIds.map(Number),
                     targetId: Number(targetId),
                 },
                 id: configuration.id!,
-            });
-
-            return {
-                movedCount: moveResult.movedConnectedUserIds.length,
-                needsAttentionCount: moveResult.needsAttentionConnectedUserIds.length,
-                skipped: toSkippedLines(moveResult.skipped),
-            };
-        },
-        [configuration.id, moveConnectedUsers, toSkippedLines]
+            }),
+        [configuration.id, moveConnectedUsers]
     );
-
-    if (!connectedUsers) {
-        return (
-            <Dialog onOpenChange={(open) => !open && onClose()} open>
-                <DialogContent showCloseButton>
-                    <DialogHeader>
-                        <DialogTitle>{title}</DialogTitle>
-
-                        <DialogDescription>
-                            {connectedUsersError ? 'Could not load the connected users.' : 'Loading users...'}
-                        </DialogDescription>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-        );
-    }
 
     return (
         <MoveConnectedUsersDialog
             connectedUsers={dialogConnectedUsers}
+            connectedUsersError={connectedUsersError}
             impact={moveImpact?.workflows}
             initialSelectedConnectedUserIds={initialSelectedConnectedUserIds?.map(String)}
             mcpServerCount={moveImpact?.mcpServerCount}
@@ -171,7 +117,7 @@ const IntegrationInstanceConfigurationMoveUsersDialog = ({
             onSelectionChange={(targetId, connectedUserIds) => setSelection({connectedUserIds, targetId})}
             previewError={moveImpactError}
             previewLoading={moveImpactLoading}
-            previewSkipped={previewSkipped}
+            previewSkipped={moveImpact?.skipped}
             sourceLabel={formatConfigurationLabel(configuration)}
             targets={targets}
             title={title}
