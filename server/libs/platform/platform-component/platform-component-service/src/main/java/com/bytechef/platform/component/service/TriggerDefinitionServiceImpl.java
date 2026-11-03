@@ -39,6 +39,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableFunction
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateWithConnectionFunction;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
@@ -321,7 +322,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentName, componentVersion, triggerName, null, null, componentConnection, null, null, false);
 
         return doExecuteWebhookValidate(
-            componentName, componentVersion, triggerName, inputParameters, webhookRequest, triggerContext);
+            componentName, componentVersion, triggerName, inputParameters, webhookRequest, componentConnection,
+            triggerContext);
     }
 
     @Override
@@ -623,7 +625,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             WebhookRequest requiredWebhookRequest = Objects.requireNonNull(webhookRequest, "webhookRequest");
 
             if (!requiredWebhookRequest.validated()) {
-                validateWebhookRequest(triggerDefinition, inputParameters, requiredWebhookRequest, context);
+                validateWebhookRequest(
+                    triggerDefinition, inputParameters, requiredWebhookRequest, componentConnection, context);
             }
 
             triggerOutput = triggerDefinition.getWebhookRequest()
@@ -699,24 +702,35 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private WebhookValidateResponse doExecuteWebhookValidate(
         String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, WebhookRequest webhookRequest, TriggerContext context) {
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest,
+        @Nullable ComponentConnection componentConnection, TriggerContext context) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return executeWebhookValidate(triggerDefinition, ParametersFactory.create(inputParameters),
-            webhookRequest, context);
+            webhookRequest, componentConnection, context);
     }
 
     private WebhookValidateResponse executeWebhookValidate(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition, Parameters inputParameters,
-        WebhookRequest webhookRequest, TriggerContext context) {
+        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection, TriggerContext context) {
 
         return triggerDefinition.getWebhookValidate()
-            .map(webhookValidateFunction -> webhookValidateFunction.apply(
-                inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
-                new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-                context))
+            .map(webhookValidateFunction -> {
+                if (webhookValidateFunction instanceof WebhookValidateWithConnectionFunction withConnectionFunction) {
+                    return withConnectionFunction.apply(
+                        inputParameters, ParametersFactory.create(componentConnection),
+                        new HttpHeadersImpl(webhookRequest.headers()),
+                        new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(),
+                        webhookRequest.method(), context);
+                }
+
+                return webhookValidateFunction.apply(
+                    inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
+                    new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(),
+                    webhookRequest.method(), context);
+            })
             .orElse(WebhookValidateResponse.ok());
     }
 
@@ -734,10 +748,11 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private void validateWebhookRequest(
         com.bytechef.component.definition.TriggerDefinition triggerDefinition, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, TriggerContext context) {
+        WebhookRequest webhookRequest, @Nullable ComponentConnection componentConnection, TriggerContext context) {
 
         WebhookValidateResponse response = executeWebhookValidate(
-            triggerDefinition, ParametersFactory.create(inputParameters), webhookRequest, context);
+            triggerDefinition, ParametersFactory.create(inputParameters), webhookRequest, componentConnection,
+            context);
 
         if (response.status() != HttpStatus.OK.getValue()) {
             throw new IllegalStateException("Invalid trigger signature.");

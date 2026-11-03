@@ -3799,6 +3799,14 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableTriggerDefinition webhookValidateWithConnection(
+            WebhookValidateWithConnectionFunction webhookValidate) {
+
+            this.webhookValidateFunction = webhookValidate;
+
+            return this;
+        }
+
         public ModifiableTriggerDefinition webhookValidateOnEnable(
             WebhookValidateOnEnableFunction webhookValidateEnable) {
 
