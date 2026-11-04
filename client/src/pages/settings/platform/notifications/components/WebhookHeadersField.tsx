@@ -9,7 +9,6 @@ import {MASKED_VALUE, MAX_WEBHOOK_HEADERS, NotificationFormValuesType} from '../
 
 interface WebhookHeadersFieldProps {
     control: Control<NotificationFormValuesType, unknown, NotificationFormValuesType>;
-    /** Clears every saved (masked) header value so it must be entered again, e.g. after the webhook URL changed. */
     requireHeaderValues?: boolean;
 }
 
