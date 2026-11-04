@@ -45,6 +45,11 @@ service TaskExecutionRemoteService {
   rpc Update(RemoteTaskExecution) returns (RemoteTaskExecution);
 }
 
+service TaskExecutionLockedUpdatesRemoteService {
+  rpc PutOutputEntry(PutOutputEntryRequest) returns (RemoteTaskExecution);
+  rpc SetEndDate(SetEndDateRequest) returns (RemoteTaskExecution);
+}
+
 service ContextRemoteService {
   rpc Peek(ContextKeyRequest) returns (RemoteFileEntry);
   rpc Push(PushContextRequest) returns (google.protobuf.Empty);
@@ -54,6 +59,17 @@ service CounterRemoteService {
   rpc Decrement(IdRequest) returns (Int64Response);
   rpc Delete(IdRequest) returns (google.protobuf.Empty);
   rpc Set(SetCounterRequest) returns (google.protobuf.Empty);
+}
+
+message PutOutputEntryRequest {
+  int64 task_execution_id = 1;
+  string key = 2;
+  bytes value = 3;
+}
+
+message SetEndDateRequest {
+  int64 task_execution_id = 1;
+  google.protobuf.Timestamp end_date = 2;
 }
 
 message IdRequest {
