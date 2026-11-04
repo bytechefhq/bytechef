@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool.aiagent;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Set;
@@ -160,7 +161,7 @@ public class AddAiAgentElementToolCallback implements ToolCallback {
                 Map.of("created", true, "id", element.getId(), "kind", element.getKind()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (IllegalArgumentException exception) {
+        } catch (ConfigurationException | IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(jsonMapper, AddAiAgentElementToolCallback.class, TOOL_NAME, exception);
