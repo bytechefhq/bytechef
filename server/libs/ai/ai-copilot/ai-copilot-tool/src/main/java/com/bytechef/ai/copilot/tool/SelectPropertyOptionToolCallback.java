@@ -41,7 +41,7 @@ import tools.jackson.core.JacksonException;
  * Spring AI {@link ToolCallback} that asks the chat client to render a searchable picker of an ACTION property's
  * dynamic options (e.g. Slack channels). Unlike {@link LookupActionPropertyOptionsToolCallback} (which returns the
  * options to the LLM), this returns a {@code select-property-option} marker carrying ALL fetched options so the client
- * renders them directly — the LLM never re-emits the list and cannot drop options. The picker submits the option's real
+ * renders them directly; the LLM never re-emits the list and cannot drop options. The picker submits the option's real
  * value (e.g. the channel id), not its label. Failures reuse the same envelopes as the lookup tool so the agent
  * self-corrects.
  *
@@ -57,12 +57,12 @@ public class SelectPropertyOptionToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Ask the user to PICK a value for a component ACTION property that has a dynamic option list (its descriptor
-        shows "lookupRequired": true) — e.g. a Slack channel. The client renders a searchable dropdown of ALL options
+        shows "lookupRequired": true), e.g. a Slack channel. The client renders a searchable dropdown of ALL options
         fetched from the connection; the user's pick (its real value/id) is captured as their next message. Satisfy any
         "lookupDependsOn" siblings via inputParameters and pass connectionId when required. Pass the canonical property
         name and actionName from the descriptor, never the human label. Use this instead of hand-building
         askUserQuestion for option properties. On a wrong name the tool returns action_not_found / property_not_found
-        with the valid names — retry with one of those.""";
+        with the valid names; retry with one of those.""";
 
     private static final String INPUT_SCHEMA = """
         {
@@ -176,7 +176,7 @@ public class SelectPropertyOptionToolCallback implements ToolCallback {
             return buildMarker(componentName, propertyName, options, success.truncated());
         } catch (JacksonException exception) {
             log.warn(
-                "selectPropertyOption rejected malformed tool input: {} — first 200 chars: {}",
+                "selectPropertyOption rejected malformed tool input: {} - first 200 chars: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 

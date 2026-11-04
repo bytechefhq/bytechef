@@ -182,7 +182,7 @@ public class LookupActionPropertyOptionsToolCallback implements ToolCallback {
                     componentName, "actionName", actionName, propertyName, options, success.truncated()));
         } catch (JacksonException exception) {
             log.warn(
-                "lookupActionPropertyOptions rejected malformed tool input: {} — first 200 chars: {}",
+                "lookupActionPropertyOptions rejected malformed tool input: {} - first 200 chars: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 

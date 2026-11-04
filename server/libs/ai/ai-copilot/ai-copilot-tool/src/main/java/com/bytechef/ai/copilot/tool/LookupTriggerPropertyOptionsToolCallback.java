@@ -179,7 +179,7 @@ public class LookupTriggerPropertyOptionsToolCallback implements ToolCallback {
                     componentName, "triggerName", triggerName, propertyName, options, success.truncated()));
         } catch (JacksonException exception) {
             log.warn(
-                "lookupTriggerPropertyOptions rejected malformed tool input: {} — first 200 chars: {}",
+                "lookupTriggerPropertyOptions rejected malformed tool input: {} - first 200 chars: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
