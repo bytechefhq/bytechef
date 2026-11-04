@@ -16,7 +16,7 @@ bytechef:
     # permit. Workflow task and trigger execution are bounded separately by bytechef.worker.task.*.
     concurrency-limit: 200
   cache:
-    # Cache provider (CAFFEINE | REDIS(EE)) default: CAFFEINE
+    # Cache provider (CAFFEINE) default: CAFFEINE
     provider: CAFFEINE
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job execution)
