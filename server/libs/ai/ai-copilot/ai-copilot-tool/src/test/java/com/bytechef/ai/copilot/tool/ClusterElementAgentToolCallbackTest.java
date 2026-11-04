@@ -90,7 +90,7 @@ class ClusterElementAgentToolCallbackTest {
 
         assertThat(result)
             .contains("error")
-            .containsIgnoringCase("invalid tool input");
+            .contains("Invalid input: not valid JSON");
     }
 
     @Test

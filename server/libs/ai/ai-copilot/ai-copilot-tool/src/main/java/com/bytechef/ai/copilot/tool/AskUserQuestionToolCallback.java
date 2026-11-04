@@ -253,7 +253,7 @@ public final class AskUserQuestionToolCallback implements ToolCallback {
         try {
             rootJsonNode = JsonUtils.readTree(toolInput);
         } catch (JacksonException exception) {
-            return "askUserQuestion input is not valid JSON: " + exception.getMessage();
+            return "askUserQuestion input is not valid JSON";
         }
 
         JsonNode questionsJsonNode = rootJsonNode.get("questions");

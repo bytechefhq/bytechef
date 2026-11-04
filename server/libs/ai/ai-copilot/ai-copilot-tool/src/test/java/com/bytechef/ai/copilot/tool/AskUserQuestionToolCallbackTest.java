@@ -133,6 +133,7 @@ class AskUserQuestionToolCallbackTest {
         JsonNode node = jsonMapper.readTree(result);
 
         assertThat(node.has("error")).isTrue();
+        assertThat(result).doesNotContain("not-json");
     }
 
     @Test

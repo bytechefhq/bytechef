@@ -22,6 +22,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.HashMap;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import tools.jackson.core.JacksonException;
@@ -107,5 +109,64 @@ class ToolErrorsTest {
         assertThat(node.size())
             .as("response must contain only the 'error' field")
             .isEqualTo(1);
+    }
+
+    @Test
+    void testInvalidInputDoesNotEchoTheParserTextForMalformedJson() {
+        JacksonException exception = readFailure("{\"connectionId\": \"secret-token", LookupInput.class);
+
+        assertThat(errorOf(ToolErrors.invalidInput(exception)))
+            .isEqualTo("Invalid input: not valid JSON");
+    }
+
+    @Test
+    void testInvalidInputNamesTheMismatchedField() {
+        JacksonException exception = readFailure(
+            "{\"connectionId\": \"secret-token\", \"items\": [1]}", LookupInput.class);
+
+        assertThat(errorOf(ToolErrors.invalidInput(exception)))
+            .isEqualTo("Invalid input: unexpected value for 'connectionId'");
+    }
+
+    @Test
+    void testInvalidInputNamesANestedIndexedField() {
+        JacksonException exception = readFailure("{\"items\": [1, \"secret-token\"]}", LookupInput.class);
+
+        assertThat(errorOf(ToolErrors.invalidInput(exception)))
+            .isEqualTo("Invalid input: unexpected value for 'items[1]'");
+    }
+
+    @Test
+    void testInvalidInputOmitsAFieldNameThatIsNotAPlainIdentifier() {
+        JacksonException exception = readFailure("{\"secret token\": \"x\"}", NumberMap.class);
+
+        assertThat(errorOf(ToolErrors.invalidInput(exception)))
+            .isEqualTo("Invalid input: does not match the input schema");
+    }
+
+    private JacksonException readFailure(String json, Class<?> type) {
+        try {
+            jsonMapper.readValue(json, type);
+        } catch (JacksonException exception) {
+            return exception;
+        }
+
+        throw new AssertionError("Expected " + json + " to fail");
+    }
+
+    private String errorOf(String result) {
+        JsonNode node = jsonMapper.readTree(result);
+
+        JsonNode errorNode = node.get("error");
+
+        return errorNode.asString();
+    }
+
+    record LookupInput(Long connectionId, List<Integer> items) {
+    }
+
+    static class NumberMap extends HashMap<String, Integer> {
+
+        private static final long serialVersionUID = 1L;
     }
 }

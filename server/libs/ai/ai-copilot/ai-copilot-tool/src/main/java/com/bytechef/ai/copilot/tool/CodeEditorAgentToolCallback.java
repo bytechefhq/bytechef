@@ -129,7 +129,7 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (ChatModelUnavailableException exception) {
             log.warn("writeScript cannot run its sub-agent: {}", exception.getMessage());
 

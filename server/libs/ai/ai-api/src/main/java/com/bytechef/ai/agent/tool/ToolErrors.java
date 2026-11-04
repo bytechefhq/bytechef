@@ -17,15 +17,23 @@
 package com.bytechef.ai.agent.tool;
 
 import com.bytechef.commons.util.JsonUtils;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.exc.StreamReadException;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
  */
 public final class ToolErrors {
+
+    private static final Pattern FIELD_NAME_PATTERN = Pattern.compile("[A-Za-z_][A-Za-z0-9_]{0,63}");
 
     private static final Logger log = LoggerFactory.getLogger(ToolErrors.class);
 
@@ -97,5 +105,58 @@ public final class ToolErrors {
         Class<? extends RuntimeException> exceptionClass = exception.getClass();
 
         return toolError(jsonMapper, toolName + " failed (" + exceptionClass.getSimpleName() + ")");
+    }
+
+    public static String invalidInput(JacksonException exception) {
+        return toolError(describeInvalidInput(exception));
+    }
+
+    private static String describeInvalidInput(JacksonException exception) {
+        if (exception instanceof StreamReadException) {
+            return "Invalid input: not valid JSON";
+        }
+
+        String fieldPath = toSafeFieldPath(exception.getPath());
+
+        if (fieldPath == null) {
+            return "Invalid input: does not match the input schema";
+        }
+
+        return "Invalid input: unexpected value for '" + fieldPath + "'";
+    }
+
+    @Nullable
+    private static String toSafeFieldPath(List<JacksonException.Reference> references) {
+        StringBuilder fieldPath = new StringBuilder();
+
+        for (JacksonException.Reference reference : references) {
+            String propertyName = reference.getPropertyName();
+
+            if (propertyName != null) {
+                Matcher matcher = FIELD_NAME_PATTERN.matcher(propertyName);
+
+                if (!matcher.matches()) {
+                    return null;
+                }
+
+                if (!fieldPath.isEmpty()) {
+                    fieldPath.append('.');
+                }
+
+                fieldPath.append(propertyName);
+            } else if (reference.getIndex() >= 0) {
+                fieldPath.append('[')
+                    .append(reference.getIndex())
+                    .append(']');
+            } else {
+                return null;
+            }
+        }
+
+        if (fieldPath.isEmpty()) {
+            return null;
+        }
+
+        return fieldPath.toString();
     }
 }
