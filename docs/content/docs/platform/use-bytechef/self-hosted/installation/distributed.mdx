@@ -141,7 +141,7 @@ Key properties served to all apps:
 |---|---|
 | `bytechef.edition` | `EE` |
 | `bytechef.message-broker.provider` | `REDIS` (or `AMQP`, `KAFKA`, `JMS`, `AWS`) |
-| `bytechef.cache.provider` | `CAFFEINE` |
+| `bytechef.cache.provider` | `CAFFEINE` - the distributed apps keep their caches in memory; with `REDIS` they log a warning and keep `CAFFEINE` |
 | `bytechef.discovery-service.provider` | `REDIS` - the only supported discovery backend |
 | `bytechef.data-storage.provider` / `bytechef.workflow.output-storage.provider` | `JDBC` |
 | `bytechef.scheduler.provider` | `QUARTZ` |

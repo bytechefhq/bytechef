@@ -106,15 +106,17 @@ Workers and webhook nodes do not use sessions, so they keep the session store di
 
 ## Cache invalidation
 
-Caffeine is the only cache provider, so every node keeps its own caches. In EE, evictions are broadcast to every other node over the message broker as a control message, and no setting is needed; webhook nodes take part like coordinators. CE runs one coordinator and does not broadcast evictions. A CE webhook node does not need them: production webhooks run published workflow versions, which never change, and the editor's webhook test runs on the coordinator.
+Every node keeps its caches in its own memory (Caffeine). The only exception is the shared state caches below, which EE keeps in Redis with `BYTECHEF_CACHE_PROVIDER=REDIS`. In EE, evictions are broadcast to every other node over the message broker as a control message, and no setting is needed; webhook nodes take part like coordinators. CE runs one coordinator and does not broadcast evictions. A CE webhook node does not need them: production webhooks run published workflow versions, which never change, and the editor's webhook test runs on the coordinator.
 
 The broadcast needs a broker whose control routes reach every node: `AMQP`, `REDIS`, `KAFKA` (a consumer group per node), `JMS` (a topic), or `AWS` with `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=REDIS`. With `AWS` and the default `SQS` control provider, a control message reaches one node only, so cache invalidation stays off and every node keeps its caches for up to 10 minutes. The in-memory broker has a single node and needs no invalidation.
 
 ### Shared state caches
 
-A few caches hold state instead of copies of stored data: the editor's webhook test (whether a test webhook is enabled and the output of its registration), the values that Data Storage keeps during editor test runs, and the public keys of embedded JWTs. In EE, when the message broker is not the in-memory one and a Redis connection is configured (`BYTECHEF_SESSION_STORE=REDIS`, the `REDIS` broker, or `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=REDIS`), these caches live in Redis under the key prefix `bytechef:cache:` with a 10-minute TTL, so every coordinator sees the same entries. All other caches stay in each node's memory. With the in-memory broker, or the `AWS` broker with the default `SQS` control provider, these caches stay in memory even when Redis is configured, the same as cache invalidation; both setups are meant for a single node.
+A few caches hold state instead of copies of stored data: the editor's webhook test (whether a test webhook is enabled and the output of its registration), the values that Data Storage keeps during editor test runs, the jobs that generate API connectors, and the public keys of embedded JWTs. In EE, `BYTECHEF_CACHE_PROVIDER=REDIS` keeps these caches in Redis under the key prefix `bytechef:cache:` with a 10-minute TTL, so every node sees the same entries, whatever the node role, message broker or session store. All other caches stay in each node's memory. The setting turns the Redis connection on by itself; configure it with `BYTECHEF_REDIS_HOST` and `BYTECHEF_REDIS_PORT`. A node fails at startup when Redis cannot be reached, and a CE node with `REDIS` logs a warning at startup and keeps these caches in memory.
 
-Without Redis, these caches stay in each node's memory too. With more than one EE coordinator, the editor's webhook test and the embedded JWT checks can then fail, and an editor test run can miss Data Storage values, when a request lands on a different coordinator than the one that stored the state, so configure Redis when you run more than one coordinator.
+With the default `CAFFEINE`, these caches stay in each node's memory, even when Redis is configured for the message broker or the session store; EE then logs a warning at startup. With more than one EE coordinator, the editor's webhook test and the embedded JWT checks can then fail, and an editor test run can miss Data Storage values, when a request lands on a different coordinator than the one that stored the state, so set `BYTECHEF_CACHE_PROVIDER=REDIS` when you run more than one coordinator.
+
+Upgrading from a version before this setting: an EE cluster that kept these caches in Redis because it used the `REDIS` broker, `BYTECHEF_SESSION_STORE=REDIS` or `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=REDIS` must now set `BYTECHEF_CACHE_PROVIDER=REDIS`.
 
 ## Database migrations
 
@@ -137,7 +139,7 @@ docker compose -f docker-compose.cluster.yml up -d
 BYTECHEF_WEBHOOKS=2 docker compose -f docker-compose.cluster.yml up -d
 
 # EE high availability: 2 coordinators
-BYTECHEF_EDITION=EE BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.cluster.yml up -d
+BYTECHEF_EDITION=EE BYTECHEF_CACHE_PROVIDER=REDIS BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.cluster.yml up -d
 
 # Webhooks only on 2 webhook nodes, no coordinator fallback
 BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker-compose.cluster.yml up -d
