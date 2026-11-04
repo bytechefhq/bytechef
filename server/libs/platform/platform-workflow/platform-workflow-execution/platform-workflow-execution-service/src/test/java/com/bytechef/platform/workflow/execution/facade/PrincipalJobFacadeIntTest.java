@@ -109,6 +109,40 @@ class PrincipalJobFacadeIntTest {
     }
 
     @Test
+    void testCreateJobCommitsThePrincipalLinkBeforeTheJobStarts() {
+        long jobId = principalJobFacade.createJob(newJobParameters(), PRINCIPAL_ID, PlatformType.AUTOMATION);
+
+        assertThat(principalJobService.fetchJobPrincipalId(jobId, PlatformType.AUTOMATION)).contains(PRINCIPAL_ID);
+        assertThat(startedJobPrincipalRecorder.principalIdsAtStart()).containsExactly(
+            Map.entry(jobId, Optional.of(PRINCIPAL_ID)));
+    }
+
+    @Test
+    void testCreateChildJobCommitsTheParentPrincipalLinkBeforeTheJobStarts() {
+        long parentJobId = createReferenceJob(PRINCIPAL_ID);
+
+        long childJobId = principalJobFacade.createChildJob(
+            parentJobId, newJobParameters(), PlatformType.AUTOMATION);
+
+        assertThat(principalJobService.fetchJobPrincipalId(childJobId, PlatformType.AUTOMATION))
+            .contains(PRINCIPAL_ID);
+        assertThat(startedJobPrincipalRecorder.principalIdsAtStart()).containsExactly(
+            Map.entry(childJobId, Optional.of(PRINCIPAL_ID)));
+    }
+
+    @Test
+    void testCreateChildJobStartsWithoutPrincipalWhenTheParentHasNone() {
+        long parentJobId = createJob();
+
+        long childJobId = principalJobFacade.createChildJob(
+            parentJobId, newJobParameters(), PlatformType.AUTOMATION);
+
+        assertThat(principalJobService.fetchJobPrincipalId(childJobId, PlatformType.AUTOMATION)).isEmpty();
+        assertThat(startedJobPrincipalRecorder.principalIdsAtStart()).containsExactly(
+            Map.entry(childJobId, Optional.empty()));
+    }
+
+    @Test
     void testCreatePrincipalLinkedJobCommitsThePrincipalLinkBeforeTheJobStarts() {
         long referenceJobId = createReferenceJob(PRINCIPAL_ID);
 
