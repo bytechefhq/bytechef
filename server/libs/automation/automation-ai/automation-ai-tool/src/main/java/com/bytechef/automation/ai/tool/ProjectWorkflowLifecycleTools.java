@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.automation.ai.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
+import com.bytechef.automation.ai.tool.model.WorkflowSaveInfo;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
@@ -30,11 +31,6 @@ import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 /**
- * Project workflow tools for surfaces that delegate workflow content to the {@code buildWorkflow} intelligent tool:
- * reads, lifecycle writes, and an empty-only create. Nothing here writes a workflow definition, so
- * {@code buildWorkflow} stays the only path to workflow content. Delegates to {@link ProjectWorkflowTools}, which the
- * workflow-authoring subagents register whole.
- *
  * @author Ivica Cardic
  */
 @Component
@@ -91,6 +87,21 @@ public class ProjectWorkflowLifecycleTools {
         return delegate.createProjectWorkflow(projectId, emptyDefinition(name, description), toolContext);
     }
 
+    @Tool(
+        description = "Replace the whole workflow definition. Base it on the version returned by getWorkflow or the previous updateWorkflow call; if the workflow changed since then the update is rejected and it must be re-read with getWorkflow. The definition is validated first: if it has errors, nothing is saved and the errors are listed, so fix them and call this again with the same version. Warnings, such as a missing connection, are returned after a successful save along with the workflow id, name and new version.")
+    public WorkflowSaveInfo updateWorkflow(
+        @ToolParam(description = "The ID of the workflow to update") String workflowId,
+        @ToolParam(
+            description = "The new definition of the workflow. Needs to be in JSON format similar to " +
+                ProjectWorkflowTools.DEFAULT_DEFINITION) String definition,
+        @ToolParam(
+            description = "The version of the workflow, as returned by the getWorkflow call this definition is " +
+                "based on") int version,
+        ToolContext toolContext) {
+
+        return delegate.updateWorkflow(workflowId, definition, version, toolContext);
+    }
+
     @Tool(description = "Delete a workflow. Returns a confirmation message.")
     public String deleteWorkflow(
         @ToolParam(description = "The ID of the workflow to delete") String workflowId,
@@ -100,13 +111,23 @@ public class ProjectWorkflowLifecycleTools {
     }
 
     @Tool(
-        description = "Bind a connection the user picked to a workflow node so the workflow can be test-run. Call this AFTER the workflow exists AND after the user picks an existing connection (selectConnection) or creates one (createConnection). The chosen connection instance is stored separately, per environment, by this tool. The connection is bound for the environment the user is currently working in. Returns a confirmation message.")
+        description = "Bind a connection the user picked to a workflow node so the workflow can be test-run. Call this "
+            +
+            "AFTER the workflow exists (createProjectWorkflow or updateWorkflow) AND after choosing a connection: "
+            +
+            "listConnections lists the connections of the workflow's workspace and environment; the user creates new "
+            +
+            "ones in the ByteChef UI. NEVER put a connectionId or id inside " +
+            "the workflow definition JSON: the definition's 'connections' block only declares the required component " +
+            "(componentName/componentVersion). The chosen connection instance is stored separately, per environment, " +
+            "by this tool. The connection is bound in the environment of this call. Returns a " +
+            "confirmation message.")
     public String saveWorkflowTestConnection(
         @ToolParam(description = "The id of the workflow the node belongs to") String workflowId,
         @ToolParam(
-            description = "The workflow node (task or trigger) name the connection is for, e.g. 'sendChannelMessage_1'") String workflowNodeName,
+            description = "The workflow node the connection is for: a task or trigger name, e.g. 'sendChannelMessage_1', or the name of a cluster element inside it, e.g. an AI Agent's model 'model_1'") String workflowNodeName,
         @ToolParam(
-            description = "The connection key declared in the node's 'connections' block — usually the component name, e.g. 'slack'") String connectionKey,
+            description = "The connection key declared in the node's 'connections' block, usually the component name, e.g. 'slack'. Ignored for a cluster element, whose own name is its key") String connectionKey,
         @ToolParam(description = "The id of the connection the user picked") long connectionId,
         ToolContext toolContext) {
 

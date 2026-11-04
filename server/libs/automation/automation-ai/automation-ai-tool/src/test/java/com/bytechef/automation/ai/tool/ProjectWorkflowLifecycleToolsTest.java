@@ -20,7 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.tool.model.WorkflowSaveInfo;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Arrays;
@@ -42,7 +44,7 @@ import org.springframework.ai.tool.ToolCallback;
 class ProjectWorkflowLifecycleToolsTest {
 
     @Test
-    void testExposesNoToolThatWritesAWorkflowDefinition() {
+    void testExposesNoToolThatCreatesAWorkflowWithADefinition() {
         ToolCallback[] toolCallbacks = ToolCallbacks.from(new ProjectWorkflowLifecycleTools(
             mock(ProjectWorkflowTools.class)));
 
@@ -53,7 +55,7 @@ class ProjectWorkflowLifecycleToolsTest {
 
         assertThat(toolNames).containsExactlyInAnyOrder(
             "getWorkflow", "listWorkflows", "searchWorkflows", "createProjectWorkflow", "deleteWorkflow",
-            "saveWorkflowTestConnection");
+            "updateWorkflow", "saveWorkflowTestConnection");
 
         String createInputSchema = Arrays.stream(toolCallbacks)
             .filter(toolCallback -> "createProjectWorkflow".equals(toolCallback.getToolDefinition()
@@ -124,5 +126,35 @@ class ProjectWorkflowLifecycleToolsTest {
         assertThat((List<Map<String, Object>>) definition.get("triggers"))
             .singleElement()
             .satisfies(trigger -> assertThat(trigger).containsEntry("type", "manual/v1/manual"));
+    }
+
+    @Test
+    void testUpdateWorkflowDelegates() {
+        ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
+        ToolContext toolContext = new ToolContext(Map.of());
+        WorkflowSaveInfo workflowSaveInfo = new WorkflowSaveInfo("wf", 5L, "name", 3, List.of());
+
+        when(projectWorkflowTools.updateWorkflow("wf", "{}", 2, toolContext)).thenReturn(workflowSaveInfo);
+
+        WorkflowSaveInfo result = new ProjectWorkflowLifecycleTools(projectWorkflowTools)
+            .updateWorkflow("wf", "{}", 2, toolContext);
+
+        assertThat(result).isSameAs(workflowSaveInfo);
+
+        verify(projectWorkflowTools).updateWorkflow("wf", "{}", 2, toolContext);
+    }
+
+    @Test
+    void testToolNamesIncludeUpdateWorkflowOnce() {
+        ToolCallback[] toolCallbacks = ToolCallbacks.from(new ProjectWorkflowLifecycleTools(
+            mock(ProjectWorkflowTools.class)));
+
+        List<String> toolNames = Arrays.stream(toolCallbacks)
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .toList();
+
+        assertThat(toolNames).filteredOn("updateWorkflow"::equals)
+            .hasSize(1);
     }
 }
