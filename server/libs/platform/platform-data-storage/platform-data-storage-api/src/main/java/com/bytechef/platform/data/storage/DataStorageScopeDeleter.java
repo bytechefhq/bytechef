@@ -22,8 +22,11 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Ivica Cardic
@@ -35,17 +38,23 @@ public final class DataStorageScopeDeleter {
     private DataStorageScopeDeleter() {
     }
 
-    public static void deleteAfterCommit(@Nullable DataStorage dataStorage, List<ScopeData> scopeDataList) {
+    public static void deleteAfterCommit(
+        @Nullable DataStorage dataStorage, PlatformTransactionManager transactionManager,
+        List<ScopeData> scopeDataList) {
+
         if (dataStorage == null || scopeDataList.isEmpty()) {
             return;
         }
 
         List<ScopeData> scopeDataListCopy = List.copyOf(scopeDataList);
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
         if (!TransactionSynchronizationManager.isSynchronizationActive() ||
             !TransactionSynchronizationManager.isActualTransactionActive()) {
 
-            delete(dataStorage, scopeDataListCopy);
+            delete(dataStorage, transactionTemplate, scopeDataListCopy);
 
             return;
         }
@@ -54,15 +63,18 @@ public final class DataStorageScopeDeleter {
 
             @Override
             public void afterCommit() {
-                delete(dataStorage, scopeDataListCopy);
+                delete(dataStorage, transactionTemplate, scopeDataListCopy);
             }
         });
     }
 
-    private static void delete(DataStorage dataStorage, List<ScopeData> scopeDataList) {
+    private static void delete(
+        DataStorage dataStorage, TransactionTemplate transactionTemplate, List<ScopeData> scopeDataList) {
+
         for (ScopeData scopeData : scopeDataList) {
             try {
-                dataStorage.deleteScopeData(scopeData.scope(), scopeData.scopeId(), scopeData.type());
+                transactionTemplate.executeWithoutResult(transactionStatus -> dataStorage.deleteScopeData(
+                    scopeData.scope(), scopeData.scopeId(), scopeData.type()));
             } catch (UnsupportedOperationException exception) {
                 log.debug(
                     "Scope-wide Data Storage delete is unsupported by this provider; skipping {}", scopeData);

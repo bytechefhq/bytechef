@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Ivica Cardic
@@ -38,14 +39,17 @@ public class DataStorageProjectDeploymentDeleteEventListener implements ProjectD
 
     private final ObjectProvider<DataStorage> dataStorageProvider;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final PlatformTransactionManager transactionManager;
 
     @SuppressFBWarnings("EI")
     public DataStorageProjectDeploymentDeleteEventListener(
         ObjectProvider<DataStorage> dataStorageProvider,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        PlatformTransactionManager transactionManager) {
 
         this.dataStorageProvider = dataStorageProvider;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.transactionManager = transactionManager;
     }
 
     @Override
@@ -64,6 +68,7 @@ public class DataStorageProjectDeploymentDeleteEventListener implements ProjectD
                     PlatformType.AUTOMATION));
         }
 
-        DataStorageScopeDeleter.deleteAfterCommit(dataStorageProvider.getIfAvailable(), scopeDataList);
+        DataStorageScopeDeleter.deleteAfterCommit(
+            dataStorageProvider.getIfAvailable(), transactionManager, scopeDataList);
     }
 }

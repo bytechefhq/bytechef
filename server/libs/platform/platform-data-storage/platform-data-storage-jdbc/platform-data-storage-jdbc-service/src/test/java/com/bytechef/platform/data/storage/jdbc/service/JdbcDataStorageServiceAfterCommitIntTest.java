@@ -79,11 +79,28 @@ class JdbcDataStorageServiceAfterCommitIntTest {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
         transactionTemplate.executeWithoutResult(transactionStatus -> DataStorageScopeDeleter.deleteAfterCommit(
-            dataStorage,
+            dataStorage, transactionManager,
             List.of(
                 new ScopeData(DataStorageScope.PRINCIPAL, "5", PlatformType.AUTOMATION),
                 new ScopeData(DataStorageScope.WORKFLOW, "6", PlatformType.AUTOMATION))));
 
         assertThat(dataStorageRepository.count()).isZero();
+    }
+
+    @Test
+    void testDeleteScopeDataInARolledBackTransactionKeepsTheValues() {
+        dataStorage.put(
+            COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION, "7", "key", "value", ENVIRONMENT_ID,
+            PlatformType.AUTOMATION);
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        transactionTemplate.executeWithoutResult(transactionStatus -> {
+            dataStorage.deleteScopeData(DataStorageScope.CURRENT_EXECUTION, "7", PlatformType.AUTOMATION);
+
+            transactionStatus.setRollbackOnly();
+        });
+
+        assertThat(dataStorageRepository.count()).isEqualTo(1);
     }
 }
