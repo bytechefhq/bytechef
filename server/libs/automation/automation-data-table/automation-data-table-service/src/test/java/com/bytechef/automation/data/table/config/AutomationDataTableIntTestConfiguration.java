@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -51,6 +52,11 @@ public class AutomationDataTableIntTestConfiguration {
     @Bean
     JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry() {
         return mock(JobPrincipalAccessorRegistry.class);
+    }
+
+    @Bean
+    WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade() {
+        return mock(WorkflowNodeTestOutputFacade.class);
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

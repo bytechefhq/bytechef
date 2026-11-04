@@ -21,6 +21,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentTy
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
+import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
@@ -34,6 +35,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,18 +48,24 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Turns each row of a {@link DataTableWebhookEvent} into one {@link TriggerWebhookEvent} per registration of that
  * table, environment and type. It runs inside the write's transaction, and {@code MessageEventListener} sends the
  * events after commit. Registrations of disabled workflows are skipped. Registrations and workflow states are read in
- * nested transactions, so a failed read rolls back to a savepoint and leaves the write's transaction usable.
+ * nested transactions, so a failed read rolls back to a savepoint and leaves the write's transaction usable. A
+ * registration made by the workflow editor's trigger test saves each row as the trigger's test output after commit,
+ * instead of running the workflow.
  */
 @Component
 public class DataTableWebhookEventListener {
 
     public static final String WORKFLOW_EXECUTION_ID_HEADER = "X-ByteChef-Workflow-Execution-Id";
+
+    private static final long EDITOR_TEST_JOB_PRINCIPAL_ID = -1;
 
     private static final Logger log = LoggerFactory.getLogger(DataTableWebhookEventListener.class);
 
@@ -65,20 +73,28 @@ public class DataTableWebhookEventListener {
     private final DataTableWebhookService dataTableWebhookService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TransactionTemplate lookupTransactionTemplate;
+    private final TransactionTemplate testOutputTransactionTemplate;
+    private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
     @SuppressFBWarnings("EI")
     public DataTableWebhookEventListener(
         DataTableWebhookService dataTableWebhookService, ApplicationEventPublisher applicationEventPublisher,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        PlatformTransactionManager platformTransactionManager) {
+        PlatformTransactionManager platformTransactionManager,
+        WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
 
         this.applicationEventPublisher = applicationEventPublisher;
         this.dataTableWebhookService = dataTableWebhookService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
 
         lookupTransactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         lookupTransactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_NESTED);
+
+        testOutputTransactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        testOutputTransactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @EventListener
@@ -109,6 +125,12 @@ public class DataTableWebhookEventListener {
                 log.error(
                     "Data table webhook {} registration '{}' could not be parsed; {} rows were not sent",
                     hook.id(), hook.workflowExecutionId(), rows.size(), runtimeException);
+
+                continue;
+            }
+
+            if (workflowExecutionId.getJobPrincipalId() == EDITOR_TEST_JOB_PRINCIPAL_ID) {
+                saveTestOutputs(hook, workflowExecutionId, environmentId, type, baseName, rows);
 
                 continue;
             }
@@ -152,6 +174,42 @@ public class DataTableWebhookEventListener {
         }
 
         return false;
+    }
+
+    private void saveTestOutputs(
+        DataTableWebhookService.Webhook hook, WorkflowExecutionId workflowExecutionId, long environmentId,
+        DataTableWebhookType type, String baseName, List<DataTableRow> rows) {
+
+        List<WebhookRequest> webhookRequests = new ArrayList<>();
+
+        for (DataTableRow row : rows) {
+            webhookRequests.add(createWebhookRequest(hook.workflowExecutionId(), createBody(type, baseName, row)));
+        }
+
+        Runnable saveRunnable = () -> {
+            for (WebhookRequest webhookRequest : webhookRequests) {
+                try {
+                    testOutputTransactionTemplate.executeWithoutResult(
+                        status -> workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
+                            workflowExecutionId, environmentId, webhookRequest.asValidated()));
+                } catch (RuntimeException runtimeException) {
+                    log.error(
+                        "Data table webhook {} test output could not be saved", hook.id(), runtimeException);
+                }
+            }
+        };
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+                @Override
+                public void afterCommit() {
+                    saveRunnable.run();
+                }
+            });
+        } else {
+            saveRunnable.run();
+        }
     }
 
     private List<DataTableWebhookService.Webhook> listWebhooks(

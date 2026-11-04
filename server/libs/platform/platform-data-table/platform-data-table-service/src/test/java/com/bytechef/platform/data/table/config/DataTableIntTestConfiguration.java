@@ -23,6 +23,7 @@ import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.message.event.MessageEventPreSendProcessor;
 import com.bytechef.message.event.listener.MessageEventListener;
+import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -95,6 +96,11 @@ public class DataTableIntTestConfiguration {
     @Bean
     AsyncTaskExecutor taskExecutor() {
         return new SimpleAsyncTaskExecutor("task-");
+    }
+
+    @Bean
+    WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade() {
+        return mock(WorkflowNodeTestOutputFacade.class);
     }
 
     @Bean
