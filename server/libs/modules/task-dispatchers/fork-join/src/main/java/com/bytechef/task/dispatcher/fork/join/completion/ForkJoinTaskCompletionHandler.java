@@ -31,10 +31,11 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskExecutionLockedUpdates;
+import com.bytechef.atlas.file.storage.TaskExecutionLockedUpdatesImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
-import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -60,20 +61,33 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
     private final ContextService contextService;
     private final CounterService counterService;
     private final Evaluator evaluator;
+    private final TaskExecutionLockedUpdates taskExecutionLockedUpdates;
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskFileStorage taskFileStorage;
 
-    @SuppressFBWarnings("EI")
     public ForkJoinTaskCompletionHandler(
         ContextService contextService, CounterService counterService, Evaluator evaluator,
         TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskFileStorage taskFileStorage) {
 
+        this(
+            contextService, counterService, evaluator, taskExecutionService, taskCompletionHandler, taskDispatcher,
+            taskFileStorage, new TaskExecutionLockedUpdatesImpl(taskExecutionService, taskFileStorage));
+    }
+
+    @SuppressFBWarnings("EI")
+    public ForkJoinTaskCompletionHandler(
+        ContextService contextService, CounterService counterService, Evaluator evaluator,
+        TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher<? super Task> taskDispatcher, TaskFileStorage taskFileStorage,
+        TaskExecutionLockedUpdates taskExecutionLockedUpdates) {
+
         this.contextService = contextService;
         this.counterService = counterService;
         this.evaluator = evaluator;
+        this.taskExecutionLockedUpdates = taskExecutionLockedUpdates;
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
@@ -171,42 +185,17 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 ? null
                 : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
 
-            taskExecutionService.update(
-                taskExecutionParentId,
-                lockedForkJoinTaskExecution -> putBranchOutput(lockedForkJoinTaskExecution, branch, branchValue));
+            taskExecutionLockedUpdates.putOutputEntry(
+                taskExecutionParentId, ForkJoinTaskDispatcherConstants.BRANCH_OUTPUT_KEY_PREFIX + branch, branchValue);
 
             long branchesLeft = counterService.decrement(taskExecutionParentId);
 
             if (branchesLeft == 0) {
-                TaskExecution completedForkJoinTaskExecution = taskExecutionService.update(
-                    taskExecutionParentId,
-                    lockedForkJoinTaskExecution -> lockedForkJoinTaskExecution.setEndDate(Instant.now()));
+                TaskExecution completedForkJoinTaskExecution = taskExecutionLockedUpdates.setEndDate(
+                    taskExecutionParentId, Instant.now());
 
                 taskCompletionHandler.handle(completedForkJoinTaskExecution);
             }
         }
-    }
-
-    private void putBranchOutput(TaskExecution forkJoinTaskExecution, int branch, Object branchValue) {
-        long jobId = Objects.requireNonNull(forkJoinTaskExecution.getJobId());
-        long forkJoinTaskExecutionId = Objects.requireNonNull(forkJoinTaskExecution.getId());
-
-        Map<String, Object> branchOutputs;
-
-        if (forkJoinTaskExecution.getOutput() != null) {
-            branchOutputs = new HashMap<>(readBranchOutputs(forkJoinTaskExecution.getOutput()));
-        } else {
-            branchOutputs = new HashMap<>();
-        }
-
-        branchOutputs.put(ForkJoinTaskDispatcherConstants.BRANCH_OUTPUT_KEY_PREFIX + branch, branchValue);
-
-        forkJoinTaskExecution.setOutput(
-            taskFileStorage.storeTaskExecutionOutput(jobId, forkJoinTaskExecutionId, branchOutputs));
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> readBranchOutputs(FileEntry fileEntry) {
-        return (Map<String, Object>) taskFileStorage.readTaskExecutionOutput(fileEntry);
     }
 }
