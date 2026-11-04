@@ -84,7 +84,7 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
                 return ToolErrors.toolError("mcpServerId is required");
             }
 
-            return JsonUtils.write(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(mcpServerId));
+            return writeResult(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(mcpServerId));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException exception) {
@@ -95,5 +95,13 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
     }
 
     public record ListMcpProjectWorkflowsInput(@Nullable Long mcpServerId) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(ListMcpProjectWorkflowsToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

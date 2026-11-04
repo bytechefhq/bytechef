@@ -157,7 +157,7 @@ public class AddKnowledgeBaseDocumentToolCallback implements ToolCallback {
                 knowledgeBaseId, input.name(), input.mimeType(), contentBytes.length,
                 new ByteArrayInputStream(contentBytes));
 
-            return JsonUtils.write(
+            return writeResult(
                 new AddKnowledgeBaseDocumentOutput(true, document.getId()
                     .toString(), document.getName()));
         } catch (JacksonException exception) {
@@ -192,5 +192,13 @@ public class AddKnowledgeBaseDocumentToolCallback implements ToolCallback {
     }
 
     public record AddKnowledgeBaseDocumentOutput(boolean added, String documentId, String name) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(AddKnowledgeBaseDocumentToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

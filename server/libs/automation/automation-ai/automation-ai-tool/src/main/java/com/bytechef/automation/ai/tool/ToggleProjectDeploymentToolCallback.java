@@ -105,7 +105,7 @@ public class ToggleProjectDeploymentToolCallback implements ToolCallback {
                 return toolError("Project deployment " + projectDeploymentId + " not found");
             }
 
-            return JsonUtils.write(
+            return writeResult(
                 new ToggleProjectDeploymentOutput(projectDeploymentId, input.enabled()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
@@ -124,5 +124,13 @@ public class ToggleProjectDeploymentToolCallback implements ToolCallback {
     }
 
     public record ToggleProjectDeploymentOutput(long projectDeploymentId, boolean enabled) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(ToggleProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

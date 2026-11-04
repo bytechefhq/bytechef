@@ -120,7 +120,7 @@ public class UpdateMcpProjectWorkflowParametersToolCallback implements ToolCallb
 
             Map<String, ?> updatedParameters = updatedMcpProjectWorkflow.getParameters();
 
-            return JsonUtils.write(
+            return writeResult(
                 new UpdateMcpProjectWorkflowParametersOutput(
                     updatedMcpProjectWorkflow.getId(),
                     MapUtils.getString(updatedParameters, ToolConstants.TOOL_NAME),
@@ -149,5 +149,14 @@ public class UpdateMcpProjectWorkflowParametersToolCallback implements ToolCallb
     public record UpdateMcpProjectWorkflowParametersOutput(
         Long mcpProjectWorkflowId, @Nullable String toolName, @Nullable String toolDescription,
         Map<String, ?> parameters) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(UpdateMcpProjectWorkflowParametersToolCallback.class, TOOL_NAME,
+                exception);
+        }
     }
 }

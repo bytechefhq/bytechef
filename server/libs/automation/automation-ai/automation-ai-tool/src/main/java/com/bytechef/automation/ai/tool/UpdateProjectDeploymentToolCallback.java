@@ -145,7 +145,7 @@ public class UpdateProjectDeploymentToolCallback implements ToolCallback {
                         + " could not be updated — one of its workflows no longer exists");
             }
 
-            return JsonUtils.write(
+            return writeResult(
                 new UpdateProjectDeploymentOutput(projectDeploymentId, updated.name(), updated.description()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
@@ -166,5 +166,13 @@ public class UpdateProjectDeploymentToolCallback implements ToolCallback {
 
     public record UpdateProjectDeploymentOutput(
         long projectDeploymentId, String name, @Nullable String description) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(UpdateProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }
