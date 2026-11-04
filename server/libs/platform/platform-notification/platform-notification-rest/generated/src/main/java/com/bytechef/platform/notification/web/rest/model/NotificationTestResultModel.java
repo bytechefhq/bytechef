@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -22,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NotificationTestResult", description = "The outcome of a test send of a notification.")
 @JsonTypeName("NotificationTestResult")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:06:18.157671+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:06:55.152675+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class NotificationTestResultModel {
 
   private Boolean success;
@@ -34,6 +35,43 @@ public class NotificationTestResultModel {
   private @Nullable String error;
 
   private Boolean signed;
+
+  /**
+   * Why a webhook test message was sent without a signature: NO_SECRET when the notification has no signing secret yet, URL_CHANGED when the URL differs from the saved one
+   */
+  public enum UnsignedReasonEnum {
+    NO_SECRET("NO_SECRET"),
+    
+    URL_CHANGED("URL_CHANGED");
+
+    private final String value;
+
+    UnsignedReasonEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static UnsignedReasonEnum fromValue(String value) {
+      for (UnsignedReasonEnum b : UnsignedReasonEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable UnsignedReasonEnum unsignedReason;
 
   public NotificationTestResultModel() {
     super();
@@ -152,6 +190,27 @@ public class NotificationTestResultModel {
     this.signed = signed;
   }
 
+  public NotificationTestResultModel unsignedReason(@Nullable UnsignedReasonEnum unsignedReason) {
+    this.unsignedReason = unsignedReason;
+    return this;
+  }
+
+  /**
+   * Why a webhook test message was sent without a signature: NO_SECRET when the notification has no signing secret yet, URL_CHANGED when the URL differs from the saved one
+   * @return unsignedReason
+   */
+  
+  @Schema(name = "unsignedReason", description = "Why a webhook test message was sent without a signature: NO_SECRET when the notification has no signing secret yet, URL_CHANGED when the URL differs from the saved one", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("unsignedReason")
+  public @Nullable UnsignedReasonEnum getUnsignedReason() {
+    return unsignedReason;
+  }
+
+  @JsonProperty("unsignedReason")
+  public void setUnsignedReason(@Nullable UnsignedReasonEnum unsignedReason) {
+    this.unsignedReason = unsignedReason;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -165,12 +224,13 @@ public class NotificationTestResultModel {
         Objects.equals(this.statusCode, notificationTestResult.statusCode) &&
         Objects.equals(this.responseBody, notificationTestResult.responseBody) &&
         Objects.equals(this.error, notificationTestResult.error) &&
-        Objects.equals(this.signed, notificationTestResult.signed);
+        Objects.equals(this.signed, notificationTestResult.signed) &&
+        Objects.equals(this.unsignedReason, notificationTestResult.unsignedReason);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(success, statusCode, responseBody, error, signed);
+    return Objects.hash(success, statusCode, responseBody, error, signed, unsignedReason);
   }
 
   @Override
@@ -182,6 +242,7 @@ public class NotificationTestResultModel {
     sb.append("    responseBody: ").append(toIndentedString(responseBody)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("    signed: ").append(toIndentedString(signed)).append("\n");
+    sb.append("    unsignedReason: ").append(toIndentedString(unsignedReason)).append("\n");
     sb.append("}");
     return sb.toString();
   }

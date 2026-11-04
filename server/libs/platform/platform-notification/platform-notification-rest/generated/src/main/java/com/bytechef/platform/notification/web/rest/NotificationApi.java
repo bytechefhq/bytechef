@@ -8,6 +8,7 @@ package com.bytechef.platform.notification.web.rest;
 import com.bytechef.platform.notification.web.rest.model.NotificationModel;
 import com.bytechef.platform.notification.web.rest.model.NotificationSigningSecretModel;
 import com.bytechef.platform.notification.web.rest.model.NotificationTestResultModel;
+import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:06:18.157671+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:06:55.152675+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "notification", description = "The Platform Notification Internal API")
 public interface NotificationApi {
@@ -202,6 +203,7 @@ public interface NotificationApi {
      * Sends a sample JOB_FAILED notification to the configured destination without saving anything. Masked values are resolved against the stored notification when an id is given.
      *
      * @param notificationModel  (required)
+     * @param notificationId The id of the saved notification whose masked values and signing secret the test uses. Omit it for a notification that is not saved yet. (optional)
      * @return The outcome of the test send. (status code 200)
      */
     @Operation(
@@ -222,12 +224,13 @@ public interface NotificationApi {
         consumes = { "application/json" }
     )
     default ResponseEntity<NotificationTestResultModel> testNotification(
-        @Parameter(name = "NotificationModel", description = "", required = true) @Valid @RequestBody NotificationModel notificationModel
+        @Parameter(name = "NotificationModel", description = "", required = true) @Valid @RequestBody NotificationModel notificationModel,
+        @Parameter(name = "notificationId", description = "The id of the saved notification whose masked values and signing secret the test uses. Omit it for a notification that is not saved yet.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "notificationId", required = false) @Nullable Long notificationId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"success\" : true, \"statusCode\" : 0, \"responseBody\" : \"responseBody\", \"error\" : \"error\", \"signed\" : true }";
+                    String exampleString = "{ \"success\" : true, \"statusCode\" : 0, \"responseBody\" : \"responseBody\", \"error\" : \"error\", \"signed\" : true, \"unsignedReason\" : \"NO_SECRET\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
