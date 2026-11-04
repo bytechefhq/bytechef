@@ -124,7 +124,7 @@ public class CreateMcpProjectToolCallback implements ToolCallback {
             McpProject created = mcpProjectFacade.createMcpProject(
                 mcpServerId, projectId, input.projectVersion(), input.workflowIds());
 
-            return JsonUtils.write(
+            return writeResult(
                 new CreateMcpProjectOutput(
                     created.getId(), created.getProjectDeploymentId(), created.getMcpServerId(),
                     input.workflowIds()
@@ -153,5 +153,13 @@ public class CreateMcpProjectToolCallback implements ToolCallback {
 
     public record CreateMcpProjectOutput(
         long mcpProjectId, long projectDeploymentId, long mcpServerId, int exposedWorkflowCount) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(CreateMcpProjectToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

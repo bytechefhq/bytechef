@@ -107,7 +107,7 @@ public class CreateKnowledgeBaseToolCallback implements ToolCallback {
             KnowledgeBase createdKnowledgeBase = workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(
                 knowledgeBase, workspaceId, resolveEnvironmentId(invocationContext));
 
-            return JsonUtils.write(
+            return writeResult(
                 new CreateKnowledgeBaseOutput(
                     String.valueOf(createdKnowledgeBase.getId()), createdKnowledgeBase.getName()));
         } catch (JacksonException exception) {
@@ -131,5 +131,13 @@ public class CreateKnowledgeBaseToolCallback implements ToolCallback {
     }
 
     public record CreateKnowledgeBaseOutput(String knowledgeBaseId, String name) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(CreateKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }
