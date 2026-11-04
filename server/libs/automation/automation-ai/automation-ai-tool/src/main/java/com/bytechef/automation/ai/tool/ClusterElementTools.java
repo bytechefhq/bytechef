@@ -24,6 +24,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ErrorType;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -106,8 +107,7 @@ public class ClusterElementTools {
             log.error("updateWorkflowRootProperties({}): Failed to update root properties in workflow {}",
                 workflowId, workflowId, e);
 
-            throw new ExecutionException(
-                "Failed to update workflow root properties: " + e.getMessage(), e,
+            throw ToolUtils.toToolExecutionException("update workflow root properties", e,
                 ProjectWorkflowErrorType.UPDATE_WORKFLOW_ROOT);
         }
     }
@@ -181,8 +181,7 @@ public class ClusterElementTools {
                 "updateClusterElementTask({}, {}): Failed to update clusterElements for task '{}' in workflow {}",
                 workflowId, taskName, taskName, workflowId, e);
 
-            throw new ExecutionException(
-                "Failed to update workflow: " + e.getMessage(), e,
+            throw ToolUtils.toToolExecutionException("update workflow", e,
                 ProjectWorkflowErrorType.UPDATE_CLUSTER_ELEMENT_TASK);
         }
     }

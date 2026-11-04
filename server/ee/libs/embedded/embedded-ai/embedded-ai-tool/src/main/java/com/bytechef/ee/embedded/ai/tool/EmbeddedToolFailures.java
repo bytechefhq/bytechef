@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.tool;
 
 import com.bytechef.exception.ErrorType;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import org.slf4j.Logger;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -38,18 +39,7 @@ final class EmbeddedToolFailures {
 
         log.error("{}: {}", invocation, failureMessage, exception);
 
-        return new ExecutionException(failureMessage + ": " + describe(exception), exception, errorType);
-    }
-
-    private static String describe(RuntimeException exception) {
-        String message = exception.getMessage();
-
-        if (message != null) {
-            return message;
-        }
-
-        Class<? extends RuntimeException> exceptionClass = exception.getClass();
-
-        return exceptionClass.getSimpleName();
+        return new ExecutionException(failureMessage + ": " + ToolUtils.toUserFacingDetail(exception), exception,
+            errorType);
     }
 }

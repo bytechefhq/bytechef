@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.ai.tool;
 
-import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.exception.FirecrawlToolErrorType;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -116,8 +116,7 @@ public class FirecrawlTools {
                 "webSearch({}, {}, {}): Failed to perform Firecrawl search for query: {}", query, limit, country, query,
                 e);
 
-            throw new ExecutionException(
-                "Failed to perform Firecrawl search: " + e.getMessage(), e, FirecrawlToolErrorType.WEB_SEARCH);
+            throw ToolUtils.toToolExecutionException("perform Firecrawl search", e, FirecrawlToolErrorType.WEB_SEARCH);
         }
     }
 
@@ -174,8 +173,7 @@ public class FirecrawlTools {
             log.error(
                 "webpageScrape({}, {}): Failed to scrape URL with Firecrawl: {}", url, onlyMainContent, url, e);
 
-            throw new ExecutionException(
-                "Failed to scrape URL: " + e.getMessage(), e, FirecrawlToolErrorType.WEBPAGE_SCRAPE);
+            throw ToolUtils.toToolExecutionException("scrape URL", e, FirecrawlToolErrorType.WEBPAGE_SCRAPE);
         }
     }
 
@@ -255,8 +253,7 @@ public class FirecrawlTools {
                 "websiteMap({}, {}, {}, {}, {}): Failed to map website URLs for: {}", url, search, limit,
                 includeSubdomains, ignoreQueryParameters, url, e);
 
-            throw new ExecutionException(
-                "Failed to map website: " + e.getMessage(), e, FirecrawlToolErrorType.WEBSITE_MAP);
+            throw ToolUtils.toToolExecutionException("map website", e, FirecrawlToolErrorType.WEBSITE_MAP);
         }
     }
 

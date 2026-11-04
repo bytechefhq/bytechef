@@ -17,6 +17,7 @@
 package com.bytechef.ai.copilot.tool.catalog;
 
 import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -49,7 +50,8 @@ public final class SubAgentChatModelResolution {
             log.warn("Subagent chat model resolution failed", exception);
 
             throw new ChatModelUnavailableException(
-                "Could not resolve the AI model for the sub-agent: " + exception.getMessage(), exception);
+                "Could not resolve the AI model for the sub-agent: " + ToolUtils.toUserFacingDetail(exception),
+                exception);
         }
     }
 }

@@ -21,7 +21,7 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectWorkflowErrorType;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,8 +110,7 @@ public class ScriptTools {
                 "updateScriptComponentCode({}, {}): Failed to update Script component in workflow {}", workflowId,
                 scriptName, workflowId, e);
 
-            throw new ExecutionException(
-                "Failed to update workflow: " + e.getMessage(), e, ProjectWorkflowErrorType.UPDATE_SCRIPT);
+            throw ToolUtils.toToolExecutionException("update workflow", e, ProjectWorkflowErrorType.UPDATE_SCRIPT);
         }
     }
 }
