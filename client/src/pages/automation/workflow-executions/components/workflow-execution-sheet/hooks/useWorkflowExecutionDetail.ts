@@ -1,5 +1,6 @@
 import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
+import {isSameExecution} from '@/shared/components/workflow-executions/util/executionSelectionKey';
 import {groupTaskExecutionAttempts} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {getClusterElementCallOutcome} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
@@ -121,7 +122,7 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
 
     const focusedExecution = useMemo<FocusedExecutionI | undefined>(() => {
         if (triggerExecution?.error) {
-            return {execution: triggerExecution, path: triggerExecution.id ? [triggerExecution.id] : []};
+            return {execution: triggerExecution, path: []};
         }
 
         const execution = focusedTaskExecution || focusedTopLevelTaskExecution;
@@ -145,7 +146,7 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         stackTrace: [],
     };
 
-    const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
+    const isTriggerExecution = isSameExecution(selectedItem, triggerExecution);
 
     const lazy = useMemo<LazyTaskExecutionChildrenOptionsI>(
         () => ({
@@ -205,12 +206,12 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     }, [activeJobId, isWorkflowRunning, queryClient, taskExecutionChildrenOfJobQueryKey]);
 
     useEffect(() => {
-        if (!rootJob && triggerExecution && selectedItem?.id !== triggerExecution.id) {
+        if (!rootJob && triggerExecution && !isTriggerExecution) {
             setActiveTab(triggerExecution.error ? 'error' : 'input');
 
             setSelectedItem(triggerExecution);
         }
-    }, [rootJob, selectedItem?.id, triggerExecution]);
+    }, [isTriggerExecution, rootJob, triggerExecution]);
 
     useEffect(() => {
         if (!job?.id || focusApplied || !focusResolved) {

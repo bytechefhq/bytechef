@@ -36,7 +36,7 @@ interface TaskExecutionChildrenListProps {
     onLoadMore: () => void;
     parentTaskExecution: TaskExecution;
     remainingCount?: number;
-    selectedExecutionId: string;
+    selectedExecutionKey: string;
 }
 
 const TaskExecutionChildrenList = ({
@@ -51,7 +51,7 @@ const TaskExecutionChildrenList = ({
     onLoadMore,
     parentTaskExecution,
     remainingCount = 0,
-    selectedExecutionId,
+    selectedExecutionKey,
 }: TaskExecutionChildrenListProps) => {
     const [loadMoreElement, setLoadMoreElement] = useState<HTMLDivElement | null>(null);
 
@@ -155,7 +155,7 @@ const TaskExecutionChildrenList = ({
                                                     key={convertedIterationItem.id}
                                                     lazy={lazy}
                                                     onExecutionClick={onExecutionClick}
-                                                    selectedExecutionId={selectedExecutionId}
+                                                    selectedExecutionKey={selectedExecutionKey}
                                                 >
                                                     <WorkflowTaskExecutionItem
                                                         jobEnded={jobEnded}
@@ -197,7 +197,7 @@ const TaskExecutionChildrenList = ({
                     key={childTaskExecution.id}
                     lazy={lazy}
                     onExecutionClick={onExecutionClick}
-                    selectedExecutionId={selectedExecutionId}
+                    selectedExecutionKey={selectedExecutionKey}
                 >
                     <WorkflowTaskExecutionItem jobEnded={jobEnded} taskExecution={childTaskExecution} />
                 </WorkflowExecutionsAccordionItem>

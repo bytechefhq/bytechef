@@ -162,4 +162,39 @@ describe('useWorkflowExecutions', () => {
 
         expect(result.current.activeTab).toBe('details');
     });
+
+    it('should tell a task execution apart from a trigger execution with the same id', () => {
+        const triggerExecution = {
+            id: '34',
+            output: {orderId: '42'},
+            priority: 0,
+            startDate: new Date(),
+            status: 'COMPLETED',
+            workflowTrigger: {name: 'trigger_1'},
+        };
+
+        const {result} = renderHook(() =>
+            useWorkflowExecutions({
+                workflowTestExecution: {
+                    job: {
+                        id: '1',
+                        priority: 0,
+                        status: 'COMPLETED',
+                        taskExecutions: [createTaskExecution('34', 'COMPLETED')],
+                    },
+                    triggerExecution,
+                } as WorkflowTestExecution,
+            })
+        );
+
+        expect(result.current.selectedExecution).toBe(triggerExecution);
+        expect(result.current.isTriggerExecution).toBe(true);
+
+        act(() => {
+            result.current.handleExecutionClick(result.current.taskExecutions[0]);
+        });
+
+        expect(result.current.selectedExecution).toBe(result.current.taskExecutions[0]);
+        expect(result.current.isTriggerExecution).toBe(false);
+    });
 });

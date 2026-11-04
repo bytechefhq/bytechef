@@ -1,3 +1,4 @@
+import {isSameExecution} from '@/shared/components/workflow-executions/util/executionSelectionKey';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {TabValueType} from '@/shared/types';
@@ -70,7 +71,7 @@ export const getDisplayValue = ({job, selectedItem, tab, triggerExecution}: GetD
         return selectedItem.error;
     }
 
-    if (selectedItem.id === triggerExecution?.id && job?.inputs && triggerExecution?.workflowTrigger?.name) {
+    if (isSameExecution(selectedItem, triggerExecution) && job?.inputs && triggerExecution?.workflowTrigger?.name) {
         return getFilteredOutput(selectedItem.output, job.inputs, triggerExecution?.workflowTrigger?.name);
     }
 

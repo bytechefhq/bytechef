@@ -193,7 +193,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -216,7 +216,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -245,7 +245,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={loopTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             </div>
         );
@@ -265,7 +265,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -280,7 +280,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{refetchInterval: 2000, workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={{...loopTaskExecution, status: 'STARTED'}}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -307,7 +307,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{refetchInterval: 2000, workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={{...loopTaskExecution, status: 'STARTED'}}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -318,7 +318,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{refetchInterval: 2000, workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={{...loopTaskExecution, status: 'COMPLETED'}}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -327,7 +327,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{refetchInterval: 2000, workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={{...loopTaskExecution, status: 'COMPLETED'}}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -349,7 +349,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{refetchInterval: false, workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={{...loopTaskExecution, status: 'COMPLETED'}}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -364,7 +364,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{refetchInterval: 2000, workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={{...loopTaskExecution, status}}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -390,7 +390,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -411,7 +411,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -480,7 +480,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -527,7 +527,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -544,7 +544,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="586"
+                selectedExecutionKey="task:586"
             />
         );
 
@@ -560,7 +560,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="210"
+                selectedExecutionKey="task:210"
             />
         );
 
@@ -576,7 +576,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="586"
+                selectedExecutionKey="task:586"
             />
         );
 
@@ -597,7 +597,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="586"
+                selectedExecutionKey="task:586"
             />
         );
 
@@ -618,7 +618,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="586"
+                selectedExecutionKey="task:586"
             />
         );
 
@@ -634,7 +634,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="586"
+                selectedExecutionKey="task:586"
             />
         );
 
@@ -655,7 +655,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="4999"
+                selectedExecutionKey="task:4999"
             />
         );
 
@@ -674,7 +674,7 @@ describe('LazyTaskExecutionChildren', () => {
                 }}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId="9"
+                selectedExecutionKey="task:9"
             />
         );
 
@@ -697,7 +697,7 @@ describe('LazyTaskExecutionChildren', () => {
                 }}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="586"
+                selectedExecutionKey="task:586"
             />
         );
 
@@ -717,7 +717,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -742,7 +742,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -769,7 +769,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -788,7 +788,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -807,7 +807,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -834,7 +834,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{focusPath, workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="210"
+                selectedExecutionKey="task:210"
             />
         );
 
@@ -854,7 +854,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{focusPath, workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="210"
+                selectedExecutionKey="task:210"
             />
         );
 
@@ -873,7 +873,7 @@ describe('LazyTaskExecutionChildren', () => {
                 }}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId="999"
+                selectedExecutionKey="task:999"
             />
         );
 
@@ -901,7 +901,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={loopTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -934,7 +934,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{refetchInterval: 2000, workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={{...plainTaskExecution, status: 'STARTED'}}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -956,7 +956,7 @@ describe('LazyTaskExecutionChildren', () => {
                 lazy={{workflowExecutionId: 9}}
                 onExecutionClick={vi.fn()}
                 parentTaskExecution={plainTaskExecution}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             />
         );
 
@@ -1002,7 +1002,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={plainTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1056,7 +1056,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={plainTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1071,7 +1071,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={plainTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1096,7 +1096,7 @@ describe('LazyTaskExecutionChildren', () => {
                         lazy={{workflowExecutionId: 9}}
                         onExecutionClick={vi.fn()}
                         parentTaskExecution={plainTaskExecution}
-                        selectedExecutionId=""
+                        selectedExecutionKey=""
                     />
                 );
             };
@@ -1139,7 +1139,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={plainTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1163,7 +1163,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={plainTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1214,7 +1214,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={loopTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1238,7 +1238,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={loopTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1248,7 +1248,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={loopTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1289,7 +1289,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={onErrorTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1306,7 +1306,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={onErrorTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 
@@ -1322,7 +1322,7 @@ describe('LazyTaskExecutionChildren', () => {
                     lazy={{workflowExecutionId: 9}}
                     onExecutionClick={vi.fn()}
                     parentTaskExecution={onErrorTaskExecution}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 />
             );
 

@@ -565,4 +565,38 @@ describe('useWorkflowExecutionDetail', () => {
 
         expect(result.current.lazy.focusPath).toEqual(focusPath);
     });
+
+    it('tells a task execution apart from a trigger execution with the same id', () => {
+        const triggerExecution = {
+            id: '34',
+            startDate: new Date('2026-11-05T10:00:00Z'),
+            status: 'COMPLETED',
+            workflowTrigger: {label: 'Webhook', name: 'trigger_1'},
+        };
+        const taskExecution = {
+            id: '34',
+            jobId: '34',
+            startDate: new Date('2026-11-05T10:00:01Z'),
+            status: 'COMPLETED',
+            workflowTask: {label: 'Var', name: 'var_1'},
+        };
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 34, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({
+            data: {id: 34, job: {id: '34', status: 'COMPLETED', taskExecutions: [taskExecution]}, triggerExecution},
+            isLoading: false,
+        });
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(34, true));
+
+        expect(result.current.selectedItem).toBe(triggerExecution);
+        expect(result.current.isTriggerExecution).toBe(true);
+
+        act(() => {
+            result.current.handleTaskClick(taskExecution as never);
+        });
+
+        expect(result.current.selectedItem).toBe(taskExecution);
+        expect(result.current.isTriggerExecution).toBe(false);
+    });
 });

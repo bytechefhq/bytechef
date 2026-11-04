@@ -50,7 +50,7 @@ const renderAccordionItem = (
                 execution={latestAttempt}
                 onExecutionClick={onExecutionClick}
                 previousTaskExecutions={previousTaskExecutions}
-                selectedExecutionId=""
+                selectedExecutionKey=""
             >
                 <WorkflowTaskExecutionItem attemptLabel="Attempt 3" taskExecution={latestAttempt} />
             </WorkflowExecutionsAccordionItem>
@@ -84,14 +84,14 @@ describe('WorkflowExecutionsAccordionItem', () => {
             vi.restoreAllMocks();
         });
 
-        const renderSelectable = (selectedExecutionId: string, previousTaskExecutions?: TaskExecution[]) =>
+        const renderSelectable = (selectedExecutionKey: string, previousTaskExecutions?: TaskExecution[]) =>
             render(
                 <Accordion type="multiple">
                     <WorkflowExecutionsAccordionItem
                         execution={latestAttempt}
                         onExecutionClick={vi.fn()}
                         previousTaskExecutions={previousTaskExecutions}
-                        selectedExecutionId={selectedExecutionId}
+                        selectedExecutionKey={selectedExecutionKey}
                     >
                         <WorkflowTaskExecutionItem taskExecution={latestAttempt} />
                     </WorkflowExecutionsAccordionItem>
@@ -101,7 +101,7 @@ describe('WorkflowExecutionsAccordionItem', () => {
         it('scrolls a selected task into view', () => {
             const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
 
-            renderSelectable('13');
+            renderSelectable('task:13');
 
             expect(scrollIntoView).toHaveBeenCalledTimes(1);
             expect(scrollIntoView).toHaveBeenCalledWith({block: 'nearest'});
@@ -111,7 +111,7 @@ describe('WorkflowExecutionsAccordionItem', () => {
         it('scrolls a selected expandable task into view', () => {
             const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
 
-            renderSelectable('13', [firstAttempt]);
+            renderSelectable('task:13', [firstAttempt]);
 
             expect(scrollIntoView).toHaveBeenCalledTimes(1);
             expect(scrollIntoView.mock.contexts[0]).toBe(screen.getByRole('button'));
@@ -120,7 +120,7 @@ describe('WorkflowExecutionsAccordionItem', () => {
         it('does not scroll a task that is not selected', () => {
             const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
 
-            renderSelectable('99');
+            renderSelectable('task:99');
 
             expect(scrollIntoView).not.toHaveBeenCalled();
         });
@@ -171,7 +171,7 @@ describe('WorkflowExecutionsAccordionItem', () => {
                             <WorkflowExecutionsAccordionItem
                                 execution={latestAttempt}
                                 onExecutionClick={vi.fn()}
-                                selectedExecutionId="13"
+                                selectedExecutionKey="task:13"
                             >
                                 <WorkflowTaskExecutionItem taskExecution={latestAttempt} />
                             </WorkflowExecutionsAccordionItem>
@@ -201,17 +201,29 @@ describe('WorkflowExecutionsAccordionItem', () => {
             });
         });
 
+        it('does not select a task when the trigger with the same id is selected', () => {
+            renderSelectable('trigger:13');
+
+            expect(screen.getByRole('button')).not.toHaveClass('bg-surface-neutral-secondary');
+        });
+
+        it('selects a task by its kind and id', () => {
+            renderSelectable('task:13');
+
+            expect(screen.getByRole('button')).toHaveClass('bg-surface-neutral-secondary');
+        });
+
         it('scrolls a task into view when it becomes selected', () => {
             const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
 
-            const {rerender} = renderSelectable('99');
+            const {rerender} = renderSelectable('task:99');
 
             rerender(
                 <Accordion type="multiple">
                     <WorkflowExecutionsAccordionItem
                         execution={latestAttempt}
                         onExecutionClick={vi.fn()}
-                        selectedExecutionId="13"
+                        selectedExecutionKey="task:13"
                     >
                         <WorkflowTaskExecutionItem taskExecution={latestAttempt} />
                     </WorkflowExecutionsAccordionItem>
@@ -256,7 +268,7 @@ describe('WorkflowExecutionsAccordionItem', () => {
                 <WorkflowExecutionsAccordionItem
                     execution={agentExecution}
                     onExecutionClick={onExecutionClick}
-                    selectedExecutionId=""
+                    selectedExecutionKey=""
                 >
                     <WorkflowTaskExecutionItem taskExecution={agentExecution} />
                 </WorkflowExecutionsAccordionItem>
@@ -313,7 +325,7 @@ describe('WorkflowExecutionsAccordionItem', () => {
                     <WorkflowExecutionsAccordionItem
                         execution={loopTaskExecution}
                         onExecutionClick={vi.fn()}
-                        selectedExecutionId=""
+                        selectedExecutionKey=""
                     >
                         <span>Loop trigger</span>
                     </WorkflowExecutionsAccordionItem>
@@ -353,7 +365,7 @@ describe('WorkflowExecutionsAccordionItem', () => {
                         jobEnded
                         onExecutionClick={vi.fn()}
                         previousTaskExecutions={previousTaskExecutions}
-                        selectedExecutionId=""
+                        selectedExecutionKey=""
                     >
                         <WorkflowTaskExecutionItem jobEnded taskExecution={execution} />
                     </WorkflowExecutionsAccordionItem>
@@ -422,7 +434,7 @@ describe('WorkflowExecutionsAccordionItem', () => {
                         execution={execution}
                         lazy={{workflowExecutionId: 9}}
                         onExecutionClick={vi.fn()}
-                        selectedExecutionId=""
+                        selectedExecutionKey=""
                     >
                         <span>Lazy parent</span>
                     </WorkflowExecutionsAccordionItem>
