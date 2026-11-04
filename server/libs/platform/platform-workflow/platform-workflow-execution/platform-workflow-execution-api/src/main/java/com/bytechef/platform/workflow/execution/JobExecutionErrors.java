@@ -122,7 +122,7 @@ public final class JobExecutionErrors {
 
     private static String getPaymentRequiredMessage(Job job) {
         return "Workflow run " + job.getId()
-            + " was not started: no job execution units are left.";
+            + " was not started: payment is required (no job execution units are left, or the subscription is not active).";
     }
 
     private static @Nullable String findFailedTaskExecutionErrorMessage(List<TaskExecution> taskExecutions) {
