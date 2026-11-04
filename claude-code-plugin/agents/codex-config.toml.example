@@ -1,0 +1,12 @@
+# Add to ~/.codex/config.toml. Replace <host> with your ByteChef host.
+# Keys verified against the Codex MCP documentation (https://developers.openai.com/codex/mcp).
+
+# OAuth sign-in (default): run `codex mcp login bytechef` after adding this.
+[mcp_servers.bytechef]
+url = "https://<host>/api/management/mcp"
+
+# API key instead of OAuth: use this table in place of the one above. Create an Admin API key in
+# ByteChef under Settings, Admin API Keys, and export it as BYTECHEF_API_KEY.
+# [mcp_servers.bytechef]
+# url = "https://<host>/api/management/mcp"
+# bearer_token_env_var = "BYTECHEF_API_KEY"
