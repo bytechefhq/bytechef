@@ -44,7 +44,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(
     classes = PlatformNotificationIntTestConfiguration.class,
     properties = {
-        "bytechef.webhook-delivery.allowed-hosts=localhost", "bytechef.webhook-delivery.concurrency-limit=10",
+        "bytechef.edition=ee", "bytechef.webhook-delivery.allowed-hosts=localhost",
+        "bytechef.webhook-delivery.concurrency-limit=10",
         "bytechef.webhook-delivery.max-pending-deliveries=1000"
     })
 @Timeout(30)
