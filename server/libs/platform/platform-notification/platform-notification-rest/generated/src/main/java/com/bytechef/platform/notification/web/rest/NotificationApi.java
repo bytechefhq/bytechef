@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:06:55.152675+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:56:22.769511+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "notification", description = "The Platform Notification Internal API")
 public interface NotificationApi {
