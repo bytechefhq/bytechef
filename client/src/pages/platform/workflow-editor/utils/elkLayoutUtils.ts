@@ -216,11 +216,12 @@ function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDi
 function getMemberCrossBounds(
     memberNode: Node,
     direction: LayoutDirectionType,
-    crossAxis: 'x' | 'y'
+    crossAxis: 'x' | 'y',
+    populatedDispatcherIds: Set<string>
 ): {crossEnd: number; crossStart: number} {
     const renderedSize = getRenderedNodeSize(memberNode, direction);
     const renderedCross = crossAxis === 'x' ? renderedSize.width : renderedSize.height;
-    const footprintSize = getElkNodeSize(memberNode, direction);
+    const footprintSize = getElkNodeSize(memberNode, direction, populatedDispatcherIds);
     const footprintCross = crossAxis === 'x' ? footprintSize.width : footprintSize.height;
 
     const memberCrossCenter = memberNode.position[crossAxis] + renderedCross / 2;
@@ -229,7 +230,10 @@ function getMemberCrossBounds(
         return {crossEnd: memberCrossCenter + renderedCross / 2, crossStart: memberCrossCenter - renderedCross / 2};
     }
 
-    const hasSideLabel = crossAxis === 'x' && hasSideLabelForCollision(memberNode);
+    const isPopulatedFramePlaceholder =
+        memberNode.type === 'placeholder' && populatedDispatcherIds.has(getOwningDispatcherId(memberNode) ?? '');
+
+    const hasSideLabel = crossAxis === 'x' && (hasSideLabelForCollision(memberNode) || isPopulatedFramePlaceholder);
 
     if (hasSideLabel) {
         const iconCrossStart = memberCrossCenter - renderedCross / 2;
@@ -413,7 +417,11 @@ const getChildAlignmentOptions = (direction: LayoutDirectionType): Record<string
  * depth: node→node edges of ELK_LAYER_SPACING + 2×slack, box-adjacent edges of
  * ELK_LAYER_SPACING + 1×slack — the consistency guarantee of the ELK engine.
  */
-function getElkNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
+function getElkNodeSize(
+    node: Node,
+    direction: LayoutDirectionType,
+    populatedDispatcherIds: Set<string> = new Set()
+): {height: number; width: number} {
     const {height, width} = getDagreNodeSize(
         isReadOnlyPlaceholder(node) ? {...node, type: 'placeholder'} : node,
         direction
@@ -447,7 +455,10 @@ function getElkNodeSize(node: Node, direction: LayoutDirectionType): {height: nu
 
     let crossAxisSize = direction === 'TB' ? width : height;
 
-    if (node.type === 'placeholder' || isReadOnlyPlaceholder(node)) {
+    const isPopulatedFramePlaceholder =
+        node.type === 'placeholder' && populatedDispatcherIds.has(getOwningDispatcherId(node) ?? '');
+
+    if ((node.type === 'placeholder' || isReadOnlyPlaceholder(node)) && !isPopulatedFramePlaceholder) {
         crossAxisSize = CASE_PLACEHOLDER_CROSS_FOOTPRINT;
     }
 
@@ -487,6 +498,31 @@ function getOwningDispatcherId(node: Node): string | undefined {
     );
 }
 
+function isFrameContentNode(node: Node): boolean {
+    return (
+        node.type !== 'placeholder' &&
+        node.type !== 'triggerPlaceholder' &&
+        node.type !== 'taskDispatcherTopGhostNode' &&
+        node.type !== 'taskDispatcherBottomGhostNode' &&
+        node.type !== 'taskDispatcherLeftGhostNode' &&
+        !isReadOnlyPlaceholder(node)
+    );
+}
+
+function getPopulatedDispatcherIds(nodes: Node[]): Set<string> {
+    const populatedDispatcherIds = new Set<string>();
+
+    nodes.forEach((node) => {
+        const owningDispatcherId = getOwningDispatcherId(node);
+
+        if (owningDispatcherId && isFrameContentNode(node)) {
+            populatedDispatcherIds.add(owningDispatcherId);
+        }
+    });
+
+    return populatedDispatcherIds;
+}
+
 // The canonical left-to-right case order of a branch lives ONLY in the
 // dispatcher's parameters (see createBranchEdges): the default case first,
 // then the custom cases in authored order. Children and placeholders carry
@@ -510,6 +546,8 @@ function getBranchCaseOrdinals(branchNode: Node): string[] {
  */
 export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDirectionType): ElkNode {
     const nodesById = new Map(nodes.map((node) => [node.id, node]));
+
+    const populatedDispatcherIds = getPopulatedDispatcherIds(nodes);
 
     const frameDispatcherIds = nodes.filter((node) => isFrameDispatcherNode(node)).map((node) => node.id);
 
@@ -735,7 +773,7 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
                 return;
             }
 
-            const {height, width} = getElkNodeSize(node, direction);
+            const {height, width} = getElkNodeSize(node, direction, populatedDispatcherIds);
 
             memberEntries.push({
                 caseRank: getMemberCaseRank(node, scopeDispatcherNode),
@@ -898,6 +936,8 @@ export const getElkLayoutElements = async ({
 }: GetLayoutElementsProps): Promise<LayoutElementsResultI> => {
     try {
         const elk = await loadElk();
+
+        const populatedDispatcherIds = getPopulatedDispatcherIds(nodes);
 
         const layoutedGraph = await elk.layout(buildElkGraph(nodes, edges, direction));
 
@@ -1786,7 +1826,12 @@ export const getElkLayoutElements = async ({
                     const renderedSize = getRenderedNodeSize(memberNode, direction);
                     const renderedMain = mainAxis === 'x' ? renderedSize.width : renderedSize.height;
 
-                    const {crossEnd, crossStart} = getMemberCrossBounds(memberNode, direction, crossAxis);
+                    const {crossEnd, crossStart} = getMemberCrossBounds(
+                        memberNode,
+                        direction,
+                        crossAxis,
+                        populatedDispatcherIds
+                    );
 
                     // In LR the title block extends along the MAIN axis, but
                     // ELK already spaces LR layers by footprint widths that
@@ -1852,7 +1897,12 @@ export const getElkLayoutElements = async ({
                             return;
                         }
 
-                        const candidateBounds = getMemberCrossBounds(candidateNode, direction, crossAxis);
+                        const candidateBounds = getMemberCrossBounds(
+                            candidateNode,
+                            direction,
+                            crossAxis,
+                            populatedDispatcherIds
+                        );
 
                         rectangleStart = Math.min(rectangleStart, candidateBounds.crossStart);
                         rectangleEnd = Math.max(rectangleEnd, candidateBounds.crossEnd);
