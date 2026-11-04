@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,25 +65,32 @@ public class DataStorageDeleteValueFromListAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.data(data -> data.put(
-            Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-            inputParameters.getRequiredString(KEY), getValues(inputParameters, context)));
-    }
+        Scope scope = Scope.valueOf(inputParameters.getRequiredString(SCOPE));
+        String key = inputParameters.getRequiredString(KEY);
 
-    @SuppressWarnings("unchecked")
-    private static List<Object> getValues(Parameters inputParameters, ActionContext context) {
-        List<Object> list;
+        Optional<Object> optionalList = context.data(data -> data.fetch(scope, key));
 
-        Optional<Object> optionalList = context
-            .data(data -> data.fetch(Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                inputParameters.getRequiredString(KEY)));
-        if (optionalList.isPresent() && optionalList.get() instanceof List<?> curList) {
-            list = (List<Object>) curList;
-        } else {
+        if (optionalList.isEmpty() || !(optionalList.get() instanceof List<?>)) {
             return null;
         }
 
-        list.remove(inputParameters.getRequiredInteger(INDEX));
+        int index = inputParameters.getRequiredInteger(INDEX);
+
+        context.data(data -> data.update(
+            scope, key, (Optional<Object> currentValue) -> removeValue(currentValue, key, index)));
+
+        return null;
+    }
+
+    private static List<Object> removeValue(Optional<Object> currentValue, String key, int index) {
+        if (currentValue.isEmpty() || !(currentValue.get() instanceof List<?> currentList)) {
+            throw new IllegalStateException(
+                "The list stored under key '%s' was removed while it was being updated".formatted(key));
+        }
+
+        List<Object> list = new ArrayList<>(currentList);
+
+        list.remove(index);
 
         return list;
     }

@@ -42,6 +42,7 @@ import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -135,33 +136,33 @@ public class DataStorageSetValueInListAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        List<Object> values = getValues(inputParameters, context);
+        Scope scope = Scope.valueOf(inputParameters.getRequiredString(SCOPE));
+        String key = inputParameters.getRequiredString(KEY);
 
-        if (values == null) {
+        Optional<Object> optionalList = context.data(data -> data.fetch(scope, key));
+
+        if (optionalList.isEmpty() || !(optionalList.get() instanceof List<?>)) {
             return null;
         }
 
-        context.data(data -> data.put(
-            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY),
-            values));
+        int index = inputParameters.getRequiredInteger(INDEX);
+        Object value = DataStorageUtils.getValue(inputParameters);
+
+        context.data(data -> data.update(
+            scope, key, (Optional<Object> currentValue) -> setValue(currentValue, key, index, value)));
 
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private static List<Object> getValues(Parameters inputParameters, ActionContext context) {
-        List<Object> list;
-
-        Optional<Object> optionalList = context.data(data -> data.fetch(
-            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
-
-        if (optionalList.isPresent() && optionalList.get() instanceof List<?> curList) {
-            list = (List<Object>) curList;
-        } else {
-            return null;
+    private static List<Object> setValue(Optional<Object> currentValue, String key, int index, Object value) {
+        if (currentValue.isEmpty() || !(currentValue.get() instanceof List<?> currentList)) {
+            throw new IllegalStateException(
+                "The list stored under key '%s' was removed while it was being updated".formatted(key));
         }
 
-        list.set(inputParameters.getRequiredInteger(INDEX), DataStorageUtils.getValue(inputParameters));
+        List<Object> list = new ArrayList<>(currentList);
+
+        list.set(index, value);
 
         return list;
     }

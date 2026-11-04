@@ -30,16 +30,11 @@ import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Ivica Cardic
  */
 public class DataStorageAtomicIncrementAction {
-
-    private static final Lock LOCK = new ReentrantLock();
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("atomicIncrement")
         .title("Atomic Increment")
@@ -67,44 +62,35 @@ public class DataStorageAtomicIncrementAction {
         .perform(DataStorageAtomicIncrementAction::perform);
 
     protected static Integer perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-        throws InterruptedException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Scope scope = Scope.valueOf(inputParameters.getRequiredString(SCOPE));
         String key = inputParameters.getRequiredString(KEY);
+        int valueToAdd = inputParameters.getRequiredInteger(VALUE_TO_ADD);
 
-        if (!LOCK.tryLock(10, TimeUnit.SECONDS)) {
-            throw new IllegalStateException("Timed out waiting to increment the value stored under key '%s'"
-                .formatted(key));
-        }
+        Object value = context.data(
+            data -> data.update(scope, key,
+                (Optional<Object> currentValue) -> increment(currentValue, key, valueToAdd)));
 
+        return (Integer) value;
+    }
+
+    private static Integer increment(Optional<Object> currentValue, String key, int valueToAdd) {
         try {
-            int value;
-
-            try {
-                value = Math.addExact(getValue(scope, key, context), inputParameters.getRequiredInteger(VALUE_TO_ADD));
-            } catch (ArithmeticException arithmeticException) {
-                throw new IllegalArgumentException(
-                    "Incrementing the value stored under key '%s' overflows an integer".formatted(key),
-                    arithmeticException);
-            }
-
-            context.data(data -> data.put(scope, key, value));
-
-            return value;
-        } finally {
-            LOCK.unlock();
+            return Math.addExact(getValue(currentValue, key), valueToAdd);
+        } catch (ArithmeticException arithmeticException) {
+            throw new IllegalArgumentException(
+                "Incrementing the value stored under key '%s' overflows an integer".formatted(key),
+                arithmeticException);
         }
     }
 
-    private static int getValue(Scope scope, String key, ActionContext context) {
-        Optional<Object> optionalValue = context.data(data -> data.fetch(scope, key));
-
-        if (optionalValue.isEmpty()) {
+    private static int getValue(Optional<Object> currentValue, String key) {
+        if (currentValue.isEmpty()) {
             return 0;
         }
 
-        if (optionalValue.get() instanceof Number number) {
+        if (currentValue.get() instanceof Number number) {
             try {
                 return Math.toIntExact(number.longValue());
             } catch (ArithmeticException arithmeticException) {
