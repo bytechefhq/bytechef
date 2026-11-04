@@ -22,6 +22,7 @@ import com.bytechef.ai.copilot.connection.CopilotConnectionLister.CopilotConnect
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister.CopilotConnectionRequest;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -42,14 +43,22 @@ public class ScopedConnectionGuard {
     public static final String NOT_ENTITLED_MESSAGE = "This chat can only use connections its user is entitled to use.";
     public static final String UNVERIFIED_MESSAGE =
         "This chat could not verify that its user may use the connection. Try again later.";
+    public static final String NO_WORKSPACE_MESSAGE =
+        "This chat has no workspace and environment, so it cannot use a connection. Retry without connectionId.";
 
     private static final Logger log = LoggerFactory.getLogger(ScopedConnectionGuard.class);
 
     private final ObjectProvider<CopilotConnectionLister> connectionListersProvider;
+    private final CopilotConnectionLister workspaceConnectionLister;
 
     @SuppressFBWarnings("EI")
-    public ScopedConnectionGuard(ObjectProvider<CopilotConnectionLister> connectionListersProvider) {
+    public ScopedConnectionGuard(
+        ObjectProvider<CopilotConnectionLister> connectionListersProvider,
+        WorkspaceConnectionFacade workspaceConnectionFacade, PropertyOptionsResolver propertyOptionsResolver) {
+
         this.connectionListersProvider = connectionListersProvider;
+        this.workspaceConnectionLister = new WorkspaceCopilotConnectionLister(
+            workspaceConnectionFacade, propertyOptionsResolver);
     }
 
     public boolean isEntitled(
@@ -69,11 +78,15 @@ public class ScopedConnectionGuard {
     public @Nullable String fetchDenialMessage(
         @Nullable String componentName, @Nullable Long connectionId, @Nullable ToolContext toolContext) {
 
-        if (connectionId == null || !ScopedProjectToolContext.isConfined(toolContext)) {
+        if (connectionId == null) {
             return null;
         }
 
         AgentToolInvocationContext invocationContext = AgentToolInvocationContext.fromToolContext(toolContext);
+
+        if (!ScopedProjectToolContext.isConfined(toolContext)) {
+            return fetchWorkspaceDenialMessage(componentName, connectionId, invocationContext);
+        }
 
         if (invocationContext == null) {
             log.warn(
@@ -99,7 +112,30 @@ public class ScopedConnectionGuard {
             return UNVERIFIED_MESSAGE;
         }
 
-        CopilotConnectionLister connectionLister = connectionListerOptional.get();
+        return fetchListedDenialMessage(componentName, connectionId, connectionListerOptional.get(), request);
+    }
+
+    private @Nullable String fetchWorkspaceDenialMessage(
+        @Nullable String componentName, long connectionId, @Nullable AgentToolInvocationContext invocationContext) {
+
+        if (invocationContext == null || invocationContext.workspaceId() == null ||
+            invocationContext.environmentId() == null) {
+
+            log.warn(
+                "Rejected connection {} for component {}: the run carries no workspace and environment", connectionId,
+                componentName);
+
+            return NO_WORKSPACE_MESSAGE;
+        }
+
+        CopilotConnectionRequest request = invocationContext.toConnectionRequest(componentName, null);
+
+        return fetchListedDenialMessage(componentName, connectionId, workspaceConnectionLister, request);
+    }
+
+    private static @Nullable String fetchListedDenialMessage(
+        @Nullable String componentName, long connectionId, CopilotConnectionLister connectionLister,
+        CopilotConnectionRequest request) {
 
         List<CopilotConnection> connections;
 
