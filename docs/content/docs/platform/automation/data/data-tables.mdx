@@ -150,26 +150,10 @@ A workflow can also start in response to a row change:
 - **Record Updated** - a row was changed
 - **Record Deleted** - a row was removed
 
-Every row change sends one trigger event per changed row once it is saved, whether it comes from a Data Table action
-(**Clear Table** included), from editing rows in the table, or from a CSV import. A slow or unreachable endpoint never holds up the step that changed the rows. Delivery is best
-effort: unreachable endpoints, server errors and rate-limit responses are retried with backoff, with retry waits adding
-up to about a minute per row on top of the request timeouts. If an endpoint answers that it does not exist or does not
-accept the request, redirects it elsewhere, or has an invalid URL, the remaining rows of that step are not sent to it.
-Other failures, such as refusing access or errors that persist after retries, do the same after 10 consecutive failed
-rows to that webhook, counted across steps. A row the endpoint accepts, or rejects as invalid (400, 409 or 422), resets
-that count; a rejected row fails on its own. A row that fails before reaching the endpoint, for example because one of
-its values cannot be sent as JSON, fails on its own and leaves the count unchanged.
-After either stop, no rows are sent to that webhook for 5 minutes, or until its URL is changed, including rows of steps
-whose delivery had already started. This pause is kept in memory on each server and ends on restart. When too many
-Each webhook receives one step's rows at a time, so a slow endpoint delays only its own deliveries. When too many
-deliveries to a webhook are already pending, none of the step's rows are sent to it, and when too many changed rows
-are still waiting to be sent, none of the step's rows are sent to any webhook. When the server shuts down, deliveries
-still in progress stop and their remaining rows are skipped; a delivery that has not stopped after about 10 seconds is
-cut off, and only a shutdown warning with the number of pending deliveries and rows records it. Failed and skipped rows are not
-retried later. The server log names them by record id (every id for deleted rows, the first 20 otherwise), and the
-`bytechef_data_table_webhook_unsent_rows_total` metric counts them by event type and outcome (`failed`, `skipped` or
-`dropped`), with paused webhooks counted in `bytechef_data_table_webhook_suspensions_total`; check these when a trigger
-did not fire. A webhook URL must be an absolute `http` or `https` URL, otherwise enabling the trigger fails.
+Every row change starts one run per changed row for each enabled trigger on that table, whether the change comes from
+a Data Table action (**Clear Table** included), from editing rows in the table, or from a CSV import. Runs start once
+the change is saved; a change that is rolled back starts none. The rows of one change may run in any order, and a run
+that fails shows up in the workflow's execution history like any other run.
 
 This makes Data Tables a lightweight event source - for example, "when a row is added to the *Customers* table, send a welcome email."
 
