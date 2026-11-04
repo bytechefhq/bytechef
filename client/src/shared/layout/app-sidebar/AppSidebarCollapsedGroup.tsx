@@ -40,14 +40,19 @@ const AppSidebarCollapsedGroup = ({group, isActive, items, onOpenChange, open}: 
                     </div>
                 </HoverCardTrigger>
 
-                <HoverCardContent align="start" className="w-56 p-1" side="right" sideOffset={0}>
+                <HoverCardContent
+                    align="start"
+                    className="w-56 border-sidebar-border bg-sidebar p-1 text-sidebar-foreground"
+                    side="right"
+                    sideOffset={0}
+                >
                     <span className="block px-2 py-1.5 text-xs font-medium text-muted-foreground">{group.name}</span>
 
                     <nav aria-label={group.name} className="flex flex-col">
                         {items.map((item) => (
                             <Link
                                 aria-current={isActive(item.href) ? 'page' : undefined}
-                                className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent aria-[current=page]:font-medium aria-[current=page]:text-content-brand-primary"
+                                className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-sidebar-accent aria-[current=page]:font-medium aria-[current=page]:text-content-brand-primary"
                                 key={item.name}
                                 to={item.href}
                             >
