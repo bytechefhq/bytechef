@@ -10,10 +10,13 @@ package com.bytechef.ee.platform.data.storage.db.remote.client.service;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.ParameterizedTypeReference;
 
 /**
@@ -90,6 +93,43 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
                     + "/save/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}")
                 .build(componentName, scope, scopeId, key, environmentId, type),
             value);
+    }
+
+    @Override
+    public <T> Optional<VersionedValue<T>> fetchVersioned(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type) {
+
+        return Optional.ofNullable(loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(DATA_STORAGE_SERVICE
+                    + "/fetch-versioned/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}")
+                .build(componentName, scope, scopeId, key, environmentId, type),
+            new ParameterizedTypeReference<VersionedValue<T>>() {}));
+    }
+
+    @Override
+    public boolean putIfVersion(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, PlatformType type,
+        Object value, @Nullable Integer expectedVersion) {
+
+        Boolean result = loadBalancedRestClient.put(
+            uriBuilder -> {
+                uriBuilder
+                    .host(EXECUTION_APP)
+                    .path(DATA_STORAGE_SERVICE
+                        + "/put-if-version/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}");
+
+                if (expectedVersion != null) {
+                    uriBuilder.queryParam("expectedVersion", expectedVersion);
+                }
+
+                return uriBuilder.build(componentName, scope, scopeId, key, environmentId, type);
+            },
+            Collections.singletonMap("value", value), Boolean.class);
+
+        return Boolean.TRUE.equals(result);
     }
 
     private <T> Optional<T>

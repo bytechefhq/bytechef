@@ -10,14 +10,18 @@ package com.bytechef.ee.platform.data.storage.db.remote.web.rest.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -80,5 +84,39 @@ public class RemoteJdbcDataStorageServiceController {
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/fetch-versioned/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}")
+    public ResponseEntity<VersionedValue<Object>> fetchVersioned(
+        @PathVariable String componentName, @PathVariable DataStorageScope scope,
+        @PathVariable String scopeId, @PathVariable String key, @PathVariable Integer environment,
+        @PathVariable PlatformType type) {
+
+        Optional<VersionedValue<Object>> versionedValueOptional = dataStorageService.fetchVersioned(
+            componentName, scope, scopeId, key, environment.intValue(), type);
+
+        return versionedValueOptional.map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.noContent()
+                .build());
+    }
+
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/put-if-version/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<Boolean> putIfVersion(
+        @PathVariable String componentName, @PathVariable DataStorageScope scope,
+        @PathVariable String scopeId, @PathVariable String key, @PathVariable Integer environment,
+        @PathVariable PlatformType type, @RequestParam(required = false) Integer expectedVersion,
+        @RequestBody Map<String, Object> body) {
+
+        return ResponseEntity.ok(
+            dataStorageService.putIfVersion(
+                componentName, scope, scopeId, key, environment.intValue(), type, body.get("value"),
+                expectedVersion));
     }
 }

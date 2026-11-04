@@ -19,12 +19,18 @@ package com.bytechef.platform.data.storage.jdbc.service;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.domain.DataEntry;
+import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -72,6 +78,19 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
 
     @Override
     @SuppressWarnings("unchecked")
+    @Transactional
+    public <T> Optional<VersionedValue<T>> fetchVersioned(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type) {
+
+        return dataStorageRepository
+            .findByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(
+                componentName, scope.ordinal(), scopeId, key, (int) environmentId, type.ordinal())
+            .map(dataEntry -> new VersionedValue<>((T) dataEntry.getValue(), dataEntry.getVersion()));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public <T> @NonNull T get(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
@@ -109,5 +128,52 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
                 },
                 () -> dataStorageRepository.save(
                     new DataEntry(componentName, scope, scopeId, key, value, (int) environmentId, type)));
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public boolean putIfVersion(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, PlatformType type,
+        Object value, @Nullable Integer expectedVersion) {
+
+        try {
+            if (expectedVersion == null) {
+                dataStorageRepository.save(
+                    new DataEntry(componentName, scope, scopeId, key, value, (int) environmentId, type));
+
+                return true;
+            }
+
+            Optional<DataEntry> dataEntryOptional = dataStorageRepository
+                .findByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(
+                    componentName, scope.ordinal(), scopeId, key, (int) environmentId, type.ordinal());
+
+            if (dataEntryOptional.isEmpty()) {
+                return false;
+            }
+
+            DataEntry dataEntry = dataEntryOptional.get();
+
+            if (dataEntry.getVersion() != expectedVersion) {
+                return false;
+            }
+
+            dataEntry.setValue(value);
+
+            dataStorageRepository.save(dataEntry);
+
+            return true;
+        } catch (RuntimeException exception) {
+            if (isLostRace(exception)) {
+                return false;
+            }
+
+            throw exception;
+        }
+    }
+
+    private static boolean isLostRace(RuntimeException exception) {
+        return ExceptionUtils.indexOfType(exception, DuplicateKeyException.class) >= 0 ||
+            ExceptionUtils.indexOfType(exception, OptimisticLockingFailureException.class) >= 0;
     }
 }
