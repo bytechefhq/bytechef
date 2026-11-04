@@ -5,4 +5,6 @@ dependencies {
     compileOnly("com.github.spotbugs:spotbugs-annotations")
 
     implementation("org.jspecify:jspecify")
+
+    testImplementation(project(":server:libs:test:test-support"))
 }
