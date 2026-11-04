@@ -1,4 +1,5 @@
 x-bytechef-environment: &bytechef-environment
+  BYTECHEF_CACHE_PROVIDER: ${BYTECHEF_CACHE_PROVIDER:-CAFFEINE}
   BYTECHEF_DATASOURCE_PASSWORD: postgres
   BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
   BYTECHEF_DATASOURCE_USERNAME: postgres
