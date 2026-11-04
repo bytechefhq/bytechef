@@ -29,6 +29,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
@@ -163,7 +164,8 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
             log.warn("{}: resolving the chat model failed", getClass().getSimpleName(), exception);
 
             throw new AGUIException(
-                "Could not resolve the AI model for this Copilot run: " + exception.getMessage(), exception);
+                "Could not resolve the AI model for this Copilot run: " + ToolUtils.toUserFacingDetail(exception),
+                exception);
         }
 
         if (override != null) {

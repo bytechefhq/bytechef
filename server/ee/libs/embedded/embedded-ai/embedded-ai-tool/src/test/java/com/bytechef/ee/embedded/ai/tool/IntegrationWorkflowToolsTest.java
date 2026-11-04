@@ -68,7 +68,7 @@ class IntegrationWorkflowToolsTest {
 
         assertThatThrownBy(() -> newTools().getWorkflow("wf-1"))
             .isInstanceOf(ExecutionException.class)
-            .hasMessageContaining("Failed to get workflow");
+            .hasMessageContaining("Failed to get workflow: RuntimeException");
     }
 
     @Test

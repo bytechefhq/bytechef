@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.ai.tool;
 
-import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.exception.BraveToolErrorType;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -125,8 +125,7 @@ public class BraveWebSearchTools {
                 "braveWebSearch({}, {}, {}, {}): Failed to perform Brave search for query: {}", query, count, country,
                 freshness, query, e);
 
-            throw new ExecutionException(
-                "Failed to perform Brave search: " + e.getMessage(), e, BraveToolErrorType.WEB_SEARCH);
+            throw ToolUtils.toToolExecutionException("perform Brave search", e, BraveToolErrorType.WEB_SEARCH);
         }
     }
 

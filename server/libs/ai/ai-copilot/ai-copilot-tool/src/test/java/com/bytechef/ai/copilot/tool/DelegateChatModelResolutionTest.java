@@ -155,7 +155,8 @@ class DelegateChatModelResolutionTest {
         assertThatThrownBy(() -> toolCallback.call(toolInput, new ToolContext(Map.of())))
             .as("%s must fail the turn rather than fall back to the startup model", toolName)
             .isInstanceOf(ChatModelUnavailableException.class)
-            .hasMessageContaining("model lookup failed");
+            .hasMessageContaining("IllegalStateException")
+            .hasMessageNotContaining("model lookup failed");
 
         assertThat(factoryInvoked.get())
             .as("%s must not run the delegate on another model", toolName)

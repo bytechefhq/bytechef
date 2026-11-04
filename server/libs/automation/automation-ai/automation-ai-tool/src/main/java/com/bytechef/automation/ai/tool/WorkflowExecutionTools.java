@@ -28,6 +28,7 @@ import com.bytechef.automation.workflow.execution.exception.ProjectWorkflowExecu
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
@@ -121,8 +122,7 @@ public class WorkflowExecutionTools {
         } catch (Exception exception) {
             log.error("getWorkflowExecution(): Failed for id={}", workflowExecutionId, exception);
 
-            throw new ExecutionException(
-                "Failed to get workflow execution: " + exception.getMessage(), exception,
+            throw ToolUtils.toToolExecutionException("get workflow execution", exception,
                 ProjectWorkflowExecutionErrorType.GET_WORKFLOW_EXECUTION);
         }
     }
@@ -188,8 +188,7 @@ public class WorkflowExecutionTools {
         } catch (Exception exception) {
             log.error("listWorkflowExecutions(): Failed", exception);
 
-            throw new ExecutionException(
-                "Failed to list workflow executions: " + exception.getMessage(), exception,
+            throw ToolUtils.toToolExecutionException("list workflow executions", exception,
                 ProjectWorkflowExecutionErrorType.LIST_WORKFLOW_EXECUTIONS);
         }
     }
