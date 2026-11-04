@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
 import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import java.time.Duration;
 import java.util.Map;
@@ -75,7 +76,7 @@ class JdbcDataStorageUpdatesTest {
         @Override
         public boolean putIfVersion(
             String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
-            PlatformType type, Object value, @Nullable Integer expectedVersion) {
+            PlatformType type, Object value, @Nullable DataEntryVersion expectedVersion) {
 
             return attempts.incrementAndGet() > conflicts;
         }

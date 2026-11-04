@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.data.storage.db.remote.client.service;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
 import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -112,7 +113,7 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
     @Override
     public boolean putIfVersion(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, PlatformType type,
-        Object value, @Nullable Integer expectedVersion) {
+        Object value, @Nullable DataEntryVersion expectedVersion) {
 
         Boolean result = loadBalancedRestClient.put(
             uriBuilder -> {
@@ -122,7 +123,8 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
                         + "/put-if-version/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}");
 
                 if (expectedVersion != null) {
-                    uriBuilder.queryParam("expectedVersion", expectedVersion);
+                    uriBuilder.queryParam("expectedId", expectedVersion.id());
+                    uriBuilder.queryParam("expectedVersion", expectedVersion.version());
                 }
 
                 return uriBuilder.build(componentName, scope, scopeId, key, environmentId, type);
