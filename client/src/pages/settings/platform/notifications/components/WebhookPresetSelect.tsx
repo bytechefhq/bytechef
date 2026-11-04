@@ -1,34 +1,40 @@
 import AlertDialog from '@/components/AlertDialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
-import {useId, useState} from 'react';
+import {useEffect, useId, useState} from 'react';
 import {useFormContext} from 'react-hook-form';
 
-import {WEBHOOK_PRESETS, WebhookPresetI} from './webhookPresets';
+import {
+    WEBHOOK_PRESETS,
+    WebhookPresetI,
+    WebhookPresetSettingsI,
+    findWebhookPresetForUrl,
+    isWebhookPresetUnchanged,
+    isWebhookSettingsEmpty,
+} from './webhookPresets';
 
 interface WebhookPresetFormValuesI {
-    settings: {
-        webhook?: string;
-        webhookBodyTemplate?: string;
-        webhookHeaders?: Array<{name: string; value: string}>;
-    };
+    settings: WebhookPresetSettingsI;
 }
 
 const WebhookPresetSelect = () => {
     const [pendingPreset, setPendingPreset] = useState<WebhookPresetI | undefined>();
+    const [selectedPreset, setSelectedPreset] = useState<WebhookPresetI | undefined>();
 
     const presetSelectId = useId();
 
     const {getValues, setValue} = useFormContext<WebhookPresetFormValuesI>();
 
-    const applyPreset = (preset: WebhookPresetI) => {
-        setValue('settings.webhook', preset.url, {shouldDirty: true});
+    const applyPreset = (preset: WebhookPresetI, shouldDirty: boolean) => {
+        setValue('settings.webhook', preset.url, {shouldDirty});
         setValue(
             'settings.webhookHeaders',
             preset.headers.map((header) => ({name: header.name, value: header.value})),
-            {shouldDirty: true}
+            {shouldDirty}
         );
-        setValue('settings.webhookBodyTemplate', preset.template, {shouldDirty: true});
+        setValue('settings.webhookBodyTemplate', preset.template, {shouldDirty});
+
+        setSelectedPreset(preset);
     };
 
     const handleValueChange = (presetId: string) => {
@@ -39,23 +45,36 @@ const WebhookPresetSelect = () => {
         }
 
         const settings = getValues('settings');
-        const hasValues = !!settings?.webhook || !!settings?.webhookBodyTemplate || !!settings?.webhookHeaders?.length;
+        const canReplaceSilently =
+            isWebhookSettingsEmpty(settings) ||
+            (!!selectedPreset && isWebhookPresetUnchanged(settings, selectedPreset));
 
-        if (hasValues) {
-            setPendingPreset(preset);
+        if (canReplaceSilently) {
+            applyPreset(preset, true);
 
             return;
         }
 
-        applyPreset(preset);
+        setPendingPreset(preset);
     };
+
+    useEffect(() => {
+        const settings = getValues('settings');
+
+        if (isWebhookSettingsEmpty(settings)) {
+            applyPreset(WEBHOOK_PRESETS[0], false);
+        } else {
+            setSelectedPreset(findWebhookPresetForUrl(settings?.webhook));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <>
             <div className="space-y-2">
                 <Label htmlFor={presetSelectId}>Preset</Label>
 
-                <Select onValueChange={handleValueChange} value="">
+                <Select onValueChange={handleValueChange} value={selectedPreset?.id || ''}>
                     <SelectTrigger className="w-full" id={presetSelectId}>
                         <SelectValue placeholder="Start from a preset" />
                     </SelectTrigger>
@@ -81,7 +100,7 @@ const WebhookPresetSelect = () => {
                     description="The current URL, headers and body template are replaced by the preset."
                     onCancel={() => setPendingPreset(undefined)}
                     onConfirm={() => {
-                        applyPreset(pendingPreset);
+                        applyPreset(pendingPreset, true);
 
                         setPendingPreset(undefined);
                     }}

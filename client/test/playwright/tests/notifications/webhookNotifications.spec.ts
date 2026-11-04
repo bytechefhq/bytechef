@@ -300,6 +300,7 @@ test.describe('Webhook notifications', () => {
             });
 
             await createDialog.getByPlaceholder('https://example.com/ingest').fill(catcherUrl(jobPath));
+            await createDialog.getByRole('textbox', {name: 'Body template'}).clear();
 
             const signingSecret = await notificationsPage.saveAndReadSigningSecret(createDialog);
 
