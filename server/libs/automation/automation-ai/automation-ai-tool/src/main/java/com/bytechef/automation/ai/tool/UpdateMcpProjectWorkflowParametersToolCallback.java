@@ -126,7 +126,7 @@ public class UpdateMcpProjectWorkflowParametersToolCallback implements ToolCallb
                     MapUtils.getString(updatedParameters, ToolConstants.TOOL_NAME),
                     MapUtils.getString(updatedParameters, ToolConstants.TOOL_DESCRIPTION), updatedParameters));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException exception) {
             return ToolErrors.toolError(exception.getMessage());
         } catch (RuntimeException exception) {

@@ -143,7 +143,7 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
 
             return JsonUtils.write(new DeleteKnowledgeBaseDocumentOutput(true, input.documentId()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(DeleteKnowledgeBaseDocumentToolCallback.class, TOOL_NAME, exception);
         }

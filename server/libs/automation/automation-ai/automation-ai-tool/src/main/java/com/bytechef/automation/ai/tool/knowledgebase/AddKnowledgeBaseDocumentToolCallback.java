@@ -160,7 +160,7 @@ public class AddKnowledgeBaseDocumentToolCallback implements ToolCallback {
                 new AddKnowledgeBaseDocumentOutput(true, document.getId()
                     .toString(), document.getName()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(AddKnowledgeBaseDocumentToolCallback.class, TOOL_NAME, exception);
         }

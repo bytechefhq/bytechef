@@ -104,7 +104,7 @@ public class DeleteKnowledgeBaseToolCallback implements ToolCallback {
 
             return JsonUtils.write(Map.of("deleted", true, "id", input.id()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {

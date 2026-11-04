@@ -138,7 +138,7 @@ public class CreateProjectDeploymentToolCallback implements ToolCallback {
                 new CreateProjectDeploymentOutput(
                     projectDeploymentId, projectId, input.projectVersion(), environment.name(), false));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {

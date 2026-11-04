@@ -106,7 +106,7 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
                 new CloneMcpProjectOutput(
                     clone.getId(), clone.getProjectDeploymentId(), clone.getMcpServerId()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException
             | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());

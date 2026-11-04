@@ -132,7 +132,7 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
 
             return delegate.call(JsonUtils.write(delegateInput), new ToolContext(forwardedContext));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 

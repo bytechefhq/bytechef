@@ -133,7 +133,7 @@ public class CreateMcpServerToolCallback implements ToolCallback {
                         .name(),
                     mcpServer.isEnabled()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
