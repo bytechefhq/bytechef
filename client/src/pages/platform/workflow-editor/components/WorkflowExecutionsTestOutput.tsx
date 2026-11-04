@@ -4,7 +4,6 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
 import SubflowExecutionBreadcrumb, {
     BreadcrumbEntryI,
-    TruncatedLabel,
 } from '@/shared/components/workflow-executions/SubflowExecutionBreadcrumb';
 import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
 import WorkflowExecutionsAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem';
@@ -15,7 +14,7 @@ import WorkflowTriggerExecutionItem from '@/shared/components/workflow-execution
 import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {RefreshCwIcon, RefreshCwOffIcon, WorkflowIcon, XIcon} from 'lucide-react';
+import {RefreshCwIcon, RefreshCwOffIcon, XIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -182,17 +181,6 @@ const WorkflowExecutionsTestOutput = ({
                                         className="flex flex-col overflow-hidden"
                                         defaultSize={resizablePanelSize}
                                     >
-                                        {subflowStack.length === 0 && rootJob && (
-                                            <div className={twMerge(EXECUTIONS_PANEL_HEADER_CLASS_NAME, 'gap-1')}>
-                                                <WorkflowIcon className="size-3 shrink-0 text-content-neutral-primary" />
-
-                                                <TruncatedLabel
-                                                    className="text-xs leading-4 font-medium text-content-neutral-primary"
-                                                    label={rootJob.label ?? ''}
-                                                />
-                                            </div>
-                                        )}
-
                                         {subflowStack.length > 0 && (
                                             <SubflowExecutionBreadcrumb
                                                 items={breadcrumbItems}
