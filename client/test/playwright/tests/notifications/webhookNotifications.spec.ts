@@ -344,6 +344,138 @@ test.describe('Webhook notifications', () => {
             await deleteNotificationByName(authenticatedPage, name);
         }
     });
+
+    test('N7 a failed job is delivered with the New Relic preset body and the saved API key', async ({
+        authenticatedPage,
+        deployer,
+    }) => {
+        const notificationsPage = new NotificationsPage(authenticatedPage);
+        const name = `N7 New Relic ${uniqueSuffix()}`;
+        const newRelicPath = `/new-relic-${uniqueSuffix()}`;
+        const workflowLabel = `N7 workflow ${uniqueSuffix()}`;
+
+        try {
+            await notificationsPage.goto();
+
+            const createDialog = await notificationsPage.openCreateDialog({
+                eventType: 'JOB_FAILED',
+                name,
+                type: 'WEBHOOK',
+            });
+
+            await notificationsPage.applyWebhookPreset(createDialog, 'New Relic');
+
+            await expect(createDialog.getByPlaceholder('https://example.com/ingest')).toHaveValue(NEW_RELIC_URL);
+            await expectInputValues(headerValueInputs(createDialog), ['']);
+
+            await createDialog.getByPlaceholder('https://example.com/ingest').fill(catcherUrl(newRelicPath));
+
+            await headerValueInputs(createDialog).nth(0).fill('new-relic-license-key');
+
+            await test.step('A test send renders the flat New Relic event', async () => {
+                const testResult = await notificationsPage.runTest(createDialog);
+
+                await expect(testResult).toContainText('Test sent');
+
+                const caughtRequest = await waitForCaughtRequestCount(newRelicPath, 1);
+
+                expect(caughtRequest.headers['api-key']).toBe('new-relic-license-key');
+
+                const newRelicEvents = JSON.parse(caughtRequest.body);
+
+                expect(newRelicEvents).toHaveLength(1);
+                expect(newRelicEvents[0].eventType).toBe('ByteChefNotification');
+                expect(newRelicEvents[0].notificationEvent).toBe('JOB_FAILED');
+            });
+
+            const signingSecret = await notificationsPage.saveAndReadSigningSecret(createDialog);
+
+            const deployedProject = await deployer.deploy([
+                {
+                    description: workflowLabel,
+                    label: workflowLabel,
+                    tasks: [{name: 'var_1', parameters: {type: 'STRING', value: 'fail'}, type: 'var/v1/missingAction'}],
+                    triggers: [{name: 'trigger_1', parameters: {}, type: 'webhook/v1/autoRespondWithHTTP200'}],
+                },
+            ]);
+
+            const job = await deployer.triggerWebhookAndWaitForJob(deployedProject);
+
+            const findJobDelivery = () =>
+                caughtRequestsFor(newRelicPath).find(
+                    (caughtRequest) => String(JSON.parse(caughtRequest.body)[0].jobId) === String(job.id)
+                );
+
+            await expect(() => expect(findJobDelivery()).toBeTruthy()).toPass({timeout: 60000});
+
+            const jobDelivery = findJobDelivery() as CaughtRequestI;
+
+            const [newRelicEvent] = JSON.parse(jobDelivery.body);
+
+            expect(jobDelivery.headers['api-key']).toBe('new-relic-license-key');
+            expect(newRelicEvent.eventType).toBe('ByteChefNotification');
+            expect(newRelicEvent.notificationEvent).toBe('JOB_FAILED');
+            expect(newRelicEvent.jobStatus).toBe('FAILED');
+            expect(newRelicEvent.workflowName).toBe(workflowLabel);
+            expect(newRelicEvent.errorMessage).not.toBe('');
+            expect(
+                verifyWebhookSignature(
+                    String(jobDelivery.headers['x-bytechef-signature']),
+                    jobDelivery.body,
+                    signingSecret
+                )
+            ).toBe(true);
+        } finally {
+            await deleteNotificationByName(authenticatedPage, name);
+        }
+    });
+
+    test('N8 the Custom preset sends the generic body template', async ({authenticatedPage}) => {
+        const notificationsPage = new NotificationsPage(authenticatedPage);
+        const customPath = `/custom-${uniqueSuffix()}`;
+
+        await notificationsPage.goto();
+
+        const createDialog = await notificationsPage.openCreateDialog({
+            eventType: 'JOB_FAILED',
+            name: `N8 Custom ${uniqueSuffix()}`,
+            type: 'WEBHOOK',
+        });
+
+        await notificationsPage.applyWebhookPreset(createDialog, 'Custom');
+
+        await expect(createDialog.getByPlaceholder('https://example.com/ingest')).toHaveValue('');
+        await expect(createDialog.getByRole('textbox', {name: 'Header name'})).toHaveCount(0);
+        await expect(createDialog.getByRole('textbox', {name: 'Body template'})).toHaveValue(
+            /"jobStatus": "\{\{job.status\}\}"/
+        );
+
+        await createDialog.getByPlaceholder('https://example.com/ingest').fill(catcherUrl(customPath));
+
+        const testResult = await notificationsPage.runTest(createDialog);
+
+        await expect(testResult).toContainText('Test sent');
+
+        const caughtRequest = await waitForCaughtRequestCount(customPath, 1);
+
+        const customBody = JSON.parse(caughtRequest.body);
+
+        expect(customBody.eventType).toBe('JOB_FAILED');
+        expect(customBody.deliveryId).toBe(caughtRequest.headers['x-bytechef-delivery']);
+        expect(Object.keys(customBody)).toEqual([
+            'eventType',
+            'jobId',
+            'jobName',
+            'jobStatus',
+            'workflowName',
+            'projectName',
+            'environment',
+            'errorMessage',
+            'executionUrl',
+            'deliveryId',
+            'timestamp',
+        ]);
+    });
 });
 
 test.describe('Email notifications', () => {
