@@ -4,18 +4,26 @@ import {type AddressInfo} from 'node:net';
 
 export interface CaughtRequestI {
     body: string;
+    headers: IncomingMessage['headers'];
     path: string;
+}
+
+interface CatcherResponseI {
+    body: string;
+    status: number;
 }
 
 export interface RequestCatcherI {
     baseUrl: string;
     caughtRequests: CaughtRequestI[];
     close: () => Promise<void>;
+    respondWith: (pathPrefix: string, status: number, body: string) => void;
     waitForRequest: (pathPrefix: string, timeout?: number) => Promise<CaughtRequestI>;
 }
 
 export async function startRequestCatcher(): Promise<RequestCatcherI> {
     const caughtRequests: CaughtRequestI[] = [];
+    const responsesByPathPrefix = new Map<string, CatcherResponseI>();
 
     const server: Server = createServer((incomingMessage: IncomingMessage, serverResponse: ServerResponse) => {
         const bodyChunks: Buffer[] = [];
@@ -23,11 +31,26 @@ export async function startRequestCatcher(): Promise<RequestCatcherI> {
         incomingMessage.on('data', (bodyChunk: Buffer) => bodyChunks.push(bodyChunk));
 
         incomingMessage.on('end', () => {
-            caughtRequests.push({body: Buffer.concat(bodyChunks).toString('utf8'), path: incomingMessage.url ?? ''});
+            const path = incomingMessage.url ?? '';
 
-            serverResponse.writeHead(200, {'Content-Type': 'application/json'});
+            caughtRequests.push({
+                body: Buffer.concat(bodyChunks).toString('utf8'),
+                headers: incomingMessage.headers,
+                path,
+            });
 
-            serverResponse.end('{"ok":true}');
+            const matchingPathPrefix = [...responsesByPathPrefix.keys()].find((pathPrefix) =>
+                path.startsWith(pathPrefix)
+            );
+
+            const catcherResponse = (matchingPathPrefix && responsesByPathPrefix.get(matchingPathPrefix)) || {
+                body: '{"ok":true}',
+                status: 200,
+            };
+
+            serverResponse.writeHead(catcherResponse.status, {'Content-Type': 'application/json'});
+
+            serverResponse.end(catcherResponse.body);
         });
     });
 
@@ -51,6 +74,7 @@ export async function startRequestCatcher(): Promise<RequestCatcherI> {
         baseUrl: `http://127.0.0.1:${port}`,
         caughtRequests,
         close: () => new Promise<void>((resolve) => server.close(() => resolve())),
+        respondWith: (pathPrefix, status, body) => responsesByPathPrefix.set(pathPrefix, {body, status}),
         waitForRequest,
     };
 }
