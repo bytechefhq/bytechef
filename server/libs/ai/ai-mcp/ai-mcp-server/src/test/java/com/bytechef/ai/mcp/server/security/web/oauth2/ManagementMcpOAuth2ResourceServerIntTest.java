@@ -23,10 +23,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestConfiguration;
+import com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestState;
 import com.bytechef.platform.configuration.domain.Property;
-import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -52,7 +51,6 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -73,30 +71,24 @@ class ManagementMcpOAuth2ResourceServerIntTest {
     private KeyPair mcpTestSigningKeyPair;
 
     @Autowired
-    private PropertyService propertyService;
-
-    @Autowired
-    private UserService userService;
+    private ManagementMcpOAuth2ResourceServerIntTestState intTestState;
 
     @LocalServerPort
     private int port;
 
     @BeforeEach
     void beforeEach() {
-        Mockito.reset(propertyService, userService);
-
         Property property = mock(Property.class);
 
         when(property.get("secretKey")).thenReturn(MCP_SERVER_SECRET_KEY);
-        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.of(property));
+        intTestState.setMcpServerProperty(Optional.of(property));
 
         User user = mock(User.class);
 
         when(user.isActivated()).thenReturn(true);
         when(user.getLogin()).thenReturn("admin@localhost.com");
         when(user.getAuthorityIds()).thenReturn(List.of());
-        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
+        intTestState.setAdminUser(Optional.of(user));
     }
 
     @Test
@@ -184,7 +176,7 @@ class ManagementMcpOAuth2ResourceServerIntTest {
 
     @Test
     void testDeactivatedUserIsRejected() throws Exception {
-        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.empty());
+        intTestState.setAdminUser(Optional.empty());
 
         String token = signManagementJwt(managementEndpointUrl());
 

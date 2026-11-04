@@ -23,11 +23,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestConfiguration;
+import com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestState;
 import com.bytechef.platform.configuration.domain.Property;
-import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.web.authentication.CredentialAuthenticationSuccessEvent;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -57,7 +56,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -114,10 +112,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     private KeyPair mcpTestSigningKeyPair;
 
     @Autowired
-    private PropertyService propertyService;
-
-    @Autowired
-    private UserService userService;
+    private ManagementMcpOAuth2ResourceServerIntTestState intTestState;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -127,23 +122,20 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
     @BeforeEach
     void beforeEach() {
-        Mockito.reset(propertyService, userService);
-
         authenticationEventRecorder.clear();
 
         Property property = mock(Property.class);
 
         when(property.get("secretKey")).thenReturn(MCP_SERVER_SECRET_KEY);
-        when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
-        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.of(property));
+
+        intTestState.setMcpServerProperty(Optional.of(property));
 
         User user = mock(User.class);
 
         when(user.isActivated()).thenReturn(true);
         when(user.getLogin()).thenReturn("admin@localhost.com");
         when(user.getAuthorityIds()).thenReturn(List.of());
-        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
+        intTestState.setAdminUser(Optional.of(user));
     }
 
     @Test
@@ -168,9 +160,8 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         Property property = mock(Property.class);
 
         when(property.get("secretKey")).thenReturn(tenantSecretKey);
-        when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
-        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.of(property));
+
+        intTestState.setMcpServerProperty(Optional.of(property));
 
         String token = sign(
             baseClaims(ISSUER_URI)
@@ -269,7 +260,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
     @Test
     void testDeactivatedUserIsRejected() throws Exception {
-        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.empty());
+        intTestState.setAdminUser(Optional.empty());
 
         String token = signManagementJwt(managementEndpointUrl());
 
@@ -325,8 +316,7 @@ class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
     @Test
     void testCanonicalEndpointInitializesWithSelfIssuerJwtWhenTenantHasNoManagementServerProperty() {
-        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
-            .thenReturn(Optional.empty());
+        intTestState.setMcpServerProperty(Optional.empty());
 
         String token = signManagementJwt("http://localhost:" + port + CANONICAL_ENDPOINT_PATH);
 

@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.server.security.web.oauth2.config;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpEndpoint;
@@ -25,6 +26,7 @@ import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSec
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.McpDiscoverySecurityConfigurerContributor;
@@ -85,13 +87,28 @@ public class ManagementMcpOAuth2ResourceServerIntTestConfiguration {
     }
 
     @Bean
-    PropertyService propertyService() {
-        return mock(PropertyService.class);
+    ManagementMcpOAuth2ResourceServerIntTestState managementMcpOAuth2ResourceServerIntTestState() {
+        return new ManagementMcpOAuth2ResourceServerIntTestState();
     }
 
     @Bean
-    UserService userService() {
-        return mock(UserService.class);
+    PropertyService propertyService(ManagementMcpOAuth2ResourceServerIntTestState intTestState) {
+        PropertyService propertyService = mock(PropertyService.class);
+
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
+            .thenAnswer(invocation -> intTestState.getMcpServerProperty());
+
+        return propertyService;
+    }
+
+    @Bean
+    UserService userService(ManagementMcpOAuth2ResourceServerIntTestState intTestState) {
+        UserService userService = mock(UserService.class);
+
+        when(userService.fetchUserByLogin("admin@localhost.com"))
+            .thenAnswer(invocation -> intTestState.getAdminUser());
+
+        return userService;
     }
 
     @Bean
