@@ -7,6 +7,7 @@ All URIs are relative to */api/platform/internal*
 | [**createNotification**](NotificationApi.md#createnotification) | **POST** /notifications | Create a notification entry |
 | [**deleteNotification**](NotificationApi.md#deletenotification) | **DELETE** /notifications/{notificationId} | Delete a notification |
 | [**getNotifications**](NotificationApi.md#getnotifications) | **GET** /notifications | Get a list of notifications |
+| [**regenerateNotificationSigningSecret**](NotificationApi.md#regeneratenotificationsigningsecret) | **POST** /notifications/{notificationId}/signing-secret | Regenerate the signing secret of a webhook notification |
 | [**updateNotification**](NotificationApi.md#updatenotification) | **PUT** /notifications/{notificationId} | Update an existing notification |
 
 
@@ -200,6 +201,73 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## regenerateNotificationSigningSecret
+
+> NotificationSigningSecret regenerateNotificationSigningSecret(notificationId)
+
+Regenerate the signing secret of a webhook notification
+
+Regenerates the signing secret of a webhook notification. The new secret is returned only once.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  NotificationApi,
+} from '';
+import type { RegenerateNotificationSigningSecretRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new NotificationApi();
+
+  const body = {
+    // number | The id of a notification.
+    notificationId: 789,
+  } satisfies RegenerateNotificationSigningSecretRequest;
+
+  try {
+    const data = await api.regenerateNotificationSigningSecret(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **notificationId** | `number` | The id of a notification. | [Defaults to `undefined`] |
+
+### Return type
+
+[**NotificationSigningSecret**](NotificationSigningSecret.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The new signing secret. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

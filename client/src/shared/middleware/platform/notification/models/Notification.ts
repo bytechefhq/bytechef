@@ -68,6 +68,14 @@ export interface Notification {
      */
     notificationEventIds?: Array<number>;
     /**
+     * Whether the notification has a webhook signing secret
+     */
+    readonly hasSigningSecret?: boolean;
+    /**
+     * The webhook signing secret, returned only in the create response
+     */
+    readonly signingSecret?: string;
+    /**
      * 
      */
     version?: number;
@@ -115,6 +123,8 @@ export function NotificationFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'settings': json['settings'],
         'notificationEvents': json['notificationEvents'] == null ? undefined : ((json['notificationEvents'] as Array<any>).map(NotificationEventFromJSON)),
         'notificationEventIds': json['notificationEventIds'] == null ? undefined : json['notificationEventIds'],
+        'hasSigningSecret': json['hasSigningSecret'] == null ? undefined : json['hasSigningSecret'],
+        'signingSecret': json['signingSecret'] == null ? undefined : json['signingSecret'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
@@ -123,7 +133,7 @@ export function NotificationToJSON(json: any): Notification {
     return NotificationToJSONTyped(json, false);
 }
 
-export function NotificationToJSONTyped(value?: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'> | null, ignoreDiscriminator: boolean = false): any {
+export function NotificationToJSONTyped(value?: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'|'hasSigningSecret'|'signingSecret'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

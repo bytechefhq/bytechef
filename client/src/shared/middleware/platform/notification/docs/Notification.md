@@ -17,6 +17,8 @@ Name | Type
 `settings` | { [key: string]: object; }
 `notificationEvents` | [Array&lt;NotificationEvent&gt;](NotificationEvent.md)
 `notificationEventIds` | Array&lt;number&gt;
+`hasSigningSecret` | boolean
+`signingSecret` | string
 `version` | number
 
 ## Example
@@ -36,6 +38,8 @@ const example = {
   "settings": null,
   "notificationEvents": null,
   "notificationEventIds": null,
+  "hasSigningSecret": null,
+  "signingSecret": null,
   "version": null,
 } satisfies Notification
 

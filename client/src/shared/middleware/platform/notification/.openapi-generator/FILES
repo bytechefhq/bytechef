@@ -5,8 +5,10 @@ docs/Notification.md
 docs/NotificationApi.md
 docs/NotificationEvent.md
 docs/NotificationEventApi.md
+docs/NotificationSigningSecret.md
 index.ts
 models/Notification.ts
 models/NotificationEvent.ts
+models/NotificationSigningSecret.ts
 models/index.ts
 runtime.ts
