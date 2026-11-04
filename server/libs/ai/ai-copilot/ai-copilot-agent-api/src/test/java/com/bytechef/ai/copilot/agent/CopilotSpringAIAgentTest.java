@@ -335,7 +335,8 @@ class CopilotSpringAIAgentTest {
 
             assertThatThrownBy(() -> agent.resolveChatClient(newInput(new State())))
                 .isInstanceOf(AGUIException.class)
-                .hasMessageContaining("catalog down");
+                .hasMessageContaining("IllegalStateException")
+                .hasMessageNotContaining("catalog down");
         }
 
         @Test

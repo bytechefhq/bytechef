@@ -89,7 +89,7 @@ class WorkflowExecutionAgentToolCallbackTest {
         String result = callback.call("not-json");
 
         assertThat(result).contains("error");
-        assertThat(result).containsIgnoringCase("invalid tool input");
+        assertThat(result).contains("Invalid input: not valid JSON");
     }
 
     @Test

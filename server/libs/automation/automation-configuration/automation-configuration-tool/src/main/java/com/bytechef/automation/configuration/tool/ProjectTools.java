@@ -34,6 +34,7 @@ import com.bytechef.automation.configuration.tool.model.ProjectPublishInfo;
 import com.bytechef.automation.configuration.tool.model.ProjectStatusInfo;
 import com.bytechef.automation.configuration.tool.model.ProjectVersionInfo;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
@@ -102,8 +103,7 @@ public class ProjectTools {
         } catch (Exception e) {
             log.error("listProjects({}): Failed to list projects", query, e);
 
-            throw new ExecutionException(
-                "Failed to list projects: " + e.getMessage(), e, ProjectErrorType.LIST_PROJECTS);
+            throw ToolUtils.toToolExecutionException("list projects", e, ProjectErrorType.LIST_PROJECTS);
         }
     }
 
@@ -146,8 +146,7 @@ public class ProjectTools {
         } catch (Exception e) {
             log.error("getProject({}): Failed to get project {}", projectId, projectId, e);
 
-            throw new ExecutionException(
-                "Failed to get project: " + e.getMessage(), e, ProjectErrorType.GET_PROJECT);
+            throw ToolUtils.toToolExecutionException("get project", e, ProjectErrorType.GET_PROJECT);
         }
     }
 
@@ -175,8 +174,7 @@ public class ProjectTools {
         } catch (Exception e) {
             log.error("searchProjects({}): Failed to search projects with query '{}'", query, query, e);
 
-            throw new ExecutionException(
-                "Failed to search projects: " + e.getMessage(), e, ProjectErrorType.SEARCH_PROJECTS);
+            throw ToolUtils.toToolExecutionException("search projects", e, ProjectErrorType.SEARCH_PROJECTS);
         }
     }
 
@@ -206,8 +204,7 @@ public class ProjectTools {
         } catch (Exception e) {
             log.error("getProjectStatus({}): Failed to get status for project {}", projectId, projectId, e);
 
-            throw new ExecutionException(
-                "Failed to get project status: " + e.getMessage(), e, ProjectErrorType.GET_PROJECT_STATUS);
+            throw ToolUtils.toToolExecutionException("get project status", e, ProjectErrorType.GET_PROJECT_STATUS);
         }
     }
 
@@ -253,8 +250,7 @@ public class ProjectTools {
                 "createProject({}, {}, {}, {}, {}): Failed to create project with name '{}'", name, description,
                 categoryId, resolvedWorkspaceId, tagIds, name, e);
 
-            throw new ExecutionException(
-                "Failed to create project: " + e.getMessage(), e, ProjectErrorType.CREATE_PROJECT);
+            throw ToolUtils.toToolExecutionException("create project", e, ProjectErrorType.CREATE_PROJECT);
         }
     }
 
@@ -304,8 +300,7 @@ public class ProjectTools {
                 "updateProject({}, {}, {}, {}, {}): Failed to update project {}", projectId, name, description,
                 categoryId, tagIds, projectId, e);
 
-            throw new ExecutionException(
-                "Failed to update project: " + e.getMessage(), e, ProjectErrorType.UPDATE_PROJECT);
+            throw ToolUtils.toToolExecutionException("update project", e, ProjectErrorType.UPDATE_PROJECT);
         }
     }
 
@@ -333,8 +328,7 @@ public class ProjectTools {
         } catch (Exception e) {
             log.error("deleteProject({}): Failed to delete project {}", projectId, projectId, e);
 
-            throw new ExecutionException(
-                "Failed to delete project: " + e.getMessage(), e, ProjectErrorType.DELETE_PROJECT);
+            throw ToolUtils.toToolExecutionException("delete project", e, ProjectErrorType.DELETE_PROJECT);
         }
     }
 
@@ -365,8 +359,7 @@ public class ProjectTools {
         } catch (Exception e) {
             log.error("publishProject({}, {}): Failed to publish project {}", projectId, description, projectId, e);
 
-            throw new ExecutionException(
-                "Failed to publish project: " + e.getMessage(), e, ProjectErrorType.PUBLISH_PROJECT);
+            throw ToolUtils.toToolExecutionException("publish project", e, ProjectErrorType.PUBLISH_PROJECT);
         }
     }
 

@@ -24,6 +24,7 @@ import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.agui.server.EventFactory;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.WebSearchToolCallbacks;
 import com.bytechef.commons.util.JsonUtils;
@@ -163,7 +164,8 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
             log.warn("{}: resolving the chat model failed", getClass().getSimpleName(), exception);
 
             throw new AGUIException(
-                "Could not resolve the AI model for this Copilot run: " + exception.getMessage(), exception);
+                "Could not resolve the AI model for this Copilot run: " + ToolErrors.toUserFacingDetail(exception),
+                exception);
         }
 
         if (override != null) {

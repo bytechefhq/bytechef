@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.copilot.agent;
 
+import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentModelRequest;
 import com.bytechef.platform.ai.provider.catalog.CatalogChatClientResolver;
@@ -107,7 +108,8 @@ public class CatalogSubAgentChatModelResolver implements SubAgentChatModelResolv
 
     private static ChatModelUnavailableException unresolvable(long environmentId, RuntimeException exception) {
         return new ChatModelUnavailableException(
-            "Could not resolve the AI model in environment %d: %s".formatted(environmentId, exception.getMessage()),
+            "Could not resolve the AI model in environment %d: %s".formatted(environmentId,
+                ToolErrors.toUserFacingDetail(exception)),
             exception);
     }
 }

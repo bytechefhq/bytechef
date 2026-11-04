@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:error:error-api"))
     implementation(project(":server:libs:core:exception:exception-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
 

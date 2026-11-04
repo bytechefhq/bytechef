@@ -18,11 +18,16 @@ package com.bytechef.platform.ai.tool.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.exception.AbstractException;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.exception.ErrorType;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.ToolUtils.PropertyDecorator;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.BooleanProperty;
@@ -37,6 +42,63 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class ToolUtilsTest {
+
+    private static final ErrorType ERROR_TYPE = new ErrorType() {
+
+        @Override
+        public Class<?> getErrorClass() {
+            return ToolUtilsTest.class;
+        }
+
+        @Override
+        public int getErrorKey() {
+            return 100;
+        }
+    };
+
+    @Test
+    void testToToolExecutionExceptionRethrowsAnAbstractExceptionUnchanged() {
+        ConfigurationException configurationException = new ConfigurationException("Invalid definition", ERROR_TYPE);
+
+        assertSame(
+            configurationException,
+            ToolUtils.toToolExecutionException("update workflow", configurationException, ERROR_TYPE));
+    }
+
+    @Test
+    void testToToolExecutionExceptionKeepsTheMessageOfAnIllegalArgumentException() {
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Category 3 not found");
+
+        AbstractException abstractException = ToolUtils.toToolExecutionException(
+            "create project", illegalArgumentException, ERROR_TYPE);
+
+        assertThat(abstractException).isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to create project: Category 3 not found")
+            .hasCause(illegalArgumentException);
+    }
+
+    @Test
+    void testToToolExecutionExceptionReducesAnIllegalArgumentExceptionCarryingOnlyItsCause() {
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException(
+            new IllegalStateException("secret"));
+
+        AbstractException abstractException = ToolUtils.toToolExecutionException(
+            "create project", illegalArgumentException, ERROR_TYPE);
+
+        assertThat(abstractException).hasMessage("Failed to create project: IllegalArgumentException");
+    }
+
+    @Test
+    void testToToolExecutionExceptionNamesTheOperationAndCauseTypeWithoutTheCauseMessage() {
+        IllegalStateException illegalStateException = new IllegalStateException("SQL [select secret] failed");
+
+        AbstractException abstractException = ToolUtils.toToolExecutionException(
+            "update workflow", illegalStateException, ERROR_TYPE);
+
+        assertThat(abstractException).isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to update workflow: IllegalStateException")
+            .hasCause(illegalStateException);
+    }
 
     @Test
     void testConvertToPropertyInfoCarriesFixedOptionValues() {

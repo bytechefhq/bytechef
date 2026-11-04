@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
     implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
 
     testImplementation("org.assertj:assertj-core")

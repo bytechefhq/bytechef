@@ -17,6 +17,7 @@
 package com.bytechef.ai.copilot.agent;
 
 import com.agui.core.state.State;
+import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
@@ -153,7 +154,8 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
 
     private static ChatModelUnavailableException unresolvable(long environmentId, RuntimeException exception) {
         return new ChatModelUnavailableException(
-            "Could not resolve the AI model in environment %d: %s".formatted(environmentId, exception.getMessage()),
+            "Could not resolve the AI model in environment %d: %s".formatted(environmentId,
+                ToolErrors.toUserFacingDetail(exception)),
             exception);
     }
 }

@@ -251,7 +251,7 @@ class ProjectToolsTest {
 
         assertThatCode(() -> projectTools.getProject(7L, toolContext))
             .isInstanceOf(ExecutionException.class)
-            .hasMessageContaining("denied");
+            .hasMessage("Failed to get project: IllegalStateException");
     }
 
     @Test
