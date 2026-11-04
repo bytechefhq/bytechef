@@ -132,7 +132,7 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
 
             return delegate.call(JsonUtils.write(inputNode), new ToolContext(forwardedContext));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 

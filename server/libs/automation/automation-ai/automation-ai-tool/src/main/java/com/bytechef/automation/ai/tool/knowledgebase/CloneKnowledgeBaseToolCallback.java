@@ -136,7 +136,7 @@ public class CloneKnowledgeBaseToolCallback implements ToolCallback {
                 return ToolErrors.toolError(invalid.getMessage());
             }
         } catch (JacksonException exception) {
-            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(CloneKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
         }

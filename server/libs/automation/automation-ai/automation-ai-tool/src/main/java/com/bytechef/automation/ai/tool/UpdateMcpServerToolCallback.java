@@ -108,7 +108,7 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
             return JsonUtils.write(
                 new UpdateMcpServerOutput(updated.getId(), updated.getName(), updated.isEnabled()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | NoSuchElementException
             | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());

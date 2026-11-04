@@ -86,7 +86,7 @@ public class ListMcpProjectWorkflowsToolCallback implements ToolCallback {
 
             return JsonUtils.write(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(mcpServerId));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException exception) {
             return ToolErrors.toolError(exception.getMessage());
         } catch (RuntimeException exception) {
