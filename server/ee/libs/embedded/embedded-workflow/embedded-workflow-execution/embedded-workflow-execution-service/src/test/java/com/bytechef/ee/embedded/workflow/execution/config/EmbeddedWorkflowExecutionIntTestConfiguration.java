@@ -13,9 +13,11 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.execution.service.ContextServiceImpl;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
@@ -97,7 +99,7 @@ import tools.jackson.databind.ObjectMapper;
 @Import({
     ConnectedUserServiceImpl.class, ContextServiceImpl.class, IntegrationInstanceConfigurationServiceImpl.class,
     IntegrationInstanceServiceImpl.class, IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class,
-    JacksonConfiguration.class, JobServiceImpl.class, LiquibaseConfiguration.class, PrincipalJobServiceImpl.class,
+    JacksonConfiguration.class, LiquibaseConfiguration.class, PrincipalJobServiceImpl.class,
     TaskExecutionServiceImpl.class, TriggerExecutionServiceImpl.class
 })
 @Configuration
@@ -125,6 +127,11 @@ public class EmbeddedWorkflowExecutionIntTestConfiguration {
     @Bean
     Evaluator evaluator() {
         return SpelEvaluator.create();
+    }
+
+    @Bean
+    JobService jobService(JobRepository jobRepository) {
+        return new JobServiceImpl(jobRepository);
     }
 
     @Bean
