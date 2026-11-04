@@ -17,7 +17,9 @@ import com.bytechef.ee.embedded.ai.tool.model.IntegrationDetailInfo;
 import com.bytechef.ee.embedded.ai.tool.model.IntegrationInfo;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
+import com.bytechef.ee.embedded.configuration.exception.IntegrationErrorType;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import java.time.Instant;
 import java.util.List;
@@ -111,7 +113,17 @@ class IntegrationToolsTest {
 
         assertThatThrownBy(() -> newTools().getIntegration(1L))
             .isInstanceOf(ExecutionException.class)
-            .hasMessageContaining("Failed to get integration");
+            .hasMessage("Failed to get integration: RuntimeException");
+    }
+
+    @Test
+    void testFailureKeepsTheMessageOfAByteChefException() {
+        when(integrationFacade.getIntegration(1L)).thenThrow(
+            new ConfigurationException("Integration 1 is not published", IntegrationErrorType.GET_INTEGRATION));
+
+        assertThatThrownBy(() -> newTools().getIntegration(1L))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to get integration: Integration 1 is not published");
     }
 
     @Test

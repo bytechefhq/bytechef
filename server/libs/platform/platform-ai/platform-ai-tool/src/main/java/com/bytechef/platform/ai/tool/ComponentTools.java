@@ -75,7 +75,6 @@ public class ComponentTools {
     private static final String FAILED_TO_GET_ACTION = "Failed to get action";
     private static final String FAILED_TO_SEARCH_ACTIONS = "Failed to search actions";
     private static final String FAILED_TO_GENERATE_ACTION_DEFINITION = "Failed to generate action definition";
-    private static final String FAILED_TO_GET_OUTPUT_PROPERTIES = "Failed to get output properties";
     private static final String FAILED_TO_GET_PROPERTIES = "Failed to get properties";
 
     private final ActionDefinitionFacade actionDefinitionFacade;
@@ -792,9 +791,8 @@ public class ComponentTools {
                 "getOutputProperty({}, {}, {}): Failed to get output properties for '{}:{}'", componentName,
                 operationName, version, componentName, operationName, e);
 
-            throw new ExecutionException(
-                FAILED_TO_GET_OUTPUT_PROPERTIES + ": " + e.getMessage(), e,
-                ComponentErrorType.GET_OUTPUT_PROPERTIES);
+            throw ToolUtils.toToolExecutionException(
+                "get output properties", e, ComponentErrorType.GET_OUTPUT_PROPERTIES);
         }
     }
 

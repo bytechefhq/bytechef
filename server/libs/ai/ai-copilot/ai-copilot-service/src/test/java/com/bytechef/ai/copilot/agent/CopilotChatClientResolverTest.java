@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.copilot.agent;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -103,8 +104,10 @@ class CopilotChatClientResolverTest {
 
         assertSame(ChatModelUnavailableException.class, exception.getClass());
         assertSame(cause, exception.getCause());
-        assertTrue(exception.getMessage()
-            .contains("cannot decrypt the API key"));
+        String message = exception.getMessage();
+
+        assertTrue(message.contains("IllegalStateException"));
+        assertFalse(message.contains("cannot decrypt the API key"));
         verify(catalogChatClientResolver, never()).resolveDefault(anyInt());
     }
 
@@ -169,8 +172,10 @@ class CopilotChatClientResolverTest {
 
         assertSame(ChatModelUnavailableException.class, exception.getClass());
         assertSame(cause, exception.getCause());
-        assertTrue(exception.getMessage()
-            .contains("catalog down"));
+        String message = exception.getMessage();
+
+        assertTrue(message.contains("IllegalStateException"));
+        assertFalse(message.contains("catalog down"));
     }
 
     @Test
