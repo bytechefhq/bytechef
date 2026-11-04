@@ -119,6 +119,8 @@ public interface TaskExecutionRepository {
 
     Optional<TaskExecution> findLastCancelledLeafByJobId(long jobId);
 
+    Optional<TaskExecution> findLastFailedWithErrorByJobId(long jobId);
+
     Optional<TaskExecution> findLastStartedByJobId(long jobId);
 
     /**

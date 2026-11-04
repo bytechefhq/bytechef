@@ -494,6 +494,31 @@ public class JdbcTaskExecutionRepositoryIntTest {
     }
 
     @Test
+    public void testFindLastFailedWithErrorByJobId() {
+        long jobId = saveJob();
+
+        saveFailedTaskExecution(jobId, 0, new ExecutionError("first", List.of()));
+
+        TaskExecution lastFailedTaskExecution = saveFailedTaskExecution(
+            jobId, 1, new ExecutionError("second", List.of()));
+
+        saveFailedTaskExecution(jobId, 2, null);
+        saveTaskExecution(jobId, null, 3, new ExecutionError("completed", List.of()));
+
+        Assertions.assertEquals(
+            lastFailedTaskExecution.getId(), taskExecutionRepository.findLastFailedWithErrorByJobId(jobId)
+                .map(TaskExecution::getId)
+                .orElseThrow());
+
+        long notFailedJobId = saveJob();
+
+        saveTaskExecutionId(notFailedJobId, TaskExecution.Status.COMPLETED);
+
+        Assertions.assertTrue(taskExecutionRepository.findLastFailedWithErrorByJobId(notFailedJobId)
+            .isEmpty());
+    }
+
+    @Test
     public void testFindAllUnfinishedByJobId() {
         long jobId = saveJob();
 
@@ -585,6 +610,18 @@ public class JdbcTaskExecutionRepositoryIntTest {
             .retryAttempts(retryAttempts)
             .jobId(jobId)
             .parentId(parentId)
+            .taskNumber(taskNumber)
+            .workflowTask(new WorkflowTask(Map.of("name", "task" + taskNumber, "type", "test/v1")))
+            .build();
+
+        return taskExecutionRepository.save(taskExecution);
+    }
+
+    private TaskExecution saveFailedTaskExecution(long jobId, int taskNumber, ExecutionError error) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .error(error)
+            .jobId(jobId)
+            .status(TaskExecution.Status.FAILED)
             .taskNumber(taskNumber)
             .workflowTask(new WorkflowTask(Map.of("name", "task" + taskNumber, "type", "test/v1")))
             .build();

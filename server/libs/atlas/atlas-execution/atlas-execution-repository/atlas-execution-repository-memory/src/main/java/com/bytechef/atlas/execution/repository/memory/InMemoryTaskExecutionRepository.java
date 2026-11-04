@@ -564,6 +564,15 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
+    public Optional<TaskExecution> findLastFailedWithErrorByJobId(long jobId) {
+        return findAllByJobIdOrderByCreatedDate(jobId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getStatus() == TaskExecution.Status.FAILED)
+            .filter(taskExecution -> taskExecution.getError() != null)
+            .max(CREATED_DATE_COMPARATOR);
+    }
+
+    @Override
     public Optional<TaskExecution> findLastStartedByJobId(long jobId) {
         return findAllByJobIdOrderByCreatedDate(jobId)
             .stream()

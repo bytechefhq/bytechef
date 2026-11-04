@@ -41,6 +41,8 @@ public interface TaskExecutionService {
 
     Optional<TaskExecution> fetchLastCancelledLeafJobTaskExecution(long jobId);
 
+    Optional<TaskExecution> fetchLastFailedJobTaskExecution(long jobId);
+
     Optional<TaskExecution> fetchLastJobTaskExecution(long jobId);
 
     Optional<TaskExecution> fetchLastStartedJobTaskExecution(long jobId);
