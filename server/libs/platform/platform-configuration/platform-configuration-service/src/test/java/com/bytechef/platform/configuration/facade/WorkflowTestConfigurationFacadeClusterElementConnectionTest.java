@@ -26,14 +26,19 @@ import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.configuration.security.WorkflowConnectionAccessResolver;
+import com.bytechef.platform.configuration.security.WorkflowConnectionAccessResolver.ConnectionAccess;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * @author Ivica Cardic
@@ -69,12 +74,14 @@ class WorkflowTestConfigurationFacadeClusterElementConnectionTest {
     private final WorkflowService workflowService = mock(WorkflowService.class);
     private final WorkflowTestConfigurationService workflowTestConfigurationService =
         mock(WorkflowTestConfigurationService.class);
-    private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade =
-        new WorkflowTestConfigurationFacadeImpl(
-            connectionService, componentConnectionFacade, workflowService, workflowTestConfigurationService);
+    private WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
 
     @BeforeEach
     void beforeEach() {
+        workflowTestConfigurationFacade = new WorkflowTestConfigurationFacadeImpl(
+            connectionService, componentConnectionFacade, createGrantingWorkflowConnectionAccessResolvers(),
+            workflowService, workflowTestConfigurationService);
+
         when(workflowService.getWorkflow("workflow1")).thenReturn(AGENT_WORKFLOW);
         when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
             .thenAnswer(invocation -> {
@@ -112,6 +119,16 @@ class WorkflowTestConfigurationFacadeClusterElementConnectionTest {
 
         verify(workflowTestConfigurationService).saveWorkflowTestConfigurationConnection(
             "workflow1", "sendChannelMessage_1", "slack", 8L, false, 0L);
+    }
+
+    private static ObjectProvider<WorkflowConnectionAccessResolver> createGrantingWorkflowConnectionAccessResolvers() {
+        WorkflowConnectionAccessResolver workflowConnectionAccessResolver =
+            (workflowId, connectionId, environmentId) -> ConnectionAccess.GRANTED;
+
+        StaticListableBeanFactory staticListableBeanFactory = new StaticListableBeanFactory(
+            Map.of("workflowConnectionAccessResolver", workflowConnectionAccessResolver));
+
+        return staticListableBeanFactory.getBeanProvider(WorkflowConnectionAccessResolver.class);
     }
 
     private void stubConnection(long connectionId, String componentName) {
