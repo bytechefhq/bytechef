@@ -16,11 +16,21 @@
 
 package com.bytechef.automation.connection.tool.config;
 
+import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.tool.WorkspaceConnectionScopedToolCallback;
 import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.connection.tool.ConnectionTools;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.tool.ComponentTools;
+import com.bytechef.platform.component.tool.LookupComponentPropertyOptionsToolCallback;
+import com.bytechef.platform.component.tool.PropertyOptionsResolver;
+import com.bytechef.platform.component.tool.ScopedConnectionGuard;
 import com.bytechef.platform.component.tool.TaskTools;
 import com.bytechef.platform.workflow.tool.WorkflowInstructionTools;
 import java.util.ArrayList;
@@ -45,7 +55,14 @@ public class WorkflowAuthoringMcpContributorConfiguration {
     McpServerToolCallbackContributor workflowAuthoringMcpContributor(
         ObjectProvider<ComponentTools> componentToolsProvider, ObjectProvider<TaskTools> taskToolsProvider,
         ObjectProvider<WorkflowInstructionTools> workflowInstructionToolsProvider,
-        ObjectProvider<ConnectionTools> connectionToolsProvider, WorkspaceFacade workspaceFacade) {
+        ObjectProvider<ConnectionTools> connectionToolsProvider,
+        ObjectProvider<ActionDefinitionService> actionDefinitionServiceProvider,
+        ObjectProvider<ActionDefinitionFacade> actionDefinitionFacadeProvider,
+        ObjectProvider<TriggerDefinitionService> triggerDefinitionServiceProvider,
+        ObjectProvider<TriggerDefinitionFacade> triggerDefinitionFacadeProvider,
+        ObjectProvider<PropertyOptionsResolver> propertyOptionsResolverProvider,
+        ObjectProvider<ScopedConnectionGuard> scopedConnectionGuardProvider,
+        ObjectProvider<WorkspaceConnectionFacade> workspaceConnectionFacadeProvider, WorkspaceFacade workspaceFacade) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
@@ -72,6 +89,28 @@ public class WorkflowAuthoringMcpContributorConfiguration {
                 for (ToolCallback toolCallback : ToolCallbacks.from(connectionTools)) {
                     toolCallbacks.add(new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade));
                 }
+            }
+
+            ActionDefinitionService actionDefinitionService = actionDefinitionServiceProvider.getIfAvailable();
+            ActionDefinitionFacade actionDefinitionFacade = actionDefinitionFacadeProvider.getIfAvailable();
+            TriggerDefinitionService triggerDefinitionService = triggerDefinitionServiceProvider.getIfAvailable();
+            TriggerDefinitionFacade triggerDefinitionFacade = triggerDefinitionFacadeProvider.getIfAvailable();
+            PropertyOptionsResolver propertyOptionsResolver = propertyOptionsResolverProvider.getIfAvailable();
+            ScopedConnectionGuard scopedConnectionGuard = scopedConnectionGuardProvider.getIfAvailable();
+            WorkspaceConnectionFacade workspaceConnectionFacade = workspaceConnectionFacadeProvider.getIfAvailable();
+
+            if (actionDefinitionService != null && actionDefinitionFacade != null && triggerDefinitionService != null &&
+                triggerDefinitionFacade != null && propertyOptionsResolver != null && scopedConnectionGuard != null &&
+                workspaceConnectionFacade != null) {
+
+                ToolCallback lookupToolCallback = new LookupComponentPropertyOptionsToolCallback(
+                    actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+                    propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard);
+
+                toolCallbacks.add(
+                    new WorkspaceScopedFlatToolCallback(
+                        new WorkspaceConnectionScopedToolCallback(lookupToolCallback, workspaceConnectionFacade),
+                        workspaceFacade));
             }
 
             return toolCallbacks;

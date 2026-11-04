@@ -43,7 +43,7 @@ class ManagementMcpInstructionsTest {
         "updateWorkflow", "listConnections", "saveWorkflowTestConnection", "createProjectWorkflow", "getWorkflow",
         "getWorkflowBuildInstructions", "searchComponents", "getActionDefinition", "searchTriggers",
         "getTriggerDefinition", "publishProject", "createMcpServer", "createMcpProject", "updateMcpServer",
-        "listMcpServers", "updateMcpProjectWorkflowParameters");
+        "listMcpServers", "updateMcpProjectWorkflowParameters", "lookupPropertyOptions");
 
     @Test
     void testOmitsIntelligentToolsWhenNotRegistered() {
@@ -87,6 +87,27 @@ class ManagementMcpInstructionsTest {
 
             previous = index;
         }
+    }
+
+    @Test
+    void testAuthoringLoopNamesLookupPropertyOptionsBeforeCreatingTheWorkflowWhenRegistered() {
+        Set<String> toolNames = deterministicToolNames();
+
+        toolNames.add("lookupPropertyOptions");
+
+        String instructions = ManagementMcpInstructions.build(toolNames);
+
+        assertThat(instructions).contains("lookupPropertyOptions for the real options", "lookupRequired");
+
+        int lookupIndex = instructions.indexOf("lookupPropertyOptions");
+
+        assertThat(lookupIndex).isGreaterThan(instructions.indexOf("searchComponents"));
+        assertThat(lookupIndex).isLessThan(instructions.indexOf("createProjectWorkflow"));
+    }
+
+    @Test
+    void testOmitsLookupPropertyOptionsWhenNotRegistered() {
+        assertThat(ManagementMcpInstructions.build(deterministicToolNames())).doesNotContain("lookupPropertyOptions");
     }
 
     @Test
@@ -216,6 +237,7 @@ class ManagementMcpInstructionsTest {
         Set<String> toolNames = deterministicToolNames();
 
         toolNames.addAll(INTELLIGENT_TOOL_NAMES);
+        toolNames.add("lookupPropertyOptions");
 
         return toolNames;
     }
