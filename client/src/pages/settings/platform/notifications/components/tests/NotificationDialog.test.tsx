@@ -158,7 +158,7 @@ describe('NotificationDialog', () => {
         expect(screen.getByRole('option', {name: NotificationTypeEnum.Slack})).toBeInTheDocument();
     });
 
-    it('offers Email and Slack but not Webhook in the community edition', async () => {
+    it('offers only Email in the community edition', async () => {
         applicationInfoStore.setState({application: {edition: EditionType.CE}});
 
         render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Email} />);
@@ -166,7 +166,7 @@ describe('NotificationDialog', () => {
         await userEvent.click(screen.getByRole('combobox'));
 
         expect(screen.getByRole('option', {name: NotificationTypeEnum.Email})).toBeInTheDocument();
-        expect(screen.getByRole('option', {name: NotificationTypeEnum.Slack})).toBeInTheDocument();
+        expect(screen.queryByRole('option', {name: NotificationTypeEnum.Slack})).not.toBeInTheDocument();
         expect(screen.queryByRole('option', {name: NotificationTypeEnum.Webhook})).not.toBeInTheDocument();
     });
 

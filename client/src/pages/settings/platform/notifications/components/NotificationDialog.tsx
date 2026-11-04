@@ -228,12 +228,14 @@ const NotificationDialog = ({
                                                             </SelectItem>
                                                         )}
 
-                                                        <SelectItem
-                                                            key={NotificationTypeEnum.Slack.toString()}
-                                                            value={NotificationTypeEnum.Slack.toString()}
-                                                        >
-                                                            {NotificationTypeEnum.Slack.toString()}
-                                                        </SelectItem>
+                                                        {isEnterpriseEdition && (
+                                                            <SelectItem
+                                                                key={NotificationTypeEnum.Slack.toString()}
+                                                                value={NotificationTypeEnum.Slack.toString()}
+                                                            >
+                                                                {NotificationTypeEnum.Slack.toString()}
+                                                            </SelectItem>
+                                                        )}
                                                     </SelectContent>
                                                 </Select>
                                             </FormControl>
