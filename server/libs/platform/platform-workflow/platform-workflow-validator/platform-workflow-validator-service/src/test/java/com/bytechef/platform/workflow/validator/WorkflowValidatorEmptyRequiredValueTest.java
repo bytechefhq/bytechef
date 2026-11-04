@@ -54,6 +54,16 @@ class WorkflowValidatorEmptyRequiredValueTest {
     }
 
     @Test
+    void validateTaskParametersReportsARequiredPropertyHoldingAnEmptyFormula() {
+        StringBuilder errors = new StringBuilder();
+
+        TaskValidator.validateTaskParameters(
+            "accelo_1", "{\"name\": \"= \"}", TASK_DEFINITION, errors, new StringBuilder());
+
+        assertEquals("[accelo_1] Missing required property: name", errors.toString());
+    }
+
+    @Test
     void validateTaskParametersAcceptsAnOptionalPropertyClearedToNull() {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
