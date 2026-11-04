@@ -148,6 +148,20 @@ public class ConfigurationApplicationIntTest {
     }
 
     @Test
+    void testDataStorageIsReadFromExecutionApp() throws ClassNotFoundException {
+        Class<?> dataStorageClass = Class.forName("com.bytechef.platform.data.storage.DataStorage");
+
+        assertThat(applicationContext.getBeanNamesForType(dataStorageClass)).hasSize(1);
+
+        Object jdbcDataStorageService = applicationContext.getBean(
+            Class.forName("com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService"));
+
+        assertThat(AopUtils.getTargetClass(jdbcDataStorageService)
+            .getName()).isEqualTo(
+                "com.bytechef.ee.platform.data.storage.db.remote.client.service.RemoteJdbcDataStorageServiceClient");
+    }
+
+    @Test
     void testJobCompletionIsAwaitedThroughTheMessageBroker() throws ClassNotFoundException {
         Object jobCompletionAwaiter = applicationContext.getBean(
             Class.forName("com.bytechef.platform.workflow.execution.JobCompletionAwaiter"));
