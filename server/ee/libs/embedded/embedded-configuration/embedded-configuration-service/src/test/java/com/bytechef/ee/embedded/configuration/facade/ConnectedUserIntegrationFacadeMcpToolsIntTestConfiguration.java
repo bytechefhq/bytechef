@@ -100,7 +100,7 @@ public class ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration {
 
         return new ConnectedUserIntegrationFacadeImpl(
             clusterElementDefinitionService, null, null, null, null, null, null, null, null, null, null, null, null,
-            mcpComponentService, mcpIntegrationComponentService, null, null, mcpIntegrationInstanceToolService,
+            null, mcpComponentService, mcpIntegrationComponentService, null, null, mcpIntegrationInstanceToolService,
             mcpServerService, mcpToolService, null, null, null, null, null);
     }
 

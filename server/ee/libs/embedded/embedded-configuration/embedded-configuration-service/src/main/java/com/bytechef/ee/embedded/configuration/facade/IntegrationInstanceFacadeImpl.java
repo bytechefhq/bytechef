@@ -74,6 +74,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     private final PrincipalJobService principalJobService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
+    private final IntegrationInstanceDataStorageCleanup integrationInstanceDataStorageCleanup;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
@@ -91,6 +92,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         ConnectedUserService connectedUserService, Evaluator evaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
+        IntegrationInstanceDataStorageCleanup integrationInstanceDataStorageCleanup,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService, JobService jobService,
@@ -103,6 +105,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         this.evaluator = evaluator;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
+        this.integrationInstanceDataStorageCleanup = integrationInstanceDataStorageCleanup;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
@@ -126,6 +129,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         if (integrationInstance.isEnabled()) {
             enableIntegrationInstanceWorkflowTriggers(integrationInstanceId, false);
         }
+
+        integrationInstanceDataStorageCleanup.deleteAfterCommit(integrationInstanceId);
 
         integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
 

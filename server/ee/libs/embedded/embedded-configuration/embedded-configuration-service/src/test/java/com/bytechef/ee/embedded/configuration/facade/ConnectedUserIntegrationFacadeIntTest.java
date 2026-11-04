@@ -96,6 +96,8 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.data.storage.DataStorageScopeDeleter.ScopeData;
+import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpComponentService;
@@ -153,7 +155,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(
     classes = {
         AutomationWorkflowProjectFacadeIntTestConfiguration.class,
-        ConnectedUserIntegrationFacadeIntTest.ConnectedUserServiceConfiguration.class
+        ConnectedUserIntegrationFacadeIntTest.ConnectedUserServiceConfiguration.class,
+        ConnectedUserIntegrationFacadeIntTest.RecordingDataStorageConfiguration.class
     },
     properties = {
         "bytechef.edition=EE",
@@ -223,6 +226,9 @@ class ConnectedUserIntegrationFacadeIntTest {
     private McpServerService mcpServerService;
 
     @Autowired
+    private RecordingDataStorage recordingDataStorage;
+
+    @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
 
     @Autowired
@@ -238,6 +244,8 @@ class ConnectedUserIntegrationFacadeIntTest {
 
     @BeforeEach
     void beforeEach() {
+        recordingDataStorage.reset();
+
         ownerExternalUserId = "owner-" + UUID.randomUUID();
         otherExternalUserId = "other-" + UUID.randomUUID();
 
@@ -345,6 +353,32 @@ class ConnectedUserIntegrationFacadeIntTest {
     }
 
     @Test
+    void testDeleteIntegrationInstanceDeletesItsDataStorageAfterCommit() {
+        integrationInstanceService.updateEnabled(integrationInstanceId, false);
+
+        List<ScopeData> expectedScopeDataList = new ArrayList<>();
+
+        expectedScopeDataList.add(
+            new ScopeData(DataStorageScope.PRINCIPAL, String.valueOf(integrationInstanceId), PlatformType.EMBEDDED));
+
+        for (IntegrationInstanceWorkflow integrationInstanceWorkflow : integrationInstanceWorkflowService
+            .getIntegrationInstanceWorkflows(integrationInstanceId)) {
+
+            expectedScopeDataList.add(
+                new ScopeData(
+                    DataStorageScope.WORKFLOW, String.valueOf(integrationInstanceWorkflow.getId()),
+                    PlatformType.EMBEDDED));
+        }
+
+        assertThat(expectedScopeDataList).hasSize(3);
+
+        connectedUserIntegrationFacade.deleteIntegrationInstance(ownerExternalUserId, integrationInstanceId);
+
+        assertThat(recordingDataStorage.getDeletedScopeDataList()).containsExactlyInAnyOrderElementsOf(
+            expectedScopeDataList);
+    }
+
+    @Test
     void testDeleteDeniedForNonOwner() {
         assertThatThrownBy(
             () -> connectedUserIntegrationFacade.deleteIntegrationInstance(otherExternalUserId, integrationInstanceId))
@@ -391,6 +425,15 @@ class ConnectedUserIntegrationFacadeIntTest {
     @Configuration
     @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
     static class ConnectedUserServiceConfiguration {
+    }
+
+    @Configuration
+    static class RecordingDataStorageConfiguration {
+
+        @Bean
+        RecordingDataStorage recordingDataStorage() {
+            return new RecordingDataStorage();
+        }
     }
 
     private void exposeAsMcpWorkflow(
@@ -1577,6 +1620,34 @@ class ConnectedUserIntegrationFacadeIntTest {
             verify(triggerLifecycleFacade).executeTriggerDisable(
                 eq(workflowIdA), any(), any(), any(), eq(CONNECTION_ID));
             verify(connectionFacade).delete(CONNECTION_ID);
+        }
+
+        @Test
+        void testFailedProvisioningDeletesTheCreatedInstanceDataStorage() {
+            doThrow(new IllegalStateException("trigger registration failed"))
+                .when(triggerLifecycleFacade)
+                .executeTriggerEnable(eq(workflowIdB), any(), any(), any(), any(), any(), anyLong());
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(),
+                List.of(
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of()),
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of()))))
+                        .isInstanceOf(IllegalStateException.class);
+
+            List<ScopeData> deletedScopeDataList = recordingDataStorage.getDeletedScopeDataList();
+
+            assertThat(deletedScopeDataList)
+                .filteredOn(scopeData -> scopeData.scope() == DataStorageScope.PRINCIPAL)
+                .singleElement()
+                .satisfies(scopeData -> assertThat(scopeData.scopeId()).isNotEqualTo(
+                    String.valueOf(integrationInstanceId)));
+            assertThat(deletedScopeDataList)
+                .filteredOn(scopeData -> scopeData.scope() == DataStorageScope.WORKFLOW)
+                .isNotEmpty();
+            assertThat(deletedScopeDataList)
+                .extracting(ScopeData::type)
+                .containsOnly(PlatformType.EMBEDDED);
         }
 
         @Test
