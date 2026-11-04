@@ -47,10 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Builds the {@link NotificationHandlerContext} of a job event: the job, its workflow, the project (or integration) and
- * environment it runs in, the failing task's error and a link to the execution. Each lookup is best-effort; a failed
- * lookup omits its field and never prevents the notification.
- *
  * @author Ivica Cardic
  */
 public class NotificationHandlerContexts {

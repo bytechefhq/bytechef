@@ -28,46 +28,19 @@ import java.util.Map;
  */
 public class NotificationHandlerContext {
 
-    /**
-     * @param id
-     * @param name
-     * @param status
-     * @param startDate
-     * @param endDate
-     * @param durationMillis
-     */
     public record JobSummary(
         Long id, String name, String status, Instant startDate, Instant endDate, Long durationMillis) {
     }
 
-    /**
-     * @param id
-     * @param name
-     */
     public record WorkflowSummary(String id, String name) {
     }
 
-    /**
-     * @param id
-     * @param name
-     * @param version
-     */
     public record ProjectSummary(Long id, String name, Integer version) {
     }
 
-    /**
-     * @param taskName
-     * @param taskType
-     * @param message
-     * @param stackTrace
-     */
     public record ErrorSummary(String taskName, String taskType, String message, String stackTrace) {
     }
 
-    /**
-     * @param expiresAt
-     * @param formUrl
-     */
     public record ApprovalSummary(String expiresAt, String formUrl) {
     }
 
@@ -258,9 +231,6 @@ public class NotificationHandlerContext {
         return new ApprovalSummary(approvalExpiresAt, approvalFormUrl);
     }
 
-    /**
-     * Returns the default webhook body: the legacy keys first, followed by the summary sections that are present.
-     */
     public Map<String, Object> toMap() {
         Map<String, Object> map = new LinkedHashMap<>();
 
@@ -349,9 +319,6 @@ public class NotificationHandlerContext {
         return map;
     }
 
-    /**
-     * Returns the human-readable detail lines shared by the email and chat handlers; empty when nothing is present.
-     */
     public String toDetailsText() {
         List<String> lines = new ArrayList<>();
 
@@ -384,9 +351,6 @@ public class NotificationHandlerContext {
         return String.join("\n", lines);
     }
 
-    /**
-     * Returns a copy of this context that differs only in its delivery id.
-     */
     public NotificationHandlerContext withDeliveryId(String deliveryId) {
         NotificationHandlerContext copy = new NotificationHandlerContext();
 
