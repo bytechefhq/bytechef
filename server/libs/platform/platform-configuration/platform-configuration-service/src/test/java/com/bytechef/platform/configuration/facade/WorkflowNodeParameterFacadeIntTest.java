@@ -57,6 +57,7 @@ import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationR
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1493,6 +1494,35 @@ class WorkflowNodeParameterFacadeIntTest {
                 "tasks", List.of()));
 
         assertThat(workflowNodeParameterFacade.getWorkflowNodeMissingRequiredProperties(workflowId, "trigger_1"))
+            .isEmpty();
+    }
+
+    @Test
+    void testGetWorkflowNodeMissingRequiredPropertiesSkipsNullItemsInNestedListParameters() {
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn(new ArrayList<>());
+
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+
+        List<Object> value = new ArrayList<>();
+
+        value.add(new ArrayList<>(Collections.singletonList(null)));
+        value.add(null);
+
+        Map<String, Object> varParameters = new HashMap<>();
+
+        varParameters.put("type", "ARRAY");
+        varParameters.put("value", value);
+
+        String workflowId = createWorkflow(
+            Map.of(
+                "tasks", List.of(
+                    Map.of("name", "var_1", "type", "var/v1/set", "parameters", varParameters),
+                    Map.of("name", "logger_1", "type", "logger/v1/info", "parameters", Map.of()))));
+
+        assertThat(workflowNodeParameterFacade.getWorkflowNodeMissingRequiredProperties(workflowId, "logger_1"))
             .isEmpty();
     }
 
