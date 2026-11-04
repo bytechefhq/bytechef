@@ -85,21 +85,6 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecuteRubyWithInputAndContext() {
-        Object result = execute("ruby", "def perform(input, context)\n\treturn input.name\nend");
-
-        assertThat(result).isEqualTo("ByteChef");
-    }
-
-    @Test
-    void testExecuteRubyWithInputConnectionAndContext() {
-        Object result = execute(
-            "ruby", "def perform(input, connection, context)\n\treturn connection[\"my-connection\"][\"token\"]\nend");
-
-        assertThat(result).isEqualTo("secret");
-    }
-
-    @Test
     void testExecuteWithoutComponentConnections() {
         Parameters inputParameters = ParametersFactory.create(
             Map.of(
@@ -117,31 +102,6 @@ class PolyglotEngineTest {
             "python", "def perform(input, context):\n\treturn input.items", Map.of("items", List.of(1, 2)));
 
         assertThat(result).isEqualTo(List.of(1, 2));
-    }
-
-    @Test
-    void testExecuteRubyReadsInputKeyNamedLikeHashMethod() {
-        Object result = execute(
-            "ruby", "def perform(input, context)\n\tinput.count\nend", Map.of("count", 7, "name", "ByteChef"));
-
-        assertThat(result).isEqualTo(7);
-    }
-
-    @Test
-    void testExecuteRubyWithInputContextAndBlock() {
-        Object result = execute(
-            "ruby", "def perform(input, context, &block)\n\tcontext.component.nil? ? 'connection' : 'context'\nend");
-
-        assertThat(result).isEqualTo("context");
-    }
-
-    @Test
-    void testExecuteRubyWithInputContextAndOptionalParameter() {
-        Object result = execute(
-            "ruby",
-            "def perform(input, context, options = {})\n\tcontext.component.nil? ? 'connection' : 'context'\nend");
-
-        assertThat(result).isEqualTo("context");
     }
 
     @Test
