@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20261103000001-1" author="Ivica Cardic">
+        <addColumn tableName="data_table_webhook">
+            <column name="workflow_execution_id" type="VARCHAR(512)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20261103000001-2" author="Ivica Cardic">
+        <sql>
+            UPDATE data_table_webhook
+            SET workflow_execution_id = CASE
+                WHEN length(regexp_replace(regexp_replace(url, '[?#].*$', ''), '^.*/webhooks/', '')) &lt;= 512
+                THEN regexp_replace(regexp_replace(url, '[?#].*$', ''), '^.*/webhooks/', '')
+            END
+        </sql>
+    </changeSet>
+
+    <changeSet id="20261103000001-3" author="Ivica Cardic">
+        <sql>
+            DELETE FROM data_table_webhook
+            WHERE workflow_execution_id IS NULL OR NOT regexp_like(workflow_execution_id, '^[A-Za-z0-9+/=]+$')
+        </sql>
+
+        <sql>
+            DELETE FROM data_table_webhook
+            WHERE id NOT IN (
+                SELECT MAX(id) FROM data_table_webhook
+                GROUP BY data_table_id, type, workflow_execution_id, environment)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20261103000001-4" author="Ivica Cardic">
+        <dropUniqueConstraint tableName="data_table_webhook" constraintName="uk_data_table_webhook"/>
+
+        <dropNotNullConstraint tableName="data_table_webhook" columnName="url" columnDataType="VARCHAR(2000)"/>
+
+        <addUniqueConstraint
+            tableName="data_table_webhook"
+            columnNames="data_table_id,type,workflow_execution_id,environment"
+            constraintName="uk_data_table_webhook"/>
+    </changeSet>
+</databaseChangeLog>
