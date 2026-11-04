@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261104163510-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <uniqueConstraintExists tableName="data_entry" constraintName="uk_data_entry_key"/>
+        </preConditions>
+
+        <dropUniqueConstraint tableName="data_entry" constraintName="uk_data_entry_key"/>
+
+        <addUniqueConstraint
+            constraintName="uk_data_entry_key"
+            tableName="data_entry"
+            columnNames="component_name, scope, scope_id, key, environment, type"/>
+    </changeSet>
+
+</databaseChangeLog>
