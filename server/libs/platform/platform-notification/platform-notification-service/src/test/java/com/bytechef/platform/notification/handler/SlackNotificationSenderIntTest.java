@@ -112,6 +112,24 @@ class SlackNotificationSenderIntTest {
     }
 
     @Test
+    void testSendReadsSlackUrlFromSecretSettings() throws Exception {
+        Notification notification = createNotification(Map.of());
+
+        notification.setSecretSettings(Map.of("slackWebhookUrl", loopbackWebhookReceiver.getUrl("/services/S/E/C")));
+
+        CompletableFuture<Void> future = slackNotificationSender.send(
+            notification, slackNotificationHandler, notificationHandlerContext);
+
+        LoopbackWebhookReceiver.ReceivedRequest receivedRequest = loopbackWebhookReceiver.awaitRequest();
+
+        future.join();
+
+        assertThat(receivedRequest.path()).isEqualTo("/services/S/E/C");
+        assertThat(receivedRequest.body()).isEqualTo("{\"text\":\"Approval pending\"}");
+        assertThat(future).isCompleted();
+    }
+
+    @Test
     void testSendStripsSurroundingWhitespaceFromWebhookUrl() throws Exception {
         CompletableFuture<Void> future = slackNotificationSender.send(
             createNotification(

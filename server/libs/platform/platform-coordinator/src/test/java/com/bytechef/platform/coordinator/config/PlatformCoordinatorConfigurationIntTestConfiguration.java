@@ -26,6 +26,9 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.Encryption;
+import com.bytechef.encryption.EncryptionImpl;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.message.broker.MessageBroker;
@@ -56,6 +59,16 @@ import org.springframework.context.annotation.Import;
 })
 @Configuration
 public class PlatformCoordinatorConfigurationIntTestConfiguration {
+
+    @Bean
+    Encryption encryption(EncryptionKey encryptionKey) {
+        return new EncryptionImpl(encryptionKey);
+    }
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
 
     @Bean
     JobService jobService(JobRepository jobRepository) {
