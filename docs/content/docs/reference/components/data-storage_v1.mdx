@@ -420,7 +420,7 @@ Data Storage actions accept a `scope` that defines how broadly the value is visi
 
 - CURRENT_EXECUTION
   - Visibility: Only within the currently running workflow execution (this single run).
-  - Lifetime: Disappears when this execution finishes.
+  - Lifetime: Deleted when this execution completes. A failed, stopped or paused execution keeps its values so it can use them when it restarts or resumes, and the values of a subflow are deleted when its top-level execution completes.
   - Example: Accumulate items in a loop and emit at the end of the run.
 
 - WORKFLOW
