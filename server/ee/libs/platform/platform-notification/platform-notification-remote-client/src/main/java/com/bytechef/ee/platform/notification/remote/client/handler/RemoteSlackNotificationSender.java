@@ -12,6 +12,7 @@ import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.SlackNotificationHandler;
+import java.util.concurrent.CompletableFuture;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -34,7 +35,7 @@ public class RemoteSlackNotificationSender extends AbstractRemoteNotificationSen
     }
 
     @Override
-    public void send(
+    public CompletableFuture<Void> send(
         Notification notification, @Nullable SlackNotificationHandler slackNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
@@ -44,6 +45,6 @@ public class RemoteSlackNotificationSender extends AbstractRemoteNotificationSen
             sendNotificationRequestBuilder.setContent(slackNotificationHandler.getText(notificationHandlerContext));
         }
 
-        send(notification, sendNotificationRequestBuilder);
+        return send(notification, sendNotificationRequestBuilder);
     }
 }

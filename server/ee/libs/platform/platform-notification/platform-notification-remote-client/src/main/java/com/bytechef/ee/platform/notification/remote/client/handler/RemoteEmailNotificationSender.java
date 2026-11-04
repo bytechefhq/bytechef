@@ -12,6 +12,7 @@ import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.handler.EmailNotificationHandler;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -33,7 +34,7 @@ public class RemoteEmailNotificationSender extends AbstractRemoteNotificationSen
     }
 
     @Override
-    public void send(
+    public CompletableFuture<Void> send(
         Notification notification, EmailNotificationHandler emailNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
@@ -42,6 +43,6 @@ public class RemoteEmailNotificationSender extends AbstractRemoteNotificationSen
             .setHtml(emailNotificationHandler.isHtml())
             .setSubject(emailNotificationHandler.getSubject(notificationHandlerContext));
 
-        send(notification, sendNotificationRequestBuilder);
+        return send(notification, sendNotificationRequestBuilder);
     }
 }
