@@ -18,6 +18,20 @@ Every name below is the property path uppercased with dots **and dashes** replac
 | `BYTECHEF_AI_COPILOT_EMBEDDING_PROVIDER` | Embedding provider for the Copilot vector index (OLLAMA, OPENAI) | - |
 | `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` | API key for the Copilot embedding provider - OpenAI only. With Ollama, the docs index uses `BYTECHEF_AI_PROVIDER_OLLAMA_URL` and the optional `BYTECHEF_AI_PROVIDER_OLLAMA_API_KEY` (sensitive) | - |
 
+## AI Agent Utils Configuration
+
+Settings of the [Agent Utils](/platform/automation/build/workflows/ai/agent/agent-utils) tools.
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_AGENT_UTILS_ALLOWED_PRIVATE_HOSTS` | Comma-separated hosts the Smart Web Fetch tool and the A2A Agent Tool may reach even though they resolve to a private, loopback or link-local address. Every other such host is refused | - |
+| `BYTECHEF_AI_AGENT_UTILS_WORKSPACE_BASEDIR` | Directory under which each tenant's agents get their own [workspace](/platform/automation/build/workflows/ai/agent/agent-utils#agent-workspace) for the File System, Glob, Grep, List Directory and Shell tools. When empty, those tools fail at run time | `${user.home}/bytechef/data/ai-agent-workspaces` |
+| `BYTECHEF_AI_AGENT_UTILS_SHELL_ENABLED` | Offer the [Shell Tools](/platform/automation/build/workflows/ai/agent/agent-utils#shell-tools) element to AI agents | `false` |
+| `BYTECHEF_AI_AGENT_UTILS_SHELL_ALLOW_LOCAL` | Allow Shell Tools elements to run commands directly on the server instead of in a Docker container. Local commands are not confined to the agent workspace; allow only on trusted single-tenant installations | `false` |
+| `BYTECHEF_AI_AGENT_UTILS_SHELL_DOCKER_COMMAND` | Docker-compatible CLI on the server's `PATH` used to manage the shell containers (`docker`, `podman`) | `docker` |
+| `BYTECHEF_AI_AGENT_UTILS_SHELL_DOCKER_IDLE_TIMEOUT` | How long an agent's shell container may stay unused before it is removed | `10m` |
+| `BYTECHEF_AI_AGENT_UTILS_SHELL_DOCKER_IMAGE` | Container image for shell commands; it must provide `/bin/bash` and `sleep` | `debian:bookworm-slim` |
+
 ## AI Auto Memory Configuration
 
 > **Coming soon.** Auto Memory is on the upcoming release track and is not yet available in the latest released version of ByteChef.
