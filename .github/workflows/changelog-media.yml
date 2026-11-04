@@ -1,0 +1,196 @@
+name: Changelog media
+
+# Started by the "Automate new ByteChef release" workflow on app.bytechef.io after it opens the changelog pull request
+# in bytechef-website. Runs the released version, lets Claude Code capture screenshots and short videos of the headline
+# features, adds them to the changelog entry and marks the pull request ready for review.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, e.g. v0.36.0'
+        required: true
+      branch:
+        description: 'Changelog pull request branch in bytechefhq/bytechef-website'
+        required: true
+
+concurrency:
+  group: changelog-media-${{ inputs.branch }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  CAPTURE_DIR: ${{ github.workspace }}/capture
+  WEBSITE_REPOSITORY: bytechefhq/bytechef-website
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout workflow scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+
+      - name: Checkout release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          path: app
+
+      - name: Checkout changelog pull request
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WEBSITE_REPOSITORY }}
+          ref: ${{ inputs.branch }}
+          path: website
+          token: ${{ secrets.CHANGELOG_WEBSITE_TOKEN }}
+          persist-credentials: false
+
+      - name: Prepare capture directory
+        env:
+          GH_TOKEN: ${{ secrets.CHANGELOG_WEBSITE_TOKEN }}
+          TAG: ${{ inputs.tag }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          mkdir -p "$CAPTURE_DIR"
+          SLUG=$(echo "$TAG" | sed -E 's/^v?([0-9]+)\.([0-9]+).*/v\1-\2/')
+          echo "SLUG=$SLUG" >> "$GITHUB_ENV"
+          test -f "website/app/(marketing)/changelog/data/$SLUG.ts"
+          gh pr view "$BRANCH" -R "$WEBSITE_REPOSITORY" --json body --jq .body > "$CAPTURE_DIR/shot-list.md"
+
+      - name: Set up GraalVM for JDK 25
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'graalvm-community'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: app/client/package-lock.json
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('app/**/*.gradle.kts') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: Start infrastructure
+        working-directory: app/server
+        run: docker compose -f docker-compose.dev.infra.yml up -d
+
+      - name: Start server
+        working-directory: app
+        run: nohup ./gradlew -p server/apps/server-app bootRun --no-daemon > "$CAPTURE_DIR/server.log" 2>&1 &
+
+      - name: Install client and browsers
+        working-directory: app/client
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          cp ../../.github/changelog-media/playwright.capture.config.ts playwright.capture.config.ts
+          mkdir -p test/playwright/changelog-capture
+
+      - name: Start client
+        working-directory: app/client
+        run: nohup npx vite --host 127.0.0.1 --port 5173 --strictPort > "$CAPTURE_DIR/client.log" 2>&1 &
+
+      - name: Wait for the app
+        run: |
+          for _ in $(seq 1 240); do
+            SERVER_STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:9555/api/account || true)
+
+            if [ "$SERVER_STATUS" != '000' ] && curl -sf http://127.0.0.1:5173 > /dev/null; then
+              echo "App is up"
+              exit 0
+            fi
+            sleep 10
+          done
+          tail -n 200 "$CAPTURE_DIR/server.log"
+          exit 1
+
+      - name: Build capture prompt
+        id: prompt
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          sed -e "s|{{TAG}}|$TAG|g" -e "s|{{SLUG}}|$SLUG|g" -e "s|{{CAPTURE_DIR}}|$CAPTURE_DIR|g" \
+            .github/changelog-media/capture-prompt.md > "$CAPTURE_DIR/prompt.md"
+          {
+            echo 'text<<CAPTURE_PROMPT_EOF'
+            cat "$CAPTURE_DIR/prompt.md"
+            echo 'CAPTURE_PROMPT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Capture media with Claude Code
+        id: claude
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: ${{ steps.prompt.outputs.text }}
+          claude_args: '--model claude-opus-5-5 --max-turns 150 --allowedTools "Bash,Read,Write,Edit,Glob,Grep"'
+
+      - name: Add media to the changelog entry
+        id: apply
+        if: always() && hashFiles('capture/manifest.json') != ''
+        run: node .github/changelog-media/apply-media.mjs "$CAPTURE_DIR" website "$SLUG"
+
+      - name: Push media and mark pull request ready
+        if: always() && steps.prompt.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.CHANGELOG_WEBSITE_TOKEN }}
+          BRANCH: ${{ inputs.branch }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          APPLY_OUTCOME: ${{ steps.apply.outcome }}
+        run: |
+          cd website
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -A "public/changelog/$SLUG" "app/(marketing)/changelog/data/$SLUG.ts"
+            git commit -m "Add $SLUG changelog media"
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${WEBSITE_REPOSITORY}.git" "HEAD:$BRANCH"
+          fi
+
+          if [ "$APPLY_OUTCOME" = 'success' ]; then
+            SUMMARY=$(node -e "
+              const summary = require('$CAPTURE_DIR/summary.json');
+              const lines = ['**Changelog media**', ''];
+              summary.applied.forEach((item) => lines.push('- Added ' + item.src + ' to \"' + item.category + '\"'));
+              summary.skipped.forEach((item) => lines.push('- Skipped \"' + item.shot + '\": ' + item.reason));
+              summary.rejected.forEach((item) => lines.push('- Could not use ' + (item.shot.file || 'a capture') + ': ' + item.reason));
+              console.log(lines.join('\n'));
+            ")
+          else
+            SUMMARY="**Changelog media**: capture failed, no media was added."
+          fi
+
+          gh pr comment "$BRANCH" -R "$WEBSITE_REPOSITORY" --body "$SUMMARY
+
+          Run: $RUN_URL"
+          gh pr ready "$BRANCH" -R "$WEBSITE_REPOSITORY"
+
+      - name: Upload capture artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog-media-${{ inputs.tag }}
+          path: |
+            capture
+            app/client/test/playwright/changelog-capture
+          retention-days: 14
