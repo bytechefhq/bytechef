@@ -70,21 +70,6 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecutePythonWithInputAndContext() {
-        Object result = execute("python", "def perform(input, context):\n\treturn input.name");
-
-        assertThat(result).isEqualTo("ByteChef");
-    }
-
-    @Test
-    void testExecutePythonWithInputConnectionAndContext() {
-        Object result = execute(
-            "python", "def perform(input, connection, context):\n\treturn connection[\"my-connection\"][\"token\"]");
-
-        assertThat(result).isEqualTo("secret");
-    }
-
-    @Test
     void testExecuteJavaScriptWithoutComponentConnections() {
         Parameters inputParameters = ParametersFactory.create(
             Map.of(
@@ -94,24 +79,6 @@ class PolyglotEngineTest {
         Object result = polyglotEngine.execute("js", inputParameters, null, jobContextAware);
 
         assertThat(result).isEqualTo(0);
-    }
-
-    @Test
-    void testExecutePythonReadsInputKeyNamedLikeDictMethod() {
-        Object result = execute(
-            "python", "def perform(input, context):\n\treturn input.items", Map.of("items", List.of(1, 2)));
-
-        assertThat(result).isEqualTo(List.of(1, 2));
-    }
-
-    @Test
-    void testExecutePythonWithInputContextAndOptionalParameter() {
-        Object result = execute(
-            "python",
-            "def perform(input, context, debug=False):\n\treturn 'context' if hasattr(context, 'component') " +
-                "else 'connection'");
-
-        assertThat(result).isEqualTo("context");
     }
 
     @Test
@@ -163,6 +130,39 @@ class PolyglotEngineTest {
 
         assertThatThrownBy(() -> polyglotEngine.execute("js", inputParameters, null, jobContextAware))
             .hasMessageContaining("Connection with name missing does not exist");
+    }
+
+    @Test
+    void testExecutePythonWithInputAndContext() {
+        Object result = execute("python", "def perform(input, context):\n\treturn input.name");
+
+        assertThat(result).isEqualTo("ByteChef");
+    }
+
+    @Test
+    void testExecutePythonWithInputConnectionAndContext() {
+        Object result = execute(
+            "python", "def perform(input, connection, context):\n\treturn connection[\"my-connection\"][\"token\"]");
+
+        assertThat(result).isEqualTo("secret");
+    }
+
+    @Test
+    void testExecutePythonReadsInputKeyNamedLikeDictMethod() {
+        Object result = execute(
+            "python", "def perform(input, context):\n\treturn input.items", Map.of("items", List.of(1, 2)));
+
+        assertThat(result).isEqualTo(List.of(1, 2));
+    }
+
+    @Test
+    void testExecutePythonWithInputContextAndOptionalParameter() {
+        Object result = execute(
+            "python",
+            "def perform(input, context, debug=False):\n\treturn 'context' if hasattr(context, 'component') " +
+                "else 'connection'");
+
+        assertThat(result).isEqualTo("context");
     }
 
     private Object execute(String languageId, String script) {
