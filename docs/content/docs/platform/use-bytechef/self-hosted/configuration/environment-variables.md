@@ -227,7 +227,7 @@ The Context Store sync engine writes records to Postgres by default (the same da
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_CACHE_PROVIDER` | Cache provider (CAFFEINE) | `CAFFEINE` |
+| `BYTECHEF_CACHE_PROVIDER` | Cache provider (CAFFEINE, REDIS). `REDIS` is EE only: it keeps the shared state caches in Redis and every other cache in each node's memory. See [Node roles](./node-roles#shared-state-caches). | `CAFFEINE` |
 
 ## Cloud Configuration
 
