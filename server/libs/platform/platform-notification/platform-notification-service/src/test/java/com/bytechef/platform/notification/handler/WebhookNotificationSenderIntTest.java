@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.AfterEach;
@@ -51,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Ivica Cardic
@@ -59,7 +57,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 @SpringBootTest(
     classes = PlatformNotificationIntTestConfiguration.class,
     properties = {
-        "bytechef.edition=ee", "bytechef.webhook-delivery.concurrency-limit=10",
+        "bytechef.edition=ee", "bytechef.webhook-delivery.allowed-hosts=localhost",
+        "bytechef.webhook-delivery.concurrency-limit=10",
         "bytechef.webhook-delivery.max-pending-deliveries=1000"
     })
 @Timeout(30)
@@ -68,7 +67,6 @@ class WebhookNotificationSenderIntTest {
     private LoopbackWebhookReceiver loopbackWebhookReceiver;
     private final NotificationHandlerContext notificationHandlerContext =
         new NotificationHandlerContext.Builder().build();
-    private Consumer<String> originalUrlValidator;
     private final WebhookNotificationHandler webhookNotificationHandler = mock(WebhookNotificationHandler.class);
 
     @MockitoBean
@@ -81,20 +79,13 @@ class WebhookNotificationSenderIntTest {
     private WebhookNotificationSender webhookNotificationSender;
 
     @BeforeEach
-    @SuppressWarnings("unchecked")
     void beforeEach() {
         loopbackWebhookReceiver = new LoopbackWebhookReceiver();
-
-        originalUrlValidator = (Consumer<String>) ReflectionTestUtils.getField(webhookDeliveryService, "urlValidator");
-
-        ReflectionTestUtils.setField(webhookDeliveryService, "urlValidator", (Consumer<String>) url -> {});
     }
 
     @AfterEach
     void afterEach() {
         loopbackWebhookReceiver.close();
-
-        ReflectionTestUtils.setField(webhookDeliveryService, "urlValidator", originalUrlValidator);
     }
 
     @Test
@@ -294,13 +285,11 @@ class WebhookNotificationSenderIntTest {
 
     @Test
     void testSendValidatesTheWebhookUrl() {
-        ReflectionTestUtils.setField(webhookDeliveryService, "urlValidator", originalUrlValidator);
-
         when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
 
         CompletableFuture<Void> future = webhookNotificationSender.send(
-            createNotification(Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook"))),
-            webhookNotificationHandler, notificationHandlerContext);
+            createNotification(Map.of("webhook", getDisallowedHostUrl("/hook"))), webhookNotificationHandler,
+            notificationHandlerContext);
 
         assertThatThrownBy(future::join)
             .hasCauseInstanceOf(WebhookDeliveryException.class);
@@ -369,6 +358,152 @@ class WebhookNotificationSenderIntTest {
         future.join();
 
         assertThat(future).isCompleted();
+    }
+
+    @Test
+    void testSendTestUsesSameDeliveryAsSend() throws Exception {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{\"a\":1}");
+
+        loopbackWebhookReceiver.respondWith(200, "ok");
+
+        Notification notification = createNotification(
+            Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook"), "webhookSecret", "secret"));
+
+        notification.setSecretSettings(
+            Map.of("webhookHeaders", List.of(Map.of("name", "X-Token", "value", "t"))));
+
+        webhookNotificationSender.send(notification, webhookNotificationHandler, notificationHandlerContext)
+            .join();
+
+        NotificationTestResult notificationTestResult = webhookNotificationSender.sendTest(
+            notification, webhookNotificationHandler, notificationHandlerContext);
+
+        ArgumentCaptor<WebhookDelivery> submitCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
+        ArgumentCaptor<WebhookDelivery> testCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
+
+        verify(webhookDeliveryService).submit(submitCaptor.capture());
+        verify(webhookDeliveryService).sendTest(testCaptor.capture());
+
+        WebhookDelivery sent = submitCaptor.getValue();
+        WebhookDelivery tested = testCaptor.getValue();
+
+        assertThat(tested.headers()).isEqualTo(sent.headers());
+        assertThat(tested.url()).isEqualTo(sent.url());
+        assertThat(tested.source()).isEqualTo(sent.source());
+        assertThat(tested.description()).isEqualTo(sent.description());
+        assertThat(tested.eventType()).isEqualTo(sent.eventType());
+        assertThat(tested.secret()).isEqualTo(sent.secret());
+        assertThat(tested.validateUrl()).isEqualTo(sent.validateUrl());
+        assertThat(tested.timestamp()).isEqualTo(sent.timestamp());
+        assertThat(tested.payloads()).isEqualTo(sent.payloads());
+        assertThat(tested.deliveryId()).isNotEqualTo(sent.deliveryId());
+        assertThat(notificationTestResult.success()).isTrue();
+        assertThat(notificationTestResult.statusCode()).isEqualTo(200);
+        assertThat(notificationTestResult.responseBody()).isEqualTo("ok");
+        assertThat(loopbackWebhookReceiver.getReceivedCount()).isEqualTo(2);
+    }
+
+    @Test
+    void testSendTestReportsSignedOnlyWithSecret() {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
+
+        assertThat(
+            webhookNotificationSender.sendTest(
+                createNotification(
+                    Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook"), "webhookSecret", "secret")),
+                webhookNotificationHandler, notificationHandlerContext)
+                .signed()).isTrue();
+        assertThat(
+            webhookNotificationSender.sendTest(
+                createNotification(Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook"))),
+                webhookNotificationHandler, notificationHandlerContext)
+                .signed()).isFalse();
+        assertThat(
+            webhookNotificationSender.sendTest(
+                createNotification(
+                    Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook"), "webhookSecret", " ")),
+                webhookNotificationHandler, notificationHandlerContext)
+                .signed()).isFalse();
+    }
+
+    @Test
+    void testSendTestMapsFailure() {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
+
+        loopbackWebhookReceiver.respondWith(422, "bad");
+
+        NotificationTestResult notificationTestResult = webhookNotificationSender.sendTest(
+            createNotification(Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook"))),
+            webhookNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.statusCode()).isEqualTo(422);
+        assertThat(notificationTestResult.responseBody()).isEqualTo("bad");
+        assertThat(notificationTestResult.error()).contains("HTTP 422");
+    }
+
+    @Test
+    void testSendTestValidatesTheWebhookUrl() {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
+
+        NotificationTestResult notificationTestResult = webhookNotificationSender.sendTest(
+            createNotification(Map.of("webhook", getDisallowedHostUrl("/hook"))), webhookNotificationHandler,
+            notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isNotBlank();
+        assertThat(loopbackWebhookReceiver.getReceivedCount()).isZero();
+    }
+
+    @Test
+    void testSendTestFailsWhenWebhookUrlMissing() {
+        NotificationTestResult notificationTestResult = webhookNotificationSender.sendTest(
+            createNotification(Map.of()), webhookNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("Webhook URL is required");
+
+        verify(webhookDeliveryService, never()).sendTest(any());
+    }
+
+    @Test
+    void testSendTestReportsMissingUrl() {
+        NotificationTestResult notificationTestResult = webhookNotificationSender.sendTest(
+            createNotification(Map.of("webhook", "  ")), webhookNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("Webhook URL is required");
+
+        verify(webhookDeliveryService, never()).sendTest(any());
+    }
+
+    @Test
+    void testSendTestRedactsSigningSecretAndHeaderValues() {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
+
+        loopbackWebhookReceiver.respondWith(403, "got token-12345 and whsec_signing and abc");
+
+        Notification notification = createNotification(Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook")));
+
+        notification.setSecretSettings(
+            Map.of(
+                "webhookSecret", "whsec_signing", "webhookHeaders",
+                List.of(
+                    Map.of("name", "Authorization", "value", "token-12345"),
+                    Map.of("name", "X-Short", "value", "abc"))));
+
+        NotificationTestResult notificationTestResult = webhookNotificationSender.sendTest(
+            notification, webhookNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.responseBody()).isEqualTo("got ******** and ******** and abc");
+        assertThat(notificationTestResult.error()).doesNotContain("token-12345", "whsec_signing");
+    }
+
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    private String getDisallowedHostUrl(String path) {
+        String url = loopbackWebhookReceiver.getUrl(path);
+
+        return url.replace("localhost", "127.0.0.1");
     }
 
     private static String sign(String secret, String signedContent) throws Exception {

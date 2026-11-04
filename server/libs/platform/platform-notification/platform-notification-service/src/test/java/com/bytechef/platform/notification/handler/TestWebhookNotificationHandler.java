@@ -21,8 +21,6 @@ import com.bytechef.platform.notification.domain.NotificationEvent;
 import org.springframework.stereotype.Component;
 
 /**
- * Stands in for the real handler, which lives in the coordinator module.
- *
  * @author Ivica Cardic
  */
 @Component

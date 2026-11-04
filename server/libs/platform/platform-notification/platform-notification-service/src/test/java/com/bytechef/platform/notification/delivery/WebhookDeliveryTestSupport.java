@@ -20,8 +20,6 @@ import com.bytechef.commons.util.UrlValidatorUtils;
 import java.util.Set;
 
 /**
- * Lets integration tests deliver to a loopback receiver, which the default URL validator rejects.
- *
  * @author Ivica Cardic
  */
 public final class WebhookDeliveryTestSupport {

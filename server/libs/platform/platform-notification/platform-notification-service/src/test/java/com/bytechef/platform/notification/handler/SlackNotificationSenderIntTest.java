@@ -25,13 +25,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.config.PlatformNotificationIntTestConfiguration;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryException;
-import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.domain.Notification;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +37,6 @@ import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Ivica Cardic
@@ -47,7 +44,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 @SpringBootTest(
     classes = PlatformNotificationIntTestConfiguration.class,
     properties = {
-        "bytechef.webhook-delivery.concurrency-limit=10", "bytechef.webhook-delivery.max-pending-deliveries=1000"
+        "bytechef.webhook-delivery.allowed-hosts=localhost", "bytechef.webhook-delivery.concurrency-limit=10",
+        "bytechef.webhook-delivery.max-pending-deliveries=1000"
     })
 @Timeout(30)
 class SlackNotificationSenderIntTest {
@@ -63,19 +61,9 @@ class SlackNotificationSenderIntTest {
     @Autowired
     private SlackNotificationSender slackNotificationSender;
 
-    @Autowired
-    private WebhookDeliveryService webhookDeliveryService;
-
-    private Consumer<String> originalUrlValidator;
-
     @BeforeEach
-    @SuppressWarnings("unchecked")
     void beforeEach() {
         loopbackWebhookReceiver = new LoopbackWebhookReceiver();
-
-        originalUrlValidator = (Consumer<String>) ReflectionTestUtils.getField(webhookDeliveryService, "urlValidator");
-
-        ReflectionTestUtils.setField(webhookDeliveryService, "urlValidator", (Consumer<String>) url -> {});
 
         when(slackNotificationHandler.getText(notificationHandlerContext)).thenReturn("Approval pending");
     }
@@ -83,8 +71,6 @@ class SlackNotificationSenderIntTest {
     @AfterEach
     void afterEach() {
         loopbackWebhookReceiver.close();
-
-        ReflectionTestUtils.setField(webhookDeliveryService, "urlValidator", originalUrlValidator);
     }
 
     @Test
@@ -146,10 +132,8 @@ class SlackNotificationSenderIntTest {
 
     @Test
     void testSendValidatesTheWebhookUrl() {
-        ReflectionTestUtils.setField(webhookDeliveryService, "urlValidator", originalUrlValidator);
-
         CompletableFuture<Void> future = slackNotificationSender.send(
-            createNotification(Map.of("slackWebhookUrl", loopbackWebhookReceiver.getUrl("/services/T/B/X"))),
+            createNotification(Map.of("slackWebhookUrl", getDisallowedHostUrl("/services/T/B/X"))),
             slackNotificationHandler, notificationHandlerContext);
 
         assertThatThrownBy(future::join)
@@ -217,6 +201,79 @@ class SlackNotificationSenderIntTest {
                     .isInstanceOf(IllegalStateException.class);
 
         assertThat(loopbackWebhookReceiver.getReceivedCount()).isZero();
+    }
+
+    @Test
+    void testSendTestPostsSlackText() throws Exception {
+        NotificationTestResult notificationTestResult = slackNotificationSender.sendTest(
+            createNotification(
+                Map.of("slackWebhookUrl", " " + loopbackWebhookReceiver.getUrl("/services/T/B/X") + " ")),
+            slackNotificationHandler, notificationHandlerContext);
+
+        LoopbackWebhookReceiver.ReceivedRequest receivedRequest = loopbackWebhookReceiver.awaitRequest();
+
+        assertThat(receivedRequest.method()).isEqualTo("POST");
+        assertThat(receivedRequest.path()).isEqualTo("/services/T/B/X");
+        assertThat(receivedRequest.body()).isEqualTo("{\"text\":\"Approval pending\"}");
+        assertThat(receivedRequest.headers()).containsEntry("X-ByteChef-Event", "slack.message");
+        assertThat(loopbackWebhookReceiver.getReceivedCount()).isEqualTo(1);
+        assertThat(notificationTestResult.success()).isTrue();
+        assertThat(notificationTestResult.statusCode()).isEqualTo(200);
+        assertThat(notificationTestResult.signed()).isFalse();
+    }
+
+    @Test
+    void testSendTestValidatesTheWebhookUrl() {
+        NotificationTestResult notificationTestResult = slackNotificationSender.sendTest(
+            createNotification(Map.of("slackWebhookUrl", getDisallowedHostUrl("/services/T/B/X"))),
+            slackNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isNotBlank();
+        assertThat(loopbackWebhookReceiver.getReceivedCount()).isZero();
+    }
+
+    @Test
+    void testSendTestFailsWhenSlackUrlMissing() {
+        NotificationTestResult notificationTestResult = slackNotificationSender.sendTest(
+            createNotification(Map.of()), slackNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("Slack webhook URL is required");
+        assertThat(loopbackWebhookReceiver.getReceivedCount()).isZero();
+    }
+
+    @Test
+    void testSendTestReportsMissingUrl() {
+        NotificationTestResult notificationTestResult = slackNotificationSender.sendTest(
+            createNotification(Map.of("slackWebhookUrl", "  ")), slackNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("Slack webhook URL is required");
+        assertThat(loopbackWebhookReceiver.getReceivedCount()).isZero();
+    }
+
+    @Test
+    void testSendTestRedactsSlackUrl() {
+        String slackWebhookUrl = loopbackWebhookReceiver.getUrl("/services/T/B/X");
+
+        loopbackWebhookReceiver.respondWith(404, "no hook at " + slackWebhookUrl);
+
+        NotificationTestResult notificationTestResult = slackNotificationSender.sendTest(
+            createNotification(Map.of("slackWebhookUrl", " " + slackWebhookUrl + " ")), slackNotificationHandler,
+            notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.statusCode()).isEqualTo(404);
+        assertThat(notificationTestResult.responseBody()).isEqualTo("no hook at ********");
+        assertThat(notificationTestResult.error()).doesNotContain(slackWebhookUrl);
+    }
+
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    private String getDisallowedHostUrl(String path) {
+        String url = loopbackWebhookReceiver.getUrl(path);
+
+        return url.replace("localhost", "127.0.0.1");
     }
 
     private static Notification createNotification(Map<String, Object> settings) {

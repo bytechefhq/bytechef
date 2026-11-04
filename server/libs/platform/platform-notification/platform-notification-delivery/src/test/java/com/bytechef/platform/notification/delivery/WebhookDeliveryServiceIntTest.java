@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -106,6 +107,7 @@ class WebhookDeliveryServiceIntTest {
     private final Map<String, List<String>> receivedBodies = new ConcurrentHashMap<>();
     private final CountDownLatch releaseLatch = new CountDownLatch(1);
     private final AtomicInteger requestCount = new AtomicInteger();
+    private final Map<String, String> responseBodies = new ConcurrentHashMap<>();
     private final AtomicInteger startedTaskCount = new AtomicInteger();
     private final Map<String, Deque<Integer>> statusSequences = new ConcurrentHashMap<>();
 
@@ -163,7 +165,19 @@ class WebhookDeliveryServiceIntTest {
                 inFlightCount.decrementAndGet();
             }
 
-            httpExchange.sendResponseHeaders(status, -1);
+            String responseBody = responseBodies.get(path);
+
+            if (responseBody == null) {
+                httpExchange.sendResponseHeaders(status, -1);
+            } else {
+                byte[] responseBytes = responseBody.getBytes(StandardCharsets.UTF_8);
+
+                httpExchange.sendResponseHeaders(status, responseBytes.length);
+
+                httpExchange.getResponseBody()
+                    .write(responseBytes);
+            }
+
             httpExchange.close();
         });
         httpServer.start();
@@ -233,6 +247,195 @@ class WebhookDeliveryServiceIntTest {
         assertThat(statuses(outcome)).containsExactly(Status.FAILED);
 
         verify(webhookNotificationClient, times(3)).post(any(), any());
+    }
+
+    @Test
+    void testSendTestReturnsStatusAndBody() {
+        respondWith("/test", 202);
+        responseBodies.put("/test", "ok");
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(delivery("/test", 1));
+
+        assertThat(webhookTestResult.success()).isTrue();
+        assertThat(webhookTestResult.statusCode()).isEqualTo(202);
+        assertThat(webhookTestResult.responseBody()).isEqualTo("ok");
+        assertThat(webhookTestResult.error()).isNull();
+    }
+
+    @Test
+    void testSendTestCapsResponseBody() {
+        respondWith("/test", 500);
+        responseBodies.put("/test", "x".repeat(5000));
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(delivery("/test", 1));
+
+        assertThat(webhookTestResult.success()).isFalse();
+        assertThat(webhookTestResult.statusCode()).isEqualTo(500);
+        assertThat(webhookTestResult.responseBody()).hasSize(1001)
+            .endsWith("…");
+        assertThat(webhookTestResult.error()).doesNotContain("xxx");
+    }
+
+    @Test
+    void testSendTestRejectsDisallowedUrl() {
+        WebhookDelivery webhookDelivery = WebhookDelivery.builder(SOURCE, url("/"))
+            .description("test delivery")
+            .tenantId(TENANT_ID)
+            .payload("payload-0", "{}")
+            .build();
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(webhookDelivery);
+
+        assertThat(webhookTestResult.success()).isFalse();
+        assertThat(webhookTestResult.statusCode()).isNull();
+        assertThat(webhookTestResult.error()).isNotNull();
+        assertThat(requestCount).hasValue(0);
+    }
+
+    @Test
+    void testAllowedHostsBypassThePrivateAddressCheck() throws Exception {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.WebhookDelivery webhookDeliveryProperties = applicationProperties.getWebhookDelivery();
+
+        webhookDeliveryProperties.setAllowedHosts(List.of("LOCALHOST"));
+        webhookDeliveryProperties.setConcurrencyLimit(2);
+        webhookDeliveryProperties.setMaxPendingDeliveries(2);
+
+        WebhookDeliveryService allowingWebhookDeliveryService = new WebhookDeliveryService(
+            webhookNotificationClient, webhookDeliveryExecutor, applicationProperties,
+            meterRegistryProvider(meterRegistry));
+
+        WebhookDelivery validatedWebhookDelivery = WebhookDelivery.builder(SOURCE, url("/allowed"))
+            .description("test delivery")
+            .tenantId(TENANT_ID)
+            .validateUrl(true)
+            .payload("payload-0", "{\"index\":0}")
+            .build();
+
+        WebhookTestResult webhookTestResult = allowingWebhookDeliveryService.sendTest(validatedWebhookDelivery);
+
+        assertThat(webhookTestResult.success()).isTrue();
+        assertThat(webhookTestResult.statusCode()).isEqualTo(200);
+        assertThat(statuses(await(allowingWebhookDeliveryService.submit(validatedWebhookDelivery))))
+            .containsExactly(Status.SENT);
+        assertThat(receivedBodies.get("/allowed")).hasSize(2);
+
+        assertThat(webhookDeliveryService.sendTest(validatedWebhookDelivery)
+            .success()).isFalse();
+    }
+
+    @Test
+    void testSendTestReportsConnectionError() throws Exception {
+        WebhookDelivery webhookDelivery = WebhookDelivery.builder(SOURCE, closedPortUrl())
+            .description("test delivery")
+            .tenantId(TENANT_ID)
+            .validateUrl(false)
+            .payload("payload-0", "{}")
+            .build();
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(webhookDelivery);
+
+        assertThat(webhookTestResult.success()).isFalse();
+        assertThat(webhookTestResult.statusCode()).isNull();
+        assertThat(webhookTestResult.error()).contains("localhost")
+            .doesNotContain("SECRET");
+    }
+
+    @Test
+    void testSendTestDoesNotRetry() {
+        respondWith("/test", 503, 503, 503);
+
+        WebhookDelivery webhookDelivery = WebhookDelivery.builder(SOURCE, url("/test"))
+            .description("test delivery")
+            .tenantId(TENANT_ID)
+            .validateUrl(false)
+            .retry(new WebhookRetry(3, Duration.ofMillis(1), 1.0))
+            .payload("payload-0", "{}")
+            .build();
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(webhookDelivery);
+
+        assertThat(webhookTestResult.success()).isFalse();
+        assertThat(webhookTestResult.statusCode()).isEqualTo(503);
+        assertThat(requestCount).hasValue(1);
+    }
+
+    @Test
+    void testSendTestDoesNotAffectEndpointState() throws Exception {
+        int testCount = EndpointState.MAX_CONSECUTIVE_FAILURES + 1;
+
+        Integer[] failureStatuses = new Integer[testCount];
+
+        Arrays.fill(failureStatuses, 500);
+
+        respondWith("/test", failureStatuses);
+
+        for (int index = 0; index < testCount; index++) {
+            webhookDeliveryService.sendTest(delivery("/test", 1));
+        }
+
+        WebhookDeliveryOutcome outcome = await(webhookDeliveryService.submit(delivery("/test", 1)));
+
+        assertThat(outcome.anySent()).isTrue();
+        assertThat(requestCount).hasValue(testCount + 1);
+    }
+
+    @Test
+    void testSendTestRecordsNoMetrics() throws Exception {
+        respondWith("/test", 500, 500);
+
+        int meterCountBefore = meterRegistry.getMeters()
+            .size();
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(delivery("/test", 1));
+
+        assertThat(webhookTestResult.success()).isFalse();
+        assertThat(meterRegistry.getMeters()).hasSize(meterCountBefore);
+        assertThat(unsentCount("failed")).isZero();
+
+        await(webhookDeliveryService.submit(delivery("/test", 1)));
+
+        assertThat(unsentCount("failed")).isEqualTo(1);
+    }
+
+    @Test
+    void testSendTestCapsMultiByteBody() {
+        respondWith("/test", 200);
+        responseBodies.put("/test", "é".repeat(3000));
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(delivery("/test", 1));
+
+        assertThat(webhookTestResult.responseBody()).hasSizeLessThanOrEqualTo(1001)
+            .endsWith("…")
+            .doesNotContain("\uFFFD");
+    }
+
+    @Test
+    void testSendTestMapsRuntimeExceptionWithoutLeakingMessage() {
+        doThrow(new IllegalArgumentException("secret-value")).when(webhookNotificationClient)
+            .post(any(), any());
+
+        WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(delivery("/test", 1));
+
+        assertThat(webhookTestResult.success()).isFalse();
+        assertThat(webhookTestResult.error()).doesNotContain("secret-value")
+            .contains("IllegalArgumentException");
+    }
+
+    @Test
+    void testSendTestRestoresInterruptFlag() {
+        doThrow(new IllegalStateException(new InterruptedException())).when(webhookNotificationClient)
+            .post(any(), any());
+
+        try {
+            WebhookTestResult webhookTestResult = webhookDeliveryService.sendTest(delivery("/test", 1));
+
+            assertThat(webhookTestResult.success()).isFalse();
+            assertThat(Thread.interrupted()).isTrue();
+        } finally {
+            Thread.interrupted();
+        }
     }
 
     @Test
@@ -376,7 +579,7 @@ class WebhookDeliveryServiceIntTest {
                     awaitRelease(releasePostLatch);
                 }
 
-                return null;
+                return new WebhookNotificationClient.WebhookResponse(200, null);
             }).when(webhookNotificationClient)
                 .post(any(), any());
 
@@ -462,7 +665,7 @@ class WebhookDeliveryServiceIntTest {
                 awaitRelease(releasePostLatch);
             }
 
-            return null;
+            return new WebhookNotificationClient.WebhookResponse(200, null);
         }).when(webhookNotificationClient)
             .post(any(), any());
 
@@ -642,7 +845,7 @@ class WebhookDeliveryServiceIntTest {
         doAnswer(invocation -> {
             recordedTenantId.set(TenantContext.getCurrentTenantId());
 
-            return null;
+            return new WebhookNotificationClient.WebhookResponse(200, null);
         }).when(webhookNotificationClient)
             .post(any(), any());
 
@@ -684,7 +887,7 @@ class WebhookDeliveryServiceIntTest {
                 awaitRelease(releasePostLatch);
             }
 
-            return null;
+            return new WebhookNotificationClient.WebhookResponse(200, null);
         }).when(webhookNotificationClient)
             .post(any(), any());
 
@@ -843,7 +1046,7 @@ class WebhookDeliveryServiceIntTest {
         doAnswer(invocation -> {
             postCount.incrementAndGet();
 
-            return null;
+            return new WebhookNotificationClient.WebhookResponse(200, null);
         }).when(webhookNotificationClient)
             .post(any(), any());
 
@@ -889,7 +1092,7 @@ class WebhookDeliveryServiceIntTest {
                 throw new LinkageError("drainer died");
             }
 
-            return null;
+            return new WebhookNotificationClient.WebhookResponse(200, null);
         }).when(webhookNotificationClient)
             .post(any(), any());
 

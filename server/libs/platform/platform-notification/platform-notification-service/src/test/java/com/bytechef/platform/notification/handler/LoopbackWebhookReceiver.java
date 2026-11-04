@@ -42,6 +42,7 @@ final class LoopbackWebhookReceiver implements AutoCloseable {
     private final BlockingQueue<ReceivedRequest> receivedRequests = new LinkedBlockingQueue<>();
     private volatile CountDownLatch holdResponse;
     private final HttpServer httpServer;
+    private volatile String responseBody = "";
     private volatile int responseStatus = 200;
 
     LoopbackWebhookReceiver() {
@@ -93,6 +94,11 @@ final class LoopbackWebhookReceiver implements AutoCloseable {
         this.responseStatus = status;
     }
 
+    void respondWith(int status, String body) {
+        this.responseBody = body;
+        this.responseStatus = status;
+    }
+
     private void handle(HttpExchange httpExchange) throws IOException {
         byte[] body = httpExchange.getRequestBody()
             .readAllBytes();
@@ -125,7 +131,15 @@ final class LoopbackWebhookReceiver implements AutoCloseable {
             }
         }
 
-        httpExchange.sendResponseHeaders(responseStatus, -1);
+        byte[] responseBytes = responseBody.getBytes(StandardCharsets.UTF_8);
+
+        httpExchange.sendResponseHeaders(responseStatus, responseBytes.length == 0 ? -1 : responseBytes.length);
+
+        if (responseBytes.length > 0) {
+            httpExchange.getResponseBody()
+                .write(responseBytes);
+        }
+
         httpExchange.close();
     }
 
