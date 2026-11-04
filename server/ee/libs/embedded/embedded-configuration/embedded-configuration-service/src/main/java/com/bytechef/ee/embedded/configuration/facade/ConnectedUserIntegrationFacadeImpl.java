@@ -115,6 +115,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
+    private final IntegrationInstanceDataStorageCleanup integrationInstanceDataStorageCleanup;
     private final IntegrationInstanceFacade integrationInstanceFacade;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
@@ -141,6 +142,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
+        IntegrationInstanceDataStorageCleanup integrationInstanceDataStorageCleanup,
         IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
         IntegrationService integrationService, McpComponentService mcpComponentService,
         McpIntegrationComponentService mcpIntegrationComponentService,
@@ -161,6 +163,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
+        this.integrationInstanceDataStorageCleanup = integrationInstanceDataStorageCleanup;
         this.integrationInstanceFacade = integrationInstanceFacade;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
@@ -239,6 +242,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         if (integrationInstance.isEnabled()) {
             disableIntegrationInstanceWorkflows(integrationInstanceId);
         }
+
+        integrationInstanceDataStorageCleanup.deleteAfterCommit(integrationInstanceId);
 
         integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
 
@@ -558,6 +563,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             }
 
             try {
+                integrationInstanceDataStorageCleanup.deleteAfterCommit(integrationInstanceId);
+
                 integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
 
                 integrationInstanceService.delete(integrationInstanceId);

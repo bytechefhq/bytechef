@@ -67,6 +67,9 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.data.storage.DataStorageScopeDeleter.ScopeData;
+import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -118,7 +121,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     classes = {
         AutomationWorkflowProjectFacadeIntTestConfiguration.class,
         IntegrationInstanceFacadeIntTest.ConnectedUserServiceConfiguration.class,
-        IntegrationInstanceFacadeIntTest.MethodSecurityConfiguration.class
+        IntegrationInstanceFacadeIntTest.MethodSecurityConfiguration.class,
+        IntegrationInstanceFacadeIntTest.RecordingDataStorageConfiguration.class
     },
     properties = {
         "bytechef.edition=EE",
@@ -184,6 +188,9 @@ class IntegrationInstanceFacadeIntTest {
     private PermissionService permissionService;
 
     @Autowired
+    private RecordingDataStorage recordingDataStorage;
+
+    @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
 
     @Autowired
@@ -200,6 +207,8 @@ class IntegrationInstanceFacadeIntTest {
 
     @BeforeEach
     void beforeEach() {
+        recordingDataStorage.reset();
+
         externalUserAId = "external-user-a-" + UUID.randomUUID();
 
         connectedUserA = connectedUserService.createConnectedUser(externalUserAId, Environment.PRODUCTION);
@@ -401,6 +410,36 @@ class IntegrationInstanceFacadeIntTest {
                 .isEqualTo(Map.of("key", "value")));
     }
 
+    @Test
+    void testDeleteIntegrationInstanceDeletesItsDataStorageAfterCommit() {
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceFacade.enableIntegrationInstanceWorkflow(integrationInstanceAId, workflowId, true);
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow = fetchIntegrationInstanceWorkflow(
+            integrationInstanceAId).orElseThrow();
+
+        integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceAId);
+
+        assertThat(recordingDataStorage.getDeletedScopeDataList()).containsExactlyInAnyOrder(
+            new ScopeData(DataStorageScope.PRINCIPAL, String.valueOf(integrationInstanceAId), PlatformType.EMBEDDED),
+            new ScopeData(
+                DataStorageScope.WORKFLOW, String.valueOf(integrationInstanceWorkflow.getId()),
+                PlatformType.EMBEDDED));
+    }
+
+    @Test
+    void testFailingDataStorageDoesNotFailTheInstanceDelete() {
+        authenticate(createTenantAdminAuthentication());
+
+        recordingDataStorage.setFailing(true);
+
+        integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceAId);
+
+        assertThat(recordingDataStorage.getAttempts()).isPositive();
+        assertThat(integrationInstanceService.getIntegrationInstances(List.of(integrationInstanceAId))).isEmpty();
+    }
+
     private static void authenticate(Authentication authentication) {
         SecurityContextHolder.getContext()
             .setAuthentication(authentication);
@@ -427,6 +466,15 @@ class IntegrationInstanceFacadeIntTest {
     @Configuration
     @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
     static class ConnectedUserServiceConfiguration {
+    }
+
+    @Configuration
+    static class RecordingDataStorageConfiguration {
+
+        @Bean
+        RecordingDataStorage recordingDataStorage() {
+            return new RecordingDataStorage();
+        }
     }
 
     @Configuration
