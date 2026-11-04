@@ -96,8 +96,9 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
                 return;
             }
 
-            NotificationHandlerContext notificationHandlerContext = notificationHandlerContexts.builder(job, eventType)
-                .build();
+            NotificationHandlerContext notificationHandlerContext =
+                notificationHandlerContexts.builder(job, status, eventType)
+                    .build();
 
             for (Notification notification : notifications) {
                 NotificationSender notificationSender = notificationSenderRegistry.getNotificationSender(

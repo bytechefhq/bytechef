@@ -177,8 +177,36 @@ class IntegrationJobPrincipalAccessorIntTest {
 
         long integrationInstanceId = createIntegrationInstance(integrationInstanceConfigurationId);
 
-        assertThat(integrationJobPrincipalAccessor.getJobPrincipalSummary(integrationInstanceId))
+        assertThat(integrationJobPrincipalAccessor.getJobPrincipalSummary(integrationInstanceId, workflowId))
             .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), integrationId, integrationName, 1));
+    }
+
+    @Test
+    void testGetJobPrincipalSummaryReportsTheIntegrationVersionTheJobRan() {
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(true, true, Map.of());
+
+        long integrationInstanceId = createIntegrationInstance(integrationInstanceConfigurationId);
+
+        jdbcTemplate.update(
+            "UPDATE integration_instance_configuration SET integration_version = 2 WHERE id = ?",
+            integrationInstanceConfigurationId);
+
+        assertThat(integrationJobPrincipalAccessor.getJobPrincipalSummary(integrationInstanceId, workflowId))
+            .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), integrationId, integrationName, 1));
+    }
+
+    @Test
+    void testGetJobPrincipalSummaryFallsBackToTheConfigurationVersionForAnUnknownWorkflow() {
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(true, true, Map.of());
+
+        long integrationInstanceId = createIntegrationInstance(integrationInstanceConfigurationId);
+
+        jdbcTemplate.update(
+            "UPDATE integration_instance_configuration SET integration_version = 2 WHERE id = ?",
+            integrationInstanceConfigurationId);
+
+        assertThat(integrationJobPrincipalAccessor.getJobPrincipalSummary(integrationInstanceId, "missing-workflow"))
+            .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), integrationId, integrationName, 2));
     }
 
     @Test
@@ -193,7 +221,7 @@ class IntegrationJobPrincipalAccessorIntTest {
             jdbcTemplate.update("DELETE FROM integration WHERE id = ?", integrationId);
         });
 
-        assertThat(integrationJobPrincipalAccessor.getJobPrincipalSummary(integrationInstanceId))
+        assertThat(integrationJobPrincipalAccessor.getJobPrincipalSummary(integrationInstanceId, workflowId))
             .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), integrationId, null, 1));
     }
 

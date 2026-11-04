@@ -25,6 +25,7 @@ import com.bytechef.automation.configuration.instance.config.ProjectDeploymentJo
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -56,6 +57,9 @@ class ProjectDeploymentJobPrincipalAccessorIntTest {
     private ProjectService projectService;
 
     @Autowired
+    private ProjectWorkflowService projectWorkflowService;
+
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
     @Autowired
@@ -67,9 +71,25 @@ class ProjectDeploymentJobPrincipalAccessorIntTest {
 
         ProjectDeployment projectDeployment = createProjectDeployment(project);
 
-        assertThat(projectDeploymentJobPrincipalAccessor.getJobPrincipalSummary(projectDeployment.getId()))
+        assertThat(
+            projectDeploymentJobPrincipalAccessor.getJobPrincipalSummary(projectDeployment.getId(), "missing-workflow"))
+                .isEqualTo(
+                    new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), project.getId(), project.getName(), 3));
+    }
+
+    @Test
+    void testGetJobPrincipalSummaryReportsTheProjectVersionTheJobRan() {
+        Project project = createProject("CRM " + UUID.randomUUID());
+
+        ProjectDeployment projectDeployment = createProjectDeployment(project);
+
+        String workflowId = "workflow-" + UUID.randomUUID();
+
+        projectWorkflowService.addWorkflow(project.getId(), 2, workflowId, UUID.randomUUID());
+
+        assertThat(projectDeploymentJobPrincipalAccessor.getJobPrincipalSummary(projectDeployment.getId(), workflowId))
             .isEqualTo(
-                new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), project.getId(), project.getName(), 3));
+                new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), project.getId(), project.getName(), 2));
     }
 
     @Test
@@ -84,8 +104,9 @@ class ProjectDeploymentJobPrincipalAccessorIntTest {
             jdbcTemplate.update("DELETE FROM project WHERE id = ?", project.getId());
         });
 
-        assertThat(projectDeploymentJobPrincipalAccessor.getJobPrincipalSummary(projectDeployment.getId()))
-            .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), project.getId(), null, 3));
+        assertThat(
+            projectDeploymentJobPrincipalAccessor.getJobPrincipalSummary(projectDeployment.getId(), "missing-workflow"))
+                .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), project.getId(), null, 3));
     }
 
     private Project createProject(String name) {
