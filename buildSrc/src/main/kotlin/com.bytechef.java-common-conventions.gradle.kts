@@ -72,14 +72,6 @@ java {
 
 val graalVmVersion = libs.findVersion("graalvm").get().requiredVersion
 
-tasks.withType<JavaCompile>().configureEach {
-    val requiredGraalVmVersion = graalVmVersion
-
-    doFirst {
-        verifyGraalVmToolchain((this as JavaCompile).javaCompiler.get().metadata, requiredGraalVmVersion)
-    }
-}
-
 tasks.withType<Test>().configureEach {
     val requiredGraalVmVersion = graalVmVersion
 
