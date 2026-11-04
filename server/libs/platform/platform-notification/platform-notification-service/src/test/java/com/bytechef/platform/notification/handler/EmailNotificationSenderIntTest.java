@@ -26,20 +26,33 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.mail.MailService;
+import com.bytechef.platform.notification.config.PlatformNotificationIntTestConfiguration;
 import com.bytechef.platform.notification.domain.Notification;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
  */
-class EmailNotificationSenderTest {
+@SpringBootTest(
+    classes = PlatformNotificationIntTestConfiguration.class,
+    properties = {
+        "bytechef.webhook-delivery.concurrency-limit=10", "bytechef.webhook-delivery.max-pending-deliveries=1000"
+    })
+class EmailNotificationSenderIntTest {
 
     private final EmailNotificationHandler emailNotificationHandler = mock(EmailNotificationHandler.class);
-    private final MailService mailService = mock(MailService.class);
-    private final EmailNotificationSender emailNotificationSender = new EmailNotificationSender(mailService);
     private final NotificationHandlerContext notificationHandlerContext =
         new NotificationHandlerContext.Builder().build();
+
+    @Autowired
+    private EmailNotificationSender emailNotificationSender;
+
+    @MockitoBean
+    private MailService mailService;
 
     @Test
     void testSendMailsHandlerContentToConfiguredAddress() {

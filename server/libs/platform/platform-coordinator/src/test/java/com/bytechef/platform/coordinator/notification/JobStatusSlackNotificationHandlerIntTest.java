@@ -18,25 +18,24 @@ package com.bytechef.platform.coordinator.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.platform.coordinator.config.PlatformCoordinatorIntTestConfiguration;
 import com.bytechef.platform.notification.domain.NotificationEvent.Type;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-class JobStatusSlackNotificationHandlerTest {
+@SpringBootTest(classes = PlatformCoordinatorIntTestConfiguration.class)
+class JobStatusSlackNotificationHandlerIntTest {
+
+    @Autowired
+    private JobStatusSlackNotificationHandler jobStatusSlackNotificationHandler;
 
     @Test
     void testTextStartsWithIconAndAppendsDetails() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-
-        messageSource.setBasename("messages");
-
-        JobStatusSlackNotificationHandler jobStatusSlackNotificationHandler =
-            new JobStatusSlackNotificationHandler(messageSource);
-
         NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
             .eventType(Type.JOB_FAILED)
             .executionUrl("https://x/automation/executions?id=42")

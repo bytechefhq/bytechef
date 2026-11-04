@@ -18,15 +18,22 @@ package com.bytechef.platform.notification.delivery;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.commons.util.UrlValidationException;
+import com.bytechef.commons.util.UrlValidatorUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.PayloadResult;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.Status;
+import com.bytechef.platform.notification.delivery.config.RestartableAsyncTaskExecutor;
+import com.bytechef.platform.notification.delivery.config.WebhookDeliveryIntTestConfiguration;
 import com.bytechef.tenant.TenantContext;
 import com.sun.net.httpserver.HttpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -71,15 +78,22 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @author Ivica Cardic
  */
 @Timeout(60)
-class WebhookDeliveryServiceTest {
+@SpringBootTest(
+    classes = WebhookDeliveryIntTestConfiguration.class,
+    properties = {
+        "bytechef.webhook-delivery.concurrency-limit=2", "bytechef.webhook-delivery.max-pending-deliveries=2"
+    })
+class WebhookDeliveryServiceIntTest {
 
     private static final String SOURCE = "test";
     private static final String TENANT_ID = "tenant";
@@ -97,9 +111,18 @@ class WebhookDeliveryServiceTest {
 
     private ExecutorService httpServerExecutor;
     private HttpServer httpServer;
+
+    @Autowired
     private SimpleMeterRegistry meterRegistry;
+
+    @MockitoSpyBean
+    private WebhookNotificationClient webhookNotificationClient;
+
+    @Autowired
     private WebhookDeliveryService webhookDeliveryService;
-    private SimpleAsyncTaskExecutor webhookDeliveryExecutor;
+
+    @Autowired
+    private RestartableAsyncTaskExecutor webhookDeliveryExecutor;
 
     @BeforeEach
     void beforeEach() throws IOException {
@@ -147,16 +170,17 @@ class WebhookDeliveryServiceTest {
         });
         httpServer.start();
 
-        meterRegistry = new SimpleMeterRegistry();
-        webhookDeliveryExecutor = createExecutor();
-        webhookDeliveryService = createService(
-            new WebhookNotificationClient(), 2, 2, meterRegistryProvider(meterRegistry));
+        meterRegistry.clear();
+        webhookDeliveryExecutor.restart();
+        webhookDeliveryService.clearEndpointState();
+        webhookDeliveryService.setClock(mutableClock);
+        webhookDeliveryService.setUrlValidator(url -> UrlValidatorUtils.validate(url, Set.of()));
     }
 
     @AfterEach
     void afterEach() {
         releaseLatch.countDown();
-        webhookDeliveryExecutor.close();
+        webhookDeliveryExecutor.restart();
         httpServer.stop(0);
         httpServerExecutor.shutdownNow();
     }
@@ -196,21 +220,6 @@ class WebhookDeliveryServiceTest {
 
     @Test
     void testRetriesConnectionFailures() throws Exception {
-        AtomicInteger attemptCount = new AtomicInteger();
-
-        WebhookNotificationClient countingWebhookNotificationClient = new WebhookNotificationClient() {
-
-            @Override
-            public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
-                attemptCount.incrementAndGet();
-
-                super.post(webhookDelivery, webhookPayload);
-            }
-        };
-
-        WebhookDeliveryService countingWebhookDeliveryService = createService(
-            countingWebhookNotificationClient, 2, 2, meterRegistryProvider(meterRegistry));
-
         WebhookDelivery webhookDelivery = WebhookDelivery.builder(SOURCE, closedPortUrl())
             .description("test delivery")
             .tenantId(TENANT_ID)
@@ -219,10 +228,11 @@ class WebhookDeliveryServiceTest {
             .payload("payload-0", "{\"index\":0}")
             .build();
 
-        WebhookDeliveryOutcome outcome = await(countingWebhookDeliveryService.submit(webhookDelivery));
+        WebhookDeliveryOutcome outcome = await(webhookDeliveryService.submit(webhookDelivery));
 
         assertThat(statuses(outcome)).containsExactly(Status.FAILED);
-        assertThat(attemptCount).hasValue(3);
+
+        verify(webhookNotificationClient, times(3)).post(any(), any());
     }
 
     @Test
@@ -355,22 +365,23 @@ class WebhookDeliveryServiceTest {
             List<String> postedLabels = new CopyOnWriteArrayList<>();
             CountDownLatch releasePostLatch = new CountDownLatch(1);
 
-            WebhookNotificationClient orderRecordingWebhookNotificationClient = new WebhookNotificationClient() {
+            doAnswer(invocation -> {
+                WebhookPayload webhookPayload = invocation.getArgument(1);
 
-                @Override
-                public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
-                    postedLabels.add(webhookPayload.label());
+                postedLabels.add(webhookPayload.label());
 
-                    if (postedLabels.size() == 1) {
-                        firstPostLatch.countDown();
+                if (postedLabels.size() == 1) {
+                    firstPostLatch.countDown();
 
-                        awaitRelease(releasePostLatch);
-                    }
+                    awaitRelease(releasePostLatch);
                 }
-            };
+
+                return null;
+            }).when(webhookNotificationClient)
+                .post(any(), any());
 
             WebhookDeliveryService orderRecordingWebhookDeliveryService = createService(
-                orderRecordingWebhookNotificationClient, 2, 20, meterRegistryProvider(null));
+                2, 20, meterRegistryProvider(null));
 
             List<CompletableFuture<WebhookDeliveryOutcome>> futures = new ArrayList<>();
             List<String> submittedLabels = new ArrayList<>();
@@ -446,18 +457,17 @@ class WebhookDeliveryServiceTest {
     void testCompletedDeliveryNoLongerCountsAsPending() throws Exception {
         CountDownLatch releasePostLatch = new CountDownLatch(1);
 
-        WebhookNotificationClient blockingWebhookNotificationClient = new WebhookNotificationClient() {
-
-            @Override
-            public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
-                if (requestCount.incrementAndGet() == 1) {
-                    awaitRelease(releasePostLatch);
-                }
+        doAnswer(invocation -> {
+            if (requestCount.incrementAndGet() == 1) {
+                awaitRelease(releasePostLatch);
             }
-        };
+
+            return null;
+        }).when(webhookNotificationClient)
+            .post(any(), any());
 
         WebhookDeliveryService singlePendingWebhookDeliveryService = createService(
-            blockingWebhookNotificationClient, 2, 1, meterRegistryProvider(null));
+            2, 1, meterRegistryProvider(null));
 
         CompletableFuture<WebhookDeliveryOutcome> firstFuture = singlePendingWebhookDeliveryService.submit(
             delivery("/resubmitted", 1));
@@ -499,8 +509,7 @@ class WebhookDeliveryServiceTest {
         };
 
         WebhookDeliveryService failingOnceWebhookDeliveryService = createService(
-            new WebhookNotificationClient(), failingOnceAsyncTaskExecutor, 2, 2,
-            meterRegistryProvider(meterRegistry));
+            failingOnceAsyncTaskExecutor, 2, 2, meterRegistryProvider(meterRegistry));
 
         WebhookDeliveryOutcome droppedOutcome = await(
             failingOnceWebhookDeliveryService.submit(delivery("/unstartable", 1)));
@@ -532,8 +541,7 @@ class WebhookDeliveryServiceTest {
         };
 
         WebhookDeliveryService failingOnceWebhookDeliveryService = createService(
-            new WebhookNotificationClient(), failingOnceAsyncTaskExecutor, 2, 2,
-            meterRegistryProvider(meterRegistry));
+            failingOnceAsyncTaskExecutor, 2, 2, meterRegistryProvider(meterRegistry));
 
         WebhookDelivery webhookDelivery = delivery("/erroring", 1);
 
@@ -629,20 +637,16 @@ class WebhookDeliveryServiceTest {
     void testTenantIdIsRestoredOnTheDeliveryThread() throws Exception {
         AtomicReference<String> recordedTenantId = new AtomicReference<>();
 
-        WebhookNotificationClient recordingWebhookNotificationClient = new WebhookNotificationClient() {
+        doAnswer(invocation -> {
+            recordedTenantId.set(TenantContext.getCurrentTenantId());
 
-            @Override
-            public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
-                recordedTenantId.set(TenantContext.getCurrentTenantId());
-            }
-        };
-
-        WebhookDeliveryService recordingWebhookDeliveryService = createService(
-            recordingWebhookNotificationClient, 2, 2, meterRegistryProvider(meterRegistry));
+            return null;
+        }).when(webhookNotificationClient)
+            .post(any(), any());
 
         AtomicReference<CompletableFuture<WebhookDeliveryOutcome>> futureReference = new AtomicReference<>();
 
-        TenantContext.runWithTenantId("t1", () -> futureReference.set(recordingWebhookDeliveryService.submit(
+        TenantContext.runWithTenantId("t1", () -> futureReference.set(webhookDeliveryService.submit(
             WebhookDelivery.builder(SOURCE, url("/tenant"))
                 .description("test delivery")
                 .validateUrl(false)
@@ -666,24 +670,24 @@ class WebhookDeliveryServiceTest {
         Map<String, String> observedContexts = new ConcurrentHashMap<>();
         CountDownLatch releasePostLatch = new CountDownLatch(1);
 
-        WebhookNotificationClient contextRecordingWebhookNotificationClient = new WebhookNotificationClient() {
+        doAnswer(invocation -> {
+            WebhookPayload webhookPayload = invocation.getArgument(1);
+            String observedContext = contextThreadLocal.get();
 
-            @Override
-            public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
-                String observedContext = contextThreadLocal.get();
+            observedContexts.put(webhookPayload.label(), observedContext == null ? "none" : observedContext);
 
-                observedContexts.put(webhookPayload.label(), observedContext == null ? "none" : observedContext);
+            if (observedContexts.size() == 1) {
+                firstPostLatch.countDown();
 
-                if (observedContexts.size() == 1) {
-                    firstPostLatch.countDown();
-
-                    awaitRelease(releasePostLatch);
-                }
+                awaitRelease(releasePostLatch);
             }
-        };
+
+            return null;
+        }).when(webhookNotificationClient)
+            .post(any(), any());
 
         WebhookDeliveryService contextRecordingWebhookDeliveryService = createService(
-            contextRecordingWebhookNotificationClient, 2, 10, meterRegistryProvider(null));
+            2, 10, meterRegistryProvider(null));
 
         try {
             contextThreadLocal.set("first-trace");
@@ -735,7 +739,7 @@ class WebhookDeliveryServiceTest {
             contextThreadLocal::remove);
 
         WebhookDeliveryService contextFailingWebhookDeliveryService = createService(
-            new WebhookNotificationClient(), 2, 10, meterRegistryProvider(null));
+            2, 10, meterRegistryProvider(null));
 
         try {
             contextThreadLocal.set("unrestorable");
@@ -796,7 +800,7 @@ class WebhookDeliveryServiceTest {
     @Test
     void testInterruptDuringShutdownSkipsEveryQueuedDelivery() throws Exception {
         WebhookDeliveryService queueingWebhookDeliveryService = createService(
-            new WebhookNotificationClient(), 2, 10, meterRegistryProvider(meterRegistry));
+            2, 10, meterRegistryProvider(meterRegistry));
 
         blockOncePaths.add("/queued");
 
@@ -827,16 +831,15 @@ class WebhookDeliveryServiceTest {
     void testConcurrentSubmissionsToOneEndpointAreAllDelivered() throws Exception {
         AtomicInteger postCount = new AtomicInteger();
 
-        WebhookNotificationClient countingWebhookNotificationClient = new WebhookNotificationClient() {
+        doAnswer(invocation -> {
+            postCount.incrementAndGet();
 
-            @Override
-            public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
-                postCount.incrementAndGet();
-            }
-        };
+            return null;
+        }).when(webhookNotificationClient)
+            .post(any(), any());
 
         WebhookDeliveryService countingWebhookDeliveryService = createService(
-            countingWebhookNotificationClient, 2, 10_000, meterRegistryProvider(null));
+            2, 10_000, meterRegistryProvider(null));
 
         List<CompletableFuture<WebhookDeliveryOutcome>> futures = new CopyOnWriteArrayList<>();
         ExecutorService submitterExecutor = Executors.newFixedThreadPool(4);
@@ -868,22 +871,21 @@ class WebhookDeliveryServiceTest {
         CountDownLatch firstPostLatch = new CountDownLatch(1);
         CountDownLatch releasePostLatch = new CountDownLatch(1);
 
-        WebhookNotificationClient dyingWebhookNotificationClient = new WebhookNotificationClient() {
+        doAnswer(invocation -> {
+            if (requestCount.incrementAndGet() == 1) {
+                firstPostLatch.countDown();
 
-            @Override
-            public void post(WebhookDelivery webhookDelivery, WebhookPayload webhookPayload) {
-                if (requestCount.incrementAndGet() == 1) {
-                    firstPostLatch.countDown();
+                awaitRelease(releasePostLatch);
 
-                    awaitRelease(releasePostLatch);
-
-                    throw new LinkageError("drainer died");
-                }
+                throw new LinkageError("drainer died");
             }
-        };
+
+            return null;
+        }).when(webhookNotificationClient)
+            .post(any(), any());
 
         WebhookDeliveryService dyingWebhookDeliveryService = createService(
-            dyingWebhookNotificationClient, 2, 10, meterRegistryProvider(null));
+            2, 10, meterRegistryProvider(null));
 
         Logger logger = (Logger) LoggerFactory.getLogger(WebhookDeliveryService.class);
         ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
@@ -1034,8 +1036,7 @@ class WebhookDeliveryServiceTest {
 
     @Test
     void testWorksWithoutAMeterRegistry() throws Exception {
-        WebhookDeliveryService unmeteredWebhookDeliveryService = createService(
-            new WebhookNotificationClient(), 2, 2, meterRegistryProvider(null));
+        WebhookDeliveryService unmeteredWebhookDeliveryService = createService(2, 2, meterRegistryProvider(null));
 
         respondWith("/unmetered", 500, 404);
 
@@ -1046,13 +1047,12 @@ class WebhookDeliveryServiceTest {
 
     @Test
     void testLimitBelowOneFailsConstruction() {
-        WebhookNotificationClient webhookNotificationClient = new WebhookNotificationClient();
         ObjectProvider<MeterRegistry> meterRegistryProvider = meterRegistryProvider(meterRegistry);
 
-        assertThatThrownBy(() -> createService(webhookNotificationClient, 0, 2, meterRegistryProvider))
+        assertThatThrownBy(() -> createService(0, 2, meterRegistryProvider))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("bytechef.webhook-delivery.concurrency-limit");
-        assertThatThrownBy(() -> createService(webhookNotificationClient, 2, 0, meterRegistryProvider))
+        assertThatThrownBy(() -> createService(2, 0, meterRegistryProvider))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("bytechef.webhook-delivery.max-pending-deliveries");
     }
@@ -1133,15 +1133,6 @@ class WebhookDeliveryServiceTest {
         return "http://localhost:" + port + "/hook?token=SECRET";
     }
 
-    private static SimpleAsyncTaskExecutor createExecutor() {
-        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor("webhook-delivery-test-");
-
-        simpleAsyncTaskExecutor.setCancelRemainingTasksOnClose(true);
-        simpleAsyncTaskExecutor.setVirtualThreads(true);
-
-        return simpleAsyncTaskExecutor;
-    }
-
     private static ObjectProvider<MeterRegistry> meterRegistryProvider(MeterRegistry meterRegistry) {
         DefaultListableBeanFactory defaultListableBeanFactory = new DefaultListableBeanFactory();
 
@@ -1168,17 +1159,14 @@ class WebhookDeliveryServiceTest {
     }
 
     private WebhookDeliveryService createService(
-        WebhookNotificationClient webhookNotificationClient, int concurrencyLimit, int maxPendingDeliveries,
-        ObjectProvider<MeterRegistry> meterRegistryProvider) {
+        int concurrencyLimit, int maxPendingDeliveries, ObjectProvider<MeterRegistry> meterRegistryProvider) {
 
-        return createService(
-            webhookNotificationClient, webhookDeliveryExecutor, concurrencyLimit, maxPendingDeliveries,
-            meterRegistryProvider);
+        return createService(webhookDeliveryExecutor, concurrencyLimit, maxPendingDeliveries, meterRegistryProvider);
     }
 
     private WebhookDeliveryService createService(
-        WebhookNotificationClient webhookNotificationClient, AsyncTaskExecutor asyncTaskExecutor,
-        int concurrencyLimit, int maxPendingDeliveries, ObjectProvider<MeterRegistry> meterRegistryProvider) {
+        AsyncTaskExecutor asyncTaskExecutor, int concurrencyLimit, int maxPendingDeliveries,
+        ObjectProvider<MeterRegistry> meterRegistryProvider) {
 
         ApplicationProperties applicationProperties = new ApplicationProperties();
 

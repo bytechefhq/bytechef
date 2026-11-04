@@ -41,8 +41,13 @@ import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.coordinator.notification.ApprovalEscalationEmailNotificationHandler;
 import com.bytechef.platform.coordinator.notification.ApprovalEscalationWebhookNotificationHandler;
+import com.bytechef.platform.coordinator.notification.ApprovalReminderEmailNotificationHandler;
 import com.bytechef.platform.coordinator.notification.ApprovalReminderWebhookNotificationHandler;
+import com.bytechef.platform.coordinator.notification.JobStatusEmailNotificationHandler;
+import com.bytechef.platform.coordinator.notification.JobStatusSlackNotificationHandler;
+import com.bytechef.platform.coordinator.notification.JobStatusWebhookNotificationHandler;
 import com.bytechef.platform.coordinator.notification.NotificationHandlerContexts;
 import com.bytechef.platform.data.storage.jdbc.config.JdbcDataStorageConfiguration;
 import com.bytechef.platform.notification.domain.Notification;
@@ -76,8 +81,10 @@ import tools.jackson.databind.ObjectMapper;
  */
 @EnableAutoConfiguration
 @Import({
-    JacksonConfiguration.class, JdbcDataStorageConfiguration.class, LiquibaseConfiguration.class,
-    PostgreSQLContainerConfiguration.class
+    ApprovalEscalationEmailNotificationHandler.class, ApprovalReminderEmailNotificationHandler.class,
+    ApprovalReminderWebhookNotificationHandler.class, JacksonConfiguration.class, JdbcDataStorageConfiguration.class,
+    JobStatusEmailNotificationHandler.class, JobStatusSlackNotificationHandler.class,
+    JobStatusWebhookNotificationHandler.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
 })
 @Configuration
 public class PlatformCoordinatorIntTestConfiguration {

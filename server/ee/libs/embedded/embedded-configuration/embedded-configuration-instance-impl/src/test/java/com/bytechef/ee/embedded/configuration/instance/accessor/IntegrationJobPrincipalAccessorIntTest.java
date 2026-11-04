@@ -33,6 +33,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @version ee
@@ -66,6 +68,12 @@ class IntegrationJobPrincipalAccessorIntTest {
 
     @Autowired
     private IntegrationWorkflowService integrationWorkflowService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
     private long integrationId;
     private String integrationName;
@@ -171,6 +179,22 @@ class IntegrationJobPrincipalAccessorIntTest {
 
         assertThat(integrationJobPrincipalAccessor.getJobPrincipalSummary(integrationInstanceId))
             .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), integrationId, integrationName, 1));
+    }
+
+    @Test
+    void testGetJobPrincipalSummaryHasNoNameWhenTheIntegrationIsMissing() {
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(true, true, Map.of());
+
+        long integrationInstanceId = createIntegrationInstance(integrationInstanceConfigurationId);
+
+        transactionTemplate.executeWithoutResult(status -> {
+            jdbcTemplate.execute("SET LOCAL session_replication_role = replica");
+
+            jdbcTemplate.update("DELETE FROM integration WHERE id = ?", integrationId);
+        });
+
+        assertThat(integrationJobPrincipalAccessor.getJobPrincipalSummary(integrationInstanceId))
+            .isEqualTo(new JobPrincipalSummary(Environment.PRODUCTION.ordinal(), integrationId, null, 1));
     }
 
     private long createIntegrationInstance(long integrationInstanceConfigurationId) {
