@@ -155,6 +155,7 @@ Like `docker-compose.yml`, the file uses fixed credentials (PostgreSQL `postgres
 | `BYTECHEF_WEBHOOKS` | `0` | with 0, the coordinators serve webhooks |
 | `BYTECHEF_COORDINATOR_WEBHOOKS` | `true` | with `false` and every webhook node down, webhooks fail |
 | `BYTECHEF_MESSAGE_BROKER_PROVIDER` | `AMQP` | `AMQP` (RabbitMQ), `REDIS` |
+| `BYTECHEF_CACHE_PROVIDER` | `CAFFEINE` | `CAFFEINE`, `REDIS` (`EE` only; a CE node with `REDIS` logs a warning and keeps `CAFFEINE`) |
 | `BYTECHEF_SESSION_STORE` | `REDIS` | `REDIS`, `JDBC` (`EE` only) |
 | `BYTECHEF_TENANT_MODE` | `SINGLE` | `SINGLE`, `MULTI` (`EE` only) |
 | `BYTECHEF_IMAGE` | `docker.bytechef.io/bytechef/bytechef:latest` | a locally built image |
