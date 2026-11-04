@@ -128,6 +128,22 @@ class RemoteNotificationServiceClientIntTest {
     }
 
     @Test
+    void testGetNotificationsCarriesTheSecretSettings() {
+        Notification webhookNotification = notification(
+            "Failed jobs webhook", Notification.Type.WEBHOOK, List.of(JOB_FAILED_EVENT_ID));
+
+        webhookNotification.setSecretSettings(Map.of("signingSecret", "whsec_test"));
+
+        notificationService.create(webhookNotification);
+
+        Notification readWebhookNotification = remoteNotificationServiceClient.getNotifications()
+            .getFirst();
+
+        assertThat(readWebhookNotification.getSecretSettings()).isEqualTo(Map.of("signingSecret", "whsec_test"));
+        assertThat(readWebhookNotification.getSetting("signingSecret")).isEqualTo("whsec_test");
+    }
+
+    @Test
     void testGetNotificationsWithoutStoredNotificationsIsEmpty() {
         assertThat(remoteNotificationServiceClient.getNotifications()).isEmpty();
     }
