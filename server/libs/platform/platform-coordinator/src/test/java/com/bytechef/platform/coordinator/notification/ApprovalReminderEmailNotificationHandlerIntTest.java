@@ -18,37 +18,36 @@ package com.bytechef.platform.coordinator.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.platform.coordinator.config.PlatformCoordinatorIntTestConfiguration;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-class ApprovalEscalationEmailNotificationHandlerTest {
+@SpringBootTest(classes = PlatformCoordinatorIntTestConfiguration.class)
+class ApprovalReminderEmailNotificationHandlerIntTest {
 
     private static final String FORM_URL = "https://example.com/resume/v1.signed.token";
 
+    @Autowired
+    private ApprovalReminderEmailNotificationHandler approvalReminderEmailNotificationHandler;
+
     @Test
     void testContentKeepsTheFormUrlOnALineOfItsOwn() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-
-        messageSource.setBasename("messages");
-
-        ApprovalEscalationEmailNotificationHandler approvalEscalationEmailNotificationHandler =
-            new ApprovalEscalationEmailNotificationHandler(messageSource);
-
         NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
             .approvalExpiresAt("2026-10-17T13:39:23Z")
             .approvalFormUrl(FORM_URL)
-            .eventType(NotificationEvent.Type.JOB_APPROVAL_ESCALATED)
+            .eventType(NotificationEvent.Type.JOB_APPROVAL_EXPIRING)
             .executionUrl("https://x/automation/executions?id=4")
             .jobId(4L)
             .jobName("Order approval")
             .build();
 
-        String content = approvalEscalationEmailNotificationHandler.getContent(notificationHandlerContext);
+        String content = approvalReminderEmailNotificationHandler.getContent(notificationHandlerContext);
 
         assertThat(content.lines())
             .contains(FORM_URL);

@@ -19,24 +19,28 @@ package com.bytechef.platform.coordinator.notification;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.coordinator.config.PlatformCoordinatorIntTestConfiguration;
 import com.bytechef.platform.notification.domain.NotificationEvent.Type;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(ObjectMapperSetupExtension.class)
-class JobStatusWebhookNotificationHandlerTest {
+@SpringBootTest(classes = PlatformCoordinatorIntTestConfiguration.class)
+class JobStatusWebhookNotificationHandlerIntTest {
+
+    @Autowired
+    private ApprovalReminderWebhookNotificationHandler approvalReminderWebhookNotificationHandler;
+
+    @Autowired
+    private JobStatusWebhookNotificationHandler jobStatusWebhookNotificationHandler;
 
     @Test
     void testPayloadIsContextMap() {
-        JobStatusWebhookNotificationHandler jobStatusWebhookNotificationHandler =
-            new JobStatusWebhookNotificationHandler();
-
         NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
             .error(new NotificationHandlerContext.ErrorSummary("Send email", "email/v1/send", "boom", null))
             .eventType(Type.JOB_FAILED)
@@ -55,9 +59,6 @@ class JobStatusWebhookNotificationHandlerTest {
 
     @Test
     void testPayloadForApprovalEventKeepsTopLevelApprovalKeys() {
-        ApprovalReminderWebhookNotificationHandler approvalReminderWebhookNotificationHandler =
-            new ApprovalReminderWebhookNotificationHandler();
-
         NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
             .approvalExpiresAt("2026-10-17T13:39:23Z")
             .approvalFormUrl("https://example.com/resume/v1.token")
@@ -79,9 +80,6 @@ class JobStatusWebhookNotificationHandlerTest {
 
     @Test
     void testPayloadForApprovalEventKeepsNullApprovalKeysInJson() {
-        ApprovalReminderWebhookNotificationHandler approvalReminderWebhookNotificationHandler =
-            new ApprovalReminderWebhookNotificationHandler();
-
         NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
             .approvalExpiresAt("2026-10-17T13:39:23Z")
             .eventType(Type.JOB_APPROVAL_EXPIRING)

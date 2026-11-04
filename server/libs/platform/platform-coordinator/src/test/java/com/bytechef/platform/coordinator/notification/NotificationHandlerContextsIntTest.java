@@ -29,11 +29,14 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.repository.JobRepository;
+import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.coordinator.config.PlatformCoordinatorConfigurationIntTestConfiguration;
 import com.bytechef.platform.notification.domain.NotificationEvent.Type;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext.ErrorSummary;
@@ -44,44 +47,81 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(ObjectMapperSetupExtension.class)
-class NotificationHandlerContextsTest {
+@SpringBootTest(classes = PlatformCoordinatorConfigurationIntTestConfiguration.class)
+@TestPropertySource(properties = "bytechef.public-url=" + NotificationHandlerContextsIntTest.PUBLIC_URL)
+class NotificationHandlerContextsIntTest {
+
+    static final String PUBLIC_URL = "https://bytechef.example";
 
     private static final Instant END_DATE = Instant.parse("2026-11-03T10:00:05Z");
-    private static final String PUBLIC_URL = "https://bytechef.example";
     private static final Instant START_DATE = Instant.parse("2026-11-03T10:00:00Z");
 
-    private final EnvironmentService environmentService = mock(EnvironmentService.class);
+    @MockitoBean
+    private EnvironmentService environmentService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     private final JobPrincipalAccessor jobPrincipalAccessor = mock(JobPrincipalAccessor.class);
-    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry = mock(JobPrincipalAccessorRegistry.class);
-    private final PrincipalJobService principalJobService = mock(PrincipalJobService.class);
-    private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
-    private final WorkflowService workflowService = mock(WorkflowService.class);
+
+    @MockitoBean
+    private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private NotificationHandlerContexts notificationHandlerContexts;
+
+    @MockitoBean
+    private PrincipalJobService principalJobService;
+
+    @Autowired
+    private TaskExecutionRepository taskExecutionRepository;
+
+    @MockitoSpyBean
+    private TaskExecutionService taskExecutionService;
+
+    @MockitoBean
+    private WorkflowService workflowService;
 
     private Job job;
+    private long jobId;
 
     @BeforeEach
     void beforeEach() {
-        job = new Job();
+        jdbcTemplate.update("DELETE FROM task_execution");
+        jdbcTemplate.update("DELETE FROM job");
 
-        job.setEndDate(END_DATE);
-        job.setId(42L);
-        job.setLabel("Daily sync");
-        job.setStartDate(START_DATE);
-        job.setStatus(Job.Status.FAILED);
-        job.setWorkflowId("wf-1");
+        Job newJob = new Job();
+
+        newJob.setEndDate(END_DATE);
+        newJob.setLabel("Daily sync");
+        newJob.setStartDate(START_DATE);
+        newJob.setStatus(Job.Status.FAILED);
+        newJob.setWorkflowId("wf-1");
+
+        job = jobRepository.save(newJob);
+
+        jobId = Objects.requireNonNull(job.getId());
     }
 
     @Test
@@ -93,19 +133,19 @@ class NotificationHandlerContextsTest {
         when(environmentService.getEnvironment(2L)).thenReturn(Environment.PRODUCTION);
         when(workflowService.fetchWorkflow("wf-1")).thenReturn(Optional.of(workflow));
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_FAILED)
             .build();
 
         assertEquals(Type.JOB_FAILED, context.getEventType());
-        assertEquals(42L, context.getJobId());
+        assertEquals(jobId, context.getJobId());
         assertEquals("Daily sync", context.getJobName());
         assertEquals("AUTOMATION", context.getSource());
         assertEquals(new ProjectSummary(1L, "CRM", 3), context.getProject());
         assertEquals("PRODUCTION", context.getEnvironment());
         assertEquals(new WorkflowSummary("wf-1", "Daily sync"), context.getWorkflow());
         assertEquals(
-            new JobSummary(42L, "Daily sync", "FAILED", START_DATE, END_DATE, 5000L), context.getJob());
-        assertEquals(PUBLIC_URL + "/automation/executions?id=42", context.getExecutionUrl());
+            new JobSummary(jobId, "Daily sync", "FAILED", START_DATE, END_DATE, 5000L), context.getJob());
+        assertEquals(PUBLIC_URL + "/automation/executions?id=" + jobId, context.getExecutionUrl());
         assertNotNull(context.getDeliveryId());
         assertNotNull(context.getTimestamp());
     }
@@ -116,7 +156,7 @@ class NotificationHandlerContextsTest {
         when(jobPrincipalAccessor.getJobPrincipalSummary(7L)).thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
         when(environmentService.getEnvironment(2L)).thenThrow(new IllegalStateException("boom"));
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_FAILED)
             .build();
 
         assertEquals(new ProjectSummary(1L, "CRM", 3), context.getProject());
@@ -130,25 +170,23 @@ class NotificationHandlerContextsTest {
             .thenReturn(new JobPrincipalSummary(1, 5L, "HubSpot", 2));
         when(environmentService.getEnvironment(1L)).thenReturn(Environment.STAGING);
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_COMPLETED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)
             .build();
 
         assertEquals("EMBEDDED", context.getSource());
         assertEquals(new ProjectSummary(5L, "HubSpot", 2), context.getProject());
         assertEquals("STAGING", context.getEnvironment());
-        assertEquals(PUBLIC_URL + "/embedded/executions?id=42", context.getExecutionUrl());
+        assertEquals(PUBLIC_URL + "/embedded/executions?id=" + jobId, context.getExecutionUrl());
     }
 
     @Test
     void testBuilderResolvesFailingTaskError() {
-        when(taskExecutionService.getJobTaskExecutions(42L)).thenReturn(
-            List.of(
-                taskExecution("Read rows", "csvFile/v1/read", TaskExecution.Status.COMPLETED, null),
-                taskExecution(
-                    "Send email", "email/v1/send", TaskExecution.Status.FAILED,
-                    new ExecutionError("boom", List.of("a", "b")))));
+        saveTaskExecution(1, "Read rows", "csvFile/v1/read", TaskExecution.Status.COMPLETED, null);
+        saveTaskExecution(
+            2, "Send email", "email/v1/send", TaskExecution.Status.FAILED,
+            new ExecutionError("boom", List.of("a", "b")));
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_FAILED)
             .build();
 
         assertEquals(new ErrorSummary("Send email", "email/v1/send", "boom", "a\nb"), context.getError());
@@ -158,9 +196,7 @@ class NotificationHandlerContextsTest {
     void testBuilderFallsBackToJobErrorWhenNoTaskFailed() {
         job.setError(new ExecutionError("job boom", List.of("c")));
 
-        when(taskExecutionService.getJobTaskExecutions(42L)).thenReturn(List.of());
-
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_FAILED)
             .build();
 
         assertEquals(new ErrorSummary(null, null, "job boom", "c"), context.getError());
@@ -168,13 +204,11 @@ class NotificationHandlerContextsTest {
 
     @Test
     void testBuilderKeepsTaskNameWhenErrorMessageIsNull() {
-        when(taskExecutionService.getJobTaskExecutions(42L)).thenReturn(
-            List.of(
-                taskExecution(
-                    "Send email", "email/v1/send", TaskExecution.Status.FAILED,
-                    new ExecutionError(null, List.of("a", "b")))));
+        saveTaskExecution(
+            1, "Send email", "email/v1/send", TaskExecution.Status.FAILED,
+            new ExecutionError(null, List.of("a", "b")));
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_FAILED)
             .build();
 
         assertEquals(new ErrorSummary("Send email", "email/v1/send", null, "a\nb"), context.getError());
@@ -182,30 +216,29 @@ class NotificationHandlerContextsTest {
 
     @Test
     void testBuilderTruncatesStackTraceTo2000Characters() {
-        when(taskExecutionService.getJobTaskExecutions(42L)).thenReturn(
-            List.of(
-                taskExecution(
-                    "Send email", "email/v1/send", TaskExecution.Status.FAILED,
-                    new ExecutionError("boom", List.of("x".repeat(5000))))));
+        saveTaskExecution(
+            1, "Send email", "email/v1/send", TaskExecution.Status.FAILED,
+            new ExecutionError("boom", List.of("x".repeat(5000))));
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_FAILED)
             .build();
 
         ErrorSummary errorSummary = context.getError();
 
-        assertEquals(2000, errorSummary.stackTrace()
-            .length());
+        String stackTrace = errorSummary.stackTrace();
+
+        assertEquals(2000, stackTrace.length());
     }
 
     @Test
     void testBuilderOmitsPrincipalFieldsWhenJobHasNoPrincipal() {
         Workflow workflow = workflow("Daily sync");
 
-        when(principalJobService.fetchJobPrincipalId(42L, PlatformType.AUTOMATION)).thenReturn(Optional.empty());
-        when(principalJobService.fetchJobPrincipalId(42L, PlatformType.EMBEDDED)).thenReturn(Optional.empty());
+        when(principalJobService.fetchJobPrincipalId(jobId, PlatformType.AUTOMATION)).thenReturn(Optional.empty());
+        when(principalJobService.fetchJobPrincipalId(jobId, PlatformType.EMBEDDED)).thenReturn(Optional.empty());
         when(workflowService.fetchWorkflow("wf-1")).thenReturn(Optional.of(workflow));
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_COMPLETED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)
             .build();
 
         assertNull(context.getSource());
@@ -219,7 +252,7 @@ class NotificationHandlerContextsTest {
     void testBuilderKeepsWorkflowIdWhenWorkflowIsMissing() {
         when(workflowService.fetchWorkflow("wf-1")).thenReturn(Optional.empty());
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_COMPLETED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)
             .build();
 
         assertEquals(new WorkflowSummary("wf-1", null), context.getWorkflow());
@@ -231,13 +264,13 @@ class NotificationHandlerContextsTest {
         when(jobPrincipalAccessor.getJobPrincipalSummary(7L)).thenThrow(new IllegalArgumentException("gone"));
 
         NotificationHandlerContext context = assertDoesNotThrow(
-            () -> contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+            () -> notificationHandlerContexts.builder(job, Type.JOB_FAILED)
                 .build());
 
         assertNull(context.getProject());
         assertNull(context.getEnvironment());
         assertEquals("AUTOMATION", context.getSource());
-        assertEquals(PUBLIC_URL + "/automation/executions?id=42", context.getExecutionUrl());
+        assertEquals(PUBLIC_URL + "/automation/executions?id=" + jobId, context.getExecutionUrl());
     }
 
     @Test
@@ -246,7 +279,7 @@ class NotificationHandlerContextsTest {
         when(jobPrincipalAccessor.getJobPrincipalSummary(7L)).thenReturn(new JobPrincipalSummary(2, null, null, null));
         when(environmentService.getEnvironment(2L)).thenReturn(Environment.PRODUCTION);
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_COMPLETED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)
             .build();
 
         assertNull(context.getProject());
@@ -254,22 +287,8 @@ class NotificationHandlerContextsTest {
     }
 
     @Test
-    void testBuilderOmitsExecutionUrlWhenPublicUrlIsBlank() {
-        mockPrincipal(PlatformType.AUTOMATION, 7L);
-        when(jobPrincipalAccessor.getJobPrincipalSummary(7L)).thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
-
-        NotificationHandlerContext context = contexts("").builder(job, Type.JOB_COMPLETED)
-            .build();
-
-        assertNull(context.getExecutionUrl());
-        assertNull(contexts(null).builder(job, Type.JOB_COMPLETED)
-            .build()
-            .getExecutionUrl());
-    }
-
-    @Test
     void testBuilderSkipsErrorLookupForNonFailureEvents() {
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_COMPLETED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)
             .build();
 
         assertNull(context.getError());
@@ -281,39 +300,70 @@ class NotificationHandlerContextsTest {
     void testBuilderOmitsDurationWhenEndDateIsMissing() {
         job.setEndDate(null);
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_STARTED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_STARTED)
             .build();
 
-        assertEquals(new JobSummary(42L, "Daily sync", "FAILED", START_DATE, null, null), context.getJob());
+        assertEquals(new JobSummary(jobId, "Daily sync", "FAILED", START_DATE, null, null), context.getJob());
     }
 
-    private NotificationHandlerContexts contexts(String publicUrl) {
-        return new NotificationHandlerContexts(
-            environmentService, jobPrincipalAccessorRegistry, principalJobService, publicUrl, taskExecutionService,
-            workflowService);
+    @Nested
+    @TestPropertySource(properties = "bytechef.public-url=")
+    class BlankPublicUrlIntTest {
+
+        @Test
+        void testBuilderOmitsExecutionUrlWhenPublicUrlIsBlank() {
+            mockPrincipal(PlatformType.AUTOMATION, 7L);
+            when(jobPrincipalAccessor.getJobPrincipalSummary(7L))
+                .thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
+
+            NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)
+                .build();
+
+            assertEquals("AUTOMATION", context.getSource());
+            assertNull(context.getExecutionUrl());
+        }
+    }
+
+    @Nested
+    @TestPropertySource(inheritProperties = false, properties = "bytechef.coordinator.enabled=true")
+    class MissingPublicUrlIntTest {
+
+        @Test
+        void testBuilderOmitsExecutionUrlWhenPublicUrlIsMissing() {
+            mockPrincipal(PlatformType.AUTOMATION, 7L);
+            when(jobPrincipalAccessor.getJobPrincipalSummary(7L))
+                .thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
+
+            NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)
+                .build();
+
+            assertEquals("AUTOMATION", context.getSource());
+            assertNull(context.getExecutionUrl());
+        }
     }
 
     private void mockPrincipal(PlatformType platformType, long jobPrincipalId) {
         for (PlatformType type : PlatformType.values()) {
-            when(principalJobService.fetchJobPrincipalId(42L, type)).thenReturn(
+            when(principalJobService.fetchJobPrincipalId(jobId, type)).thenReturn(
                 type == platformType ? Optional.of(jobPrincipalId) : Optional.empty());
         }
 
         when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(platformType)).thenReturn(jobPrincipalAccessor);
     }
 
-    private static TaskExecution taskExecution(
-        String name, String type, TaskExecution.Status status, ExecutionError executionError) {
+    private void saveTaskExecution(
+        int taskNumber, String name, String type, TaskExecution.Status status, ExecutionError executionError) {
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .jobId(42L)
+            .jobId(jobId)
+            .taskNumber(taskNumber)
             .workflowTask(new WorkflowTask(Map.of("name", name, "type", type)))
             .build();
 
         taskExecution.setError(executionError);
         taskExecution.setStatus(status);
 
-        return taskExecution;
+        taskExecutionRepository.save(taskExecution);
     }
 
     private static Workflow workflow(String label) {

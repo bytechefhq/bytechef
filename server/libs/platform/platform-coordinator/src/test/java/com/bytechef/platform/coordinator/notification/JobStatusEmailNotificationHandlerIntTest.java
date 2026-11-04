@@ -19,6 +19,7 @@ package com.bytechef.platform.coordinator.notification;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.bytechef.platform.coordinator.config.PlatformCoordinatorIntTestConfiguration;
 import com.bytechef.platform.notification.domain.NotificationEvent.Type;
 import com.bytechef.platform.notification.handler.NotificationEventType;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
@@ -26,15 +27,17 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-class JobStatusEmailNotificationHandlerTest {
+@SpringBootTest(classes = PlatformCoordinatorIntTestConfiguration.class)
+class JobStatusEmailNotificationHandlerIntTest {
 
-    private final JobStatusEmailNotificationHandler jobStatusEmailNotificationHandler =
-        new JobStatusEmailNotificationHandler(createMessageSource());
+    @Autowired
+    private JobStatusEmailNotificationHandler jobStatusEmailNotificationHandler;
 
     @Test
     void testJobStoppedIsHandled() {
@@ -88,15 +91,6 @@ class JobStatusEmailNotificationHandlerTest {
             .jobId(42L)
             .jobName("Daily sync")
             .build();
-    }
-
-    private static ResourceBundleMessageSource createMessageSource() {
-        ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
-
-        resourceBundleMessageSource.setBasename("messages");
-        resourceBundleMessageSource.setDefaultEncoding("UTF-8");
-
-        return resourceBundleMessageSource;
     }
 
     private static Type[] handledTypes() {

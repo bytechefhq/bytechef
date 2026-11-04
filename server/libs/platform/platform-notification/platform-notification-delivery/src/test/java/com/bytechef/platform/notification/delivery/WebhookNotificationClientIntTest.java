@@ -19,6 +19,7 @@ package com.bytechef.platform.notification.delivery;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bytechef.platform.notification.delivery.config.WebhookDeliveryIntTestConfiguration;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
@@ -35,22 +36,31 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.ResourceAccessException;
 
 /**
  * @author Ivica Cardic
  */
-class WebhookNotificationClientTest {
+@SpringBootTest(
+    classes = WebhookDeliveryIntTestConfiguration.class,
+    properties = {
+        "bytechef.webhook-delivery.concurrency-limit=2", "bytechef.webhook-delivery.max-pending-deliveries=2"
+    })
+class WebhookNotificationClientIntTest {
 
     private final AtomicInteger failuresBeforeSuccess = new AtomicInteger();
     private final AtomicInteger responseStatus = new AtomicInteger(500);
     private final List<Long> requestNanoTimes = new CopyOnWriteArrayList<>();
-    private final WebhookNotificationClient webhookNotificationClient = new WebhookNotificationClient();
 
     private final AtomicReference<Headers> receivedHeaders = new AtomicReference<>();
     private final AtomicReference<String> receivedBody = new AtomicReference<>();
     private final AtomicReference<String> receivedRawQuery = new AtomicReference<>();
     private final AtomicInteger redirectTargetHits = new AtomicInteger();
+
+    @Autowired
+    private WebhookNotificationClient webhookNotificationClient;
 
     private HttpServer httpServer;
     private String url;
