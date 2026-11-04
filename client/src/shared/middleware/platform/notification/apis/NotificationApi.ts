@@ -23,6 +23,11 @@ import {
     NotificationSigningSecretFromJSON,
     NotificationSigningSecretToJSON,
 } from '../models/NotificationSigningSecret';
+import {
+    type NotificationTestResult,
+    NotificationTestResultFromJSON,
+    NotificationTestResultToJSON,
+} from '../models/NotificationTestResult';
 
 export interface CreateNotificationRequest {
     /**
@@ -43,6 +48,17 @@ export interface RegenerateNotificationSigningSecretRequest {
      * The id of a notification.
      */
     notificationId: number;
+}
+
+export interface TestNotificationRequest {
+    /**
+     * 
+     */
+    notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'|'hasSigningSecret'|'signingSecret'>;
+    /**
+     * The id of the saved notification whose masked values and signing secret the test uses. Omit it for a notification that is not saved yet.
+     */
+    notificationId?: number;
 }
 
 export interface UpdateNotificationRequest {
@@ -239,6 +255,59 @@ export class NotificationApi extends runtime.BaseAPI {
      */
     async regenerateNotificationSigningSecret(requestParameters: RegenerateNotificationSigningSecretRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NotificationSigningSecret> {
         const response = await this.regenerateNotificationSigningSecretRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for testNotification without sending the request
+     */
+    async testNotificationRequestOpts(requestParameters: TestNotificationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['notification'] == null) {
+            throw new runtime.RequiredError(
+                'notification',
+                'Required parameter "notification" was null or undefined when calling testNotification().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['notificationId'] != null) {
+            queryParameters['notificationId'] = requestParameters['notificationId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/notifications/test`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: NotificationToJSON(requestParameters['notification']),
+        };
+    }
+
+    /**
+     * Sends a sample JOB_FAILED notification to the configured destination without saving anything. Masked values are resolved against the stored notification when an id is given.
+     * Send a test notification
+     */
+    async testNotificationRaw(requestParameters: TestNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NotificationTestResult>> {
+        const requestOptions = await this.testNotificationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => NotificationTestResultFromJSON(jsonValue));
+    }
+
+    /**
+     * Sends a sample JOB_FAILED notification to the configured destination without saving anything. Masked values are resolved against the stored notification when an id is given.
+     * Send a test notification
+     */
+    async testNotification(requestParameters: TestNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NotificationTestResult> {
+        const response = await this.testNotificationRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -6,9 +6,11 @@ docs/NotificationApi.md
 docs/NotificationEvent.md
 docs/NotificationEventApi.md
 docs/NotificationSigningSecret.md
+docs/NotificationTestResult.md
 index.ts
 models/Notification.ts
 models/NotificationEvent.ts
 models/NotificationSigningSecret.ts
+models/NotificationTestResult.ts
 models/index.ts
 runtime.ts
