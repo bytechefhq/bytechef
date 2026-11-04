@@ -91,6 +91,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Notification"
+  /notifications/{notificationId}/signing-secret:
+    post:
+      description: "Regenerates the signing secret of a webhook notification. The new secret is returned only once."
+      summary: "Regenerate the signing secret of a webhook notification"
+      tags:
+        - "notification"
+      operationId: "regenerateNotificationSigningSecret"
+      parameters:
+        - name: "notificationId"
+          description: "The id of a notification."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The new signing secret."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationSigningSecret"
   /notifications/events:
     get:
       description: "Get a list of possible notification events"
@@ -169,8 +191,23 @@ components:
             type: "integer"
             format: "int64"
           writeOnly: true
+        hasSigningSecret:
+          description: "Whether the notification has a webhook signing secret"
+          type: "boolean"
+          readOnly: true
+        signingSecret:
+          description: "The webhook signing secret, returned only in the create response"
+          type: "string"
+          readOnly: true
         __version:
           type: "integer"
+    NotificationSigningSecret:
+      description: "A regenerated webhook signing secret."
+      type: "object"
+      properties:
+        signingSecret:
+          description: "The signing secret"
+          type: "string"
     NotificationEvent:
       type: "object"
       description: "A notification event definition."
