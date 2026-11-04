@@ -98,7 +98,7 @@ class JdbcDataStorageUpdatesTest {
         }
 
         @Override
-        public void deleteScopeData(DataStorageScope scope, String scopeId) {
+        public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
             throw new UnsupportedOperationException();
         }
 

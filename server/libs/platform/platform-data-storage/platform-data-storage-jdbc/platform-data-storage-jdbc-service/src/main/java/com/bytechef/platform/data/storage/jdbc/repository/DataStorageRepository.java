@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
 public interface DataStorageRepository
     extends ListPagingAndSortingRepository<DataEntry, Long>, ListCrudRepository<DataEntry, Long> {
 
-    void deleteAllByScopeAndScopeId(int scope, String scopeId);
+    void deleteAllByScopeAndScopeIdAndType(int scope, String scopeId, int type);
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
     Optional<DataEntry> findByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(

@@ -52,8 +52,8 @@ public class JdbcDataStorageConfiguration {
     private record DataStorageImpl(JdbcDataStorageService jdbcDataStorageService) implements DataStorage {
 
         @Override
-        public void deleteScopeData(DataStorageScope scope, String scopeId) {
-            jdbcDataStorageService.deleteScopeData(scope, scopeId);
+        public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
+            jdbcDataStorageService.deleteScopeData(scope, scopeId, type);
         }
 
         @Override

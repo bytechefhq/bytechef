@@ -35,18 +35,23 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class ExecutionDataJobDeletionListenerTest {
 
     @Test
@@ -57,7 +62,20 @@ class ExecutionDataJobDeletionListenerTest {
 
         listener.onDeleteJob(new DeleteJobEvent(42L, Map.of()));
 
-        verify(dataStorage).deleteScopeData(DataStorageScope.CURRENT_EXECUTION, "42");
+        for (PlatformType type : PlatformType.values()) {
+            verify(dataStorage).deleteScopeData(DataStorageScope.CURRENT_EXECUTION, "42", type);
+        }
+    }
+
+    @Test
+    void testSkipsEditorJobs() {
+        DataStorage dataStorage = mock(DataStorage.class);
+
+        ExecutionDataJobDeletionListener listener = new ExecutionDataJobDeletionListener(dataStorage);
+
+        listener.onDeleteJob(new DeleteJobEvent(42L, Map.of(MetadataConstants.EDITOR_ENVIRONMENT, true)));
+
+        verify(dataStorage, never()).deleteScopeData(any(), any(), any());
     }
 
     @Test
@@ -72,7 +90,7 @@ class ExecutionDataJobDeletionListenerTest {
         DataStorage dataStorage = mock(DataStorage.class);
 
         doThrow(new UnsupportedOperationException()).when(dataStorage)
-            .deleteScopeData(any(), any());
+            .deleteScopeData(any(), any(), any());
 
         ExecutionDataJobDeletionListener listener = new ExecutionDataJobDeletionListener(dataStorage);
 
@@ -84,7 +102,7 @@ class ExecutionDataJobDeletionListenerTest {
         DataStorage dataStorage = mock(DataStorage.class);
 
         doThrow(new IllegalStateException("db down")).when(dataStorage)
-            .deleteScopeData(any(), any());
+            .deleteScopeData(any(), any(), any());
 
         ExecutionDataJobDeletionListener listener = new ExecutionDataJobDeletionListener(dataStorage);
 
@@ -110,11 +128,13 @@ class ExecutionDataJobDeletionListenerTest {
             InOrder inOrder = inOrder(dataStorage, jobService);
 
             inOrder.verify(dataStorage)
-                .deleteScopeData(DataStorageScope.CURRENT_EXECUTION, String.valueOf(CHILD_JOB_ID));
+                .deleteScopeData(
+                    DataStorageScope.CURRENT_EXECUTION, String.valueOf(CHILD_JOB_ID), PlatformType.AUTOMATION);
             inOrder.verify(jobService)
                 .deleteJob(CHILD_JOB_ID);
             inOrder.verify(dataStorage)
-                .deleteScopeData(DataStorageScope.CURRENT_EXECUTION, String.valueOf(PARENT_JOB_ID));
+                .deleteScopeData(
+                    DataStorageScope.CURRENT_EXECUTION, String.valueOf(PARENT_JOB_ID), PlatformType.AUTOMATION);
             inOrder.verify(jobService)
                 .deleteJob(PARENT_JOB_ID);
         }
@@ -122,7 +142,8 @@ class ExecutionDataJobDeletionListenerTest {
         @Test
         void testFailedDataDeletionKeepsTheJobRow() {
             doThrow(new IllegalStateException("db down")).when(dataStorage)
-                .deleteScopeData(DataStorageScope.CURRENT_EXECUTION, String.valueOf(PARENT_JOB_ID));
+                .deleteScopeData(
+                    DataStorageScope.CURRENT_EXECUTION, String.valueOf(PARENT_JOB_ID), PlatformType.AUTOMATION);
 
             assertThatThrownBy(() -> jobFacade.deleteJob(PARENT_JOB_ID))
                 .isInstanceOf(IllegalStateException.class);
