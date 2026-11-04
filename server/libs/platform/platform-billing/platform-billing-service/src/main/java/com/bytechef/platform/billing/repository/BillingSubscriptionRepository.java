@@ -20,6 +20,8 @@ import com.bytechef.platform.billing.domain.BillingSubscription;
 import java.time.Instant;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.relational.core.sql.LockMode;
+import org.springframework.data.relational.repository.Lock;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -45,5 +47,8 @@ public interface BillingSubscriptionRepository extends ListCrudRepository<Billin
 
     Optional<BillingSubscription> findFirstByPlanNameOrderByCreatedDateDesc(String planName);
 
+    // Locks the row so concurrent webhook events for one subscription are applied one at a time: a renewal decided from
+    // a stale period start would reset the unit counters a second time and erase units consumed in between.
+    @Lock(LockMode.PESSIMISTIC_WRITE)
     Optional<BillingSubscription> findBySubscriptionId(String subscriptionId);
 }
