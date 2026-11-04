@@ -39,7 +39,7 @@ public class DeleteAiAgentChannelToolCallback implements ToolCallback {
         Delete a channel from an AI Agent: pass the agentId and the channel id from that agent's getAiAgent
         channels list; an id from another agent is rejected. The permanent
         chat and workflowCall channels cannot be deleted and this call is rejected for them. Always
-        confirm with the user before calling — the agent stops being reachable through this channel.""";
+        confirm with the user before calling, because the agent stops being reachable through this channel.""";
 
     private static final String INPUT_SCHEMA = """
         {

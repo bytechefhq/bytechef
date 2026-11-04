@@ -42,8 +42,8 @@ public class GetAiAgentToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Get the full configuration of one AI Agent by id: its title/description/instructions, every
-        channel (inbound trigger — channelType, parameters, connectionId), every element (building
-        block — kind, referenceId, parameters, connectionId; kinds are MODEL, TOOL, SKILL, SUB_AGENT,
+        channel (inbound trigger: channelType, parameters, connectionId), every element (building
+        block: kind, referenceId, parameters, connectionId; kinds are MODEL, TOOL, SKILL, SUB_AGENT,
         KNOWLEDGE_BASE, CHAT_MEMORY, APPROVAL_GATE, APPROVAL_CHANNEL, APPROVAL_TOOL), the settings
         object (streamResponse plus the builtInTools on/off switches), and
         unpublishedChanges/lastPublishedVersion. Always call

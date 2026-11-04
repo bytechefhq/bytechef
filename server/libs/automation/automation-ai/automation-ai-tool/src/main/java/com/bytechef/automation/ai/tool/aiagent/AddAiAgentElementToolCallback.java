@@ -49,7 +49,7 @@ public class AddAiAgentElementToolCallback implements ToolCallback {
     private static final String DESCRIPTION =
         """
             Add a building-block element to an AI Agent. kind is one of:
-            - MODEL: the LLM the agent runs on. Singleton — required before the agent can be published.
+            - MODEL: the LLM the agent runs on. Singleton, required before the agent can be published.
               parameters is {"provider": the model component's name such as "anthropic", "model": the model
               id, "parameters": optional model settings such as maxTokens}.
               connectionId is required: the id of a connection to the provider's component (find one with
