@@ -36,6 +36,8 @@ const Notifications = () => {
         testNotification,
     } = useNotifications();
 
+    const hasNotifications = !!notificationsData && notificationsData.length > 0;
+
     return (
         <LayoutContainer
             header={
@@ -47,14 +49,18 @@ const Notifications = () => {
                             : 'Send an email or Slack message when a workflow run reaches a given status.'
                     }
                     position="main"
-                    right={<Button icon={<PlusIcon />} label="New Notification" onClick={() => openEditDialog()} />}
+                    right={
+                        hasNotifications && (
+                            <Button icon={<PlusIcon />} label="New Notification" onClick={() => openEditDialog()} />
+                        )
+                    }
                     title="Notifications"
                 />
             }
             leftSidebarOpen={false}
         >
             <PageLoader errors={[notificationsError]} loading={isNotificationsLoading}>
-                {notificationsData && notificationsData?.length > 0 ? (
+                {hasNotifications ? (
                     <NotificationsTable columns={columns} notifications={notificationsData!} />
                 ) : (
                     <EmptyList
