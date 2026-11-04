@@ -22,84 +22,20 @@ export type MultiSelectOptionType = {
     icon?: ComponentType<{className?: string}>;
 };
 
-/**
- * Props for MultiSelect component - Variant style for the Badge component
- */
 interface MultiSelectProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'default' | 'destructive' | 'secondary';
-    /**
-     * Icon component to display on the left side of the multi-select component.
-     * Optional, defaults to undefined.
-     */
     leadingIcon?: ReactNode;
-    /**
-     * An array of option objects to be displayed in the multi-select component.
-     * Each option object has a label, value, and an optional icon.
-     */
     options: MultiSelectOptionType[];
-
-    /**
-     * Callback function triggered when the selected values change.
-     * Receives an array of the new selected values.
-     */
     onValueChange: (value: string[]) => void;
-
-    /** The default selected values when the component mounts. */
     defaultValue?: string[];
-
-    /**
-     * Placeholder text to be displayed when no values are selected.
-     * Optional, defaults to "Select options".
-     */
     placeholder?: string;
-
-    /**
-     * Maximum number of items to display. Extra selected items will be summarized.
-     * Optional, defaults to 3.
-     */
     maxCount?: number;
-
-    /**
-     * The modality of the popover. When set to true, interaction with outside elements
-     * will be disabled and only popover content will be visible to screen readers.
-     * Optional, defaults to false.
-     */
     modalPopover?: boolean;
-
-    /**
-     * If true, shows a loading indicator on the multi-select component.
-     * Optional, defaults to false.
-     */
     optionsLoading?: boolean;
-
-    /**
-     * Additional class names to apply custom styles to the multi-select component.
-     * Optional, can be used to add custom styles.
-     */
     className?: string;
-
-    /**
-     * Additional class name to apply custom styles to the placeholder.
-     * Optional, can be used to add custom styles
-     */
     placeholderClassName?: string;
-
-    /**
-     * If true, enables the search functionality in the multi-select component.
-     * Optional, defaults to false.
-     */
     searchable?: boolean;
-
-    /**
-     * If true, shows the footer with clear and close buttons.
-     * Optional, defaults to false.
-     */
     showFooter?: boolean;
-
-    /**
-     * The selected values in the multi-select component.
-     * Optional, defaults to an empty array.
-     */
     value?: string[];
 }
 
