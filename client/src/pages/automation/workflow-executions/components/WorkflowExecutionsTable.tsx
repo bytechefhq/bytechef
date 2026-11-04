@@ -180,7 +180,7 @@ const ExecutionRows = ({
                         )}
                         onClick={() => onRowClick(execution)}
                     >
-                        <TableCell className="w-9 py-4">
+                        <TableCell className="w-9">
                             {expandable && (
                                 <Button
                                     className={twMerge(
