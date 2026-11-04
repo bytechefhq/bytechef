@@ -33,6 +33,8 @@ public interface ConnectedUserProjectService {
 
     Optional<ConnectedUserProject> fetchConnectUserProject(String externalUserId, Environment environment);
 
+    Optional<ConnectedUserProject> fetchProjectConnectedUserProject(long projectId);
+
     ConnectedUserProject getConnectedUserProject(Long id);
 
     @Transactional(readOnly = true)

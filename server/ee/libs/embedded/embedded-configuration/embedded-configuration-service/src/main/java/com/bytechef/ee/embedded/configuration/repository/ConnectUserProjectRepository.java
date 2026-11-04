@@ -70,6 +70,8 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
 
     Optional<ConnectedUserProject> findByConnectedUserId(Long connectedUserid);
 
+    Optional<ConnectedUserProject> findByProjectId(long projectId);
+
     @Query("""
         SELECT id
         FROM connected_user
