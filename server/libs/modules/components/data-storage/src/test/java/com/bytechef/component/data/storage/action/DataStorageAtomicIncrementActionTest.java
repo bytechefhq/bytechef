@@ -21,8 +21,6 @@ import static com.bytechef.component.data.storage.constant.DataStorageConstants.
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE_TO_ADD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -36,16 +34,10 @@ import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -55,6 +47,7 @@ class DataStorageAtomicIncrementActionTest {
     private final Data mockedData = mock(Data.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(KEY, "counter", SCOPE, "WORKFLOW", VALUE_TO_ADD, 5));
+    private final AtomicReference<Object> storedValue = new AtomicReference<>();
 
     @BeforeEach
     @SuppressWarnings("unchecked")
@@ -65,130 +58,88 @@ class DataStorageAtomicIncrementActionTest {
 
                 return dataFunction.apply(mockedData);
             });
+
+        when(mockedData.update(eq(Scope.WORKFLOW), eq("counter"), any())).thenAnswer(
+            invocation -> {
+                Function<Optional<Object>, Object> updater = invocation.getArgument(2);
+
+                Object result = updater.apply(Optional.ofNullable(storedValue.get()));
+
+                storedValue.set(result);
+
+                return result;
+            });
     }
 
     @Test
-    void testPerformStartsFromZeroWhenKeyIsMissing() throws InterruptedException {
-        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.empty());
-
+    void testPerformStartsFromZeroWhenKeyIsMissing() {
         Integer result = DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext);
 
-        assertEquals(5, result);
-
-        verify(mockedData).put(Scope.WORKFLOW, "counter", 5);
+        assertThat(result).isEqualTo(5);
+        assertThat(storedValue.get()).isEqualTo(5);
     }
 
     @Test
-    void testPerformAddsToExistingValue() throws InterruptedException {
-        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.of(52L));
+    void testPerformAddsToExistingValue() {
+        storedValue.set(52L);
 
         Integer result = DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext);
 
-        assertEquals(57, result);
+        assertThat(result).isEqualTo(57);
+        assertThat(storedValue.get()).isEqualTo(57);
+    }
 
-        verify(mockedData).put(Scope.WORKFLOW, "counter", 57);
+    @Test
+    void testPerformAcceptsAnIntegerStoredValue() {
+        storedValue.set(52);
+
+        Integer result = DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext);
+
+        assertThat(result).isEqualTo(57);
+    }
+
+    @Test
+    void testPerformUsesUpdate() {
+        DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext);
+
+        verify(mockedData).update(eq(Scope.WORKFLOW), eq("counter"), any());
+        verify(mockedData, never()).fetch(any(), any());
+        verify(mockedData, never()).put(any(), any(), any());
     }
 
     @Test
     void testPerformRejectsNonNumericValue() {
-        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.of("text"));
+        storedValue.set("text");
 
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext));
+        assertThatThrownBy(
+            () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The value stored under key 'counter' is not a number");
 
-        verify(mockedData, never()).put(any(), any(), any());
+        assertThat(storedValue.get()).isEqualTo("text");
     }
 
     @Test
     void testPerformRejectsStoredValueOutsideIntegerRange() {
-        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.of((long) Integer.MAX_VALUE + 1));
+        storedValue.set((long) Integer.MAX_VALUE + 1);
 
         assertThatThrownBy(
             () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("'counter'");
 
-        verify(mockedData, never()).put(any(), any(), any());
+        assertThat(storedValue.get()).isEqualTo((long) Integer.MAX_VALUE + 1);
     }
 
     @Test
     void testPerformRejectsIncrementThatOverflows() {
-        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.of(Integer.MAX_VALUE));
+        storedValue.set(Integer.MAX_VALUE);
 
         assertThatThrownBy(
             () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("'counter'");
 
-        verify(mockedData, never()).put(any(), any(), any());
-    }
-
-    @Test
-    void testPerformIncrementsWithoutLostUpdatesWhenCalledConcurrently() throws Exception {
-        int callCount = 3;
-
-        Map<String, Object> storedValues = new ConcurrentHashMap<>();
-
-        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenAnswer(
-            invocation -> Optional.ofNullable(storedValues.get("counter")));
-        when(mockedData.put(eq(Scope.WORKFLOW), eq("counter"), any())).thenAnswer(
-            invocation -> {
-                Thread.sleep(50);
-
-                storedValues.put("counter", invocation.getArgument(2));
-
-                return null;
-            });
-
-        CountDownLatch startLatch = new CountDownLatch(1);
-        ExecutorService executorService = Executors.newFixedThreadPool(callCount);
-
-        try {
-            List<Future<Integer>> futures = new ArrayList<>();
-
-            for (int index = 0; index < callCount; index++) {
-                futures.add(executorService.submit(() -> {
-                    startLatch.await();
-
-                    return DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext);
-                }));
-            }
-
-            startLatch.countDown();
-
-            List<Integer> results = new ArrayList<>();
-
-            for (Future<Integer> future : futures) {
-                results.add(future.get(5, TimeUnit.SECONDS));
-            }
-
-            assertThat(results).containsExactlyInAnyOrder(5, 10, 15);
-            assertEquals(15, storedValues.get("counter"));
-        } finally {
-            executorService.shutdownNow();
-        }
-    }
-
-    @Test
-    void testPerformReleasesTheLockWhenItFails() throws Exception {
-        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.of("text"));
-
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext));
-
-        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.empty());
-
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-        try {
-            Future<Integer> future = executorService.submit(
-                () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext));
-
-            assertEquals(5, future.get(2, TimeUnit.SECONDS));
-        } finally {
-            executorService.shutdownNow();
-        }
+        assertThat(storedValue.get()).isEqualTo(Integer.MAX_VALUE);
     }
 }

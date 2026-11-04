@@ -128,21 +128,21 @@ public class DataStorageAppendValueToListAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.data(data -> data.put(
-            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY),
-            getValues(inputParameters, context, DataStorageUtils.getValue(inputParameters))));
+        Scope scope = Scope.valueOf(inputParameters.getRequiredString(SCOPE));
+        String key = inputParameters.getRequiredString(KEY);
+        Object value = DataStorageUtils.getValue(inputParameters);
+
+        context
+            .data(data -> data.update(scope, key, (Optional<Object> currentValue) -> appendValue(currentValue, value)));
+
+        return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private static List<Object> getValues(Parameters inputParameters, ActionContext context, Object value) {
-        List<Object> list;
-        Optional<Object> optionalList = context.data(data -> data.fetch(
-            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
+    private static List<Object> appendValue(Optional<Object> currentValue, Object value) {
+        List<Object> list = new ArrayList<>();
 
-        if (optionalList.isPresent() && optionalList.get() instanceof List<?> curList) {
-            list = (List<Object>) curList;
-        } else {
-            list = new ArrayList<>();
+        if (currentValue.isPresent() && currentValue.get() instanceof List<?> currentList) {
+            list.addAll(currentList);
         }
 
         if (value instanceof Object[] values) {
