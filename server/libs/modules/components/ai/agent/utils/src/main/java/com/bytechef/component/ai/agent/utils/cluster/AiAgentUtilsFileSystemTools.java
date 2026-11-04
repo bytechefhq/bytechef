@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.WorkspacePathToolCallback;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
@@ -44,6 +45,7 @@ public class AiAgentUtilsFileSystemTools {
     public static final String READ_ONLY = "readOnly";
 
     private static final String CLUSTER_ELEMENT_NAME = "fileSystemTools";
+    private static final String FILE_PATH_ARGUMENT_NAME = "filePath";
     private static final String READ_TOOL_NAME = "Read";
 
     private final AgentWorkspaceResolver agentWorkspaceResolver;
@@ -80,7 +82,10 @@ public class AiAgentUtilsFileSystemTools {
             .workspace(workspace)
             .build();
 
-        List<ToolCallback> toolCallbacks = Arrays.asList(ToolCallbacks.from(fileSystemTools));
+        List<ToolCallback> toolCallbacks = Arrays.stream(ToolCallbacks.from(fileSystemTools))
+            .<ToolCallback>map(
+                toolCallback -> new WorkspacePathToolCallback(toolCallback, FILE_PATH_ARGUMENT_NAME, workspace.root()))
+            .toList();
 
         if (inputParameters.getBoolean(READ_ONLY, false)) {
             toolCallbacks = toolCallbacks.stream()

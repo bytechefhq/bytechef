@@ -118,6 +118,37 @@ class AiAgentUtilsFileSystemToolsTest {
             .normalize()).doesNotExist();
     }
 
+    @Test
+    void testWriteWithARelativePathWritesInsideTheWorkspace() throws Exception {
+        Path workspace = basedir.resolve(AGENT_WORKSPACE);
+
+        String result = callTool(applyTools(), "Write", Map.of("filePath", "notes/hello.txt", "content", "hello"));
+
+        assertThat(result).doesNotContain("Access denied");
+        assertThat(workspace.resolve("notes/hello.txt")).hasContent("hello");
+    }
+
+    @Test
+    void testWriteWithARelativeParentTraversalIsDenied() throws Exception {
+        Path workspace = basedir.resolve(AGENT_WORKSPACE);
+
+        String result = callTool(applyTools(), "Write", Map.of("filePath", "../../escaped.txt", "content", "x"));
+
+        assertThat(result).contains("Access denied");
+        assertThat(workspace.resolve("../../escaped.txt")
+            .normalize()).doesNotExist();
+    }
+
+    @Test
+    void testToolDescriptionsNameTheWorkspace() throws Exception {
+        Path workspace = basedir.resolve(AGENT_WORKSPACE)
+            .toAbsolutePath()
+            .normalize();
+
+        assertThat(applyTools()).allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
+            .description()).contains("The agent workspace is " + workspace));
+    }
+
     private ToolCallback[] applyTools() throws Exception {
         ActionContextAware actionContext = mock(ActionContextAware.class);
 
