@@ -13,11 +13,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.platform.notification.remote.client.config.NotificationRemoteClientIntTestConfiguration;
 import com.bytechef.ee.platform.notification.remote.client.config.NotificationRemoteClientIntTestConfiguration.RecordingJavaMailSender;
-import com.bytechef.ee.platform.notification.remote.client.config.NotificationRemoteClientIntTestConfiguration.RecordingWebhookNotificationClient;
+import com.bytechef.ee.platform.notification.remote.client.config.NotificationRemoteClientIntTestConfiguration.RecordingWebhookDeliveryService;
 import com.bytechef.ee.platform.notification.remote.grpc.NotificationProtoMapper;
 import com.bytechef.ee.platform.notification.remote.grpc.NotificationRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.handler.EmailNotificationSender;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
@@ -68,7 +69,7 @@ class RemoteSlackNotificationSenderIntTest {
     private RecordingJavaMailSender recordingJavaMailSender;
 
     @Autowired
-    private RecordingWebhookNotificationClient recordingWebhookNotificationClient;
+    private RecordingWebhookDeliveryService recordingWebhookDeliveryService;
 
     private ManagedChannel managedChannel;
     private Server server;
@@ -90,7 +91,7 @@ class RemoteSlackNotificationSenderIntTest {
         }
 
         recordingJavaMailSender.clear();
-        recordingWebhookNotificationClient.clear();
+        recordingWebhookDeliveryService.clear();
     }
 
     @Test
@@ -103,11 +104,11 @@ class RemoteSlackNotificationSenderIntTest {
                 new NotificationHandlerContext.Builder().build()))
                     .doesNotThrowAnyException();
 
-        assertThat(recordingWebhookNotificationClient.getWebhookDeliveryRequests())
+        assertThat(recordingWebhookDeliveryService.getRecordedWebhookDeliveries())
             .singleElement()
-            .satisfies(webhookDeliveryRequest -> {
-                assertThat(webhookDeliveryRequest.url()).isEqualTo("https://hooks.example.com/jobs");
-                assertThat(webhookDeliveryRequest.payloadJson()).isEqualTo("{\"text\":\"Job 42 failed\"}");
+            .satisfies(recordedWebhookDelivery -> {
+                assertThat(recordedWebhookDelivery.url()).isEqualTo("https://hooks.example.com/jobs");
+                assertThat(recordedWebhookDelivery.payloadJson()).isEqualTo("{\"text\":\"Job 42 failed\"}");
             });
         assertThat(recordingJavaMailSender.getSentMimeMessages()).isEmpty();
     }
@@ -127,7 +128,22 @@ class RemoteSlackNotificationSenderIntTest {
                     .isEqualTo(Status.Code.INTERNAL);
 
         assertThat(recordingJavaMailSender.getSentMimeMessages()).isEmpty();
-        assertThat(recordingWebhookNotificationClient.getWebhookDeliveryRequests()).isEmpty();
+        assertThat(recordingWebhookDeliveryService.getRecordedWebhookDeliveries()).isEmpty();
+    }
+
+    @Test
+    void testSendFailsWhenTheServingAppCannotDeliverTheMessage() throws IOException {
+        RemoteSlackNotificationSender remoteSlackNotificationSender = startServer(notificationSenderRegistry);
+
+        recordingWebhookDeliveryService.setStatus(WebhookDeliveryOutcome.Status.FAILED);
+
+        assertThatThrownBy(
+            () -> remoteSlackNotificationSender.send(
+                notification(), notificationHandlerContext -> "Job 42 failed",
+                new NotificationHandlerContext.Builder().build()))
+                    .isInstanceOf(StatusRuntimeException.class);
+
+        assertThat(recordingWebhookDeliveryService.getRecordedWebhookDeliveries()).hasSize(1);
     }
 
     private RemoteSlackNotificationSender startServer(NotificationSenderRegistry senderRegistry)

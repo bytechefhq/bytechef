@@ -13,7 +13,10 @@ import com.bytechef.ee.platform.notification.remote.grpc.proto.SendNotificationR
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.handler.NotificationHandler;
+import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.NotificationSender;
+import com.bytechef.platform.notification.handler.NotificationTestResult;
+import java.util.concurrent.CompletableFuture;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -36,12 +39,23 @@ abstract class AbstractRemoteNotificationSender<T extends NotificationHandler> i
         this.notificationProtoMapper = new NotificationProtoMapper(objectMapper);
     }
 
-    protected void send(Notification notification, SendNotificationRequest.Builder sendNotificationRequestBuilder) {
+    protected CompletableFuture<Void> send(
+        Notification notification, SendNotificationRequest.Builder sendNotificationRequestBuilder) {
+
         sendNotificationRequestBuilder.setNotification(notificationProtoMapper.toProto(notification));
 
         NotificationRemoteServiceGrpc.NotificationRemoteServiceBlockingStub stub =
             NotificationRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(SERVICE_ID));
 
         stub.sendNotification(sendNotificationRequestBuilder.build());
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public NotificationTestResult sendTest(
+        Notification notification, T notificationHandler, NotificationHandlerContext notificationHandlerContext) {
+
+        throw new UnsupportedOperationException();
     }
 }

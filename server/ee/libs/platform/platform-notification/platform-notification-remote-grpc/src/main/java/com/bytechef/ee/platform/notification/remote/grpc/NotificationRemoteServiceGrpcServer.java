@@ -24,6 +24,7 @@ import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @version ee
@@ -74,10 +75,12 @@ public class NotificationRemoteServiceGrpcServer
                 "No notification sender for notification type %s".formatted(notification.getType()));
         }
 
-        notificationSender.send(
+        CompletableFuture<Void> deliveryFuture = notificationSender.send(
             notification,
             new RenderedNotificationHandler(request.getSubject(), request.getContent(), request.getHtml()),
             new NotificationHandlerContext.Builder().build());
+
+        deliveryFuture.join();
 
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
