@@ -54,7 +54,7 @@ const SigningSecretDialog = ({onClose, signingSecret}: SigningSecretDialogProps)
                                     icon={<ClipboardIcon />}
                                     label="Copy"
                                     onClick={() => {
-                                        copyToClipboard(signingSecret);
+                                        void copyToClipboard(signingSecret);
 
                                         toast('The signing secret is copied.');
                                     }}

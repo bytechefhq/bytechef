@@ -234,14 +234,14 @@ export default function useNotifications() {
 
     const deleteNotificationMutation = useDeleteNotificationMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: NotificationKeys,
             });
         },
     });
 
     const onSuccess = () => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: NotificationKeys,
         });
 
@@ -260,7 +260,7 @@ export default function useNotifications() {
     const updateNotificationMutation = useUpdateNotificationMutation({onSuccess: onSaveSuccess});
     const regenerateNotificationSigningSecretMutation = useRegenerateNotificationSigningSecretMutation({
         onSuccess: (result, notificationId) => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: NotificationKeys,
             });
 
