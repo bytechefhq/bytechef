@@ -49,6 +49,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -525,6 +526,14 @@ class StateValueDataStorageIntTest {
             long environmentId, PlatformType type) {
 
             fileDataStorageService.put(componentName, scope, scopeId, key, value, environmentId, type);
+        }
+
+        @Override
+        public <T> T update(
+            String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+            PlatformType type, Function<Optional<T>, T> updater) {
+
+            return fileDataStorageService.update(componentName, scope, scopeId, key, environmentId, type, updater);
         }
     }
 }
