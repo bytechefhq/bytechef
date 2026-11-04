@@ -21,13 +21,22 @@ import static com.bytechef.platform.data.table.configuration.domain.DataTableWeb
 import static com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType.RECORD_UPDATED;
 import static com.bytechef.platform.data.table.execution.listener.DataTableWebhookEventListener.WORKFLOW_EXECUTION_ID_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.platform.data.table.config.DisabledWorkflowJobPrincipalAccessor;
@@ -54,6 +63,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.CapturedOutput;
@@ -77,6 +87,9 @@ class DataTableWebhookEventListenerIntTest {
     private static final String OTHER_CREATED_ID = workflowExecutionId("other_created");
     private static final String DELETED_ID = workflowExecutionId("deleted");
     private static final String UPDATED_ID = workflowExecutionId("updated");
+    private static final String EDITOR_TEST_ID = WorkflowExecutionId.of(
+        PlatformType.AUTOMATION, -1, "workflow-uuid", "editor_test")
+        .toString();
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -105,9 +118,14 @@ class DataTableWebhookEventListenerIntTest {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
+    @Autowired
+    private WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
+
     @AfterEach
     void afterEach() {
         disabledWorkflowJobPrincipalAccessor.clear();
+
+        clearInvocations(workflowNodeTestOutputFacade);
 
         dataTableService.dropTable("orders", DEV_ENVIRONMENT_ID);
         dataTableService.dropTable("invoices", DEV_ENVIRONMENT_ID);
@@ -302,6 +320,68 @@ class DataTableWebhookEventListenerIntTest {
         assertThat(jdbcTemplate.queryForObject("SELECT count(*) FROM dt_0_orders", Long.class)).isZero();
         assertThat(triggerEvents()).isEmpty();
         assertThat(capturedOutput).contains("could not be listed");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testEditorTestRegistrationSavesEachRowAsTestOutputInsteadOfRunningTheWorkflow() {
+        register("orders", EDITOR_TEST_ID, RECORD_CREATED, DEV_ENVIRONMENT_ID);
+        register("orders", CREATED_ID, RECORD_CREATED, DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRows("orders", List.of(row("a"), row("b")), DEV_ENVIRONMENT_ID);
+
+        ArgumentCaptor<WebhookRequest> webhookRequestArgumentCaptor = ArgumentCaptor.forClass(WebhookRequest.class);
+
+        verify(workflowNodeTestOutputFacade, times(2)).saveWorkflowNodeTestOutput(
+            argThat(workflowExecutionId -> EDITOR_TEST_ID.equals(workflowExecutionId.toString())),
+            eq(DEV_ENVIRONMENT_ID),
+            webhookRequestArgumentCaptor.capture());
+
+        assertThat(webhookRequestArgumentCaptor.getAllValues()).extracting(webhookRequest -> {
+            WebhookRequest.WebhookBodyImpl webhookBody = webhookRequest.body();
+
+            Map<String, Object> content = webhookBody.getContent(new TypeReference<>() {});
+
+            return ((Map<String, Object>) ((Map<String, Object>) content.get("payload")).get("values")).get("name");
+        })
+            .containsExactly("a", "b");
+        assertThat(triggerEvents()).extracting(event -> event.getWorkflowExecutionId()
+            .toString())
+            .containsOnly(CREATED_ID);
+    }
+
+    @Test
+    void testEditorTestRegistrationSavesNoTestOutputForARolledBackWrite() {
+        register("orders", EDITOR_TEST_ID, RECORD_CREATED, DEV_ENVIRONMENT_ID);
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        transactionTemplate.executeWithoutResult(status -> {
+            dataTableRowService.insertRow("orders", row("a"), DEV_ENVIRONMENT_ID);
+
+            status.setRollbackOnly();
+        });
+
+        verify(workflowNodeTestOutputFacade, never()).saveWorkflowNodeTestOutput(
+            any(WorkflowExecutionId.class), eq(DEV_ENVIRONMENT_ID), any(WebhookRequest.class));
+    }
+
+    @Test
+    void testFailingTestOutputSaveIsLoggedAndTheWriteSucceeds(CapturedOutput capturedOutput) {
+        register("orders", EDITOR_TEST_ID, RECORD_CREATED, DEV_ENVIRONMENT_ID);
+
+        doThrow(new IllegalStateException("test output store unavailable")).when(workflowNodeTestOutputFacade)
+            .saveWorkflowNodeTestOutput(any(WorkflowExecutionId.class), eq(DEV_ENVIRONMENT_ID),
+                any(WebhookRequest.class));
+
+        try {
+            dataTableRowService.insertRow("orders", row("a"), DEV_ENVIRONMENT_ID);
+        } finally {
+            reset(workflowNodeTestOutputFacade);
+        }
+
+        assertThat(jdbcTemplate.queryForObject("SELECT count(*) FROM dt_0_orders", Long.class)).isOne();
+        assertThat(capturedOutput).contains("test output could not be saved");
     }
 
     @Test
