@@ -97,6 +97,38 @@ class JdbcDataStorageServiceIntTest {
     }
 
     @Test
+    void testPutKeepsTheSameKeyOfTwoComponentsApart() {
+        dataStorage.put(
+            COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, "count", 1, ENVIRONMENT_ID, PlatformType.AUTOMATION);
+        dataStorage.put(
+            "otherComponent", DataStorageScope.WORKFLOW, SCOPE_ID, "count", 2, ENVIRONMENT_ID,
+            PlatformType.AUTOMATION);
+
+        assertThat(
+            dataStorage.<Integer>fetch(
+                COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, "count", ENVIRONMENT_ID, PlatformType.AUTOMATION))
+                    .contains(1);
+        assertThat(
+            dataStorage.<Integer>fetch(
+                "otherComponent", DataStorageScope.WORKFLOW, SCOPE_ID, "count", ENVIRONMENT_ID,
+                PlatformType.AUTOMATION))
+                    .contains(2);
+    }
+
+    @Test
+    void testPutKeepsTheSameKeyOfTwoPlatformTypesApart() {
+        dataStorage.put(
+            COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "key", "automation", ENVIRONMENT_ID,
+            PlatformType.AUTOMATION);
+        dataStorage.put(
+            COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "key", "embedded", ENVIRONMENT_ID,
+            PlatformType.EMBEDDED);
+
+        assertThat(fetchPrincipalValue("5", ENVIRONMENT_ID, PlatformType.AUTOMATION)).contains("automation");
+        assertThat(fetchPrincipalValue("5", ENVIRONMENT_ID, PlatformType.EMBEDDED)).contains("embedded");
+    }
+
+    @Test
     void testDeleteScopeDataDeletesEveryEnvironment() {
         dataStorage.put(COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "key", "first", 1, PlatformType.AUTOMATION);
         dataStorage.put(COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "key", "second", 2, PlatformType.AUTOMATION);
