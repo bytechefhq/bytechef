@@ -483,7 +483,7 @@ class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId) {
+                public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId, String workflowId) {
                     return new JobPrincipalSummary(0, null, null, null);
                 }
 

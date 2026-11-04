@@ -34,7 +34,7 @@ public interface JobPrincipalAccessor {
 
     Map<String, ?> getMetadataMap(long jobPrincipalId);
 
-    JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId);
+    JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId, String workflowId);
 
     PlatformType getType();
 

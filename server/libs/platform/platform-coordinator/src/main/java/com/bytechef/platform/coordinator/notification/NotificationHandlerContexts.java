@@ -78,12 +78,18 @@ public class NotificationHandlerContexts {
     }
 
     public NotificationHandlerContext.Builder builder(Job job, NotificationEvent.Type eventType) {
+        return builder(job, job.getStatus(), eventType);
+    }
+
+    public NotificationHandlerContext.Builder builder(
+        Job job, Job.@Nullable Status eventStatus, NotificationEvent.Type eventType) {
+
         Long jobId = job.getId();
 
         NotificationHandlerContext.Builder builder = new NotificationHandlerContext.Builder()
             .deliveryId(String.valueOf(UUID.randomUUID()))
             .eventType(eventType)
-            .job(getJobSummary(job))
+            .job(getJobSummary(job, eventStatus))
             .jobId(jobId)
             .jobName(job.getLabel())
             .timestamp(Instant.now());
@@ -98,7 +104,7 @@ public class NotificationHandlerContexts {
             return builder;
         }
 
-        resolvePrincipal(builder, jobId);
+        resolvePrincipal(builder, jobId, workflowId);
 
         if (eventType == NotificationEvent.Type.JOB_FAILED) {
             try {
@@ -124,15 +130,15 @@ public class NotificationHandlerContexts {
     }
 
     private @Nullable ErrorSummary getErrorSummary(Job job, long jobId) {
-        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+        Optional<TaskExecution> taskExecutionOptional = taskExecutionService.fetchLastFailedJobTaskExecution(jobId);
 
-        for (TaskExecution taskExecution : taskExecutions.reversed()) {
+        if (taskExecutionOptional.isPresent()) {
+            TaskExecution taskExecution = taskExecutionOptional.get();
+
             ExecutionError error = taskExecution.getError();
 
-            if (taskExecution.getStatus() == TaskExecution.Status.FAILED && error != null) {
-                return new ErrorSummary(
-                    taskExecution.getName(), taskExecution.getType(), error.getMessage(), getStackTrace(error));
-            }
+            return new ErrorSummary(
+                taskExecution.getName(), taskExecution.getType(), error.getMessage(), getStackTrace(error));
         }
 
         ExecutionError jobError = job.getError();
@@ -155,10 +161,13 @@ public class NotificationHandlerContexts {
         return publicUrl + executionsPath + "?id=" + jobId;
     }
 
-    private static JobSummary getJobSummary(Job job) {
+    private static JobSummary getJobSummary(Job job, Job.@Nullable Status status) {
         Instant startDate = job.getStartDate();
-        Instant endDate = job.getEndDate();
-        Job.Status status = job.getStatus();
+        Instant endDate = null;
+
+        if (status != Job.Status.CREATED && status != Job.Status.STARTED) {
+            endDate = job.getEndDate();
+        }
 
         Long durationMillis = null;
 
@@ -182,7 +191,9 @@ public class NotificationHandlerContexts {
         return StringUtils.truncate(String.join("\n", stackTrace), MAX_STACK_TRACE_LENGTH);
     }
 
-    private void resolvePrincipal(NotificationHandlerContext.Builder builder, long jobId) {
+    private void resolvePrincipal(
+        NotificationHandlerContext.Builder builder, long jobId, @Nullable String workflowId) {
+
         PlatformType platformType = null;
         Long jobPrincipalId = null;
 
@@ -211,13 +222,17 @@ public class NotificationHandlerContexts {
         builder.executionUrl(getExecutionUrl(platformType, jobId));
         builder.source(platformType.name());
 
+        if (workflowId == null) {
+            return;
+        }
+
         JobPrincipalSummary jobPrincipalSummary;
 
         try {
             JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
                 platformType);
 
-            jobPrincipalSummary = jobPrincipalAccessor.getJobPrincipalSummary(jobPrincipalId);
+            jobPrincipalSummary = jobPrincipalAccessor.getJobPrincipalSummary(jobPrincipalId, workflowId);
         } catch (RuntimeException runtimeException) {
             log.warn(
                 "Could not resolve the project and environment of job {} for its notification", jobId,

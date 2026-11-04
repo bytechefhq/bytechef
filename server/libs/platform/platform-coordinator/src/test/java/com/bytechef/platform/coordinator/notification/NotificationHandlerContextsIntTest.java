@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -129,7 +131,8 @@ class NotificationHandlerContextsIntTest {
         Workflow workflow = workflow("Daily sync");
 
         mockPrincipal(PlatformType.AUTOMATION, 7L);
-        when(jobPrincipalAccessor.getJobPrincipalSummary(7L)).thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
+        when(jobPrincipalAccessor.getJobPrincipalSummary(7L, "wf-1"))
+            .thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
         when(environmentService.getEnvironment(2L)).thenReturn(Environment.PRODUCTION);
         when(workflowService.fetchWorkflow("wf-1")).thenReturn(Optional.of(workflow));
 
@@ -153,7 +156,8 @@ class NotificationHandlerContextsIntTest {
     @Test
     void testBuilderKeepsProjectWhenEnvironmentLookupFails() {
         mockPrincipal(PlatformType.AUTOMATION, 7L);
-        when(jobPrincipalAccessor.getJobPrincipalSummary(7L)).thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
+        when(jobPrincipalAccessor.getJobPrincipalSummary(7L, "wf-1"))
+            .thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
         when(environmentService.getEnvironment(2L)).thenThrow(new IllegalStateException("boom"));
 
         NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_FAILED)
@@ -166,7 +170,7 @@ class NotificationHandlerContextsIntTest {
     @Test
     void testBuilderUsesEmbeddedExecutionsPathForEmbeddedJobs() {
         mockPrincipal(PlatformType.EMBEDDED, 9L);
-        when(jobPrincipalAccessor.getJobPrincipalSummary(9L))
+        when(jobPrincipalAccessor.getJobPrincipalSummary(9L, "wf-1"))
             .thenReturn(new JobPrincipalSummary(1, 5L, "HubSpot", 2));
         when(environmentService.getEnvironment(1L)).thenReturn(Environment.STAGING);
 
@@ -190,6 +194,8 @@ class NotificationHandlerContextsIntTest {
             .build();
 
         assertEquals(new ErrorSummary("Send email", "email/v1/send", "boom", "a\nb"), context.getError());
+
+        verify(taskExecutionService, never()).getJobTaskExecutions(jobId);
     }
 
     @Test
@@ -261,7 +267,7 @@ class NotificationHandlerContextsIntTest {
     @Test
     void testBuilderOmitsProjectWhenAccessorThrows() {
         mockPrincipal(PlatformType.AUTOMATION, 7L);
-        when(jobPrincipalAccessor.getJobPrincipalSummary(7L)).thenThrow(new IllegalArgumentException("gone"));
+        when(jobPrincipalAccessor.getJobPrincipalSummary(7L, "wf-1")).thenThrow(new IllegalArgumentException("gone"));
 
         NotificationHandlerContext context = assertDoesNotThrow(
             () -> notificationHandlerContexts.builder(job, Type.JOB_FAILED)
@@ -276,7 +282,8 @@ class NotificationHandlerContextsIntTest {
     @Test
     void testBuilderOmitsProjectWhenSummaryHasNoProject() {
         mockPrincipal(PlatformType.AUTOMATION, 7L);
-        when(jobPrincipalAccessor.getJobPrincipalSummary(7L)).thenReturn(new JobPrincipalSummary(2, null, null, null));
+        when(jobPrincipalAccessor.getJobPrincipalSummary(7L, "wf-1"))
+            .thenReturn(new JobPrincipalSummary(2, null, null, null));
         when(environmentService.getEnvironment(2L)).thenReturn(Environment.PRODUCTION);
 
         NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)
@@ -306,6 +313,17 @@ class NotificationHandlerContextsIntTest {
         assertEquals(new JobSummary(jobId, "Daily sync", "FAILED", START_DATE, null, null), context.getJob());
     }
 
+    @Test
+    void testBuilderReportsEventStatusInsteadOfCurrentJobStatus() {
+        job.setStatus(Job.Status.COMPLETED);
+
+        NotificationHandlerContext context = notificationHandlerContexts.builder(
+            job, Job.Status.STARTED, Type.JOB_STARTED)
+            .build();
+
+        assertEquals(new JobSummary(jobId, "Daily sync", "STARTED", START_DATE, null, null), context.getJob());
+    }
+
     @Nested
     @TestPropertySource(properties = "bytechef.public-url=")
     class BlankPublicUrlIntTest {
@@ -313,7 +331,7 @@ class NotificationHandlerContextsIntTest {
         @Test
         void testBuilderOmitsExecutionUrlWhenPublicUrlIsBlank() {
             mockPrincipal(PlatformType.AUTOMATION, 7L);
-            when(jobPrincipalAccessor.getJobPrincipalSummary(7L))
+            when(jobPrincipalAccessor.getJobPrincipalSummary(7L, "wf-1"))
                 .thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
 
             NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)
@@ -331,7 +349,7 @@ class NotificationHandlerContextsIntTest {
         @Test
         void testBuilderOmitsExecutionUrlWhenPublicUrlIsMissing() {
             mockPrincipal(PlatformType.AUTOMATION, 7L);
-            when(jobPrincipalAccessor.getJobPrincipalSummary(7L))
+            when(jobPrincipalAccessor.getJobPrincipalSummary(7L, "wf-1"))
                 .thenReturn(new JobPrincipalSummary(2, 1L, "CRM", 3));
 
             NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_COMPLETED)

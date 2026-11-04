@@ -123,7 +123,7 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
-    public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId) {
+    public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId, String workflowId) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(jobPrincipalId);
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
@@ -143,9 +143,19 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
             }
         }
 
+        Integer integrationVersion;
+
+        try {
+            IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
+                workflowId);
+
+            integrationVersion = integrationWorkflow.getIntegrationVersion();
+        } catch (IllegalArgumentException illegalArgumentException) {
+            integrationVersion = integrationInstanceConfiguration.getIntegrationVersion();
+        }
+
         return new JobPrincipalSummary(
-            integrationInstanceConfiguration.getEnvironmentId(), integrationId, integrationName,
-            integrationInstanceConfiguration.getIntegrationVersion());
+            integrationInstanceConfiguration.getEnvironmentId(), integrationId, integrationName, integrationVersion);
     }
 
     @Override

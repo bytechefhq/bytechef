@@ -29,6 +29,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -100,7 +101,7 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
     }
 
     @Override
-    public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId) {
+    public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId, String workflowId) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(jobPrincipalId);
 
         Long projectId = projectDeployment.getProjectId();
@@ -113,8 +114,13 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
                 .orElse(null);
         }
 
-        return new JobPrincipalSummary(
-            projectDeployment.getEnvironmentId(), projectId, projectName, projectDeployment.getProjectVersion());
+        int projectVersion = projectWorkflowService.getWorkflowProjectWorkflows(List.of(workflowId))
+            .stream()
+            .findFirst()
+            .map(ProjectWorkflow::getProjectVersion)
+            .orElse(projectDeployment.getProjectVersion());
+
+        return new JobPrincipalSummary(projectDeployment.getEnvironmentId(), projectId, projectName, projectVersion);
     }
 
     @Override
