@@ -59,11 +59,29 @@ Searches the web (with optional domain filtering) via the Brave Search API and r
 
 Fetches a web page and returns an AI-summarized version of its content, with caching - useful for pulling in a specific page the agent already has a URL for.
 
+Smart Web Fetch refuses URLs whose host resolves to a private, loopback or link-local address, so an agent cannot use it to reach the server's internal network. An administrator can allow specific internal hosts with [`BYTECHEF_AI_AGENT_UTILS_ALLOWED_PRIVATE_HOSTS`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration).
+
 ### File System, Glob, Grep, and Shell
 
-A set of coding-agent-style tools for working with files and a shell in the agent's sandboxed environment: read, write, and edit files (**File System**), match file patterns (**Glob**), regex-search file contents (**Grep**), and execute shell commands with timeouts (**Shell**). These pair naturally with **Todo Write** and **Task** for agents that carry out multi-step, file-oriented work.
+A set of coding-agent-style tools for working with files and a shell: read, write, and edit files (**File System Tools**, with a **Read Only** option), match file patterns (**Glob Tool**), regex-search file contents (**Grep Tool**), and execute shell commands with timeouts and background processes (**Shell Tools**). These pair naturally with **Todo Write** and **Task** for agents that carry out multi-step, file-oriented work.
 
 A separate **List Directory** tool is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+#### Agent workspace
+
+Each of these tools works only inside the agent's own **workspace** directory; files outside it are not reachable through them. Workspaces live under the server's workspace base directory ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_BASEDIR`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)), separated by tenant and then by the run's owner: the project deployment or integration instance, its environment and its workflow.
+
+Every tool has an advanced **Workspace Name** option (letters, digits, `-` and `_`, default `default`). Tools of the same agent with the same workspace name share files, so a file written by File System Tools is visible to Grep Tool and Shell Tools. Give tools different names to keep their files apart.
+
+Editor test runs get a fresh workspace per run, removed after 24 hours. Deployed workflows keep their workspace between runs.
+
+#### Shell Tools
+
+Shell Tools are offered only when the server enables them ([`BYTECHEF_AI_AGENT_UTILS_SHELL_ENABLED`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)); otherwise the tool does not appear in the Tools slot.
+
+By default commands run in a **Docker** container that sees only the agent's workspace, mounted at the same path. Each workspace gets its own container, reused by every command of the agent and removed after it has been unused for a while (10 minutes by default). The server needs a Docker-compatible CLI (`docker` or `podman`) on its `PATH`, and the container image must provide `/bin/bash` and `sleep`.
+
+The advanced **Execution Backend** option can switch a Shell Tools element to **Local**, which runs commands directly on the server. Local is offered only when the server allows it ([`BYTECHEF_AI_AGENT_UTILS_SHELL_ALLOW_LOCAL`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)). Local commands start in the workspace with a clean environment, so none of the server's environment variables reach them, but they are not confined to the workspace: allow Local only on a trusted single-tenant installation.
 
 ---
 

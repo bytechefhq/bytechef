@@ -160,6 +160,10 @@ Name** and **Tool Description** - for example `askJavaReleaseExpert` - so the mo
 and can tell several remote agents apart. The tool reads the agent card from `<Agent URL>/.well-known/agent-card.json`,
 sends the task as an A2A message to the Agent URL, and returns the remote agent's text reply.
 
+The tool refuses an Agent URL whose host resolves to a private, loopback or link-local address. To call an agent on an
+internal network, including an A2A Server of the same ByteChef reached through `localhost`, add its host to
+[`BYTECHEF_AI_AGENT_UTILS_ALLOWED_PRIVATE_HOSTS`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration).
+
 ---
 
 ## Deleting
