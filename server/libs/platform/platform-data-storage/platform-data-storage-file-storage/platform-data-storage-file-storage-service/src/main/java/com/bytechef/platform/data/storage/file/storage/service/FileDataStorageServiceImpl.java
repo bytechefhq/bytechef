@@ -56,11 +56,18 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     public void delete(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
-        String directoryPath = getDirectoryPath(type, environmentId);
 
-        fileStorageService.deleteFile(
-            directoryPath,
-            fileStorageService.getFileEntry(directoryPath, getFilename(componentName, scope, scopeId, key)));
+        String directoryPath = getDirectoryPath(type, environmentId);
+        String filename = getFilename(componentName, scope, scopeId, key);
+        ReentrantLock lock = getLock(directoryPath + "/" + filename);
+
+        lock.lock();
+
+        try {
+            fileStorageService.deleteFile(directoryPath, fileStorageService.getFileEntry(directoryPath, filename));
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -119,10 +126,18 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         PlatformType type) {
 
         TypedValue typedValue = new TypedValue(value);
+        String directoryPath = getDirectoryPath(type, environmentId);
+        String filename = getFilename(componentName, scope, scopeId, key);
+        ReentrantLock lock = getLock(directoryPath + "/" + filename);
 
-        fileStorageService.storeFileContent(
-            getDirectoryPath(type, environmentId), getFilename(componentName, scope, scopeId, key),
-            CompressionUtils.compress(typedValue.write(objectMapper)), false);
+        lock.lock();
+
+        try {
+            fileStorageService.storeFileContent(
+                directoryPath, filename, CompressionUtils.compress(typedValue.write(objectMapper)), false);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
