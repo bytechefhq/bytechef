@@ -210,8 +210,17 @@ class PropertyValidator {
     }
 
     private static boolean isEmptyValue(JsonNode valueJsonNode) {
-        return valueJsonNode.isNull() || (valueJsonNode.isString() && org.apache.commons.lang3.StringUtils.isBlank(
-            valueJsonNode.asString()));
+        return valueJsonNode.isNull() || (valueJsonNode.isString() && isBlankOrEmptyFormula(valueJsonNode.asString()));
+    }
+
+    private static boolean isBlankOrEmptyFormula(String value) {
+        String strippedValue = value.strip();
+
+        if (strippedValue.startsWith("=")) {
+            strippedValue = strippedValue.substring(1);
+        }
+
+        return strippedValue.isBlank();
     }
 
     private static void validatePropertyByType(

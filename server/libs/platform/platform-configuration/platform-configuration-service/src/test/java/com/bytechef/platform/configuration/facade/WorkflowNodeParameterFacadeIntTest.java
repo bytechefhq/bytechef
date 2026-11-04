@@ -1400,6 +1400,19 @@ class WorkflowNodeParameterFacadeIntTest {
             .contains("name"));
     }
 
+    @Test
+    void testGetWorkflowNodeMissingRequiredPropertiesReportsEmptyFormulaRequiredValue() {
+        Map<String, Object> parameters = new HashMap<>();
+
+        parameters.put("name", "= ");
+
+        DisplayConditionResultDTO result = getWorkflowNodeDisplayConditions(
+            List.of(mockRequiredStringProperty("name", null)), parameters);
+
+        assertTrue(result.missingRequiredProperties()
+            .contains("name"));
+    }
+
     /**
      * Resolving display conditions/missing required properties for a node that has no previous outputs to fetch must
      * not throw, and the required property is still reported missing. A persisted {@link Workflow} never returns null

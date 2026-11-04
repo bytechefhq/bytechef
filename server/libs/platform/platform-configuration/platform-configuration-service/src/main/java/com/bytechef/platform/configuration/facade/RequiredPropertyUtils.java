@@ -158,6 +158,16 @@ final class RequiredPropertyUtils {
 
         Object value = parameterMap.get(propertyName);
 
-        return value == null || (value instanceof String string && string.isBlank());
+        return value == null || (value instanceof String string && isBlankOrEmptyFormula(string));
+    }
+
+    private static boolean isBlankOrEmptyFormula(String value) {
+        String strippedValue = value.strip();
+
+        if (strippedValue.startsWith("=")) {
+            strippedValue = strippedValue.substring(1);
+        }
+
+        return strippedValue.isBlank();
     }
 }
