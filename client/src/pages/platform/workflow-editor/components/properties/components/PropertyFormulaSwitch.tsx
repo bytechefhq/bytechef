@@ -9,7 +9,7 @@ interface PropertyFormulaSwitchProps {
 const PropertyFormulaSwitch = ({formulaMode, handleClick}: PropertyFormulaSwitchProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
-            <span className="inline-flex">
+            <span className="inline-flex [&_[data-testid=switch-wrapper]>div]:gap-0.5">
                 <Switch
                     checked={formulaMode}
                     label="Formula"
