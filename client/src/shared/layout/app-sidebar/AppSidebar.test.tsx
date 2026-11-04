@@ -271,6 +271,19 @@ describe('AppSidebar', () => {
             expect(screen.getByRole('link', {name: 'Projects'})).toBeInTheDocument();
         });
 
+        it('paints the flyout of a collapsed group with the sidebar background', async () => {
+            renderSidebar(false, '/automation/projects', groupedNavigation);
+
+            fireEvent.pointerEnter(screen.getByRole('button', {name: 'Servers'}), {pointerType: 'mouse'});
+
+            const flyoutNavigation = await screen.findByRole('navigation', {name: 'Servers'});
+            const flyout = flyoutNavigation.parentElement!;
+
+            expect(flyout).toHaveClass('bg-sidebar', 'border-sidebar-border', 'text-sidebar-foreground');
+            expect(flyout).not.toHaveClass('bg-popover');
+            expect(screen.getByRole('link', {name: 'MCP Servers'})).toHaveClass('hover:bg-sidebar-accent');
+        });
+
         it('renders a one-item group as a plain row on the collapsed sidebar', () => {
             renderSidebar(false, '/automation/projects', [...navigation, groupedNavigation[navigation.length]]);
 
