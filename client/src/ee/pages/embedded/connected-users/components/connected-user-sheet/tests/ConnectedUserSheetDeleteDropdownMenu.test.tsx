@@ -51,6 +51,18 @@ describe('ConnectedUserSheetDeleteDropdownMenu', () => {
         expect(screen.queryByRole('menuitem', {name: 'Change configuration'})).not.toBeInTheDocument();
     });
 
+    it('should offer only Change configuration when no delete handler is given', async () => {
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onChangeConfigurationClick={vi.fn()} />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual(['Change configuration…']);
+    });
+
     it('should list Change configuration before Delete and call its handler', async () => {
         const onChangeConfigurationClick = vi.fn();
 

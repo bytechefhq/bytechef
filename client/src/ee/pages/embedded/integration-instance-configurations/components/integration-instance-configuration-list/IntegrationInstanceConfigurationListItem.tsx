@@ -26,7 +26,6 @@ import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries
 import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
-import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
@@ -82,7 +81,7 @@ const IntegrationInstanceConfigurationListItem = ({
 
     const canDeleteConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_DELETE');
     const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
-    const isTenantAdmin = useIsTenantAdmin();
+    const canViewConnectedUsers = useHasEmbeddedScope('CONNECTED_USER_VIEW');
 
     const queryClient = useQueryClient();
 
@@ -301,7 +300,7 @@ const IntegrationInstanceConfigurationListItem = ({
                         <IntegrationInstanceConfigurationListItemDropdownMenu
                             canDelete={canDeleteConfiguration}
                             canEdit={canEditConfiguration}
-                            canMoveUsers={isTenantAdmin}
+                            canMoveUsers={canEditConfiguration && canViewConnectedUsers}
                             moveUsersDisabled={!integrationConfigurations}
                             moveUsersDisabledReason={moveUsersDisabledReason}
                             onDeleteClick={() => setShowDeleteDialog(true)}

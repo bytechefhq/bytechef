@@ -1,6 +1,5 @@
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
-import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 
 export const useViewableEmbeddedPageHrefs = (): string[] => {
@@ -13,7 +12,6 @@ export const useViewableEmbeddedPageHrefs = (): string[] => {
     const instanceConfigurationViewGranted = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_VIEW');
     const mcpViewGranted = useHasEmbeddedScope('MCP_VIEW');
     const developmentWorkflowViewGranted = useHasEmbeddedScope('WORKFLOW_VIEW', DEVELOPMENT_ENVIRONMENT);
-    const isTenantAdmin = useIsTenantAdmin();
 
     const developmentEnvironment = currentEnvironmentId === DEVELOPMENT_ENVIRONMENT;
 
@@ -22,7 +20,7 @@ export const useViewableEmbeddedPageHrefs = (): string[] => {
         ['/embedded/configurations', instanceConfigurationViewGranted && !developmentEnvironment],
         ['/embedded/app-events', appEventViewGranted],
         ['/embedded/automation-workflows', developmentWorkflowViewGranted && developmentEnvironment],
-        ['/embedded/automation-configurations', isTenantAdmin && !developmentEnvironment],
+        ['/embedded/automation-configurations', instanceConfigurationViewGranted && !developmentEnvironment],
         ['/embedded/mcp-servers', mcpViewGranted],
         ['/embedded/connected-users', connectedUserViewGranted],
         ['/embedded/executions', executionViewGranted],

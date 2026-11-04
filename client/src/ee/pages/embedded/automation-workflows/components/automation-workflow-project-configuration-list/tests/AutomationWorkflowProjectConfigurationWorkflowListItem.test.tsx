@@ -10,9 +10,15 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import AutomationWorkflowProjectConfigurationWorkflowListItem from '../AutomationWorkflowProjectConfigurationWorkflowListItem';
 
 const mocks = vi.hoisted(() => ({
+    deniedScopes: new Set<string>(),
     enableWorkflowMutate: vi.fn(),
     invalidateQueries: vi.fn(),
     workflowTriggerAndComponentsRowProps: vi.fn(),
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => !mocks.deniedScopes.has(scope),
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -130,6 +136,8 @@ const renderItem = (
 
 describe('AutomationWorkflowProjectConfigurationWorkflowListItem', () => {
     beforeEach(() => {
+        mocks.deniedScopes.clear();
+
         windowResizeObserver();
 
         useAutomationWorkflowExecutionsSheetStore.setState({
@@ -270,5 +278,22 @@ describe('AutomationWorkflowProjectConfigurationWorkflowListItem', () => {
         renderItem();
 
         expect(screen.getByText('No executions')).toBeInTheDocument();
+    });
+
+    it('disables the toggle and hides Edit without the edit scope', async () => {
+        mocks.deniedScopes = new Set(['INTEGRATION_INSTANCE_CONFIGURATION_EDIT']);
+
+        const user = userEvent.setup();
+
+        renderItem();
+
+        expect(screen.getByRole('switch')).toBeDisabled();
+
+        screen.getByRole('button', {name: 'Workflow Actions'}).focus();
+
+        await user.keyboard('{ArrowDown}');
+
+        expect(await screen.findByRole('menuitem', {name: 'View Executions'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Edit'})).not.toBeInTheDocument();
     });
 });

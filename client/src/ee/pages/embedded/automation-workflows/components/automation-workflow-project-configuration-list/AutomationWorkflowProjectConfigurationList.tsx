@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
@@ -30,6 +31,8 @@ const AutomationWorkflowProjectConfigurationList = ({
     onUpdateVersion,
     project,
 }: AutomationWorkflowProjectConfigurationListProps) => {
+    const canCreate = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', environmentId);
+
     const queryClient = useQueryClient();
 
     const {data: configurationsData} = useAutomationWorkflowProjectConfigurationsQuery({
@@ -50,7 +53,9 @@ const AutomationWorkflowProjectConfigurationList = ({
         return (
             <div className="flex justify-center py-8">
                 <EmptyList
-                    button={project.published && <Button label="Create Configuration" onClick={onCreate} />}
+                    button={
+                        project.published && canCreate && <Button label="Create Configuration" onClick={onCreate} />
+                    }
                     icon={<SlidersHorizontalIcon className="size-24 text-stroke-neutral-tertiary" />}
                     message={
                         project.published

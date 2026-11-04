@@ -10,6 +10,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
@@ -44,6 +45,8 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
     const openAutomationWorkflowExecutionsSheet = useAutomationWorkflowExecutionsSheetStore(
         (state) => state.openAutomationWorkflowExecutionsSheet
     );
+
+    const canEdit = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT', Number(configuration.environmentId));
 
     const queryClient = useQueryClient();
 
@@ -143,7 +146,7 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                     aria-label={`Enable ${workflowLabel}`}
                     checked={workflow.enabled}
                     className="mr-2"
-                    disabled={enableWorkflowMutation.isPending}
+                    disabled={!canEdit || enableWorkflowMutation.isPending}
                     onCheckedChange={(enable) =>
                         enableWorkflowMutation.mutate(
                             {enable, id: configuration.id, workflowUuid: workflow.workflowUuid},
@@ -168,12 +171,14 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            aria-label="Edit"
-                            icon={<PencilIcon />}
-                            label="Edit"
-                            onClick={() => setShowProvidedValuesDialog(true)}
-                        />
+                        {canEdit && (
+                            <DropdownMenuItem
+                                aria-label="Edit"
+                                icon={<PencilIcon />}
+                                label="Edit"
+                                onClick={() => setShowProvidedValuesDialog(true)}
+                            />
+                        )}
 
                         <DropdownMenuItem
                             aria-label="View Executions"

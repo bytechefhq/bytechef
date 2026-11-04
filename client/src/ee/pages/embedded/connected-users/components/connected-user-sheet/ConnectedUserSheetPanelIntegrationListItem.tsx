@@ -28,7 +28,6 @@ import {
 } from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
-import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
@@ -62,7 +61,10 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
     const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
     const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
-    const isTenantAdmin = useIsTenantAdmin();
+    const canChangeConfiguration = useHasEmbeddedScope(
+        'INTEGRATION_INSTANCE_CONFIGURATION_EDIT',
+        integrationInstanceConfiguration?.environmentId
+    );
 
     const queryClient = useQueryClient();
 
@@ -235,14 +237,14 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
                         </div>
 
-                        {canDeleteConnectedUser && (
+                        {(canDeleteConnectedUser || canChangeConfiguration) && (
                             <ConnectedUserSheetDeleteDropdownMenu
                                 changeConfigurationDisabled={!integrationConfigurations}
                                 changeConfigurationDisabledReason={changeConfigurationDisabledReason}
                                 onChangeConfigurationClick={
-                                    isTenantAdmin ? () => setShowChangeConfigurationDialog(true) : undefined
+                                    canChangeConfiguration ? () => setShowChangeConfigurationDialog(true) : undefined
                                 }
-                                onDeleteClick={() => setShowDeleteDialog(true)}
+                                onDeleteClick={canDeleteConnectedUser ? () => setShowDeleteDialog(true) : undefined}
                             />
                         )}
                     </div>
