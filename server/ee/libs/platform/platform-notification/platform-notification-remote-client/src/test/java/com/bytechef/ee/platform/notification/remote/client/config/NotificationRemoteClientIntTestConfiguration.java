@@ -9,9 +9,14 @@ package com.bytechef.ee.platform.notification.remote.client.config;
 
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.Encryption;
+import com.bytechef.encryption.EncryptionImpl;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.delivery.WebhookDelivery;
@@ -61,6 +66,16 @@ import tools.jackson.databind.ObjectMapper;
 public class NotificationRemoteClientIntTestConfiguration {
 
     public static final String MAIL_FROM = "noreply@bytechef.io";
+
+    @Bean
+    Encryption encryption(EncryptionKey encryptionKey) {
+        return new EncryptionImpl(encryptionKey);
+    }
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
 
     @Bean
     ApplicationProperties applicationProperties() {
@@ -198,17 +213,21 @@ public class NotificationRemoteClientIntTestConfiguration {
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     static class NotificationJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
+        private final Encryption encryption;
         private final ObjectMapper objectMapper;
 
         @SuppressFBWarnings("EI2")
-        NotificationJdbcConfiguration(ObjectMapper objectMapper) {
+        NotificationJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            this.encryption = encryption;
             this.objectMapper = objectMapper;
         }
 
         @Override
         protected List<?> userConverters() {
-            return List.of(new MapWrapperToStringConverter(objectMapper),
-                new StringToMapWrapperConverter(objectMapper));
+            return List.of(
+                new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
+                new MapWrapperToStringConverter(objectMapper), new StringToMapWrapperConverter(objectMapper));
         }
     }
 }

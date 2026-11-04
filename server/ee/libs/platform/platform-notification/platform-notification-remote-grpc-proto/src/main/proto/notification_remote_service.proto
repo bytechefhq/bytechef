@@ -39,4 +39,5 @@ message RemoteNotification {
   optional string last_modified_by = 8;
   optional google.protobuf.Timestamp last_modified_date = 9;
   int32 version = 10;
+  optional bytes secret_settings = 11;
 }
