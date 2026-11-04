@@ -69,6 +69,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -901,6 +902,7 @@ class TestWorkflowExecutorIntTest {
     }
 
     @Test
+    @Timeout(120)
     void executeSyncRepeatedlyOverLoopedRecordsReleasesTaskContextsOfDeletedJobs() {
         String workflowId = createWorkflow(getRecordFilteringWorkflowDefinition());
 
@@ -920,6 +922,7 @@ class TestWorkflowExecutorIntTest {
     }
 
     @Test
+    @Timeout(120)
     void executeSyncOverLoopedRecordsSharesUnchangedContextValuesBetweenIterations() {
         String workflowId = createWorkflow(getRecordFilteringWorkflowDefinition());
 
