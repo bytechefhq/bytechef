@@ -141,15 +141,30 @@ export default function getExecutedEdgeStatus(
         return sourceStatus === 'COMPLETED' ? 'COMPLETED' : undefined;
     }
 
-    if (sourceStatus !== 'COMPLETED' && sourceStatus !== 'FAILED') {
+    if (!isReachedStatus(sourceNode, sourceStatus)) {
         return undefined;
     }
 
     const targetStatus = resolveNodeStatus(targetNode, workflowTestNodeStates);
 
-    if (targetStatus === 'COMPLETED' || targetStatus === 'FAILED') {
+    if (isReachedStatus(targetNode, targetStatus)) {
         return 'COMPLETED';
     }
 
     return undefined;
+}
+
+function isTaskDispatcherEntryNode(node: Node | undefined): boolean {
+    return (
+        node?.type === 'taskDispatcherTopGhostNode' ||
+        Boolean((node?.data as {taskDispatcher?: boolean} | undefined)?.taskDispatcher)
+    );
+}
+
+function isReachedStatus(node: Node | undefined, status: WorkflowTestNodeStateI['status'] | undefined): boolean {
+    if (status === 'COMPLETED' || status === 'FAILED') {
+        return true;
+    }
+
+    return status === 'RUNNING' && isTaskDispatcherEntryNode(node);
 }
