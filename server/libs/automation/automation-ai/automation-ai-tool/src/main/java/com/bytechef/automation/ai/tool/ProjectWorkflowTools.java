@@ -40,6 +40,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -349,7 +350,11 @@ public class ProjectWorkflowTools {
                 projectWorkflowErrorType);
         }
 
-        return workflowValidationResult.warnings();
+        List<String> warnings = new ArrayList<>(workflowValidationResult.warnings());
+
+        warnings.addAll(workflowValidationResult.errors());
+
+        return warnings;
     }
 
     private static int resolveValidationEnvironmentId(@Nullable ToolContext toolContext) {
