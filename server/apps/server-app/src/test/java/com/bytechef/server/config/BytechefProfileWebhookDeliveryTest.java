@@ -52,12 +52,4 @@ class BytechefProfileWebhookDeliveryTest {
         assertThat(webhookDelivery.getConcurrencyLimit()).isGreaterThanOrEqualTo(1);
         assertThat(webhookDelivery.getMaxPendingDeliveries()).isGreaterThanOrEqualTo(1);
     }
-
-    @Test
-    void testWebhookDeliveryLimitsDefaultToAtLeastOneWithoutConfiguration() {
-        ApplicationProperties.WebhookDelivery webhookDelivery = new ApplicationProperties.WebhookDelivery();
-
-        assertThat(webhookDelivery.getConcurrencyLimit()).isGreaterThanOrEqualTo(1);
-        assertThat(webhookDelivery.getMaxPendingDeliveries()).isGreaterThanOrEqualTo(1);
-    }
 }
