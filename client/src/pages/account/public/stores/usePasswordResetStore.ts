@@ -11,7 +11,7 @@ export interface PasswordResetI {
 
     reset: () => void;
     resetPasswordInit: (email: string) => void;
-    resetPasswordFinish: (key: string | null, newPassword: string) => void;
+    resetPasswordFinish: (key: string | null, newPassword: string) => Promise<void>;
 }
 
 const initialState = {
