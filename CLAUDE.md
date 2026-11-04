@@ -705,6 +705,11 @@ In IntelliJ IDEA:
 
 ## Troubleshooting
 
+**Sudden or strange `./gradlew` failures**
+- Before reporting or investigating a sudden, unexpected `./gradlew` failure (e.g. `NoClassDefFoundError`, `zip file closed`, errors in code nobody changed), run `./gradlew --stop` and re-run the same command
+- A long-lived Gradle daemon keeps state in memory between builds (e.g. Spotless caches formatter classloaders), and that state can go stale; `--stop` throws it away (it does not clear `~/.gradle/caches`)
+- Only report or investigate the failure if it still happens in a fresh daemon. The full error output of a daemon build is in `~/.gradle/daemon/<gradle-version>/daemon-*.out.log`
+
 **Database schema issues**
 - Reset database: `docker compose -f server/docker-compose.dev.infra.yml down -v`
 - Check Liquibase logs for migration errors
