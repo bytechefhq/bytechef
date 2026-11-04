@@ -28,7 +28,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
-import tools.jackson.core.JacksonException;
 
 /**
  * @author Ivica Cardic
@@ -108,8 +107,6 @@ public class ListProjectDeploymentsToolCallback implements ToolCallback {
                 .toList();
 
             return JsonUtils.write(summaries);
-        } catch (JacksonException exception) {
-            return toolError("Serialization error: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(ListProjectDeploymentsToolCallback.class, TOOL_NAME, exception);
         }
