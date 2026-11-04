@@ -440,7 +440,7 @@ Data Storage actions accept a `scope` that defines how broadly the value is visi
 
 Notes
 - Keys must be unique within a chosen scope; otherwise the new write overwrites the existing value.
-- When you need safe concurrent numeric increments from multiple executions, use `Atomic Increment`.
+- `Append Value to List`, `Set Value in List`, `Delete Value from List` and `Atomic Increment` are safe when several executions change the same key at once: no update is lost. With the `JDBC` provider this holds across every node of a cluster. With `FILESYSTEM` and `AWS`, it holds only for executions on the same node.
 - Keys must be smaller than 1024 bytes (see Set Value reference).
 
 ---
@@ -452,6 +452,7 @@ Test runs in the workflow editor do not write to the database. They keep Data St
 - `CURRENT_EXECUTION` values disappear when the test run finishes, the same as in a deployed workflow.
 - `WORKFLOW`, `PRINCIPAL` and `ACCOUNT` values stay between test runs and expire 10 minutes after the last write to that scope. A list that a test appends to keeps growing with every run until it expires, so use `CURRENT_EXECUTION` for values that only one run needs.
 - The 400 KB limit per key applies in the editor too.
+- The list actions and `Atomic Increment` are safe for test runs on the same node at the same time.
 - In an Enterprise Edition cluster with Redis, every coordinator shares these values, so the next test run sees them even when another coordinator runs it. See [Shared state caches](/platform/use-bytechef/self-hosted/configuration/node-roles#shared-state-caches).
 - A test run stops after 1,000 task executions. A loop over many items can reach this limit in the editor while the deployed workflow runs to the end.
 
