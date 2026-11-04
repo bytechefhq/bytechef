@@ -66,6 +66,33 @@ tasks.withType(JacocoReport::class) {
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of("${libs.findVersion("java").get()}"))
+        vendor.set(JvmVendorSpec.GRAAL_VM)
+    }
+}
+
+val graalVmVersion = libs.findVersion("graalvm").get().requiredVersion
+
+tasks.withType<JavaCompile>().configureEach {
+    val requiredGraalVmVersion = graalVmVersion
+
+    doFirst {
+        verifyGraalVmToolchain((this as JavaCompile).javaCompiler.get().metadata, requiredGraalVmVersion)
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    val requiredGraalVmVersion = graalVmVersion
+
+    doFirst {
+        verifyGraalVmToolchain((this as Test).javaLauncher.get().metadata, requiredGraalVmVersion)
+    }
+}
+
+tasks.withType<JavaExec>().configureEach {
+    val requiredGraalVmVersion = graalVmVersion
+
+    doFirst {
+        verifyGraalVmToolchain((this as JavaExec).javaLauncher.get().metadata, requiredGraalVmVersion)
     }
 }
 
