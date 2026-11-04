@@ -41,6 +41,7 @@ import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.JdbcJobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.JdbcTaskExecutionRepository;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
@@ -1157,7 +1158,7 @@ class ProjectWorkflowExecutionFacadeIntTest {
     @EnableAutoConfiguration
     @Import({
         CacheConfiguration.class, ContextServiceImpl.class, EnvironmentServiceImpl.class, JacksonConfiguration.class,
-        JobServiceImpl.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class,
+        LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class,
         PrincipalJobServiceImpl.class, ProjectCallback.class, ProjectDeploymentServiceImpl.class,
         ProjectServiceImpl.class,
         ProjectWorkflowCallback.class,
@@ -1183,6 +1184,11 @@ class ProjectWorkflowExecutionFacadeIntTest {
         @Bean
         Evaluator evaluator() {
             return SpelEvaluator.create();
+        }
+
+        @Bean
+        JobService jobService(JobRepository jobRepository) {
+            return new JobServiceImpl(jobRepository);
         }
 
         @Bean
