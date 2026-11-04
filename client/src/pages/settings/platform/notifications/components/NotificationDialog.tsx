@@ -33,7 +33,8 @@ import NotificationTestResult from './NotificationTestResult';
 import WebhookHeadersField from './WebhookHeadersField';
 import WebhookPresetSelect from './WebhookPresetSelect';
 
-const WEBHOOK_PAYLOAD_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/settings/notifications#webhook-requests';
+const WEBHOOK_BODY_TEMPLATE_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/settings/notifications#body-template';
 
 interface NotificationDialogProps {
     closeEditDialog: () => void;
@@ -313,22 +314,6 @@ const NotificationDialog = ({
                                                     />
                                                 </FormControl>
 
-                                                <FormDescription>
-                                                    <span>
-                                                        ByteChef sends a JSON POST with the event type, job ID, job name
-                                                        and timestamp.
-                                                    </span>
-
-                                                    <a
-                                                        className="ml-1 underline"
-                                                        href={WEBHOOK_PAYLOAD_DOCUMENTATION_URL}
-                                                        rel="noreferrer"
-                                                        target="_blank"
-                                                    >
-                                                        See the payload format
-                                                    </a>
-                                                </FormDescription>
-
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -353,11 +338,28 @@ const NotificationDialog = ({
                                                         <Textarea
                                                             className="font-mono text-xs md:text-xs"
                                                             onChange={(event) => field.onChange(event.target.value)}
-                                                            placeholder="Optional. Leave empty to send the default JSON payload."
+                                                            placeholder="Optional"
                                                             rows={6}
                                                             value={(field.value as string) || ''}
                                                         />
                                                     </FormControl>
+
+                                                    <FormDescription>
+                                                        <span>
+                                                            {
+                                                                'Leave it empty to send the default JSON payload. Use {{path}} placeholders to insert its fields.'
+                                                            }
+                                                        </span>
+
+                                                        <a
+                                                            className="ml-1 underline"
+                                                            href={WEBHOOK_BODY_TEMPLATE_DOCUMENTATION_URL}
+                                                            rel="noreferrer"
+                                                            target="_blank"
+                                                        >
+                                                            See the template and payload format
+                                                        </a>
+                                                    </FormDescription>
 
                                                     <FormMessage />
                                                 </FormItem>
