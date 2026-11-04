@@ -95,8 +95,9 @@ public class PropertyOptionsResolver {
         envelope.put("componentName", componentName);
         envelope.put(
             "hint",
-            "No connectionId supplied. Call listConnectionsForComponent for '" + componentName +
-                "' to pick an existing one, or createConnection to make a new one, then retry.");
+            "No connectionId supplied. Call listConnectionsForComponent (listConnections over the management MCP " +
+                "server) for '" + componentName + "' to pick an existing one, or create a connection in ByteChef, " +
+                "then retry.");
 
         return envelope;
     }
