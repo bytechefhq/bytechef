@@ -32,6 +32,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -186,6 +188,58 @@ public class FileDataStorageServiceIntTest {
             "componentName", DataStorageScope.WORKFLOW, scopeId, "list", 0, PlatformType.AUTOMATION);
 
         assertThat(values).hasSize(200);
+    }
+
+    @Test
+    public void testPutWaitsForARunningUpdateOfTheSameKey() throws Exception {
+        String scopeId = String.valueOf(UUID.randomUUID());
+
+        dataStorage.put(
+            "componentName", DataStorageScope.WORKFLOW, scopeId, "list", List.of("a"), 0, PlatformType.AUTOMATION);
+
+        CountDownLatch updateStartedLatch = new CountDownLatch(1);
+        CountDownLatch putFinishedLatch = new CountDownLatch(1);
+        AtomicBoolean putFinishedDuringUpdate = new AtomicBoolean();
+
+        try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
+            Future<?> updateFuture = executorService.submit(() -> dataStorage.update(
+                "componentName", DataStorageScope.WORKFLOW, scopeId, "list", 0, PlatformType.AUTOMATION,
+                (Optional<List<String>> currentValue) -> {
+                    updateStartedLatch.countDown();
+
+                    try {
+                        putFinishedDuringUpdate.set(putFinishedLatch.await(500, TimeUnit.MILLISECONDS));
+                    } catch (InterruptedException interruptedException) {
+                        Thread.currentThread()
+                            .interrupt();
+                    }
+
+                    List<String> values = new ArrayList<>(currentValue.orElse(List.of()));
+
+                    values.add("b");
+
+                    return values;
+                }));
+
+            assertThat(updateStartedLatch.await(5, TimeUnit.SECONDS)).isTrue();
+
+            Future<?> putFuture = executorService.submit(() -> {
+                dataStorage.put(
+                    "componentName", DataStorageScope.WORKFLOW, scopeId, "list", List.of("x"), 0,
+                    PlatformType.AUTOMATION);
+
+                putFinishedLatch.countDown();
+            });
+
+            updateFuture.get();
+            putFuture.get();
+        }
+
+        assertThat(putFinishedDuringUpdate).isFalse();
+        assertThat(
+            dataStorage.<List<String>>get(
+                "componentName", DataStorageScope.WORKFLOW, scopeId, "list", 0, PlatformType.AUTOMATION))
+                    .containsExactly("x");
     }
 
     private void appendValue(String scopeId, String key, int value) {
