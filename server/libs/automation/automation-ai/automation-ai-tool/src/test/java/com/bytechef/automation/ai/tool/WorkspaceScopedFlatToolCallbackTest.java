@@ -184,6 +184,15 @@ class WorkspaceScopedFlatToolCallbackTest {
     }
 
     @Test
+    void testMalformedInputReturnsErrorWithoutEchoingTheParserText() {
+        String result = toolCallback.call("{\"name\": secret-token}");
+
+        assertThat(result).contains("Invalid input: not valid JSON")
+            .doesNotContain("secret-token");
+        assertThat(delegate.capturedContext).isNull();
+    }
+
+    @Test
     void testNonNumericWorkspaceIdReturnsError() {
         String result = toolCallback.call("{\"name\": \"my server\", \"workspaceId\": \"abc\"}");
 

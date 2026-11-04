@@ -130,7 +130,7 @@ public class CreateMcpProjectToolCallback implements ToolCallback {
                     input.workflowIds()
                         .size()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | NoSuchElementException
             | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
