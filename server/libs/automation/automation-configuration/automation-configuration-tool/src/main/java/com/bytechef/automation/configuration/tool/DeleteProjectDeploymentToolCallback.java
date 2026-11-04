@@ -105,10 +105,10 @@ public class DeleteProjectDeploymentToolCallback implements ToolCallback {
                 return toolError("Project deployment " + projectDeploymentId + " not found");
             }
 
-            return JsonUtils.write(
+            return writeResult(
                 new DeleteProjectDeploymentOutput(projectDeploymentId, true));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
@@ -124,5 +124,13 @@ public class DeleteProjectDeploymentToolCallback implements ToolCallback {
     }
 
     public record DeleteProjectDeploymentOutput(long projectDeploymentId, boolean deleted) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(DeleteProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

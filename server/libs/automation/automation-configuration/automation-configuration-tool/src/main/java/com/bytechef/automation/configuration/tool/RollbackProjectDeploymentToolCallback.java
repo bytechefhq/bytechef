@@ -145,11 +145,11 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
                         + " could not be rolled back — one of its workflows no longer exists");
             }
 
-            return JsonUtils.write(
+            return writeResult(
                 new RollbackProjectDeploymentOutput(
                     projectDeploymentId, input.projectVersion(), previousProjectVersion));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
@@ -166,5 +166,13 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
 
     public record RollbackProjectDeploymentOutput(
         long projectDeploymentId, int projectVersion, int previousProjectVersion) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(RollbackProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

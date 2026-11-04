@@ -27,7 +27,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
-import tools.jackson.core.JacksonException;
 
 /**
  * @author Ivica Cardic
@@ -85,8 +84,6 @@ public class ListMcpServersToolCallback implements ToolCallback {
             return JsonUtils.write(servers.stream()
                 .map(ListMcpServersToolCallback::toSummary)
                 .toList());
-        } catch (JacksonException exception) {
-            return ToolErrors.toolError("Serialization error: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(ListMcpServersToolCallback.class, TOOL_NAME, exception);
         }
