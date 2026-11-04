@@ -3,7 +3,7 @@ import {WorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/Workfl
 import useEmbeddedWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import useAutomationWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {act, mockScrollIntoView, render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
-import {MemoryRouter, useLocation} from 'react-router-dom';
+import {MemoryRouter, RouterProvider, createMemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const {
@@ -194,6 +194,34 @@ describe('WorkflowExecutions', () => {
 
         expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(42);
         expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionKind).toBe('JOB');
+        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
+        expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+    });
+
+    it('switches to the automation execution sheet when the query params change without remounting', async () => {
+        const router = createMemoryRouter(
+            [
+                {
+                    element: (
+                        <TooltipProvider>
+                            <WorkflowExecutions />
+                        </TooltipProvider>
+                    ),
+                    path: '/embedded/executions',
+                },
+            ],
+            {initialEntries: ['/embedded/executions?id=42']}
+        );
+
+        render(<RouterProvider router={router} />);
+
+        expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
+
+        await act(async () => {
+            await router.navigate('/embedded/executions?automations=1&id=43');
+        });
+
+        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(43);
         expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
         expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
     });

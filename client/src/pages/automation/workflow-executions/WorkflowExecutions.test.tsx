@@ -1,6 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {render, screen, userEvent} from '@/shared/util/test-utils';
-import {MemoryRouter} from 'react-router-dom';
+import {act, render, screen, userEvent} from '@/shared/util/test-utils';
+import {MemoryRouter, RouterProvider, createMemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {WorkflowExecutions} from './WorkflowExecutions';
@@ -89,6 +89,35 @@ describe('WorkflowExecutions deep link', () => {
 
         expect(useWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(42);
         expect(useWorkflowExecutionSheetStore.getState().workflowExecutionKind).toBe('JOB');
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
+    });
+
+    it('opens the execution sheet for a new id query param without remounting', async () => {
+        const router = createMemoryRouter(
+            [
+                {
+                    element: (
+                        <TooltipProvider>
+                            <WorkflowExecutions />
+                        </TooltipProvider>
+                    ),
+                    path: '/',
+                },
+            ],
+            {initialEntries: ['/?id=42']}
+        );
+
+        render(<RouterProvider router={router} />);
+
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(42);
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionSheetOpen: false});
+
+        await act(async () => {
+            await router.navigate('/?id=43');
+        });
+
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(43);
         expect(useWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
     });
 

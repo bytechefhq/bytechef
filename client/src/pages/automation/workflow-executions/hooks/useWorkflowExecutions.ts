@@ -288,15 +288,16 @@ export const useWorkflowExecutions = () => {
         filter(filterStatus, filterStartDate, filterEndDate, filterProjectId, undefined, undefined, undefined);
     });
 
+    const linkedExecutionIdParameter = searchParams.get('id');
+
     useEffect(() => {
-        const linkedExecutionId = Number.parseInt(searchParams.get('id') ?? '', 10);
+        const linkedExecutionId = Number.parseInt(linkedExecutionIdParameter ?? '', 10);
 
         if (Number.isInteger(linkedExecutionId) && linkedExecutionId > 0) {
             setWorkflowExecutionId(linkedExecutionId, 'JOB');
             setWorkflowExecutionSheetOpen(true);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [linkedExecutionIdParameter, setWorkflowExecutionId, setWorkflowExecutionSheetOpen]);
 
     return {
         currentEnvironmentId,
