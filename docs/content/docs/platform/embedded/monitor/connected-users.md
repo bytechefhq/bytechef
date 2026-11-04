@@ -137,20 +137,30 @@ The instance is created in the connected user's own environment. Provisioning al
 
 Use a batch upgrade to put many connected users on a newer configuration in one go, without opening each one.
 
-1. Tick the checkboxes of the users you want in the table. A bar appears above it with the count, for example "3 selected", and the buttons **Upgrade integration**, **Upgrade automation**, and **Clear**. **Clear** drops the selection.
-2. For an integration, click **Upgrade integration**, then pick one of the integrations the selected users have. Next pick the **Configuration** to move them to. Each configuration of the current environment is listed as its name and version, for example "Production Gmail · V3". Configurations with a version higher than the lowest one the selected users are on are marked **Newer version**.
-3. For an automation, click **Upgrade automation**, then pick a project that has configurations in the current environment. Next pick the **Configuration**. The one with the highest version is marked **Latest version**.
-4. Read the impact preview. It shows what changes for the workflows involved, such as new required inputs or connections, and which users will be skipped. **Upgrade** stays unavailable until the preview has loaded.
-5. Click **Upgrade**.
+1. Tick the checkboxes of the users you want in the table, or the checkbox in the header to select every user on the page. A bar appears above the table with the count, for example "2 selected", and the buttons **Upgrade integration**, **Upgrade automation**, and **Clear**. **Clear** drops the selection. The selection is also cleared when you change a filter, the page or the environment.
 
-When it finishes, the dialog shows how many users were moved and how many need attention, and lists each skipped user with a reason. The reasons you may see are:
+   ![Connected users selected for a batch upgrade](connected-users/connected-users-batch-selection.png)
+
+2. For an integration, click **Upgrade integration**, then pick one of the integrations the selected users have. Next pick the **Configuration** to move them to. Each configuration of the current environment is listed as its name and version, for example "Gmail · V10". Configurations with a version higher than the lowest one the selected users are on are marked **Newer version**. If none of the selected users has an integration in this environment, the dialog says so instead of listing any.
+3. For an automation, click **Upgrade automation**, then pick a project that has configurations in the current environment. Next pick the **Configuration**. When the configurations have different versions, the one with the highest version is marked **Latest version**. If no published project has configurations in this environment, the dialog says so.
+4. Read the impact preview. It shows what changes for the workflows involved, such as new required inputs or connections, and lists the users that would be skipped, each with the reason under their name. When MCP servers use these configurations, a note says how many, because their tools follow the configuration each user lands on.
+
+   ![Upgrade dialog with the impact preview](connected-users/connected-users-upgrade-integration.png)
+
+5. Click **Upgrade**. While the upgrade runs, the dialog stays open and cannot be closed.
+
+**Upgrade** stays unavailable until you pick a configuration and the preview has loaded. It also stays unavailable when none of the selected users would move, because each of them is already on that configuration or doesn't have that integration or project. A warning under the **Configuration** field says so. Pick another configuration or change the selection.
+
+![Warning when none of the selected users would move](connected-users/connected-users-upgrade-nobody-moves.png)
+
+When it finishes, the dialog shows how many users were moved and how many need attention, and lists each skipped user with a reason. Closing the dialog refreshes the list and clears the selection. The reasons you may see are:
 
 - **Already on this configuration**: nothing to do for that user.
 - **Doesn't have this integration** or **Doesn't have this project**: the user has no configuration of what you picked in this environment.
-- **The target has no** followed by workflow names: the target configuration lacks a workflow the user relies on.
-- **The target has no enabled** followed by workflow names: those workflows exist on the target but are not enabled.
-- **The target uses a different authorization type**: the user's connection cannot be carried over.
-- **The move failed, try again**: the move did not complete for that user.
+- **The target configuration doesn't have these workflows:** followed by the workflow names: the target lacks a workflow the user relies on.
+- **These workflows aren't enabled on the target configuration:** followed by the workflow names: those workflows exist on the target but are not enabled.
+- **The target configuration uses a different authorization type**: the user's connection cannot be carried over.
+- **The move failed. Try again.**: the move did not complete for that user.
 
 Skipped users are left exactly as they were.
 
