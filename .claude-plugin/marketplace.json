@@ -1,1 +1,1 @@
-{"name": "bytechef", "owner": {"name": "ByteChef"}, "plugins": [{"name": "bytechef-dev", "source": "./claude-code-plugin/bytechef-dev", "description": "Build ByteChef workflows from coding agents"}]}
+{"name": "bytechef", "owner": {"name": "ByteChef"}, "plugins": [{"name": "bytechef-dev", "source": "./claude-code-plugin/bytechef-dev", "description": "Build ByteChef workflows and AI Agents from coding agents"}]}

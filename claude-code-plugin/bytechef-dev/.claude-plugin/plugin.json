@@ -1,7 +1,7 @@
 {
   "name": "bytechef-dev",
   "version": "0.4.0",
-  "description": "Build ByteChef workflows from Claude, Claude Code and other coding agents over the management MCP server, plus ByteChef development skills",
+  "description": "Build ByteChef workflows and AI Agents from Claude, Claude Code and other coding agents over the management MCP server, plus ByteChef development skills",
   "author": {
     "name": "ByteChef Team"
   }
