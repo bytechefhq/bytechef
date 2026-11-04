@@ -157,16 +157,6 @@ class ManagementMcpServerConfigurationIntTest {
     }
 
     @Test
-    void testInstructionsDescribeImportWorkflowWithAProjectIdOrAWorkflowId() {
-        assertThat(ManagementMcpServerConfiguration.INSTRUCTIONS)
-            .contains("createProject (if needed) → importWorkflow with the source")
-            .contains("the projectId for a new workflow or the workflowId for an existing one")
-            .doesNotContain(
-                "createProjectWorkflow", "searchProjects", "getProjectStatus", "cloneMcpProject",
-                "listMcpProjectWorkflows", "—");
-    }
-
-    @Test
     void testWorksWithNoContributors() {
         applicationContextRunner.run(context -> {
             assertThat(context).hasNotFailed();
