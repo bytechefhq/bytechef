@@ -21,9 +21,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.tool.EnvironmentScopedToolCallback;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import java.util.Arrays;
@@ -36,6 +39,9 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
@@ -50,7 +56,11 @@ class ManagementMcpServerConfigurationIntTest {
         .withBean(ProjectTools.class, () -> mock(ProjectTools.class))
         .withBean(ProjectWorkflowLifecycleTools.class, () -> mock(ProjectWorkflowLifecycleTools.class))
         .withBean(WorkspaceTools.class, () -> mock(WorkspaceTools.class))
-        .withUserConfiguration(ManagementMcpServerConfiguration.class);
+        .withUserConfiguration(ManagementMcpServerConfiguration.class, JacksonConfiguration.class)
+        .withBean(ObjectMapper.class, () -> JsonMapper.builder()
+            .build())
+        .withBean(XmlMapper.class, () -> XmlMapper.builder()
+            .build());
 
     @Test
     void testToolCallbackProviderIsNotRegisteredAsBean() {
@@ -198,6 +208,38 @@ class ManagementMcpServerConfigurationIntTest {
                         .hasSize(2)
                         .allSatisfy(definition -> assertThat(definition.inputSchema()).contains("\"query\""));
         });
+    }
+
+    @Test
+    void testBuildsTheContributedCallbacksOnlyAfterJsonUtilsIsInitialized() {
+        ToolCallback probeToolCallback = mock(ToolCallback.class);
+
+        when(probeToolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name("probe")
+                .description("d")
+                .inputSchema("{\"type\":\"object\",\"properties\":{}}")
+                .build());
+
+        McpServerToolCallbackContributor contributor = () -> List.of(
+            new EnvironmentScopedToolCallback(probeToolCallback));
+
+        JsonUtils.setObjectMapper(null);
+
+        try {
+            applicationContextRunner
+                .withBean(McpServerToolCallbackContributor.class, () -> contributor)
+                .run(context -> {
+                    assertThat(context).hasNotFailed();
+
+                    assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
+                        .contains("probe");
+                });
+        } finally {
+            JsonUtils.setObjectMapper(
+                JsonMapper.builder()
+                    .build());
+        }
     }
 
     @Test
