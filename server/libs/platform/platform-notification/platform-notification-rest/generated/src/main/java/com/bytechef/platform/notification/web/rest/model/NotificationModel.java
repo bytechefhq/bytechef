@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Notification", description = "A Notification definition.")
 @JsonTypeName("Notification")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:06:55.152675+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:56:22.769511+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class NotificationModel {
 
   private @Nullable Long id;
@@ -373,11 +373,11 @@ public class NotificationModel {
   }
 
   /**
-   * The webhook signing secret, returned only in the create response
+   * The webhook signing secret, returned only in the response that generated it: creating a webhook notification, or changing a notification to a webhook
    * @return signingSecret
    */
   
-  @Schema(name = "signingSecret", accessMode = Schema.AccessMode.READ_ONLY, description = "The webhook signing secret, returned only in the create response", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "signingSecret", accessMode = Schema.AccessMode.READ_ONLY, description = "The webhook signing secret, returned only in the response that generated it: creating a webhook notification, or changing a notification to a webhook", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("signingSecret")
   public @Nullable String getSigningSecret() {
     return signingSecret;
