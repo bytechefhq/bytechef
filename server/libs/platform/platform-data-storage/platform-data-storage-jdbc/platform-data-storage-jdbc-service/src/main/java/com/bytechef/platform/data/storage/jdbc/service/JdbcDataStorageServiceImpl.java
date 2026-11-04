@@ -60,7 +60,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
         dataStorageRepository.deleteAllByScopeAndScopeIdAndType(scope.ordinal(), scopeId, type.ordinal());
     }
