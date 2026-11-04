@@ -9,6 +9,7 @@ extend type Query {
         connectionId: Long
         inputParameters: Map
         lookupDependsOnPaths: [String!]
+        mcpComponentId: ID!
     ): [Property!]!
     clusterElementOptions(
         componentName: String!
@@ -18,6 +19,7 @@ extend type Query {
         connectionId: Long
         inputParameters: Map
         lookupDependsOnPaths: [String!]
+        mcpComponentId: ID!
     ): [Option!]!
 }
 
