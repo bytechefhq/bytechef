@@ -56,7 +56,9 @@ class BillingSubscriptionServiceImpl implements BillingSubscriptionService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    // Not read-only: the lookup takes a row lock (SELECT ... FOR UPDATE), which PostgreSQL refuses in a read-only
+    // transaction.
+    @Transactional
     public Optional<BillingSubscription> fetchSubscriptionBySubscriptionId(String subscriptionId) {
         return billingSubscriptionRepository.findBySubscriptionId(subscriptionId);
     }
