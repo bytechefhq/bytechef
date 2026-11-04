@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -28,8 +29,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 
 /**
@@ -50,8 +49,8 @@ public class AutomationDataTableIntTestConfiguration {
     }
 
     @Bean
-    AsyncTaskExecutor webhookDeliveryExecutor() {
-        return new SimpleAsyncTaskExecutor("webhook-delivery-");
+    JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry() {
+        return mock(JobPrincipalAccessorRegistry.class);
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

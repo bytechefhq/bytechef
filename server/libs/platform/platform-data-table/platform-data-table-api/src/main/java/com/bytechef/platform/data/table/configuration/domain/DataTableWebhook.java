@@ -37,7 +37,11 @@ public class DataTableWebhook {
     @Id
     private Long id;
 
+    @Column
     private String url;
+
+    @Column("workflow_execution_id")
+    private String workflowExecutionId;
 
     @Column
     private int type;
@@ -98,6 +102,14 @@ public class DataTableWebhook {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getWorkflowExecutionId() {
+        return workflowExecutionId;
+    }
+
+    public void setWorkflowExecutionId(String workflowExecutionId) {
+        this.workflowExecutionId = workflowExecutionId;
     }
 
     public DataTableWebhookType getType() {
@@ -169,6 +181,7 @@ public class DataTableWebhook {
         return "DataTableWebhook{" +
             "id=" + id +
             ", url='" + url + '\'' +
+            ", workflowExecutionId='" + workflowExecutionId + '\'' +
             ", type=" + type +
             ", dataTableId=" + dataTableId +
             ", environment=" + environment +

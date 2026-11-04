@@ -22,9 +22,8 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableWebhook;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.configuration.repository.DataTableWebhookRepository;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +39,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
+    private static final String WEBHOOKS_PATH = "/webhooks/";
+
     private final DataTableRepository dataTableRepository;
     private final DataTableWebhookRepository webhookRepository;
 
@@ -52,8 +53,15 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
     }
 
     @Override
-    public long addWebhook(String baseName, String url, DataTableWebhookType type, long environmentId) {
-        validateUrl(url);
+    public long addWebhook(
+        String baseName, String workflowExecutionId, String url, DataTableWebhookType type, long environmentId) {
+
+        try {
+            WorkflowExecutionId.parse(workflowExecutionId);
+        } catch (RuntimeException exception) {
+            throw new IllegalArgumentException(
+                "Data table webhook workflow execution id '" + workflowExecutionId + "' is not valid", exception);
+        }
 
         String normalizedBaseName = DataTableServiceImpl.normalizeBaseName(baseName);
 
@@ -67,6 +75,7 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
         dataTableWebhook.setDataTableId(table.getId());
         dataTableWebhook.setType(type);
         dataTableWebhook.setUrl(url);
+        dataTableWebhook.setWorkflowExecutionId(workflowExecutionId);
         dataTableWebhook.setEnvironment(Environment.values()[(int) environmentId]);
 
         DataTableWebhook savedDataTableHook = webhookRepository.save(dataTableWebhook);
@@ -95,7 +104,7 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
         for (DataTableWebhook dataTableWebhook : dataTableWebhooks) {
             webhooks.add(new Webhook(
-                dataTableWebhook.getId(), dataTableWebhook.getDataTableId(), dataTableWebhook.getUrl(),
+                dataTableWebhook.getId(), dataTableWebhook.getDataTableId(), getWorkflowExecutionId(dataTableWebhook),
                 dataTableWebhook.getType(), dataTableWebhook.getEnvironment()
                     .ordinal()));
         }
@@ -108,25 +117,27 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
         webhookRepository.deleteById(id);
     }
 
-    private static void validateUrl(String url) {
-        try {
-            URI uri = URI.create(url);
+    private static String getWorkflowExecutionId(DataTableWebhook dataTableWebhook) {
+        String workflowExecutionId = dataTableWebhook.getWorkflowExecutionId();
 
-            String scheme = uri.getScheme();
-
-            // URI#getHost is null for host names such as bytechef_server that URL, and so delivery, accepts
-            if (("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) &&
-                !uri.toURL()
-                    .getHost()
-                    .isEmpty()) {
-
-                return;
-            }
-        } catch (IllegalArgumentException | MalformedURLException exception) {
-            throw new IllegalArgumentException(
-                "Data table webhook URL must be an absolute http or https URL with a host", exception);
+        if (workflowExecutionId != null) {
+            return workflowExecutionId;
         }
 
-        throw new IllegalArgumentException("Data table webhook URL must be an absolute http or https URL with a host");
+        String url = dataTableWebhook.getUrl();
+
+        if (url == null) {
+            return null;
+        }
+
+        String path = url.replaceFirst("[?#].*$", "");
+
+        int index = path.lastIndexOf(WEBHOOKS_PATH);
+
+        if (index < 0) {
+            return null;
+        }
+
+        return path.substring(index + WEBHOOKS_PATH.length());
     }
 }

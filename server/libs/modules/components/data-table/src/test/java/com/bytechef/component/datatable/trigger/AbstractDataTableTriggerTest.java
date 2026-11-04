@@ -16,10 +16,22 @@
 
 package com.bytechef.component.datatable.trigger;
 
+import static com.bytechef.component.datatable.constant.DataTableConstants.TABLE;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableFunction;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunction;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.platform.component.definition.TriggerContextAware;
+import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
@@ -27,6 +39,33 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 abstract class AbstractDataTableTriggerTest {
+
+    protected static final String WEBHOOK_URL = "http://localhost/webhooks/workflow-execution-id";
+    protected static final String WORKFLOW_EXECUTION_ID = "workflow-execution-id";
+
+    protected static long webhookEnable(
+        ModifiableTriggerDefinition triggerDefinition, DataTableWebhookService dataTableWebhookService,
+        DataTableWebhookType dataTableWebhookType) throws Exception {
+
+        Parameters inputParameters = mock(Parameters.class);
+        TriggerContext triggerContext = mock(
+            TriggerContext.class, withSettings().extraInterfaces(TriggerContextAware.class));
+
+        when(inputParameters.getRequiredString(TABLE)).thenReturn("conversations");
+        when(((TriggerContextAware) triggerContext).getEnvironmentId()).thenReturn(1L);
+        when(dataTableWebhookService.addWebhook(
+            "conversations", WORKFLOW_EXECUTION_ID, WEBHOOK_URL, dataTableWebhookType, 1L))
+                .thenReturn(42L);
+
+        WebhookEnableFunction webhookEnableFunction = triggerDefinition.getWebhookEnable()
+            .orElseThrow();
+
+        WebhookEnableOutput webhookEnableOutput = webhookEnableFunction.apply(
+            inputParameters, null, WEBHOOK_URL, WORKFLOW_EXECUTION_ID, triggerContext);
+
+        return (Long) webhookEnableOutput.parameters()
+            .get("webhookId");
+    }
 
     protected static Map<String, Object> rowContent(String type, Map<String, Object> values) {
         return Map.of("type", type, "table", "conversations", "payload", Map.of("id", 7, "values", values));

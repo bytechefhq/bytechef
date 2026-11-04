@@ -56,10 +56,11 @@ public class DataTableWebhookGraphQlController {
 
         return dataTableWebhookService.listWebhooks(baseName, environmentId)
             .stream()
-            .map(webhook -> new Webhook(webhook.id(), webhook.url(), webhook.type(), webhook.environmentId()))
+            .map(webhook -> new Webhook(webhook.id(), webhook.workflowExecutionId(), webhook.type(),
+                webhook.environmentId()))
             .toList();
     }
 
-    public record Webhook(Long id, String url, DataTableWebhookType type, long environmentId) {
+    public record Webhook(Long id, String workflowExecutionId, DataTableWebhookType type, long environmentId) {
     }
 }

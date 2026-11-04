@@ -5193,14 +5193,6 @@ public class ApplicationProperties {
          */
         private int maxPendingDeliveries = 1000;
 
-        /**
-         * Rows of writes whose webhook deliveries are pending, counted once per write however many webhooks it goes to,
-         * allowed before the deliveries of new writes are dropped; must be at least 1. A write is still accepted when
-         * nothing else is pending, so one write that changes more rows than this is still accepted for delivery to
-         * every matching webhook.
-         */
-        private int maxPendingRows = 10000;
-
         public int getConcurrencyLimit() {
             return concurrencyLimit;
         }
@@ -5209,20 +5201,12 @@ public class ApplicationProperties {
             return maxPendingDeliveries;
         }
 
-        public int getMaxPendingRows() {
-            return maxPendingRows;
-        }
-
         public void setConcurrencyLimit(int concurrencyLimit) {
             this.concurrencyLimit = concurrencyLimit;
         }
 
         public void setMaxPendingDeliveries(int maxPendingDeliveries) {
             this.maxPendingDeliveries = maxPendingDeliveries;
-        }
-
-        public void setMaxPendingRows(int maxPendingRows) {
-            this.maxPendingRows = maxPendingRows;
         }
     }
 
