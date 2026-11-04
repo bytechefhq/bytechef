@@ -18,15 +18,27 @@ import {
     NotificationFromJSON,
     NotificationToJSON,
 } from '../models/Notification';
+import {
+    type NotificationSigningSecret,
+    NotificationSigningSecretFromJSON,
+    NotificationSigningSecretToJSON,
+} from '../models/NotificationSigningSecret';
 
 export interface CreateNotificationRequest {
     /**
      * 
      */
-    notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'>;
+    notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'|'hasSigningSecret'|'signingSecret'>;
 }
 
 export interface DeleteNotificationRequest {
+    /**
+     * The id of a notification.
+     */
+    notificationId: number;
+}
+
+export interface RegenerateNotificationSigningSecretRequest {
     /**
      * The id of a notification.
      */
@@ -41,7 +53,7 @@ export interface UpdateNotificationRequest {
     /**
      * 
      */
-    notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'>;
+    notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'|'hasSigningSecret'|'signingSecret'>;
 }
 
 /**
@@ -180,6 +192,53 @@ export class NotificationApi extends runtime.BaseAPI {
      */
     async getNotifications(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Notification>> {
         const response = await this.getNotificationsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for regenerateNotificationSigningSecret without sending the request
+     */
+    async regenerateNotificationSigningSecretRequestOpts(requestParameters: RegenerateNotificationSigningSecretRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['notificationId'] == null) {
+            throw new runtime.RequiredError(
+                'notificationId',
+                'Required parameter "notificationId" was null or undefined when calling regenerateNotificationSigningSecret().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/notifications/{notificationId}/signing-secret`;
+        urlPath = urlPath.replace('{notificationId}', encodeURIComponent(String(requestParameters['notificationId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Regenerates the signing secret of a webhook notification. The new secret is returned only once.
+     * Regenerate the signing secret of a webhook notification
+     */
+    async regenerateNotificationSigningSecretRaw(requestParameters: RegenerateNotificationSigningSecretRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NotificationSigningSecret>> {
+        const requestOptions = await this.regenerateNotificationSigningSecretRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => NotificationSigningSecretFromJSON(jsonValue));
+    }
+
+    /**
+     * Regenerates the signing secret of a webhook notification. The new secret is returned only once.
+     * Regenerate the signing secret of a webhook notification
+     */
+    async regenerateNotificationSigningSecret(requestParameters: RegenerateNotificationSigningSecretRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NotificationSigningSecret> {
+        const response = await this.regenerateNotificationSigningSecretRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
