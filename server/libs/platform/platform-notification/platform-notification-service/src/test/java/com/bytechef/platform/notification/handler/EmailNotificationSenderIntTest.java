@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -32,6 +33,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.MailSendException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -95,6 +97,103 @@ class EmailNotificationSenderIntTest {
                     .isInstanceOf(IllegalStateException.class);
 
         verify(mailService, never()).sendEmail(anyString(), anyString(), anyString(), anyBoolean(), anyBoolean());
+    }
+
+    @Test
+    void testSendTestSendsSynchronously() {
+        when(emailNotificationHandler.getSubject(notificationHandlerContext)).thenReturn("Subject");
+        when(emailNotificationHandler.getContent(notificationHandlerContext)).thenReturn("Content");
+        when(emailNotificationHandler.isHtml()).thenReturn(true);
+
+        NotificationTestResult notificationTestResult = emailNotificationSender.sendTest(
+            createNotification(Map.of("email", "approver@example.com")), emailNotificationHandler,
+            notificationHandlerContext);
+
+        verify(mailService).sendEmailNow("approver@example.com", "Subject", "Content", true);
+        verify(mailService, never()).sendEmail(anyString(), anyString(), anyString(), anyBoolean(), anyBoolean());
+
+        assertThat(notificationTestResult.success()).isTrue();
+        assertThat(notificationTestResult.statusCode()).isNull();
+        assertThat(notificationTestResult.signed()).isFalse();
+    }
+
+    @Test
+    void testSendTestReportsMailFailure() {
+        when(emailNotificationHandler.getSubject(notificationHandlerContext)).thenReturn("Subject");
+        when(emailNotificationHandler.getContent(notificationHandlerContext)).thenReturn("Content");
+
+        doThrow(new MailSendException("boom")).when(mailService)
+            .sendEmailNow(anyString(), anyString(), anyString(), anyBoolean());
+
+        NotificationTestResult notificationTestResult = emailNotificationSender.sendTest(
+            createNotification(Map.of("email", "approver@example.com")), emailNotificationHandler,
+            notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("MailSendException: boom");
+    }
+
+    @Test
+    void testSendTestReportsMailNotConfigured() {
+        when(emailNotificationHandler.getSubject(notificationHandlerContext)).thenReturn("Subject");
+        when(emailNotificationHandler.getContent(notificationHandlerContext)).thenReturn("Content");
+
+        doThrow(new IllegalStateException("Mail server is not configured")).when(mailService)
+            .sendEmailNow(anyString(), anyString(), anyString(), anyBoolean());
+
+        assertThat(
+            emailNotificationSender.sendTest(
+                createNotification(Map.of("email", "approver@example.com")), emailNotificationHandler,
+                notificationHandlerContext)
+                .error()).isEqualTo("IllegalStateException: Mail server is not configured");
+    }
+
+    @Test
+    void testSendTestMapsUnexpectedExceptionWithoutMessage() {
+        when(emailNotificationHandler.getSubject(notificationHandlerContext)).thenReturn("Subject");
+        when(emailNotificationHandler.getContent(notificationHandlerContext))
+            .thenThrow(new IllegalArgumentException("secret-value"));
+
+        NotificationTestResult notificationTestResult = emailNotificationSender.sendTest(
+            createNotification(Map.of("email", "approver@example.com")), emailNotificationHandler,
+            notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("Test send failed (IllegalArgumentException)");
+        assertThat(notificationTestResult.error()).doesNotContain("secret-value");
+    }
+
+    @Test
+    void testSendTestFailsWhenEmailMissing() {
+        NotificationTestResult notificationTestResult = emailNotificationSender.sendTest(
+            createNotification(Map.of()), emailNotificationHandler, notificationHandlerContext);
+
+        assertThat(notificationTestResult.success()).isFalse();
+        assertThat(notificationTestResult.error()).isEqualTo("Email address is required");
+    }
+
+    @Test
+    void testSendTestCollapsesAndCapsErrorText() {
+        when(emailNotificationHandler.getSubject(notificationHandlerContext)).thenReturn("Subject");
+        when(emailNotificationHandler.getContent(notificationHandlerContext)).thenReturn("Content");
+
+        String message = ("line one\n\tline two   " + "x".repeat(50) + "\r\n").repeat(14)
+            .substring(0, 1000);
+
+        doThrow(new MailSendException(message)).when(mailService)
+            .sendEmailNow(anyString(), anyString(), anyString(), anyBoolean());
+
+        String error = emailNotificationSender.sendTest(
+            createNotification(Map.of("email", "approver@example.com")), emailNotificationHandler,
+            notificationHandlerContext)
+            .error();
+
+        assertThat(message).hasSize(1000)
+            .contains("\n");
+        assertThat(error).hasSize(201)
+            .startsWith("MailSendException: line one line two xxx")
+            .endsWith("\u2026")
+            .doesNotContain("\n", "\r", "\t", "  ");
     }
 
     private static Notification createNotification(Map<String, Object> settings) {

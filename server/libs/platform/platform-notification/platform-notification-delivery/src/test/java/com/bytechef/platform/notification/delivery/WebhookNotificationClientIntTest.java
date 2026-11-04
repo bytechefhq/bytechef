@@ -358,6 +358,13 @@ class WebhookNotificationClientIntTest {
         assertThat(receivedBody.get()).isEqualTo(payloadJson);
     }
 
+    @Test
+    void testSignatureMatchesHmacSha256OverTimestampDotBody() {
+        String signature = WebhookNotificationClient.sign("secret", "12345.{}");
+
+        assertThat(signature).isEqualTo("4df28e080fc082b61331789f00e00e122571a07d78931a85ae3d327292701d4e");
+    }
+
     private void respondWith(String path, int status, String body) {
         httpServer.createContext(path, httpExchange -> {
             httpExchange.getRequestBody()
@@ -383,12 +390,5 @@ class WebhookNotificationClientIntTest {
             .tenantId("tenant")
             .description("test delivery")
             .payload("body", "{\"a\":1}");
-    }
-
-    @Test
-    void testSignatureMatchesHmacSha256OverTimestampDotBody() {
-        String signature = WebhookNotificationClient.sign("secret", "12345.{}");
-
-        assertThat(signature).isEqualTo("4df28e080fc082b61331789f00e00e122571a07d78931a85ae3d327292701d4e");
     }
 }
