@@ -111,7 +111,7 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
                 return toolError("MCP server " + mcpServerId + " not found. Check the id with listMcpServers.");
             }
 
-            return JsonUtils.write(
+            return writeResult(
                 new UpdateMcpServerOutput(updated.getId(), updated.getName(), updated.isEnabled()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
@@ -130,5 +130,13 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
     }
 
     public record UpdateMcpServerOutput(long mcpServerId, String name, boolean enabled) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(UpdateMcpServerToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }
