@@ -234,6 +234,68 @@ class InMemoryDataStorageIntTest {
             .hasSize(200);
     }
 
+    @ParameterizedTest
+    @MethodSource("cacheManagers")
+    void testEvictingAJobDropsItsCurrentExecutionValuesOfEveryComponent(CacheManager cacheManager) {
+        InMemoryDataStorage firstInMemoryDataStorage = new InMemoryDataStorage(workflowUuid, cacheManager);
+        InMemoryDataStorage secondInMemoryDataStorage = new InMemoryDataStorage(
+            String.valueOf(UUID.randomUUID()), cacheManager);
+
+        firstInMemoryDataStorage.put("a", DataStorageScope.CURRENT_EXECUTION, "7", "key", "a7");
+        secondInMemoryDataStorage.put("b", DataStorageScope.CURRENT_EXECUTION, "7", "key", "b7");
+        firstInMemoryDataStorage.put("a", DataStorageScope.CURRENT_EXECUTION, "8", "key", "a8");
+        firstInMemoryDataStorage.put("a", DataStorageScope.WORKFLOW, "7", "key", "workflow");
+
+        InMemoryDataStorage.evictJob(cacheManager, 7);
+
+        assertThat(firstInMemoryDataStorage.fetch("a", DataStorageScope.CURRENT_EXECUTION, "7", "key")).isEmpty();
+        assertThat(secondInMemoryDataStorage.fetch("b", DataStorageScope.CURRENT_EXECUTION, "7", "key")).isEmpty();
+        assertThat(firstInMemoryDataStorage.<String>fetch("a", DataStorageScope.CURRENT_EXECUTION, "8", "key"))
+            .contains("a8");
+        assertThat(firstInMemoryDataStorage.<String>fetch("a", DataStorageScope.WORKFLOW, "7", "key"))
+            .contains("workflow");
+    }
+
+    @ParameterizedTest
+    @MethodSource("cacheManagers")
+    void testCurrentExecutionValuesWithoutAJobStayPerWorkflow(CacheManager cacheManager) {
+        InMemoryDataStorage firstInMemoryDataStorage = new InMemoryDataStorage(workflowUuid, cacheManager);
+        InMemoryDataStorage secondInMemoryDataStorage = new InMemoryDataStorage(
+            String.valueOf(UUID.randomUUID()), cacheManager);
+
+        firstInMemoryDataStorage.put(COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION, "null", "key", "first");
+        secondInMemoryDataStorage.put(COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION, "null", "key", "second");
+
+        assertThat(
+            firstInMemoryDataStorage.<String>fetch(COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION, "null", "key"))
+                .contains("first");
+        assertThat(
+            secondInMemoryDataStorage.<String>fetch(COMPONENT_NAME, DataStorageScope.CURRENT_EXECUTION, "null", "key"))
+                .contains("second");
+    }
+
+    @ParameterizedTest
+    @MethodSource("cacheManagers")
+    void testConcurrentUpdatesOfOneJobFromDifferentComponentsKeepEveryValue(CacheManager cacheManager)
+        throws Exception {
+
+        runConcurrently(8, 25, (threadIndex, iteration) -> {
+            InMemoryDataStorage inMemoryDataStorage = new InMemoryDataStorage(workflowUuid, cacheManager);
+
+            inMemoryDataStorage.update(
+                threadIndex % 2 == 0 ? "a" : "b", DataStorageScope.CURRENT_EXECUTION, "9", "counter",
+                (Optional<Number> currentValue) -> (Number) (currentValue.map(Number::intValue)
+                    .orElse(0) + 1));
+        });
+
+        InMemoryDataStorage inMemoryDataStorage = new InMemoryDataStorage(workflowUuid, cacheManager);
+
+        assertThat(inMemoryDataStorage.<Number>get("a", DataStorageScope.CURRENT_EXECUTION, "9", "counter"))
+            .satisfies(counter -> assertThat(counter.intValue()).isEqualTo(100));
+        assertThat(inMemoryDataStorage.<Number>get("b", DataStorageScope.CURRENT_EXECUTION, "9", "counter"))
+            .satisfies(counter -> assertThat(counter.intValue()).isEqualTo(100));
+    }
+
     private void appendValue(InMemoryDataStorage inMemoryDataStorage, String key, int value) {
         inMemoryDataStorage.update(
             COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, key, (Optional<List<Integer>> currentValue) -> {

@@ -41,6 +41,7 @@ class InMemoryDataStorage {
 
     static final String CACHE = InMemoryDataStorage.class.getName() + ".dataStorage";
 
+    private static final String NO_JOB_SCOPE_ID = "null";
     private static final int LOCK_STRIPES = 64;
     private static final ReentrantLock[] LOCKS = IntStream.range(0, LOCK_STRIPES)
         .mapToObj(index -> new ReentrantLock())
@@ -54,6 +55,12 @@ class InMemoryDataStorage {
     InMemoryDataStorage(@Nullable String workflowUuid, CacheManager cacheManager) {
         this.cacheManager = cacheManager;
         this.workflowUuid = workflowUuid;
+    }
+
+    static void evictJob(CacheManager cacheManager, long jobId) {
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE), CACHE);
+
+        cache.evict(getJobCacheKey(String.valueOf(jobId)));
     }
 
     public void delete(String componentName, DataStorageScope scope, String scopeId, String key) {
@@ -155,7 +162,15 @@ class InMemoryDataStorage {
     }
 
     private String getCacheKey(String componentName, DataStorageScope scope, String scopeId) {
+        if (isJobScope(scope, scopeId)) {
+            return getJobCacheKey(scopeId);
+        }
+
         return TenantCacheKeyUtils.getKey(workflowUuid, componentName, scope, scopeId);
+    }
+
+    private static String getJobCacheKey(String jobId) {
+        return TenantCacheKeyUtils.getKey(DataStorageScope.CURRENT_EXECUTION, jobId);
     }
 
     private ReentrantLock getLock(String componentName, DataStorageScope scope, String scopeId) {
@@ -182,6 +197,10 @@ class InMemoryDataStorage {
 
         Map<String, ?> taggedValueMap = cache.get(getCacheKey(componentName, scope, scopeId), Map.class);
 
+        if (taggedValueMap != null && isJobScope(scope, scopeId)) {
+            taggedValueMap = (Map<String, ?>) taggedValueMap.get(componentName);
+        }
+
         if (taggedValueMap == null) {
             return new HashMap<>();
         }
@@ -189,11 +208,30 @@ class InMemoryDataStorage {
         return new HashMap<>(ValueTagUtils.untagMap(taggedValueMap));
     }
 
+    @SuppressWarnings("unchecked")
     private void putValueMap(
         String componentName, DataStorageScope scope, String scopeId, Map<String, Object> valueMap) {
 
         Cache cache = getCache();
 
-        cache.put(getCacheKey(componentName, scope, scopeId), ValueTagUtils.tag(valueMap));
+        String cacheKey = getCacheKey(componentName, scope, scopeId);
+
+        if (!isJobScope(scope, scopeId)) {
+            cache.put(cacheKey, ValueTagUtils.tag(valueMap));
+
+            return;
+        }
+
+        Map<String, Object> componentValueMaps = cache.get(cacheKey, Map.class);
+
+        componentValueMaps = componentValueMaps == null ? new HashMap<>() : new HashMap<>(componentValueMaps);
+
+        componentValueMaps.put(componentName, ValueTagUtils.tag(valueMap));
+
+        cache.put(cacheKey, componentValueMaps);
+    }
+
+    private static boolean isJobScope(DataStorageScope scope, String scopeId) {
+        return scope == DataStorageScope.CURRENT_EXECUTION && !NO_JOB_SCOPE_ID.equals(scopeId);
     }
 }
