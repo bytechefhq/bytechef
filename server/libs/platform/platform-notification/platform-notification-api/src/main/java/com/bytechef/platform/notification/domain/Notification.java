@@ -108,9 +108,6 @@ public class Notification {
         return Collections.unmodifiableMap(secretSettings.getMap());
     }
 
-    /**
-     * Returns the value of a setting, looking in the encrypted secret settings first and in the plain settings second.
-     */
     @Nullable
     public Object getSetting(String key) {
         Map<String, Object> secrets = getSecretSettings();

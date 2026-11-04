@@ -26,9 +26,6 @@ import java.util.Set;
 import org.springframework.lang.Nullable;
 
 /**
- * Splits notification settings into plain and secret parts, resolves masked values against the stored notification and
- * builds the masked view returned by the API.
- *
  * @author Ivica Cardic
  */
 final class NotificationSecretSettings {
@@ -108,9 +105,6 @@ final class NotificationSecretSettings {
         target.setSecretSettings(secretSettings);
     }
 
-    /**
-     * Returns the plain settings plus the mask in place of every secret value. The signing secret is never included.
-     */
     static Map<String, Object> masked(Notification notification) {
         Map<String, Object> maskedSettings = new HashMap<>();
 

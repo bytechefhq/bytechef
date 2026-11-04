@@ -47,7 +47,6 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
     @Override
     protected List<?> userConverters() {
-        // TODO Use JsonUtils directly
         return Arrays.asList(
             new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
