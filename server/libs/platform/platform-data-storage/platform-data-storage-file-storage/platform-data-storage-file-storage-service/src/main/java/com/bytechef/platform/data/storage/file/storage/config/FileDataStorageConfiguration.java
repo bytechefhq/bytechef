@@ -111,7 +111,7 @@ public class FileDataStorageConfiguration {
 
         @Override
         public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
-            throw new UnsupportedOperationException();
+            fileDataStorageService.deleteScopeData(scope, scopeId, type);
         }
     }
 }

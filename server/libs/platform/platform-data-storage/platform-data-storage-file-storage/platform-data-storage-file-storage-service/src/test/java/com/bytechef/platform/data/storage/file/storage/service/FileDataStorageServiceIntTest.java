@@ -18,6 +18,8 @@ package com.bytechef.platform.data.storage.file.storage.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -51,6 +53,9 @@ public class FileDataStorageServiceIntTest {
 
     @Autowired
     private DataStorage dataStorage;
+
+    @Autowired
+    private FilesystemFileStorageService filesystemFileStorageService;
 
     @Test
     public void testDelete() {
@@ -240,6 +245,194 @@ public class FileDataStorageServiceIntTest {
             dataStorage.<List<String>>get(
                 "componentName", DataStorageScope.WORKFLOW, scopeId, "list", 0, PlatformType.AUTOMATION))
                     .containsExactly("x");
+    }
+
+    @Test
+    public void testPutStoresTheValueInTheDirectoryOfItsScope() {
+        String scopeId = String.valueOf(UUID.randomUUID());
+
+        dataStorage.put("test", DataStorageScope.WORKFLOW, scopeId, "key1", "value1", 2, PlatformType.EMBEDDED);
+
+        assertThat(
+            filesystemFileStorageService.fileExists(
+                getDirectory(DataStorageScope.WORKFLOW, scopeId, 2, PlatformType.EMBEDDED), "test_key1"))
+                    .isTrue();
+        assertThat(
+            filesystemFileStorageService.fileExists(
+                getOldDirectory(2, PlatformType.EMBEDDED),
+                getOldFilename("test", DataStorageScope.WORKFLOW, scopeId, "key1")))
+                    .isFalse();
+    }
+
+    @Test
+    public void testDeleteScopeDataDeletesTheValuesOfTheScopeInEveryEnvironment() {
+        String scopeId = String.valueOf(UUID.randomUUID());
+        String otherScopeId = String.valueOf(UUID.randomUUID());
+
+        dataStorage.put("test", DataStorageScope.WORKFLOW, scopeId, "key1", "value1", 0, PlatformType.AUTOMATION);
+        dataStorage.put("other", DataStorageScope.WORKFLOW, scopeId, "key2", "value2", 2, PlatformType.AUTOMATION);
+        dataStorage.put(
+            "test", DataStorageScope.WORKFLOW, otherScopeId, "key1", "value3", 0, PlatformType.AUTOMATION);
+        dataStorage.put("test", DataStorageScope.PRINCIPAL, scopeId, "key1", "value4", 0, PlatformType.AUTOMATION);
+        dataStorage.put("test", DataStorageScope.WORKFLOW, scopeId, "key1", "value5", 0, PlatformType.EMBEDDED);
+
+        dataStorage.deleteScopeData(DataStorageScope.WORKFLOW, scopeId, PlatformType.AUTOMATION);
+
+        assertThat(
+            dataStorage.fetch("test", DataStorageScope.WORKFLOW, scopeId, "key1", 0, PlatformType.AUTOMATION))
+                .isEmpty();
+        assertThat(
+            dataStorage.fetch("other", DataStorageScope.WORKFLOW, scopeId, "key2", 2, PlatformType.AUTOMATION))
+                .isEmpty();
+        assertThat(
+            dataStorage.<String>get(
+                "test", DataStorageScope.WORKFLOW, otherScopeId, "key1", 0, PlatformType.AUTOMATION))
+                    .isEqualTo("value3");
+        assertThat(
+            dataStorage.<String>get("test", DataStorageScope.PRINCIPAL, scopeId, "key1", 0, PlatformType.AUTOMATION))
+                .isEqualTo("value4");
+        assertThat(
+            dataStorage.<String>get("test", DataStorageScope.WORKFLOW, scopeId, "key1", 0, PlatformType.EMBEDDED))
+                .isEqualTo("value5");
+    }
+
+    @Test
+    public void testDeleteScopeDataOfAScopeWithoutValuesDoesNothing() {
+        dataStorage.deleteScopeData(
+            DataStorageScope.CURRENT_EXECUTION, String.valueOf(UUID.randomUUID()), PlatformType.AUTOMATION);
+    }
+
+    @Test
+    public void testReadsAValueStoredUnderTheOldName() {
+        String scopeId = String.valueOf(UUID.randomUUID());
+
+        storeUnderOldName("test", scopeId, "key1", Map.of("count", 3));
+
+        assertThat(
+            dataStorage.<Map<String, Integer>>get(
+                "test", DataStorageScope.WORKFLOW, scopeId, "key1", 0, PlatformType.AUTOMATION))
+                    .isEqualTo(Map.of("count", 3));
+        assertThat(
+            dataStorage.<Map<String, Integer>>fetch(
+                "test", DataStorageScope.WORKFLOW, scopeId, "key1", 0, PlatformType.AUTOMATION))
+                    .contains(Map.of("count", 3));
+    }
+
+    @Test
+    public void testPutMovesAValueStoredUnderTheOldName() {
+        String scopeId = String.valueOf(UUID.randomUUID());
+
+        storeUnderOldName("test", scopeId, "key1", "old");
+
+        dataStorage.put("test", DataStorageScope.WORKFLOW, scopeId, "key1", "new", 0, PlatformType.AUTOMATION);
+
+        assertThat(
+            filesystemFileStorageService.fileExists(
+                getOldDirectory(0, PlatformType.AUTOMATION),
+                getOldFilename("test", DataStorageScope.WORKFLOW, scopeId, "key1")))
+                    .isFalse();
+        assertThat(
+            dataStorage.<String>get("test", DataStorageScope.WORKFLOW, scopeId, "key1", 0, PlatformType.AUTOMATION))
+                .isEqualTo("new");
+    }
+
+    @Test
+    public void testUpdateStartsFromAValueStoredUnderTheOldName() {
+        String scopeId = String.valueOf(UUID.randomUUID());
+
+        storeUnderOldName("test", scopeId, "list", List.of(1));
+
+        appendValue(scopeId, "test", "list", 2);
+
+        assertThat(
+            dataStorage.<List<Integer>>get(
+                "test", DataStorageScope.WORKFLOW, scopeId, "list", 0, PlatformType.AUTOMATION))
+                    .containsExactly(1, 2);
+        assertThat(
+            filesystemFileStorageService.fileExists(
+                getOldDirectory(0, PlatformType.AUTOMATION),
+                getOldFilename("test", DataStorageScope.WORKFLOW, scopeId, "list")))
+                    .isFalse();
+    }
+
+    @Test
+    public void testDeleteRemovesAValueStoredUnderTheOldName() {
+        String scopeId = String.valueOf(UUID.randomUUID());
+
+        storeUnderOldName("test", scopeId, "key1", "old");
+
+        dataStorage.delete("test", DataStorageScope.WORKFLOW, scopeId, "key1", 0, PlatformType.AUTOMATION);
+
+        assertThat(
+            dataStorage.fetch("test", DataStorageScope.WORKFLOW, scopeId, "key1", 0, PlatformType.AUTOMATION))
+                .isEmpty();
+    }
+
+    @Test
+    public void testGetAllMergesBothNamesAndPrefersTheNewOne() {
+        String scopeId = String.valueOf(UUID.randomUUID());
+
+        storeUnderOldName("test", scopeId, "key1", "old1");
+        storeUnderOldName("test", scopeId, "key2", "old2");
+        storeUnderOldName("test", scopeId + "1", "key3", "otherScope");
+        storeUnderOldName("testing", scopeId, "key4", "otherComponent");
+
+        dataStorage.put("test", DataStorageScope.WORKFLOW, scopeId, "key3", "new3", 0, PlatformType.AUTOMATION);
+        dataStorage.put("other", DataStorageScope.WORKFLOW, scopeId, "key5", "new5", 0, PlatformType.AUTOMATION);
+
+        storeUnderOldName("test", scopeId, "key3", "stale3");
+
+        Map<String, String> values = dataStorage.getAll(
+            "test", DataStorageScope.WORKFLOW, scopeId, 0, PlatformType.AUTOMATION);
+
+        assertThat(values).isEqualTo(Map.of("key1", "old1", "key2", "old2", "key3", "new3"));
+    }
+
+    private void storeUnderOldName(String componentName, String scopeId, String key, Object value) {
+        String directory = getDirectory(DataStorageScope.WORKFLOW, scopeId, 0, PlatformType.AUTOMATION);
+        String temporaryKey = key + "_" + UUID.randomUUID();
+
+        dataStorage.put(
+            componentName, DataStorageScope.WORKFLOW, scopeId, temporaryKey, value, 0, PlatformType.AUTOMATION);
+
+        FileEntry fileEntry = filesystemFileStorageService.getFileEntry(
+            directory, componentName + "_" + temporaryKey);
+
+        byte[] content = filesystemFileStorageService.readFileToBytes(directory, fileEntry);
+
+        filesystemFileStorageService.deleteFile(directory, fileEntry);
+
+        filesystemFileStorageService.storeFileContent(
+            getOldDirectory(0, PlatformType.AUTOMATION),
+            getOldFilename(componentName, DataStorageScope.WORKFLOW, scopeId, key), content, false);
+    }
+
+    private static String getDirectory(
+        DataStorageScope scope, String scopeId, long environmentId, PlatformType type) {
+
+        return "data_storage/" + type.ordinal() + "/" + scope.ordinal() + "/" + scopeId + "/" + environmentId;
+    }
+
+    private static String getOldDirectory(long environmentId, PlatformType type) {
+        return "data_entries/" + type.ordinal() + "/" + environmentId;
+    }
+
+    private static String getOldFilename(
+        String componentName, DataStorageScope scope, String scopeId, String key) {
+
+        return componentName + "_" + scope.ordinal() + "_" + scopeId + "_" + key;
+    }
+
+    private void appendValue(String scopeId, String componentName, String key, int value) {
+        dataStorage.update(
+            componentName, DataStorageScope.WORKFLOW, scopeId, key, 0, PlatformType.AUTOMATION,
+            (Optional<List<Integer>> currentValue) -> {
+                List<Integer> values = new ArrayList<>(currentValue.orElse(List.of()));
+
+                values.add(value);
+
+                return values;
+            });
     }
 
     private void appendValue(String scopeId, String key, int value) {
