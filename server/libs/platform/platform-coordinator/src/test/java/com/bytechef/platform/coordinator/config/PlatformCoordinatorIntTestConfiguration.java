@@ -35,10 +35,13 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
+import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.coordinator.notification.ApprovalEscalationWebhookNotificationHandler;
 import com.bytechef.platform.coordinator.notification.ApprovalReminderWebhookNotificationHandler;
+import com.bytechef.platform.data.storage.jdbc.config.JdbcDataStorageConfiguration;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
@@ -68,7 +71,8 @@ import tools.jackson.databind.ObjectMapper;
  */
 @EnableAutoConfiguration
 @Import({
-    JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
+    JacksonConfiguration.class, JdbcDataStorageConfiguration.class, LiquibaseConfiguration.class,
+    PostgreSQLContainerConfiguration.class
 })
 @Configuration
 public class PlatformCoordinatorIntTestConfiguration {
@@ -153,8 +157,10 @@ public class PlatformCoordinatorIntTestConfiguration {
                 new StringToExecutionErrorConverter(objectMapper),
                 new StringToFileEntryConverter(objectMapper),
                 new StringToMapWrapperConverter(objectMapper),
+                new StringToTypedValueConverter(objectMapper),
                 new StringToWebhooksConverter(objectMapper),
                 new StringToWorkflowTaskConverter(objectMapper),
+                new TypedValueToStringConverter(objectMapper),
                 new WebhooksToStringConverter(objectMapper),
                 new WorkflowTaskToStringConverter(objectMapper));
         }
