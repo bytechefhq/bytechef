@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NotificationSigningSecret", description = "A regenerated webhook signing secret.")
 @JsonTypeName("NotificationSigningSecret")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:04:41.316123+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:06:18.157671+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class NotificationSigningSecretModel {
 
   private @Nullable String signingSecret;
