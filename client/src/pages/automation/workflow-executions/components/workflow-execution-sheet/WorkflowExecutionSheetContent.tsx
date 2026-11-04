@@ -5,7 +5,6 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import SubflowExecutionBreadcrumb, {
     BreadcrumbEntryI,
-    TruncatedLabel,
 } from '@/shared/components/workflow-executions/SubflowExecutionBreadcrumb';
 import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
 import WorkflowExecutionsAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem';
@@ -17,12 +16,9 @@ import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-ex
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {isClusterElementCallTaskExecution} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
-import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
-import {WorkflowIcon} from 'lucide-react';
 import {ReactNode, useCallback, useMemo} from 'react';
-import {twMerge} from 'tailwind-merge';
 
 import {type FocusedExecutionI} from './hooks/useWorkflowExecutionDetail';
 
@@ -134,17 +130,6 @@ const WorkflowExecutionSheetContent = ({
                         groupResizeBehavior="preserve-pixel-size"
                         minSize={15}
                     >
-                        {subflowStack.length === 0 && rootJob && (
-                            <div className={twMerge(EXECUTIONS_PANEL_HEADER_CLASS_NAME, 'gap-1')}>
-                                <WorkflowIcon className="size-3 shrink-0 text-content-neutral-primary" />
-
-                                <TruncatedLabel
-                                    className="text-xs leading-4 font-medium text-content-neutral-primary"
-                                    label={rootJob.label ?? ''}
-                                />
-                            </div>
-                        )}
-
                         {subflowStack.length > 0 && (
                             <SubflowExecutionBreadcrumb
                                 items={breadcrumbItems}

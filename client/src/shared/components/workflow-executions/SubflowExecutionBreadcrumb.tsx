@@ -25,7 +25,7 @@ interface TruncatedLabelProps {
     style?: CSSProperties;
 }
 
-export const TruncatedLabel = ({className, label, style}: TruncatedLabelProps) => {
+const TruncatedLabel = ({className, label, style}: TruncatedLabelProps) => {
     const [isTruncated, setIsTruncated] = useState(false);
 
     const labelRef = useRef<HTMLSpanElement>(null);
