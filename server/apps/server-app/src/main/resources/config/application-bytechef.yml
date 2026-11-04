@@ -124,7 +124,7 @@ bytechef:
       reconciliation:
         enabled: true
   cache:
-    # Cache provider (CAFFEINE) default: CAFFEINE
+    # Cache provider (CAFFEINE | REDIS(EE)) default: CAFFEINE
     provider: CAFFEINE
   cloud:
     # Cloud provider (AWS(EE) | NONE)
