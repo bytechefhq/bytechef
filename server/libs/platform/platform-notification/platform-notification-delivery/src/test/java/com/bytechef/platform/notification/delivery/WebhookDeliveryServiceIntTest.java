@@ -32,7 +32,6 @@ import com.bytechef.commons.util.UrlValidatorUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.PayloadResult;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome.Status;
-import com.bytechef.platform.notification.delivery.config.RestartableAsyncTaskExecutor;
 import com.bytechef.platform.notification.delivery.config.WebhookDeliveryIntTestConfiguration;
 import com.bytechef.tenant.TenantContext;
 import com.sun.net.httpserver.HttpServer;
@@ -82,6 +81,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
@@ -111,6 +111,7 @@ class WebhookDeliveryServiceIntTest {
 
     private ExecutorService httpServerExecutor;
     private HttpServer httpServer;
+    private SimpleAsyncTaskExecutor webhookDeliveryExecutor;
 
     @Autowired
     private SimpleMeterRegistry meterRegistry;
@@ -120,9 +121,6 @@ class WebhookDeliveryServiceIntTest {
 
     @Autowired
     private WebhookDeliveryService webhookDeliveryService;
-
-    @Autowired
-    private RestartableAsyncTaskExecutor webhookDeliveryExecutor;
 
     @BeforeEach
     void beforeEach() throws IOException {
@@ -171,7 +169,9 @@ class WebhookDeliveryServiceIntTest {
         httpServer.start();
 
         meterRegistry.clear();
-        webhookDeliveryExecutor.restart();
+
+        webhookDeliveryExecutor = createExecutor();
+
         webhookDeliveryService.clearEndpointState();
         webhookDeliveryService.setClock(mutableClock);
         webhookDeliveryService.setUrlValidator(url -> UrlValidatorUtils.validate(url, Set.of()));
@@ -180,7 +180,7 @@ class WebhookDeliveryServiceIntTest {
     @AfterEach
     void afterEach() {
         releaseLatch.countDown();
-        webhookDeliveryExecutor.restart();
+        webhookDeliveryExecutor.close();
         httpServer.stop(0);
         httpServerExecutor.shutdownNow();
     }
@@ -484,9 +484,11 @@ class WebhookDeliveryServiceIntTest {
 
     @Test
     void testSubmitAfterShutdownCompletesAsDropped() throws Exception {
+        WebhookDeliveryService closedWebhookDeliveryService = createService(2, 2, meterRegistryProvider(meterRegistry));
+
         webhookDeliveryExecutor.close();
 
-        WebhookDeliveryOutcome outcome = await(webhookDeliveryService.submit(delivery("/closed", 2)));
+        WebhookDeliveryOutcome outcome = await(closedWebhookDeliveryService.submit(delivery("/closed", 2)));
 
         assertThat(statuses(outcome)).containsExactly(Status.DROPPED, Status.DROPPED);
         assertThat(requestCount).hasValue(0);
@@ -765,7 +767,11 @@ class WebhookDeliveryServiceIntTest {
     void testInterruptDuringShutdownSkipsTheRest() throws Exception {
         blockOncePaths.add("/interrupted");
 
-        CompletableFuture<WebhookDeliveryOutcome> future = webhookDeliveryService.submit(delivery("/interrupted", 3));
+        WebhookDeliveryService interruptedWebhookDeliveryService = createService(
+            2, 2, meterRegistryProvider(meterRegistry));
+
+        CompletableFuture<WebhookDeliveryOutcome> future = interruptedWebhookDeliveryService.submit(
+            delivery("/interrupted", 3));
 
         assertThat(arrivals.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
 
@@ -781,7 +787,10 @@ class WebhookDeliveryServiceIntTest {
     void testInterruptDuringRetryBackOffSkipsThePayloadAndTheRest() throws Exception {
         respondWith("/backing-off", 503, 503);
 
-        CompletableFuture<WebhookDeliveryOutcome> future = webhookDeliveryService.submit(
+        WebhookDeliveryService backingOffWebhookDeliveryService = createService(
+            2, 2, meterRegistryProvider(meterRegistry));
+
+        CompletableFuture<WebhookDeliveryOutcome> future = backingOffWebhookDeliveryService.submit(
             delivery("/backing-off", 2, new WebhookRetry(3, Duration.ofSeconds(30), 1.0)));
 
         assertThat(arrivals.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
@@ -1156,6 +1165,15 @@ class WebhookDeliveryServiceIntTest {
             .stream()
             .map(PayloadResult::status)
             .toList();
+    }
+
+    private static SimpleAsyncTaskExecutor createExecutor() {
+        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor("webhook-delivery-test-");
+
+        simpleAsyncTaskExecutor.setCancelRemainingTasksOnClose(true);
+        simpleAsyncTaskExecutor.setVirtualThreads(true);
+
+        return simpleAsyncTaskExecutor;
     }
 
     private WebhookDeliveryService createService(
