@@ -803,7 +803,8 @@ class WebhookDeliveryServiceIntTest {
         assertThat(statuses(outcome)).containsExactly(Status.DROPPED);
         assertThat(outcome.suspendedUntil()).isNull();
         assertThat(validationCount).hasValue(2);
-        assertThat(validationThreads).doesNotContain(Thread.currentThread());
+        assertThat(validationThreads).hasSize(2)
+            .doesNotContain(Thread.currentThread());
         assertThat(receivedBodies.get("/rebinding")).hasSize(1);
         assertThat(unsentCount("dropped")).isEqualTo(1.0);
     }
