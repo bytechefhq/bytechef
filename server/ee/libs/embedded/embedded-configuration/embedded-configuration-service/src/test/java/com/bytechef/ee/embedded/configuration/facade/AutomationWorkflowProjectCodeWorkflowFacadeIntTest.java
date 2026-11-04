@@ -63,7 +63,10 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -161,6 +164,45 @@ class AutomationWorkflowProjectCodeWorkflowFacadeIntTest {
         assertThat(configuration.projectVersion()).isEqualTo(newVersion);
         assertThat(configuration.enabled()).isFalse();
         assertThat(configuration.automationHubVisible()).isFalse();
+    }
+
+    @Test
+    void testSaveWithReleaseUpdatesEveryConfigurationOfTheEnvironment() {
+        String name = "Release Many " + UUID.randomUUID();
+        long projectId = createDeployedProject(name);
+
+        automationProjectFacade.publishProject(projectId);
+
+        int firstVersion = getLastPublishedVersion(projectId);
+
+        long acmeConfigurationId = automationProjectConfigurationAdminFacade.createConfiguration(
+            projectId, Environment.PRODUCTION.ordinal(), "Acme", null, firstVersion, true, true);
+        long globexConfigurationId = automationProjectConfigurationAdminFacade.createConfiguration(
+            projectId, Environment.PRODUCTION.ordinal(), "Globex", null, firstVersion, false, true);
+        long developmentConfigurationId = automationProjectConfigurationAdminFacade.createConfiguration(
+            projectId, Environment.DEVELOPMENT.ordinal(), "Development", null, firstVersion, true, true);
+
+        automationWorkflowProjectCodeWorkflowFacade.save(
+            codeProject(name), Language.JAVASCRIPT, Environment.PRODUCTION, true);
+
+        int newVersion = getLastPublishedVersion(projectId);
+
+        assertThat(newVersion).isGreaterThan(firstVersion);
+
+        Map<Long, AutomationProjectConfigurationDTO> configurations =
+            automationProjectConfigurationAdminFacade.getConfigurations(projectId)
+                .stream()
+                .collect(Collectors.toMap(AutomationProjectConfigurationDTO::id, Function.identity()));
+
+        assertThat(configurations).hasSize(3);
+        assertThat(configurations.get(acmeConfigurationId)
+            .projectVersion()).isEqualTo(newVersion);
+        assertThat(configurations.get(globexConfigurationId)
+            .projectVersion()).isEqualTo(newVersion);
+        assertThat(configurations.get(globexConfigurationId)
+            .enabled()).isFalse();
+        assertThat(configurations.get(developmentConfigurationId)
+            .projectVersion()).isEqualTo(firstVersion);
     }
 
     @Test

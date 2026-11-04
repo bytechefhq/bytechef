@@ -244,21 +244,24 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
         int projectVersion = Objects.requireNonNull(lastPublishedProjectVersion)
             .getVersion();
 
-        Optional<AutomationProjectConfigurationDTO> existingConfigurationOptional =
+        List<AutomationProjectConfigurationDTO> environmentConfigurations =
             automationProjectConfigurationAdminFacade.getConfigurations(projectId)
                 .stream()
                 .filter(configuration -> configuration.environmentId() == environment.ordinal())
-                .findFirst();
+                .toList();
 
-        if (existingConfigurationOptional.isPresent()) {
-            AutomationProjectConfigurationDTO existingConfiguration = existingConfigurationOptional.get();
-
-            automationProjectConfigurationAdminFacade.updateConfiguration(
-                existingConfiguration.id(), existingConfiguration.name(), existingConfiguration.permissionExpression(),
-                projectVersion, existingConfiguration.enabled(), existingConfiguration.automationHubVisible());
-        } else {
+        if (environmentConfigurations.isEmpty()) {
             automationProjectConfigurationAdminFacade.createConfiguration(
                 projectId, environment.ordinal(), environment.name(), null, projectVersion, true, true);
+
+            return;
+        }
+
+        for (AutomationProjectConfigurationDTO environmentConfiguration : environmentConfigurations) {
+            automationProjectConfigurationAdminFacade.updateConfiguration(
+                environmentConfiguration.id(), environmentConfiguration.name(),
+                environmentConfiguration.permissionExpression(), projectVersion, environmentConfiguration.enabled(),
+                environmentConfiguration.automationHubVisible());
         }
     }
 
