@@ -74,7 +74,6 @@ public class AiAgentUtilsSkillsTool implements AiAgentUtilsClusterElementContrib
     private static final Map<String, String> EXTENSION_TO_LANGUAGE_ID = Map.of(
         "js", "js",
         "py", "python",
-        "rb", "ruby",
         "r", "R",
         "java", "java");
     private static final Pattern FRONTMATTER_NAME_PATTERN = Pattern.compile(
