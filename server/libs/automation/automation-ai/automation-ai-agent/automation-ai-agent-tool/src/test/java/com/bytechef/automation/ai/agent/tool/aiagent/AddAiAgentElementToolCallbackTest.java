@@ -26,7 +26,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
+import com.bytechef.automation.ai.agent.exception.AiAgentErrorType;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
@@ -132,6 +134,41 @@ class AddAiAgentElementToolCallbackTest {
 
         assertThat(result.get("created")
             .asBoolean()).isTrue();
+    }
+
+    @Test
+    void testCallReturnsTheMessageOfAConfigurationException() {
+        Map<String, Object> parameters = Map.of("model", "claude-sonnet-4-5", "provider", "anthropic");
+
+        when(aiAgentFacade.addAgentElement(1L, AiAgentElement.KIND_MODEL, null, parameters, 9L))
+            .thenThrow(new ConfigurationException(
+                "Connection 9 does not belong to the workspace of agent 1",
+                AiAgentErrorType.CONNECTION_NOT_IN_WORKSPACE));
+
+        JsonNode result = jsonMapper.readTree(addAiAgentElementToolCallback.call(
+            "{\"agentId\": 1, \"kind\": \"MODEL\", \"connectionId\": 9, " +
+                "\"parameters\": {\"provider\": \"anthropic\", \"model\": \"claude-sonnet-4-5\"}}"));
+
+        assertThat(result.get("error")
+            .asString()).isEqualTo("Connection 9 does not belong to the workspace of agent 1");
+    }
+
+    @Test
+    void testCallHidesTheMessageOfAnUnexpectedException() {
+        Map<String, Object> parameters = Map.of("model", "claude-sonnet-4-5", "provider", "anthropic");
+
+        when(aiAgentFacade.addAgentElement(1L, AiAgentElement.KIND_MODEL, null, parameters, 9L))
+            .thenThrow(new IllegalStateException("secret"));
+
+        JsonNode result = jsonMapper.readTree(addAiAgentElementToolCallback.call(
+            "{\"agentId\": 1, \"kind\": \"MODEL\", \"connectionId\": 9, " +
+                "\"parameters\": {\"provider\": \"anthropic\", \"model\": \"claude-sonnet-4-5\"}}"));
+
+        String error = result.get("error")
+            .asString();
+
+        assertThat(error).isEqualTo("addAiAgentElement failed (IllegalStateException)");
+        assertThat(error).doesNotContain("secret");
     }
 
     private static AiAgentElement element(String kind) {

@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-api"))
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
