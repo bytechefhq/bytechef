@@ -259,9 +259,11 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             }
         }, [value, defaultValue, expressionEnabled, setIsFormulaMode]);
 
+        const showLockedFormulaSwitch = controlType === 'FORMULA_MODE' && expressionEnabled !== false && !isFromAi;
+
         return (
             <fieldset className={twMerge('w-full', label && 'space-y-1')} data-pill-target="">
-                {(label || description || showInputTypeSwitchButton || dynamicSwitch) && (
+                {(label || description || showInputTypeSwitchButton || showLockedFormulaSwitch || dynamicSwitch) && (
                     <div className={twMerge('flex w-full items-center justify-between', !label && 'justify-end')}>
                         {label && (
                             <div className="flex items-center">
@@ -316,6 +318,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                     handleClick={handleInputTypeSwitchButtonClick}
                                 />
                             )}
+
+                            {showLockedFormulaSwitch && <PropertyFormulaSwitch disabled formulaMode />}
 
                             {deletePropertyButton}
                         </div>

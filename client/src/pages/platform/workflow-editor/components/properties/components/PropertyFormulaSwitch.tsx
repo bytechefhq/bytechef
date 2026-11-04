@@ -2,31 +2,41 @@ import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 
 interface PropertyFormulaSwitchProps {
+    disabled?: boolean;
     formulaMode: boolean;
-    handleClick: () => void;
+    handleClick?: () => void;
 }
 
-const PropertyFormulaSwitch = ({formulaMode, handleClick}: PropertyFormulaSwitchProps) => (
-    <Tooltip>
-        <TooltipTrigger asChild>
-            <span className="inline-flex [&_[data-testid=switch-wrapper]>div]:gap-0.5">
-                <Switch
-                    checked={formulaMode}
-                    label="Formula"
-                    onCheckedChange={(checked) => {
-                        if (checked !== formulaMode) {
-                            handleClick();
-                        }
-                    }}
-                    variant="small"
-                />
-            </span>
-        </TooltipTrigger>
+const PropertyFormulaSwitch = ({disabled = false, formulaMode, handleClick}: PropertyFormulaSwitchProps) => {
+    let tooltip = formulaMode ? 'Switch to text' : 'Switch to formula';
 
-        <TooltipPortal>
-            <TooltipContent>{formulaMode ? 'Switch to text' : 'Switch to formula'}</TooltipContent>
-        </TooltipPortal>
-    </Tooltip>
-);
+    if (disabled) {
+        tooltip = 'This field always takes a formula';
+    }
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <span className="inline-flex [&_[data-testid=switch-wrapper]>div]:gap-0.5">
+                    <Switch
+                        checked={formulaMode}
+                        disabled={disabled}
+                        label="Formula"
+                        onCheckedChange={(checked) => {
+                            if (!disabled && checked !== formulaMode) {
+                                handleClick?.();
+                            }
+                        }}
+                        variant="small"
+                    />
+                </span>
+            </TooltipTrigger>
+
+            <TooltipPortal>
+                <TooltipContent>{tooltip}</TooltipContent>
+            </TooltipPortal>
+        </Tooltip>
+    );
+};
 
 export default PropertyFormulaSwitch;
