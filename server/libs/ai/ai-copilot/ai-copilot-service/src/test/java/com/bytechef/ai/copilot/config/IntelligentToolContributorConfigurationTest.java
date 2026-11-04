@@ -37,7 +37,6 @@ import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.tool.AutomationConfigurationAgentType;
 import com.bytechef.automation.configuration.tool.ClusterElementTools;
-import com.bytechef.automation.configuration.tool.PersistedWorkflowChecker;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ReadProjectTools;
@@ -47,12 +46,11 @@ import com.bytechef.automation.configuration.tool.WorkflowIntelligentToolContrib
 import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.data.table.tool.DataTableTools;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionAgentType;
-import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionIntelligentToolContributorConfiguration;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
 import com.bytechef.platform.ai.skill.tool.ReadSkillsTools;
 import com.bytechef.platform.ai.skill.tool.SkillAgentType;
-import com.bytechef.platform.ai.skill.tool.SkillsIntelligentToolContributorConfiguration;
 import com.bytechef.platform.ai.skill.tool.SkillsTools;
+import com.bytechef.platform.ai.tool.PlatformIntelligentToolContributorConfiguration;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
@@ -62,7 +60,6 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.component.tool.ClusterElementIntelligentToolContributorConfiguration;
 import com.bytechef.platform.component.tool.ComponentTools;
 import com.bytechef.platform.component.tool.PlatformComponentAgentType;
 import com.bytechef.platform.component.tool.PropertyOptionsResolver;
@@ -70,18 +67,15 @@ import com.bytechef.platform.component.tool.ScopedConnectionGuard;
 import com.bytechef.platform.component.tool.TaskTools;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.workflow.tool.CodeEditorIntelligentToolContributorConfiguration;
 import com.bytechef.platform.workflow.tool.PlatformWorkflowAgentType;
 import com.bytechef.platform.workflow.tool.WorkflowInstructionTools;
 import com.bytechef.platform.workflow.tool.WorkflowValidatorTools;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -111,6 +105,11 @@ final class IntelligentToolContributorConfigurationTest {
         new DelegateCase("authorSkill", IntelligentToolVariant.ASK, "skillsAsk"),
         new DelegateCase("authorSkill", IntelligentToolVariant.BUILD, "skillsBuild"),
         new DelegateCase("debugWorkflowExecution", IntelligentToolVariant.BUILD, "workflowExecutionBuild"));
+
+    private final PlatformIntelligentToolContributorConfiguration platformConfiguration =
+        new PlatformIntelligentToolContributorConfiguration();
+    private final WorkflowIntelligentToolContributorConfiguration workflowConfiguration =
+        new WorkflowIntelligentToolContributorConfiguration();
 
     @Test
     void testContributesSixDefinitionsWithExpectedNamesAndAgentTypeKeys() {
@@ -151,7 +150,7 @@ final class IntelligentToolContributorConfigurationTest {
             .call()
             .content()).thenReturn("converted");
 
-        IntelligentToolContributor contributor = workflowIntelligentToolContributor(
+        IntelligentToolContributor contributor = workflowConfiguration.workflowIntelligentToolContributor(
             emptyProvider(), emptyProvider(), present((IntelligentToolChatClientFactory) chatModel -> chatClient),
             emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)),
             emptyProvider());
@@ -189,7 +188,7 @@ final class IntelligentToolContributorConfigurationTest {
             .call()
             .content()).thenReturn("{\"error\":\"could not map the n8n nodes\"}");
 
-        IntelligentToolContributor contributor = workflowIntelligentToolContributor(
+        IntelligentToolContributor contributor = workflowConfiguration.workflowIntelligentToolContributor(
             emptyProvider(), emptyProvider(), present((IntelligentToolChatClientFactory) chatModel -> chatClient),
             emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)),
             emptyProvider());
@@ -218,12 +217,12 @@ final class IntelligentToolContributorConfigurationTest {
     @Test
     void testChatClientFactoryIsNullWhenProviderHasNoBean() {
         List<IntelligentToolDefinition> definitions = contributedDefinitions(
-            workflowIntelligentToolContributor(emptyProvider(),
+            workflowConfiguration.workflowIntelligentToolContributor(emptyProvider(),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class)),
                 emptyProvider(), emptyProvider()),
-            platformIntelligentToolContributor(
+            platformConfiguration.platformIntelligentToolContributor(
                 emptyProvider(), present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
@@ -385,13 +384,13 @@ final class IntelligentToolContributorConfigurationTest {
 
     private List<IntelligentToolDefinition> definitionsWithAllProvidersPresent() {
         List<IntelligentToolDefinition> definitions = contributedDefinitions(
-            workflowIntelligentToolContributor(
+            workflowConfiguration.workflowIntelligentToolContributor(
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class)),
                 emptyProvider(), emptyProvider()),
-            platformIntelligentToolContributor(
+            platformConfiguration.platformIntelligentToolContributor(
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
@@ -418,11 +417,11 @@ final class IntelligentToolContributorConfigurationTest {
         DelegateFixture workflowExecutionBuild = workflowExecutionBuildFixture(copilotConfiguration, defaultChatModel);
 
         List<IntelligentToolDefinition> definitions = contributedDefinitions(
-            workflowIntelligentToolContributor(present(workflowEditorAsk.factory()),
+            workflowConfiguration.workflowIntelligentToolContributor(present(workflowEditorAsk.factory()),
                 present(workflowEditorBuild.factory()), present(converterBuild.factory()),
                 present(workflowExecutionBuild.factory()), present(mock(SubAgentChatModelResolver.class)),
                 emptyProvider(), emptyProvider()),
-            platformIntelligentToolContributor(
+            platformConfiguration.platformIntelligentToolContributor(
                 present(clusterElementAsk.factory()), present(clusterElementBuild.factory()),
                 present(codeEditorAsk.factory()), present(codeEditorBuild.factory()), present(skillsAsk.factory()),
                 present(skillsBuild.factory()), present(mock(SubAgentChatModelResolver.class))));
@@ -642,7 +641,8 @@ final class IntelligentToolContributorConfigurationTest {
         TriggerDefinitionFacade triggerDefinitionFacade = mock(TriggerDefinitionFacade.class);
         PropertyOptionsResolver propertyOptionsResolver = mock(PropertyOptionsResolver.class);
         ObjectProvider<CopilotConnectionLister> connectionListerProvider = emptyProvider();
-        ScopedConnectionGuard scopedConnectionGuard = new ScopedConnectionGuard(connectionListerProvider);
+        ScopedConnectionGuard scopedConnectionGuard =
+            new ScopedConnectionGuard(connectionListerProvider, emptyProvider());
 
         return new CopilotConfiguration(
             promptResource, promptResource, promptResource, promptResource, promptResource, promptResource,
@@ -726,59 +726,5 @@ final class IntelligentToolContributorConfigurationTest {
     @SuppressWarnings("unchecked")
     private static ObjectProvider<DataTableTools> emptyDataTableToolsProvider() {
         return mock(ObjectProvider.class);
-    }
-
-    private static IntelligentToolContributor platformIntelligentToolContributor(
-        ObjectProvider<IntelligentToolChatClientFactory> clusterElementAskFactoryProvider,
-        ObjectProvider<IntelligentToolChatClientFactory> clusterElementBuildFactoryProvider,
-        ObjectProvider<IntelligentToolChatClientFactory> codeEditorAskFactoryProvider,
-        ObjectProvider<IntelligentToolChatClientFactory> codeEditorBuildFactoryProvider,
-        ObjectProvider<IntelligentToolChatClientFactory> skillsAskFactoryProvider,
-        ObjectProvider<IntelligentToolChatClientFactory> skillsBuildFactoryProvider,
-        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider) {
-
-        IntelligentToolContributor contributor1 =
-            new ClusterElementIntelligentToolContributorConfiguration().clusterElementIntelligentToolContributor(
-                clusterElementAskFactoryProvider, clusterElementBuildFactoryProvider, chatModelResolverProvider);
-        IntelligentToolContributor contributor2 =
-            new CodeEditorIntelligentToolContributorConfiguration().codeEditorIntelligentToolContributor(
-                codeEditorAskFactoryProvider, codeEditorBuildFactoryProvider, chatModelResolverProvider);
-        IntelligentToolContributor contributor3 =
-            new SkillsIntelligentToolContributorConfiguration().skillsIntelligentToolContributor(
-                skillsAskFactoryProvider, skillsBuildFactoryProvider, chatModelResolverProvider);
-
-        List<String> order = List.of("configureClusterElement", "writeScript", "authorSkill");
-
-        return () -> Stream.of(contributor1, contributor2, contributor3)
-            .flatMap(contributor -> contributor.getIntelligentToolDefinitions()
-                .stream())
-            .sorted(Comparator.comparingInt(definition -> order.indexOf(definition.name())))
-            .toList();
-    }
-
-    private static IntelligentToolContributor workflowIntelligentToolContributor(
-        ObjectProvider<IntelligentToolChatClientFactory> workflowEditorAskFactoryProvider,
-        ObjectProvider<IntelligentToolChatClientFactory> workflowEditorBuildFactoryProvider,
-        ObjectProvider<IntelligentToolChatClientFactory> converterBuildFactoryProvider,
-        ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
-        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
-        ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider,
-        ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider) {
-
-        IntelligentToolContributor contributor1 =
-            new WorkflowExecutionIntelligentToolContributorConfiguration().workflowExecutionIntelligentToolContributor(
-                workflowExecutionBuildFactoryProvider, chatModelResolverProvider);
-        IntelligentToolContributor contributor2 =
-            new WorkflowIntelligentToolContributorConfiguration().workflowIntelligentToolContributor(
-                workflowEditorAskFactoryProvider, workflowEditorBuildFactoryProvider, converterBuildFactoryProvider,
-                chatModelResolverProvider, projectWorkflowLifecycleToolsProvider, persistedWorkflowCheckerProvider);
-
-        List<String> order = List.of("buildWorkflow", "importWorkflow", "debugWorkflowExecution");
-
-        return () -> Stream.of(contributor1, contributor2)
-            .flatMap(contributor -> contributor.getIntelligentToolDefinitions()
-                .stream())
-            .sorted(Comparator.comparingInt(definition -> order.indexOf(definition.name())))
-            .toList();
     }
 }
