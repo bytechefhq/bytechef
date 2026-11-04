@@ -40,7 +40,6 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.model.tool.ToolCallingManager;
-import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -114,6 +113,14 @@ class ComponentProtoMapperTest {
             .withEqualsForFieldsMatchingRegexes(this::jsonEquals, FREE_FORM_FIELDS)
             .isEqualTo(outputResponse);
 
+        OutputResponse generatedOutputResponse = new OutputResponse(
+            outputResponse.outputSchema(), outputResponse.sampleOutput(), outputResponse.placeholder(), true);
+
+        assertThat(componentProtoMapper.toOutputResponse(componentProtoMapper.toProto(generatedOutputResponse)))
+            .usingRecursiveComparison()
+            .withEqualsForFieldsMatchingRegexes(this::jsonEquals, FREE_FORM_FIELDS)
+            .isEqualTo(generatedOutputResponse);
+
         TriggerOutput triggerOutput = new TriggerOutput(Map.of("count", 1), Map.of("cursor", "abc"), true);
 
         assertThat(componentProtoMapper.toTriggerOutput(componentProtoMapper.toProto(triggerOutput)))
@@ -184,8 +191,7 @@ class ComponentProtoMapperTest {
         }
 
         ComponentHandler aiAgentComponentHandler = new AiAgentComponentHandler(
-            mock(AiAgentToolFacade.class), mock(ClusterElementDefinitionService.class), mock(ToolCallingManager.class),
-            mock(ObjectProvider.class));
+            mock(AiAgentToolFacade.class), mock(ClusterElementDefinitionService.class), mock(ToolCallingManager.class));
         ComponentHandler scheduleComponentHandler = new ScheduleComponentHandler(mock(TriggerScheduler.class));
 
         componentDefinitions.add(new ComponentDefinition(aiAgentComponentHandler.getDefinition()));
