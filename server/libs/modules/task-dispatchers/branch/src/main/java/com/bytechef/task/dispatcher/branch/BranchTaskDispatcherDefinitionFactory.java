@@ -40,6 +40,7 @@ import com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutputDataS
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.type.TypeReference;
 
@@ -103,7 +104,11 @@ public class BranchTaskDispatcherDefinitionFactory implements TaskDispatcherDefi
         Map<String, ?> defaultCase = Map.of(
             TASKS, MapUtils.getList(inputParameters, DEFAULT, new TypeReference<>() {}, List.of()));
 
-        if (expression == null || isUnresolved(expression)) {
+        if (isNotSet(expression)) {
+            return defaultCase;
+        }
+
+        if (isUnresolved(expression)) {
             return branchCases.stream()
                 .filter(branchCase -> !MapUtils.getList(branchCase, TASKS, List.of())
                     .isEmpty())
@@ -120,6 +125,24 @@ public class BranchTaskDispatcherDefinitionFactory implements TaskDispatcherDefi
         }
 
         return defaultCase;
+    }
+
+    private static boolean isNotSet(@Nullable Object value) {
+        if (value == null) {
+            return true;
+        }
+
+        if (!(value instanceof String string)) {
+            return false;
+        }
+
+        String strippedValue = string.strip();
+
+        if (strippedValue.startsWith("=")) {
+            strippedValue = strippedValue.substring(1);
+        }
+
+        return strippedValue.isBlank();
     }
 
     private static boolean isUnresolved(Object value) {

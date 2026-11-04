@@ -162,7 +162,7 @@ public class BranchTaskDispatcher extends ErrorHandlingTaskDispatcher implements
     }
 
     private Map<String, ?> resolveCase(TaskExecution taskExecution, Map<String, ?> context) {
-        Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
+        Object expression = MapUtils.get(taskExecution.getParameters(), EXPRESSION);
         List<Map<String, Object>> cases = MapUtils.getRequiredList(
             taskExecution.getParameters(), CASES, new TypeReference<>() {});
 
