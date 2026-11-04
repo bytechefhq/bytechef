@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool.aiagent;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -97,7 +98,7 @@ public class DeleteAiAgentChannelToolCallback implements ToolCallback {
             return writeResult(Map.of("deleted", true, "channelId", input.channelId()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (IllegalArgumentException exception) {
+        } catch (ConfigurationException | IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(

@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool.aiagent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,7 +28,9 @@ import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
 import com.bytechef.automation.ai.agent.dto.AiAgentDTO;
+import com.bytechef.automation.ai.agent.exception.AiAgentErrorType;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,6 +74,19 @@ class DeleteAiAgentChannelToolCallbackTest {
         callback().call("{\"agentId\": 1, \"channelId\": 5}");
 
         verify(aiAgentFacade).deleteAgentChannel(5L);
+    }
+
+    @Test
+    void testCallReturnsTheMessageOfAConfigurationException() {
+        doThrow(new ConfigurationException(
+            "Channel 5 of type 'schedule' cannot be deleted", AiAgentErrorType.CHANNEL_NOT_DELETABLE))
+                .when(aiAgentFacade)
+                .deleteAgentChannel(5L);
+
+        JsonNode result = jsonMapper.readTree(callback().call("{\"agentId\": 1, \"channelId\": 5}"));
+
+        assertThat(result.get("error")
+            .asString()).isEqualTo("Channel 5 of type 'schedule' cannot be deleted");
     }
 
     private DeleteAiAgentChannelToolCallback callback() {
