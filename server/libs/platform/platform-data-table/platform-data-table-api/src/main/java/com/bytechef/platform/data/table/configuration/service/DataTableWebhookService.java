@@ -31,14 +31,17 @@ public interface DataTableWebhookService {
      * Adds a new webhook for the specified data table, enabling notifications for external systems when certain events
      * occur on the data table.
      *
-     * @param baseName      The name of the data table to which the webhook will be associated.
-     * @param url           The URL that will receive the webhook notifications.
-     * @param type          The type of event for which the webhook should trigger (e.g., record_created,
-     *                      record_deleted, record_updated).
-     * @param environmentId The environment ID in which the webhook should be triggered.
+     * @param baseName            The name of the data table to which the webhook will be associated.
+     * @param workflowExecutionId The workflow execution id of the trigger that the data table events start.
+     * @param url                 The webhook URL of the trigger, stored so that the previous version can still deliver
+     *                            the events after a rollback.
+     * @param type                The type of event for which the webhook should trigger (e.g., record_created,
+     *                            record_deleted, record_updated).
+     * @param environmentId       The environment ID in which the webhook should be triggered.
      * @return The unique identifier of the newly created webhook.
      */
-    long addWebhook(String baseName, String url, DataTableWebhookType type, long environmentId);
+    long addWebhook(
+        String baseName, String workflowExecutionId, String url, DataTableWebhookType type, long environmentId);
 
     /**
      * Retrieves a list of webhooks associated with the specified data table. Webhooks provide external systems with
@@ -51,13 +54,14 @@ public interface DataTableWebhookService {
     List<Webhook> listWebhooks(String baseName, long environmentId);
 
     /**
-     * Removes an existing webhook identified by its unique identifier. This action stops notifications from being sent
-     * to the associated URL.
+     * Removes an existing webhook identified by its unique identifier. This action stops data table events from
+     * starting the associated workflow.
      *
      * @param id The unique identifier of the webhook to be removed.
      */
     void removeWebhook(long id);
 
-    record Webhook(long id, long dataTableId, String url, DataTableWebhookType type, long environmentId) {
+    record Webhook(
+        long id, long dataTableId, String workflowExecutionId, DataTableWebhookType type, long environmentId) {
     }
 }

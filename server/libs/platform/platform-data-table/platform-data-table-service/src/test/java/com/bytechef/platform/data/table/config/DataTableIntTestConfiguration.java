@@ -19,11 +19,16 @@ package com.bytechef.platform.data.table.config;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.message.event.MessageEventPreSendProcessor;
+import com.bytechef.message.event.listener.MessageEventListener;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +37,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -42,13 +49,42 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
-@Import(LiquibaseConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class, MessageEventListener.class
+})
 @Configuration
 public class DataTableIntTestConfiguration {
 
     @Bean
+    DisabledWorkflowJobPrincipalAccessor disabledWorkflowJobPrincipalAccessor() {
+        return new DisabledWorkflowJobPrincipalAccessor();
+    }
+
+    @Bean
+    JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry(
+        DisabledWorkflowJobPrincipalAccessor disabledWorkflowJobPrincipalAccessor) {
+
+        return new JobPrincipalAccessorRegistry(List.of(disabledWorkflowJobPrincipalAccessor));
+    }
+
+    @Bean
+    RecordingMessageBroker messageBroker() {
+        return new RecordingMessageBroker();
+    }
+
+    @Bean
+    TaskExecutor messageEventExecutor() {
+        return new SyncTaskExecutor();
+    }
+
+    @Bean
     MeterRegistry meterRegistry() {
         return new SimpleMeterRegistry();
+    }
+
+    @Bean
+    MessageEventPreSendProcessor passThroughMessageEventPreSendProcessor() {
+        return messageEvent -> messageEvent;
     }
 
     @Bean
@@ -59,11 +95,6 @@ public class DataTableIntTestConfiguration {
     @Bean
     AsyncTaskExecutor taskExecutor() {
         return new SimpleAsyncTaskExecutor("task-");
-    }
-
-    @Bean
-    AsyncTaskExecutor webhookDeliveryExecutor() {
-        return new SimpleAsyncTaskExecutor("webhook-delivery-");
     }
 
     @Bean

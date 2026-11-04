@@ -100,7 +100,7 @@ input UpdateDataTableTagsInput {
 
 type DataTableWebhook {
     id: ID!
-    url: String!
+    workflowExecutionId: String!
     type: DataTableWebhookType!
     environmentId: Long!
 }

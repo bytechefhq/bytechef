@@ -109,7 +109,7 @@ public class DataTableRecordUpdatedTrigger {
         String baseName = inputParameters.getRequiredString(TABLE);
 
         long webhookId = dataTableWebhookService.addWebhook(
-            baseName, webhookUrl, DataTableWebhookType.RECORD_UPDATED,
+            baseName, workflowExecutionId, webhookUrl, DataTableWebhookType.RECORD_UPDATED,
             Objects.requireNonNull(triggerContextAware.getEnvironmentId()));
 
         return new WebhookEnableOutput(Map.of("webhookId", webhookId), null);

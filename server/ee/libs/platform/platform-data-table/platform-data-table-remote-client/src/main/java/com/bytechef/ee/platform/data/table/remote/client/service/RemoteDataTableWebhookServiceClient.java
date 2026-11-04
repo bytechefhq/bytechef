@@ -23,7 +23,9 @@ import org.springframework.stereotype.Component;
 public class RemoteDataTableWebhookServiceClient implements DataTableWebhookService {
 
     @Override
-    public long addWebhook(String baseName, String url, DataTableWebhookType type, long environmentId) {
+    public long addWebhook(
+        String baseName, String workflowExecutionId, String url, DataTableWebhookType type, long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 
