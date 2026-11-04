@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @version ee
@@ -30,14 +31,17 @@ public class IntegrationInstanceDataStorageCleanup {
 
     private final ObjectProvider<DataStorage> dataStorageProvider;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
+    private final PlatformTransactionManager transactionManager;
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceDataStorageCleanup(
         ObjectProvider<DataStorage> dataStorageProvider,
-        IntegrationInstanceWorkflowService integrationInstanceWorkflowService) {
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
+        PlatformTransactionManager transactionManager) {
 
         this.dataStorageProvider = dataStorageProvider;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
+        this.transactionManager = transactionManager;
     }
 
     public void deleteAfterCommit(long integrationInstanceId) {
@@ -55,6 +59,7 @@ public class IntegrationInstanceDataStorageCleanup {
                     PlatformType.EMBEDDED));
         }
 
-        DataStorageScopeDeleter.deleteAfterCommit(dataStorageProvider.getIfAvailable(), scopeDataList);
+        DataStorageScopeDeleter.deleteAfterCommit(
+            dataStorageProvider.getIfAvailable(), transactionManager, scopeDataList);
     }
 }

@@ -27,8 +27,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.SimpleTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -43,6 +48,7 @@ class DataStorageScopeDeleterTest {
         new ScopeData(DataStorageScope.WORKFLOW, "3", PlatformType.EMBEDDED));
 
     private final RecordingDataStorage recordingDataStorage = new RecordingDataStorage();
+    private final RecordingTransactionManager transactionManager = new RecordingTransactionManager();
 
     @AfterEach
     void afterEach() {
@@ -55,7 +61,7 @@ class DataStorageScopeDeleterTest {
 
     @Test
     void testDeletesRightAwayWithoutATransaction() {
-        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, SCOPE_DATA_LIST);
+        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, transactionManager, SCOPE_DATA_LIST);
 
         assertThat(recordingDataStorage.deletedScopeDataList).containsExactlyElementsOf(SCOPE_DATA_LIST);
     }
@@ -64,7 +70,7 @@ class DataStorageScopeDeleterTest {
     void testDeletesRightAwayInANonTransactionalScopeWithSynchronization() {
         TransactionSynchronizationManager.initSynchronization();
 
-        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, SCOPE_DATA_LIST);
+        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, transactionManager, SCOPE_DATA_LIST);
 
         assertThat(recordingDataStorage.deletedScopeDataList).containsExactlyElementsOf(SCOPE_DATA_LIST);
         assertThat(TransactionSynchronizationManager.getSynchronizations()).isEmpty();
@@ -75,7 +81,7 @@ class DataStorageScopeDeleterTest {
         TransactionSynchronizationManager.initSynchronization();
         TransactionSynchronizationManager.setActualTransactionActive(true);
 
-        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, SCOPE_DATA_LIST);
+        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, transactionManager, SCOPE_DATA_LIST);
 
         assertThat(recordingDataStorage.deletedScopeDataList).isEmpty();
 
@@ -87,6 +93,10 @@ class DataStorageScopeDeleterTest {
 
         assertThat(recordingDataStorage.deletedScopeDataList).containsExactlyElementsOf(SCOPE_DATA_LIST);
         assertThat(recordingDataStorage.deletingThreads).containsOnly(Thread.currentThread());
+        assertThat(transactionManager.definitions)
+            .hasSize(SCOPE_DATA_LIST.size())
+            .allSatisfy(definition -> assertThat(definition.getPropagationBehavior())
+                .isEqualTo(TransactionDefinition.PROPAGATION_REQUIRES_NEW));
     }
 
     @Test
@@ -94,7 +104,7 @@ class DataStorageScopeDeleterTest {
         TransactionSynchronizationManager.initSynchronization();
         TransactionSynchronizationManager.setActualTransactionActive(true);
 
-        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, SCOPE_DATA_LIST);
+        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, transactionManager, SCOPE_DATA_LIST);
 
         for (TransactionSynchronization transactionSynchronization : TransactionSynchronizationManager
             .getSynchronizations()) {
@@ -109,7 +119,7 @@ class DataStorageScopeDeleterTest {
     void testContinuesAfterAFailedScope() {
         recordingDataStorage.failingScopeIds = Set.of("2");
 
-        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, SCOPE_DATA_LIST);
+        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, transactionManager, SCOPE_DATA_LIST);
 
         assertThat(recordingDataStorage.deletedScopeDataList).containsExactly(
             SCOPE_DATA_LIST.get(0), SCOPE_DATA_LIST.get(2));
@@ -119,7 +129,7 @@ class DataStorageScopeDeleterTest {
     void testIgnoresUnsupportedProvider() {
         recordingDataStorage.unsupported = true;
 
-        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, SCOPE_DATA_LIST);
+        DataStorageScopeDeleter.deleteAfterCommit(recordingDataStorage, transactionManager, SCOPE_DATA_LIST);
 
         assertThat(recordingDataStorage.deletedScopeDataList).isEmpty();
         assertThat(recordingDataStorage.attempts).isEqualTo(SCOPE_DATA_LIST.size());
@@ -130,9 +140,31 @@ class DataStorageScopeDeleterTest {
         TransactionSynchronizationManager.initSynchronization();
         TransactionSynchronizationManager.setActualTransactionActive(true);
 
-        DataStorageScopeDeleter.deleteAfterCommit(null, SCOPE_DATA_LIST);
+        DataStorageScopeDeleter.deleteAfterCommit(null, transactionManager, SCOPE_DATA_LIST);
 
         assertThat(TransactionSynchronizationManager.getSynchronizations()).isEmpty();
+    }
+
+    private static final class RecordingTransactionManager implements PlatformTransactionManager {
+
+        private final List<TransactionDefinition> definitions = new ArrayList<>();
+
+        @Override
+        public TransactionStatus getTransaction(@Nullable TransactionDefinition definition) {
+            definitions.add(definition);
+
+            return new SimpleTransactionStatus();
+        }
+
+        @Override
+        public void commit(TransactionStatus status) {
+            assertThat(status.isCompleted()).isFalse();
+        }
+
+        @Override
+        public void rollback(TransactionStatus status) {
+            assertThat(status.isCompleted()).isFalse();
+        }
     }
 
     private static final class RecordingDataStorage implements DataStorage {
