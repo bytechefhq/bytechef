@@ -19,6 +19,7 @@ import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowE
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {ReactNode, useCallback, useMemo} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import {type FocusedExecutionI} from './hooks/useWorkflowExecutionDetail';
 
