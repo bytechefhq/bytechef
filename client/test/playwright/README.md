@@ -276,3 +276,20 @@ interactivity callbacks and the approval short-token endpoint. They read the ser
 
 When `PLAYWRIGHT_BASE_URL` is set and `BYTECHEF_SERVER_URL` is not, the approval utilities stop with an error instead
 of falling back to `localhost:9555`, so a run against one client never sends its server calls to another server.
+
+## Notification Specs
+
+`tests/notifications/webhookNotifications.spec.ts` covers the Notifications settings page against a real EE server:
+the Datadog and New Relic presets, test sends (unsigned, signed, after a URL change, a `500` receiver and a
+link-local URL), a job that completes and is delivered to a saved webhook with a verified signature, and an email
+test send read back from Mailpit.
+
+The webhook cases post to a local request catcher on `127.0.0.1`, which the server refuses unless it allows that
+host. Start the server with:
+
+```
+BYTECHEF_WEBHOOKDELIVERY_ALLOWEDHOSTS=127.0.0.1
+```
+
+or `--bytechef.webhook-delivery.allowed-hosts=127.0.0.1`. Without it the webhook cases are skipped with that message.
+The email case is skipped when Mailpit is not reachable at `MAILPIT_URL` (default `http://localhost:8025`).

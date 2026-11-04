@@ -1,4 +1,5 @@
 import {type Page} from '@playwright/test';
+import {createHmac} from 'node:crypto';
 
 import {apiFetch, apiJson} from './apiUtils';
 
@@ -26,4 +27,36 @@ export function getLinkOnItsOwnLineAfter(mailText: string, label: string): strin
     }
 
     return mailLines.slice(labelIndex + 1).find((mailLine) => mailLine !== '') ?? '';
+}
+
+export interface NotificationTestResultI {
+    error?: string;
+    signed: boolean;
+    statusCode?: number;
+    success: boolean;
+}
+
+export async function testWebhookNotificationViaApi(page: Page, url: string): Promise<NotificationTestResultI> {
+    return apiJson<NotificationTestResultI>({
+        body: {name: 'Playwright probe', notificationEventIds: [], settings: {webhook: url}, type: 'WEBHOOK'},
+        method: 'POST',
+        page,
+        path: `${NOTIFICATIONS_PATH}/test`,
+    });
+}
+
+export function verifyWebhookSignature(signatureHeader: string, body: string, signingSecret: string): boolean {
+    const signatureParts = new Map(
+        signatureHeader.split(',').map((signaturePart) => {
+            const separatorIndex = signaturePart.indexOf('=');
+
+            return [signaturePart.slice(0, separatorIndex), signaturePart.slice(separatorIndex + 1)] as const;
+        })
+    );
+
+    const expectedSignature = createHmac('sha256', signingSecret)
+        .update(`${signatureParts.get('t')}.${body}`)
+        .digest('hex');
+
+    return signatureParts.get('v1') === expectedSignature;
 }
