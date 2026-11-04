@@ -18,6 +18,7 @@ package com.bytechef.platform.data.table.config;
 
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,6 +60,11 @@ public class DisabledWorkflowJobPrincipalAccessor implements JobPrincipalAccesso
 
     @Override
     public Map<String, ?> getMetadataMap(long jobPrincipalId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public JobPrincipalSummary getJobPrincipalSummary(long jobPrincipalId, String workflowId) {
         throw new UnsupportedOperationException();
     }
 
