@@ -224,7 +224,7 @@ components:
           type: "boolean"
           readOnly: true
         signingSecret:
-          description: "The webhook signing secret, returned only in the create response"
+          description: "The webhook signing secret, returned only in the response that generated it: creating a webhook notification, or changing a notification to a webhook"
           type: "string"
           readOnly: true
         __version:
