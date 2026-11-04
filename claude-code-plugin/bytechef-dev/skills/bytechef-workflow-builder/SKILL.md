@@ -47,7 +47,7 @@ and tools, or a data pipeline with a source and destination), also call
 
 ## Look up components
 
-<!-- transport: mcp uses: searchComponents, getComponent, searchActions, getActionDefinition, getProperties, getOutputProperty, searchTriggers, getTriggerDefinition, searchClusterElements, getClusterElement, searchTasks, getTaskDefinition -->
+<!-- transport: mcp uses: searchComponents, getComponent, searchActions, getActionDefinition, getProperties, getOutputProperty, searchTriggers, getTriggerDefinition, searchClusterElements, getClusterElement, searchTasks, getTaskDefinition, lookupPropertyOptions, listConnections -->
 Never guess a component, action or parameter name. Look each one up:
 
 - Find the app with `searchComponents` and confirm its version and actions with `getComponent`.
@@ -63,9 +63,13 @@ Never guess a component, action or parameter name. Look each one up:
   `getOutputProperty`, and reference only fields that exist.
 
 Fill every required parameter whose value the user has already given. Some parameters take their
-options from the user's account (a channel, a folder, a spreadsheet) and need a connection to list;
-ask the user for the value, or leave it empty and tell the user to pick it in the ByteChef UI. Never
-invent ids.
+options from the user's account (a channel, a folder, a spreadsheet); their definition shows
+`lookupRequired: true`. Fetch the real options with `lookupPropertyOptions`, after filling any
+`lookupDependsOn` siblings it names. When the component needs a connection, pass one of the
+workspace's connections in the build's environment, found with `listConnections`; a connection from
+another workspace or environment is refused. Show the options to the user and use the chosen value.
+If the lookup cannot run yet, ask the user for the value, or leave it empty and tell the user to pick
+it in the ByteChef UI. Never invent ids.
 <!-- /transport -->
 
 ## Create and save the workflow
