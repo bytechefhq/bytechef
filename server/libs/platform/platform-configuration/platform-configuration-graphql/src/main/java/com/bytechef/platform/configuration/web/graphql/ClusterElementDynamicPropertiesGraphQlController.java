@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.component.domain.Property;
-import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.configuration.facade.ClusterElementPropertyFacade;
 import java.util.List;
 import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -32,22 +32,21 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 class ClusterElementDynamicPropertiesGraphQlController {
 
-    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
+    private final ClusterElementPropertyFacade clusterElementPropertyFacade;
 
-    ClusterElementDynamicPropertiesGraphQlController(ClusterElementDefinitionFacade clusterElementDefinitionFacade) {
-        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
+    ClusterElementDynamicPropertiesGraphQlController(ClusterElementPropertyFacade clusterElementPropertyFacade) {
+        this.clusterElementPropertyFacade = clusterElementPropertyFacade;
     }
 
     @QueryMapping
     public List<Property> clusterElementDynamicProperties(
         @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
         @Argument String propertyName, @Argument Long connectionId, @Argument Map<String, ?> inputParameters,
-        @Argument List<String> lookupDependsOnPaths) {
+        @Argument List<String> lookupDependsOnPaths, @Argument long mcpComponentId) {
 
-        return clusterElementDefinitionFacade.executeDynamicProperties(
+        return clusterElementPropertyFacade.getClusterElementDynamicProperties(
             componentName, componentVersion, clusterElementName, propertyName,
             inputParameters != null ? inputParameters : Map.of(),
-            lookupDependsOnPaths != null ? lookupDependsOnPaths : List.of(),
-            connectionId);
+            lookupDependsOnPaths != null ? lookupDependsOnPaths : List.of(), mcpComponentId, connectionId);
     }
 }
