@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -91,6 +92,24 @@ class LookupComponentPropertyOptionsToolCallbackTest {
         verifyNoInteractions(
             actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
             resolver);
+    }
+
+    @Test
+    void testRejectsAConnectionOutsideTheWorkspaceOfAnInAppRunBeforeAnyLookup() {
+        LookupComponentPropertyOptionsToolCallback workspaceToolCallback =
+            new LookupComponentPropertyOptionsToolCallback(
+                actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+                resolver, metrics,
+                ScopedConnectionTestFixtures.newGuard(List.of(), mock(WorkspaceConnectionFacade.class)));
+
+        String result = workspaceToolCallback.call(
+            "{\"kind\": \"ACTION\", \"componentName\": \"slack\", \"operationName\": \"send\", "
+                + "\"propertyName\": \"channel\", \"connectionId\": 900}",
+            ScopedConnectionTestFixtures.workspaceToolContext(3L));
+
+        assertThat(result).contains(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+        verifyNoInteractions(actionDefinitionFacade, triggerDefinitionFacade, resolver);
     }
 
     @Test
