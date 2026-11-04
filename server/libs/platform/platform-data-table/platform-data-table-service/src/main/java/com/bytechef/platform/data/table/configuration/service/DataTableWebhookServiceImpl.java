@@ -39,8 +39,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
-    private static final String WEBHOOKS_PATH = "/webhooks/";
-
     private final DataTableRepository dataTableRepository;
     private final DataTableWebhookRepository webhookRepository;
 
@@ -53,9 +51,7 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
     }
 
     @Override
-    public long addWebhook(
-        String baseName, String workflowExecutionId, String url, DataTableWebhookType type, long environmentId) {
-
+    public long addWebhook(String baseName, String workflowExecutionId, DataTableWebhookType type, long environmentId) {
         try {
             WorkflowExecutionId.parse(workflowExecutionId);
         } catch (RuntimeException exception) {
@@ -74,7 +70,6 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
         dataTableWebhook.setDataTableId(table.getId());
         dataTableWebhook.setType(type);
-        dataTableWebhook.setUrl(url);
         dataTableWebhook.setWorkflowExecutionId(workflowExecutionId);
         dataTableWebhook.setEnvironment(Environment.values()[(int) environmentId]);
 
@@ -104,7 +99,7 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
         for (DataTableWebhook dataTableWebhook : dataTableWebhooks) {
             webhooks.add(new Webhook(
-                dataTableWebhook.getId(), dataTableWebhook.getDataTableId(), getWorkflowExecutionId(dataTableWebhook),
+                dataTableWebhook.getId(), dataTableWebhook.getDataTableId(), dataTableWebhook.getWorkflowExecutionId(),
                 dataTableWebhook.getType(), dataTableWebhook.getEnvironment()
                     .ordinal()));
         }
@@ -115,29 +110,5 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
     @Override
     public void removeWebhook(long id) {
         webhookRepository.deleteById(id);
-    }
-
-    private static String getWorkflowExecutionId(DataTableWebhook dataTableWebhook) {
-        String workflowExecutionId = dataTableWebhook.getWorkflowExecutionId();
-
-        if (workflowExecutionId != null) {
-            return workflowExecutionId;
-        }
-
-        String url = dataTableWebhook.getUrl();
-
-        if (url == null) {
-            return null;
-        }
-
-        String path = url.replaceFirst("[?#].*$", "");
-
-        int index = path.lastIndexOf(WEBHOOKS_PATH);
-
-        if (index < 0) {
-            return null;
-        }
-
-        return path.substring(index + WEBHOOKS_PATH.length());
     }
 }

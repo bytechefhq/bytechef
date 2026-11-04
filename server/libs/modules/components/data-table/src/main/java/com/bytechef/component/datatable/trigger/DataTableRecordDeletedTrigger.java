@@ -91,7 +91,7 @@ public class DataTableRecordDeletedTrigger {
             .help("", "https://docs.bytechef.io/reference/components/data-table_v1#record-deleted")
             .webhookEnable((
                 inputParameters, connectionParameters, webhookUrl, workflowExecutionId,
-                context) -> webhookEnable(inputParameters, webhookUrl, workflowExecutionId, context))
+                context) -> webhookEnable(inputParameters, workflowExecutionId, context))
             .webhookDisable((
                 inputParameters, connectionParameters, webhookEnableOutputParameters, workflowExecutionId,
                 context) -> webhookDisable(webhookEnableOutputParameters))
@@ -101,14 +101,14 @@ public class DataTableRecordDeletedTrigger {
     }
 
     private WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, String webhookUrl, String workflowExecutionId, TriggerContext triggerContext) {
+        Parameters inputParameters, String workflowExecutionId, TriggerContext triggerContext) {
 
         TriggerContextAware triggerContextAware = (TriggerContextAware) triggerContext;
 
         String baseName = inputParameters.getRequiredString(TABLE);
 
         long webhookId = dataTableWebhookService.addWebhook(
-            baseName, workflowExecutionId, webhookUrl, DataTableWebhookType.RECORD_DELETED,
+            baseName, workflowExecutionId, DataTableWebhookType.RECORD_DELETED,
             Objects.requireNonNull(triggerContextAware.getEnvironmentId()));
 
         return new WebhookEnableOutput(Map.of("webhookId", webhookId), null);
