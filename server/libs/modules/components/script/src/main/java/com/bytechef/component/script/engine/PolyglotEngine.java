@@ -90,7 +90,6 @@ public class PolyglotEngine {
                     "public static Object perform(Map<String, ?> input, Context context) {\n\treturn null;\n}";
                 case "js" -> "function perform(input, context) {\n\treturn null;\n}";
                 case "python" -> "def perform(input, context):\n\treturn null";
-                case "R" -> "perform <- function(input, context) {\n\treturn null\n}";
                 default -> throw new IllegalArgumentException("languageId: %s does not exist".formatted(languageId));
             }));
 
