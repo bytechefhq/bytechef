@@ -11,8 +11,10 @@ service JdbcDataStorageRemoteService {
   rpc Delete(DataStorageKeyRequest) returns (google.protobuf.Empty);
   rpc DeleteScopeData(DeleteScopeDataRequest) returns (google.protobuf.Empty);
   rpc Fetch(DataStorageKeyRequest) returns (FetchDataStorageValueResponse);
+  rpc FetchVersioned(DataStorageKeyRequest) returns (FetchVersionedDataStorageValueResponse);
   rpc GetAll(DataStorageScopeRequest) returns (JsonValue);
   rpc Put(PutDataStorageValueRequest) returns (google.protobuf.Empty);
+  rpc PutIfVersion(PutIfVersionDataStorageValueRequest) returns (PutIfVersionDataStorageValueResponse);
 }
 
 message DataStorageKeyRequest {
@@ -35,6 +37,12 @@ message DataStorageScopeRequest {
 message DeleteScopeDataRequest {
   string scope = 1;
   string scope_id = 2;
+  string type = 3;
+}
+
+message DataStorageEntryVersion {
+  int64 id = 1;
+  int32 version = 2;
 }
 
 message PutDataStorageValueRequest {
@@ -44,6 +52,25 @@ message PutDataStorageValueRequest {
 
 message FetchDataStorageValueResponse {
   optional bytes value = 1;
+}
+
+message FetchVersionedDataStorageValueResponse {
+  optional VersionedDataStorageValue versioned_value = 1;
+}
+
+message VersionedDataStorageValue {
+  bytes value = 1;
+  DataStorageEntryVersion version = 2;
+}
+
+message PutIfVersionDataStorageValueRequest {
+  DataStorageKeyRequest key = 1;
+  bytes value = 2;
+  optional DataStorageEntryVersion expected_version = 3;
+}
+
+message PutIfVersionDataStorageValueResponse {
+  bool written = 1;
 }
 
 message JsonValue {

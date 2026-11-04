@@ -7,21 +7,29 @@
 
 package com.bytechef.ee.platform.data.storage.db.remote.client.service;
 
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DataStorageEntryVersion;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DataStorageKeyRequest;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DataStorageScopeRequest;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DeleteScopeDataRequest;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.FetchDataStorageValueResponse;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.FetchVersionedDataStorageValueResponse;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JdbcDataStorageRemoteServiceGrpc;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JdbcDataStorageRemoteServiceGrpc.JdbcDataStorageRemoteServiceBlockingStub;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JsonValue;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.PutDataStorageValueRequest;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.PutIfVersionDataStorageValueRequest;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.PutIfVersionDataStorageValueResponse;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.VersionedDataStorageValue;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
+import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -50,10 +58,11 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
     }
 
     @Override
-    public void deleteScopeData(DataStorageScope scope, String scopeId) {
+    public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
         DeleteScopeDataRequest deleteScopeDataRequest = DeleteScopeDataRequest.newBuilder()
             .setScope(scope.name())
             .setScopeId(scopeId)
+            .setType(type.name())
             .build();
 
         getStub().deleteScopeData(deleteScopeDataRequest);
@@ -73,6 +82,29 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
         }
 
         return Optional.ofNullable((T) jsonBytes.read(fetchDataStorageValueResponse.getValue()));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Optional<VersionedValue<T>> fetchVersioned(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type) {
+
+        FetchVersionedDataStorageValueResponse fetchVersionedDataStorageValueResponse = getStub().fetchVersioned(
+            toDataStorageKeyRequest(componentName, scope, scopeId, key, environmentId, type));
+
+        if (!fetchVersionedDataStorageValueResponse.hasVersionedValue()) {
+            return Optional.empty();
+        }
+
+        VersionedDataStorageValue versionedDataStorageValue =
+            fetchVersionedDataStorageValueResponse.getVersionedValue();
+        DataStorageEntryVersion dataStorageEntryVersion = versionedDataStorageValue.getVersion();
+
+        return Optional.of(
+            new VersionedValue<>(
+                (T) jsonBytes.read(versionedDataStorageValue.getValue()),
+                new DataEntryVersion(dataStorageEntryVersion.getId(), dataStorageEntryVersion.getVersion())));
     }
 
     @Override
@@ -116,6 +148,29 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
             .build();
 
         getStub().put(putDataStorageValueRequest);
+    }
+
+    @Override
+    public boolean putIfVersion(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type, Object value, @Nullable DataEntryVersion expectedVersion) {
+
+        PutIfVersionDataStorageValueRequest.Builder builder = PutIfVersionDataStorageValueRequest.newBuilder()
+            .setKey(toDataStorageKeyRequest(componentName, scope, scopeId, key, environmentId, type))
+            .setValue(jsonBytes.write(value));
+
+        if (expectedVersion != null) {
+            builder.setExpectedVersion(
+                DataStorageEntryVersion.newBuilder()
+                    .setId(expectedVersion.id())
+                    .setVersion(expectedVersion.version())
+                    .build());
+        }
+
+        PutIfVersionDataStorageValueResponse putIfVersionDataStorageValueResponse = getStub().putIfVersion(
+            builder.build());
+
+        return putIfVersionDataStorageValueResponse.getWritten();
     }
 
     private JdbcDataStorageRemoteServiceBlockingStub getStub() {

@@ -7,16 +7,23 @@
 
 package com.bytechef.ee.platform.data.storage.jdbc.remote.grpc;
 
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DataStorageEntryVersion;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DataStorageKeyRequest;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DataStorageScopeRequest;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DeleteScopeDataRequest;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.FetchDataStorageValueResponse;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.FetchVersionedDataStorageValueResponse;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JdbcDataStorageRemoteServiceGrpc;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JsonValue;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.PutDataStorageValueRequest;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.PutIfVersionDataStorageValueRequest;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.PutIfVersionDataStorageValueResponse;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.VersionedDataStorageValue;
 import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
+import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -55,7 +62,9 @@ public class JdbcDataStorageRemoteServiceGrpcServer
 
     @Override
     public void deleteScopeData(DeleteScopeDataRequest request, StreamObserver<Empty> responseObserver) {
-        jdbcDataStorageService.deleteScopeData(DataStorageScope.valueOf(request.getScope()), request.getScopeId());
+        jdbcDataStorageService.deleteScopeData(
+            DataStorageScope.valueOf(request.getScope()), request.getScopeId(),
+            PlatformType.valueOf(request.getType()));
 
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
@@ -70,6 +79,26 @@ public class JdbcDataStorageRemoteServiceGrpcServer
         FetchDataStorageValueResponse.Builder builder = FetchDataStorageValueResponse.newBuilder();
 
         value.ifPresent(curValue -> builder.setValue(jsonBytes.write(curValue)));
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void fetchVersioned(
+        DataStorageKeyRequest request, StreamObserver<FetchVersionedDataStorageValueResponse> responseObserver) {
+
+        Optional<VersionedValue<Object>> versionedValueOptional = jdbcDataStorageService.fetchVersioned(
+            request.getComponentName(), DataStorageScope.valueOf(request.getScope()), request.getScopeId(),
+            request.getKey(), request.getEnvironmentId(), toPlatformType(request.hasType(), request.getType()));
+
+        FetchVersionedDataStorageValueResponse.Builder builder = FetchVersionedDataStorageValueResponse.newBuilder();
+
+        versionedValueOptional.ifPresent(versionedValue -> builder.setVersionedValue(
+            VersionedDataStorageValue.newBuilder()
+                .setValue(jsonBytes.write(versionedValue.value()))
+                .setVersion(toDataStorageEntryVersion(versionedValue.version()))
+                .build()));
 
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
@@ -101,7 +130,43 @@ public class JdbcDataStorageRemoteServiceGrpcServer
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void putIfVersion(
+        PutIfVersionDataStorageValueRequest request,
+        StreamObserver<PutIfVersionDataStorageValueResponse> responseObserver) {
+
+        DataStorageKeyRequest key = request.getKey();
+
+        DataEntryVersion expectedVersion = null;
+
+        if (request.hasExpectedVersion()) {
+            DataStorageEntryVersion dataStorageEntryVersion = request.getExpectedVersion();
+
+            expectedVersion = new DataEntryVersion(
+                dataStorageEntryVersion.getId(), dataStorageEntryVersion.getVersion());
+        }
+
+        boolean written = jdbcDataStorageService.putIfVersion(
+            key.getComponentName(), DataStorageScope.valueOf(key.getScope()), key.getScopeId(), key.getKey(),
+            key.getEnvironmentId(), toPlatformType(key.hasType(), key.getType()), jsonBytes.read(request.getValue()),
+            expectedVersion);
+
+        responseObserver.onNext(
+            PutIfVersionDataStorageValueResponse.newBuilder()
+                .setWritten(written)
+                .build());
+        responseObserver.onCompleted();
+    }
+
     private static PlatformType toPlatformType(boolean hasType, String type) {
         return hasType ? PlatformType.valueOf(type) : null;
+    }
+
+    private static DataStorageEntryVersion toDataStorageEntryVersion(DataEntryVersion dataEntryVersion) {
+
+        return DataStorageEntryVersion.newBuilder()
+            .setId(dataEntryVersion.id())
+            .setVersion(dataEntryVersion.version())
+            .build();
     }
 }
