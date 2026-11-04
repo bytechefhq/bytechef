@@ -167,10 +167,6 @@ public class NotificationHandlerContext {
         private ErrorSummary error;
     }
 
-    /**
-     * Returns a {@code JOB_FAILED} context filled with fake data in every section, used to validate body templates and
-     * to send test deliveries.
-     */
     public static NotificationHandlerContext sample() {
         Instant timestamp = Instant.parse("2026-01-01T00:00:00Z");
 

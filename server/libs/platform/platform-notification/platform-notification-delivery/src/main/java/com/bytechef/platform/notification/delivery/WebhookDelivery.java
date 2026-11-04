@@ -59,10 +59,6 @@ public record WebhookDelivery(
         return WebhookDeliveryMessages.host(url);
     }
 
-    /**
-     * Describes the delivery for logs without its secrets: the URL is reduced to its host, only header names are listed
-     * and the signing secret is redacted.
-     */
     @Override
     public String toString() {
         return "WebhookDelivery[source=" + source + ", description=" + description + ", tenantId=" + tenantId +
