@@ -144,6 +144,12 @@ public class McpComponentServiceImpl implements McpComponentService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<McpComponent> fetchMcpComponent(long mcpComponentId) {
+        return mcpComponentRepository.findById(mcpComponentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<Long> fetchMcpComponentMcpServerId(long mcpComponentId) {
         return mcpComponentRepository.findById(mcpComponentId)
             .map(McpComponent::getMcpServerId);
