@@ -72,7 +72,7 @@ export interface Notification {
      */
     readonly hasSigningSecret?: boolean;
     /**
-     * The webhook signing secret, returned only in the create response
+     * The webhook signing secret, returned only in the response that generated it: creating a webhook notification, or changing a notification to a webhook
      */
     readonly signingSecret?: string;
     /**
