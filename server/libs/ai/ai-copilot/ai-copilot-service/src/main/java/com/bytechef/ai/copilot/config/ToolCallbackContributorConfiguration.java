@@ -31,6 +31,7 @@ import com.bytechef.automation.ai.tool.ReadSkillsTools;
 import com.bytechef.automation.ai.tool.WorkspaceConnectionScopedToolCallback;
 import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
+import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -58,12 +59,16 @@ import org.springframework.context.annotation.Configuration;
 public class ToolCallbackContributorConfiguration {
 
     public static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
-        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer");
+        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer",
+        "buildAiAgent");
 
     private static final Set<String> MCP_SERVER_TOOL_NAMES = Set.of(
         "listMcpServers", "createMcpServer", "updateMcpServer", "createMcpProject");
 
     private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of("listMcpServers", "createMcpServer");
+
+    private static final Set<String> WORKSPACE_SCOPED_AI_AGENT_TOOL_NAMES = Set.of(
+        "listAiAgents", "createAiAgent", "searchAiAgentReferences");
 
     private static final Set<String> WORKSPACE_SCOPED_DEPLOYMENT_TOOL_NAMES = Set.of("listProjectDeployments");
 
@@ -116,6 +121,35 @@ public class ToolCallbackContributorConfiguration {
 
                 toolCallbacks.add(
                     WORKSPACE_SCOPED_MCP_TOOL_NAMES.contains(name)
+                        ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade)
+                        : toolCallback);
+            }
+
+            return toolCallbacks;
+        };
+    }
+
+    @Bean
+    McpServerToolCallbackContributor aiAgentFlatCrudMcpContributor(
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider,
+        WorkspaceFacade workspaceFacade) {
+
+        return () -> {
+            AiAgentToolCallbacksFactory aiAgentToolCallbacksFactory = aiAgentToolCallbacksFactoryProvider
+                .getIfAvailable();
+
+            if (aiAgentToolCallbacksFactory == null) {
+                return List.of();
+            }
+
+            List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+            for (ToolCallback toolCallback : aiAgentToolCallbacksFactory.writeToolCallbacks()) {
+                String name = toolCallback.getToolDefinition()
+                    .name();
+
+                toolCallbacks.add(
+                    WORKSPACE_SCOPED_AI_AGENT_TOOL_NAMES.contains(name)
                         ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade)
                         : toolCallback);
             }
