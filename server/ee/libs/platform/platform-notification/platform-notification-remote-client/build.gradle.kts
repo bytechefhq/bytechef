@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-notification:platform-notification-remote-grpc"))
 
     testImplementation("io.grpc:grpc-inprocess")
+    testImplementation("io.micrometer:micrometer-core")
     testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
     testImplementation("org.eclipse.angus:angus-mail")
     testImplementation("org.springframework:spring-context-support")

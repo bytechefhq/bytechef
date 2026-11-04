@@ -7,14 +7,18 @@
 
 package com.bytechef.ee.platform.notification.remote.client.config;
 
+import static org.mockito.Mockito.mock;
+
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.mail.MailService;
-import com.bytechef.platform.notification.delivery.SlackNotificationClient;
-import com.bytechef.platform.notification.delivery.WebhookDeliveryRequest;
+import com.bytechef.platform.notification.delivery.WebhookDelivery;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryOutcome;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
+import com.bytechef.platform.notification.delivery.WebhookPayload;
 import com.bytechef.platform.notification.handler.EmailNotificationSender;
 import com.bytechef.platform.notification.handler.NotificationSender;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
@@ -28,12 +32,16 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.mail.internet.MimeMessage;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.StaticMessageSource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -96,22 +104,20 @@ public class NotificationRemoteClientIntTestConfiguration {
     }
 
     @Bean
-    RecordingWebhookNotificationClient recordingWebhookNotificationClient() {
-        return new RecordingWebhookNotificationClient();
+    RecordingWebhookDeliveryService recordingWebhookDeliveryService() {
+        return new RecordingWebhookDeliveryService();
     }
 
     @Bean
-    SlackNotificationSender slackNotificationSender(
-        RecordingWebhookNotificationClient recordingWebhookNotificationClient) {
-
-        return new SlackNotificationSender(new SlackNotificationClient(recordingWebhookNotificationClient));
+    SlackNotificationSender slackNotificationSender(RecordingWebhookDeliveryService recordingWebhookDeliveryService) {
+        return new SlackNotificationSender(recordingWebhookDeliveryService);
     }
 
     @Bean
     WebhookNotificationSender webhookNotificationSender(
-        RecordingWebhookNotificationClient recordingWebhookNotificationClient) {
+        RecordingWebhookDeliveryService recordingWebhookDeliveryService) {
 
-        return new WebhookNotificationSender(recordingWebhookNotificationClient);
+        return new WebhookNotificationSender(recordingWebhookDeliveryService);
     }
 
     public static class RecordingJavaMailSender extends JavaMailSenderImpl {
@@ -132,21 +138,60 @@ public class NotificationRemoteClientIntTestConfiguration {
         }
     }
 
-    public static class RecordingWebhookNotificationClient extends WebhookNotificationClient {
+    public record RecordedWebhookDelivery(String url, String payloadJson, @Nullable String secret) {
+    }
 
-        private final List<WebhookDeliveryRequest> webhookDeliveryRequests = new CopyOnWriteArrayList<>();
+    public static class RecordingWebhookDeliveryService extends WebhookDeliveryService {
 
-        public List<WebhookDeliveryRequest> getWebhookDeliveryRequests() {
-            return List.copyOf(webhookDeliveryRequests);
+        private final List<RecordedWebhookDelivery> recordedWebhookDeliveries = new CopyOnWriteArrayList<>();
+        private volatile WebhookDeliveryOutcome.Status status = WebhookDeliveryOutcome.Status.SENT;
+
+        @SuppressWarnings("unchecked")
+        public RecordingWebhookDeliveryService() {
+            super(
+                new WebhookNotificationClient(), new SimpleAsyncTaskExecutor(), webhookDeliveryApplicationProperties(),
+                mock(ObjectProvider.class));
+        }
+
+        private static ApplicationProperties webhookDeliveryApplicationProperties() {
+            ApplicationProperties applicationProperties = new ApplicationProperties();
+
+            ApplicationProperties.WebhookDelivery webhookDelivery = applicationProperties.getWebhookDelivery();
+
+            webhookDelivery.setConcurrencyLimit(1);
+            webhookDelivery.setMaxPendingDeliveries(1);
+
+            return applicationProperties;
+        }
+
+        public List<RecordedWebhookDelivery> getRecordedWebhookDeliveries() {
+            return List.copyOf(recordedWebhookDeliveries);
         }
 
         public void clear() {
-            webhookDeliveryRequests.clear();
+            recordedWebhookDeliveries.clear();
+
+            status = WebhookDeliveryOutcome.Status.SENT;
+        }
+
+        public void setStatus(WebhookDeliveryOutcome.Status status) {
+            this.status = status;
         }
 
         @Override
-        public void deliver(WebhookDeliveryRequest webhookDeliveryRequest, WebhookRetry webhookRetry) {
-            webhookDeliveryRequests.add(webhookDeliveryRequest);
+        public CompletableFuture<WebhookDeliveryOutcome> submit(WebhookDelivery webhookDelivery) {
+            for (WebhookPayload webhookPayload : webhookDelivery.payloads()) {
+                recordedWebhookDeliveries
+                    .add(new RecordedWebhookDelivery(webhookDelivery.url(), webhookPayload.json(),
+                        webhookDelivery.secret()));
+            }
+
+            List<WebhookDeliveryOutcome.PayloadResult> payloadResults = webhookDelivery.payloads()
+                .stream()
+                .map(webhookPayload -> new WebhookDeliveryOutcome.PayloadResult(webhookPayload.label(), status))
+                .toList();
+
+            return CompletableFuture.completedFuture(new WebhookDeliveryOutcome(payloadResults, null, null, null));
         }
     }
 
