@@ -10,6 +10,9 @@ name: Changelog media
 # data, and is the only place the website token is used for writing.
 
 on:
+  # Temporary: registers the workflow so it can be dispatched from this branch before merge
+  push:
+    branches: [changelog-media-capture]
   workflow_dispatch:
     inputs:
       tag:
