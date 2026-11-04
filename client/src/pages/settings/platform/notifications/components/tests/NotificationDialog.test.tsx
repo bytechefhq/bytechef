@@ -108,13 +108,19 @@ describe('NotificationDialog', () => {
         );
     });
 
-    it('links the Webhook URL field to the payload format documentation', () => {
+    it('links the Body template field to the template and payload documentation', () => {
         render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />);
 
-        expect(screen.getByRole('link', {name: 'See the payload format'})).toHaveAttribute(
+        expect(
+            screen.getByText(
+                'Leave it empty to send the default JSON payload. Use {{path}} placeholders to insert its fields.'
+            )
+        ).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'See the template and payload format'})).toHaveAttribute(
             'href',
-            'https://docs.bytechef.io/platform/settings/notifications#webhook-requests'
+            'https://docs.bytechef.io/platform/settings/notifications#body-template'
         );
+        expect(screen.queryByText(/ByteChef sends a JSON POST/)).not.toBeInTheDocument();
     });
 
     it('does not show the Slack webhook URL field for an email notification', () => {
