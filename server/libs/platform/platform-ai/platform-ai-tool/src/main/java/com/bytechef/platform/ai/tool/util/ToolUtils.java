@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.ai.tool.util;
 
+import com.bytechef.exception.AbstractException;
+import com.bytechef.exception.ErrorType;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.domain.OptionsDataSource;
 import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.domain.BaseOption;
@@ -36,6 +39,33 @@ import org.jspecify.annotations.Nullable;
 public final class ToolUtils {
 
     private ToolUtils() {
+    }
+
+    public static AbstractException toToolExecutionException(
+        String operation, Exception exception, ErrorType errorType) {
+
+        if (exception instanceof AbstractException abstractException) {
+            return abstractException;
+        }
+
+        return new ExecutionException(
+            "Failed to " + operation + ": " + toUserFacingDetail(exception), exception, errorType);
+    }
+
+    public static String toUserFacingDetail(Exception exception) {
+        String message = exception.getMessage();
+        Throwable cause = exception.getCause();
+
+        boolean userFacing = exception instanceof IllegalArgumentException || exception instanceof AbstractException;
+
+        if (userFacing && message != null && (cause == null || !message.equals(cause.toString()))) {
+
+            return message;
+        }
+
+        Class<? extends Exception> exceptionClass = exception.getClass();
+
+        return exceptionClass.getSimpleName();
     }
 
     /**

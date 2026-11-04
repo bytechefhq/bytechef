@@ -249,7 +249,7 @@ class ProjectToolsTest {
 
         assertThatCode(() -> projectTools.getProject(7L, toolContext))
             .isInstanceOf(ExecutionException.class)
-            .hasMessageContaining("denied");
+            .hasMessage("Failed to get project: IllegalStateException");
     }
 
     @Test
@@ -283,7 +283,7 @@ class ProjectToolsTest {
         Tag tag = new Tag(5L, "crm");
 
         when(projectCategoryFacade.getProjectCategories(WORKSPACE_ID)).thenReturn(List.of(category));
-        when(projectTagFacade.getProjectTags()).thenReturn(List.of(tag, new Tag(6L, "other")));
+        when(projectTagFacade.getProjectTags(WORKSPACE_ID)).thenReturn(List.of(tag, new Tag(6L, "other")));
         when(projectFacade.createProject(any())).thenReturn(7L);
         when(projectFacade.getProject(7L)).thenReturn(projectDTO(7L, "Alpha"));
 
