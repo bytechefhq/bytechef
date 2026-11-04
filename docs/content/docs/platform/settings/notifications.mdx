@@ -9,8 +9,9 @@ webhook URL. When a workflow run hits one of those
 events, every notification subscribed to it fires.
 
 **Settings → Notifications** requires the `ADMIN` authority. Unlike most of the Settings area, the page
-is available in both Community and Enterprise Edition. The **Email** and **Slack** delivery types work
-in both editions; the **Webhook** delivery type is Enterprise Edition only.
+is available in both Community and Enterprise Edition. The **Email** delivery type works in both
+editions; the **Slack** and **Webhook** delivery types are Enterprise Edition only. Slack as an approval
+channel in a workflow is a separate feature of the Slack component and is not affected.
 
 ---
 
@@ -70,11 +71,11 @@ deployment. The approval reminder and escalation timings are set with environmen
 | Type | Field | Edition | Notes |
 |---|---|---|---|
 | **EMAIL** | **Email** - the recipient address. | Community and Enterprise | The default. Requires a mail host to be configured; without one the send is skipped with a warning. |
-| **SLACK** | **Slack Webhook URL** - a Slack [incoming webhook](https://api.slack.com/messaging/webhooks) URL. | Community and Enterprise | Posts one message to the channel the incoming webhook belongs to. |
+| **SLACK** | **Slack Webhook URL** - a Slack [incoming webhook](https://api.slack.com/messaging/webhooks) URL. | Enterprise only | Posts one message to the channel the incoming webhook belongs to. |
 | **WEBHOOK** | **Webhook URL** - any HTTPS or HTTP endpoint. | Enterprise only | Sends a JSON `POST` to the URL. See [Webhook requests](#webhook-requests). |
 
-In Community Edition the **Type** dropdown offers only **Email** and **Slack**, and the API refuses to
-save a Webhook notification. A Webhook notification created earlier under an Enterprise license is kept
+In Community Edition the **Type** dropdown offers only **Email**, and the API refuses to save a Slack or
+Webhook notification. A Slack or Webhook notification created earlier under an Enterprise license is kept
 but skipped, with a warning in the server log, while the deployment runs as Community Edition.
 
 ### Message content
@@ -570,8 +571,8 @@ notification.
 
 Click **Test** in the **Create Notification** or **Edit Notification** dialog, next to **Save**, to send
 one sample message to the target before you save. **Test** is offered for every type the dialog offers:
-**Email**, **Slack** and, in Enterprise Edition, **Webhook**. A Webhook test is refused in Community
-Edition for the same reason the save is. Testing needs the `ADMIN` authority, like the rest of the page,
+**Email** and, in Enterprise Edition, **Slack** and **Webhook**. A Slack or Webhook test is refused in
+Community Edition for the same reason the save is. Testing needs the `ADMIN` authority, like the rest of the page,
 and each test is recorded in the audit log as `NOTIFICATION_TESTED`.
 
 - **It uses what is in the form.** The values you typed are used, saved or not. The form is validated
