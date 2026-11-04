@@ -17,9 +17,12 @@ import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
+import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageServiceImpl;
+import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageUpdates;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -28,9 +31,14 @@ import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -259,7 +267,8 @@ class RemoteJdbcDataStorageServiceClientIntTest {
         jdbcDataStorageService.put(
             "github", DataStorageScope.WORKFLOW, "workflow-2", "state", ENVIRONMENT_ID, PlatformType.AUTOMATION, 4);
 
-        remoteJdbcDataStorageServiceClient.deleteScopeData(DataStorageScope.WORKFLOW, "workflow-1");
+        remoteJdbcDataStorageServiceClient.deleteScopeData(
+            DataStorageScope.WORKFLOW, "workflow-1", PlatformType.AUTOMATION);
 
         assertThat(jdbcDataStorageService.fetch(
             "github", DataStorageScope.WORKFLOW, "workflow-1", "state", ENVIRONMENT_ID, PlatformType.AUTOMATION))
@@ -270,6 +279,106 @@ class RemoteJdbcDataStorageServiceClientIntTest {
         assertThat(jdbcDataStorageService.<Object>fetch(
             "github", DataStorageScope.WORKFLOW, "workflow-2", "state", ENVIRONMENT_ID, PlatformType.AUTOMATION))
                 .contains(4);
+    }
+
+    @Test
+    void testDeleteScopeDataDeletesOnlyTheGivenType() {
+        jdbcDataStorageService.put(
+            "github", DataStorageScope.PRINCIPAL, "5", "key", ENVIRONMENT_ID, PlatformType.AUTOMATION, "automation");
+        jdbcDataStorageService.put(
+            "github", DataStorageScope.PRINCIPAL, "5", "embeddedKey", ENVIRONMENT_ID, PlatformType.EMBEDDED,
+            "embedded");
+
+        remoteJdbcDataStorageServiceClient.deleteScopeData(DataStorageScope.PRINCIPAL, "5", PlatformType.EMBEDDED);
+
+        assertThat(jdbcDataStorageService.<Object>fetch(
+            "github", DataStorageScope.PRINCIPAL, "5", "key", ENVIRONMENT_ID, PlatformType.AUTOMATION))
+                .contains("automation");
+        assertThat(jdbcDataStorageService.fetch(
+            "github", DataStorageScope.PRINCIPAL, "5", "embeddedKey", ENVIRONMENT_ID, PlatformType.EMBEDDED))
+                .isEmpty();
+    }
+
+    @Test
+    void testFetchVersionedAndPutIfVersionRoundTrip() {
+        assertThat(fetchVersioned("key")).isEmpty();
+
+        assertThat(putIfVersion("key", "first", null)).isTrue();
+        assertThat(putIfVersion("key", "again", null)).isFalse();
+
+        VersionedValue<Object> versionedValue = fetchVersioned("key").orElseThrow();
+
+        assertThat(versionedValue.value()).isEqualTo("first");
+        assertThat(putIfVersion("key", "second", versionedValue.version())).isTrue();
+        assertThat(putIfVersion("key", "third", versionedValue.version())).isFalse();
+
+        VersionedValue<Object> updatedVersionedValue = fetchVersioned("key").orElseThrow();
+        DataEntryVersion version = versionedValue.version();
+        DataEntryVersion updatedVersion = updatedVersionedValue.version();
+
+        assertThat(updatedVersionedValue.value()).isEqualTo("second");
+        assertThat(updatedVersion.version()).isGreaterThan(version.version());
+    }
+
+    @Test
+    void testPutIfVersionRejectsTheVersionOfADeletedAndRecreatedEntry() {
+        assertThat(putIfVersion("key", "first", null)).isTrue();
+
+        VersionedValue<Object> versionedValue = fetchVersioned("key").orElseThrow();
+
+        remoteJdbcDataStorageServiceClient.delete(
+            "github", DataStorageScope.WORKFLOW, "workflow-1", "key", ENVIRONMENT_ID, PlatformType.AUTOMATION);
+
+        assertThat(putIfVersion("key", "recreated", null)).isTrue();
+        assertThat(putIfVersion("key", "stale", versionedValue.version())).isFalse();
+        assertThat(fetchVersioned("key").map(VersionedValue::value)).contains("recreated");
+    }
+
+    @Test
+    void testUpdateKeepsEveryConcurrentIncrement() throws Exception {
+        CountDownLatch startLatch = new CountDownLatch(1);
+        List<Future<?>> futures = new ArrayList<>();
+
+        try (ExecutorService executorService = Executors.newFixedThreadPool(8)) {
+            for (int threadIndex = 0; threadIndex < 8; threadIndex++) {
+                futures.add(executorService.submit(() -> {
+                    startLatch.await();
+
+                    for (int iteration = 0; iteration < 10; iteration++) {
+                        JdbcDataStorageUpdates.update(
+                            remoteJdbcDataStorageServiceClient, "github", DataStorageScope.WORKFLOW, "workflow-1",
+                            "counter", ENVIRONMENT_ID, PlatformType.AUTOMATION,
+                            (Optional<Number> currentValue) -> (Number) (currentValue.map(Number::intValue)
+                                .orElse(0) + 1));
+                    }
+
+                    return null;
+                }));
+            }
+
+            startLatch.countDown();
+
+            for (Future<?> future : futures) {
+                future.get();
+            }
+        }
+
+        Optional<VersionedValue<Object>> counterOptional = fetchVersioned("counter");
+
+        VersionedValue<Object> counter = counterOptional.orElseThrow();
+
+        assertThat(((Number) counter.value()).intValue()).isEqualTo(80);
+    }
+
+    private Optional<VersionedValue<Object>> fetchVersioned(String key) {
+        return remoteJdbcDataStorageServiceClient.fetchVersioned(
+            "github", DataStorageScope.WORKFLOW, "workflow-1", key, ENVIRONMENT_ID, PlatformType.AUTOMATION);
+    }
+
+    private boolean putIfVersion(String key, Object value, DataEntryVersion expectedVersion) {
+        return remoteJdbcDataStorageServiceClient.putIfVersion(
+            "github", DataStorageScope.WORKFLOW, "workflow-1", key, ENVIRONMENT_ID, PlatformType.AUTOMATION, value,
+            expectedVersion);
     }
 
     @EnableAutoConfiguration
