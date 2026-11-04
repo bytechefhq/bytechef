@@ -563,22 +563,33 @@ export const WorkflowExecutions = () => {
         );
     });
 
+    const linkedExecutionAutomations = searchParams.get('automations');
+    const linkedExecutionIdParameter = searchParams.get('id');
+
     useEffect(() => {
-        const linkedExecutionId = Number.parseInt(searchParams.get('id') ?? '', 10);
+        const linkedExecutionId = Number.parseInt(linkedExecutionIdParameter ?? '', 10);
 
         if (!Number.isInteger(linkedExecutionId) || linkedExecutionId <= 0) {
             return;
         }
 
-        if (filterAutomations === 1) {
+        if (linkedExecutionAutomations === '1') {
+            setEmbeddedWorkflowExecutionSheetOpen(false);
             setAutomationWorkflowExecutionId(linkedExecutionId, 'JOB');
             setAutomationWorkflowExecutionSheetOpen(true);
         } else {
+            setAutomationWorkflowExecutionSheetOpen(false);
             setEmbeddedWorkflowExecutionId(linkedExecutionId);
             setEmbeddedWorkflowExecutionSheetOpen(true);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [
+        linkedExecutionAutomations,
+        linkedExecutionIdParameter,
+        setAutomationWorkflowExecutionId,
+        setAutomationWorkflowExecutionSheetOpen,
+        setEmbeddedWorkflowExecutionId,
+        setEmbeddedWorkflowExecutionSheetOpen,
+    ]);
 
     return (
         <LayoutContainer
