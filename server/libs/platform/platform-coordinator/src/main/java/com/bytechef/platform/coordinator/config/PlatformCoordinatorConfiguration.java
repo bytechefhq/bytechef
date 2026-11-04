@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.coordinator.event.listener.ExecutionDataJobCompletionListener;
 import com.bytechef.platform.coordinator.event.listener.ExecutionDataJobDeletionListener;
 import com.bytechef.platform.coordinator.event.listener.NotificationJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.SseStreamApplicationEventListener;
@@ -118,6 +119,13 @@ public class PlatformCoordinatorConfiguration {
         return new ApprovalExpiryMonitor(
             eventPublisher, jobService, meterRegistryObjectProvider, taskExecutionService,
             taskStateServiceObjectProvider.getIfAvailable(), tenantService);
+    }
+
+    @Bean
+    ExecutionDataJobCompletionListener executionDataJobCompletionListener(
+        ObjectProvider<DataStorage> dataStorageObjectProvider) {
+
+        return new ExecutionDataJobCompletionListener(dataStorageObjectProvider.getIfAvailable(), jobService);
     }
 
     @Bean
