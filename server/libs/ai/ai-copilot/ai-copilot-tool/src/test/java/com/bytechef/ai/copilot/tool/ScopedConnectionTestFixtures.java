@@ -16,12 +16,18 @@
 
 package com.bytechef.ai.copilot.tool;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,13 +43,40 @@ final class ScopedConnectionTestFixtures {
     }
 
     static ScopedConnectionGuard newGuard(List<CopilotConnectionLister> connectionListers) {
+        return newGuard(connectionListers, mock(WorkspaceConnectionFacade.class));
+    }
+
+    static ScopedConnectionGuard newGuard(
+        List<CopilotConnectionLister> connectionListers, WorkspaceConnectionFacade workspaceConnectionFacade) {
+
         StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
 
         for (int index = 0; index < connectionListers.size(); index++) {
             beanFactory.addBean("connectionLister" + index, connectionListers.get(index));
         }
 
-        return new ScopedConnectionGuard(beanFactory.getBeanProvider(CopilotConnectionLister.class));
+        PropertyOptionsResolver propertyOptionsResolver = mock(PropertyOptionsResolver.class);
+
+        when(propertyOptionsResolver.withUserSecurityContext(any(), any()))
+            .thenAnswer(invocation -> {
+                Supplier<?> action = invocation.getArgument(1);
+
+                return action.get();
+            });
+
+        return new ScopedConnectionGuard(
+            beanFactory.getBeanProvider(CopilotConnectionLister.class), workspaceConnectionFacade,
+            propertyOptionsResolver);
+    }
+
+    static ToolContext workspaceToolContext(long workspaceId) {
+        return new ToolContext(
+            AgentToolInvocationContext.builder()
+                .workspaceId(workspaceId)
+                .userId(7L)
+                .environmentId(0L)
+                .build()
+                .toToolContext());
     }
 
     static ScopedConnectionGuard newGuardEntitledTo(List<Long> connectionIds) {
