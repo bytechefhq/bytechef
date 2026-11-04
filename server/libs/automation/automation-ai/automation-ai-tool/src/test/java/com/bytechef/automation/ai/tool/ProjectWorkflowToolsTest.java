@@ -192,6 +192,7 @@ class ProjectWorkflowToolsTest {
                 .updateWorkflow("wf-uuid-2", DEFINITION, 3, toolContext);
 
             assertThat(workflowSaveInfo.version()).isEqualTo(4);
+            assertThat(workflowSaveInfo.warnings()).containsExactly("[slack_1] " + missingConnection);
         }
 
         @Test
