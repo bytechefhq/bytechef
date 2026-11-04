@@ -20,6 +20,7 @@ import com.bytechef.ai.copilot.tool.ask.SubAgentQuestionRenderer;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.tool.ConnectionTools;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ReadSkillsTools;
@@ -27,11 +28,15 @@ import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.platform.ai.tool.ComponentTools;
+import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +56,8 @@ public class ToolCallbackContributorConfiguration {
     private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of("listMcpServers", "createMcpServer");
 
     private static final Set<String> WORKSPACE_SCOPED_DEPLOYMENT_TOOL_NAMES = Set.of("listProjectDeployments");
+
+    private static final Set<String> EXCLUDED_AUTHORING_TOOL_NAMES = Set.of("validateTask");
 
     @Bean
     McpServerToolCallbackContributor copilotAgentToolCallbackContributor(
@@ -130,6 +137,43 @@ public class ToolCallbackContributorConfiguration {
                     WORKSPACE_SCOPED_DEPLOYMENT_TOOL_NAMES.contains(name)
                         ? new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade)
                         : toolCallback);
+            }
+
+            return toolCallbacks;
+        };
+    }
+
+    @Bean
+    McpServerToolCallbackContributor workflowAuthoringMcpContributor(
+        ObjectProvider<ComponentTools> componentToolsProvider, ObjectProvider<TaskTools> taskToolsProvider,
+        ObjectProvider<WorkflowInstructionTools> workflowInstructionToolsProvider,
+        ObjectProvider<ConnectionTools> connectionToolsProvider, WorkspaceFacade workspaceFacade) {
+
+        return () -> {
+            List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+            ComponentTools componentTools = componentToolsProvider.getIfAvailable();
+            TaskTools taskTools = taskToolsProvider.getIfAvailable();
+            WorkflowInstructionTools workflowInstructionTools = workflowInstructionToolsProvider.getIfAvailable();
+
+            if (componentTools != null && taskTools != null && workflowInstructionTools != null) {
+                for (ToolCallback toolCallback : ToolCallbacks.from(
+                    componentTools, taskTools, workflowInstructionTools)) {
+
+                    ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+
+                    if (!EXCLUDED_AUTHORING_TOOL_NAMES.contains(toolDefinition.name())) {
+                        toolCallbacks.add(toolCallback);
+                    }
+                }
+            }
+
+            ConnectionTools connectionTools = connectionToolsProvider.getIfAvailable();
+
+            if (connectionTools != null) {
+                for (ToolCallback toolCallback : ToolCallbacks.from(connectionTools)) {
+                    toolCallbacks.add(new WorkspaceScopedFlatToolCallback(toolCallback, workspaceFacade));
+                }
             }
 
             return toolCallbacks;
