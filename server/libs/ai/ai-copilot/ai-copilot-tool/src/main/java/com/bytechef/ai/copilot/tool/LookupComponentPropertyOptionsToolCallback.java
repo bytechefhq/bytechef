@@ -193,7 +193,7 @@ public class LookupComponentPropertyOptionsToolCallback implements ToolCallback 
 
             metrics.recordStateVisibility(TOOL_NAME, "error");
 
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             metrics.recordStateVisibility(TOOL_NAME, "error");
 
