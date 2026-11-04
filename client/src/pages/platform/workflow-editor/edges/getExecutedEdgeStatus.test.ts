@@ -28,6 +28,12 @@ const bottomGhostNode = (taskDispatcherId: string, suffix: string): Node => ({
     type: 'taskDispatcherBottomGhostNode',
 });
 
+const dispatcherNode = (workflowNodeName: string): Node => ({
+    data: {taskDispatcher: true, workflowNodeName},
+    id: workflowNodeName,
+    position: {x: 0, y: 0},
+});
+
 const disabledTaskNode = (workflowNodeName: string): Node => ({
     data: {disabled: true, workflowNodeName},
     id: workflowNodeName,
@@ -224,6 +230,50 @@ describe('getExecutedEdgeStatus', () => {
 
         expect(getExecutedEdgeStatus(triggerNode('trigger_2'), taskNode('var_1'), states)).toBe('COMPLETED');
         expect(getExecutedEdgeStatus(triggerNode('trigger_1'), taskNode('var_1'), states)).toBeUndefined();
+    });
+
+    it('colors the way into a running loop up to its completed child', () => {
+        const states = {
+            logger_1: {status: 'COMPLETED' as const},
+            loop_2: {status: 'RUNNING' as const},
+            var_1: {status: 'COMPLETED' as const},
+        };
+
+        const topGhost = ghostNode('loop_2', 'loop-top-ghost');
+
+        expect(getExecutedEdgeStatus(taskNode('var_1'), dispatcherNode('loop_2'), states)).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus(dispatcherNode('loop_2'), topGhost, states)).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus(topGhost, taskNode('logger_1'), states)).toBe('COMPLETED');
+    });
+
+    it('keeps the edges of a running loop neutral where the run has not reached yet', () => {
+        const states = {
+            logger_1: {status: 'RUNNING' as const},
+            loop_2: {status: 'RUNNING' as const},
+        };
+
+        const topGhost = ghostNode('loop_2', 'loop-top-ghost');
+
+        expect(getExecutedEdgeStatus(topGhost, taskNode('logger_1'), states)).toBeUndefined();
+        expect(getExecutedEdgeStatus(topGhost, taskNode('logger_2'), states)).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus(
+                bottomGhostNode('loop_2', 'loop-bottom-ghost'),
+                bottomGhostNode('loop_1', 'loop-bottom-ghost'),
+                states
+            )
+        ).toBeUndefined();
+    });
+
+    it('colors the way into a running dispatcher nested in a running loop', () => {
+        const states = {
+            condition_1: {status: 'RUNNING' as const},
+            loop_2: {status: 'RUNNING' as const},
+        };
+
+        expect(
+            getExecutedEdgeStatus(ghostNode('loop_2', 'loop-top-ghost'), dispatcherNode('condition_1'), states)
+        ).toBe('COMPLETED');
     });
 
     it('is neutral while the target is still running or has no state', () => {
