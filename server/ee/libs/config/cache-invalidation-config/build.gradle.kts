@@ -1,6 +1,7 @@
 dependencies {
     implementation("org.jspecify:jspecify")
     implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-redis")
     implementation("org.springframework:spring-context")
@@ -8,16 +9,17 @@ dependencies {
     implementation(project(":server:libs:config:cache-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-api"))
+    implementation(project(":server:libs:core:message:message-broker:message-broker-redis-control"))
     implementation(project(":server:libs:core:message:message-event:message-event-api"))
     implementation(project(":server:libs:platform:platform-api"))
 
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("io.lettuce:lettuce-core")
     testImplementation("org.awaitility:awaitility")
+    testImplementation("org.springframework.boot:spring-boot-data-redis")
     testImplementation("org.springframework:spring-context-support")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("tools.jackson.core:jackson-databind")
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
-    testImplementation(project(":server:libs:core:message:message-broker:message-broker-redis-control"))
     testImplementation(project(":server:libs:test:test-support"))
 }
