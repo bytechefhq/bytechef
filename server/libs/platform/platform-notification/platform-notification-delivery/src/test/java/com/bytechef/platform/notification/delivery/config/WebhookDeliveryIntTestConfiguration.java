@@ -24,6 +24,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
  * @author Ivica Cardic
@@ -41,7 +42,11 @@ public class WebhookDeliveryIntTestConfiguration {
     }
 
     @Bean
-    RestartableAsyncTaskExecutor webhookDeliveryExecutor() {
-        return new RestartableAsyncTaskExecutor();
+    SimpleAsyncTaskExecutor webhookDeliveryExecutor() {
+        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor("webhook-delivery-");
+
+        simpleAsyncTaskExecutor.setVirtualThreads(true);
+
+        return simpleAsyncTaskExecutor;
     }
 }
