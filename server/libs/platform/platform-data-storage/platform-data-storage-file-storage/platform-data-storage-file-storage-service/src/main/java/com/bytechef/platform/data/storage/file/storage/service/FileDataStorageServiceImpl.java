@@ -67,7 +67,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         try {
             deleteIfExists(directoryPath, filename);
             deleteIfExists(
-                getOldDirectoryPath(type, environmentId), getOldFilename(componentName, scope, scopeId, key));
+                getLegacyDirectoryPath(type, environmentId), getLegacyFilename(componentName, scope, scopeId, key));
         } finally {
             lock.unlock();
         }
@@ -94,12 +94,12 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
             return Optional.ofNullable(read(directoryPath, fileStorageService.getFileEntry(directoryPath, filename)));
         }
 
-        String oldDirectoryPath = getOldDirectoryPath(type, environmentId);
-        String oldFilename = getOldFilename(componentName, scope, scopeId, key);
+        String legacyDirectoryPath = getLegacyDirectoryPath(type, environmentId);
+        String legacyFilename = getLegacyFilename(componentName, scope, scopeId, key);
 
-        if (fileStorageService.fileExists(oldDirectoryPath, oldFilename)) {
+        if (fileStorageService.fileExists(legacyDirectoryPath, legacyFilename)) {
             return Optional.ofNullable(
-                read(oldDirectoryPath, fileStorageService.getFileEntry(oldDirectoryPath, oldFilename)));
+                read(legacyDirectoryPath, fileStorageService.getFileEntry(legacyDirectoryPath, legacyFilename)));
         }
 
         return Optional.empty();
@@ -125,14 +125,14 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
 
         Map<String, T> values = new HashMap<>();
 
-        String oldDirectoryPath = getOldDirectoryPath(type, environmentId);
-        String oldPrefix = getOldFilename(componentName, scope, scopeId, "");
+        String legacyDirectoryPath = getLegacyDirectoryPath(type, environmentId);
+        String legacyPrefix = getLegacyFilename(componentName, scope, scopeId, "");
 
-        for (FileEntry fileEntry : fileStorageService.getFileEntries(oldDirectoryPath)) {
+        for (FileEntry fileEntry : fileStorageService.getFileEntries(legacyDirectoryPath)) {
             String filename = fileEntry.getName();
 
-            if (filename.startsWith(oldPrefix)) {
-                values.put(filename.substring(oldPrefix.length()), read(oldDirectoryPath, fileEntry));
+            if (filename.startsWith(legacyPrefix)) {
+                values.put(filename.substring(legacyPrefix.length()), read(legacyDirectoryPath, fileEntry));
             }
         }
 
@@ -167,7 +167,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
                 directoryPath, filename, CompressionUtils.compress(typedValue.write(objectMapper)), false);
 
             deleteIfExists(
-                getOldDirectoryPath(type, environmentId), getOldFilename(componentName, scope, scopeId, key));
+                getLegacyDirectoryPath(type, environmentId), getLegacyFilename(componentName, scope, scopeId, key));
         } finally {
             lock.unlock();
         }
@@ -227,11 +227,11 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         return componentName + "_" + key;
     }
 
-    private static String getOldDirectoryPath(PlatformType type, long environmentId) {
+    private static String getLegacyDirectoryPath(PlatformType type, long environmentId) {
         return LEGACY_DATA_ENTRIES_ROOT_DIR + type.ordinal() + "/" + environmentId;
     }
 
-    private static String getOldFilename(String componentName, DataStorageScope scope, String scopeId, String key) {
+    private static String getLegacyFilename(String componentName, DataStorageScope scope, String scopeId, String key) {
         return componentName + "_" + scope.ordinal() + "_" + scopeId + "_" + key;
     }
 
