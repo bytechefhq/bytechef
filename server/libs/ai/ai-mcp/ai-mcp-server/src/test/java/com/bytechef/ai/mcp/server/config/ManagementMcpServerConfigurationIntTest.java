@@ -103,14 +103,14 @@ class ManagementMcpServerConfigurationIntTest {
     }
 
     @Test
-    void testToolCallbackProviderExposesLifecycleToolsWithoutUpdateWorkflow() {
+    void testToolCallbackProviderExposesTheValidatingUpdateWorkflowButNoPartialWrites() {
         applicationContextRunner.run(context -> {
             assertThat(context).hasNotFailed();
 
             assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
-                .contains("deleteWorkflow", "saveWorkflowTestConnection")
+                .contains("deleteWorkflow", "saveWorkflowTestConnection", "updateWorkflow")
                 .doesNotContain(
-                    "updateWorkflow", "getActionDefinition", "listComponents", "getTaskProperties",
+                    "getActionDefinition", "listComponents", "getTaskProperties",
                     "listTaskDispatchers", "updateScriptComponentCode", "updateClusterElementTask",
                     "updateWorkflowRootProperties");
         });
@@ -125,8 +125,7 @@ class ManagementMcpServerConfigurationIntTest {
                 .containsExactlyInAnyOrder(
                     "listWorkspaces", "listProjects", "getProject", "createProject", "updateProject",
                     "deleteProject", "publishProject", "getWorkflow", "listWorkflows", "searchWorkflows",
-                    "deleteWorkflow",
-                    "saveWorkflowTestConnection");
+                    "deleteWorkflow", "saveWorkflowTestConnection", "updateWorkflow");
         });
     }
 
