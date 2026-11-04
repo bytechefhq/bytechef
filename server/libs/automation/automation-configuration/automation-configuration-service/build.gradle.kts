@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-billing:platform-billing-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
     implementation(project(":server:libs:platform:platform-github-proxy-client"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
