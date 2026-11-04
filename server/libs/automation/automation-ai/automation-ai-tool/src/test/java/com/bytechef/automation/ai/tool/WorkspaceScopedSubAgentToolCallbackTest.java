@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.agent.tool.CoreAgentType;
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -293,6 +294,60 @@ class WorkspaceScopedSubAgentToolCallbackTest {
         assertThat(copilotDelegate.capturedContext)
             .containsEntry(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 43L)
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 43L);
+    }
+
+    @Test
+    void testNoAiProviderReturnsTheExceptionMessage() {
+        ChatModelUnavailableException exception = ChatModelUnavailableException.noProviderEnabled(0);
+
+        ToolCallback failingDelegate = new FailingDelegate(exception);
+
+        String result = new WorkspaceScopedSubAgentToolCallback(failingDelegate, workspaceFacade).call(
+            "{\"request\": \"list servers\", \"workspaceId\": 42}");
+
+        Map<String, ?> resultMap = JsonUtils.readMap(result);
+
+        assertThat(resultMap.get("error")).isEqualTo(exception.getMessage());
+        assertThat(String.valueOf(resultMap.get("error"))).startsWith("No AI provider is enabled in environment 0");
+    }
+
+    @Test
+    void testOtherFailuresStillReturnOnlyTheClassName() {
+        ToolCallback failingDelegate = new FailingDelegate(new IllegalStateException("secret"));
+
+        String result = new WorkspaceScopedSubAgentToolCallback(failingDelegate, workspaceFacade).call(
+            "{\"request\": \"list servers\", \"workspaceId\": 42}");
+
+        assertThat(result).contains("IllegalStateException")
+            .doesNotContain("secret");
+    }
+
+    private static final class FailingDelegate implements ToolCallback {
+
+        private final RuntimeException failure;
+
+        private FailingDelegate(RuntimeException failure) {
+            this.failure = failure;
+        }
+
+        @Override
+        public ToolDefinition getToolDefinition() {
+            return ToolDefinition.builder()
+                .name("failing_agent")
+                .description("Always fails.")
+                .inputSchema("{\"type\": \"object\", \"properties\": {\"request\": {\"type\": \"string\"}}}")
+                .build();
+        }
+
+        @Override
+        public String call(String toolInput) {
+            throw failure;
+        }
+
+        @Override
+        public String call(String toolInput, ToolContext toolContext) {
+            throw failure;
+        }
     }
 
     private static final class ContextCapturingDelegate implements ToolCallback {
