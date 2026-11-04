@@ -144,10 +144,6 @@ function validateUrlSetting({context, invalidMessage, requiredMessage, settingKe
     }
 }
 
-/**
- * Mirrors the server: strips surrounding whitespace, lowercases the scheme and host and drops the default port,
- * keeping the path and query exactly as given.
- */
 export function normalizeWebhookUrl(url: unknown): string {
     if (typeof url !== 'string') {
         return '';
