@@ -23,6 +23,7 @@ import static com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutp
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutputDataSource;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -64,6 +65,25 @@ public class BranchTaskDispatcherDefinitionFactoryOutputTest {
             branchParameters("${trigger_1.status}", List.of(task("var_3"))), DATA_SOURCE);
 
         Assertions.assertEquals("first", outputResponse.getSampleOutput());
+    }
+
+    @Test
+    public void testOutputIsTheDefaultOutputWhenTheExpressionIsNotSet() {
+        Map<String, Object> inputParameters = new HashMap<>(branchParameters("k1", List.of(task("var_3"))));
+
+        inputParameters.remove("expression");
+
+        OutputResponse outputResponse = BranchTaskDispatcherDefinitionFactory.output(inputParameters, DATA_SOURCE);
+
+        Assertions.assertEquals("fallback", outputResponse.getSampleOutput());
+    }
+
+    @Test
+    public void testOutputIsTheDefaultOutputWhenTheExpressionIsAnEmptyFormula() {
+        OutputResponse outputResponse = BranchTaskDispatcherDefinitionFactory.output(
+            branchParameters("=", List.of(task("var_3"))), DATA_SOURCE);
+
+        Assertions.assertEquals("fallback", outputResponse.getSampleOutput());
     }
 
     @Test

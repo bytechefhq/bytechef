@@ -102,6 +102,23 @@ public class BranchTaskDispatcherIntTest {
         Assertions.assertEquals("default output", outputs.get("result"));
     }
 
+    @Test
+    public void testDispatchOutputDefaultWhenTheExpressionIsMissing() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "branch_v1-output-missingExpression".getBytes(StandardCharsets.UTF_8)),
+            Map.of(),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("default output", outputs.get("result"));
+    }
+
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {

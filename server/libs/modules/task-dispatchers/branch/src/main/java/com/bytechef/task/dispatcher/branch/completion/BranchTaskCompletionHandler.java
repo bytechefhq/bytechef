@@ -172,7 +172,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private Map<String, ?> resolveCase(TaskExecution taskExecution, Map<String, ?> context) {
-        Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
+        Object expression = MapUtils.get(taskExecution.getParameters(), EXPRESSION);
         List<Map<String, ?>> branchCases = MapUtils.getList(
             taskExecution.getParameters(), CASES, new TypeReference<>() {}, Collections.emptyList());
 
