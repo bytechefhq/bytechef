@@ -340,7 +340,7 @@ bytechef:
         enabled: true
       approval-reminder:
         enabled: true
-        # Remind approvers this long before an approval expires default: PT24H
+        # Send one reminder this long before an approval expires default: PT24H
         lead-time: PT24H
     output-storage:
       # Output storage provider for workflow output data (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
