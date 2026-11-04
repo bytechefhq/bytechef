@@ -18,8 +18,10 @@ package com.bytechef.platform.data.storage.jdbc.service;
 
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -36,6 +38,10 @@ public interface JdbcDataStorageService {
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type);
 
+    <T> Optional<VersionedValue<T>> fetchVersioned(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type);
+
     <T> T get(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type);
@@ -46,4 +52,8 @@ public interface JdbcDataStorageService {
     void put(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, PlatformType type,
         Object value);
+
+    boolean putIfVersion(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, PlatformType type,
+        Object value, @Nullable Integer expectedVersion);
 }
