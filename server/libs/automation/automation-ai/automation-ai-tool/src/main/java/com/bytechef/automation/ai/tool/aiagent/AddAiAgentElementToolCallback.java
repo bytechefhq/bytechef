@@ -53,7 +53,8 @@ public class AddAiAgentElementToolCallback implements ToolCallback {
               parameters is {"provider": the model component's name such as "anthropic", "model": the model
               id, "parameters": optional model settings such as maxTokens}.
               connectionId is required: the id of a connection to the provider's component (find one with
-              listConnectionsForComponent, or create it first); without it the agent cannot run.
+              listConnections, or listConnectionsForComponent in the Copilot, or create it first); without it
+              the agent cannot run.
             - TOOL: a tool the agent's LLM can call. Find it with searchAiAgentTools first, then pass
               parameters {"componentName", "componentVersion", "actionName"} exactly as it returned them,
               plus an optional "parameters" object of fixed tool inputs and an optional boolean
@@ -131,7 +132,8 @@ public class AddAiAgentElementToolCallback implements ToolCallback {
             if (AiAgentElement.KIND_MODEL.equals(input.kind()) && input.connectionId() == null) {
                 return toolError(
                     "A MODEL element requires connectionId, the id of a connection to the model provider's " +
-                        "component; find one with listConnectionsForComponent or create it first");
+                        "component; find one with listConnections (listConnectionsForComponent in the Copilot) " +
+                        "or create it first");
             }
 
             if (AiAgentElement.KIND_MODEL.equals(input.kind()) && !isModelReference(input.parameters())) {
