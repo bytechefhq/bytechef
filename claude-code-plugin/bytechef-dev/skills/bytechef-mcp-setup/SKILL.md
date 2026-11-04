@@ -90,14 +90,16 @@ Enable the connector in the conversation where the workflow will be built.
 
 <!-- transport: local -->
 Add a remote (streamable HTTP) MCP server entry pointing at `https://<host>/api/management/mcp`.
-For Codex, in `~/.codex/config.toml` (check the key names against the current Codex documentation):
+For Codex, in `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.bytechef]
 url = "https://<host>/api/management/mcp"
 ```
 
-Then run `codex mcp login bytechef` to complete the OAuth sign-in. Other agents take the same URL in
+Then run `codex mcp login bytechef` to complete the OAuth sign-in. Without OAuth, set
+`bearer_token_env_var = "BYTECHEF_API_KEY"` in the same table and export that variable with an Admin
+API key; Codex sends it as `Authorization: Bearer <API key>`. Other agents take the same URL in
 their own remote MCP configuration; if the agent has no OAuth support, configure it to send the
 `Authorization: Bearer <API key>` header described above.
 <!-- /transport -->
