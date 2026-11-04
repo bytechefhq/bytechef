@@ -17,6 +17,7 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.config.JdbcDataStorageConfiguration;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
 import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
@@ -107,7 +108,10 @@ class RemoteJdbcDataStorageServiceClientIntTest {
         VersionedValue<Object> updatedVersionedValue = fetchVersioned("key").orElseThrow();
 
         assertThat(updatedVersionedValue.value()).isEqualTo("second");
-        assertThat(updatedVersionedValue.version()).isGreaterThan(versionedValue.version());
+        assertThat(updatedVersionedValue.version()
+            .version()).isGreaterThan(
+                versionedValue.version()
+                    .version());
     }
 
     @Test
@@ -150,7 +154,7 @@ class RemoteJdbcDataStorageServiceClientIntTest {
             COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, key, ENVIRONMENT_ID, PlatformType.AUTOMATION);
     }
 
-    private boolean putIfVersion(String key, Object value, Integer expectedVersion) {
+    private boolean putIfVersion(String key, Object value, DataEntryVersion expectedVersion) {
         return remoteJdbcDataStorageServiceClient.putIfVersion(
             COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, key, ENVIRONMENT_ID, PlatformType.AUTOMATION, value,
             expectedVersion);

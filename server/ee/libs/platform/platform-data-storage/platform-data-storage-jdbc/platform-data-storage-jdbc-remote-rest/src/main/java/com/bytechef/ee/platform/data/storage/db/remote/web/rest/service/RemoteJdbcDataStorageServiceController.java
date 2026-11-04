@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.data.storage.db.remote.web.rest.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
 import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -111,12 +112,15 @@ public class RemoteJdbcDataStorageServiceController {
     public ResponseEntity<Boolean> putIfVersion(
         @PathVariable String componentName, @PathVariable DataStorageScope scope,
         @PathVariable String scopeId, @PathVariable String key, @PathVariable Integer environment,
-        @PathVariable PlatformType type, @RequestParam(required = false) Integer expectedVersion,
-        @RequestBody Map<String, Object> body) {
+        @PathVariable PlatformType type, @RequestParam(required = false) Long expectedId,
+        @RequestParam(required = false) Integer expectedVersion, @RequestBody Map<String, Object> body) {
+
+        DataEntryVersion dataEntryVersion = expectedId == null || expectedVersion == null
+            ? null : new DataEntryVersion(expectedId, expectedVersion);
 
         return ResponseEntity.ok(
             dataStorageService.putIfVersion(
                 componentName, scope, scopeId, key, environment.intValue(), type, body.get("value"),
-                expectedVersion));
+                dataEntryVersion));
     }
 }

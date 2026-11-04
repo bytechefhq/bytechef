@@ -24,6 +24,7 @@ import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.config.DataStorageIntTestConfiguration;
 import com.bytechef.platform.data.storage.jdbc.config.JdbcDataStorageConfiguration;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
 import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -114,9 +115,24 @@ class JdbcDataStorageServiceIntTest {
     void testPutIfVersionRejectsAStaleVersion() {
         putValue("key", "first");
 
-        int version = fetchVersion("key");
+        DataEntryVersion version = fetchVersion("key");
 
         assertThat(putIfVersion("key", "second", version)).isTrue();
+        assertThat(putIfVersion("key", "third", version)).isFalse();
+        assertThat(this.<String>fetchValue("key")).isEqualTo("second");
+    }
+
+    @Test
+    void testPutIfVersionRejectsARecreatedEntry() {
+        putValue("key", "first");
+
+        DataEntryVersion version = fetchVersion("key");
+
+        jdbcDataStorageService.delete(
+            COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, "key", ENVIRONMENT_ID, PlatformType.AUTOMATION);
+
+        putValue("key", "second");
+
         assertThat(putIfVersion("key", "third", version)).isFalse();
         assertThat(this.<String>fetchValue("key")).isEqualTo("second");
     }
@@ -154,13 +170,13 @@ class JdbcDataStorageServiceIntTest {
         assertThat(dataStorageRepository.count()).isZero();
     }
 
-    private boolean putIfVersion(String key, Object value, @Nullable Integer expectedVersion) {
+    private boolean putIfVersion(String key, Object value, @Nullable DataEntryVersion expectedVersion) {
         return jdbcDataStorageService.putIfVersion(
             COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, key, ENVIRONMENT_ID, PlatformType.AUTOMATION, value,
             expectedVersion);
     }
 
-    private int fetchVersion(String key) {
+    private DataEntryVersion fetchVersion(String key) {
         Optional<VersionedValue<Object>> versionedValue = jdbcDataStorageService.fetchVersioned(
             COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, key, ENVIRONMENT_ID, PlatformType.AUTOMATION);
 

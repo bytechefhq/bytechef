@@ -19,10 +19,12 @@ package com.bytechef.platform.data.storage.jdbc.service;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.domain.DataEntry;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
 import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -86,7 +88,9 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
         return dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndEnvironmentAndType(
                 componentName, scope.ordinal(), scopeId, key, (int) environmentId, type.ordinal())
-            .map(dataEntry -> new VersionedValue<>((T) dataEntry.getValue(), dataEntry.getVersion()));
+            .map(dataEntry -> new VersionedValue<>(
+                (T) dataEntry.getValue(),
+                new DataEntryVersion(Objects.requireNonNull(dataEntry.getId()), dataEntry.getVersion())));
     }
 
     @Override
@@ -134,7 +138,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public boolean putIfVersion(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, PlatformType type,
-        Object value, @Nullable Integer expectedVersion) {
+        Object value, @Nullable DataEntryVersion expectedVersion) {
 
         try {
             if (expectedVersion == null) {
@@ -154,7 +158,9 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
 
             DataEntry dataEntry = dataEntryOptional.get();
 
-            if (dataEntry.getVersion() != expectedVersion) {
+            if (!Objects.equals(dataEntry.getId(), expectedVersion.id()) ||
+                dataEntry.getVersion() != expectedVersion.version()) {
+
                 return false;
             }
 

@@ -19,5 +19,5 @@ package com.bytechef.platform.data.storage.jdbc.domain;
 /**
  * @author Ivica Cardic
  */
-public record VersionedValue<T>(T value, int version) {
+public record VersionedValue<T>(T value, DataEntryVersion version) {
 }

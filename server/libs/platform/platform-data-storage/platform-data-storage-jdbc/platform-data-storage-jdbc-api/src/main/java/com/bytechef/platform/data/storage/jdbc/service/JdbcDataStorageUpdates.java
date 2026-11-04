@@ -18,6 +18,7 @@ package com.bytechef.platform.data.storage.jdbc.service;
 
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
 import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
@@ -60,7 +61,7 @@ public final class JdbcDataStorageUpdates {
                 throw new IllegalArgumentException("A data storage update must not return null");
             }
 
-            Integer expectedVersion = versionedValueOptional.map(VersionedValue::version)
+            DataEntryVersion expectedVersion = versionedValueOptional.map(VersionedValue::version)
                 .orElse(null);
 
             if (jdbcDataStorageService.putIfVersion(
