@@ -128,6 +128,12 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<TaskExecution> fetchLastFailedJobTaskExecution(long jobId) {
+        return taskExecutionRepository.findLastFailedWithErrorByJobId(jobId);
+    }
+
+    @Override
     public Optional<TaskExecution> fetchLastJobTaskExecution(long jobId) {
         return taskExecutionRepository.findLastByJobId(jobId);
     }

@@ -282,6 +282,13 @@ public interface JdbcTaskExecutionRepository
 
     @Override
     @Query("""
+        SELECT * FROM task_execution WHERE job_id = :jobId AND status = 3 AND error IS NOT NULL
+        ORDER BY created_date DESC, id DESC LIMIT 1
+        """)
+    Optional<TaskExecution> findLastFailedWithErrorByJobId(@Param("jobId") long jobId);
+
+    @Override
+    @Query("""
         SELECT * FROM task_execution WHERE job_id = :jobId AND start_date IS NOT NULL
         ORDER BY start_date DESC, id DESC LIMIT 1
         """)
