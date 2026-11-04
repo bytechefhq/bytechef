@@ -21,10 +21,13 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskExecutionLockedUpdates;
+import com.bytechef.atlas.file.storage.TaskExecutionLockedUpdatesImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.task.dispatcher.fork.join.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.fork.join.completion.ForkJoinTaskCompletionHandler;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -54,11 +57,17 @@ public class ForkJoinTaskDispatcherConfiguration {
     @Autowired
     private TaskExecutionService taskExecutionService;
 
+    @Autowired
+    private ObjectProvider<TaskExecutionLockedUpdates> taskExecutionLockedUpdatesProvider;
+
     @Bean("forkJoinTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory forkTaskCompletionHandlerFactory() {
+        TaskExecutionLockedUpdates taskExecutionLockedUpdates = taskExecutionLockedUpdatesProvider.getIfAvailable(
+            () -> new TaskExecutionLockedUpdatesImpl(taskExecutionService, taskFileStorage));
+
         return (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
             contextService, counterService, evaluator, taskExecutionService, taskCompletionHandler, taskDispatcher,
-            taskFileStorage);
+            taskFileStorage, taskExecutionLockedUpdates);
     }
 
     @Bean("forkJoinTaskDispatcherResolverFactory_v1")
