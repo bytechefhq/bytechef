@@ -23,6 +23,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.definition.BaseProperty.ResourceType;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -81,6 +82,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectionService connectionService;
+    private final Evaluator evaluator;
     private final Map<ResourceType, ResourceReferenceResolver> resourceReferenceResolverMap;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -110,7 +112,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, ConnectionService connectionService,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        Evaluator evaluator, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
@@ -121,6 +123,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
         this.connectionService = connectionService;
+        this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -665,13 +668,14 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
         try {
             JsonNode workflowJsonNode = JsonUtils.readTree(workflow);
+            Map<String, Object> sampleOutputContext = buildSampleOutputContext(workflowId, environmentId);
 
             addNodeOutputs(
                 workflowJsonNode.get("triggers"), true, workflowId, environmentId, nodeOutputMap,
-                nodeVariableOutputMap);
+                nodeVariableOutputMap, sampleOutputContext);
             addNodeOutputs(
                 workflowJsonNode.get("tasks"), false, workflowId, environmentId, nodeOutputMap,
-                nodeVariableOutputMap);
+                nodeVariableOutputMap, sampleOutputContext);
         } catch (Exception e) {
             log.debug("Failed to build config-aware node output map; falling back to static validation", e);
         }
@@ -679,22 +683,42 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         return new NodeOutputMaps(nodeOutputMap, nodeVariableOutputMap);
     }
 
+    private Map<String, Object> buildSampleOutputContext(@Nullable String workflowId, long environmentId) {
+        Map<String, Object> sampleOutputContext = new HashMap<>();
+
+        if (workflowId == null) {
+            return sampleOutputContext;
+        }
+
+        try {
+            sampleOutputContext.putAll(
+                workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, environmentId));
+        } catch (Exception e) {
+            log.debug("Failed to read the test configuration inputs of workflow '{}'", workflowId, e);
+        }
+
+        return sampleOutputContext;
+    }
+
     private void addNodeOutputs(
         @Nullable JsonNode nodesJsonNode, boolean trigger, @Nullable String workflowId, long environmentId,
-        Map<String, PropertyInfo> outputMap, Map<String, PropertyInfo> variableOutputMap) {
+        Map<String, PropertyInfo> outputMap, Map<String, PropertyInfo> variableOutputMap,
+        Map<String, Object> sampleOutputContext) {
 
         if (nodesJsonNode == null || !nodesJsonNode.isArray()) {
             return;
         }
 
         for (JsonNode nodeJsonNode : nodesJsonNode) {
-            addNodeOutput(nodeJsonNode, trigger, workflowId, environmentId, outputMap, variableOutputMap);
+            addNodeOutput(
+                nodeJsonNode, trigger, workflowId, environmentId, outputMap, variableOutputMap, sampleOutputContext);
         }
     }
 
     private void addNodeOutput(
         JsonNode nodeJsonNode, boolean trigger, @Nullable String workflowId, long environmentId,
-        Map<String, PropertyInfo> outputMap, Map<String, PropertyInfo> variableOutputMap) {
+        Map<String, PropertyInfo> outputMap, Map<String, PropertyInfo> variableOutputMap,
+        Map<String, Object> sampleOutputContext) {
 
         if (!nodeJsonNode.isObject() || !nodeJsonNode.has("name") || !nodeJsonNode.has("type")) {
             return;
@@ -706,7 +730,9 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             .asString();
         Map<String, ?> inputParameters = toInputParameters(nodeJsonNode.get("parameters"));
 
-        PropertyInfo outputProperty = resolveTestOutput(name, type, workflowId, environmentId);
+        WorkflowNodeTestOutput workflowNodeTestOutput = fetchTestOutput(name, type, workflowId, environmentId);
+
+        PropertyInfo outputProperty = resolveTestOutput(name, type, workflowNodeTestOutput);
 
         if (outputProperty == null) {
             outputProperty = resolveDynamicOutput(type, trigger, inputParameters, workflowId, environmentId);
@@ -716,20 +742,28 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             outputMap.put(name, outputProperty);
         }
 
-        PropertyInfo variableOutputProperty = resolveVariableOutput(type, trigger, inputParameters);
+        PropertyInfo variableOutputProperty = resolveVariableOutput(
+            type, trigger, inputParameters, sampleOutputContext);
 
         if (variableOutputProperty != null) {
             variableOutputMap.put(name, variableOutputProperty);
         }
 
+        Object sampleOutput = workflowNodeTestOutput == null ? null : workflowNodeTestOutput.getSampleOutput();
+
+        if (sampleOutput != null) {
+            sampleOutputContext.put(name, sampleOutput);
+        }
+
         if (!trigger) {
-            addNestedNodeOutputs(nodeJsonNode, workflowId, environmentId, outputMap, variableOutputMap);
+            addNestedNodeOutputs(
+                nodeJsonNode, workflowId, environmentId, outputMap, variableOutputMap, sampleOutputContext);
         }
     }
 
     private void addNestedNodeOutputs(
         JsonNode nodeJsonNode, @Nullable String workflowId, long environmentId, Map<String, PropertyInfo> outputMap,
-        Map<String, PropertyInfo> variableOutputMap) {
+        Map<String, PropertyInfo> variableOutputMap, Map<String, Object> sampleOutputContext) {
 
         JsonNode parametersJsonNode = nodeJsonNode.get("parameters");
 
@@ -740,10 +774,11 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         WorkflowValidator.forEachNestedTask(
             parametersJsonNode,
             nestedTaskJsonNode -> addNodeOutput(
-                nestedTaskJsonNode, false, workflowId, environmentId, outputMap, variableOutputMap));
+                nestedTaskJsonNode, false, workflowId, environmentId, outputMap, variableOutputMap,
+                sampleOutputContext));
     }
 
-    private @Nullable PropertyInfo resolveTestOutput(
+    private @Nullable WorkflowNodeTestOutput fetchTestOutput(
         String name, String type, @Nullable String workflowId, long environmentId) {
 
         if (workflowId == null) {
@@ -753,13 +788,30 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         try {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
+            return workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, name, environmentId)
+                .filter(workflowNodeTestOutput -> isOfType(workflowNodeTestOutput, workflowNodeType))
+                .orElse(null);
+        } catch (Exception e) {
+            log.debug("Failed to read the test output of node '{}'", name, e);
+        }
+
+        return null;
+    }
+
+    private static @Nullable PropertyInfo resolveTestOutput(
+        String name, String type, @Nullable WorkflowNodeTestOutput workflowNodeTestOutput) {
+
+        if (workflowNodeTestOutput == null) {
+            return null;
+        }
+
+        try {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
             Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
                 ? com.bytechef.platform.workflow.task.dispatcher.domain.Property.class : Property.class;
 
-            return workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, name, environmentId)
-                .filter(workflowNodeTestOutput -> isOfType(workflowNodeTestOutput, workflowNodeType))
-                .map(workflowNodeTestOutput -> toOutputPropertyInfo(workflowNodeTestOutput.getOutput(typeClass)))
-                .orElse(null);
+            return toOutputPropertyInfo(workflowNodeTestOutput.getOutput(typeClass));
         } catch (Exception e) {
             log.debug("Failed to read the test output of node '{}'", name, e);
         }
@@ -812,7 +864,9 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         return null;
     }
 
-    private @Nullable PropertyInfo resolveVariableOutput(String type, boolean trigger, Map<String, ?> inputParameters) {
+    private @Nullable PropertyInfo resolveVariableOutput(
+        String type, boolean trigger, Map<String, ?> inputParameters, Map<String, Object> sampleOutputContext) {
+
         if (trigger) {
             return null;
         }
@@ -825,7 +879,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             }
 
             OutputResponse outputResponse = taskDispatcherDefinitionService.executeVariableProperties(
-                workflowNodeType.name(), workflowNodeType.version(), inputParameters);
+                workflowNodeType.name(), workflowNodeType.version(),
+                evaluateParameters(inputParameters, sampleOutputContext));
 
             return toOutputPropertyInfo(outputResponse);
         } catch (Exception e) {
@@ -833,6 +888,20 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         }
 
         return null;
+    }
+
+    private Map<String, ?> evaluateParameters(Map<String, ?> inputParameters, Map<String, Object> sampleOutputContext) {
+        if (sampleOutputContext.isEmpty()) {
+            return inputParameters;
+        }
+
+        try {
+            return evaluator.evaluate(inputParameters, sampleOutputContext);
+        } catch (Exception e) {
+            log.debug("Failed to evaluate the parameters against the previous node sample outputs", e);
+        }
+
+        return inputParameters;
     }
 
     private static @Nullable PropertyInfo toOutputPropertyInfo(@Nullable OutputResponse outputResponse) {

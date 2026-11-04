@@ -20,21 +20,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl;
+import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.NodeValidationIssue;
@@ -46,12 +58,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -422,8 +437,104 @@ class WorkflowValidatorFacadeIntTest {
                     .contains("does not exist in component"));
     }
 
+    @Test
+    void testValidateWorkflowResolvesMapItemFromThePreviousTaskTestOutput() {
+        ActionDefinition dataTableActionDefinition = mock(ActionDefinition.class);
+        ActionDefinition varActionDefinition = mock(ActionDefinition.class);
+        WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
+
+        doReturn(
+            List.of(Property.toProperty(ComponentDsl.string("type")),
+                Property.toProperty(ComponentDsl.string("value"))))
+                    .when(varActionDefinition)
+                    .getProperties();
+
+        when(componentDefinitionService.hasComponentDefinition(any(), any())).thenReturn(true);
+        when(actionDefinitionService.getActionDefinition("dataTable", 1, "findRecords"))
+            .thenReturn(dataTableActionDefinition);
+        when(actionDefinitionService.getActionDefinition("var", 1, "set")).thenReturn(varActionDefinition);
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("map", 1))
+            .thenReturn(new TaskDispatcherDefinition("map"));
+        when(taskDispatcherDefinitionService.executeVariableProperties(eq("map"), eq(1), anyMap()))
+            .thenAnswer(invocation -> {
+                Map<String, ?> inputParameters = invocation.getArgument(2);
+
+                if (inputParameters.get("items") instanceof List<?> items && !items.isEmpty()) {
+                    return new OutputResponse(
+                        new ObjectProperty(
+                            TaskDispatcherDsl.object("map_1")
+                                .properties(
+                                    TaskDispatcherDsl.object("item")
+                                        .properties(
+                                            TaskDispatcherDsl.integer("number"), TaskDispatcherDsl.string("hjh"),
+                                            TaskDispatcherDsl.integer("id")),
+                                    TaskDispatcherDsl.integer("index"))),
+                        null);
+                }
+
+                return new OutputResponse(
+                    new ObjectProperty(
+                        TaskDispatcherDsl.object("map_1")
+                            .properties(TaskDispatcherDsl.object("item"), TaskDispatcherDsl.integer("index"))),
+                    null);
+            });
+        when(workflowNodeTestOutput.getTypeName()).thenReturn("dataTable");
+        when(workflowNodeTestOutput.getTypeVersion()).thenReturn(1);
+        when(workflowNodeTestOutput.getTypeOperationName()).thenReturn("findRecords");
+        when(workflowNodeTestOutput.getOutput(any())).thenReturn(
+            new OutputResponse(
+                Property.toProperty(
+                    ComponentDsl.array("dataTable_1")
+                        .items(
+                            ComponentDsl.object()
+                                .properties(
+                                    ComponentDsl.integer("number"), ComponentDsl.string("hjh"),
+                                    ComponentDsl.integer("id")))),
+                null));
+        when(workflowNodeTestOutput.getSampleOutput())
+            .thenReturn(List.of(Map.of("number", 234, "hjh", "pero", "id", 3)));
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput("wf-1", "dataTable_1", 3L))
+            .thenReturn(Optional.of(workflowNodeTestOutput));
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                """
+                    {
+                        "label": "workflow1",
+                        "description": "",
+                        "triggers": [],
+                        "tasks": [
+                            {"name": "dataTable_1", "type": "dataTable/v1/findRecords", "parameters": {}},
+                            {
+                                "name": "map_1",
+                                "type": "map/v1",
+                                "parameters": {
+                                    "items": "${dataTable_1}",
+                                    "iteratee": [
+                                        {
+                                            "name": "var_1",
+                                            "type": "var/v1/set",
+                                            "parameters": {"type": "INTEGER", "value": "${map_1.item.number}"}
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                    """,
+                "wf-1", 3L);
+
+        assertThat(workflowValidationResult.errors()).isEmpty();
+        assertThat(workflowValidationResult.warnings()).isEmpty();
+    }
+
     @Configuration
     @ComponentScan("com.bytechef.platform.workflow.validator")
     static class WorkflowValidatorIntTestConfiguration {
+
+        @Bean
+        Evaluator evaluator() {
+            return SpelEvaluator.create();
+        }
     }
 }

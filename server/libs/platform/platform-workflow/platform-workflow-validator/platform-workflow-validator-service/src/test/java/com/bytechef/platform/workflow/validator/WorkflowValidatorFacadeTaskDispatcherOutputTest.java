@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Property;
@@ -254,7 +255,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     private final WorkflowValidatorFacadeImpl workflowValidatorFacade = new WorkflowValidatorFacadeImpl(
         mock(ActionDefinitionFacade.class), actionDefinitionService, mock(ClusterElementDefinitionService.class),
-        componentDefinitionService, connectionService, taskDispatcherDefinitionService,
+        componentDefinitionService, connectionService, SpelEvaluator.create(), taskDispatcherDefinitionService,
         mock(TriggerDefinitionFacade.class),
         mock(TriggerDefinitionService.class), workflowNodeTestOutputService, workflowService,
         workflowTestConfigurationService, List.of());
