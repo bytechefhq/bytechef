@@ -144,7 +144,7 @@ class RemoteConnectedUserProjectFacadeClientIntTest {
         automationWorkflowProjectFacade.publishProject(projectId);
 
         automationWorkflowProjectConfigurationService.create(
-            projectId, Environment.PRODUCTION.ordinal(), 1, true, true);
+            projectId, Environment.PRODUCTION.ordinal(), "Default", null, 1, true, true);
 
         return workflowUuid;
     }
