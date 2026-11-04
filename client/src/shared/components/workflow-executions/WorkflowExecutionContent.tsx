@@ -64,7 +64,7 @@ const WorkflowExecutionContent = ({
     if (input !== undefined) {
         if (!hasValue(input)) {
             return (
-                <div className="flex items-center justify-center p-4">
+                <div className="flex items-center">
                     <span className="text-sm text-muted-foreground">No input data</span>
                 </div>
             );
@@ -86,7 +86,7 @@ const WorkflowExecutionContent = ({
     if (output !== undefined || (jobInputs !== undefined && workflowTriggerName)) {
         if (!hasValue(filteredOutput)) {
             return (
-                <div className="flex items-center justify-center p-4">
+                <div className="flex items-center">
                     <span className="text-sm text-muted-foreground">No output data</span>
                 </div>
             );

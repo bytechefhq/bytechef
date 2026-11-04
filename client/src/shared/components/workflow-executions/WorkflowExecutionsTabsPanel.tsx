@@ -270,13 +270,13 @@ const WorkflowExecutionsTabsPanel = ({
                 <div className="mb-4">
                     <TabsContent className="p-3" value="input">
                         {resolvedDataLoading ? (
-                            <div className="flex items-center justify-center p-4">
+                            <div className="flex items-center">
                                 <span className="text-sm text-muted-foreground">Loading…</span>
                             </div>
                         ) : resolvedInput ? (
                             <WorkflowExecutionContent input={resolvedInput} />
                         ) : (
-                            <div className="flex items-center justify-center p-4">
+                            <div className="flex items-center">
                                 <span className="text-sm text-muted-foreground">No input data</span>
                             </div>
                         )}
@@ -284,7 +284,7 @@ const WorkflowExecutionsTabsPanel = ({
 
                     <TabsContent className="p-3" value="output">
                         {resolvedDataLoading ? (
-                            <div className="flex items-center justify-center p-4">
+                            <div className="flex items-center">
                                 <span className="text-sm text-muted-foreground">Loading…</span>
                             </div>
                         ) : resolvedOutput !== undefined ? (
@@ -296,7 +296,7 @@ const WorkflowExecutionsTabsPanel = ({
                                 }
                             />
                         ) : (
-                            <div className="flex items-center justify-center p-4">
+                            <div className="flex items-center">
                                 <span className="text-sm text-muted-foreground">No output data</span>
                             </div>
                         )}

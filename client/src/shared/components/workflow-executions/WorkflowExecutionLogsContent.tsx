@@ -176,7 +176,7 @@ const LogEntryRow = ({collapsed, entry, showComponentName}: LogEntryRowProps) =>
     return (
         <div
             className={twMerge(
-                'border-b border-stroke-neutral-secondary p-2',
+                'border-b border-stroke-neutral-secondary py-2 first:pt-1',
                 hasError && 'cursor-pointer hover:bg-surface-neutral-secondary'
             )}
             onClick={() => hasError && setIsExpanded(!isExpanded)}
@@ -338,7 +338,7 @@ const WorkflowExecutionLogsContent = ({
 
     if (isLoading || !jsonViewLoaded) {
         return (
-            <div className="flex items-center justify-center p-4">
+            <div className="flex items-center">
                 <span className="text-sm text-muted-foreground">Loading logs...</span>
             </div>
         );
@@ -346,7 +346,7 @@ const WorkflowExecutionLogsContent = ({
 
     if (error) {
         return (
-            <div className="flex items-center justify-center p-4">
+            <div className="flex items-center">
                 <span className="text-sm text-content-destructive-primary">Failed to load logs</span>
             </div>
         );
@@ -354,7 +354,7 @@ const WorkflowExecutionLogsContent = ({
 
     if (logs.length === 0) {
         return (
-            <div className="flex items-center justify-center p-4">
+            <div className="flex items-center">
                 <span className="text-sm text-muted-foreground">No logs available</span>
             </div>
         );
