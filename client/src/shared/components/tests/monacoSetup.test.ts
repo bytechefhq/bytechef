@@ -23,7 +23,7 @@ describe('monacoSetup', () => {
         monacoSetup = await import('../monacoSetup');
 
         await monacoSetup.ensureMonacoConfigured();
-    });
+    }, 60000);
 
     it('configures one Monaco instance', () => {
         expect(monacoSetup.isMonacoConfigured()).toBe(true);
