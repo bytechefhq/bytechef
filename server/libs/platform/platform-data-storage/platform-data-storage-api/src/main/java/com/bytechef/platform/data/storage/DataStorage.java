@@ -20,6 +20,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Ivica Cardic
@@ -46,4 +47,8 @@ public interface DataStorage {
     void put(
         String componentName, DataStorageScope scope, String scopeId, String key, Object value, long environmentId,
         PlatformType type);
+
+    <T> T update(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type, Function<Optional<T>, T> updater);
 }

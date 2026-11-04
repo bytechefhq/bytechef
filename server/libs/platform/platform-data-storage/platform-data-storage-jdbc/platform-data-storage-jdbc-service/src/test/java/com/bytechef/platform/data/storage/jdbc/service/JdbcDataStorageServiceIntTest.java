@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.config.DataStorageIntTestConfiguration;
 import com.bytechef.platform.data.storage.jdbc.config.JdbcDataStorageConfiguration;
@@ -58,6 +59,9 @@ class JdbcDataStorageServiceIntTest {
     private static final String COMPONENT_NAME = "dataStorage";
     private static final long ENVIRONMENT_ID = 0;
     private static final String SCOPE_ID = "1";
+
+    @Autowired
+    private DataStorage dataStorage;
 
     @Autowired
     private DataStorageRepository dataStorageRepository;
@@ -136,6 +140,18 @@ class JdbcDataStorageServiceIntTest {
         assertThatThrownBy(() -> updateValue("key", (Optional<String> currentValue) -> null))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("A data storage update must not return null");
+    }
+
+    @Test
+    void testDataStorageUpdateRejectsAValueOverTheSizeLimit() {
+        String largeValue = "x".repeat(409601);
+
+        assertThatThrownBy(() -> dataStorage.update(
+            COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, "key", ENVIRONMENT_ID, PlatformType.AUTOMATION,
+            (Optional<String> currentValue) -> largeValue))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageStartingWith("Value size exceeds 400KB limit per key");
+        assertThat(dataStorageRepository.count()).isZero();
     }
 
     private boolean putIfVersion(String key, Object value, @Nullable Integer expectedVersion) {
