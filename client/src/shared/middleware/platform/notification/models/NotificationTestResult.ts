@@ -39,7 +39,22 @@ export interface NotificationTestResult {
      * Whether the test message was signed
      */
     signed: boolean;
+    /**
+     * Why a webhook test message was sent without a signature: NO_SECRET when the notification has no signing secret yet, URL_CHANGED when the URL differs from the saved one
+     */
+    unsignedReason?: NotificationTestResultUnsignedReasonEnum;
 }
+
+
+/**
+ * @export
+ */
+export const NotificationTestResultUnsignedReasonEnum = {
+    NoSecret: 'NO_SECRET',
+    UrlChanged: 'URL_CHANGED',
+} as const;
+export type NotificationTestResultUnsignedReasonEnum = typeof NotificationTestResultUnsignedReasonEnum[keyof typeof NotificationTestResultUnsignedReasonEnum];
+
 
 /**
  * Check if a given object implements the NotificationTestResult interface.
@@ -65,6 +80,7 @@ export function NotificationTestResultFromJSONTyped(json: any, ignoreDiscriminat
         'responseBody': json['responseBody'] == null ? undefined : json['responseBody'],
         'error': json['error'] == null ? undefined : json['error'],
         'signed': json['signed'],
+        'unsignedReason': json['unsignedReason'] == null ? undefined : json['unsignedReason'],
     };
 }
 
@@ -84,6 +100,7 @@ export function NotificationTestResultToJSONTyped(value?: NotificationTestResult
         'responseBody': value['responseBody'],
         'error': value['error'],
         'signed': value['signed'],
+        'unsignedReason': value['unsignedReason'],
     };
 }
 

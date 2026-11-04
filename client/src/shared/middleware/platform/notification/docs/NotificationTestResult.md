@@ -12,6 +12,7 @@ Name | Type
 `responseBody` | string
 `error` | string
 `signed` | boolean
+`unsignedReason` | string
 
 ## Example
 
@@ -25,6 +26,7 @@ const example = {
   "responseBody": null,
   "error": null,
   "signed": null,
+  "unsignedReason": null,
 } satisfies NotificationTestResult
 
 console.log(example)
