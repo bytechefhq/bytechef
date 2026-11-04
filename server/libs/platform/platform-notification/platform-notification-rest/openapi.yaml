@@ -113,6 +113,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NotificationSigningSecret"
+  /notifications/test:
+    post:
+      description: "Sends a sample JOB_FAILED notification to the configured destination without saving anything. Masked values are resolved against the stored notification when an id is given."
+      summary: "Send a test notification"
+      tags:
+        - "notification"
+      operationId: "testNotification"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Notification"
+      responses:
+        "200":
+          description: "The outcome of the test send."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationTestResult"
   /notifications/events:
     get:
       description: "Get a list of possible notification events"
@@ -208,6 +228,28 @@ components:
         signingSecret:
           description: "The signing secret"
           type: "string"
+    NotificationTestResult:
+      description: "The outcome of a test send of a notification."
+      type: "object"
+      required:
+        - "success"
+        - "signed"
+      properties:
+        success:
+          description: "Whether the destination accepted the test message"
+          type: "boolean"
+        statusCode:
+          description: "The HTTP status returned by the destination, when there was a response"
+          type: "integer"
+        responseBody:
+          description: "The response body of the destination, capped at 1000 characters"
+          type: "string"
+        error:
+          description: "The reason the test failed"
+          type: "string"
+        signed:
+          description: "Whether the test message was signed"
+          type: "boolean"
     NotificationEvent:
       type: "object"
       description: "A notification event definition."
