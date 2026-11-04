@@ -92,7 +92,8 @@ public class EnvironmentScopedToolCallback implements ToolCallback {
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 
-            return ToolErrors.runtimeFailure(EnvironmentScopedToolCallback.class, toolDefinition.name(), exception);
+            return DelegateToolErrors.toToolError(
+                EnvironmentScopedToolCallback.class, toolDefinition.name(), exception);
         }
     }
 
