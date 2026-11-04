@@ -28,7 +28,6 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.coordinator.config.PlatformCoordinatorIntTestConfiguration;
 import com.bytechef.platform.coordinator.config.RecordingWebhookNotificationSender;
@@ -48,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -617,7 +617,9 @@ class ApprovalNotificationMonitorIntTest {
     }
 
     private Job getJob(long jobId) {
-        return OptionalUtils.get(jobRepository.findById(jobId));
+        Optional<Job> jobOptional = jobRepository.findById(jobId);
+
+        return jobOptional.orElseThrow();
     }
 
     private @Nullable Object getMarker(long jobId, String markerKey) {
