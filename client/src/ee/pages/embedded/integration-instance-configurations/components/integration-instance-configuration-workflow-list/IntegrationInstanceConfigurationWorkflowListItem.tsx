@@ -171,7 +171,8 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                         <Switch
                             checked={integrationInstanceConfigurationWorkflow.enabled}
                             disabled={
-                                !canEditConfiguration || enableIntegrationInstanceConfigurationWorkflowMutation.isPending
+                                !canEditConfiguration ||
+                                enableIntegrationInstanceConfigurationWorkflowMutation.isPending
                             }
                             onCheckedChange={handleEnableIntegrationInstanceConfigurationWorkflow}
                         />

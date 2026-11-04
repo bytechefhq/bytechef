@@ -52,19 +52,21 @@ describe('useViewableEmbeddedPageHrefs', () => {
         expect(result.current).toContain('/embedded/connections');
     });
 
-    it('shows Automation Configurations only to a tenant admin outside Development', () => {
-        const {result: memberResult} = renderHook(() => useViewableEmbeddedPageHrefs());
+    it('shows Automation Configurations by the configuration view scope outside Development', () => {
+        const {result: unscopedResult} = renderHook(() => useViewableEmbeddedPageHrefs());
 
-        expect(memberResult.current).not.toContain('/embedded/automation-configurations');
+        expect(unscopedResult.current).not.toContain('/embedded/automation-configurations');
 
-        authenticationStore.setState({
-            account: {authorities: ['ROLE_ADMIN'], login: 'admin'} as never,
-            authenticated: true,
-        });
+        permissionStore.setState({
+            embeddedScopeStates: {
+                [DEVELOPMENT_ENVIRONMENT]: {scopes: ['INTEGRATION_INSTANCE_CONFIGURATION_VIEW'], status: 'loaded'},
+                [PRODUCTION_ENVIRONMENT]: {scopes: ['INTEGRATION_INSTANCE_CONFIGURATION_VIEW'], status: 'loaded'},
+            },
+        } as never);
 
-        const {result: adminResult} = renderHook(() => useViewableEmbeddedPageHrefs());
+        const {result: scopedResult} = renderHook(() => useViewableEmbeddedPageHrefs());
 
-        expect(adminResult.current).toContain('/embedded/automation-configurations');
+        expect(scopedResult.current).toContain('/embedded/automation-configurations');
 
         environmentStore.setState({currentEnvironmentId: DEVELOPMENT_ENVIRONMENT});
 
