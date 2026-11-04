@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.tool.EnvironmentScopedToolCallback;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
@@ -39,19 +40,16 @@ import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
 /**
- * Configuration for ByteChef MCP Server using Streamable HTTP transport.
- *
- * This configuration registers a set of deterministic CE automation/platform tools directly, and folds in any
- * {@link McpServerToolCallbackContributor} beans (EE deployments contribute the Copilot subagent agent-tools). The
- *
  * @author Ivica Cardic
  */
 @Configuration
 @ConditionalOnProperty(name = "bytechef.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
 public class ManagementMcpServerConfiguration {
 
-    private static final Set<String> EXCLUDED_TOOL_NAMES = Set.of(
-        "createProjectWorkflow", "getProjectStatus", "searchProjects");
+    private static final Set<String> EXCLUDED_TOOL_NAMES = Set.of("getProjectStatus", "searchProjects");
+
+    private static final Set<String> ENVIRONMENT_SCOPED_TOOL_NAMES = Set.of(
+        "updateWorkflow", "saveWorkflowTestConnection");
 
     private final ProjectTools projectTools;
     private final ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools;
@@ -111,9 +109,16 @@ public class ManagementMcpServerConfiguration {
         for (ToolCallback toolCallback : ToolCallbacks.from(tools.toArray())) {
             ToolDefinition toolDefinition = toolCallback.getToolDefinition();
 
-            if (!EXCLUDED_TOOL_NAMES.contains(toolDefinition.name())) {
-                toolCallbacks.add(toolCallback);
+            String name = toolDefinition.name();
+
+            if (EXCLUDED_TOOL_NAMES.contains(name)) {
+                continue;
             }
+
+            toolCallbacks.add(
+                ENVIRONMENT_SCOPED_TOOL_NAMES.contains(name)
+                    ? new EnvironmentScopedToolCallback(toolCallback)
+                    : toolCallback);
         }
 
         for (McpServerToolCallbackContributor contributor : mcpServerToolCallbackContributors) {
