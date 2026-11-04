@@ -127,16 +127,16 @@ public class CopilotConfiguration {
         `projectId` (the workflow does not exist yet). Build the COMPLETE definition first, exactly as step 7
         requires, then persist it with ONE call:
 
-        - Given a `workflowId` — `getWorkflow(workflowId)` for its current `version`, then
+        - Given a `workflowId`: `getWorkflow(workflowId)` for its current `version`, then
           `updateWorkflow(workflowId, workflow, version)`.
-        - Given only a `projectId` — `createProjectWorkflow(projectId, workflow)` carrying the COMPLETE definition.
+        - Given only a `projectId`: `createProjectWorkflow(projectId, workflow)` carrying the COMPLETE definition.
           Never create an empty or default "Manual" placeholder workflow and fill it in afterwards; the single
           create call must carry the whole workflow.
 
         Both calls validate the definition first. If they report errors, nothing was saved: fix them and make the
         same call again.
 
-        If you are given both, the `workflowId` wins — update it. Never create a second workflow for a project you
+        If you are given both, the `workflowId` wins; update it. Never create a second workflow for a project you
         were already pointed at.
 
         You still cannot create a PROJECT (`createProject` is not among your tools). Given neither a `workflowId`
@@ -145,7 +145,7 @@ public class CopilotConfiguration {
 
         A successful save stored exactly the definition you sent; do not re-read it with `getWorkflow`. Continue
         with step 8 as written. The
-        `workflowId | projectId | projectWorkflowId` line is REQUIRED on both branches — `createProjectWorkflow`
+        `workflowId | projectId | projectWorkflowId` line is REQUIRED on both branches; `createProjectWorkflow`
         returns all three ids.
         """;
 
