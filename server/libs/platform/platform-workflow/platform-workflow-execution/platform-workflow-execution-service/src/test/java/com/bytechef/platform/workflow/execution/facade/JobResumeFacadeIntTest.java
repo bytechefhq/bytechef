@@ -75,7 +75,9 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -93,7 +95,8 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author Ivica Cardic
  */
 @Import({
-    JobFacadeImpl.class, JobResumeFacadeImpl.class, JobServiceImpl.class, TaskExecutionServiceImpl.class
+    JobFacadeImpl.class, JobResumeFacadeImpl.class, JobResumeFacadeIntTest.JobServiceTestConfiguration.class,
+    TaskExecutionServiceImpl.class
 })
 @RecordApplicationEvents
 @SpringBootTest(
@@ -1547,5 +1550,14 @@ class JobResumeFacadeIntTest {
         SECURE_RANDOM.nextBytes(secretBytes);
 
         return EncodingUtils.base64EncodeToString(secretBytes);
+    }
+
+    @TestConfiguration(proxyBeanMethods = false)
+    static class JobServiceTestConfiguration {
+
+        @Bean
+        JobService jobService(JobRepository jobRepository) {
+            return new JobServiceImpl(jobRepository);
+        }
     }
 }
