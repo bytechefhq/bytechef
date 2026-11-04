@@ -176,9 +176,9 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                         ref={ref}
                         {...props}
                         className={twMerge(
-                            'flex h-auto w-full items-center justify-between rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-4 py-2 text-sm font-normal text-primary hover:bg-surface-neutral-primary active:bg-surface-neutral-primary [&_svg]:pointer-events-auto',
+                            'flex h-auto min-h-9 w-full items-center justify-between rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-4 py-1 text-sm font-normal text-primary hover:bg-surface-neutral-primary active:bg-surface-neutral-primary [&_svg]:pointer-events-auto',
                             leadingIcon && 'relative',
-                            optionsLoading && 'min-h-10 cursor-not-allowed',
+                            optionsLoading && 'cursor-not-allowed',
                             className
                         )}
                         disabled={!options.length || optionsLoading}
