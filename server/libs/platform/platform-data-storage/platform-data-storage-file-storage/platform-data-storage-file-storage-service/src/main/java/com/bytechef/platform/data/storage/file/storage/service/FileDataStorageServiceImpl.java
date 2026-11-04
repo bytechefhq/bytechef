@@ -36,7 +36,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class FileDataStorageServiceImpl implements FileDataStorageService {
 
-    public static final String DATA_ENTRIES_ROOT_DIR = "data_entries/";
+    public static final String LEGACY_DATA_ENTRIES_ROOT_DIR = "data_entries/";
     public static final String DATA_STORAGE_ROOT_DIR = "data_storage/";
 
     private static final int LOCK_STRIPES = 64;
@@ -228,7 +228,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     }
 
     private static String getOldDirectoryPath(PlatformType type, long environmentId) {
-        return DATA_ENTRIES_ROOT_DIR + type.ordinal() + "/" + environmentId;
+        return LEGACY_DATA_ENTRIES_ROOT_DIR + type.ordinal() + "/" + environmentId;
     }
 
     private static String getOldFilename(String componentName, DataStorageScope scope, String scopeId, String key) {
