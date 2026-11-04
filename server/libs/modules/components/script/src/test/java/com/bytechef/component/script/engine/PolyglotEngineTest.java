@@ -85,7 +85,7 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecuteWithoutComponentConnections() {
+    void testExecuteJavaScriptWithoutComponentConnections() {
         Parameters inputParameters = ParametersFactory.create(
             Map.of(
                 INPUT, Map.of(),
@@ -123,7 +123,7 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecuteWithoutExposedConnectionParameters() {
+    void testExecuteJavaScriptWithoutExposedConnectionParameters() {
         Parameters inputParameters = ParametersFactory.create(
             Map.of(
                 INPUT, Map.of(),
@@ -135,7 +135,7 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecuteWithoutPerformFunction() {
+    void testExecuteJavaScriptWithoutPerformFunction() {
         Parameters inputParameters = ParametersFactory.create(Map.of(INPUT, Map.of(), SCRIPT, "var perform = {};"));
 
         assertThatThrownBy(
@@ -145,7 +145,7 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecuteNamedConnectionWithoutComponentConnections() {
+    void testExecuteJavaScriptNamedConnectionWithoutComponentConnections() {
         Parameters inputParameters = ParametersFactory.create(
             Map.of(
                 INPUT, Map.of(),
