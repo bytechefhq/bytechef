@@ -112,7 +112,7 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
                 </header>
 
                 <main className="flex grow flex-col overflow-hidden">
-                    <div className="mb-0 border-b border-b-border/50 p-4">
+                    <div className={twMerge('border-b border-b-border/50 p-4', currentNode?.operationName && 'pt-10')}>
                         <Input
                             name="dataPillFilter"
                             onChange={(event) => setDataPillFilterQuery(event.target.value)}
