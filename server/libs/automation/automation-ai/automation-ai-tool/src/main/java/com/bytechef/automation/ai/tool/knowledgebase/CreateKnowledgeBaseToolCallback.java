@@ -111,7 +111,7 @@ public class CreateKnowledgeBaseToolCallback implements ToolCallback {
                 new CreateKnowledgeBaseOutput(
                     String.valueOf(createdKnowledgeBase.getId()), createdKnowledgeBase.getName()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(CreateKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
         }

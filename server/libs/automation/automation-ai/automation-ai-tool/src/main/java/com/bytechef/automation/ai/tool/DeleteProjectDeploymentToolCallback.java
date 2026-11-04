@@ -108,7 +108,7 @@ public class DeleteProjectDeploymentToolCallback implements ToolCallback {
             return JsonUtils.write(
                 new DeleteProjectDeploymentOutput(projectDeploymentId, true));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {

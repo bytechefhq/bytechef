@@ -174,7 +174,7 @@ public class QueryKnowledgeBaseToolCallback implements ToolCallback {
 
             return JsonUtils.write(new QueryKnowledgeBaseResult(CITATIONS_KIND, hits));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(QueryKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
         }
