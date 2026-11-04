@@ -27,4 +27,6 @@ public interface InteractivePickerToolCallbacks {
     List<ToolCallback> read();
 
     List<ToolCallback> write();
+
+    ToolCallback listConnectionsForComponent();
 }

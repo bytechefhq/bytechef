@@ -123,7 +123,8 @@ public class InteractivePickerToolCallbacksImpl implements InteractivePickerTool
             new CreateConnectionToolCallback(componentDefinitionService));
     }
 
-    private ToolCallback listConnectionsForComponent() {
+    @Override
+    public ToolCallback listConnectionsForComponent() {
         List<CopilotConnectionLister> connectionListers = new ArrayList<>();
 
         connectionListers.add(new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, propertyOptionsResolver));

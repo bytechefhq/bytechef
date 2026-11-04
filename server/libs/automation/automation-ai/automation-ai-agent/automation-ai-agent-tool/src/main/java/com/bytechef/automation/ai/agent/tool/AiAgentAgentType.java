@@ -26,7 +26,8 @@ import com.bytechef.ai.copilot.util.Source;
 public enum AiAgentAgentType implements AgentType {
 
     AI_AGENT_ASK(Source.AI_AGENT, Mode.ASK),
-    AI_AGENT_BUILD(Source.AI_AGENT, Mode.BUILD);
+    AI_AGENT_BUILD(Source.AI_AGENT, Mode.BUILD),
+    BUILD_AI_AGENT("buildAiAgent");
 
     private final String key;
 
