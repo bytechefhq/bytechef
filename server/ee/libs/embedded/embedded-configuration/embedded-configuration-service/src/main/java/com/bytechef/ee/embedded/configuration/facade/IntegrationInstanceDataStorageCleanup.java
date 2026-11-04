@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.DataStorageScopeDeleter;
@@ -27,6 +28,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class IntegrationInstanceDataStorageCleanup {
 
     private final ObjectProvider<DataStorage> dataStorageProvider;
