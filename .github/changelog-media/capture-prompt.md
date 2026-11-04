@@ -27,7 +27,8 @@ For each headline category, at most one capture, and at most 4 in total:
   `recordVideo: {dir: '<a temporary directory>', size: {height: 900, width: 1440}}` and a 1440x900 viewport, perform the
   interaction at a human pace (short waits between steps), close the context, then move the `.webm` file into
   `{{CAPTURE_DIR}}`.
-- Save every capture directly in `{{CAPTURE_DIR}}` with a short kebab-case name, e.g. `disable-nodes.png`.
+- Save every capture directly in `{{CAPTURE_DIR}}` with a short kebab-case name, e.g. `disable-nodes.png`. Only `.png`
+  and `.webm` files whose names use letters, digits and dashes are published; anything else is rejected.
 - Create the demo data the shot needs through the UI or the API helpers: realistic project and workflow names such as
   "Lead enrichment" or "Support ticket triage", never "test", "foo" or lorem ipsum. Use only built-in components that
   need no credentials (for example Manual trigger, Script, Data Mapper, Condition, Loop, HTTP Client against

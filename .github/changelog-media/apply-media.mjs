@@ -7,10 +7,15 @@
 //               "alt": "<image alt text>", "label": "<video label>"}],
 //    "skipped": [{"shot": "<checklist line>", "reason": "<why>"}]}
 // Images are PNG files; videos are Playwright WebM recordings, converted here to MP4 with a WebP poster.
+//
+// The manifest and the capture files come from an agent that read untrusted text, so everything in them is treated as
+// data: file names must be plain .png/.webm names inside the capture directory, file contents must carry the matching
+// signature, and agent-written text reaches the pull request comment only as inline code. The result is written to
+// summary.md in the capture directory.
 
 import {execFileSync} from 'node:child_process';
-import {copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
-import {basename, extname, join} from 'node:path';
+import {copyFileSync, lstatSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
+import {basename, join, resolve} from 'node:path';
 
 const [captureDirectory, websiteDirectory, slug] = process.argv.slice(2);
 
@@ -18,14 +23,187 @@ if (!captureDirectory || !websiteDirectory || !slug) {
     throw new Error('Usage: node apply-media.mjs <capture directory> <website checkout> <entry slug>');
 }
 
+const CAPTURE_FILE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*\.(png|webm)$/;
 const ENTRY_HEADER = 'export const entry: ChangelogEntryType = ';
+const FILE_SIGNATURES = {
+    png: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    webm: Buffer.from([0x1a, 0x45, 0xdf, 0xa3]),
+};
 const IMPORT_LINE = "import {type ChangelogEntryType} from '../types';";
 const INDENT_UNIT = '    ';
+const MEDIA_TYPES = {png: 'image', webm: 'video'};
 const PRINT_WIDTH = 120;
+const STRING_ESCAPES = {'"': '"', "'": "'", '/': '/', '\\': '\\', n: '\n', r: '\r', t: '\t'};
 
+const captureRoot = resolve(captureDirectory);
 const entryPath = join(websiteDirectory, 'app/(marketing)/changelog/data', `${slug}.ts`);
 const publicDirectory = join(websiteDirectory, 'public/changelog', slug);
-const manifest = JSON.parse(readFileSync(join(captureDirectory, 'manifest.json'), 'utf8'));
+const manifest = JSON.parse(readFileSync(join(captureRoot, 'manifest.json'), 'utf8'));
+
+// Reads an object literal as data, never as code. Accepts what the changelog serializer emits (objects with identifier
+// or quoted keys, quoted strings, numbers, booleans, null, arrays, trailing commas) and rejects everything else.
+const parseLiteral = (text) => {
+    let position = 0;
+
+    const fail = (message) => {
+        throw new Error(`${message} at offset ${position} in ${entryPath}`);
+    };
+
+    const skipWhitespace = () => {
+        while (position < text.length && /\s/.test(text[position])) {
+            position++;
+        }
+    };
+
+    const matchSticky = (pattern) => {
+        pattern.lastIndex = position;
+
+        const match = pattern.exec(text);
+
+        if (match) {
+            position += match[0].length;
+        }
+
+        return match?.[0];
+    };
+
+    const parseString = () => {
+        const quoteCharacter = text[position++];
+        let result = '';
+
+        while (position < text.length) {
+            const character = text[position++];
+
+            if (character === quoteCharacter) {
+                return result;
+            }
+
+            if (character === '\n') {
+                fail('Unterminated string');
+            }
+
+            if (character !== '\\') {
+                result += character;
+
+                continue;
+            }
+
+            const escapeCharacter = text[position++];
+
+            if (escapeCharacter === 'u') {
+                const hexDigits = text.slice(position, position + 4);
+
+                if (!/^[0-9a-fA-F]{4}$/.test(hexDigits)) {
+                    fail('Invalid unicode escape');
+                }
+
+                result += String.fromCharCode(parseInt(hexDigits, 16));
+                position += 4;
+            } else if (Object.hasOwn(STRING_ESCAPES, escapeCharacter)) {
+                result += STRING_ESCAPES[escapeCharacter];
+            } else {
+                fail(`Unsupported escape \\${escapeCharacter}`);
+            }
+        }
+
+        return fail('Unterminated string');
+    };
+
+    const parseKey = () => {
+        if (text[position] === "'" || text[position] === '"') {
+            return parseString();
+        }
+
+        return matchSticky(/[A-Za-z_$][\w$]*/y) ?? fail('Expected a key');
+    };
+
+    const parseList = (closingCharacter, parseItem) => {
+        position++;
+
+        for (;;) {
+            skipWhitespace();
+
+            if (text[position] === closingCharacter) {
+                position++;
+
+                return;
+            }
+
+            parseItem();
+            skipWhitespace();
+
+            if (text[position] === ',') {
+                position++;
+            } else if (text[position] !== closingCharacter) {
+                fail(`Expected ',' or '${closingCharacter}'`);
+            }
+        }
+    };
+
+    const parseValue = () => {
+        skipWhitespace();
+
+        const character = text[position];
+
+        if (character === '{') {
+            const result = {};
+
+            parseList('}', () => {
+                const key = parseKey();
+
+                if (key === '__proto__') {
+                    fail('Forbidden key __proto__');
+                }
+
+                skipWhitespace();
+
+                if (text[position++] !== ':') {
+                    fail("Expected ':'");
+                }
+
+                result[key] = parseValue();
+            });
+
+            return result;
+        }
+
+        if (character === '[') {
+            const result = [];
+
+            parseList(']', () => result.push(parseValue()));
+
+            return result;
+        }
+
+        if (character === "'" || character === '"') {
+            return parseString();
+        }
+
+        const literal = matchSticky(/-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null/y);
+
+        if (literal === undefined) {
+            fail('Unexpected token');
+        }
+
+        return literal === 'null' ? null : JSON.parse(literal);
+    };
+
+    const value = parseValue();
+
+    skipWhitespace();
+
+    if (text[position] === ';') {
+        position++;
+    }
+
+    skipWhitespace();
+
+    if (position !== text.length) {
+        fail('Unexpected content after the entry');
+    }
+
+    return value;
+};
 
 const readEntry = () => {
     const source = readFileSync(entryPath, 'utf8');
@@ -35,18 +213,19 @@ const readEntry = () => {
         throw new Error(`Unexpected entry format in ${entryPath}`);
     }
 
-    const objectLiteral = source.slice(headerIndex + ENTRY_HEADER.length).trim().replace(/;$/, '');
+    const entry = parseLiteral(source.slice(headerIndex + ENTRY_HEADER.length));
 
-    // The entry is a plain object literal generated by the changelog workflow on this same branch.
-    return new Function(`return (${objectLiteral});`)();
+    if (!Array.isArray(entry?.categories)) {
+        throw new Error(`Entry in ${entryPath} has no categories`);
+    }
+
+    return entry;
 };
+
+const hasSignature = (path, signature) => readFileSync(path).subarray(0, signature.length).equals(signature);
 
 const readPngSize = (path) => {
     const header = readFileSync(path).subarray(0, 24);
-
-    if (header.toString('ascii', 1, 4) !== 'PNG') {
-        throw new Error(`${path} is not a PNG file`);
-    }
 
     return {height: header.readUInt32BE(20), width: header.readUInt32BE(16)};
 };
@@ -67,9 +246,11 @@ const convertVideo = (sourcePath, targetBaseName) => {
     const videoPath = join(publicDirectory, `${targetBaseName}.mp4`);
     let posterPath = join(publicDirectory, `${targetBaseName}-poster.webp`);
 
+    // Forcing the Matroska demuxer and the file protocol keeps ffmpeg from following playlists or other references
+    // out of the capture file.
     execFileSync('ffmpeg', [
-        '-y', '-loglevel', 'error', '-i', sourcePath, '-c:v', 'libx264', '-preset', 'slow', '-crf', '20',
-        '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', videoPath,
+        '-y', '-loglevel', 'error', '-protocol_whitelist', 'file', '-f', 'matroska', '-i', sourcePath, '-c:v',
+        'libx264', '-preset', 'slow', '-crf', '20', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', videoPath,
     ]);
 
     try {
@@ -86,6 +267,44 @@ const convertVideo = (sourcePath, targetBaseName) => {
 
     return {posterFileName: basename(posterPath), videoFileName: basename(videoPath), ...readVideoSize(videoPath)};
 };
+
+// Returns why a manifest shot cannot be used, or undefined when its file is a plain capture of the declared type.
+const findRejectionReason = (shot) => {
+    const fileMatch = typeof shot.file === 'string' ? CAPTURE_FILE_PATTERN.exec(shot.file) : null;
+
+    if (!fileMatch) {
+        return 'file name must be a plain .png or .webm name';
+    }
+
+    const extension = fileMatch[1];
+
+    if (MEDIA_TYPES[extension] !== shot.type) {
+        return `type "${shot.type}" does not match a .${extension} file`;
+    }
+
+    let stats;
+
+    try {
+        stats = lstatSync(join(captureRoot, shot.file));
+    } catch {
+        return 'capture file missing';
+    }
+
+    if (!stats.isFile()) {
+        return 'capture file is not a regular file';
+    }
+
+    if (!hasSignature(join(captureRoot, shot.file), FILE_SIGNATURES[extension])) {
+        return `capture file is not a ${extension.toUpperCase()} file`;
+    }
+
+    return undefined;
+};
+
+const toPlainText = (value) => (typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, 300) : '');
+
+// Inline code renders no links, mentions or HTML, which keeps agent-written text inert in the pull request comment.
+const toInlineCode = (value) => `\`${String(value ?? '').replace(/[`\s]+/g, ' ').trim().slice(0, 200) || '-'}\``;
 
 const isEmpty = (value) =>
     value == null || (typeof value === 'string' && value.trim() === '') || (Array.isArray(value) && value.length === 0);
@@ -149,20 +368,29 @@ const rejected = [];
 
 mkdirSync(publicDirectory, {recursive: true});
 
-for (const shot of manifest.shots || []) {
-    const category = entry.categories.find((candidate) => candidate.heading === shot.category);
-    const sourcePath = join(captureDirectory, shot.file || '');
-
-    if (!category || !shot.file || !existsSync(sourcePath)) {
-        rejected.push({reason: category ? 'capture file missing' : 'no category with this heading', shot});
+for (const shot of Array.isArray(manifest.shots) ? manifest.shots : []) {
+    if (typeof shot !== 'object' || shot === null) {
+        rejected.push({file: undefined, reason: 'manifest entry is not an object'});
 
         continue;
     }
 
-    const targetBaseName = basename(shot.file, extname(shot.file))
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-');
-    const item = category.items[0];
+    const category = entry.categories.find((candidate) => candidate.heading === shot.category);
+    const item = category?.items?.[0];
+    const rejectionReason = !category
+        ? 'no category with this heading'
+        : !item
+          ? 'category has no items'
+          : findRejectionReason(shot);
+
+    if (rejectionReason) {
+        rejected.push({file: shot.file, reason: rejectionReason});
+
+        continue;
+    }
+
+    const sourcePath = join(captureRoot, shot.file);
+    const targetBaseName = basename(shot.file).replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
     let media;
 
     if (shot.type === 'video') {
@@ -170,7 +398,7 @@ for (const shot of manifest.shots || []) {
 
         media = {
             height,
-            label: shot.label || shot.alt || category.heading,
+            label: toPlainText(shot.label) || toPlainText(shot.alt) || category.heading,
             poster: `/changelog/${slug}/${posterFileName}`,
             src: `/changelog/${slug}/${videoFileName}`,
             type: 'video',
@@ -182,22 +410,30 @@ for (const shot of manifest.shots || []) {
         copyFileSync(sourcePath, join(publicDirectory, fileName));
 
         media = {
-            alt: shot.alt || shot.label || category.heading,
+            alt: toPlainText(shot.alt) || toPlainText(shot.label) || category.heading,
             ...readPngSize(sourcePath),
             src: `/changelog/${slug}/${fileName}`,
             type: 'image',
         };
     }
 
-    item.media = [...(item.media || []), media];
+    // A re-run overwrites the same files, so it replaces the earlier entry instead of listing the media twice.
+    item.media = [...(item.media || []).filter((existingMedia) => existingMedia.src !== media.src), media];
 
     applied.push({category: category.heading, src: media.src});
 }
 
 writeFileSync(entryPath, `${IMPORT_LINE}\n\n${ENTRY_HEADER}${serialize(entry, '', ENTRY_HEADER.length)};\n`);
 
-const summary = {applied, rejected, skipped: manifest.skipped || []};
+const skipped = Array.isArray(manifest.skipped) ? manifest.skipped : [];
+const summaryLines = [
+    '**Changelog media**',
+    '',
+    ...applied.map((media) => `- Added ${toInlineCode(media.src)} to ${toInlineCode(media.category)}`),
+    ...skipped.slice(0, 20).map((skip) => `- Skipped ${toInlineCode(skip?.shot)}: ${toInlineCode(skip?.reason)}`),
+    ...rejected.map((rejection) => `- Could not use ${toInlineCode(rejection.file || 'a capture')}: ${rejection.reason}`),
+];
 
-writeFileSync(join(captureDirectory, 'summary.json'), JSON.stringify(summary, null, 4));
+writeFileSync(join(captureRoot, 'summary.md'), `${summaryLines.join('\n')}\n`);
 
-console.log(JSON.stringify(summary, null, 4));
+console.log(JSON.stringify({applied, rejected, skipped}, null, 4));

@@ -3,6 +3,11 @@ name: Changelog media
 # Started by the "Automate new ByteChef release" workflow on app.bytechef.io after it opens the changelog pull request
 # in bytechef-website. Runs the released version, lets Claude Code capture screenshots and short videos of the headline
 # features, adds them to the changelog entry and marks the pull request ready for review.
+#
+# The capture job runs an agent with unrestricted Bash over text other people wrote (the pull request body, the
+# changelog entry built from pull request titles), so it holds no write credentials after its first steps. The publish
+# job starts from fresh checkouts, takes only the manifest and the media files from the capture job, treats them as
+# data, and is the only place the website token is used for writing.
 
 on:
   workflow_dispatch:
@@ -20,27 +25,57 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write
 
 env:
-  CAPTURE_DIR: ${{ github.workspace }}/capture
   WEBSITE_REPOSITORY: bytechefhq/bytechef-website
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      slug: ${{ steps.validate.outputs.slug }}
+    steps:
+      - name: Validate inputs
+        id: validate
+        env:
+          TAG: ${{ inputs.tag }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if ! [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.[0-9]+$ ]]; then
+            echo '::error::The tag must look like v0.36.0'
+            exit 1
+          fi
+
+          SLUG="v${BASH_REMATCH[1]}-${BASH_REMATCH[2]}"
+
+          if ! [[ "$BRANCH" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ ]] || [[ "$BRANCH" == *..* ]]; then
+            echo '::error::The branch may contain only letters, digits, ".", "_", "/" and "-"'
+            exit 1
+          fi
+
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+
   capture:
+    needs: prepare
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    env:
+      CAPTURE_DIR: ${{ github.workspace }}/capture
+      SLUG: ${{ needs.prepare.outputs.slug }}
     steps:
       - name: Checkout workflow scripts
         uses: actions/checkout@v4
         with:
           sparse-checkout: .github
+          persist-credentials: false
 
       - name: Checkout release
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.tag }}
           path: app
+          persist-credentials: false
 
       - name: Checkout changelog pull request
         uses: actions/checkout@v4
@@ -54,12 +89,9 @@ jobs:
       - name: Prepare capture directory
         env:
           GH_TOKEN: ${{ secrets.CHANGELOG_WEBSITE_TOKEN }}
-          TAG: ${{ inputs.tag }}
           BRANCH: ${{ inputs.branch }}
         run: |
           mkdir -p "$CAPTURE_DIR"
-          SLUG=$(echo "$TAG" | sed -E 's/^v?([0-9]+)\.([0-9]+).*/v\1-\2/')
-          echo "SLUG=$SLUG" >> "$GITHUB_ENV"
           test -f "website/app/(marketing)/changelog/data/$SLUG.ts"
           gh pr view "$BRANCH" -R "$WEBSITE_REPOSITORY" --json body --jq .body > "$CAPTURE_DIR/shot-list.md"
 
@@ -126,8 +158,16 @@ jobs:
         env:
           TAG: ${{ inputs.tag }}
         run: |
-          sed -e "s|{{TAG}}|$TAG|g" -e "s|{{SLUG}}|$SLUG|g" -e "s|{{CAPTURE_DIR}}|$CAPTURE_DIR|g" \
-            .github/changelog-media/capture-prompt.md > "$CAPTURE_DIR/prompt.md"
+          node -e '
+            const {readFileSync, writeFileSync} = require("node:fs");
+            const values = {CAPTURE_DIR: process.env.CAPTURE_DIR, SLUG: process.env.SLUG, TAG: process.env.TAG};
+            const template = readFileSync(".github/changelog-media/capture-prompt.md", "utf8");
+
+            writeFileSync(
+              process.env.CAPTURE_DIR + "/prompt.md",
+              template.replace(/\{\{(\w+)\}\}/g, (placeholder, name) => values[name] ?? placeholder)
+            );
+          '
           {
             echo 'text<<CAPTURE_PROMPT_EOF'
             cat "$CAPTURE_DIR/prompt.md"
@@ -144,46 +184,17 @@ jobs:
           prompt: ${{ steps.prompt.outputs.text }}
           claude_args: '--model claude-opus-5-5 --max-turns 150 --allowedTools "Bash,Read,Write,Edit,Glob,Grep"'
 
-      - name: Add media to the changelog entry
-        id: apply
-        if: always() && hashFiles('capture/manifest.json') != ''
-        run: node .github/changelog-media/apply-media.mjs "$CAPTURE_DIR" website "$SLUG"
-
-      - name: Push media and mark pull request ready
-        if: always() && steps.prompt.outcome == 'success'
-        env:
-          GH_TOKEN: ${{ secrets.CHANGELOG_WEBSITE_TOKEN }}
-          BRANCH: ${{ inputs.branch }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          APPLY_OUTCOME: ${{ steps.apply.outcome }}
-        run: |
-          cd website
-
-          if [ -n "$(git status --porcelain)" ]; then
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add -A "public/changelog/$SLUG" "app/(marketing)/changelog/data/$SLUG.ts"
-            git commit -m "Add $SLUG changelog media"
-            git push "https://x-access-token:${GH_TOKEN}@github.com/${WEBSITE_REPOSITORY}.git" "HEAD:$BRANCH"
-          fi
-
-          if [ "$APPLY_OUTCOME" = 'success' ]; then
-            SUMMARY=$(node -e "
-              const summary = require('$CAPTURE_DIR/summary.json');
-              const lines = ['**Changelog media**', ''];
-              summary.applied.forEach((item) => lines.push('- Added ' + item.src + ' to \"' + item.category + '\"'));
-              summary.skipped.forEach((item) => lines.push('- Skipped \"' + item.shot + '\": ' + item.reason));
-              summary.rejected.forEach((item) => lines.push('- Could not use ' + (item.shot.file || 'a capture') + ': ' + item.reason));
-              console.log(lines.join('\n'));
-            ")
-          else
-            SUMMARY="**Changelog media**: capture failed, no media was added."
-          fi
-
-          gh pr comment "$BRANCH" -R "$WEBSITE_REPOSITORY" --body "$SUMMARY
-
-          Run: $RUN_URL"
-          gh pr ready "$BRANCH" -R "$WEBSITE_REPOSITORY"
+      - name: Upload media for publishing
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog-media-files
+          path: |
+            capture/manifest.json
+            capture/*.png
+            capture/*.webm
+          if-no-files-found: ignore
+          retention-days: 1
 
       - name: Upload capture artifacts
         if: always()
@@ -194,3 +205,108 @@ jobs:
             capture
             app/client/test/playwright/changelog-capture
           retention-days: 14
+
+  publish:
+    needs: [prepare, capture]
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BRANCH: ${{ inputs.branch }}
+      MEDIA_DIR: ${{ github.workspace }}/media
+      SLUG: ${{ needs.prepare.outputs.slug }}
+    steps:
+      - name: Checkout workflow scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+          persist-credentials: false
+
+      - name: Checkout changelog pull request
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WEBSITE_REPOSITORY }}
+          ref: ${{ inputs.branch }}
+          path: website
+          token: ${{ secrets.CHANGELOG_WEBSITE_TOKEN }}
+          persist-credentials: false
+
+      - name: Download captured media
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-media-files
+          path: media
+
+      - name: Install ffmpeg
+        if: steps.download.outcome == 'success'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Add media to the changelog entry
+        id: apply
+        if: steps.download.outcome == 'success' && hashFiles('media/manifest.json') != ''
+        run: node .github/changelog-media/apply-media.mjs "$MEDIA_DIR" website "$SLUG"
+
+      - name: Push media
+        id: push
+        if: steps.apply.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.CHANGELOG_WEBSITE_TOKEN }}
+        run: |
+          cd website
+
+          # Hooks and fsmonitor stay off even though this checkout never reached the capture agent.
+          GIT=(git -c core.hooksPath=/dev/null -c core.fsmonitor=false)
+          ENTRY_PATH="app/(marketing)/changelog/data/$SLUG.ts"
+          MEDIA_PATH="public/changelog/$SLUG"
+          UNEXPECTED_CHANGES=$("${GIT[@]}" status --porcelain --untracked-files=all -- . \
+            ":(exclude)$ENTRY_PATH" ":(exclude)$MEDIA_PATH")
+
+          if [ -n "$UNEXPECTED_CHANGES" ]; then
+            echo '::error::Changes outside the changelog entry and its media directory'
+            echo "$UNEXPECTED_CHANGES"
+            exit 1
+          fi
+
+          if [ -z "$("${GIT[@]}" status --porcelain --untracked-files=all)" ]; then
+            echo 'No media to push'
+            exit 0
+          fi
+
+          BASE_COMMIT=$("${GIT[@]}" rev-parse HEAD)
+
+          "${GIT[@]}" add -A
+          "${GIT[@]}" -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -m "Add $SLUG changelog media"
+
+          if [ "$("${GIT[@]}" rev-list --count "$BASE_COMMIT..HEAD")" != '1' ]; then
+            echo '::error::Expected exactly one new commit'
+            exit 1
+          fi
+
+          "${GIT[@]}" push "https://x-access-token:${GH_TOKEN}@github.com/${WEBSITE_REPOSITORY}.git" "HEAD:$BRANCH"
+
+      - name: Report and mark pull request ready
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.CHANGELOG_WEBSITE_TOKEN }}
+          PUSH_OUTCOME: ${{ steps.push.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          COMMENT_PATH="$RUNNER_TEMP/comment.md"
+
+          if [ "$PUSH_OUTCOME" = 'success' ]; then
+            cp "$MEDIA_DIR/summary.md" "$COMMENT_PATH"
+          else
+            echo '**Changelog media**: capture or publishing failed, no media was added. The pull request stays a draft.' \
+              > "$COMMENT_PATH"
+          fi
+
+          printf '\nRun: %s\n' "$RUN_URL" >> "$COMMENT_PATH"
+          gh pr comment "$BRANCH" -R "$WEBSITE_REPOSITORY" --body-file "$COMMENT_PATH"
+
+          if [ "$PUSH_OUTCOME" = 'success' ]; then
+            gh pr ready "$BRANCH" -R "$WEBSITE_REPOSITORY"
+          fi
