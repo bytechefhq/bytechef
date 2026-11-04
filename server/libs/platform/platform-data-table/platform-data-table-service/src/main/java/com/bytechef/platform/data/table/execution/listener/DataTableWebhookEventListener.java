@@ -53,12 +53,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Turns each row of a {@link DataTableWebhookEvent} into one {@link TriggerWebhookEvent} per registration of that
- * table, environment and type. It runs inside the write's transaction, and {@code MessageEventListener} sends the
- * events after commit. Registrations of disabled workflows are skipped. Registrations and workflow states are read in
- * nested transactions, so a failed read rolls back to a savepoint and leaves the write's transaction usable. A
- * registration made by the workflow editor's trigger test saves each row as the trigger's test output after commit,
- * instead of running the workflow.
+ * @author Ivica Cardic
  */
 @Component
 public class DataTableWebhookEventListener {
