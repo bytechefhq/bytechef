@@ -17,6 +17,7 @@
 package com.bytechef.platform.notification.handler;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.notification.delivery.WebhookDelivery;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.delivery.WebhookRetry;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class SlackNotificationSender implements NotificationSender<SlackNotificationHandler> {
 
     private final WebhookDeliveryService webhookDeliveryService;

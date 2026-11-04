@@ -183,13 +183,35 @@ public class NotificationFacadeIntTest {
     }
 
     @Test
-    public void testCreateSlackNotification() {
-        NotificationDTO notificationDTO = notificationFacade.createNotification(
-            createNotification(
-                Notification.Type.SLACK, Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X")));
+    public void testCreateSlackNotificationIsRejectedInCommunityEdition() {
+        Notification notification = createNotification(
+            Notification.Type.SLACK, Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X"));
 
-        assertThat(notificationDTO.type()).isEqualTo(Notification.Type.SLACK);
-        assertThat(notificationRepository.count()).isEqualTo(1);
+        assertThatThrownBy(() -> notificationFacade.createNotification(notification))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Notification type SLACK is not available in this edition");
+
+        assertThat(notificationRepository.count()).isZero();
+    }
+
+    @Test
+    public void testUpdateToSlackNotificationIsRejectedInCommunityEdition() {
+        NotificationDTO notificationDTO = notificationFacade.createNotification(
+            createNotification(Notification.Type.EMAIL, Map.of("email", "john@email.com")));
+
+        Notification notification = createNotification(
+            Notification.Type.SLACK, Map.of("slackWebhookUrl", "https://hooks.slack.com/services/T/B/X"));
+
+        notification.setId(notificationDTO.id());
+
+        assertThatThrownBy(() -> notificationFacade.updateNotification(notification))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Notification type SLACK is not available in this edition");
+
+        Notification storedNotification = notificationRepository.findById(notificationDTO.id())
+            .orElseThrow();
+
+        assertThat(storedNotification.getType()).isEqualTo(Notification.Type.EMAIL);
     }
 
     @Test
@@ -230,58 +252,6 @@ public class NotificationFacadeIntTest {
             .isInstanceOf(AuthorizationDeniedException.class);
     }
 
-    @Test
-    public void testLegacySlackRowMovesUrlToSecretSettingsOnUpdate() {
-        String slackUrl = "https://hooks.slack.com/services/T/B/LEGACY";
-
-        jdbcTemplate.update(
-            "INSERT INTO notification (name, type, settings, created_by, created_date, last_modified_by, " +
-                "last_modified_date, version) VALUES ('Legacy', 2, ?, 'system', now(), 'system', now(), 1)",
-            "{\"slackWebhookUrl\":\"" + slackUrl + "\"}");
-
-        Long id = jdbcTemplate.queryForObject("SELECT id FROM notification WHERE name = 'Legacy'", Long.class);
-
-        NotificationDTO listedNotificationDTO = notificationFacade.getNotifications()
-            .getFirst();
-
-        assertThat(listedNotificationDTO.settings()).containsEntry("slackWebhookUrl", "********");
-        assertThat(listedNotificationDTO.settings()
-            .toString()).doesNotContain(slackUrl);
-
-        Notification update = createNotification(
-            Notification.Type.SLACK, Map.of("slackWebhookUrl", "********"));
-
-        update.setId(id);
-        update.setName("Renamed");
-        update.setVersion(1);
-
-        notificationFacade.updateNotification(update);
-
-        String rawSettings = jdbcTemplate.queryForObject(
-            "SELECT settings FROM notification WHERE id = ?", String.class, id);
-
-        assertThat(rawSettings).doesNotContain(slackUrl);
-
-        Notification storedNotification = notificationRepository.findById(id)
-            .orElseThrow();
-
-        assertThat(storedNotification.getSetting("slackWebhookUrl")).isEqualTo(slackUrl);
-    }
-
-    @Test
-    public void testGetMasksSlackUrl() {
-        String slackUrl = "https://hooks.slack.com/services/T/B/X";
-
-        notificationFacade.createNotification(
-            createNotification(Notification.Type.SLACK, Map.of("slackWebhookUrl", slackUrl)));
-
-        NotificationDTO notificationDTO = notificationFacade.getNotifications()
-            .getFirst();
-
-        assertThat(notificationDTO.settings()).containsEntry("slackWebhookUrl", "********");
-        assertThat(notificationDTO.signingSecret()).isNull();
-    }
-
     private static void authenticateAs(String authority) {
         SecurityContextHolder.getContext()
             .setAuthentication(
@@ -303,6 +273,58 @@ public class NotificationFacadeIntTest {
     @Nested
     @TestPropertySource(properties = "bytechef.edition=ee")
     class EnterpriseEditionIntTest {
+
+        @Test
+        public void testLegacySlackRowMovesUrlToSecretSettingsOnUpdate() {
+            String slackUrl = "https://hooks.slack.com/services/T/B/LEGACY";
+
+            jdbcTemplate.update(
+                "INSERT INTO notification (name, type, settings, created_by, created_date, last_modified_by, " +
+                    "last_modified_date, version) VALUES ('Legacy', 2, ?, 'system', now(), 'system', now(), 1)",
+                "{\"slackWebhookUrl\":\"" + slackUrl + "\"}");
+
+            Long id = jdbcTemplate.queryForObject("SELECT id FROM notification WHERE name = 'Legacy'", Long.class);
+
+            NotificationDTO listedNotificationDTO = notificationFacade.getNotifications()
+                .getFirst();
+
+            assertThat(listedNotificationDTO.settings()).containsEntry("slackWebhookUrl", "********");
+            assertThat(listedNotificationDTO.settings()
+                .toString()).doesNotContain(slackUrl);
+
+            Notification update = createNotification(
+                Notification.Type.SLACK, Map.of("slackWebhookUrl", "********"));
+
+            update.setId(id);
+            update.setName("Renamed");
+            update.setVersion(1);
+
+            notificationFacade.updateNotification(update);
+
+            String rawSettings = jdbcTemplate.queryForObject(
+                "SELECT settings FROM notification WHERE id = ?", String.class, id);
+
+            assertThat(rawSettings).doesNotContain(slackUrl);
+
+            Notification storedNotification = notificationRepository.findById(id)
+                .orElseThrow();
+
+            assertThat(storedNotification.getSetting("slackWebhookUrl")).isEqualTo(slackUrl);
+        }
+
+        @Test
+        public void testGetMasksSlackUrl() {
+            String slackUrl = "https://hooks.slack.com/services/T/B/X";
+
+            notificationFacade.createNotification(
+                createNotification(Notification.Type.SLACK, Map.of("slackWebhookUrl", slackUrl)));
+
+            NotificationDTO notificationDTO = notificationFacade.getNotifications()
+                .getFirst();
+
+            assertThat(notificationDTO.settings()).containsEntry("slackWebhookUrl", "********");
+            assertThat(notificationDTO.signingSecret()).isNull();
+        }
 
         @Test
         public void testCreateWebhookNotification() {
