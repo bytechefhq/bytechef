@@ -40,7 +40,7 @@ public class UpdateAiAgentElementToolCallback implements ToolCallback {
             Update an AI Agent element's parameters and/or connectionId: pass the agentId and the element id
             from that agent's getAiAgent elements list; an id from another agent is rejected. Only the fields you supply are changed; an omitted field keeps its current
             value. To reconfigure a TOOL's requiresApproval flag, pass the full parameters object with the
-            updated value — parameters is replaced wholesale, not merged.""";
+            updated value; parameters is replaced wholesale, not merged.""";
 
     private static final String INPUT_SCHEMA = """
         {
