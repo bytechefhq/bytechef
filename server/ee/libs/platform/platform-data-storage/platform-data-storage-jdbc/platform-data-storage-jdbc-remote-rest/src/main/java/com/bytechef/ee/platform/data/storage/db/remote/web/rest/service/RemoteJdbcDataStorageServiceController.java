@@ -44,11 +44,11 @@ public class RemoteJdbcDataStorageServiceController {
 
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/delete-scope-data/{scope}/{scopeId}")
+        value = "/delete-scope-data/{scope}/{scopeId}/{type}")
     public ResponseEntity<Void> deleteScopeData(
-        @PathVariable DataStorageScope scope, @PathVariable String scopeId) {
+        @PathVariable DataStorageScope scope, @PathVariable String scopeId, @PathVariable PlatformType type) {
 
-        dataStorageService.deleteScopeData(scope, scopeId);
+        dataStorageService.deleteScopeData(scope, scopeId, type);
 
         return ResponseEntity.noContent()
             .build();

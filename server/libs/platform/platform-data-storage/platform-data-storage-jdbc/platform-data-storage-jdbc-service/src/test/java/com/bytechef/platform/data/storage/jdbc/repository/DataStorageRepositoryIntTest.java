@@ -49,7 +49,7 @@ public class DataStorageRepositoryIntTest {
     }
 
     @Test
-    public void testDeleteAllByScopeAndScopeIdDeletesOnlyTheGivenScopeAndScopeId() {
+    public void testDeleteAllByScopeAndScopeIdAndTypeDeletesOnlyTheGivenScopeScopeIdAndType() {
         DataEntry deletedFirstDataEntry = dataStorageRepository.save(
             newDataEntry(DataStorageScope.WORKFLOW, "workflow-1", "first"));
         DataEntry deletedSecondDataEntry = dataStorageRepository.save(
@@ -58,12 +58,17 @@ public class DataStorageRepositoryIntTest {
             newDataEntry(DataStorageScope.WORKFLOW, "workflow-2", "first"));
         DataEntry otherScopeDataEntry = dataStorageRepository.save(
             newDataEntry(DataStorageScope.PRINCIPAL, "workflow-1", "first"));
+        DataEntry otherTypeDataEntry = dataStorageRepository.save(
+            new DataEntry(
+                "component", DataStorageScope.WORKFLOW, "workflow-1", "third", "value", 0, PlatformType.EMBEDDED));
 
-        dataStorageRepository.deleteAllByScopeAndScopeId(DataStorageScope.WORKFLOW.ordinal(), "workflow-1");
+        dataStorageRepository.deleteAllByScopeAndScopeIdAndType(
+            DataStorageScope.WORKFLOW.ordinal(), "workflow-1", PlatformType.AUTOMATION.ordinal());
 
         List<DataEntry> remainingDataEntries = dataStorageRepository.findAll();
 
-        assertThat(remainingDataEntries).containsExactlyInAnyOrder(otherScopeIdDataEntry, otherScopeDataEntry);
+        assertThat(remainingDataEntries).containsExactlyInAnyOrder(
+            otherScopeIdDataEntry, otherScopeDataEntry, otherTypeDataEntry);
         assertThat(remainingDataEntries).doesNotContain(deletedFirstDataEntry, deletedSecondDataEntry);
     }
 

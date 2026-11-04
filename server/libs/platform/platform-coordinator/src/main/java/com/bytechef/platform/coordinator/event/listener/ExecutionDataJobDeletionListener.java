@@ -17,6 +17,9 @@
 package com.bytechef.platform.coordinator.event.listener;
 
 import com.bytechef.atlas.coordinator.event.DeleteJobEvent;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,13 +44,18 @@ public class ExecutionDataJobDeletionListener {
 
     @EventListener
     public void onDeleteJob(DeleteJobEvent deleteJobEvent) {
-        if (dataStorage == null) {
+        if (dataStorage == null ||
+            MapUtils.getBoolean(deleteJobEvent.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false)) {
+
             return;
         }
 
+        String jobId = String.valueOf(deleteJobEvent.getJobId());
+
         try {
-            dataStorage.deleteScopeData(
-                DataStorageScope.CURRENT_EXECUTION, String.valueOf(deleteJobEvent.getJobId()));
+            for (PlatformType type : PlatformType.values()) {
+                dataStorage.deleteScopeData(DataStorageScope.CURRENT_EXECUTION, jobId, type);
+            }
         } catch (UnsupportedOperationException exception) {
             log.debug("Scope-wide data-storage delete unsupported by this provider; skipping execution-data cleanup");
         }

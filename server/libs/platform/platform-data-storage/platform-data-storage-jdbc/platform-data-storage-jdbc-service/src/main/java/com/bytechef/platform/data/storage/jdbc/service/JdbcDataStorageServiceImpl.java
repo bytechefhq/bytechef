@@ -61,8 +61,8 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
 
     @Override
     @Transactional
-    public void deleteScopeData(DataStorageScope scope, String scopeId) {
-        dataStorageRepository.deleteAllByScopeAndScopeId(scope.ordinal(), scopeId);
+    public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
+        dataStorageRepository.deleteAllByScopeAndScopeIdAndType(scope.ordinal(), scopeId, type.ordinal());
     }
 
     @Override

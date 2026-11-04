@@ -50,12 +50,12 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
     }
 
     @Override
-    public void deleteScopeData(DataStorageScope scope, String scopeId) {
+    public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
         loadBalancedRestClient.delete(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
-                .path(DATA_STORAGE_SERVICE + "/delete-scope-data/{scope}/{scopeId}")
-                .build(scope, scopeId));
+                .path(DATA_STORAGE_SERVICE + "/delete-scope-data/{scope}/{scopeId}/{type}")
+                .build(scope, scopeId, type));
     }
 
     @Override

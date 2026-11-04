@@ -93,6 +93,27 @@ class RemoteJdbcDataStorageServiceClientIntTest {
     }
 
     @Test
+    void testDeleteScopeDataThroughTheClientDeletesOnlyTheGivenType() {
+        jdbcDataStorageService.put(
+            COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "key", ENVIRONMENT_ID, PlatformType.AUTOMATION,
+            "automation");
+        jdbcDataStorageService.put(
+            COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "embeddedKey", ENVIRONMENT_ID, PlatformType.EMBEDDED,
+            "embedded");
+
+        remoteJdbcDataStorageServiceClient.deleteScopeData(DataStorageScope.PRINCIPAL, "5", PlatformType.EMBEDDED);
+
+        assertThat(
+            jdbcDataStorageService.<String>fetch(
+                COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "key", ENVIRONMENT_ID, PlatformType.AUTOMATION))
+                    .contains("automation");
+        assertThat(
+            jdbcDataStorageService.fetch(
+                COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "embeddedKey", ENVIRONMENT_ID, PlatformType.EMBEDDED))
+                    .isEmpty();
+    }
+
+    @Test
     void testFetchVersionedAndPutIfVersionRoundTrip() {
         assertThat(fetchVersioned("key")).isEmpty();
 

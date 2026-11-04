@@ -33,7 +33,7 @@ public interface JdbcDataStorageService {
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type);
 
-    void deleteScopeData(DataStorageScope scope, String scopeId);
+    void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type);
 
     <T> Optional<T> fetch(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,

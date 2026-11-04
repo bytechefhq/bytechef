@@ -76,6 +76,38 @@ class JdbcDataStorageServiceIntTest {
     }
 
     @Test
+    void testDeleteScopeDataDeletesOnlyTheGivenType() {
+        dataStorage.put(
+            COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "key", "automation", ENVIRONMENT_ID,
+            PlatformType.AUTOMATION);
+        dataStorage.put(
+            COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "embeddedKey", "embedded", ENVIRONMENT_ID,
+            PlatformType.EMBEDDED);
+        dataStorage.put(
+            COMPONENT_NAME, DataStorageScope.PRINCIPAL, "6", "key", "other", ENVIRONMENT_ID, PlatformType.AUTOMATION);
+
+        dataStorage.deleteScopeData(DataStorageScope.PRINCIPAL, "5", PlatformType.AUTOMATION);
+
+        assertThat(fetchPrincipalValue("5", ENVIRONMENT_ID, PlatformType.AUTOMATION)).isEmpty();
+        assertThat(
+            dataStorage.<String>fetch(
+                COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "embeddedKey", ENVIRONMENT_ID, PlatformType.EMBEDDED))
+                    .contains("embedded");
+        assertThat(fetchPrincipalValue("6", ENVIRONMENT_ID, PlatformType.AUTOMATION)).contains("other");
+    }
+
+    @Test
+    void testDeleteScopeDataDeletesEveryEnvironment() {
+        dataStorage.put(COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "key", "first", 1, PlatformType.AUTOMATION);
+        dataStorage.put(COMPONENT_NAME, DataStorageScope.PRINCIPAL, "5", "key", "second", 2, PlatformType.AUTOMATION);
+
+        dataStorage.deleteScopeData(DataStorageScope.PRINCIPAL, "5", PlatformType.AUTOMATION);
+
+        assertThat(fetchPrincipalValue("5", 1, PlatformType.AUTOMATION)).isEmpty();
+        assertThat(fetchPrincipalValue("5", 2, PlatformType.AUTOMATION)).isEmpty();
+    }
+
+    @Test
     void testUpdateKeepsEveryConcurrentAppend() throws Exception {
         putValue("list", List.of());
 
@@ -208,6 +240,10 @@ class JdbcDataStorageServiceIntTest {
     private void putValue(String key, Object value) {
         jdbcDataStorageService.put(
             COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, key, ENVIRONMENT_ID, PlatformType.AUTOMATION, value);
+    }
+
+    private Optional<String> fetchPrincipalValue(String scopeId, long environmentId, PlatformType type) {
+        return dataStorage.fetch(COMPONENT_NAME, DataStorageScope.PRINCIPAL, scopeId, "key", environmentId, type);
     }
 
     private <T> T fetchValue(String key) {
