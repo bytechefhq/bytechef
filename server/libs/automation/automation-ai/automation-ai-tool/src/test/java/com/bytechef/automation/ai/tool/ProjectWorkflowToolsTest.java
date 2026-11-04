@@ -76,6 +76,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.quality.Strictness;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -224,6 +227,57 @@ class ProjectWorkflowToolsTest {
 
             assertThat(workflowSaveInfo.version()).isEqualTo(4);
             assertThat(workflowSaveInfo.warnings()).containsExactly("[slack_1] Property 'text' is empty");
+        }
+
+        @Test
+        void testUpdateWorkflowValidatesInTheToolContextEnvironment() {
+            when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(buildDto("wf-uuid-2", 88L, 3));
+            when(projectWorkflowFacade.updateWorkflow("wf-uuid-2", DEFINITION, 3))
+                .thenReturn(buildDto("wf-uuid-2", 88L, 4));
+            when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), eq("wf-uuid-2"), anyLong())).thenReturn(
+                new WorkflowValidatorFacade.WorkflowValidationResult(List.of(), List.of()));
+
+            ToolContext environmentToolContext = new ToolContext(
+                Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, 2L));
+
+            newTools(null, workflowValidatorFacade)
+                .updateWorkflow("wf-uuid-2", DEFINITION, 3, environmentToolContext);
+
+            verify(workflowValidatorFacade).validateWorkflow(DEFINITION, "wf-uuid-2", 2);
+        }
+
+        @Test
+        void testUpdateWorkflowValidatesInDevelopmentWithoutAnyEnvironment() {
+            when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(buildDto("wf-uuid-2", 88L, 3));
+            when(projectWorkflowFacade.updateWorkflow("wf-uuid-2", DEFINITION, 3))
+                .thenReturn(buildDto("wf-uuid-2", 88L, 4));
+            when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), eq("wf-uuid-2"), anyLong())).thenReturn(
+                new WorkflowValidatorFacade.WorkflowValidationResult(List.of(), List.of()));
+
+            newTools(null, workflowValidatorFacade)
+                .updateWorkflow("wf-uuid-2", DEFINITION, 3, new ToolContext(Map.of()));
+
+            verify(workflowValidatorFacade).validateWorkflow(DEFINITION, "wf-uuid-2", 0);
+        }
+
+        @Test
+        void testSaveWorkflowTestConnectionDescriptionPointsToListConnections() {
+            ToolCallback[] toolCallbacks = ToolCallbacks.from(newTools());
+
+            String description = null;
+
+            for (ToolCallback toolCallback : toolCallbacks) {
+                ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+
+                if ("saveWorkflowTestConnection".equals(toolDefinition.name())) {
+                    description = toolDefinition.description();
+                }
+            }
+
+            assertThat(description)
+                .contains("listConnections")
+                .doesNotContain("selectConnection")
+                .doesNotContain("createConnection");
         }
     }
 
