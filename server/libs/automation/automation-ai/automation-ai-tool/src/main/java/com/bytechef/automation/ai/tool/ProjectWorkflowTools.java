@@ -66,7 +66,7 @@ public class ProjectWorkflowTools {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowTools.class);
 
-    private static final String DEFAULT_DEFINITION = """
+    static final String DEFAULT_DEFINITION = """
         {
             "label": "workflowName",
             "description": "workflowDescription",
