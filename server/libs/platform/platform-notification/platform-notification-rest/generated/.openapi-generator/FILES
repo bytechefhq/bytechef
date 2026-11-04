@@ -6,3 +6,4 @@ src/main/java/com/bytechef/platform/notification/web/rest/NotificationEventApi.j
 src/main/java/com/bytechef/platform/notification/web/rest/model/NotificationEventModel.java
 src/main/java/com/bytechef/platform/notification/web/rest/model/NotificationModel.java
 src/main/java/com/bytechef/platform/notification/web/rest/model/NotificationSigningSecretModel.java
+src/main/java/com/bytechef/platform/notification/web/rest/model/NotificationTestResultModel.java

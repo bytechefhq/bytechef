@@ -7,6 +7,7 @@ package com.bytechef.platform.notification.web.rest;
 
 import com.bytechef.platform.notification.web.rest.model.NotificationModel;
 import com.bytechef.platform.notification.web.rest.model.NotificationSigningSecretModel;
+import com.bytechef.platform.notification.web.rest.model.NotificationTestResultModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:04:41.316123+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:06:18.157671+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "notification", description = "The Platform Notification Internal API")
 public interface NotificationApi {
@@ -185,6 +186,48 @@ public interface NotificationApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"signingSecret\" : \"signingSecret\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_TEST_NOTIFICATION = "/notifications/test";
+    /**
+     * POST /notifications/test : Send a test notification
+     * Sends a sample JOB_FAILED notification to the configured destination without saving anything. Masked values are resolved against the stored notification when an id is given.
+     *
+     * @param notificationModel  (required)
+     * @return The outcome of the test send. (status code 200)
+     */
+    @Operation(
+        operationId = "testNotification",
+        summary = "Send a test notification",
+        description = "Sends a sample JOB_FAILED notification to the configured destination without saving anything. Masked values are resolved against the stored notification when an id is given.",
+        tags = { "notification" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The outcome of the test send.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = NotificationTestResultModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = NotificationApi.PATH_TEST_NOTIFICATION,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<NotificationTestResultModel> testNotification(
+        @Parameter(name = "NotificationModel", description = "", required = true) @Valid @RequestBody NotificationModel notificationModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"success\" : true, \"statusCode\" : 0, \"responseBody\" : \"responseBody\", \"error\" : \"error\", \"signed\" : true }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
