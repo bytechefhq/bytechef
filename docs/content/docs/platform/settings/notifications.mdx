@@ -323,20 +323,23 @@ sent.
 
 In the dialog, a Webhook notification has a **Preset** control above **Webhook URL**, with the placeholder
 "Start from a preset" and the description "Fills in the URL, headers and body template. You can edit
-every field." It offers **Custom**, **Datadog** and **New Relic**.
+every field." It offers **Custom**, **Datadog** and **New Relic**, and a new Webhook notification starts on
+**Custom**.
 
 Picking a preset fills in three things: the **Webhook URL**, the **Headers** list and the **Body
-template**. **Custom** clears all three, so the default body is sent again. Then change anything you
-need. Every field stays editable.
+template**. **Custom** clears the URL and headers and fills in a starter template with the main fields of
+the event, one placeholder each. To send the default body instead, clear the template. Then change
+anything you need. Every field stays editable.
 
 - **Nothing about the preset is saved.** Only the URL, headers and template are saved, like any other
-  webhook. The dialog does not remember which preset you picked.
+  webhook. When you open a saved notification, the control shows **Datadog** or **New Relic** if the URL's
+  host belongs to that vendor, and **Custom** otherwise.
 - **Header values start empty.** A preset adds the header names the vendor needs, with no values. **Save**
   and **Test** show "Enter a value" until you paste your key into each one.
-- **A preset replaces all three fields.** If the URL, headers or template already has content, the dialog
-  first asks "Replace the URL, headers and body template?" with **Replace** and **Cancel**. When all three
-  are empty, the preset applies at once. The control resets after each pick, so picking the same preset
-  again applies it again.
+- **A preset replaces all three fields.** While the fields still hold what the last preset filled in, or
+  are all empty, another preset applies at once. Once you have changed one of them, the dialog first asks
+  "Replace the URL, headers and body template?" with **Replace** and **Cancel**, and **Cancel** keeps the
+  current preset selected.
 - **Saved header values are dropped.** When you edit a saved notification and pick a preset, its header
   rows replace the saved ones, and you enter the values again. See [Custom headers](#custom-headers).
 
