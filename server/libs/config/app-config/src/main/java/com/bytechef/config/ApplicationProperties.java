@@ -5185,13 +5185,13 @@ public class ApplicationProperties {
          * Outbound webhook POSTs allowed at the same time across all endpoints, each of which receives one delivery at
          * a time; must be at least 1
          */
-        private int concurrencyLimit = 10;
+        private int concurrencyLimit;
 
         /**
          * Deliveries to one endpoint allowed to wait or run at the same time before new ones to it are dropped; must be
          * at least 1
          */
-        private int maxPendingDeliveries = 1000;
+        private int maxPendingDeliveries;
 
         public int getConcurrencyLimit() {
             return concurrencyLimit;
