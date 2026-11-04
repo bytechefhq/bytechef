@@ -16,13 +16,23 @@
 
 package com.bytechef.platform.data.storage.file.storage.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.file.storage.config.FileDataStorageIntTestConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -163,5 +173,59 @@ public class FileDataStorageServiceIntTest {
             "test", DataStorageScope.WORKFLOW, "scopeId1", "key1", 0, PlatformType.AUTOMATION);
 
         Assertions.assertEquals(Map.of("key1", 23), value);
+    }
+
+    @Test
+    public void testConcurrentUpdatesKeepEveryItem() throws Exception {
+        String scopeId = String.valueOf(UUID.randomUUID());
+
+        runConcurrently(
+            8, 25, (threadIndex, iteration) -> appendValue(scopeId, "list", threadIndex * 25 + iteration));
+
+        List<Integer> values = dataStorage.get(
+            "componentName", DataStorageScope.WORKFLOW, scopeId, "list", 0, PlatformType.AUTOMATION);
+
+        assertThat(values).hasSize(200);
+    }
+
+    private void appendValue(String scopeId, String key, int value) {
+        dataStorage.update(
+            "componentName", DataStorageScope.WORKFLOW, scopeId, key, 0, PlatformType.AUTOMATION,
+            (Optional<List<Integer>> currentValue) -> {
+                List<Integer> values = new ArrayList<>(currentValue.orElse(List.of()));
+
+                values.add(value);
+
+                return values;
+            });
+    }
+
+    private static void runConcurrently(int threadCount, int iterations, BiConsumer<Integer, Integer> work)
+        throws Exception {
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        List<Future<?>> futures = new ArrayList<>();
+
+        try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
+            for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
+                int currentThreadIndex = threadIndex;
+
+                futures.add(executorService.submit(() -> {
+                    startLatch.await();
+
+                    for (int iteration = 0; iteration < iterations; iteration++) {
+                        work.accept(currentThreadIndex, iteration);
+                    }
+
+                    return null;
+                }));
+            }
+
+            startLatch.countDown();
+
+            for (Future<?> future : futures) {
+                future.get();
+            }
+        }
     }
 }

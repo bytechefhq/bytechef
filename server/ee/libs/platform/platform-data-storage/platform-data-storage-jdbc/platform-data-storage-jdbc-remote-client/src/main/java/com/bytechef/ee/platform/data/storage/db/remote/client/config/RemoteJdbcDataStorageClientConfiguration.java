@@ -14,8 +14,10 @@ import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
+import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageUpdates;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -80,6 +82,15 @@ public class RemoteJdbcDataStorageClientConfiguration {
             String key, Object value, long environmentId, PlatformType type) {
 
             jdbcDataStorageService.put(componentName, scope, scopeId, key, environmentId, type, value);
+        }
+
+        @Override
+        public <T> T update(
+            String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+            PlatformType type, Function<Optional<T>, T> updater) {
+
+            return JdbcDataStorageUpdates.update(
+                jdbcDataStorageService, componentName, scope, scopeId, key, environmentId, type, updater);
         }
 
         @Override

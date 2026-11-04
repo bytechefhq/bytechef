@@ -24,9 +24,11 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageServiceImpl;
+import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageUpdates;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -83,14 +85,27 @@ public class JdbcDataStorageConfiguration {
             String componentName, DataStorageScope scope, String scopeId,
             String key, Object value, long environmentId, PlatformType type) {
 
-            int size = getSizeInBytes(value);
-
-            if (size > 409600) {
-                throw new IllegalArgumentException(
-                    "Value size exceeds 400KB limit per key. Actual: " + size + " bytes)");
-            }
+            checkSize(value);
 
             jdbcDataStorageService.put(componentName, scope, scopeId, key, environmentId, type, value);
+        }
+
+        @Override
+        public <T> T update(
+            String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+            PlatformType type, Function<Optional<T>, T> updater) {
+
+            return JdbcDataStorageUpdates.update(
+                jdbcDataStorageService, componentName, scope, scopeId, key, environmentId, type,
+                currentValue -> {
+                    T value = updater.apply(currentValue);
+
+                    if (value != null) {
+                        checkSize(value);
+                    }
+
+                    return value;
+                });
         }
 
         @Override
@@ -99,6 +114,15 @@ public class JdbcDataStorageConfiguration {
             String key, long environmentId, PlatformType type) {
 
             jdbcDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
+        }
+
+        private void checkSize(Object value) {
+            int size = getSizeInBytes(value);
+
+            if (size > 409600) {
+                throw new IllegalArgumentException(
+                    "Value size exceeds 400KB limit per key. Actual: " + size + " bytes)");
+            }
         }
 
         private int getSizeInBytes(Object value) {

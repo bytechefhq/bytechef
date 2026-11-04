@@ -30,6 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Named;
@@ -194,6 +199,78 @@ class InMemoryDataStorageIntTest {
             }
 
             return JsonUtils.read(new String(bytes, StandardCharsets.UTF_8));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("cacheManagers")
+    void testConcurrentUpdatesFromSeparateInstancesKeepEveryItem(CacheManager cacheManager) throws Exception {
+        runConcurrently(8, 25, (threadIndex, iteration) -> {
+            InMemoryDataStorage inMemoryDataStorage = new InMemoryDataStorage(workflowUuid, cacheManager);
+
+            appendValue(inMemoryDataStorage, "list", threadIndex * 25 + iteration);
+        });
+
+        InMemoryDataStorage inMemoryDataStorage = new InMemoryDataStorage(workflowUuid, cacheManager);
+
+        assertThat(inMemoryDataStorage.<List<Integer>>get(COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, "list"))
+            .hasSize(200);
+    }
+
+    @ParameterizedTest
+    @MethodSource("cacheManagers")
+    void testConcurrentPutsOfDifferentKeysInOneScopeKeepEveryKey(CacheManager cacheManager) throws Exception {
+        runConcurrently(8, 25, (threadIndex, iteration) -> {
+            InMemoryDataStorage inMemoryDataStorage = new InMemoryDataStorage(workflowUuid, cacheManager);
+
+            inMemoryDataStorage.put(
+                COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, "key" + (threadIndex * 25 + iteration),
+                iteration);
+        });
+
+        InMemoryDataStorage inMemoryDataStorage = new InMemoryDataStorage(workflowUuid, cacheManager);
+
+        assertThat(inMemoryDataStorage.getAll(COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID))
+            .hasSize(200);
+    }
+
+    private void appendValue(InMemoryDataStorage inMemoryDataStorage, String key, int value) {
+        inMemoryDataStorage.update(
+            COMPONENT_NAME, DataStorageScope.WORKFLOW, SCOPE_ID, key, (Optional<List<Integer>> currentValue) -> {
+                List<Integer> values = new ArrayList<>(currentValue.orElse(List.of()));
+
+                values.add(value);
+
+                return values;
+            });
+    }
+
+    private static void runConcurrently(int threadCount, int iterations, BiConsumer<Integer, Integer> work)
+        throws Exception {
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        List<Future<?>> futures = new ArrayList<>();
+
+        try (ExecutorService executorService = Executors.newFixedThreadPool(threadCount)) {
+            for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
+                int currentThreadIndex = threadIndex;
+
+                futures.add(executorService.submit(() -> {
+                    startLatch.await();
+
+                    for (int iteration = 0; iteration < iterations; iteration++) {
+                        work.accept(currentThreadIndex, iteration);
+                    }
+
+                    return null;
+                }));
+            }
+
+            startLatch.countDown();
+
+            for (Future<?> future : futures) {
+                future.get();
+            }
         }
     }
 }

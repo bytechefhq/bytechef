@@ -25,7 +25,10 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -34,6 +37,11 @@ import tools.jackson.databind.ObjectMapper;
 public class FileDataStorageServiceImpl implements FileDataStorageService {
 
     public static final String DATA_ENTRIES_ROOT_DIR = "data_entries/";
+
+    private static final int LOCK_STRIPES = 64;
+    private static final ReentrantLock[] LOCKS = IntStream.range(0, LOCK_STRIPES)
+        .mapToObj(index -> new ReentrantLock())
+        .toArray(ReentrantLock[]::new);
 
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
@@ -115,6 +123,35 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         fileStorageService.storeFileContent(
             getDirectoryPath(type, environmentId), getFilename(componentName, scope, scopeId, key),
             CompressionUtils.compress(typedValue.write(objectMapper)), false);
+    }
+
+    @Override
+    public <T> T update(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type, Function<Optional<T>, T> updater) {
+
+        ReentrantLock lock = getLock(
+            getDirectoryPath(type, environmentId) + "/" + getFilename(componentName, scope, scopeId, key));
+
+        lock.lock();
+
+        try {
+            T value = updater.apply(fetch(componentName, scope, scopeId, key, environmentId, type));
+
+            if (value == null) {
+                throw new IllegalArgumentException("A data storage update must not return null");
+            }
+
+            put(componentName, scope, scopeId, key, value, environmentId, type);
+
+            return value;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private static ReentrantLock getLock(String lockKey) {
+        return LOCKS[Math.floorMod(lockKey.hashCode(), LOCK_STRIPES)];
     }
 
     private static String getDirectoryPath(PlatformType type, long environmentId) {

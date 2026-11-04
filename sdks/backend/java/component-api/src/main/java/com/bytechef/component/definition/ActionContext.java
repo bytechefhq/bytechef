@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author Ivica Cardic
@@ -89,6 +90,12 @@ public interface ActionContext extends Context {
         Void put(Data.Scope scope, String key, Object data);
 
         Void remove(Data.Scope scope, String key);
+
+        /**
+         * Atomically replaces the value with the updater's result; the updater may run more than once and must not have
+         * side effects.
+         */
+        <T> T update(Data.Scope scope, String key, Function<Optional<T>, T> updater);
     }
 
     /**

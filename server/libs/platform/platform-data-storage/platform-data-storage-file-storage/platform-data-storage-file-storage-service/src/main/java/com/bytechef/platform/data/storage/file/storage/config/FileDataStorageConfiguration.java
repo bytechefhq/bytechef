@@ -28,6 +28,7 @@ import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageSe
 import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageServiceImpl;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.ObjectMapper;
@@ -90,6 +91,14 @@ public class FileDataStorageConfiguration {
             String key, Object value, long environmentId, PlatformType type) {
 
             fileDataStorageService.put(componentName, scope, scopeId, key, value, environmentId, type);
+        }
+
+        @Override
+        public <T> T update(
+            String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+            PlatformType type, Function<Optional<T>, T> updater) {
+
+            return fileDataStorageService.update(componentName, scope, scopeId, key, environmentId, type, updater);
         }
 
         @Override

@@ -44,6 +44,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
@@ -639,6 +640,18 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             }
 
             return null;
+        }
+
+        @Override
+        public <T> T update(Scope scope, String key, Function<Optional<T>, T> updater) {
+            if (editorEnvironment) {
+                return inMemoryDataStorage.update(
+                    componentName, getDataStorageScope(scope), getScopeId(scope), key, updater);
+            }
+
+            return dataStorage.update(
+                componentName, getDataStorageScope(scope), getScopeId(scope), key,
+                Objects.requireNonNull(environmentId), Objects.requireNonNull(type), updater);
         }
 
         private DataStorageScope getDataStorageScope(Scope scope) {

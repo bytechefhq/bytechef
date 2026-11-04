@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -37,6 +40,11 @@ import org.springframework.cache.CacheManager;
 class InMemoryDataStorage {
 
     static final String CACHE = InMemoryDataStorage.class.getName() + ".dataStorage";
+
+    private static final int LOCK_STRIPES = 64;
+    private static final ReentrantLock[] LOCKS = IntStream.range(0, LOCK_STRIPES)
+        .mapToObj(index -> new ReentrantLock())
+        .toArray(ReentrantLock[]::new);
 
     private final CacheManager cacheManager;
 
@@ -49,12 +57,20 @@ class InMemoryDataStorage {
     }
 
     public void delete(String componentName, DataStorageScope scope, String scopeId, String key) {
-        Map<String, Object> valueMap = getValueMap(componentName, scope, scopeId);
+        ReentrantLock lock = getLock(componentName, scope, scopeId);
 
-        if (valueMap.containsKey(key)) {
-            valueMap.remove(key);
+        lock.lock();
 
-            putValueMap(componentName, scope, scopeId, valueMap);
+        try {
+            Map<String, Object> valueMap = getValueMap(componentName, scope, scopeId);
+
+            if (valueMap.containsKey(key)) {
+                valueMap.remove(key);
+
+                putValueMap(componentName, scope, scopeId, valueMap);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -78,6 +94,53 @@ class InMemoryDataStorage {
     }
 
     public void put(String componentName, DataStorageScope scope, String scopeId, String key, Object value) {
+        checkSize(value);
+
+        ReentrantLock lock = getLock(componentName, scope, scopeId);
+
+        lock.lock();
+
+        try {
+            Map<String, Object> valueMap = getValueMap(componentName, scope, scopeId);
+
+            valueMap.put(key, value);
+
+            putValueMap(componentName, scope, scopeId, valueMap);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T update(
+        String componentName, DataStorageScope scope, String scopeId, String key, Function<Optional<T>, T> updater) {
+
+        ReentrantLock lock = getLock(componentName, scope, scopeId);
+
+        lock.lock();
+
+        try {
+            Map<String, Object> valueMap = getValueMap(componentName, scope, scopeId);
+
+            T value = updater.apply(Optional.ofNullable((T) valueMap.get(key)));
+
+            if (value == null) {
+                throw new IllegalArgumentException("A data storage update must not return null");
+            }
+
+            checkSize(value);
+
+            valueMap.put(key, value);
+
+            putValueMap(componentName, scope, scopeId, valueMap);
+
+            return value;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void checkSize(Object value) {
         int size = getSizeInBytes(value);
 
         if (size > 409600) {
@@ -85,12 +148,6 @@ class InMemoryDataStorage {
                 "Value size exceeds 400KB limit per key. Actual: " + size + " bytes",
                 ComponentErrorType.DATA_STORAGE_SIZE_EXCEEDED);
         }
-
-        Map<String, Object> valueMap = getValueMap(componentName, scope, scopeId);
-
-        valueMap.put(key, value);
-
-        putValueMap(componentName, scope, scopeId, valueMap);
     }
 
     private Cache getCache() {
@@ -99,6 +156,12 @@ class InMemoryDataStorage {
 
     private String getCacheKey(String componentName, DataStorageScope scope, String scopeId) {
         return TenantCacheKeyUtils.getKey(workflowUuid, componentName, scope, scopeId);
+    }
+
+    private ReentrantLock getLock(String componentName, DataStorageScope scope, String scopeId) {
+        String cacheKey = getCacheKey(componentName, scope, scopeId);
+
+        return LOCKS[Math.floorMod(cacheKey.hashCode(), LOCK_STRIPES)];
     }
 
     private int getSizeInBytes(Object value) {
