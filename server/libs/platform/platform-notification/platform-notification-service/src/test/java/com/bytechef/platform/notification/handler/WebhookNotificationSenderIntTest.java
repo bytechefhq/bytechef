@@ -21,10 +21,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.config.PlatformNotificationIntTestConfiguration;
+import com.bytechef.platform.notification.delivery.WebhookDelivery;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryException;
 import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.notification.domain.Notification;
@@ -32,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -42,9 +46,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -68,7 +74,7 @@ class WebhookNotificationSenderIntTest {
     @MockitoBean
     private MailService mailService;
 
-    @Autowired
+    @MockitoSpyBean
     private WebhookDeliveryService webhookDeliveryService;
 
     @Autowired
@@ -89,6 +95,29 @@ class WebhookNotificationSenderIntTest {
         loopbackWebhookReceiver.close();
 
         ReflectionTestUtils.setField(webhookDeliveryService, "urlValidator", originalUrlValidator);
+    }
+
+    @Test
+    void testSendReadsSecretFromSecretSettings() throws Exception {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{\"a\":1}");
+
+        Notification notification = createNotification(Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook")));
+
+        notification.setSecretSettings(Map.of("webhookSecret", "from-secret"));
+
+        CompletableFuture<Void> future = webhookNotificationSender.send(
+            notification, webhookNotificationHandler, notificationHandlerContext);
+
+        LoopbackWebhookReceiver.ReceivedRequest receivedRequest = loopbackWebhookReceiver.awaitRequest();
+
+        future.join();
+
+        Map<String, String> headers = receivedRequest.headers();
+
+        assertThat(headers.get("X-ByteChef-Signature"))
+            .isEqualTo(
+                "t=" + headers.get("X-ByteChef-Timestamp") + ",v1=" + sign(
+                    "from-secret", headers.get("X-ByteChef-Timestamp") + ".{\"a\":1}"));
     }
 
     @Test
@@ -188,6 +217,79 @@ class WebhookNotificationSenderIntTest {
         assertThat(secondDeliveryId).isNotEqualTo("d-1");
         assertThat(firstRequest.body()).isEqualTo("{\"deliveryId\":\"" + firstDeliveryId + "\"}");
         assertThat(secondRequest.body()).isEqualTo("{\"deliveryId\":\"" + secondDeliveryId + "\"}");
+    }
+
+    @Test
+    void testSendRendersTemplateWithDeliveryId() throws Exception {
+        CompletableFuture<Void> future = webhookNotificationSender.send(
+            createNotification(
+                Map.of(
+                    "webhook", loopbackWebhookReceiver.getUrl("/hook"), "webhookBodyTemplate",
+                    "{\"d\":\"{{deliveryId}}\"}")),
+            webhookNotificationHandler, notificationHandlerContext);
+
+        LoopbackWebhookReceiver.ReceivedRequest receivedRequest = loopbackWebhookReceiver.awaitRequest();
+
+        future.join();
+
+        String deliveryId = receivedRequest.headers()
+            .get("X-ByteChef-Delivery");
+
+        assertThat(receivedRequest.body()).isEqualTo("{\"d\":\"" + deliveryId + "\"}");
+
+        verify(webhookNotificationHandler, never()).getPayload(any());
+    }
+
+    @Test
+    void testSendPassesHeadersInOrder() throws Exception {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{}");
+
+        Notification notification = createNotification(Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook")));
+
+        notification.setSecretSettings(
+            Map.of(
+                "webhookHeaders",
+                List.of(
+                    Map.of("name", "Z-First", "value", "1"), Map.of("name", "A-Second", "value", "2"),
+                    Map.of("name", "M-Third", "value", "3"))));
+
+        CompletableFuture<Void> future = webhookNotificationSender.send(
+            notification, webhookNotificationHandler, notificationHandlerContext);
+
+        LoopbackWebhookReceiver.ReceivedRequest receivedRequest = loopbackWebhookReceiver.awaitRequest();
+
+        future.join();
+
+        Map<String, String> headers = receivedRequest.headers();
+
+        assertThat(headers).containsEntry("Z-First", "1");
+        assertThat(headers).containsEntry("A-Second", "2");
+        assertThat(headers).containsEntry("M-Third", "3");
+
+        ArgumentCaptor<WebhookDelivery> webhookDeliveryArgumentCaptor = ArgumentCaptor.forClass(WebhookDelivery.class);
+
+        verify(webhookDeliveryService).submit(webhookDeliveryArgumentCaptor.capture());
+
+        WebhookDelivery webhookDelivery = webhookDeliveryArgumentCaptor.getValue();
+
+        assertThat(webhookDelivery.headers()
+            .keySet()).containsExactly("Z-First", "A-Second", "M-Third");
+    }
+
+    @Test
+    void testSendUsesDefaultBodyWhenTemplateBlank() throws Exception {
+        when(webhookNotificationHandler.getPayload(any())).thenReturn("{\"default\":true}");
+
+        CompletableFuture<Void> future = webhookNotificationSender.send(
+            createNotification(
+                Map.of("webhook", loopbackWebhookReceiver.getUrl("/hook"), "webhookBodyTemplate", "   ")),
+            webhookNotificationHandler, notificationHandlerContext);
+
+        LoopbackWebhookReceiver.ReceivedRequest receivedRequest = loopbackWebhookReceiver.awaitRequest();
+
+        future.join();
+
+        assertThat(receivedRequest.body()).isEqualTo("{\"default\":true}");
     }
 
     @Test
