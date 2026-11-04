@@ -59,6 +59,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-notification:platform-notification-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
@@ -78,6 +79,8 @@ dependencies {
     testImplementation("io.grpc:grpc-api")
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
+    testImplementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
+    testImplementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-api"))
     testImplementation(project(":server:ee:libs:core:tenant:tenant-remote-client"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
