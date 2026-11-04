@@ -20,6 +20,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
@@ -29,7 +30,7 @@ import java.util.function.Function;
  */
 public final class JdbcDataStorageUpdates {
 
-    private static final int MAX_ATTEMPTS = 20;
+    private static final Duration TIME_BUDGET = Duration.ofSeconds(10);
 
     private JdbcDataStorageUpdates() {
     }
@@ -38,7 +39,18 @@ public final class JdbcDataStorageUpdates {
         JdbcDataStorageService jdbcDataStorageService, String componentName, DataStorageScope scope, String scopeId,
         String key, long environmentId, PlatformType type, Function<Optional<T>, T> updater) {
 
-        for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        return update(
+            jdbcDataStorageService, componentName, scope, scopeId, key, environmentId, type, updater, TIME_BUDGET);
+    }
+
+    static <T> T update(
+        JdbcDataStorageService jdbcDataStorageService, String componentName, DataStorageScope scope, String scopeId,
+        String key, long environmentId, PlatformType type, Function<Optional<T>, T> updater,
+        Duration timeBudget) {
+
+        long deadline = System.nanoTime() + timeBudget.toNanos();
+
+        for (int attempt = 1;; attempt++) {
             Optional<VersionedValue<T>> versionedValueOptional = jdbcDataStorageService.fetchVersioned(
                 componentName, scope, scopeId, key, environmentId, type);
 
@@ -55,6 +67,10 @@ public final class JdbcDataStorageUpdates {
                 componentName, scope, scopeId, key, environmentId, type, result, expectedVersion)) {
 
                 return result;
+            }
+
+            if (System.nanoTime() - deadline >= 0) {
+                break;
             }
 
             backOff(attempt);
