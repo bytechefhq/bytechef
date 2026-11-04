@@ -190,7 +190,10 @@ const WorkflowExecutionsTestOutput = ({
 
                                         <ScrollArea className="min-h-0 flex-1 pr-4 pl-1">
                                             <Accordion
-                                                className="ml-2 space-y-2 pb-4"
+                                                className={twMerge(
+                                                    'ml-2 space-y-2 pb-4',
+                                                    subflowStack.length === 0 && 'pt-3'
+                                                )}
                                                 defaultValue={
                                                     deepestFailedExecution?.path ||
                                                     (isTriggerExecution
