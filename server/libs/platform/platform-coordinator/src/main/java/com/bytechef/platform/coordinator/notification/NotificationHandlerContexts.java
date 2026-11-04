@@ -226,13 +226,13 @@ public class NotificationHandlerContexts {
             return;
         }
 
-        if (jobPrincipalSummary.projectId() != null || jobPrincipalSummary.projectName() != null ||
-            jobPrincipalSummary.projectVersion() != null) {
+        if (jobPrincipalSummary.principalId() != null || jobPrincipalSummary.principalName() != null ||
+            jobPrincipalSummary.principalVersion() != null) {
 
             builder.project(
                 new ProjectSummary(
-                    jobPrincipalSummary.projectId(), jobPrincipalSummary.projectName(),
-                    jobPrincipalSummary.projectVersion()));
+                    jobPrincipalSummary.principalId(), jobPrincipalSummary.principalName(),
+                    jobPrincipalSummary.principalVersion()));
         }
 
         try {

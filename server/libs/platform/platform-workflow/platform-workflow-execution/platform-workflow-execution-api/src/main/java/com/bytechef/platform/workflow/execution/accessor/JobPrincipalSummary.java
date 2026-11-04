@@ -19,16 +19,9 @@ package com.bytechef.platform.workflow.execution.accessor;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Describes the principal a job runs under, for notifications. For {@code EMBEDDED} jobs the {@code project*} fields
- * describe the integration.
- *
- * @param environmentId  the environment identifier (ordinal of the platform environment)
- * @param projectId      the project id, or the integration id for embedded jobs
- * @param projectName    the project name, or the integration name for embedded jobs
- * @param projectVersion the deployed project version, or the integration version for embedded jobs
- *
  * @author Ivica Cardic
  */
 public record JobPrincipalSummary(
-    long environmentId, @Nullable Long projectId, @Nullable String projectName, @Nullable Integer projectVersion) {
+    long environmentId, @Nullable Long principalId, @Nullable String principalName,
+    @Nullable Integer principalVersion) {
 }
