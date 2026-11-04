@@ -631,7 +631,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         TriggerDefinitionFacade triggerDefinitionFacade = mock(TriggerDefinitionFacade.class);
         PropertyOptionsResolver propertyOptionsResolver = mock(PropertyOptionsResolver.class);
         ObjectProvider<CopilotConnectionLister> connectionListerProvider = emptyProvider();
-        ScopedConnectionGuard scopedConnectionGuard = new ScopedConnectionGuard(connectionListerProvider);
+        ScopedConnectionGuard scopedConnectionGuard = new ScopedConnectionGuard(
+            connectionListerProvider, mock(WorkspaceConnectionFacade.class), propertyOptionsResolver);
 
         return new CopilotConfiguration(
             promptResource, promptResource, promptResource, promptResource, promptResource, promptResource,
