@@ -88,7 +88,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 class ManagementMcpWorkflowAuthoringIntTest {
 
     private static final List<String> INTELLIGENT_TOOL_NAMES = List.of(
-        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer");
+        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer",
+        "buildAiAgent");
 
     private static final String SETUP_LOGIN = "admin";
     private static final String SLACK_CHANNEL_ID = "C0123456789";
