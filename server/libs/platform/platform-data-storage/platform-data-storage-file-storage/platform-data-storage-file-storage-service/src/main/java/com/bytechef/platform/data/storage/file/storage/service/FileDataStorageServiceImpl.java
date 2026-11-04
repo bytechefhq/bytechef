@@ -23,11 +23,11 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import tools.jackson.databind.ObjectMapper;
 
@@ -37,6 +37,7 @@ import tools.jackson.databind.ObjectMapper;
 public class FileDataStorageServiceImpl implements FileDataStorageService {
 
     public static final String DATA_ENTRIES_ROOT_DIR = "data_entries/";
+    public static final String DATA_STORAGE_ROOT_DIR = "data_storage/";
 
     private static final int LOCK_STRIPES = 64;
     private static final ReentrantLock[] LOCKS = IntStream.range(0, LOCK_STRIPES)
@@ -57,39 +58,51 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
 
-        String directoryPath = getDirectoryPath(type, environmentId);
-        String filename = getFilename(componentName, scope, scopeId, key);
+        String directoryPath = getDirectoryPath(type, scope, scopeId, environmentId);
+        String filename = getFilename(componentName, key);
         ReentrantLock lock = getLock(directoryPath + "/" + filename);
 
         lock.lock();
 
         try {
-            fileStorageService.deleteFile(directoryPath, fileStorageService.getFileEntry(directoryPath, filename));
+            deleteIfExists(directoryPath, filename);
+            deleteIfExists(
+                getOldDirectoryPath(type, environmentId), getOldFilename(componentName, scope, scopeId, key));
         } finally {
             lock.unlock();
         }
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
+        String scopeDirectoryPath = getScopeDirectoryPath(type, scope, scopeId);
+
+        for (FileEntry fileEntry : fileStorageService.getFileEntries(scopeDirectoryPath)) {
+            fileStorageService.deleteFile(scopeDirectoryPath, fileEntry);
+        }
+    }
+
+    @Override
     public <T> Optional<T> fetch(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
 
-        String directoryPath = getDirectoryPath(type, environmentId);
+        String directoryPath = getDirectoryPath(type, scope, scopeId, environmentId);
+        String filename = getFilename(componentName, key);
 
-        if (!fileStorageService.fileExists(directoryPath, getFilename(componentName, scope, scopeId, key))) {
-            return Optional.empty();
+        if (fileStorageService.fileExists(directoryPath, filename)) {
+            return Optional.ofNullable(read(directoryPath, fileStorageService.getFileEntry(directoryPath, filename)));
         }
 
-        TypedValue typedValue = TypedValue.read(
-            objectMapper,
-            CompressionUtils.decompressToString(
-                fileStorageService.readFileToBytes(
-                    directoryPath,
-                    fileStorageService.getFileEntry(directoryPath, getFilename(componentName, scope, scopeId, key)))));
+        String oldDirectoryPath = getOldDirectoryPath(type, environmentId);
+        String oldFilename = getOldFilename(componentName, scope, scopeId, key);
 
-        return Optional.ofNullable((T) typedValue.value());
+        if (fileStorageService.fileExists(oldDirectoryPath, oldFilename)) {
+            return Optional.ofNullable(
+                read(oldDirectoryPath, fileStorageService.getFileEntry(oldDirectoryPath, oldFilename)));
+        }
+
+        return Optional.empty();
     }
 
     @Override
@@ -109,15 +122,32 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     @Override
     public <T> Map<String, T> getAll(
         String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type) {
-        String prefix = getFilename(componentName, scope, scopeId, "");
 
-        return fileStorageService.getFileEntries(getDirectoryPath(type, environmentId))
-            .stream()
-            .map(FileEntry::getName)
-            .filter(filename -> filename.startsWith(prefix))
-            .map(filename -> filename.substring(prefix.length()))
-            .collect(
-                Collectors.toMap(key -> key, key -> get(componentName, scope, scopeId, key, environmentId, type)));
+        Map<String, T> values = new HashMap<>();
+
+        String oldDirectoryPath = getOldDirectoryPath(type, environmentId);
+        String oldPrefix = getOldFilename(componentName, scope, scopeId, "");
+
+        for (FileEntry fileEntry : fileStorageService.getFileEntries(oldDirectoryPath)) {
+            String filename = fileEntry.getName();
+
+            if (filename.startsWith(oldPrefix)) {
+                values.put(filename.substring(oldPrefix.length()), read(oldDirectoryPath, fileEntry));
+            }
+        }
+
+        String directoryPath = getDirectoryPath(type, scope, scopeId, environmentId);
+        String prefix = getFilename(componentName, "");
+
+        for (FileEntry fileEntry : fileStorageService.getFileEntries(directoryPath)) {
+            String filename = fileEntry.getName();
+
+            if (filename.startsWith(prefix)) {
+                values.put(filename.substring(prefix.length()), read(directoryPath, fileEntry));
+            }
+        }
+
+        return values;
     }
 
     @Override
@@ -126,8 +156,8 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         PlatformType type) {
 
         TypedValue typedValue = new TypedValue(value);
-        String directoryPath = getDirectoryPath(type, environmentId);
-        String filename = getFilename(componentName, scope, scopeId, key);
+        String directoryPath = getDirectoryPath(type, scope, scopeId, environmentId);
+        String filename = getFilename(componentName, key);
         ReentrantLock lock = getLock(directoryPath + "/" + filename);
 
         lock.lock();
@@ -135,6 +165,9 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         try {
             fileStorageService.storeFileContent(
                 directoryPath, filename, CompressionUtils.compress(typedValue.write(objectMapper)), false);
+
+            deleteIfExists(
+                getOldDirectoryPath(type, environmentId), getOldFilename(componentName, scope, scopeId, key));
         } finally {
             lock.unlock();
         }
@@ -146,7 +179,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         PlatformType type, Function<Optional<T>, T> updater) {
 
         ReentrantLock lock = getLock(
-            getDirectoryPath(type, environmentId) + "/" + getFilename(componentName, scope, scopeId, key));
+            getDirectoryPath(type, scope, scopeId, environmentId) + "/" + getFilename(componentName, key));
 
         lock.lock();
 
@@ -165,15 +198,44 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
         }
     }
 
+    private void deleteIfExists(String directoryPath, String filename) {
+        if (fileStorageService.fileExists(directoryPath, filename)) {
+            fileStorageService.deleteFile(directoryPath, fileStorageService.getFileEntry(directoryPath, filename));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T read(String directoryPath, FileEntry fileEntry) {
+        TypedValue typedValue = TypedValue.read(
+            objectMapper,
+            CompressionUtils.decompressToString(fileStorageService.readFileToBytes(directoryPath, fileEntry)));
+
+        return (T) typedValue.value();
+    }
+
     private static ReentrantLock getLock(String lockKey) {
         return LOCKS[Math.floorMod(lockKey.hashCode(), LOCK_STRIPES)];
     }
 
-    private static String getDirectoryPath(PlatformType type, long environmentId) {
+    private static String getDirectoryPath(
+        PlatformType type, DataStorageScope scope, String scopeId, long environmentId) {
+
+        return getScopeDirectoryPath(type, scope, scopeId) + "/" + environmentId;
+    }
+
+    private static String getFilename(String componentName, String key) {
+        return componentName + "_" + key;
+    }
+
+    private static String getOldDirectoryPath(PlatformType type, long environmentId) {
         return DATA_ENTRIES_ROOT_DIR + type.ordinal() + "/" + environmentId;
     }
 
-    private static String getFilename(String componentName, DataStorageScope scope, String scopeId, String key) {
+    private static String getOldFilename(String componentName, DataStorageScope scope, String scopeId, String key) {
         return componentName + "_" + scope.ordinal() + "_" + scopeId + "_" + key;
+    }
+
+    private static String getScopeDirectoryPath(PlatformType type, DataStorageScope scope, String scopeId) {
+        return DATA_STORAGE_ROOT_DIR + type.ordinal() + "/" + scope.ordinal() + "/" + scopeId;
     }
 }
