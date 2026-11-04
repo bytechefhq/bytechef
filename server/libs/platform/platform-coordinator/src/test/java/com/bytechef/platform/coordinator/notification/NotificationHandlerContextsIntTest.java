@@ -238,13 +238,11 @@ class NotificationHandlerContextsIntTest {
 
     @Test
     void testErrorMessageIsCappedAt1000Characters() {
-        when(taskExecutionService.getJobTaskExecutions(42L)).thenReturn(
-            List.of(
-                taskExecution(
-                    "Send email", "email/v1/send", TaskExecution.Status.FAILED,
-                    new ExecutionError("m".repeat(5000), List.of("x")))));
+        saveTaskExecution(
+            1, "Send email", "email/v1/send", TaskExecution.Status.FAILED,
+            new ExecutionError("m".repeat(5000), List.of("x")));
 
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_FAILED)
             .build();
 
         ErrorSummary errorSummary = context.getError();
@@ -257,9 +255,7 @@ class NotificationHandlerContextsIntTest {
     void testJobErrorMessageIsCappedAt1000Characters() {
         job.setError(new ExecutionError("m".repeat(5000), List.of("x")));
 
-        when(taskExecutionService.getJobTaskExecutions(42L)).thenReturn(List.of());
-
-        NotificationHandlerContext context = contexts(PUBLIC_URL).builder(job, Type.JOB_FAILED)
+        NotificationHandlerContext context = notificationHandlerContexts.builder(job, Type.JOB_FAILED)
             .build();
 
         ErrorSummary errorSummary = context.getError();
