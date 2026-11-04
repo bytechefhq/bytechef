@@ -7,7 +7,7 @@ export const EXECUTIONS_TABLE_ROW_CLASS_NAME = 'group cursor-pointer border-0 ho
 
 export const EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME = 'even:bg-surface-neutral-secondary';
 
-export const EXECUTIONS_TABLE_CELL_CLASS_NAME = 'py-4 whitespace-nowrap';
+export const EXECUTIONS_TABLE_CELL_CLASS_NAME = 'whitespace-nowrap';
 
 export const PINNED_HEAD_CLASS_NAME = 'sticky right-0 z-10 bg-surface-main text-center';
 

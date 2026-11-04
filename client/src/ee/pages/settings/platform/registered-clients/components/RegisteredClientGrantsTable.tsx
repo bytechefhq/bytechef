@@ -138,7 +138,7 @@ const RegisteredClientGrantsTable = ({registeredClientId}: RegisteredClientGrant
                             {row.getAllCells().map((cell) => (
                                 <TableCell
                                     className={
-                                        cell.id.endsWith('actions') ? 'flex justify-end p-3' : 'p-3 whitespace-nowrap'
+                                        cell.id.endsWith('actions') ? 'flex justify-end px-3' : 'px-3 whitespace-nowrap'
                                     }
                                     key={cell.id}
                                 >
