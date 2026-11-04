@@ -55,6 +55,36 @@ it('should send the invitation key with the new password and confirm the activat
     );
 });
 
+it('should send the invitation once when the activate button is clicked twice', async () => {
+    let resolveResponse: (response: Response) => void = () => {};
+
+    const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation(() => new Promise<Response>((resolve) => (resolveResponse = resolve)));
+
+    document.cookie = 'XSRF-TOKEN=xsrf-token';
+
+    renderAcceptInvitationPage();
+
+    await userEvent.type(screen.getByLabelText('Password'), 'Password1');
+
+    const activateButton = screen.getByRole('button', {name: 'Activate account'});
+
+    await userEvent.click(activateButton);
+
+    await waitFor(() => expect(activateButton).toBeDisabled());
+
+    await userEvent.click(activateButton);
+
+    resolveResponse(new Response(null, {status: 200}));
+
+    await waitFor(() => expect(screen.getByText('Your account is ready')).toBeInTheDocument());
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    document.cookie = 'XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+});
+
 it('should explain when the invitation link is invalid or expired', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, {status: 500}));
 

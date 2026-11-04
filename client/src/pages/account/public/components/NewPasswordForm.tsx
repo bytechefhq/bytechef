@@ -49,7 +49,7 @@ const formSchema = z
     });
 
 interface NewPasswordFormProps {
-    onSubmit: (newPassword: string) => void;
+    onSubmit: (newPassword: string) => Promise<void> | void;
     submitLabel: string;
 }
 
@@ -67,12 +67,12 @@ const NewPasswordForm = ({onSubmit, submitLabel}: NewPasswordFormProps) => {
     });
 
     const {
-        formState: {errors},
+        formState: {errors, isSubmitting},
         getValues,
     } = form;
 
     function handleSubmit({newPassword}: z.infer<typeof formSchema>) {
-        onSubmit(newPassword);
+        return onSubmit(newPassword);
     }
 
     return (
@@ -116,7 +116,14 @@ const NewPasswordForm = ({onSubmit, submitLabel}: NewPasswordFormProps) => {
                     )}
                 />
 
-                <Button className="w-full" data-cy="submit" label={submitLabel} size="lg" type="submit" />
+                <Button
+                    className="w-full"
+                    data-cy="submit"
+                    disabled={isSubmitting}
+                    label={submitLabel}
+                    size="lg"
+                    type="submit"
+                />
             </form>
         </Form>
     );
