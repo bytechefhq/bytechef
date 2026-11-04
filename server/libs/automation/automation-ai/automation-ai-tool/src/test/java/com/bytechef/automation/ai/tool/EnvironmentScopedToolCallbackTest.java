@@ -19,6 +19,8 @@ package com.bytechef.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.automation.configuration.exception.ProjectWorkflowErrorType;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.execution.ToolExecutionException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -101,6 +104,32 @@ class EnvironmentScopedToolCallbackTest {
     }
 
     @Test
+    void testReturnsTheMessageOfAFailedDelegateCall() {
+        delegate.failure = new ToolExecutionException(
+            delegate.getToolDefinition(),
+            new ExecutionException(
+                "Nothing was saved: 1 validation error(s)", ProjectWorkflowErrorType.UPDATE_WORKFLOW));
+
+        String result = toolCallback.call("{\"workflowId\":\"w\"}");
+
+        assertThat(jsonMapper.readTree(result)
+            .path("error")
+            .asString()).isEqualTo("Nothing was saved: 1 validation error(s)");
+    }
+
+    @Test
+    void testReducesAnUnexpectedDelegateFailureToItsClassName() {
+        delegate.failure = new ToolExecutionException(
+            delegate.getToolDefinition(), new IllegalStateException("secret"));
+
+        String result = toolCallback.call("{\"workflowId\":\"w\"}");
+
+        assertThat(result)
+            .contains("IllegalStateException")
+            .doesNotContain("secret");
+    }
+
+    @Test
     void testKeepsExistingContextEntries() {
         toolCallback.call("{\"workflowId\":\"w\"}", new ToolContext(Map.of("exchange", "x")));
 
@@ -111,6 +140,7 @@ class EnvironmentScopedToolCallbackTest {
 
         private Map<String, Object> capturedContext;
         private String capturedInput;
+        private RuntimeException failure;
 
         @Override
         public ToolDefinition getToolDefinition() {
@@ -130,6 +160,10 @@ class EnvironmentScopedToolCallbackTest {
         public String call(String toolInput, ToolContext toolContext) {
             capturedInput = toolInput;
             capturedContext = toolContext == null ? null : toolContext.getContext();
+
+            if (failure != null) {
+                throw failure;
+            }
 
             return "done";
         }
