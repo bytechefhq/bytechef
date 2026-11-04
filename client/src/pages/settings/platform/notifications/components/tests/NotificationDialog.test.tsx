@@ -103,7 +103,13 @@ describe('NotificationDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
         expect(saveNotification).toHaveBeenCalledWith(
-            expect.objectContaining({settings: {webhook: 'https://example.com/ingest', webhookHeaders: []}}),
+            expect.objectContaining({
+                settings: {
+                    webhook: 'https://example.com/ingest',
+                    webhookBodyTemplate: expect.stringContaining('"eventType": "{{eventType}}"'),
+                    webhookHeaders: [],
+                },
+            }),
             expect.anything()
         );
     });
@@ -189,6 +195,7 @@ describe('NotificationDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Add header'}));
         await userEvent.type(screen.getByLabelText('Header name'), 'X-Api-Key');
         await userEvent.type(screen.getByLabelText('Header value'), 'secret');
+        await userEvent.clear(screen.getByLabelText('Body template'));
         await userEvent.type(screen.getByLabelText('Body template'), 'plain');
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
@@ -635,19 +642,83 @@ describe('NotificationDialog', () => {
                 />
             );
 
-            await pickPreset('Custom');
+            await pickPreset('Datadog');
 
             expect(screen.getByText('Replace the URL, headers and body template?')).toBeInTheDocument();
         });
 
-        it('applies Custom immediately on an empty form and leaves it empty', async () => {
+        it('selects Custom and fills its starter template on a new Webhook form', async () => {
             render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />);
+
+            expect(await screen.findByRole('combobox', {name: 'Preset'})).toHaveTextContent('Custom');
+            expect(screen.getByLabelText('Webhook URL')).toHaveValue('');
+            expect(screen.queryByLabelText('Header name')).not.toBeInTheDocument();
+            expect((screen.getByLabelText('Body template') as HTMLTextAreaElement).value).toContain(
+                '"eventType": "{{eventType}}"'
+            );
+        });
+
+        it('shows the picked preset in the select', async () => {
+            render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />);
+
+            await pickPreset('Datadog');
+
+            expect(screen.getByRole('combobox', {name: 'Preset'})).toHaveTextContent('Datadog');
+        });
+
+        it('switches between presets without asking while their values are unchanged', async () => {
+            render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />);
+
+            await pickPreset('Datadog');
+            await pickPreset('New Relic');
+
+            expect(screen.queryByText('Replace the URL, headers and body template?')).not.toBeInTheDocument();
+            expect(screen.getByLabelText('Header name')).toHaveValue('Api-Key');
 
             await pickPreset('Custom');
 
             expect(screen.queryByText('Replace the URL, headers and body template?')).not.toBeInTheDocument();
             expect(screen.getByLabelText('Webhook URL')).toHaveValue('');
-            expect(screen.queryByLabelText('Header name')).not.toBeInTheDocument();
+        });
+
+        it('asks before replacing an edited preset and keeps it selected on Cancel', async () => {
+            render(<NotificationDialogHarness saveNotification={vi.fn()} type={NotificationTypeEnum.Webhook} />);
+
+            await pickPreset('Datadog');
+            await userEvent.type(screen.getByLabelText('Webhook URL'), '/extra');
+            await pickPreset('New Relic');
+
+            expect(screen.getByText('Replace the URL, headers and body template?')).toBeInTheDocument();
+
+            await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+            expect(screen.getByRole('combobox', {name: 'Preset'})).toHaveTextContent('Datadog');
+            expect(screen.getByLabelText('Webhook URL')).toHaveValue(`${DATADOG_URL}/extra`);
+        });
+
+        it('shows the preset a saved webhook URL belongs to without changing its fields', async () => {
+            render(
+                <NotificationDialogHarness
+                    saveNotification={vi.fn()}
+                    settings={{webhook: DATADOG_URL, webhookHeaders: []}}
+                    type={NotificationTypeEnum.Webhook}
+                />
+            );
+
+            expect(await screen.findByRole('combobox', {name: 'Preset'})).toHaveTextContent('Datadog');
+            expect(screen.getByLabelText('Body template')).toHaveValue('');
+        });
+
+        it('shows Custom for a saved webhook URL that matches no preset', async () => {
+            render(
+                <NotificationDialogHarness
+                    saveNotification={vi.fn()}
+                    settings={{webhook: 'https://example.com/ingest', webhookHeaders: []}}
+                    type={NotificationTypeEnum.Webhook}
+                />
+            );
+
+            expect(await screen.findByRole('combobox', {name: 'Preset'})).toHaveTextContent('Custom');
             expect(screen.getByLabelText('Body template')).toHaveValue('');
         });
 
