@@ -42,7 +42,7 @@ public class CreateAiAgentToolCallback implements ToolCallback {
         names a project to put the agent in, create or find that project first and pass its id: never call
         createProject and createAiAgent in the same step, or the agent lands in a second project of its own.
         The agent starts with no MODEL, no tools, and only the two permanent channels (chat,
-        workflowCall) — it cannot be published until a MODEL element is added via addAiAgentElement.
+        workflowCall), so it cannot be published until a MODEL element is added via addAiAgentElement.
         Returns the new agent's id, name (slugified from the title), title, and projectId.""";
 
     private static final String INPUT_SCHEMA =

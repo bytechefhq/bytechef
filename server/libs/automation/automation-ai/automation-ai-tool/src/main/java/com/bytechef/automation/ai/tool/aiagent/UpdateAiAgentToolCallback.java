@@ -38,9 +38,9 @@ public class UpdateAiAgentToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Update an AI Agent's title, description, and/or instructions. instructions is the agent's system
-        prompt text — the persona and behaviour the model follows on every turn. Only the fields you
+        prompt text: the persona and behaviour the model follows on every turn. Only the fields you
         supply are changed; omitted fields keep their current value (there is no way to clear a field to
-        empty through this tool). Every mutating call regenerates the agent's draft workflow — the
+        empty through this tool). Every mutating call regenerates the agent's draft workflow; the
         change is live in the test-chat panel immediately, but is only visible to deployed
         channels after the agent's project is published with publishProject.""";
 
