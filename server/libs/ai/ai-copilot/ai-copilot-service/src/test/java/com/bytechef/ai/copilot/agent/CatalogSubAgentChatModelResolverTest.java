@@ -128,7 +128,8 @@ class CatalogSubAgentChatModelResolverTest {
         assertThatThrownBy(() -> resolver.resolve(SubAgentModelRequest.fromToolContext(fullToolContext())))
             .isExactlyInstanceOf(ChatModelUnavailableException.class)
             .hasCause(cause)
-            .hasMessageContaining("provider exploded");
+            .hasMessageContaining("IllegalStateException")
+            .hasMessageNotContaining("provider exploded");
     }
 
     @Test
@@ -142,7 +143,20 @@ class CatalogSubAgentChatModelResolverTest {
         assertThatThrownBy(() -> resolver.resolve(SubAgentModelRequest.fromToolContext(toolContext)))
             .isExactlyInstanceOf(ChatModelUnavailableException.class)
             .hasCause(cause)
-            .hasMessageContaining("connection refused");
+            .hasMessageContaining("IllegalStateException")
+            .hasMessageNotContaining("connection refused");
+    }
+
+    @Test
+    void testKeepsTheMessageOfAnIllegalArgumentException() {
+        IllegalArgumentException cause = new IllegalArgumentException("The Anthropic API key is not set");
+
+        when(catalogChatClientResolver.resolveChatModel(anyString(), anyString(), anyInt()))
+            .thenThrow(cause);
+
+        assertThatThrownBy(() -> resolver.resolve(SubAgentModelRequest.fromToolContext(fullToolContext())))
+            .isExactlyInstanceOf(ChatModelUnavailableException.class)
+            .hasMessageContaining("The Anthropic API key is not set");
     }
 
     private static Map<String, Object> fullToolContext() {
