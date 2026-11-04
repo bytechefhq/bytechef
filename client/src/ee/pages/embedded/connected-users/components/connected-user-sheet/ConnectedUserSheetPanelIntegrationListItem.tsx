@@ -44,7 +44,6 @@ import {useGetProvisionableIntegrationsQuery} from '@/ee/shared/queries/embedded
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
-import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {type MouseEvent, useMemo, useState} from 'react';
@@ -92,7 +91,10 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
     const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
     const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
-    const isTenantAdmin = useIsTenantAdmin();
+    const canChangeConfiguration = useHasEmbeddedScope(
+        'INTEGRATION_INSTANCE_CONFIGURATION_EDIT',
+        integrationInstanceConfiguration?.environmentId
+    );
 
     const queryClient = useQueryClient();
 
@@ -396,7 +398,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
                         </div>
 
-                        {canDeleteConnectedUser && (
+                        {(canDeleteConnectedUser || canChangeConfiguration) && (
                             <ConnectedUserSheetDeleteDropdownMenu
                                 changeConfigurationDisabled={!integrationConfigurations}
                                 changeConfigurationDisabledReason={changeConfigurationDisabledReason}
@@ -407,10 +409,12 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 }
                                 changeVersionDisabledReason={changeVersionDisabledReason}
                                 onChangeConfigurationClick={
-                                    isTenantAdmin ? () => setShowChangeConfigurationDialog(true) : undefined
+                                    canChangeConfiguration ? () => setShowChangeConfigurationDialog(true) : undefined
                                 }
-                                onChangeVersionClick={isTenantAdmin ? () => setShowChangeVersionDialog(true) : undefined}
-                                onDeleteClick={() => setShowDeleteDialog(true)}
+                                onChangeVersionClick={
+                                    canChangeConfiguration ? () => setShowChangeVersionDialog(true) : undefined
+                                }
+                                onDeleteClick={canDeleteConnectedUser ? () => setShowDeleteDialog(true) : undefined}
                             />
                         )}
                     </div>

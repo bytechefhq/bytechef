@@ -7,6 +7,7 @@ import AutomationProjectConfigurationList from '@/ee/pages/embedded/automations/
 import {getEnvironmentName} from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/automationProjectConfigurationList-utils';
 import ListGroupHeader from '@/shared/components/ListGroupHeader';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -41,6 +42,8 @@ const AutomationConfigurations = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setCurrentEnvironmentId = useEnvironmentStore((state) => state.setCurrentEnvironmentId);
 
+    const canCreate = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', currentEnvironmentId);
+
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -72,7 +75,7 @@ const AutomationConfigurations = () => {
 
     const isFirstRun = !projectsIsLoading && !projectId && configuredProjects.length === 0;
 
-    const newConfigurationButton = (
+    const newConfigurationButton = canCreate && (
         <Button label="New Configuration" onClick={() => setConfigurationDialog({project: selectedProject})} />
     );
 
@@ -157,7 +160,7 @@ const AutomationConfigurations = () => {
                     <AutomationConfigurationsEmptyState
                         hasProject={(projectsData?.automationProjects ?? []).length > 0}
                         hasPublishedProject={publishedProjects.length > 0}
-                        onCreateConfiguration={handleCreateConfiguration}
+                        onCreateConfiguration={canCreate ? handleCreateConfiguration : undefined}
                         onGoToAutomations={handleGoToAutomations}
                     />
                 )}
