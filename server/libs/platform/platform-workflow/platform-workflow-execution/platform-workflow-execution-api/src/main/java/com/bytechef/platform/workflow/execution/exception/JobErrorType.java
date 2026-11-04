@@ -26,6 +26,7 @@ public class JobErrorType extends AbstractErrorType {
 
     public static final JobErrorType JOB_FAILED = new JobErrorType(100);
     public static final JobErrorType JOB_NOT_COMPLETED = new JobErrorType(101);
+    public static final JobErrorType JOB_PAYMENT_REQUIRED = new JobErrorType(102);
 
     private JobErrorType(int errorKey) {
         super(Job.class, errorKey);

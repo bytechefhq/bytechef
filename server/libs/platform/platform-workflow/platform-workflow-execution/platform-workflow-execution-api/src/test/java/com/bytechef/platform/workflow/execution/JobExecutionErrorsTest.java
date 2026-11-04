@@ -128,6 +128,15 @@ class JobExecutionErrorsTest {
             assertThatCode(() -> JobExecutionErrors.checkForError(job, taskExecutionService))
                 .doesNotThrowAnyException();
         }
+
+        @Test
+        void testThrowsForAPaymentRequiredJob() {
+            Job job = createJob(Job.Status.PAYMENT_REQUIRED, null);
+
+            assertThatThrownBy(() -> JobExecutionErrors.checkForError(job, taskExecutionService))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("was not started");
+        }
     }
 
     private static Job createJob(Job.Status status, @Nullable String errorMessage) {

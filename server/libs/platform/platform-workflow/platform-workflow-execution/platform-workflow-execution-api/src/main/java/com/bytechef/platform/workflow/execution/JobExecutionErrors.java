@@ -42,6 +42,11 @@ public final class JobExecutionErrors {
     public static void checkForError(Job job, TaskExecutionService taskExecutionService) {
         long jobId = Validate.notNull(job.getId(), "id");
 
+        // A refused job never ran, so without this a synchronous caller would get an empty, successful result.
+        if (job.getStatus() == Job.Status.PAYMENT_REQUIRED) {
+            throw new ExecutionException(getPaymentRequiredMessage(job), JobErrorType.JOB_PAYMENT_REQUIRED);
+        }
+
         TaskExecution taskExecution = taskExecutionService
             .fetchLastJobTaskExecution(jobId)
             .orElse(null);
@@ -107,12 +112,17 @@ public final class JobExecutionErrors {
         if (status == Job.Status.STOPPED) {
             message = "Workflow run " + job.getId() + " was stopped before it completed.";
         } else if (status == Job.Status.PAYMENT_REQUIRED) {
-            message = "Workflow run " + job.getId() + " was not started: no job execution units are left.";
+            message = getPaymentRequiredMessage(job);
         } else {
             message = "Workflow run " + job.getId() + " ended in status " + status + " without completing.";
         }
 
         throw new ExecutionException(message, JobErrorType.JOB_NOT_COMPLETED);
+    }
+
+    private static String getPaymentRequiredMessage(Job job) {
+        return "Workflow run " + job.getId()
+            + " was not started: no job execution units are left.";
     }
 
     private static @Nullable String findFailedTaskExecutionErrorMessage(List<TaskExecution> taskExecutions) {
