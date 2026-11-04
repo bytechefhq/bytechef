@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
+import com.bytechef.commons.util.PrivateAddressGuardedHttpClient;
 import com.bytechef.commons.util.UrlValidatorUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -36,6 +37,8 @@ import io.a2a.client.MessageEvent;
 import io.a2a.client.TaskEvent;
 import io.a2a.client.TaskUpdateEvent;
 import io.a2a.client.config.ClientConfig;
+import io.a2a.client.http.A2AHttpClient;
+import io.a2a.client.http.JdkA2AHttpClient;
 import io.a2a.client.transport.jsonrpc.JSONRPCTransport;
 import io.a2a.client.transport.jsonrpc.JSONRPCTransportConfig;
 import io.a2a.client.transport.spi.interceptors.ClientCallContext;
@@ -70,6 +73,7 @@ public class A2aAgentTool {
         "Delegate a task to the configured remote A2A agent and return its response. Provide the task as a " +
             "self-contained instruction.";
     private static final String DEFAULT_TOOL_NAME = "sendTaskToRemoteAgent";
+    private static final String HTTP_CLIENT_FIELD = "httpClient";
 
     private final Set<String> allowedPrivateHosts;
 
@@ -119,15 +123,18 @@ public class A2aAgentTool {
         AtomicReference<Throwable> errorReference = new AtomicReference<>();
 
         try {
+            A2AHttpClient a2aHttpClient = createA2AHttpClient();
+
             AgentCard agentCard = withEndpointUrl(
-                A2A.getAgentCard(getAgentCardBaseUrl(baseUrl), AGENT_CARD_PATH, headers), getEndpointUrl(baseUrl));
+                A2A.getAgentCard(a2aHttpClient, getAgentCardBaseUrl(baseUrl), AGENT_CARD_PATH, headers),
+                getEndpointUrl(baseUrl));
 
             Client client = Client.builder(agentCard)
                 .clientConfig(new ClientConfig.Builder()
                     .setStreaming(false)
                     .setAcceptedOutputModes(List.of("text"))
                     .build())
-                .withTransport(JSONRPCTransport.class, new JSONRPCTransportConfig())
+                .withTransport(JSONRPCTransport.class, new JSONRPCTransportConfig(a2aHttpClient))
                 .addConsumer((clientEvent, card) -> {
                     appendEventText(responseBuilder, clientEvent);
 
@@ -177,6 +184,14 @@ public class A2aAgentTool {
         }
 
         return Map.of("Authorization", "Bearer " + token);
+    }
+
+    private A2AHttpClient createA2AHttpClient() {
+        JdkA2AHttpClient jdkA2AHttpClient = new JdkA2AHttpClient();
+
+        PrivateAddressGuardedHttpClient.replaceHttpClient(jdkA2AHttpClient, HTTP_CLIENT_FIELD, allowedPrivateHosts);
+
+        return jdkA2AHttpClient;
     }
 
     static String getAgentCardBaseUrl(String baseUrl) {

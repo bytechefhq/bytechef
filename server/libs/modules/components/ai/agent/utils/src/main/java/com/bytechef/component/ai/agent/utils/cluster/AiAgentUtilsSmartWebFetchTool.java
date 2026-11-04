@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 
+import com.bytechef.commons.util.PrivateAddressGuardedHttpClient;
 import com.bytechef.component.ai.agent.utils.cluster.network.PrivateAddressGuardedToolCallback;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -54,6 +55,7 @@ public class AiAgentUtilsSmartWebFetchTool {
     public static final String DOMAIN_SAFETY_CHECK = "domainSafetyCheck";
     public static final String MAX_CONTENT_LENGTH = "maxContentLength";
 
+    private static final String HTTP_CLIENT_FIELD = "httpClient";
     private static final String URL_ARGUMENT_NAME = "url";
 
     private final Set<String> allowedPrivateHosts;
@@ -110,7 +112,11 @@ public class AiAgentUtilsSmartWebFetchTool {
             builder.maxContentLength(maxContentLength);
         }
 
-        List<ToolCallback> toolCallbacks = Arrays.stream(ToolCallbacks.from(builder.build()))
+        SmartWebFetchTool smartWebFetchTool = builder.build();
+
+        PrivateAddressGuardedHttpClient.replaceHttpClient(smartWebFetchTool, HTTP_CLIENT_FIELD, allowedPrivateHosts);
+
+        List<ToolCallback> toolCallbacks = Arrays.stream(ToolCallbacks.from(smartWebFetchTool))
             .<ToolCallback>map(toolCallback -> new PrivateAddressGuardedToolCallback(
                 toolCallback, URL_ARGUMENT_NAME, allowedPrivateHosts))
             .toList();
