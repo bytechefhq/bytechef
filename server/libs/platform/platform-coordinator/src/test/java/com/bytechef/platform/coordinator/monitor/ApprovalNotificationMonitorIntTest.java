@@ -274,7 +274,7 @@ class ApprovalNotificationMonitorIntTest {
             RecordingWebhookNotificationSender.DELAYED_NOTIFICATION_NAME, Notification.Type.WEBHOOK,
             NotificationEvent.Type.JOB_APPROVAL_EXPIRING);
 
-        monitor(REMINDER_LEAD_TIME, null).notifyPendingApprovals();
+        monitor(REMINDER_LEAD_TIME, null, Duration.ofSeconds(1)).notifyPendingApprovals();
 
         assertThat(recordingWebhookNotificationSender.getAttemptedNotificationNames())
             .containsExactlyInAnyOrder(
