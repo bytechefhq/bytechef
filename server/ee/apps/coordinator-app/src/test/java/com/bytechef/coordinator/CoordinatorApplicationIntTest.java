@@ -9,6 +9,8 @@ package com.bytechef.coordinator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.platform.data.storage.DataStorage;
+import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import io.grpc.BindableService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,12 @@ public class CoordinatorApplicationIntTest {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private ObjectProvider<DataStorage> dataStorageProvider;
+
+    @Autowired
+    private ObjectProvider<JdbcDataStorageService> jdbcDataStorageServiceProvider;
+
     @Test
     void testAuditEventsAreSentToExecutionApp() {
         AuditEventRepository auditEventRepository = auditEventRepositoryProvider.getIfAvailable();
@@ -53,6 +61,19 @@ public class CoordinatorApplicationIntTest {
 
     @Test
     void testContextLoads() {
+    }
+
+    @Test
+    void testDataStorageIsReadFromExecutionApp() {
+        JdbcDataStorageService jdbcDataStorageService = jdbcDataStorageServiceProvider.getIfAvailable();
+
+        assertThat(jdbcDataStorageService).isNotNull();
+
+        Class<?> jdbcDataStorageServiceClass = AopUtils.getTargetClass(jdbcDataStorageService);
+
+        assertThat(jdbcDataStorageServiceClass.getName()).isEqualTo(
+            "com.bytechef.ee.platform.data.storage.db.remote.client.service.RemoteJdbcDataStorageServiceClient");
+        assertThat(dataStorageProvider.getIfAvailable()).isNotNull();
     }
 
     @Test
