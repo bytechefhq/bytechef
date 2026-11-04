@@ -303,6 +303,18 @@ class SseStreamBridgeRegistryTest {
     }
 
     @Test
+    void testRegisterReportsAnErrorOnPaymentRequiredStatus() {
+        Registration registration = sseStreamBridgeRegistry.register(JOB_ID, sseStreamBridge);
+
+        sendJobStatus("PAYMENT_REQUIRED");
+
+        verify(sseStreamBridge).onError(any(RuntimeException.class));
+        verify(sseStreamBridge, never()).onComplete();
+
+        assertThat(registration.completion()).isDone();
+    }
+
+    @Test
     void testRegisterCompletesOnStoppedStatusOfAJobThatWasNotSuspended() {
         Registration registration = sseStreamBridgeRegistry.register(JOB_ID, sseStreamBridge);
 

@@ -47,9 +47,9 @@ import org.slf4j.LoggerFactory;
  * Routes a job's SSE stream events to the SSE connections registered for the job. A registration made with
  * {@link #register(long, SseStreamBridge)} receives events right away and ends when the job completes, fails, stops
  * ({@code STOPPED}) or is refused ({@code PAYMENT_REQUIRED}, which reaches the bridge as
- * {@link SseStreamBridge#onComplete()}). A {@code STOPPED} status reaches the bridge as
- * {@link SseStreamBridge#onSuspend()} unless the event marks it as not suspended, in which case it reaches the bridge
- * as {@link SseStreamBridge#onComplete()}.
+ * {@link SseStreamBridge#onError(Throwable)}, as a failure does, since the job never ran). A {@code STOPPED} status
+ * reaches the bridge as {@link SseStreamBridge#onSuspend()} unless the event marks it as not suspended, in which case
+ * it reaches the bridge as {@link SseStreamBridge#onComplete()}.
  *
  * <p>
  * A registration for a resumed job, made with {@link #registerForResume(long, SseStreamBridge)}, stays pending so it
@@ -331,6 +331,9 @@ public class SseStreamBridgeRegistry {
                     try {
                         if ("FAILED".equals(status)) {
                             sseStreamBridge.onError(new RuntimeException(getJobFailedMessage(sseStreamEvent)));
+                        } else if (paymentRequired) {
+                            sseStreamBridge.onError(
+                                new RuntimeException("Job was not started: payment is required."));
                         } else if (suspended) {
                             sseStreamBridge.onSuspend();
                         } else {
