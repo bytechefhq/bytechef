@@ -120,6 +120,14 @@ paths:
       tags:
         - "notification"
       operationId: "testNotification"
+      parameters:
+        - name: "notificationId"
+          description: "The id of the saved notification whose masked values and signing secret the test uses. Omit it for a notification that is not saved yet."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         required: true
         content:
@@ -250,6 +258,12 @@ components:
         signed:
           description: "Whether the test message was signed"
           type: "boolean"
+        unsignedReason:
+          description: "Why a webhook test message was sent without a signature: NO_SECRET when the notification has no signing secret yet, URL_CHANGED when the URL differs from the saved one"
+          type: "string"
+          enum:
+            - "NO_SECRET"
+            - "URL_CHANGED"
     NotificationEvent:
       type: "object"
       description: "A notification event definition."
