@@ -380,9 +380,6 @@ public class NotificationHandlerContext {
         return copy;
     }
 
-    /**
-     * Returns a copy of this context that differs only in its timestamp.
-     */
     public NotificationHandlerContext withTimestamp(Instant timestamp) {
         NotificationHandlerContext copy = copy();
 

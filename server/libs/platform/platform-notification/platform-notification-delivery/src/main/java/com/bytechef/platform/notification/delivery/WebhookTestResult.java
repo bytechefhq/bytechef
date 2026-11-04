@@ -19,8 +19,6 @@ package com.bytechef.platform.notification.delivery;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The result of a synchronous test send; the response body is capped at 1000 characters.
- *
  * @author Ivica Cardic
  */
 public record WebhookTestResult(
