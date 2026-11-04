@@ -20,6 +20,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -27,15 +28,16 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +68,7 @@ class ConnectedUserProjectWorkflowManager {
         }
         """;
 
+    private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserProjectService connectUserProjectService;
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectionService connectionService;
@@ -78,12 +81,14 @@ class ConnectedUserProjectWorkflowManager {
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowManager(
+        ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectionService connectionService, ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
         WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
         WorkflowValidatorFacade workflowValidatorFacade) {
+        this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectionService = connectionService;
@@ -116,7 +121,8 @@ class ConnectedUserProjectWorkflowManager {
 
         connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
 
-        List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
+        List<Connection> connections = getConnectedUserConnections(
+            connectedUserProject.getConnectedUserId(), environment);
         Map<String, ?> workflowMap = JsonUtils.readMap(effectiveDefinition);
 
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
@@ -160,6 +166,16 @@ class ConnectedUserProjectWorkflowManager {
 
                 return connectUserProjectService.create(connectedUserId, project.getId());
             });
+    }
+
+    private List<Connection> getConnectedUserConnections(long connectedUserId, Environment environment) {
+        Set<Long> connectionIds = connectedUserConnectionMembership.getConnectionIds(connectedUserId, environment);
+
+        if (connectionIds.isEmpty()) {
+            return List.of();
+        }
+
+        return connectionService.getConnections(new ArrayList<>(connectionIds));
     }
 
     private void checkWorkflowNodeConnection(
