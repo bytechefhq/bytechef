@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Notification", description = "A Notification definition.")
 @JsonTypeName("Notification")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T15:13:32.900053+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:04:41.316123+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class NotificationModel {
 
   private @Nullable Long id;
@@ -92,6 +92,10 @@ public class NotificationModel {
   private List<@Valid NotificationEventModel> notificationEvents = new ArrayList<>();
 
   private List<Long> notificationEventIds = new ArrayList<>();
+
+  private @Nullable Boolean hasSigningSecret;
+
+  private @Nullable String signingSecret;
 
   private @Nullable Integer version;
 
@@ -342,6 +346,48 @@ public class NotificationModel {
     this.notificationEventIds = notificationEventIds;
   }
 
+  public NotificationModel hasSigningSecret(@Nullable Boolean hasSigningSecret) {
+    this.hasSigningSecret = hasSigningSecret;
+    return this;
+  }
+
+  /**
+   * Whether the notification has a webhook signing secret
+   * @return hasSigningSecret
+   */
+  
+  @Schema(name = "hasSigningSecret", accessMode = Schema.AccessMode.READ_ONLY, description = "Whether the notification has a webhook signing secret", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("hasSigningSecret")
+  public @Nullable Boolean getHasSigningSecret() {
+    return hasSigningSecret;
+  }
+
+  @JsonProperty("hasSigningSecret")
+  public void setHasSigningSecret(@Nullable Boolean hasSigningSecret) {
+    this.hasSigningSecret = hasSigningSecret;
+  }
+
+  public NotificationModel signingSecret(@Nullable String signingSecret) {
+    this.signingSecret = signingSecret;
+    return this;
+  }
+
+  /**
+   * The webhook signing secret, returned only in the create response
+   * @return signingSecret
+   */
+  
+  @Schema(name = "signingSecret", accessMode = Schema.AccessMode.READ_ONLY, description = "The webhook signing secret, returned only in the create response", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("signingSecret")
+  public @Nullable String getSigningSecret() {
+    return signingSecret;
+  }
+
+  @JsonProperty("signingSecret")
+  public void setSigningSecret(@Nullable String signingSecret) {
+    this.signingSecret = signingSecret;
+  }
+
   public NotificationModel version(@Nullable Integer version) {
     this.version = version;
     return this;
@@ -382,12 +428,14 @@ public class NotificationModel {
         Objects.equals(this.settings, notification.settings) &&
         Objects.equals(this.notificationEvents, notification.notificationEvents) &&
         Objects.equals(this.notificationEventIds, notification.notificationEventIds) &&
+        Objects.equals(this.hasSigningSecret, notification.hasSigningSecret) &&
+        Objects.equals(this.signingSecret, notification.signingSecret) &&
         Objects.equals(this.version, notification.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, createdBy, createdDate, lastModifiedBy, lastModifiedDate, name, type, settings, notificationEvents, notificationEventIds, version);
+    return Objects.hash(id, createdBy, createdDate, lastModifiedBy, lastModifiedDate, name, type, settings, notificationEvents, notificationEventIds, hasSigningSecret, signingSecret, version);
   }
 
   @Override
@@ -404,6 +452,8 @@ public class NotificationModel {
     sb.append("    settings: ").append(toIndentedString(settings)).append("\n");
     sb.append("    notificationEvents: ").append(toIndentedString(notificationEvents)).append("\n");
     sb.append("    notificationEventIds: ").append(toIndentedString(notificationEventIds)).append("\n");
+    sb.append("    hasSigningSecret: ").append(toIndentedString(hasSigningSecret)).append("\n");
+    sb.append("    signingSecret: ").append(toIndentedString(signingSecret)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

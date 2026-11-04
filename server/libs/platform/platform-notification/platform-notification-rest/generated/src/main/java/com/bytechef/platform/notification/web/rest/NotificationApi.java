@@ -6,6 +6,7 @@
 package com.bytechef.platform.notification.web.rest;
 
 import com.bytechef.platform.notification.web.rest.model.NotificationModel;
+import com.bytechef.platform.notification.web.rest.model.NotificationSigningSecretModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T15:13:32.900053+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-04T19:04:41.316123+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "notification", description = "The Platform Notification Internal API")
 public interface NotificationApi {
@@ -73,7 +74,7 @@ public interface NotificationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"id\" : 0, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"type\" : \"EMAIL\", \"settings\" : { \"key\" : \"{}\" }, \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ], \"notificationEventIds\" : [ 1, 1 ], \"__version\" : 5 }";
+                    String exampleString = "{ \"id\" : 0, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"type\" : \"EMAIL\", \"settings\" : { \"key\" : \"{}\" }, \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ], \"notificationEventIds\" : [ 1, 1 ], \"hasSigningSecret\" : true, \"signingSecret\" : \"signingSecret\", \"__version\" : 5 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -142,7 +143,48 @@ public interface NotificationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"id\" : 0, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"type\" : \"EMAIL\", \"settings\" : { \"key\" : \"{}\" }, \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ], \"notificationEventIds\" : [ 1, 1 ], \"__version\" : 5 }, { \"id\" : 0, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"type\" : \"EMAIL\", \"settings\" : { \"key\" : \"{}\" }, \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ], \"notificationEventIds\" : [ 1, 1 ], \"__version\" : 5 } ]";
+                    String exampleString = "[ { \"id\" : 0, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"type\" : \"EMAIL\", \"settings\" : { \"key\" : \"{}\" }, \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ], \"notificationEventIds\" : [ 1, 1 ], \"hasSigningSecret\" : true, \"signingSecret\" : \"signingSecret\", \"__version\" : 5 }, { \"id\" : 0, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"type\" : \"EMAIL\", \"settings\" : { \"key\" : \"{}\" }, \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ], \"notificationEventIds\" : [ 1, 1 ], \"hasSigningSecret\" : true, \"signingSecret\" : \"signingSecret\", \"__version\" : 5 } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_REGENERATE_NOTIFICATION_SIGNING_SECRET = "/notifications/{notificationId}/signing-secret";
+    /**
+     * POST /notifications/{notificationId}/signing-secret : Regenerate the signing secret of a webhook notification
+     * Regenerates the signing secret of a webhook notification. The new secret is returned only once.
+     *
+     * @param notificationId The id of a notification. (required)
+     * @return The new signing secret. (status code 200)
+     */
+    @Operation(
+        operationId = "regenerateNotificationSigningSecret",
+        summary = "Regenerate the signing secret of a webhook notification",
+        description = "Regenerates the signing secret of a webhook notification. The new secret is returned only once.",
+        tags = { "notification" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The new signing secret.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = NotificationSigningSecretModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = NotificationApi.PATH_REGENERATE_NOTIFICATION_SIGNING_SECRET,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<NotificationSigningSecretModel> regenerateNotificationSigningSecret(
+        @Parameter(name = "notificationId", description = "The id of a notification.", required = true, in = ParameterIn.PATH) @PathVariable("notificationId") Long notificationId
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"signingSecret\" : \"signingSecret\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -186,7 +228,7 @@ public interface NotificationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"id\" : 0, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"type\" : \"EMAIL\", \"settings\" : { \"key\" : \"{}\" }, \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ], \"notificationEventIds\" : [ 1, 1 ], \"__version\" : 5 }";
+                    String exampleString = "{ \"id\" : 0, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"type\" : \"EMAIL\", \"settings\" : { \"key\" : \"{}\" }, \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ], \"notificationEventIds\" : [ 1, 1 ], \"hasSigningSecret\" : true, \"signingSecret\" : \"signingSecret\", \"__version\" : 5 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
