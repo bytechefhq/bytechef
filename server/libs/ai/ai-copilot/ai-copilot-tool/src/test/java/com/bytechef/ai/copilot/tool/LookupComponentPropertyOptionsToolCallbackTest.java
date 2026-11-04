@@ -94,6 +94,19 @@ class LookupComponentPropertyOptionsToolCallbackTest {
     }
 
     @Test
+    void testMalformedInputNamesTheFieldWithoutEchoingTheParserText() {
+        String result = toolCallback.call(
+            "{\"kind\": \"ACTION\", \"componentName\": \"slack\", \"operationName\": \"send\", "
+                + "\"propertyName\": \"channel\", \"connectionId\": \"secret-token\"}",
+            toolContext());
+
+        assertThat(result).contains("Invalid input: unexpected value for 'connectionId'");
+        assertThat(result).doesNotContain("secret-token");
+
+        verifyNoInteractions(resolver);
+    }
+
+    @Test
     void testInvalidKindReturnsErrorWithoutResolving() {
         String result = toolCallback.call(
             "{\"kind\": \"WEBHOOK\", \"componentName\": \"slack\", \"operationName\": \"send\", "
