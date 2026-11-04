@@ -27,6 +27,7 @@ import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.configuration.exception.ProjectWorkflowErrorType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.mcp.domain.McpServer;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -56,6 +57,24 @@ class UpdateMcpServerToolCallbackTest {
 
         assertThat(node.get("error")
             .asText()).isEqualTo("MCP server has an incomplete tool mapping for: orders");
+    }
+
+    @Test
+    void testReportsAMissingServerByItsIdWithoutTheExceptionText() throws Exception {
+        WorkspaceMcpServerFacade facade = mock(WorkspaceMcpServerFacade.class);
+
+        when(facade.updateWorkspaceMcpServer(eq(7L), isNull(), eq(true)))
+            .thenThrow(new NoSuchElementException("row 7 missing in schema bytechef_000001"));
+
+        UpdateMcpServerToolCallback callback = new UpdateMcpServerToolCallback(facade);
+
+        String result = callback.call("{\"mcpServerId\":\"7\",\"enabled\":true}", null);
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        assertThat(node.get("error")
+            .asText()).isEqualTo("MCP server 7 not found. Check the id with listMcpServers.");
+        assertThat(result).doesNotContain("bytechef_000001");
     }
 
     @Test
