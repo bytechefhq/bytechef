@@ -21,6 +21,7 @@ import com.bytechef.automation.ai.tool.EnvironmentScopedToolCallback;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
@@ -36,6 +37,7 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -44,6 +46,7 @@ import org.springframework.web.servlet.function.ServerResponse;
  */
 @Configuration
 @ConditionalOnProperty(name = "bytechef.ai.mcp.server.enabled", havingValue = "true", matchIfMissing = true)
+@DependsOn(JacksonConfiguration.JSON_UTILS_CONFIGURATION)
 public class ManagementMcpServerConfiguration {
 
     private static final Set<String> EXCLUDED_TOOL_NAMES = Set.of("getProjectStatus", "searchProjects");
