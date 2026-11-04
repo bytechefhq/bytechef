@@ -17,7 +17,16 @@
 package com.bytechef.ai.mcp.server.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -26,9 +35,12 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.service.WorkspaceService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -61,6 +73,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @author Ivica Cardic
@@ -78,7 +91,11 @@ class ManagementMcpWorkflowAuthoringIntTest {
         "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer");
 
     private static final String SETUP_LOGIN = "admin";
+    private static final String SLACK_CHANNEL_ID = "C0123456789";
     private static final String SLACK_NODE_NAME = "sendChannelMessage_1";
+
+    @MockitoSpyBean
+    private ActionDefinitionFacade actionDefinitionFacade;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -158,17 +175,16 @@ class ManagementMcpWorkflowAuthoringIntTest {
 
         assertThat(toolNames)
             .doesNotContainAnyElementsOf(INTELLIGENT_TOOL_NAMES)
-            .doesNotContain("lookupPropertyOptions")
             .contains(
                 "createProjectWorkflow", "updateWorkflow", "getWorkflow", "getWorkflowBuildInstructions",
-                "listConnections", "saveWorkflowTestConnection", "publishProject");
+                "listConnections", "lookupPropertyOptions", "saveWorkflowTestConnection", "publishProject");
 
         assertThat(applicationContext.containsBean("mcpAsyncServer")).isTrue();
         assertThat(applicationContext.containsBean("canonicalMcpAsyncServer")).isTrue();
 
         String instructions = ManagementMcpInstructions.build(toolNames);
 
-        assertThat(instructions).contains("To author a workflow yourself");
+        assertThat(instructions).contains("To author a workflow yourself", "lookupPropertyOptions");
 
         for (String intelligentToolName : INTELLIGENT_TOOL_NAMES) {
             assertThat(instructions).doesNotContain(intelligentToolName);
@@ -291,6 +307,47 @@ class ManagementMcpWorkflowAuthoringIntTest {
     }
 
     @Test
+    void testLookupPropertyOptionsResolvesOptionsWithAConnectionOfTheCallersWorkspace() {
+        doReturn(List.of(new Option(ComponentDsl.option("general", SLACK_CHANNEL_ID))))
+            .when(actionDefinitionFacade)
+            .executeOptions(
+                eq("slack"), anyInt(), eq("sendChannelMessage"), eq("channel"), anyMap(), anyList(), anyString(),
+                eq(connectionId));
+
+        ToolResult lookupResult = callTool("lookupPropertyOptions", slackChannelLookupInput(connectionId));
+
+        assertThat(lookupResult.error()).as(lookupResult.text())
+            .isFalse();
+        assertThat(lookupResult.text()).contains(SLACK_CHANNEL_ID);
+
+        verify(actionDefinitionFacade).executeOptions(
+            eq("slack"), anyInt(), eq("sendChannelMessage"), eq("channel"), anyMap(), anyList(), anyString(),
+            eq(connectionId));
+    }
+
+    @Test
+    void testLookupPropertyOptionsRefusesAConnectionOfAnotherWorkspace() {
+        authenticate(SETUP_LOGIN, AuthorityConstants.ADMIN);
+
+        long otherWorkspaceId = createWorkspace();
+
+        long foreignConnectionId = createSlackConnection(otherWorkspaceId, "Foreign Slack " + UUID.randomUUID());
+
+        authenticate(authorLogin, AuthorityConstants.ADMIN);
+
+        ToolResult lookupResult = callTool("lookupPropertyOptions", slackChannelLookupInput(foreignConnectionId));
+
+        assertThat(lookupResult.error()).as(lookupResult.text())
+            .isTrue();
+        assertThat(lookupResult.text()).contains(
+            "Connection " + foreignConnectionId + " is not a slack connection of workspace " + workspaceId,
+            "listConnections");
+
+        verify(actionDefinitionFacade, never()).executeOptions(
+            anyString(), anyInt(), anyString(), anyString(), anyMap(), anyList(), anyString(), nullable(Long.class));
+    }
+
+    @Test
     void testUpdateWorkflowIsDeniedToAUserWithoutAccessToTheProject() {
         Class<? extends PermissionService> permissionServiceClass = permissionService.getClass();
 
@@ -379,6 +436,12 @@ class ManagementMcpWorkflowAuthoringIntTest {
                 .build());
     }
 
+    private Map<String, ?> slackChannelLookupInput(long lookupConnectionId) {
+        return Map.of(
+            "workspaceId", workspaceId, "kind", "ACTION", "componentName", "slack", "operationName",
+            "sendChannelMessage", "propertyName", "channel", "connectionId", lookupConnectionId);
+    }
+
     private String createUser(String authority) {
         String login = "mcp-" + UUID.randomUUID();
 
@@ -435,7 +498,7 @@ class ManagementMcpWorkflowAuthoringIntTest {
     private static String definition(String taskType) {
         Map<String, Object> parameters = new HashMap<>();
 
-        parameters.put("channel", "C0123456789");
+        parameters.put("channel", SLACK_CHANNEL_ID);
         parameters.put("text", "Hello from an MCP client");
 
         Map<String, Object> task = new LinkedHashMap<>();

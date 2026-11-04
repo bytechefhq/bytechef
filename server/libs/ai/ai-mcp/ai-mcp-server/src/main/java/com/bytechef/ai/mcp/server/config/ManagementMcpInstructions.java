@@ -113,6 +113,12 @@ final class ManagementMcpInstructions {
             steps.add("look up components, actions and triggers with " + String.join(", ", lookups));
         }
 
+        if (names.contains("lookupPropertyOptions")) {
+            steps.add(
+                "lookupPropertyOptions for the real options of a property whose definition shows lookupRequired "
+                    + "(pass the connectionId of one of the workspace's connections when the component needs one)");
+        }
+
         steps.add("createProjectWorkflow to create an empty workflow in a project");
 
         steps.add("getWorkflow for the current version");
