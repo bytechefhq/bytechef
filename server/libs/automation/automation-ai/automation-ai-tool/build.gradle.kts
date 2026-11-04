@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:ai:ai-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
