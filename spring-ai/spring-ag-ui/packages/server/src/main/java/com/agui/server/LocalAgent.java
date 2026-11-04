@@ -39,7 +39,7 @@ public abstract class LocalAgent implements Agent {
     /**
      * Current state of the agent, containing persistent data and configuration.
      */
-    protected State state;
+    protected final State state;
 
     /**
      * Static system message content used when no system message provider is specified.
@@ -52,7 +52,7 @@ public abstract class LocalAgent implements Agent {
      */
     protected Function<LocalAgent, String> systemMessageProvider;
 
-    protected List<BaseMessage> messages;
+    protected final List<BaseMessage> messages;
 
     /**
      * Constructs a new LocalAgent with the specified configuration.
@@ -81,7 +81,7 @@ public abstract class LocalAgent implements Agent {
         this.systemMessage = systemMessage;
         this.systemMessageProvider = systemMessageProvider;
 
-        this.messages = messages;
+        this.messages = Objects.isNull(messages) ? List.of() : List.copyOf(messages);
     }
 
     /**
@@ -91,15 +91,6 @@ public abstract class LocalAgent implements Agent {
      */
     public String getAgentId() {
         return this.agentId;
-    }
-
-    /**
-     * Updates the current state of the agent.
-     *
-     * @param state the new state to set for this agent
-     */
-    public void setState(final State state) {
-        this.state = state;
     }
 
     /**
@@ -150,7 +141,7 @@ public abstract class LocalAgent implements Agent {
 
                 try {
                     subscriber.onRunFailed(
-                        new AgentSubscriberParams(input.messages(), this.state, this, input), cause);
+                        new AgentSubscriberParams(input.messages(), input.state(), this, input), cause);
                 } catch (RuntimeException runFailedException) {
                     cause.addSuppressed(runFailedException);
                 }

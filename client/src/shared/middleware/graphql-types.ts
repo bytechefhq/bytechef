@@ -1345,6 +1345,24 @@ export type GenerateFromDocumentationInput = {
   userPrompt?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type GeneratePropertyValueInput = {
+  dynamic: Scalars['Boolean']['input'];
+  environmentId: Scalars['Int']['input'];
+  mode: PropertyCopilotMode;
+  prompt: Scalars['String']['input'];
+  propertyPath: Scalars['String']['input'];
+  propertyType?: InputMaybe<Scalars['String']['input']>;
+  workflowId: Scalars['ID']['input'];
+  workflowNodeName: Scalars['String']['input'];
+};
+
+export type GeneratePropertyValuePayload = {
+  __typename?: 'GeneratePropertyValuePayload';
+  message?: Maybe<Scalars['String']['output']>;
+  valid: Scalars['Boolean']['output'];
+  value: Scalars['String']['output'];
+};
+
 export type GenerateSpecificationInput = {
   baseUrl?: InputMaybe<Scalars['String']['input']>;
   endpoints: Array<EndpointDefinitionInput>;
@@ -1354,6 +1372,17 @@ export type GenerateSpecificationInput = {
 export type GenerateSpecificationResponse = {
   __typename?: 'GenerateSpecificationResponse';
   specification?: Maybe<Scalars['String']['output']>;
+};
+
+export type GenerateWorkflowDescriptionInput = {
+  environmentId: Scalars['Int']['input'];
+  workflowId: Scalars['ID']['input'];
+  workflowNodeName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type GenerateWorkflowDescriptionPayload = {
+  __typename?: 'GenerateWorkflowDescriptionPayload';
+  value: Scalars['String']['output'];
 };
 
 export type GenerationJobStatus = {
@@ -1885,6 +1914,7 @@ export type Mutation = {
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
+  deleteWebSearchProvider?: Maybe<Scalars['Boolean']['output']>;
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
   disconnectConnection: Scalars['Boolean']['output'];
@@ -1899,10 +1929,13 @@ export type Mutation = {
   enableConnectedUserMcpTool?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   enableCustomComponent: Scalars['Boolean']['output'];
+  enableWebSearchProvider?: Maybe<Scalars['Boolean']['output']>;
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
   generateFromDocumentation: ApiConnector;
+  generatePropertyValue: GeneratePropertyValuePayload;
   generateSpecification: GenerateSpecificationResponse;
+  generateWorkflowDescription: GenerateWorkflowDescriptionPayload;
   importDataTableCsv: Scalars['Boolean']['output'];
   importOpenApiSpecification: ApiConnector;
   importProjectTemplate: Scalars['ID']['output'];
@@ -1927,6 +1960,7 @@ export type Mutation = {
   startGenerateForEndpoints: GenerationJobStatus;
   startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
+  testWebSearchProvider: WebSearchProviderTestResult;
   testWorkflowNodeScript: ScriptTestExecution;
   updateA2aProject?: Maybe<A2aProject>;
   updateA2aProjectWorkflowEnabled?: Maybe<A2aProjectWorkflow>;
@@ -1984,6 +2018,7 @@ export type Mutation = {
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
   updateUser: AdminUser;
+  updateWebSearchProvider?: Maybe<Scalars['Boolean']['output']>;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
   updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
 };
@@ -2393,6 +2428,12 @@ export type MutationDeleteUserArgs = {
 };
 
 
+export type MutationDeleteWebSearchProviderArgs = {
+  environment: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+};
+
+
 export type MutationDeleteWorkspaceApiKeyArgs = {
   apiKeyId: Scalars['ID']['input'];
 };
@@ -2472,6 +2513,13 @@ export type MutationEnableCustomComponentArgs = {
 };
 
 
+export type MutationEnableWebSearchProviderArgs = {
+  enabled: Scalars['Boolean']['input'];
+  environment: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+};
+
+
 export type MutationExportSharedProjectArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
@@ -2489,8 +2537,18 @@ export type MutationGenerateFromDocumentationArgs = {
 };
 
 
+export type MutationGeneratePropertyValueArgs = {
+  input: GeneratePropertyValueInput;
+};
+
+
 export type MutationGenerateSpecificationArgs = {
   input: GenerateSpecificationInput;
+};
+
+
+export type MutationGenerateWorkflowDescriptionArgs = {
+  input: GenerateWorkflowDescriptionInput;
 };
 
 
@@ -2649,6 +2707,14 @@ export type MutationTestClusterElementScriptArgs = {
   inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationTestWebSearchProviderArgs = {
+  apiKey?: InputMaybe<Scalars['String']['input']>;
+  baseUrl?: InputMaybe<Scalars['String']['input']>;
+  environment: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
 };
 
 
@@ -2958,6 +3024,14 @@ export type MutationUpdateUserArgs = {
 };
 
 
+export type MutationUpdateWebSearchProviderArgs = {
+  apiKey?: InputMaybe<Scalars['String']['input']>;
+  baseUrl?: InputMaybe<Scalars['String']['input']>;
+  environment: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateWorkspaceApiKeyArgs = {
   apiKeyId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -3216,6 +3290,11 @@ export type Property = {
   required?: Maybe<Scalars['Boolean']['output']>;
   type: PropertyType;
 };
+
+export enum PropertyCopilotMode {
+  Formula = 'FORMULA',
+  Text = 'TEXT'
+}
 
 export enum PropertyType {
   Array = 'ARRAY',
@@ -3481,6 +3560,7 @@ export type Query = {
   users?: Maybe<AdminUserPage>;
   validateWorkflow: WorkflowValidationResult;
   validateWorkflowById: WorkflowValidationResult;
+  webSearchProviders: Array<WebSearchProvider>;
   workflowNodeComponentConnections: Array<ComponentConnection>;
   workflowNodeMissingRequiredProperties: Array<Scalars['String']['output']>;
   workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
@@ -4339,6 +4419,11 @@ export type QueryValidateWorkflowByIdArgs = {
 };
 
 
+export type QueryWebSearchProvidersArgs = {
+  environment: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkflowNodeComponentConnectionsArgs = {
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
@@ -4758,6 +4843,25 @@ export type VersionWorkflowChanges = {
   baseVersion?: Maybe<Scalars['Int']['output']>;
   version: Scalars['Int']['output'];
   workflows: Array<VersionWorkflowChangeSummary>;
+};
+
+export type WebSearchProvider = {
+  __typename?: 'WebSearchProvider';
+  apiKeyFromProperties: Scalars['Boolean']['output'];
+  baseUrl: Scalars['String']['output'];
+  defaultBaseUrl: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  enabled: Scalars['Boolean']['output'];
+  icon?: Maybe<Scalars['String']['output']>;
+  label: Scalars['String']['output'];
+  maskedApiKey?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+};
+
+export type WebSearchProviderTestResult = {
+  __typename?: 'WebSearchProviderTestResult';
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
 };
 
 export type Workflow = {

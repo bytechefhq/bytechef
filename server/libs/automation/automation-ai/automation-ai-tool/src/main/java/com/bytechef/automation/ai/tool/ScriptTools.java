@@ -16,9 +16,9 @@
 
 package com.bytechef.automation.ai.tool;
 
-import com.bytechef.automation.ai.tool.exception.ScriptToolErrorType;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.exception.ProjectWorkflowErrorType;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
@@ -53,11 +53,10 @@ public class ScriptTools {
     public WorkflowInfo updateScriptComponentCode(
         @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(description = "The new code") String code,
-        @ToolParam(description = "The name of the script node") String scriptName,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
+        @ToolParam(description = "The name of the script node") String scriptName, ToolContext toolContext) {
 
-        scopedProjectGuard.checkWorkflow(workflowId, workspaceId, toolContext, ScriptToolErrorType.UPDATE_SCRIPT);
+        scopedProjectGuard.checkWorkflow(workflowId, ScopedProjectGuard.WORKFLOW_EDIT, toolContext,
+            ProjectWorkflowErrorType.UPDATE_SCRIPT);
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
@@ -112,7 +111,7 @@ public class ScriptTools {
                 scriptName, workflowId, e);
 
             throw new ExecutionException(
-                "Failed to update workflow: " + e.getMessage(), e, ScriptToolErrorType.UPDATE_SCRIPT);
+                "Failed to update workflow: " + e.getMessage(), e, ProjectWorkflowErrorType.UPDATE_SCRIPT);
         }
     }
 }

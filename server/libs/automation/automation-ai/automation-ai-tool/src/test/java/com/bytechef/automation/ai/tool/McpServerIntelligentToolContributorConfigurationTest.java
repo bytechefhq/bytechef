@@ -60,7 +60,8 @@ final class McpServerIntelligentToolContributorConfigurationTest {
 
     @Test
     void testChatClientFactoryIsNullForBuildWhenProviderHasNoBean() {
-        IntelligentToolContributor contributor = configuration.mcpServerIntelligentToolContributor(emptyProvider());
+        IntelligentToolContributor contributor = configuration.mcpServerIntelligentToolContributor(
+            emptyProvider(), emptyProvider());
 
         List<IntelligentToolDefinition> definitions = contributor.getIntelligentToolDefinitions();
 
@@ -75,7 +76,7 @@ final class McpServerIntelligentToolContributorConfigurationTest {
 
         IntelligentToolDefinition definition = definitions.get(0);
 
-        ToolCallback toolCallback = definition.create(() -> mock(ChatClient.class));
+        ToolCallback toolCallback = definition.create(chatModel -> mock(ChatClient.class));
 
         assertThat(toolCallback.getToolDefinition()
             .name()).isEqualTo("configureMcpServer");
@@ -83,7 +84,7 @@ final class McpServerIntelligentToolContributorConfigurationTest {
 
     private List<IntelligentToolDefinition> definitionsWithProviderPresent() {
         IntelligentToolContributor contributor = configuration.mcpServerIntelligentToolContributor(
-            present(mock(IntelligentToolChatClientFactory.class)));
+            present(mock(IntelligentToolChatClientFactory.class)), emptyProvider());
 
         return contributor.getIntelligentToolDefinitions();
     }

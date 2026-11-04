@@ -20,7 +20,10 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -63,10 +66,14 @@ public class WorkflowExecutionAgentToolCallback implements ToolCallback {
             }""";
 
     private final IntelligentToolChatClientFactory chatClientFactory;
+    private final @Nullable SubAgentChatModelResolver chatModelResolver;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowExecutionAgentToolCallback(IntelligentToolChatClientFactory chatClientFactory) {
+    public WorkflowExecutionAgentToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
         this.chatClientFactory = chatClientFactory;
+        this.chatModelResolver = chatModelResolver;
     }
 
     @Override
@@ -98,7 +105,8 @@ public class WorkflowExecutionAgentToolCallback implements ToolCallback {
 
             Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            ChatClient workflowExecutionChatClient = chatClientFactory.get();
+            ChatClient workflowExecutionChatClient =
+                chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
             String result = CurrentAgentContext.callWith(CopilotAgentType.DEBUG_WORKFLOW_EXECUTION, parentAgent,
                 () -> workflowExecutionChatClient.prompt(input.request())
@@ -122,6 +130,10 @@ public class WorkflowExecutionAgentToolCallback implements ToolCallback {
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
+        } catch (ChatModelUnavailableException exception) {
+            log.warn("debugWorkflowExecution cannot run its sub-agent: {}", exception.getMessage());
+
+            throw exception;
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
                 WorkflowExecutionAgentToolCallback.class, "debugWorkflowExecution", exception);

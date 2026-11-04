@@ -52,6 +52,12 @@ describe('resolveAutoApplyDefinition', () => {
         expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
     });
 
+    it('returns null for a reply cut off before its closing fence', () => {
+        const messages = [user('add a delay step'), assistant('Done.\n```json\n{"tasks": [')];
+
+        expect(resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, MODE.BUILD, messages)).toBeNull();
+    });
+
     it('returns null when the fenced block is neither valid JSON nor valid YAML', () => {
         const messages = [assistant('```json\n{"tasks": [\n```')];
 

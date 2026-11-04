@@ -47,6 +47,14 @@ public interface KnowledgeBaseDocumentFacade {
     void deleteKnowledgeBaseDocument(Long id);
 
     /**
+     * Returns a knowledge base document.
+     *
+     * @param id the ID of the document
+     * @return the knowledge base document
+     */
+    KnowledgeBaseDocument getKnowledgeBaseDocument(long id);
+
+    /**
      * Updates the tag names for a knowledge base document in both the relational database and the vector store.
      *
      * @param knowledgeBaseDocumentId the ID of the document whose tags are to be updated

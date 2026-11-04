@@ -18,13 +18,13 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.automation.ai.tool.exception.WorkflowExecutionToolErrorType;
 import com.bytechef.automation.ai.tool.model.TaskExecutionInfo;
 import com.bytechef.automation.ai.tool.model.TriggerExecutionInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowExecutionDetailInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowExecutionSummary;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.exception.ProjectWorkflowExecutionErrorType;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.exception.ExecutionException;
@@ -53,21 +53,45 @@ public class WorkflowExecutionTools {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowExecutionTools.class);
 
+    private static final long NO_WORKSPACE_ID = 0L;
+
     private final ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade;
+    private final ScopedProjectGuard scopedProjectGuard;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowExecutionTools(ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade) {
+    public WorkflowExecutionTools(
+        ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade, ScopedProjectGuard scopedProjectGuard) {
+
         this.projectWorkflowExecutionFacade = projectWorkflowExecutionFacade;
+        this.scopedProjectGuard = scopedProjectGuard;
     }
 
     @Tool(
         description = "Get the full detail of a single workflow execution by id: job status, dates, job-level error, " +
             "the trigger execution, and every task execution with its input, output, and error. Use this to diagnose " +
-            "why a specific run behaved the way it did.")
+            "why a specific run behaved the way it did. In an embedded chat confined to one project, only that " +
+            "project's executions can be read.")
     public WorkflowExecutionDetailInfo getWorkflowExecution(
         @ToolParam(description = "The workflow execution id") long workflowExecutionId, ToolContext toolContext) {
 
         try {
+            Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
+
+            if (scopedProjectId != null) {
+                WorkflowExecutionDTO execution = projectWorkflowExecutionFacade.getWorkflowExecution(
+                    workflowExecutionId);
+
+                Project project = execution == null ? null : execution.project();
+
+                if (project == null || !scopedProjectId.equals(project.getId())) {
+                    throw new ExecutionException(
+                        "Workflow execution " + workflowExecutionId + " not found",
+                        ProjectWorkflowExecutionErrorType.GET_WORKFLOW_EXECUTION);
+                }
+
+                return toDetailInfo(execution);
+            }
+
             Long workspaceId = asLong(toolContext, WorkflowExecutionToolContextKeys.WORKSPACE_ID);
 
             if (workspaceId == null) {
@@ -77,7 +101,7 @@ public class WorkflowExecutionTools {
                     "Workspace context unavailable in this tool invocation, so workflow execution " +
                         workflowExecutionId + " could not be read. This is not a statement that the execution " +
                         "does not exist.",
-                    WorkflowExecutionToolErrorType.GET_WORKFLOW_EXECUTION);
+                    ProjectWorkflowExecutionErrorType.GET_WORKFLOW_EXECUTION);
             }
 
             WorkflowExecutionDTO execution = projectWorkflowExecutionFacade.getWorkflowExecution(workflowExecutionId);
@@ -88,7 +112,7 @@ public class WorkflowExecutionTools {
             if (executionWorkspaceId == null || !workspaceId.equals(executionWorkspaceId)) {
                 throw new ExecutionException(
                     "Workflow execution " + workflowExecutionId + " not found",
-                    WorkflowExecutionToolErrorType.GET_WORKFLOW_EXECUTION);
+                    ProjectWorkflowExecutionErrorType.GET_WORKFLOW_EXECUTION);
             }
 
             return toDetailInfo(execution);
@@ -99,7 +123,7 @@ public class WorkflowExecutionTools {
 
             throw new ExecutionException(
                 "Failed to get workflow execution: " + exception.getMessage(), exception,
-                WorkflowExecutionToolErrorType.GET_WORKFLOW_EXECUTION);
+                ProjectWorkflowExecutionErrorType.GET_WORKFLOW_EXECUTION);
         }
     }
 
@@ -110,7 +134,8 @@ public class WorkflowExecutionTools {
             "execution id. Returns a JSON array of {id, workflowLabel, projectName, status, startDate, endDate}, " +
             "newest first. Optional filters: jobStatus narrows to a single status (any value outside CREATED, " +
             "STARTED, COMPLETED, FAILED, STOPPED is an error, never a silently unfiltered listing); " +
-            "workflowId filters to one workflow.")
+            "workflowId filters to one workflow. In an embedded chat confined to one project, only that project's " +
+            "executions are listed, and a workflowId of another project is an error.")
     public List<WorkflowExecutionSummary> listWorkflowExecutions(
         @ToolParam(
             required = false,
@@ -121,6 +146,25 @@ public class WorkflowExecutionTools {
         ToolContext toolContext) {
 
         try {
+            Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
+
+            if (scopedProjectId != null) {
+                if (workflowId != null) {
+                    scopedProjectGuard.checkWorkflow(
+                        workflowId, ScopedProjectGuard.WORKFLOW_VIEW, toolContext,
+                        ProjectWorkflowExecutionErrorType.LIST_WORKFLOW_EXECUTIONS);
+                }
+
+                Long environmentId = asLong(toolContext, WorkflowExecutionToolContextKeys.ENVIRONMENT_ID);
+                Status status = parseStatus(jobStatus);
+
+                Page<WorkflowExecutionDTO> page = projectWorkflowExecutionFacade.getWorkflowExecutions(
+                    null, environmentId, status, null, null, scopedProjectId, null, workflowId, null,
+                    NO_WORKSPACE_ID, 0);
+
+                return toSummaries(page);
+            }
+
             Long workspaceId = asLong(toolContext, WorkflowExecutionToolContextKeys.WORKSPACE_ID);
 
             if (workspaceId == null) {
@@ -129,7 +173,7 @@ public class WorkflowExecutionTools {
                 throw new ExecutionException(
                     "Workspace context unavailable in this tool invocation, so no workflow executions were listed. " +
                         "This is not a statement that there are no executions.",
-                    WorkflowExecutionToolErrorType.LIST_WORKFLOW_EXECUTIONS);
+                    ProjectWorkflowExecutionErrorType.LIST_WORKFLOW_EXECUTIONS);
             }
 
             Long environmentId = asLong(toolContext, WorkflowExecutionToolContextKeys.ENVIRONMENT_ID);
@@ -138,10 +182,7 @@ public class WorkflowExecutionTools {
             Page<WorkflowExecutionDTO> page = projectWorkflowExecutionFacade.getWorkflowExecutions(
                 false, environmentId, status, null, null, null, null, workflowId, null, workspaceId, 0);
 
-            return page.getContent()
-                .stream()
-                .map(WorkflowExecutionTools::toSummary)
-                .toList();
+            return toSummaries(page);
         } catch (ExecutionException executionException) {
             throw executionException;
         } catch (Exception exception) {
@@ -149,7 +190,7 @@ public class WorkflowExecutionTools {
 
             throw new ExecutionException(
                 "Failed to list workflow executions: " + exception.getMessage(), exception,
-                WorkflowExecutionToolErrorType.LIST_WORKFLOW_EXECUTIONS);
+                ProjectWorkflowExecutionErrorType.LIST_WORKFLOW_EXECUTIONS);
         }
     }
 
@@ -203,6 +244,13 @@ public class WorkflowExecutionTools {
             errorMessage(triggerExecution.error()));
     }
 
+    private static List<WorkflowExecutionSummary> toSummaries(Page<WorkflowExecutionDTO> page) {
+        return page.getContent()
+            .stream()
+            .map(WorkflowExecutionTools::toSummary)
+            .toList();
+    }
+
     private static WorkflowExecutionSummary toSummary(WorkflowExecutionDTO execution) {
         JobDTO job = execution.job();
         Workflow workflow = execution.workflow();
@@ -253,7 +301,7 @@ public class WorkflowExecutionTools {
                 "Unknown jobStatus '" + value + "'. Valid values: " + Arrays.stream(Status.values())
                     .map(Status::name)
                     .collect(Collectors.joining(", ")),
-                WorkflowExecutionToolErrorType.LIST_WORKFLOW_EXECUTIONS);
+                ProjectWorkflowExecutionErrorType.LIST_WORKFLOW_EXECUTIONS);
         }
     }
 }

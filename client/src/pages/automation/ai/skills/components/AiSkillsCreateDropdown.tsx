@@ -11,7 +11,6 @@ import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsB
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon, PencilIcon, SparklesIcon, UploadIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -23,8 +22,6 @@ interface AiSkillsCreateDropdownProps {
 const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [showWriteDialog, setShowWriteDialog] = useState(false);
-
-    const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
     const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
@@ -66,7 +63,7 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="w-72">
-                    {ff_4554 && copilotEnabled && (
+                    {copilotEnabled && (
                         <DropdownMenuItem
                             className="flex flex-col items-start gap-0.5 p-3"
                             onClick={handleCreateWithAi}

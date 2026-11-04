@@ -18,11 +18,11 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -30,7 +30,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -77,12 +76,11 @@ public class UpdateMcpProjectWorkflowParametersToolCallback implements ToolCallb
                 "required": ["mcpProjectWorkflowId"]
             }""";
 
-    private final McpProjectWorkflowService mcpProjectWorkflowService;
-    private final JsonMapper jsonMapper = new JsonMapper();
+    private final McpProjectWorkflowFacade mcpProjectWorkflowFacade;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public UpdateMcpProjectWorkflowParametersToolCallback(McpProjectWorkflowService mcpProjectWorkflowService) {
-        this.mcpProjectWorkflowService = mcpProjectWorkflowService;
+    public UpdateMcpProjectWorkflowParametersToolCallback(McpProjectWorkflowFacade mcpProjectWorkflowFacade) {
+        this.mcpProjectWorkflowFacade = mcpProjectWorkflowFacade;
     }
 
     @Override
@@ -102,65 +100,38 @@ public class UpdateMcpProjectWorkflowParametersToolCallback implements ToolCallb
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            UpdateMcpProjectWorkflowParametersInput input = jsonMapper.readValue(
+            UpdateMcpProjectWorkflowParametersInput input = JsonUtils.read(
                 toolInput, UpdateMcpProjectWorkflowParametersInput.class);
 
             Long mcpProjectWorkflowId = input.mcpProjectWorkflowId();
 
             if (mcpProjectWorkflowId == null) {
-                return ToolErrors.toolError(jsonMapper, "mcpProjectWorkflowId is required");
+                return ToolErrors.toolError("mcpProjectWorkflowId is required");
             }
 
             String toolName = input.toolName();
 
             if (toolName != null && StringUtils.isBlank(toolName)) {
-                return ToolErrors.toolError(jsonMapper, "toolName must not be blank when supplied");
+                return ToolErrors.toolError("toolName must not be blank when supplied");
             }
 
-            McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService
-                .fetchMcpProjectWorkflow(mcpProjectWorkflowId)
-                .orElse(null);
-
-            if (mcpProjectWorkflow == null) {
-                return ToolErrors.toolError(
-                    jsonMapper, "McpProjectWorkflow not found: " + mcpProjectWorkflowId);
-            }
-
-            Map<String, Object> mergedParameters = new HashMap<>(mcpProjectWorkflow.getParameters());
-
-            if (toolName != null) {
-                mergedParameters.put(ToolConstants.TOOL_NAME, toolName);
-            }
-
-            String toolDescription = input.toolDescription();
-
-            if (toolDescription != null) {
-                mergedParameters.put(ToolConstants.TOOL_DESCRIPTION, toolDescription);
-            }
-
-            Map<String, Object> inputParameters = input.parameters();
-
-            if (inputParameters != null) {
-                mergedParameters.putAll(inputParameters);
-            }
-
-            McpProjectWorkflow updatedMcpProjectWorkflow = mcpProjectWorkflowService.updateParameters(
-                mcpProjectWorkflowId, mergedParameters);
+            McpProjectWorkflow updatedMcpProjectWorkflow = mcpProjectWorkflowFacade.updateMcpProjectWorkflowParameters(
+                mcpProjectWorkflowId, toolName, input.toolDescription(), input.parameters());
 
             Map<String, ?> updatedParameters = updatedMcpProjectWorkflow.getParameters();
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new UpdateMcpProjectWorkflowParametersOutput(
                     updatedMcpProjectWorkflow.getId(),
                     MapUtils.getString(updatedParameters, ToolConstants.TOOL_NAME),
                     MapUtils.getString(updatedParameters, ToolConstants.TOOL_DESCRIPTION), updatedParameters));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError(jsonMapper, "Invalid tool input: " + exception.getMessage());
+            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
         } catch (IllegalArgumentException exception) {
-            return ToolErrors.toolError(jsonMapper, exception.getMessage());
+            return ToolErrors.toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, UpdateMcpProjectWorkflowParametersToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(UpdateMcpProjectWorkflowParametersToolCallback.class, TOOL_NAME,
+                exception);
         }
     }
 

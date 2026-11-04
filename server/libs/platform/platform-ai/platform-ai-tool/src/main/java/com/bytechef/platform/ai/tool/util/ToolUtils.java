@@ -129,6 +129,8 @@ public final class ToolUtils {
         }
 
         List<String> options = null;
+        List<Object> optionValues = null;
+
         if (type == PropertyDecorator.Type.ARRAY || type == PropertyDecorator.Type.BOOLEAN ||
             type == PropertyDecorator.Type.DATE || type == PropertyDecorator.Type.DATE_TIME ||
             type == PropertyDecorator.Type.INTEGER || type == PropertyDecorator.Type.NUMBER ||
@@ -138,9 +140,22 @@ public final class ToolUtils {
             options = convertToOptionList(decorator);
         }
 
+        if (type == PropertyDecorator.Type.ARRAY || type == PropertyDecorator.Type.BOOLEAN ||
+            type == PropertyDecorator.Type.INTEGER || type == PropertyDecorator.Type.NUMBER ||
+            type == PropertyDecorator.Type.STRING) {
+
+            optionValues = PropertyInfo.toFixedOptionValues(decorator.getOptions(), hasOptionsDataSource(property));
+        }
+
         return new PropertyInfo(
             property.getName(), type.name(), property.getDescription(), property.getRequired(),
-            property.getExpressionEnabled(), property.getDisplayCondition(), options, nestedPropertyInfos);
+            property.getExpressionEnabled(), property.getDisplayCondition(), options, nestedPropertyInfos, null,
+            optionValues);
+    }
+
+    private static boolean hasOptionsDataSource(BaseProperty property) {
+        return property instanceof OptionsDataSourceAware optionsDataSourceAware &&
+            optionsDataSourceAware.getOptionsDataSource() != null;
     }
 
     /**

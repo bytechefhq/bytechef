@@ -1,0 +1,142 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.platform.ai.provider.catalog;
+
+import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
+import com.bytechef.platform.configuration.domain.Environment;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author Ivica Cardic
+ */
+@Component
+public class CatalogChatClientResolverImpl implements CatalogChatClientResolver {
+
+    private final CatalogChatModelFactory catalogChatModelFactory;
+    private final AiProviderFacade aiProviderFacade;
+
+    @SuppressFBWarnings("EI")
+    public CatalogChatClientResolverImpl(
+        CatalogChatModelFactory catalogChatModelFactory, AiProviderFacade aiProviderFacade) {
+
+        this.catalogChatModelFactory = catalogChatModelFactory;
+        this.aiProviderFacade = aiProviderFacade;
+    }
+
+    @Override
+    public @Nullable ChatClient resolve(String providerKey, String model, int environment) {
+        if (environment < 0 || environment >= Environment.values().length) {
+            return null;
+        }
+
+        ChatModel chatModel = resolveChatModel(providerKey, model, environment);
+
+        if (chatModel == null) {
+            return null;
+        }
+
+        return ChatClient.builder(chatModel)
+            .build();
+    }
+
+    @Override
+    public @Nullable ChatModel resolveDefaultChatModel(@Nullable String preferredProviderKey, int environment) {
+        if (environment < 0 || environment >= Environment.values().length) {
+            return null;
+        }
+
+        AiDefaultModelDTO defaultModel = null;
+
+        if (preferredProviderKey != null && !preferredProviderKey.isBlank()) {
+            defaultModel = aiProviderFacade.getAiDefaultChatModel(preferredProviderKey, environment);
+        }
+
+        if (defaultModel == null) {
+            defaultModel = aiProviderFacade.getAiDefaultChatModel(environment);
+        }
+
+        if (defaultModel == null) {
+            return null;
+        }
+
+        return resolveChatModel(defaultModel.provider(), defaultModel.model(), environment);
+    }
+
+    @Override
+    public @Nullable ChatModel resolveChatModel(String providerKey, String model, int environment) {
+        Provider provider = Arrays.stream(Provider.values())
+            .filter(curProvider -> Objects.equals(curProvider.getKey(), providerKey))
+            .findFirst()
+            .orElse(null);
+
+        if (provider == null) {
+            return null;
+        }
+
+        String apiKey = aiProviderFacade.getApiKey(provider.getKey(), environment);
+
+        if ((apiKey == null || apiKey.isBlank()) && provider.requiresApiKey()) {
+            return null;
+        }
+
+        String url = aiProviderFacade.getUrl(provider.getKey(), environment);
+
+        return catalogChatModelFactory.createChatModel(provider, model, apiKey, url);
+    }
+
+    @Override
+    public @Nullable ChatClient resolveDefault(int environment) {
+        if (environment < 0 || environment >= Environment.values().length) {
+            return null;
+        }
+
+        AiDefaultModelDTO defaultModel = aiProviderFacade.getAiDefaultChatModel(environment);
+
+        if (defaultModel == null) {
+            return null;
+        }
+
+        return resolve(defaultModel.provider(), defaultModel.model(), environment);
+    }
+
+    @Override
+    public @Nullable ChatClient resolvePreferred(String providerKey, int environment) {
+        if (providerKey == null || providerKey.isBlank()) {
+            return null;
+        }
+
+        if (environment < 0 || environment >= Environment.values().length) {
+            return null;
+        }
+
+        AiDefaultModelDTO defaultModel = aiProviderFacade.getAiDefaultChatModel(providerKey, environment);
+
+        if (defaultModel == null) {
+            return null;
+        }
+
+        return resolve(defaultModel.provider(), defaultModel.model(), environment);
+    }
+}

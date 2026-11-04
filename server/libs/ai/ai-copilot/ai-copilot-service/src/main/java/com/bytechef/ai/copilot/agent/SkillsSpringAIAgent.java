@@ -71,8 +71,9 @@ public class SkillsSpringAIAgent extends CopilotSpringAIAgent {
         String resolvedMessage = Objects.nonNull(this.systemMessageProvider)
             ? this.systemMessageProvider.apply(this) : this.systemMessage;
 
-        String message = "%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
-            resolvedMessage, ADDITIONAL_RULES, state, String.join("\n", contextStrings));
+        String message = "%s%n%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
+            resolvedMessage, createIntentMessage(state), ADDITIONAL_RULES, state,
+            String.join("\n", contextStrings));
 
         SystemMessage systemMessage = new SystemMessage();
 
@@ -80,6 +81,21 @@ public class SkillsSpringAIAgent extends CopilotSpringAIAgent {
         systemMessage.setContent(message);
 
         return systemMessage;
+    }
+
+    private String createIntentMessage(State state) {
+        if (!(state.get("parameters") instanceof Map<?, ?> parameters)) {
+            return "";
+        }
+
+        StringBuilder message = new StringBuilder();
+
+        if ("create_skill".equals(parameters.get("intent")) && !getAgentId().endsWith("_ask")) {
+            message.append(
+                "The user opened this conversation to create a new skill. Do not wait for a detailed brief — open by asking what the skill should do, then build it.");
+        }
+
+        return message.toString();
     }
 
     public static class Builder extends SpringAIAgent.Builder {

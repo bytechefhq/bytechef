@@ -40,6 +40,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,6 +147,13 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
         knowledgeBaseFileStorage.deleteDocument(knowledgeBaseDocument.getDocument());
 
         knowledgeBaseDocumentService.delete(id);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public KnowledgeBaseDocument getKnowledgeBaseDocument(long id) {
+        return knowledgeBaseDocumentService.getKnowledgeBaseDocument(id);
     }
 
     @Override

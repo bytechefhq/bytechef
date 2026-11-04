@@ -40,7 +40,7 @@ interface SelectConnectionResultI {
 interface SelectPropertyOptionResultI {
     componentName: string;
     kind: 'select-property-option';
-    options: Array<{label: string; value: string}>;
+    options: Array<{label: string; value: number | string}>;
     propertyName: string;
     truncated?: boolean;
 }
@@ -102,7 +102,11 @@ export function toToolResultDataPart(toolCallName: string, eventContent: string)
         };
     }
 
-    if (toolCallName === 'selectPropertyOption' || toolCallName === 'selectTriggerPropertyOption') {
+    if (
+        toolCallName === 'selectPropertyOption' ||
+        toolCallName === 'selectTriggerPropertyOption' ||
+        toolCallName === 'selectClusterElementPropertyOption'
+    ) {
         const parsed = parseJson<SelectPropertyOptionResultI>(eventContent, 'selectPropertyOption result');
 
         if (!parsed || parsed.kind !== 'select-property-option' || !Array.isArray(parsed.options)) {
@@ -127,26 +131,59 @@ export function toToolResultDataPart(toolCallName: string, eventContent: string)
     }
 
     if (toolCallName === 'askUserQuestion') {
-        const parsed = parseJson<AskUserQuestionResultI>(eventContent, 'askUserQuestion result');
+        return toAskUserQuestionDataPart(eventContent, toolCallName);
+    }
 
-        if (!parsed || parsed.kind !== 'ask-user-question' || !Array.isArray(parsed.questions)) {
-            const errorMessage = !parsed
-                ? 'askUserQuestion returned an unparseable payload'
-                : 'askUserQuestion returned a malformed payload (missing kind or questions)';
-
-            return {errorMessage, ok: false, toolName: 'askUserQuestion'};
-        }
-
-        return {
-            data: {
-                awaitingAnswer: parsed.awaitingAnswer,
-                kind: parsed.kind,
-                questions: parsed.questions,
-            },
-            ok: true,
-            type: 'data-ask-user-question',
-        };
+    if (readPayloadKind(eventContent) === 'ask-user-question') {
+        return toAskUserQuestionDataPart(eventContent, toolCallName);
     }
 
     return undefined;
+}
+
+function toAskUserQuestionDataPart(eventContent: string, toolName: string): ToolResultDataPartType {
+    const parsed = parseJson<AskUserQuestionResultI>(eventContent, `${toolName} result`);
+
+    if (!parsed || parsed.kind !== 'ask-user-question' || !Array.isArray(parsed.questions)) {
+        const errorMessage = !parsed
+            ? 'askUserQuestion returned an unparseable payload'
+            : 'askUserQuestion returned a malformed payload (missing kind or questions)';
+
+        return {errorMessage, ok: false, toolName};
+    }
+
+    return {
+        data: {
+            awaitingAnswer: parsed.awaitingAnswer,
+            kind: parsed.kind,
+            questions: parsed.questions,
+        },
+        ok: true,
+        type: 'data-ask-user-question',
+    };
+}
+
+/**
+ * Reads a tool result's `kind` without logging. Deliberately not `parseJson`: this runs on *every* unmatched tool
+ * result, and most of those are ordinary prose, so `parseJson`'s warning would fill the console with noise about
+ * payloads that were never meant to be JSON. The cheap `{` guard skips the parse entirely for those.
+ */
+function readPayloadKind(eventContent: string): string | undefined {
+    if (!eventContent.trimStart().startsWith('{')) {
+        return undefined;
+    }
+
+    try {
+        const parsed: unknown = JSON.parse(eventContent);
+
+        if (typeof parsed !== 'object' || parsed === null) {
+            return undefined;
+        }
+
+        const kind = (parsed as {kind?: unknown}).kind;
+
+        return typeof kind === 'string' ? kind : undefined;
+    } catch {
+        return undefined;
+    }
 }

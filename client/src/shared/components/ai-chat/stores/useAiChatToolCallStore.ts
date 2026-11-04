@@ -7,7 +7,7 @@ import {devtools} from 'zustand/middleware';
  * - `running` — request in flight
  * - `success` — completed normally
  * - `error` — completed with a real failure (server error, network failure, parse error)
- * - `aborted` — call terminated by the task-switch cleanup ritual; NOT a real error. Kept distinct from
+ * - `aborted` — call terminated by the chat-switch cleanup ritual; NOT a real error. Kept distinct from
  *   `error` so renderers show a neutral "Switched away" affordance and a late aborted callback can't flip a
  *   failed call back to success.
  */
@@ -22,7 +22,7 @@ export interface SubagentProgressEntryI {
 
 export interface ToolCallEntryI {
     args?: Record<string, unknown>;
-    taskId?: string;
+    chatId?: string;
     messageIndex: number;
     progress: SubagentProgressEntryI[];
     progressiveOutput: string;
@@ -47,12 +47,12 @@ interface ToolCallStateI {
     appendProgressiveOutput: (toolCallId: string, chunk: string) => void;
     completeToolCall: (toolCallId: string, result: unknown, isError: boolean) => void;
     failAllRunning: (errorResult: unknown, status?: 'aborted' | 'error') => void;
-    failRunningInTask: (taskId: string, errorResult: unknown, status?: 'aborted' | 'error') => void;
-    findRunningToolCallByName: (toolName: string, taskId?: string) => RunningToolCallEntryType | undefined;
+    failRunningInChat: (chatId: string, errorResult: unknown, status?: 'aborted' | 'error') => void;
+    findRunningToolCallByName: (toolName: string, chatId?: string) => RunningToolCallEntryType | undefined;
     order: string[];
     reset: () => void;
-    resetForTask: (taskId: string | undefined) => void;
-    startToolCall: (toolCallId: string, toolName: string, messageIndex: number, taskId?: string) => void;
+    resetForChat: (chatId: string | undefined) => void;
+    startToolCall: (toolCallId: string, toolName: string, messageIndex: number, chatId?: string) => void;
     toolCalls: Record<string, ToolCallEntryI>;
     updateToolCallArgs: (toolCallId: string, args: Record<string, unknown>) => void;
 }
@@ -62,14 +62,14 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
         order: [] as string[],
         toolCalls: {} as Record<string, ToolCallEntryI>,
 
-        startToolCall: (toolCallId, toolName, messageIndex, taskId) =>
+        startToolCall: (toolCallId, toolName, messageIndex, chatId) =>
             set((state) => {
                 if (state.toolCalls[toolCallId]) {
                     return state;
                 }
 
                 const newEntry: RunningToolCallEntryType = {
-                    taskId,
+                    chatId,
                     messageIndex,
                     progress: [],
                     progressiveOutput: '',
@@ -119,7 +119,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
 
                 const completed: TerminalToolCallEntryType = {
                     args: existing.args,
-                    taskId: existing.taskId,
+                    chatId: existing.chatId,
                     messageIndex: existing.messageIndex,
                     progress: existing.progress,
                     progressiveOutput: existing.progressiveOutput,
@@ -189,7 +189,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                     if (entry && entry.status === 'running') {
                         const terminated: TerminalToolCallEntryType = {
                             args: entry.args,
-                            taskId: entry.taskId,
+                            chatId: entry.chatId,
                             messageIndex: entry.messageIndex,
                             progress: entry.progress,
                             progressiveOutput: entry.progressiveOutput,
@@ -211,7 +211,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 return {...state, toolCalls: updated};
             }),
 
-        failRunningInTask: (taskId, errorResult, status = 'aborted') =>
+        failRunningInChat: (chatId, errorResult, status = 'aborted') =>
             set((state) => {
                 const updated: Record<string, ToolCallEntryI> = {...state.toolCalls};
                 let mutated = false;
@@ -219,10 +219,10 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 for (const id of state.order) {
                     const entry = updated[id];
 
-                    if (entry && entry.status === 'running' && entry.taskId === taskId) {
+                    if (entry && entry.status === 'running' && entry.chatId === chatId) {
                         const terminated: TerminalToolCallEntryType = {
                             args: entry.args,
-                            taskId: entry.taskId,
+                            chatId: entry.chatId,
                             messageIndex: entry.messageIndex,
                             progress: entry.progress,
                             progressiveOutput: entry.progressiveOutput,
@@ -244,12 +244,12 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 return {...state, toolCalls: updated};
             }),
 
-        findRunningToolCallByName: (toolName, taskId) => {
+        findRunningToolCallByName: (toolName, chatId) => {
             const {order, toolCalls} = get();
 
-            // Walk in reverse insertion order so the most recently started call wins. When taskId is
-            // supplied, skip entries belonging to other tasks so a late event after a task switch
-            // does not land on a card from the previous task.
+            // Walk in reverse insertion order so the most recently started call wins. When chatId is
+            // supplied, skip entries belonging to other chats so a late event after a chat switch
+            // does not land on a card from the previous chat.
             for (let i = order.length - 1; i >= 0; i--) {
                 const entry = toolCalls[order[i]];
 
@@ -257,7 +257,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                     continue;
                 }
 
-                if (taskId !== undefined && entry.taskId !== taskId) {
+                if (chatId !== undefined && entry.chatId !== chatId) {
                     continue;
                 }
 
@@ -269,9 +269,9 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
 
         reset: () => set({order: [], toolCalls: {}}),
 
-        resetForTask: (taskId) =>
+        resetForChat: (chatId) =>
             set((state) => {
-                if (!taskId) {
+                if (!chatId) {
                     return {order: [], toolCalls: {}};
                 }
 
@@ -281,7 +281,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 for (const id of state.order) {
                     const entry = state.toolCalls[id];
 
-                    if (entry && entry.taskId !== taskId) {
+                    if (entry && entry.chatId !== chatId) {
                         survivingOrder.push(id);
                         survivingToolCalls[id] = entry;
                     }
