@@ -57,23 +57,25 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
 
     @Override
     public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
+        Optional<Long> principalIdOptional = principalJobService.fetchJobPrincipalId(parentJobId, platformType);
+
+        if (principalIdOptional.isPresent()) {
+            long principalId = principalIdOptional.get();
+
+            return jobFacade.createJob(
+                jobParametersDTO, childJobId -> principalJobService.create(childJobId, principalId, platformType));
+        }
+
         long childJobId = jobFacade.createJob(jobParametersDTO);
 
-        Optional<Long> principalId = principalJobService.fetchJobPrincipalId(parentJobId, platformType);
-
-        if (principalId.isPresent()) {
-            principalJobService.create(childJobId, principalId.get(), platformType);
-        } else {
-            log.warn(
-                "No principal found for parent job {} -- child job {} will have no principal association",
-                parentJobId, childJobId);
-        }
+        log.warn(
+            "No principal found for parent job {} -- child job {} will have no principal association",
+            parentJobId, childJobId);
 
         return childJobId;
     }
 
     @Override
-    // TODO @Transactional
     public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         // The principal_job row must exist before the start, where it marks the job as deployed for billing.
         return jobFacade.createJob(
