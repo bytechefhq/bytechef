@@ -98,6 +98,53 @@ class WorkflowValidatorConfigAwareOutputTest {
         }
         """;
 
+    private static final String MAP_ITEM_WORKFLOW = """
+        {
+            "label": "Map item",
+            "description": "",
+            "triggers": [
+                {
+                    "label": "Manual",
+                    "name": "trigger_1",
+                    "type": "manual/v1/manual"
+                }
+            ],
+            "tasks": [
+                {
+                    "label": "Var",
+                    "name": "var_1",
+                    "type": "var/v1/set",
+                    "parameters": {
+                        "type": "ARRAY",
+                        "value": [
+                            {
+                                "wqe": "qwe"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "label": "Map",
+                    "name": "map_1",
+                    "type": "map/v1",
+                    "parameters": {
+                        "items": "${var_1}",
+                        "iteratee": [
+                            {
+                                "label": "Logger",
+                                "name": "logger_1",
+                                "type": "logger/v1/info",
+                                "parameters": {
+                                    "text": "${map_1.item.wqe}"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+        """;
+
     private static final PropertyInfo ARRAY_VARIABLE_OUTPUT = new PropertyInfo(
         null, "ARRAY", null, false, false, null, List.of(
             new PropertyInfo(null, "OBJECT", null, false, false, null, List.of(
@@ -114,7 +161,11 @@ class WorkflowValidatorConfigAwareOutputTest {
             new PropertyInfo("type", "STRING", null, false, true, null, null),
             new PropertyInfo("value", "ARRAY", null, true, true, "type == 'ARRAY'", null)),
         "logger/v1/info", List.of(
-            new PropertyInfo("text", "STRING", null, true, true, null, null)));
+            new PropertyInfo("text", "STRING", null, true, true, null, null)),
+        "map/v1", List.of(
+            new PropertyInfo("items", "ARRAY", null, true, true, null, null),
+            new PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
+                new PropertyInfo(null, "TASK", null, false, false, null, null)))));
 
     private static final WorkflowValidator.TaskDefinitionProvider TASK_DEFINITION_PROVIDER =
         (taskType, kind) -> TASK_DEFINITION_MAP.get(taskType);
@@ -199,6 +250,23 @@ class WorkflowValidatorConfigAwareOutputTest {
         assertEquals(
             "[logger_1] Property 'var_1[0].missing' does not exist in the output of 'var/v1/set'", errors.toString());
         assertEquals("", warnings.toString());
+    }
+
+    @Test
+    void testMapItemReferenceIsValidWhenTheItemShapeCannotBeResolved() {
+        PropertyInfo mapOutput = new PropertyInfo(
+            null, "ARRAY", null, false, false, null, List.of(
+                new PropertyInfo(null, "STRING", null, false, false, null, null)));
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.validateWorkflow(
+            MAP_ITEM_WORKFLOW, TASK_DEFINITION_PROVIDER, EMPTY_TASK_OUTPUT_PROVIDER, EMPTY_CLUSTER_TYPES_PROVIDER,
+            new HashMap<>(), new HashMap<>(), Map.of("var_1", ARRAY_VARIABLE_OUTPUT, "map_1", mapOutput),
+            new HashMap<>(), errors, warnings);
+
+        assertEquals("", errors.toString());
     }
 
     private static void validateArrayVariableWorkflow(String text, StringBuilder errors, StringBuilder warnings) {

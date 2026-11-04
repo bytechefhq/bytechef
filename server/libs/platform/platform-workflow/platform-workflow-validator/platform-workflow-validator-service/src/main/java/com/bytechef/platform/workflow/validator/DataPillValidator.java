@@ -594,7 +594,7 @@ class DataPillValidator {
         if (referencedTaskType != null) {
             validatePropertyInOutput(
                 dataPillExpression, referencedTaskType, propertyName, fieldPath, taskOutputMap,
-                context.nodeOutputMap.get(referencedTaskName), getVariableOutputInfo(referencedTaskName, context),
+                getNodeOutputInfo(referencedTaskName, context), getVariableOutputInfo(referencedTaskName, context),
                 errors, warnings, text, referencedTaskName, allTasksMap, taskDefinition, rootParametersJsonNode);
         }
     }
@@ -640,6 +640,15 @@ class DataPillValidator {
         PropertyInfo variableOutputInfo = getVariableOutputInfo(referencedTaskName, context);
 
         return variableOutputInfo != null && PropertyUtils.checkPropertyExists(variableOutputInfo, propertyName);
+    }
+
+    @Nullable
+    private static PropertyInfo getNodeOutputInfo(String referencedTaskName, TaskValidationContext context) {
+        if (context.currentTaskAncestors.contains(referencedTaskName)) {
+            return null;
+        }
+
+        return context.nodeOutputMap.get(referencedTaskName);
     }
 
     @Nullable
