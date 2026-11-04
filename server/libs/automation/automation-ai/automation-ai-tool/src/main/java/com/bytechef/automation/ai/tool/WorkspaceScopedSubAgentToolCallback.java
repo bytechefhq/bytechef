@@ -17,7 +17,6 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
-import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -134,13 +133,11 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
             return delegate.call(JsonUtils.write(delegateInput), new ToolContext(forwardedContext));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (ChatModelUnavailableException exception) {
-            return ToolErrors.toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 
-            return ToolErrors.runtimeFailure(WorkspaceScopedSubAgentToolCallback.class, toolDefinition.name(),
-                exception);
+            return DelegateToolErrors.toToolError(
+                WorkspaceScopedSubAgentToolCallback.class, toolDefinition.name(), exception);
         }
     }
 
