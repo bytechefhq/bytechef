@@ -102,7 +102,7 @@ public class DeleteKnowledgeBaseToolCallback implements ToolCallback {
 
             workspaceKnowledgeBaseFacade.deleteWorkspaceKnowledgeBase(input.id());
 
-            return JsonUtils.write(Map.of("deleted", true, "id", input.id()));
+            return writeResult(Map.of("deleted", true, "id", input.id()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException exception) {
@@ -135,5 +135,13 @@ public class DeleteKnowledgeBaseToolCallback implements ToolCallback {
     }
 
     public record DeleteKnowledgeBaseToolInput(Long id) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(DeleteKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

@@ -136,12 +136,12 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
             }
 
             if (!isDocumentInKnowledgeBase(documentId, knowledgeBaseId)) {
-                return JsonUtils.write(new DeleteKnowledgeBaseDocumentOutput(false, input.documentId()));
+                return writeResult(new DeleteKnowledgeBaseDocumentOutput(false, input.documentId()));
             }
 
             knowledgeBaseDocumentFacade.deleteKnowledgeBaseDocument(documentId);
 
-            return JsonUtils.write(new DeleteKnowledgeBaseDocumentOutput(true, input.documentId()));
+            return writeResult(new DeleteKnowledgeBaseDocumentOutput(true, input.documentId()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
@@ -183,5 +183,13 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
     }
 
     public record DeleteKnowledgeBaseDocumentOutput(boolean deleted, String documentId) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(DeleteKnowledgeBaseDocumentToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

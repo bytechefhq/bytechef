@@ -142,7 +142,7 @@ public class PromoteWorkflowToolCallback implements ToolCallback {
                 projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
             }
 
-            return JsonUtils.write(
+            return writeResult(
                 new PromoteWorkflowOutput(
                     projectDeploymentId, projectId, input.projectVersion(), targetEnvironment.name(), enabled));
         } catch (JacksonException exception) {
@@ -165,5 +165,13 @@ public class PromoteWorkflowToolCallback implements ToolCallback {
 
     public record PromoteWorkflowOutput(
         long projectDeploymentId, long projectId, int projectVersion, String environment, boolean enabled) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(PromoteWorkflowToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

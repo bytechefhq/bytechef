@@ -172,7 +172,7 @@ public class QueryKnowledgeBaseToolCallback implements ToolCallback {
                     knowledgeBase.getName()))
                 .toList();
 
-            return JsonUtils.write(new QueryKnowledgeBaseResult(CITATIONS_KIND, hits));
+            return writeResult(new QueryKnowledgeBaseResult(CITATIONS_KIND, hits));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
@@ -264,5 +264,13 @@ public class QueryKnowledgeBaseToolCallback implements ToolCallback {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record SearchHit(
         String docId, String docTitle, String excerpt, Float score, String knowledgeBaseId, String knowledgeBaseName) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(QueryKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

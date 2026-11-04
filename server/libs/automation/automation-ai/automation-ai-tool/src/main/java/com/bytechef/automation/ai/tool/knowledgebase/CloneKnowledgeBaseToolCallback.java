@@ -128,7 +128,7 @@ public class CloneKnowledgeBaseToolCallback implements ToolCallback {
                 KnowledgeBase clone = workspaceKnowledgeBaseFacade.cloneWorkspaceKnowledgeBase(
                     knowledgeBaseId, workspaceId, targetEnvironmentOrdinal, input.newName());
 
-                return JsonUtils.write(
+                return writeResult(
                     new CloneKnowledgeBaseOutput(
                         clone.getId(), clone.getName(), clone.getEnvironment()
                             .name()));
@@ -147,5 +147,13 @@ public class CloneKnowledgeBaseToolCallback implements ToolCallback {
     }
 
     public record CloneKnowledgeBaseOutput(long id, String name, String environment) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(CloneKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }
