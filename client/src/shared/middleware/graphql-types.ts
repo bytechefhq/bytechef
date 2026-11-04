@@ -1133,7 +1133,7 @@ export type DataTableWebhook = {
   environmentId: Scalars['Long']['output'];
   id: Scalars['ID']['output'];
   type: DataTableWebhookType;
-  url: Scalars['String']['output'];
+  workflowExecutionId: Scalars['String']['output'];
 };
 
 export enum DataTableWebhookType {
