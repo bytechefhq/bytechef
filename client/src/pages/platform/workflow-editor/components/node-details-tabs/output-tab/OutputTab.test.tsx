@@ -208,6 +208,16 @@ describe('OutputTab', () => {
             expect(screen.queryByTestId('output-schema-creation-controls')).not.toBeInTheDocument();
         });
 
+        it('lines the testing status up with the output schema header row', () => {
+            renderOutputTab();
+
+            const statusRow = screen.getByText('Testing Action').parentElement!;
+
+            expect(statusRow).toHaveClass('h-9', 'items-center');
+            expect(statusRow.querySelector('svg')).toHaveClass('m-0');
+            expect(statusRow.querySelector('svg')).not.toHaveClass('-ml-1');
+        });
+
         it('shows the tool being tested', () => {
             renderOutputTab({clusterElementType: CLUSTER_ELEMENT_TYPE_TOOLS});
 

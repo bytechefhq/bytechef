@@ -230,8 +230,8 @@ const OutputTab = ({
                                     'flex-col gap-2'
                             )}
                         >
-                            <div className="flex items-center">
-                                <LoadingIcon />
+                            <div className="flex h-9 items-center gap-2">
+                                <LoadingIcon className="m-0" />
 
                                 <span className="text-sm font-medium">{`Testing ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}</span>
                             </div>
