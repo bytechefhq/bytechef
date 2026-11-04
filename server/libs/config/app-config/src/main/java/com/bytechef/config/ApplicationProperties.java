@@ -3177,7 +3177,11 @@ public class ApplicationProperties {
             /**
              * Caffeine in-memory cache
              */
-            CAFFEINE
+            CAFFEINE,
+            /**
+             * EE only: caches declared as shared are kept in Redis; all other caches stay on Caffeine on each node
+             */
+            REDIS
         }
 
         /**

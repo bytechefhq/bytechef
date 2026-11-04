@@ -18,6 +18,7 @@ package com.bytechef.platform.component.context;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.cache.SharedCacheSupport;
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -36,7 +37,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.cache.CacheManager;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
@@ -144,7 +147,10 @@ class InMemoryDataStorageIntTest {
     }
 
     private static Stream<Arguments> cacheManagers() {
-        CacheConfiguration cacheConfiguration = new CacheConfiguration();
+        StaticListableBeanFactory staticListableBeanFactory = new StaticListableBeanFactory();
+
+        CacheConfiguration cacheConfiguration = new CacheConfiguration(
+            new StandardEnvironment(), staticListableBeanFactory.getBeanProvider(SharedCacheSupport.class));
 
         return Stream.of(
             Arguments.of(Named.of("caffeine", cacheConfiguration.cacheManager())),
