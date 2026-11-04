@@ -24,14 +24,18 @@ import com.bytechef.commons.util.UrlValidationException;
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import com.sun.net.httpserver.HttpServer;
 import io.a2a.spec.AgentCapabilities;
 import io.a2a.spec.AgentCard;
 import io.a2a.spec.AgentInterface;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -149,6 +153,46 @@ class A2aAgentToolTest {
             .hasMessageContaining("Failed to send task to the remote agent")
             .rootCause()
             .isNotInstanceOf(UrlValidationException.class);
+    }
+
+    @Test
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    void testSendingATaskRefusesARedirectToAPrivateAddress() throws IOException {
+        List<String> requestedPaths = new CopyOnWriteArrayList<>();
+
+        HttpServer httpServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+
+        int port = httpServer.getAddress()
+            .getPort();
+
+        httpServer.createContext("/", httpExchange -> {
+            URI requestUri = httpExchange.getRequestURI();
+
+            requestedPaths.add(requestUri.getPath());
+
+            httpExchange.getResponseHeaders()
+                .add("Location", "http://127.0.0.1:" + port + "/internal" + requestUri.getPath());
+
+            httpExchange.sendResponseHeaders(302, -1);
+            httpExchange.close();
+        });
+
+        httpServer.start();
+
+        try {
+            Map<String, Object> inputParameters = Map.of("agentUrl", "http://localhost:" + port + "/agent");
+
+            ToolCallback toolCallback = new A2aAgentTool(Set.of("localhost")).apply(
+                ParametersFactory.create(inputParameters), ParametersFactory.create(Map.of()), mock(Context.class))
+                .getToolCallbacks()[0];
+
+            assertThatThrownBy(() -> toolCallback.call("{\"task\": \"What is the latest Java release?\"}"))
+                .hasStackTraceContaining("private or loopback");
+
+            assertThat(requestedPaths).containsExactly("/agent/.well-known/agent-card.json");
+        } finally {
+            httpServer.stop(0);
+        }
     }
 
     @Test
