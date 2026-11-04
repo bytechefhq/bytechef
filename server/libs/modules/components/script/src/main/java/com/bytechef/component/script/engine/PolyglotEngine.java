@@ -128,7 +128,6 @@ public class PolyglotEngine {
         String parameterCountExpression = switch (languageId) {
             case "js" -> "perform.length";
             case "python" -> "perform.__code__.co_argcount - len(perform.__defaults__ or ())";
-            case "ruby" -> "method(:perform).parameters.count { |type, _| type == :req }";
             default -> null;
         };
 
