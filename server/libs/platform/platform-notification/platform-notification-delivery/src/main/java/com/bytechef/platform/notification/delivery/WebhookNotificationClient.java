@@ -102,7 +102,6 @@ public class WebhookNotificationClient {
 
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        // Fixed default, matching what RestTemplate.exchange sent; a configured Accept header replaces it
         httpHeaders.set(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER);
 
         for (Map.Entry<String, String> header : webhookDelivery.headers()
@@ -239,10 +238,6 @@ public class WebhookNotificationClient {
         }
     }
 
-    /**
-     * @param statusCode the HTTP status of the receiver
-     * @param body       the response body, capped at 1000 characters, or {@code null} when empty
-     */
     public record WebhookResponse(int statusCode, @Nullable String body) {
     }
 }

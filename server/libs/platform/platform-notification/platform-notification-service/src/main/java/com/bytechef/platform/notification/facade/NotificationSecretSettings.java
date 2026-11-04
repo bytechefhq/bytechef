@@ -64,9 +64,6 @@ final class NotificationSecretSettings {
         apply(target, incomingSettings, stored, true);
     }
 
-    /**
-     * Whether the stored notification is a webhook whose URL, once normalized, differs from the incoming one.
-     */
     static boolean isWebhookUrlChanged(@Nullable Map<String, Object> incomingSettings, @Nullable Notification stored) {
         if (stored == null || stored.getType() != Notification.Type.WEBHOOK) {
             return false;
@@ -78,10 +75,6 @@ final class NotificationSecretSettings {
         return !normalizeUrl(incomingUrl).equals(normalizeUrl(storedUrl));
     }
 
-    /**
-     * Strips surrounding whitespace, lowercases the scheme and host and drops the default port, keeping the path and
-     * query exactly as given.
-     */
     static String normalizeUrl(@Nullable Object url) {
         if (!(url instanceof String urlString)) {
             return "";

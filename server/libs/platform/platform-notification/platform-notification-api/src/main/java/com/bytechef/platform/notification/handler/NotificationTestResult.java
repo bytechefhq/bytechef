@@ -19,8 +19,6 @@ package com.bytechef.platform.notification.handler;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The outcome of a test send of a notification.
- *
  * @param unsignedReason why a webhook test was sent without a signature, {@link #UNSIGNED_REASON_NO_SECRET} or
  *                       {@link #UNSIGNED_REASON_URL_CHANGED}; {@code null} when the test was signed or is not a webhook
  * @author Ivica Cardic
