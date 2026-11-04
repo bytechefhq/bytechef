@@ -11,6 +11,7 @@ import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
+import {getExecutionSelectionKey} from '@/shared/components/workflow-executions/util/executionSelectionKey';
 import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
@@ -65,6 +66,8 @@ const WorkflowExecutionsTestOutput = ({
         taskExecutions,
         triggerExecution,
     } = useWorkflowExecutions({workflowTestExecution: mergedWorkflowTestExecution});
+
+    const selectedExecutionKey = getExecutionSelectionKey(selectedExecution);
 
     const breadcrumbItems = useMemo<BreadcrumbEntryI[]>(() => {
         if (subflowStack.length === 0) {
@@ -196,9 +199,7 @@ const WorkflowExecutionsTestOutput = ({
                                                 )}
                                                 defaultValue={
                                                     deepestFailedExecution?.path ||
-                                                    (isTriggerExecution
-                                                        ? [triggerExecution?.id || '']
-                                                        : [selectedExecution?.id || ''])
+                                                    (isTriggerExecution ? [] : [selectedExecution?.id || ''])
                                                 }
                                                 key={`${job?.id}-${deepestFailedExecution?.path.join('/') ?? ''}`}
                                                 type="multiple"
@@ -208,7 +209,7 @@ const WorkflowExecutionsTestOutput = ({
                                                         defaultValue={deepestFailedExecution?.path}
                                                         execution={triggerExecution}
                                                         onExecutionClick={handleExecutionClick}
-                                                        selectedExecutionId={selectedExecution?.id || ''}
+                                                        selectedExecutionKey={selectedExecutionKey}
                                                     >
                                                         <WorkflowTriggerExecutionItem
                                                             triggerExecution={triggerExecution}
@@ -223,7 +224,7 @@ const WorkflowExecutionsTestOutput = ({
                                                         jobEnded={isJobEnded(job)}
                                                         key={taskExecution.id}
                                                         onExecutionClick={handleExecutionClick}
-                                                        selectedExecutionId={selectedExecution?.id || ''}
+                                                        selectedExecutionKey={selectedExecutionKey}
                                                     >
                                                         <WorkflowTaskExecutionItem
                                                             jobEnded={isJobEnded(job)}

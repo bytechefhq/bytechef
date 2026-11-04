@@ -1,5 +1,6 @@
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {getErrorItem, getInitialSelectedItem} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
+import {isSameExecution} from '@/shared/components/workflow-executions/util/executionSelectionKey';
 import toClusterElementCallTaskExecutions, {
     getClusterElementCallOutcome,
 } from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
@@ -154,7 +155,7 @@ const useWorkflowExecutions = ({
             return selectedExecution;
         }
 
-        if (triggerExecution?.id === selectedExecution.id) {
+        if (isSameExecution(selectedExecution, triggerExecution)) {
             return triggerExecution;
         }
 
@@ -254,7 +255,7 @@ const useWorkflowExecutions = ({
         handleBreadcrumbNavigate,
         handleExecutionClick,
         handleSeeExecutions,
-        isTriggerExecution: currentSelectedExecution?.id === triggerExecution?.id,
+        isTriggerExecution: isSameExecution(currentSelectedExecution, triggerExecution),
         job: activeJob,
         jobFailedWithNoExecutions,
         jobFailureError,

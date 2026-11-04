@@ -8,6 +8,7 @@ import WorkflowExecutionContentClipboardButton from '@/shared/components/workflo
 import WorkflowExecutionLogsContent from '@/shared/components/workflow-executions/WorkflowExecutionLogsContent';
 import {getDisplayValue, hasDialogContentValue} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import useClusterElementCallValues from '@/shared/components/workflow-executions/hooks/useClusterElementCallValues';
+import {isSameExecution} from '@/shared/components/workflow-executions/util/executionSelectionKey';
 import {
     ClusterElementCallTaskExecutionI,
     isClusterElementCallTaskExecution,
@@ -97,7 +98,7 @@ const WorkflowExecutionsTabsPanel = ({
 
     const hasOutcome = callExecution?.clusterElementCallOutcome !== undefined;
 
-    const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
+    const isTriggerExecution = isSameExecution(selectedItem, triggerExecution);
 
     const itemLabel = isTriggerExecution
         ? triggerExecution?.workflowTrigger?.label

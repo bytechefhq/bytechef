@@ -5,6 +5,7 @@ import LazyTaskExecutionChildren, {
 } from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import TaskExecutionChildrenList from '@/shared/components/workflow-executions/TaskExecutionChildrenList';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
+import {getExecutionSelectionKey} from '@/shared/components/workflow-executions/util/executionSelectionKey';
 import toClusterElementCallTaskExecutions from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TaskExecution as PlatformTaskExecution} from '@/shared/middleware/platform/workflow/execution';
@@ -41,7 +42,7 @@ interface WorkflowExecutionsAccordionItemProps {
     lazy?: LazyTaskExecutionChildrenOptionsI;
     onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
     previousTaskExecutions?: TaskExecution[];
-    selectedExecutionId: string;
+    selectedExecutionKey: string;
 }
 
 const WorkflowExecutionsAccordionItem = ({
@@ -52,7 +53,7 @@ const WorkflowExecutionsAccordionItem = ({
     lazy,
     onExecutionClick,
     previousTaskExecutions = [],
-    selectedExecutionId,
+    selectedExecutionKey,
 }: WorkflowExecutionsAccordionItemProps) => {
     const [visibleIterationCount, setVisibleIterationCount] = useState(ITERATIONS_PAGE_SIZE);
 
@@ -84,7 +85,7 @@ const WorkflowExecutionsAccordionItem = ({
     const isExpandable = lazy
         ? hasLazyChildren || hasClusterElementCallChildren || hasPreviousTaskExecutions
         : hasChildren || hasIterations || hasPreviousTaskExecutions;
-    const isSelected = selectedExecutionId === execution.id;
+    const isSelected = selectedExecutionKey !== '' && selectedExecutionKey === getExecutionSelectionKey(execution);
 
     const visibleIterations = useMemo(
         () => taskExecution?.iterations?.slice(0, visibleIterationCount),
@@ -178,7 +179,7 @@ const WorkflowExecutionsAccordionItem = ({
                             lazy={lazy}
                             onExecutionClick={onExecutionClick}
                             parentTaskExecution={taskExecution}
-                            selectedExecutionId={selectedExecutionId}
+                            selectedExecutionKey={selectedExecutionKey}
                         />
                     )
                 ) : (
@@ -191,7 +192,7 @@ const WorkflowExecutionsAccordionItem = ({
                         onLoadMore={handleLoadMoreIterations}
                         parentTaskExecution={taskExecution}
                         remainingCount={remainingIterationCount}
-                        selectedExecutionId={selectedExecutionId}
+                        selectedExecutionKey={selectedExecutionKey}
                     >
                         {childExecutions}
                     </TaskExecutionChildrenList>
@@ -207,7 +208,7 @@ const WorkflowExecutionsAccordionItem = ({
                                 key={previousTaskExecution.id}
                                 lazy={lazy}
                                 onExecutionClick={onExecutionClick}
-                                selectedExecutionId={selectedExecutionId}
+                                selectedExecutionKey={selectedExecutionKey}
                             >
                                 <WorkflowTaskExecutionItem
                                     attemptLabel={`Attempt ${index + 1}`}

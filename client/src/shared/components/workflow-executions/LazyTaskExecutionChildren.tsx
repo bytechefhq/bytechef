@@ -27,7 +27,7 @@ interface LazyTaskExecutionChildrenProps {
     lazy: LazyTaskExecutionChildrenOptionsI;
     onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
     parentTaskExecution: TaskExecution;
-    selectedExecutionId: string;
+    selectedExecutionKey: string;
 }
 
 interface PageOffsetsSnapshotI {
@@ -97,7 +97,7 @@ const LazyTaskExecutionChildren = ({
     lazy,
     onExecutionClick,
     parentTaskExecution,
-    selectedExecutionId,
+    selectedExecutionKey,
 }: LazyTaskExecutionChildrenProps) => {
     const isParentActive = ACTIVE_TASK_EXECUTION_STATUSES.includes(parentTaskExecution.status);
     const focusedChildIndex = getFocusedChildIndex(lazy.focusPath, parentTaskExecution.id);
@@ -416,7 +416,7 @@ const LazyTaskExecutionChildren = ({
                     onLoadMore={handleLoadMore}
                     parentTaskExecution={parentTaskExecution}
                     remainingCount={remainingCount}
-                    selectedExecutionId={selectedExecutionId}
+                    selectedExecutionKey={selectedExecutionKey}
                 >
                     {children}
                 </TaskExecutionChildrenList>

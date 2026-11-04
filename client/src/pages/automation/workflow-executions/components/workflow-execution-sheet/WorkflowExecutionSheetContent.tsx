@@ -13,6 +13,7 @@ import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
+import {getExecutionSelectionKey} from '@/shared/components/workflow-executions/util/executionSelectionKey';
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {isClusterElementCallTaskExecution} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
@@ -90,6 +91,8 @@ const WorkflowExecutionSheetContent = ({
             isTaskSelected,
             false
         );
+
+    const selectedExecutionKey = getExecutionSelectionKey(selectedItem);
 
     const breadcrumbItems = useMemo<BreadcrumbEntryI[]>(() => {
         if (subflowStack.length === 0) {
@@ -178,8 +181,7 @@ const WorkflowExecutionSheetContent = ({
                             <Accordion
                                 className={twMerge('ml-2 space-y-2 pb-4', subflowStack.length === 0 && 'pt-3')}
                                 defaultValue={
-                                    focusedExecution?.path ||
-                                    (isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || ''])
+                                    focusedExecution?.path || (isTriggerExecution ? [] : [selectedItem?.id || ''])
                                 }
                                 type="multiple"
                             >
@@ -189,7 +191,7 @@ const WorkflowExecutionSheetContent = ({
                                         execution={triggerExecution}
                                         lazy={lazy}
                                         onExecutionClick={handleTaskClick}
-                                        selectedExecutionId={selectedItem?.id || ''}
+                                        selectedExecutionKey={selectedExecutionKey}
                                     >
                                         <WorkflowTriggerExecutionItem triggerExecution={triggerExecution} />
                                     </WorkflowExecutionsAccordionItem>
@@ -204,7 +206,7 @@ const WorkflowExecutionSheetContent = ({
                                         lazy={lazy}
                                         onExecutionClick={handleTaskClick}
                                         previousTaskExecutions={previousTaskExecutions}
-                                        selectedExecutionId={selectedItem?.id || ''}
+                                        selectedExecutionKey={selectedExecutionKey}
                                     >
                                         <WorkflowTaskExecutionItem
                                             attemptLabel={

@@ -276,4 +276,50 @@ describe('WorkflowExecutionsTabsPanel', () => {
             expect(screen.queryByRole('tab', {name: 'Details'})).not.toBeInTheDocument();
         });
     });
+
+    describe('a trigger execution and a task execution with the same id', () => {
+        const sameIdTriggerExecution = {
+            id: '34',
+            output: {orderId: '42'},
+            startDate: new Date('2026-11-05T10:00:00Z'),
+            workflowTrigger: {label: 'Webhook', name: 'trigger_1'},
+        } as unknown as TriggerExecution;
+
+        const sameIdTaskExecution = {
+            id: '34',
+            jobId: '5',
+            output: {value: 'task output'},
+            startDate: new Date('2026-11-05T10:00:01Z'),
+            workflowTask: {label: 'Var', name: 'var_1'},
+        } as unknown as TaskExecution;
+
+        it('titles the selected task by its own node and shows its own output', () => {
+            renderPanel({
+                activeTab: 'output',
+                job,
+                selectedItem: sameIdTaskExecution,
+                triggerExecution: sameIdTriggerExecution,
+            });
+
+            expect(screen.getByText('Var')).toBeInTheDocument();
+            expect(screen.getByText('(var_1)')).toBeInTheDocument();
+            expect(screen.queryByText('(trigger_1)')).not.toBeInTheDocument();
+            expect(screen.getAllByTestId('json-view')[0]).toHaveTextContent('task output');
+        });
+
+        it('asks for the logs of the selected task, not of the trigger', () => {
+            logsContentMock.mockClear();
+
+            renderPanel({
+                activeTab: 'logs',
+                job,
+                selectedItem: sameIdTaskExecution,
+                triggerExecution: sameIdTriggerExecution,
+            });
+
+            expect(logsContentMock).toHaveBeenCalledWith(
+                expect.objectContaining({jobId: '5', taskExecutionId: '34', triggerExecutionId: undefined})
+            );
+        });
+    });
 });

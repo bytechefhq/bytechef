@@ -10,11 +10,11 @@ export default function getDeepestFailedExecution({
     execution,
     isTriggerExecution = false,
 }: GetDeepestFailedExecutionProps): {execution: TaskExecution | TriggerExecution; path: string[]} | null {
-    const path = execution.id ? [...currentPath, execution.id] : currentPath;
-
     if (isTriggerExecution && execution.error) {
-        return {execution, path};
+        return {execution, path: currentPath};
     }
+
+    const path = execution.id ? [...currentPath, execution.id] : currentPath;
 
     if ('iterations' in execution && execution.iterations && execution.iterations.length > 0) {
         for (const [iterationIndex, iteration] of execution.iterations.entries()) {
