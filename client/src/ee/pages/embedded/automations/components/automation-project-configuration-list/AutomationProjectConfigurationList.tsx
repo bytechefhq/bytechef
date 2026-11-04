@@ -3,6 +3,7 @@ import EmptyState from '@/components/EmptyState/EmptyState';
 import LoadingIcon from '@/components/LoadingIcon';
 import PublishButton from '@/shared/components/PublishButton';
 import WorkflowGroupCardSkeleton from '@/shared/components/WorkflowGroupCardSkeleton';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationProjectConfigurationsQuery,
     AutomationProjectsQuery,
@@ -38,6 +39,8 @@ const AutomationProjectConfigurationList = ({
     showOpenInProject = false,
     showProjectName = false,
 }: AutomationProjectConfigurationListProps) => {
+    const canCreate = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', environmentId);
+
     const {
         data: configurationsData,
         error: configurationsError,
@@ -81,7 +84,7 @@ const AutomationProjectConfigurationList = ({
     if (configurations.length === 0) {
         return project.published ? (
             <EmptyState
-                actions={<Button icon={<Settings2Icon />} label="Configure" onClick={onCreate} />}
+                actions={canCreate && <Button icon={<Settings2Icon />} label="Configure" onClick={onCreate} />}
                 description="Configure this project to run its workflows here."
                 icon={<Settings2Icon />}
                 title={`No configurations in ${getEnvironmentName(environmentId)}`}
