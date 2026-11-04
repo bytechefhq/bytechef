@@ -20,9 +20,12 @@ fun verifyGraalVmToolchain(metadata: JavaInstallationMetadata, graalVmVersion: S
             |  ${metadata.installationPath.asFile} (java.vm.version=$jvmVersion)
             |Without a matching JVMCI, Truffle falls back to a runtime that rejects sandbox limits such as
             |sandbox.MaxHeapMemory ("Heap memory limit is not supported on the current Truffle runtime").
-            |Install GraalVM CE $graalVmVersion or newer (sdk install java $graalVmVersion-graalce, then sdk env to use .sdkmanrc)
-            |and run Gradle with JAVA_HOME pointing at it. Gradle prefers the JDK its daemon runs on, so run
-            |./gradlew --stop after switching.
+            |sdkman does not list GraalVM CE $graalVmVersion. Download it for your platform from
+            |  https://github.com/graalvm/graalvm-ce-builds/releases/tag/graal-$graalVmVersion
+            |unpack it and register it under the name .sdkmanrc uses:
+            |  sdk install java $graalVmVersion-graalce <unpacked JDK home>   (on macOS the home is <unpacked dir>/Contents/Home)
+            |Then run sdk env, or run Gradle with JAVA_HOME pointing at it. Gradle prefers the JDK its daemon runs on,
+            |so run ./gradlew --stop after switching.
             """.trimMargin())
     }
 }
