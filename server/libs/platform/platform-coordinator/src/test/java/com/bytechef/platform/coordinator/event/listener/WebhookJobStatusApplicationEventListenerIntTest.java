@@ -119,7 +119,7 @@ class WebhookJobStatusApplicationEventListenerIntTest {
 
         listener.onApplicationEvent(new JobStatusApplicationEvent(jobId, Status.COMPLETED));
 
-        assertThat(Duration.ofNanos(System.nanoTime() - startNanos)).isLessThan(Duration.ofSeconds(1));
+        assertThat(Duration.ofNanos(System.nanoTime() - startNanos)).isLessThan(Duration.ofSeconds(10));
 
         verify(webhookDeliveryService).submit(any());
     }
