@@ -9,7 +9,6 @@ package com.bytechef.ee.automation.ai.tool;
 
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.DeployProjectResultDTO;
 import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.DeployedConnection;
 import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.MissingInput;
@@ -424,7 +423,6 @@ public class AppLoopTools {
             .getWorkspaceProjectDeployments(
                 workspaceId, (long) Environment.DEVELOPMENT.ordinal(), projectId, null, false)
             .stream()
-            .filter(projectDeploymentDTO -> !SystemProjects.isSystemDeploymentName(projectDeploymentDTO.name()))
             .map(projectDeploymentDTO -> new DeploymentChoice(
                 Objects.requireNonNull(projectDeploymentDTO.id()), projectDeploymentDTO.name()))
             .toList();
