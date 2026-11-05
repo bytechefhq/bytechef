@@ -8,7 +8,6 @@
 package com.bytechef.ee.platform.audit.aspect;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -176,14 +175,17 @@ public class ScimAuditIntTest {
     }
 
     @Test
-    public void testFailedCreateUserRollsBackAndRecordsAnErrorWithTheRequestedLogin() {
+    public void testFailedCreateUserRollsBackAndRecordsAnErrorWithTheRequestedLogin() throws Exception {
         createUser("jane", "jane@example.com", true);
 
-        assertThatThrownBy(() -> mockMvc.perform(
-            scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Users"))
-                .content(userJson("jane", "jane.other@example.com", "Jane", "Doe", true))))
-                    .rootCause()
-                    .hasMessageContaining("user_login_key");
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Users"))
+                    .content(userJson("jane", "jane.other@example.com", "Jane", "Doe", true)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isConflict())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.scimType")
+                .value("uniqueness"));
 
         assertThat(countUsers(TENANT_SCHEMA, "jane")).isEqualTo(1);
         assertThat(
@@ -200,6 +202,88 @@ public class ScimAuditIntTest {
             .containsEntry("errorClass", DuplicateKeyException.class.getName())
             .containsEntry("login", "jane")
             .containsEntry("externalId", "00u-external");
+    }
+
+    @Test
+    public void testCreateUserWithActiveFalsePersistsADisabledUser() throws Exception {
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Users"))
+                    .content(userJson("jane", "jane@example.com", "Jane", "Doe", false)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isCreated())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.active")
+                .value(false));
+
+        Long userId = findUserId("jane");
+
+        assertThat(findUserColumn(userId, "activated")).isEqualTo("false");
+        assertThat(findUserColumn(userId, "activation_key")).isNull();
+
+        AuditEventRow auditEventRow = getSingleAuditEvent();
+
+        assertThat(auditEventRow.eventType()).isEqualTo(ScimUserAuditEvents.SCIM_USER_CREATED);
+        assertThat(auditEventRow.data())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("active", "false");
+    }
+
+    @Test
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public void testReplaceUserKeepsLangKeyAndImageUrl() throws Exception {
+        long userId = createUser("jane", "jane@example.com", true);
+
+        jdbcTemplate.update(
+            "UPDATE " + TENANT_SCHEMA + ".\"user\" SET lang_key = 'de', image_url = 'https://example.com/jane.png' " +
+                "WHERE id = ?",
+            userId);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.put("/api/scim/v2/Users/" + userId))
+                    .content(userJson("jane", "jane@example.com", "Janet", "Doe", true)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk());
+
+        assertThat(findUserColumn(userId, "first_name")).isEqualTo("Janet");
+        assertThat(findUserColumn(userId, "lang_key")).isEqualTo("de");
+        assertThat(findUserColumn(userId, "image_url")).isEqualTo("https://example.com/jane.png");
+    }
+
+    @Test
+    public void testListUsersPagesByItemOffsetAndReportsTheRealTotal() throws Exception {
+        createUser("anna", "anna@example.com", true);
+        createUser("bert", "bert@example.com", true);
+        createUser("carl", "carl@example.com", true);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.get("/api/scim/v2/Users"))
+                    .param("startIndex", "2")
+                    .param("count", "2"))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.totalResults")
+                .value(3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.itemsPerPage")
+                .value(2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources[0].userName")
+                .value("bert"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources[1].userName")
+                .value("carl"));
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.get("/api/scim/v2/Users"))
+                    .param("filter", "userName eq \"BERT\""))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.totalResults")
+                .value(1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources[0].userName")
+                .value("bert"));
+
+        assertNoAuditEvents();
     }
 
     @Test

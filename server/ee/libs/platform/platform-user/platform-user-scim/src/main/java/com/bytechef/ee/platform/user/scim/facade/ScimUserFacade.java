@@ -16,11 +16,13 @@ import com.bytechef.ee.platform.user.scim.model.ScimPatchRequest;
 import com.bytechef.ee.platform.user.scim.model.ScimUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
@@ -80,7 +82,15 @@ public class ScimUserFacade {
 
         applyScimUser(adminUserDTO, scimUser);
 
-        return userService.create(adminUserDTO);
+        User user = userService.create(adminUserDTO);
+
+        if (!scimUser.active()) {
+            user.setActivated(false);
+
+            userService.save(user);
+        }
+
+        return user;
     }
 
     @Audited(event = ScimUserAuditEvents.SCIM_USER_DEACTIVATED, mapper = ScimUserAuditMapper.class)
@@ -145,11 +155,17 @@ public class ScimUserFacade {
             return Optional.empty();
         }
 
+        User user = userOptional.get();
         AdminUserDTO adminUserDTO = new AdminUserDTO();
 
         adminUserDTO.setId(id);
 
         applyScimUser(adminUserDTO, scimUser);
+
+        String langKey = user.getLangKey();
+
+        adminUserDTO.setImageUrl(user.getImageUrl());
+        adminUserDTO.setLangKey(langKey == null ? UserConstants.DEFAULT_LANGUAGE : langKey);
 
         return userService.update(adminUserDTO);
     }
@@ -161,7 +177,7 @@ public class ScimUserFacade {
         if (path != null) {
             switch (path) {
                 case ACTIVE -> user.setActivated(Boolean.parseBoolean(String.valueOf(value)));
-                case "userName" -> user.setLogin(String.valueOf(value));
+                case "userName" -> user.setLogin(toLogin(String.valueOf(value)));
                 case "name.givenName" -> user.setFirstName(String.valueOf(value));
                 case "name.familyName" -> user.setLastName(String.valueOf(value));
                 default -> {
@@ -183,6 +199,10 @@ public class ScimUserFacade {
             adminUserDTO.setFirstName(scimName.givenName());
             adminUserDTO.setLastName(scimName.familyName());
         }
+    }
+
+    private static String toLogin(String userName) {
+        return userName.toLowerCase(Locale.ROOT);
     }
 
     private static String extractPrimaryEmail(ScimUser scimUser) {
