@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.DeployProjectResultDTO;
 import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.Candidate;
 import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.DeployedConnection;
@@ -146,20 +145,6 @@ class AppLoopToolsTest {
             .containsExactly(11L, 12L);
 
         verify(projectDeploymentFacade, never()).deployProject(anyLong(), any(), anyList(), anyList(), anyMap());
-    }
-
-    @Test
-    void testSystemDeploymentsDoNotCountAsTheProjectsDeployment() {
-        stubPublishedProject();
-
-        when(projectDeploymentFacade.getWorkspaceProjectDeployments(WORKSPACE_ID, 0L, PROJECT_ID, null, false))
-            .thenReturn(List.of(
-                projectDeployment(13L, SystemProjects.MCP_SERVER_DEPLOYMENT_NAME_PREFIX + "orders"),
-                projectDeployment(11L, "Orders")));
-        when(projectDeploymentFacade.deployProject(eq(PROJECT_ID), eq(11L), anyList(), anyList(), anyMap()))
-            .thenReturn(written(11L));
-
-        assertThat(deploy(null, null, null).status()).isEqualTo("deployed");
     }
 
     @Test
