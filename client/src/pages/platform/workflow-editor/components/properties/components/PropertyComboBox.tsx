@@ -310,6 +310,7 @@ const PropertyComboBox = ({
             connectionId: clusterElementContext?.connectionId,
             inputParameters: clusterElementInputParameters,
             lookupDependsOnPaths: lookupDependsOnPaths || [],
+            mcpComponentId: clusterElementContext?.mcpComponentId || '',
             propertyName: clusterElementPropertyName,
         },
         {
@@ -322,6 +323,7 @@ const PropertyComboBox = ({
                     componentVersion: clusterElementContext?.componentVersion,
                     connectionId: clusterElementContext?.connectionId,
                     lookupDependsOnValues: clusterElementLookupDependsOnValues,
+                    mcpComponentId: clusterElementContext?.mcpComponentId,
                     propertyName: clusterElementPropertyName,
                 },
             ],

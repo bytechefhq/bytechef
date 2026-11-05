@@ -176,6 +176,7 @@ describe('PropertyComboBox', () => {
             componentVersion: 1,
             connectionId: 42,
             inputParameters: {serverId: 'srv-1', toolName: 'search'},
+            mcpComponentId: '7',
         };
 
         const clusterElementOptions = [
@@ -208,6 +209,20 @@ describe('PropertyComboBox', () => {
 
             expect(screen.getByText('ServerOpt')).toBeInTheDocument();
             expect(screen.getByText('ServerOpt2')).toBeInTheDocument();
+        });
+
+        it('should send the MCP component id of the cluster element context', () => {
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
+                data: undefined,
+                isLoading: false,
+            });
+
+            render(<PropertyComboBox {...defaultProps} options={[]} optionsDataSource={optionsDataSource} />);
+
+            const queryCall = hoisted.mockClusterElementOptionsQuery.mock.calls[0];
+            const queryArgs = queryCall[0];
+
+            expect(queryArgs.mcpComponentId).toBe('7');
         });
 
         it('should filter expression values from inputParameters', () => {

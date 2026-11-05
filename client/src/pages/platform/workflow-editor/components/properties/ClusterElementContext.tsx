@@ -7,6 +7,7 @@ export interface ClusterElementContextI {
     connectionId?: number;
     connectionRequired?: boolean;
     inputParameters: Record<string, unknown>;
+    mcpComponentId: string;
 }
 
 const ClusterElementContext = createContext<ClusterElementContextI | null>(null);
