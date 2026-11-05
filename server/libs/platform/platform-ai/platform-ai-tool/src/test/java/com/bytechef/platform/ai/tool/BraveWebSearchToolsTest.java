@@ -231,7 +231,6 @@ class BraveWebSearchToolsTest {
             .getBrave();
 
         brave.setApiKey("test-key");
-        brave.setBaseUrl("https://api.search.brave.com/res/v1");
 
         return applicationProperties;
     }
