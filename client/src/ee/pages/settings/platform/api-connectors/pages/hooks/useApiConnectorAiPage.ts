@@ -18,6 +18,8 @@ import {API_CONNECTORS_PATH} from './useImportApiConnector';
 // Maximum number of polling attempts before timing out (5 minutes at 1 second intervals)
 const MAX_POLLING_ATTEMPTS = 300;
 
+const OPENAPI_OPERATION_METHODS = ['delete', 'get', 'head', 'options', 'patch', 'post', 'put', 'trace'];
+
 interface UseApiConnectorAiPageI {
     canProceed: boolean;
     currentStep: number;
@@ -256,6 +258,8 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
 
             if (parsed.paths) {
                 Object.entries(parsed.paths).forEach(([path, methods]) => {
+                    const pathItemFields: Record<string, unknown> = {};
+
                     Object.entries(methods as Record<string, unknown>).forEach(([method, operation]) => {
                         const endpointId = `${path}-${method}`;
 
@@ -265,8 +269,14 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
                             }
 
                             filteredPaths[path][method] = operation;
+                        } else if (!OPENAPI_OPERATION_METHODS.includes(method)) {
+                            pathItemFields[method] = operation;
                         }
                     });
+
+                    if (filteredPaths[path]) {
+                        Object.assign(filteredPaths[path], pathItemFields);
+                    }
                 });
             }
 
