@@ -30,8 +30,9 @@ interface DataPillProps {
     sampleOutput?: any;
 }
 
-const DataPillSampleValue = ({sampleOutput}: {sampleOutput: string | number | boolean | null}) => {
-    const sampleOutputString = String(sampleOutput);
+const DataPillSampleValue = ({sampleOutput}: {sampleOutput: string | number | boolean | object | null}) => {
+    const sampleOutputString =
+        typeof sampleOutput === 'object' && sampleOutput !== null ? JSON.stringify(sampleOutput) : String(sampleOutput);
 
     if (sampleOutputString.length > 27) {
         return (
@@ -251,12 +252,6 @@ const DataPill = ({
                             sampleValue = getNestedObject(sampleOutput, dottedSubPropertyPath);
                         } else {
                             sampleValue = sampleOutput;
-                        }
-
-                        if (typeof sampleValue === 'string') {
-                            sampleValue =
-                                (sampleValue as string).substring(0, 27) +
-                                ((sampleValue as string).length > 27 ? '...' : '');
                         }
 
                         const showSampleValue =
