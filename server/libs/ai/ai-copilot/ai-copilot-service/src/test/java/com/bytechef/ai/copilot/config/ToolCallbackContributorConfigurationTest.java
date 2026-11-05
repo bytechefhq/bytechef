@@ -44,6 +44,7 @@ import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksF
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -185,7 +186,7 @@ class ToolCallbackContributorConfigurationTest {
     @Test
     void contributesTheSevenFlatDeploymentToolsWhenFactoryPresent() {
         DeploymentToolCallbacksFactory deploymentToolCallbacksFactory = new DeploymentToolCallbacksFactory(
-            mock(ProjectDeploymentFacade.class));
+            mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowService.class));
 
         McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
             presentFactory(deploymentToolCallbacksFactory), workspaceFacade);
@@ -209,7 +210,7 @@ class ToolCallbackContributorConfigurationTest {
     @Test
     void onlyListProjectDeploymentsAcceptsWorkspaceId() {
         DeploymentToolCallbacksFactory deploymentToolCallbacksFactory = new DeploymentToolCallbacksFactory(
-            mock(ProjectDeploymentFacade.class));
+            mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowService.class));
 
         McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
             presentFactory(deploymentToolCallbacksFactory), workspaceFacade);
