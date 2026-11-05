@@ -23,9 +23,13 @@ const Header = ({
     title,
     titleClassName,
 }: HeaderProps) => {
-    const {hasLeftSidebar, leftSidebarHidden, leftSidebarOpen} = useLeftSidebarToggle();
+    const {hasLeftSidebar, hasLeftSidebarHeader, insideLeftSidebar, leftSidebarHidden, leftSidebarOpen} =
+        useLeftSidebarToggle();
 
-    const showLeftSidebarToggle = position === 'main' && hasLeftSidebar && (!!title || !leftSidebarOpen);
+    const showLeftSidebarToggle =
+        position === 'main' && hasLeftSidebar && (!leftSidebarOpen || (!hasLeftSidebarHeader && !!title));
+
+    const showSidebarHeaderToggle = position === 'sidebar' && insideLeftSidebar && hasLeftSidebar && leftSidebarOpen;
 
     return (
         <header className="relative">
@@ -63,7 +67,15 @@ const Header = ({
                     </div>
                 </div>
 
-                {right && <div>{right}</div>}
+                {showSidebarHeaderToggle ? (
+                    <div className="flex items-center gap-1">
+                        {right && <div>{right}</div>}
+
+                        <LeftSidebarToggle />
+                    </div>
+                ) : (
+                    right && <div>{right}</div>
+                )}
             </div>
         </header>
     );

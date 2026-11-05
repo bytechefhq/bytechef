@@ -77,11 +77,14 @@ const LayoutContainer = ({
         !leftSidebarHidden && (isLeftSidebarControlled ? leftSidebarOpen : uncontrolledLeftSidebarOpen);
 
     const [leftAsideMounted, setLeftAsideMounted] = useState(leftSidebarIsOpen);
+    const [leftAsideSlidIn, setLeftAsideSlidIn] = useState(leftSidebarIsOpen);
     const [leftSidebarTransitionEnabled, setLeftSidebarTransitionEnabled] = useState(!leftSidebarHidden);
 
     const ownLeftSidebarToggle = useMemo(
         () => ({
             hasLeftSidebar: !!leftSidebarBody && !isLeftSidebarControlled && !leftSidebarHidden,
+            hasLeftSidebarHeader: !!leftSidebarHeader,
+            insideLeftSidebar: false,
             leftSidebarHidden,
             leftSidebarOpen: isMobile ? mobileLeftSidebarOpen : leftSidebarIsOpen,
             toggleLeftSidebar: () =>
@@ -91,6 +94,7 @@ const LayoutContainer = ({
             isLeftSidebarControlled,
             isMobile,
             leftSidebarBody,
+            leftSidebarHeader,
             leftSidebarHidden,
             leftSidebarIsOpen,
             mobileLeftSidebarOpen,
@@ -101,18 +105,32 @@ const LayoutContainer = ({
     // renders into the Settings layout's Outlet with its own sidebar-less LayoutContainer.
     const leftSidebarToggle = leftSidebarBody ? ownLeftSidebarToggle : parentLeftSidebarToggle;
 
+    const leftAsideToggle = useMemo(() => ({...leftSidebarToggle, insideLeftSidebar: true}), [leftSidebarToggle]);
+
     // Keep the left sidebar mounted for 300ms after it closes so it can slide out before unmounting.
     useEffect(() => {
-        if (leftSidebarIsOpen) {
-            setLeftAsideMounted(true);
+        if (!leftSidebarIsOpen) {
+            setLeftAsideSlidIn(false);
+
+            const timerId = setTimeout(() => setLeftAsideMounted(false), 300);
+
+            return () => clearTimeout(timerId);
+        }
+
+        setLeftAsideMounted(true);
+
+        if (!leftSidebarTransitionEnabled) {
+            setLeftAsideSlidIn(true);
 
             return;
         }
 
-        const timerId = setTimeout(() => setLeftAsideMounted(false), 300);
+        let frameId = requestAnimationFrame(() => {
+            frameId = requestAnimationFrame(() => setLeftAsideSlidIn(true));
+        });
 
-        return () => clearTimeout(timerId);
-    }, [leftSidebarIsOpen]);
+        return () => cancelAnimationFrame(frameId);
+    }, [leftSidebarIsOpen, leftSidebarTransitionEnabled]);
 
     // A page hides its sidebar until it has loaded, so revealing it must not slide the content over. Enable the
     // padding transition only a frame after the sidebar first shows, once its padding has painted without one.
@@ -145,12 +163,14 @@ const LayoutContainer = ({
                             'hidden border-r border-r-border/50 bg-muted/50 lg:flex lg:flex-col',
                             'lg:fixed lg:inset-y-0',
                             'transition-transform duration-300 ease-in-out',
-                            leftSidebarIsOpen ? 'lg:translate-x-0' : 'lg:-translate-x-full',
+                            leftSidebarIsOpen && leftAsideSlidIn ? 'lg:translate-x-0' : 'lg:-translate-x-full',
                             leftSidebarClass,
                             leftSidebarWidths[leftSidebarWidth][0]
                         )}
                     >
-                        {leftSidebarNav}
+                        <LeftSidebarToggleContext.Provider value={leftAsideToggle}>
+                            {leftSidebarNav}
+                        </LeftSidebarToggleContext.Provider>
                     </aside>
                 )}
 

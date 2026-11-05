@@ -54,6 +54,12 @@ describe('LayoutContainer', () => {
 
         fireEvent.click(toggleButton);
 
+        expect(screen.getByText('Categories').closest('aside')).toHaveClass('lg:-translate-x-full');
+
+        act(() => {
+            vi.advanceTimersByTime(50);
+        });
+
         expect(screen.getByText('Categories').closest('aside')).toHaveClass('lg:translate-x-0');
     });
 
@@ -118,6 +124,7 @@ describe('LayoutContainer', () => {
 
         expect(contentContainer).toHaveClass('lg:pl-64');
         expect(contentContainer).not.toHaveClass('transition-[padding]');
+        expect(screen.getByText('Categories').closest('aside')).toHaveClass('lg:translate-x-0');
 
         act(() => {
             vi.advanceTimersByTime(50);
