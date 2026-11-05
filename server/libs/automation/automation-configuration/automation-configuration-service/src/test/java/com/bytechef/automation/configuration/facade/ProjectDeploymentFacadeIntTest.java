@@ -206,6 +206,13 @@ public class ProjectDeploymentFacadeIntTest {
     @Autowired
     private ConnectionService connectionService;
 
+    private static void authenticateAsAdmin() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+    }
+
     private void renameProjectDeployment(long projectDeploymentId, String name) {
         ProjectDeployment projectDeployment = projectDeploymentRepository.findById(projectDeploymentId)
             .orElseThrow();
@@ -217,6 +224,8 @@ public class ProjectDeploymentFacadeIntTest {
 
     @AfterEach
     public void afterEach() {
+        SecurityContextHolder.clearContext();
+
         projectDeploymentWorkflowRepository.deleteAll();
         projectWorkflowRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
@@ -373,6 +382,8 @@ public class ProjectDeploymentFacadeIntTest {
         renameProjectDeployment(plainDeploymentDTO.id(), "plain");
 
         testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectDTO.id());
+
+        authenticateAsAdmin();
 
         List<ProjectDeploymentDTO> workspaceProjectDeployments = projectDeploymentFacade.getWorkspaceProjectDeployments(
             workspace.getId(), null, null, null, false);
@@ -797,6 +808,8 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testUpdateProjectDeploymentWorkflowConnectionDisablesTriggersWithPreviousConnection() {
+        authenticateAsAdmin();
+
         long oldConnectionId = 1001L;
         long newConnectionId = 1002L;
 
