@@ -96,7 +96,7 @@ const Property = ({
     toolsMode,
 }: PropertyProps) => {
     const [containerHasLocalEntries, setContainerHasLocalEntries] = useState(false);
-    const [replaceEntriesDialogOpen, setReplaceEntriesDialogOpen] = useState(false);
+    const [replaceEntriesTarget, setReplaceEntriesTarget] = useState<'dataPill' | 'formula'>();
 
     const containerHasLocalEntriesRef = useRef(false);
 
@@ -304,9 +304,12 @@ const Property = ({
 
     const showDynamicSwitch = hasDynamicSwitch && !isFromAi && !isFormulaMode;
 
+    const containerHasEntries = () =>
+        !mentionInput && isPillContainer && (containerHasLocalEntriesRef.current || !isPillContainerEmpty());
+
     const handleDynamicSwitchClick = () => {
-        if (!mentionInput && isPillContainer && (containerHasLocalEntriesRef.current || !isPillContainerEmpty())) {
-            setReplaceEntriesDialogOpen(true);
+        if (containerHasEntries()) {
+            setReplaceEntriesTarget('dataPill');
 
             return;
         }
@@ -314,12 +317,28 @@ const Property = ({
         handleDynamicSwitch();
     };
 
+    const handleFormulaSwitchClick = () => {
+        if (!isFormulaMode && containerHasEntries()) {
+            setReplaceEntriesTarget('formula');
+
+            return;
+        }
+
+        handleFormulaSwitch();
+    };
+
     const handleReplaceEntriesConfirm = () => {
-        setReplaceEntriesDialogOpen(false);
+        const target = replaceEntriesTarget;
+
+        setReplaceEntriesTarget(undefined);
 
         handleContainerLocalEntriesChange(false);
 
-        replaceValueWithPillEntry();
+        if (target === 'formula') {
+            handleFormulaSwitch();
+        } else {
+            replaceValueWithPillEntry();
+        }
     };
 
     const dynamicSwitch = showDynamicSwitch ? (
@@ -506,7 +525,7 @@ const Property = ({
                                             {showFormulaSwitch && !control && (
                                                 <PropertyFormulaSwitch
                                                     formulaMode={isFormulaMode}
-                                                    handleClick={handleFormulaSwitch}
+                                                    handleClick={handleFormulaSwitchClick}
                                                 />
                                             )}
 
@@ -1300,14 +1319,14 @@ const Property = ({
                 />
             )}
 
-            {replaceEntriesDialogOpen && (
+            {replaceEntriesTarget && (
                 <AlertDialog
                     confirmLabel="Replace"
                     description={`The ${replacedEntriesNoun} in ${label || name} will be removed.`}
-                    onCancel={() => setReplaceEntriesDialogOpen(false)}
+                    onCancel={() => setReplaceEntriesTarget(undefined)}
                     onConfirm={handleReplaceEntriesConfirm}
-                    open={replaceEntriesDialogOpen}
-                    title="Replace with a data pill?"
+                    open
+                    title={replaceEntriesTarget === 'formula' ? 'Replace with a formula?' : 'Replace with a data pill?'}
                 />
             )}
         </li>
