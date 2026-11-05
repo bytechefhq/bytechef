@@ -149,6 +149,54 @@ test.describe('Invitations', () => {
         await expect(visit.page.getByText('Your account is ready')).toBeVisible();
     });
 
+    test('a second click on Activate account while the first is in flight sends no second request', async ({
+        browser,
+    }) => {
+        const email = randomEmail('invitee');
+
+        cleanups.push(() => deleteUser(adminApi, email));
+
+        await inviteUser(adminApi, email);
+
+        const {key} = await readInvitationKey(email);
+
+        const visit = await openInvitationLink(browser, key);
+
+        cleanups.push(visit.close);
+
+        let acceptInvitationRequestCount = 0;
+
+        await visit.page.route('**/api/account/accept-invitation', async (route) => {
+            acceptInvitationRequestCount++;
+
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+
+            await route.continue();
+        });
+
+        await visit.page.getByLabel('Password', {exact: true}).fill(INVITEE_PASSWORD);
+
+        const activateButton = visit.page.getByRole('button', {name: 'Activate account'});
+
+        await activateButton.click();
+
+        await expect(activateButton).toBeDisabled();
+
+        await activateButton.click({force: true});
+
+        await expect(visit.page.getByText('Your account is ready')).toBeVisible();
+
+        await expect(visit.page.getByRole('alert')).toHaveCount(0);
+
+        expect(acceptInvitationRequestCount).toBe(1);
+
+        const inviteeApi = await createUserApiContext(email, INVITEE_PASSWORD);
+
+        cleanups.push(() => inviteeApi.dispose());
+
+        expect((await inviteeApi.get('/api/account')).status()).toBe(200);
+    });
+
     test('an unknown invitation key is refused', async ({browser}) => {
         const visit = await openInvitationLink(browser, `unknown${getRandomString()}`);
 
