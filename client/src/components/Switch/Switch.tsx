@@ -141,11 +141,7 @@ const Switch = ({
         );
     }
 
-    const contentClasses = twMerge(
-        'flex items-start gap-2',
-        variant === 'small' && 'items-center gap-1',
-        alignment === 'start' && 'flex-row-reverse'
-    );
+    const contentClasses = twMerge('flex items-start gap-2', alignment === 'start' && 'flex-row-reverse');
 
     return (
         <label className={wrapperClasses} data-testid="switch-wrapper">
