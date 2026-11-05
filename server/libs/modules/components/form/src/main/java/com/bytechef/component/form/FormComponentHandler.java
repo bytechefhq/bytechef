@@ -22,6 +22,7 @@ import static com.bytechef.component.form.constant.FormConstants.FORM;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.form.trigger.NewFormRequestRespondImmediatelyTrigger;
 import com.bytechef.component.form.trigger.NewFormRequestTrigger;
 import com.google.auto.service.AutoService;
 
@@ -36,7 +37,7 @@ public class FormComponentHandler implements ComponentHandler {
         .description("Component for handling form submissions and requests.")
         .icon("path:assets/form.svg")
         .categories(ComponentCategory.HELPERS)
-        .triggers(NewFormRequestTrigger.TRIGGER_DEFINITION);
+        .triggers(NewFormRequestTrigger.TRIGGER_DEFINITION, NewFormRequestRespondImmediatelyTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

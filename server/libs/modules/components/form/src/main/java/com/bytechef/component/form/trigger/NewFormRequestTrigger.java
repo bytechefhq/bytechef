@@ -65,6 +65,7 @@ import static com.bytechef.component.form.util.FieldType.fromValue;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
@@ -88,140 +89,144 @@ import java.util.stream.Stream;
  */
 public class NewFormRequestTrigger {
 
+    static final Property[] PROPERTIES = {
+        string(FORM_TITLE)
+            .label("Form Title")
+            .description("The title for your form. Displayed as the main page title (h1).")
+            .required(false),
+        string(FORM_DESCRIPTION)
+            .label("Form Description")
+            .description("A subtitle shown under the form title. Use \n or <br> for line breaks.")
+            .required(false),
+        string(BUTTON_LABEL)
+            .label("Button Label")
+            .description("Label for the submit button.")
+            .required(false),
+        bool(IGNORE_BOTS)
+            .label("Ignore Bots")
+            .description("Ignore requests from bots and link previewers.")
+            .defaultValue(false)
+            .required(false),
+        bool(USE_WORKFLOW_TIMEZONE)
+            .label("Use Workflow Timezone")
+            .description("Use the workflow timezone for the submittedAt timestamp instead of UTC.")
+            .defaultValue(false)
+            .required(false),
+        bool(APPEND_ATTRIBUTION)
+            .label("Append Attribution")
+            .description("Show an attribution footer on the public form.")
+            .defaultValue(true)
+            .required(false),
+        string(CUSTOM_FORM_STYLING)
+            .label("Custom Form Styling (CSS)")
+            .description("Override default form styles with custom CSS.")
+            .controlType(TEXT_AREA)
+            .required(false),
+        array(INPUTS)
+            .label("Form Inputs")
+            .description("Define the form input fields")
+            .items(
+                object()
+                    .properties(
+                        integer(FIELD_TYPE)
+                            .label("Field Type")
+                            .description("The type of the form field")
+                            .options(
+                                option("Checkbox", CHECKBOX.getValue()),
+                                option("Custom HTML", CUSTOM_HTML.getValue()),
+                                option("Date Picker", DATE_PICKER.getValue()),
+                                option("Datetime Picker", DATETIME_PICKER.getValue()),
+                                option("Email", EMAIL_INPUT.getValue()),
+                                option("File", FILE_INPUT.getValue()),
+                                option("Hidden Field", HIDDEN_FIELD.getValue()),
+                                option("Input", INPUT.getValue()),
+                                option("Number", NUMBER_INPUT.getValue()),
+                                option("Password", PASSWORD_INPUT.getValue()),
+                                option("Radio Button", RADIO.getValue()),
+                                option("Select", SELECT.getValue()),
+                                option("Textarea", TEXTAREA.getValue()))
+                            .required(true),
+                        string(FIELD_LABEL)
+                            .label("Field Label")
+                            .description("The label of the form field"),
+                        string(FIELD_NAME)
+                            .label("Field Name")
+                            .description("The name of the form field")
+                            .displayCondition("inputs[index].fieldType != %s".formatted(CUSTOM_HTML.getValue())),
+                        string(FIELD_DESCRIPTION)
+                            .label("Field Description")
+                            .description("Description of the form field")
+                            .required(false),
+                        string(PLACEHOLDER)
+                            .label("Placeholder")
+                            .description("The placeholder text.")
+                            .required(false)
+                            .displayCondition("contains({%s,%s,%s,%s,%s}, inputs[index].fieldType)".formatted(
+                                EMAIL_INPUT.getValue(), INPUT.getValue(), NUMBER_INPUT.getValue(),
+                                PASSWORD_INPUT.getValue(), TEXTAREA.getValue())),
+                        string(DEFAULT_VALUE)
+                            .label("Default value")
+                            .description("Pre-filled or pre-selected value for compatible fields.")
+                            .displayCondition("inputs[index].fieldType != %s".formatted(CUSTOM_HTML.getValue()))
+                            .required(false),
+                        string(DEFAULT_VALUE)
+                            .label("Default value")
+                            .description("Pre-filled or pre-selected value for compatible fields.")
+                            .controlType(TEXT_AREA)
+                            .displayCondition("inputs[index].fieldType == %s".formatted(CUSTOM_HTML.getValue()))
+                            .required(false),
+                        array(FIELD_OPTIONS)
+                            .label("Field Options")
+                            .description("The field label/value options.")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("label")
+                                            .label("Label")
+                                            .required(true),
+                                        string("value")
+                                            .label("Value")
+                                            .required(true)))
+                            .required(false)
+                            .displayCondition(
+                                "contains({%s,%s}, inputs[index].fieldType)".formatted(
+                                    RADIO.getValue(), SELECT.getValue())),
+                        bool(MULTIPLE_CHOICE)
+                            .label("Multiple Choice")
+                            .description("Allow multiple selections.")
+                            .defaultValue(false)
+                            .required(false)
+                            .displayCondition(
+                                "inputs[index].fieldType == %s".formatted(SELECT.getValue())),
+                        integer(MIN_SELECTION)
+                            .label("Min selection")
+                            .description("Minimum selections required.")
+                            .required(false)
+                            .displayCondition(
+                                "inputs[index].fieldType == %s and inputs[index].multipleChoice == true".formatted(
+                                    SELECT.getValue())),
+                        integer(MAX_SELECTION)
+                            .label("Max selection")
+                            .description("Maximum selections allowed.")
+                            .required(false)
+                            .displayCondition(
+                                "inputs[index].fieldType == %s and inputs[index].multipleChoice == true".formatted(
+                                    SELECT.getValue())),
+                        bool(REQUIRED)
+                            .label("Required")
+                            .description("Whether this field is required")
+                            .defaultValue(false)
+                            .required(false)))
+            .required(true)
+    };
+
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newFormRequest")
         .title("New Form Request")
-        .description("Triggers when a new form request is received.")
+        .description(
+            "Triggers when a new form request is received. The submitter waits until the workflow finishes.")
         .type(TriggerType.STATIC_WEBHOOK)
         .workflowSyncExecution(true)
-        .properties(
-            string(FORM_TITLE)
-                .label("Form Title")
-                .description("The title for your form. Displayed as the main page title (h1).")
-                .required(false),
-            string(FORM_DESCRIPTION)
-                .label("Form Description")
-                .description("A subtitle shown under the form title. Use \n or <br> for line breaks.")
-                .required(false),
-            string(BUTTON_LABEL)
-                .label("Button Label")
-                .description("Label for the submit button.")
-                .required(false),
-            bool(IGNORE_BOTS)
-                .label("Ignore Bots")
-                .description("Ignore requests from bots and link previewers.")
-                .defaultValue(false)
-                .required(false),
-            bool(USE_WORKFLOW_TIMEZONE)
-                .label("Use Workflow Timezone")
-                .description("Use the workflow timezone for the submittedAt timestamp instead of UTC.")
-                .defaultValue(false)
-                .required(false),
-            bool(APPEND_ATTRIBUTION)
-                .label("Append Attribution")
-                .description("Show an attribution footer on the public form.")
-                .defaultValue(true)
-                .required(false),
-            string(CUSTOM_FORM_STYLING)
-                .label("Custom Form Styling (CSS)")
-                .description("Override default form styles with custom CSS.")
-                .controlType(TEXT_AREA)
-                .required(false),
-            array(INPUTS)
-                .label("Form Inputs")
-                .description("Define the form input fields")
-                .items(
-                    object()
-                        .properties(
-                            integer(FIELD_TYPE)
-                                .label("Field Type")
-                                .description("The type of the form field")
-                                .options(
-                                    option("Checkbox", CHECKBOX.getValue()),
-                                    option("Custom HTML", CUSTOM_HTML.getValue()),
-                                    option("Date Picker", DATE_PICKER.getValue()),
-                                    option("Datetime Picker", DATETIME_PICKER.getValue()),
-                                    option("Email", EMAIL_INPUT.getValue()),
-                                    option("File", FILE_INPUT.getValue()),
-                                    option("Hidden Field", HIDDEN_FIELD.getValue()),
-                                    option("Input", INPUT.getValue()),
-                                    option("Number", NUMBER_INPUT.getValue()),
-                                    option("Password", PASSWORD_INPUT.getValue()),
-                                    option("Radio Button", RADIO.getValue()),
-                                    option("Select", SELECT.getValue()),
-                                    option("Textarea", TEXTAREA.getValue()))
-                                .required(true),
-                            string(FIELD_LABEL)
-                                .label("Field Label")
-                                .description("The label of the form field"),
-                            string(FIELD_NAME)
-                                .label("Field Name")
-                                .description("The name of the form field")
-                                .displayCondition("inputs[index].fieldType != %s".formatted(CUSTOM_HTML.getValue())),
-                            string(FIELD_DESCRIPTION)
-                                .label("Field Description")
-                                .description("Description of the form field")
-                                .required(false),
-                            string(PLACEHOLDER)
-                                .label("Placeholder")
-                                .description("The placeholder text.")
-                                .required(false)
-                                .displayCondition("contains({%s,%s,%s,%s,%s}, inputs[index].fieldType)".formatted(
-                                    EMAIL_INPUT.getValue(), INPUT.getValue(), NUMBER_INPUT.getValue(),
-                                    PASSWORD_INPUT.getValue(), TEXTAREA.getValue())),
-                            string(DEFAULT_VALUE)
-                                .label("Default value")
-                                .description("Pre-filled or pre-selected value for compatible fields.")
-                                .displayCondition("inputs[index].fieldType != %s".formatted(CUSTOM_HTML.getValue()))
-                                .required(false),
-                            string(DEFAULT_VALUE)
-                                .label("Default value")
-                                .description("Pre-filled or pre-selected value for compatible fields.")
-                                .controlType(TEXT_AREA)
-                                .displayCondition("inputs[index].fieldType == %s".formatted(CUSTOM_HTML.getValue()))
-                                .required(false),
-                            array(FIELD_OPTIONS)
-                                .label("Field Options")
-                                .description("The field label/value options.")
-                                .items(
-                                    object()
-                                        .properties(
-                                            string("label")
-                                                .label("Label")
-                                                .required(true),
-                                            string("value")
-                                                .label("Value")
-                                                .required(true)))
-                                .required(false)
-                                .displayCondition(
-                                    "contains({%s,%s}, inputs[index].fieldType)".formatted(
-                                        RADIO.getValue(), SELECT.getValue())),
-                            bool(MULTIPLE_CHOICE)
-                                .label("Multiple Choice")
-                                .description("Allow multiple selections.")
-                                .defaultValue(false)
-                                .required(false)
-                                .displayCondition(
-                                    "inputs[index].fieldType == %s".formatted(SELECT.getValue())),
-                            integer(MIN_SELECTION)
-                                .label("Min selection")
-                                .description("Minimum selections required.")
-                                .required(false)
-                                .displayCondition(
-                                    "inputs[index].fieldType == %s and inputs[index].multipleChoice == true".formatted(
-                                        SELECT.getValue())),
-                            integer(MAX_SELECTION)
-                                .label("Max selection")
-                                .description("Maximum selections allowed.")
-                                .required(false)
-                                .displayCondition(
-                                    "inputs[index].fieldType == %s and inputs[index].multipleChoice == true".formatted(
-                                        SELECT.getValue())),
-                            bool(REQUIRED)
-                                .label("Required")
-                                .description("Whether this field is required")
-                                .defaultValue(false)
-                                .required(false)))
-                .required(true))
+        .properties(PROPERTIES)
         .output(NewFormRequestTrigger::getOutput)
         .help("", "https://docs.bytechef.io/reference/components/form_v1#new-form-request")
         .webhookRequest(NewFormRequestTrigger::getWebhookResult);
