@@ -7,49 +7,64 @@
 
 package com.bytechef.ee.platform.scheduler.tenant;
 
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.GROUP_NAME;
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.TENANT_FALLBACK_SEARCH_PATH;
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.TENANT_ID;
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.TENANT_SCHEMA;
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.callAsTenant;
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.createJobDetail;
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.createTrigger;
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.isPublicFallbackProbeResolvable;
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.openConnection;
+import static com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.showSearchPath;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.platform.scheduler.config.MultiTenantQuartzTriggerSchedulerConfiguration;
+import com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.TenantFallbackDataSource;
+import com.bytechef.ee.platform.scheduler.tenant.MultiTenantQuartzTestSupport.TenantSearchPathDataSource;
 import com.bytechef.tenant.TenantContext;
-import com.bytechef.tenant.sql.BaseDataSource;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.NotSerializableException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.quartz.Job;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
+import org.quartz.JobPersistenceException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.calendar.HolidayCalendar;
+import org.quartz.impl.jdbcjobstore.DriverDelegate;
+import org.quartz.impl.jdbcjobstore.NoSuchDelegateException;
+import org.quartz.impl.jdbcjobstore.PostgreSQLDelegate;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.springframework.boot.quartz.autoconfigure.QuartzProperties;
-import org.springframework.core.io.ClassPathResource;
+import org.quartz.simpl.CascadingClassLoadHelper;
+import org.quartz.spi.OperableTrigger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DelegatingDataSource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.scheduling.quartz.AdaptableJobFactory;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -57,53 +72,46 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
- * Runs a real Quartz scheduler, configured the way {@link MultiTenantQuartzTriggerSchedulerConfiguration} configures it
- * in multi-tenant mode, against PostgreSQL. The Quartz tables live only in {@code public}, while connections handed out
- * to a tenant caller are on the tenant's schema only, so every Quartz statement that does not go through the wrapped
- * delegate with the search_path switched either fails or, as with the queries the never-initialized
- * {@code StdJDBCDelegate} superclass used to serve, silently matches no rows.
- *
  * @version ee
  */
 @Testcontainers
 class MultiTenantDriverDelegateIntTest {
 
-    private static final String GROUP_NAME = "ScheduleTrigger";
-    private static final String TENANT_ID = "000002";
+    private static final String ISOLATED_GROUP_NAME = "IsolatedGroup";
+    private static final String MISSING_TABLE_PREFIX = "MISSING_";
+    private static final String TABLE_PREFIX = "QRTZ_";
 
     @Container
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:16-alpine");
 
     private static DataSource dataSource;
+    private static DataSource databaseDataSource;
     private static JdbcTemplate jdbcTemplate;
     private static DataSource tenantFallbackDataSource;
 
+    private final List<Connection> connections = new ArrayList<>();
     private final List<SchedulerFactoryBean> schedulerFactoryBeans = new ArrayList<>();
 
     @BeforeAll
     static void beforeAll() {
-        DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource(
+        databaseDataSource = new DriverManagerDataSource(
             postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
 
-        jdbcTemplate = new JdbcTemplate(driverManagerDataSource);
+        jdbcTemplate = new JdbcTemplate(databaseDataSource);
 
-        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator(
-            new ClassPathResource("org/quartz/impl/jdbcjobstore/tables_postgres.sql"));
+        MultiTenantQuartzTestSupport.initializeDatabase(databaseDataSource);
 
-        resourceDatabasePopulator.execute(driverManagerDataSource);
-
-        jdbcTemplate.execute("CREATE SCHEMA bytechef_" + TENANT_ID);
-
-        // Stands in for an object only the public fallback resolves for a tenant, such as the pgvector vector type
-        jdbcTemplate.execute("CREATE TYPE public.public_fallback_probe AS ENUM ('resolved')");
-
-        dataSource = new TenantSearchPathDataSource(driverManagerDataSource);
-        tenantFallbackDataSource = new TenantFallbackDataSource(driverManagerDataSource);
+        dataSource = new TenantSearchPathDataSource(databaseDataSource);
+        tenantFallbackDataSource = new TenantFallbackDataSource(databaseDataSource);
     }
 
     @AfterEach
     void afterEach() throws Exception {
         TenantContext.resetCurrentTenantId();
+
+        for (Connection connection : connections) {
+            connection.close();
+        }
 
         for (SchedulerFactoryBean schedulerFactoryBean : schedulerFactoryBeans) {
             schedulerFactoryBean.destroy();
@@ -232,8 +240,8 @@ class MultiTenantDriverDelegateIntTest {
             .as("search_path before and after each Quartz call in the tenant transaction, then whether an object in " +
                 "public still resolves")
             .containsExactly(
-                "bytechef_" + TENANT_ID + ", public", "bytechef_" + TENANT_ID + ", public",
-                "bytechef_" + TENANT_ID + ", public", "bytechef_" + TENANT_ID + ", public", true);
+                TENANT_FALLBACK_SEARCH_PATH, TENANT_FALLBACK_SEARCH_PATH, TENANT_FALLBACK_SEARCH_PATH,
+                TENANT_FALLBACK_SEARCH_PATH, true);
         assertThat(countTriggers("tenantTransaction")).isZero();
     }
 
@@ -260,7 +268,281 @@ class MultiTenantDriverDelegateIntTest {
 
         assertThat(searchPaths)
             .as("The connection was obtained, and its search_path set, before the tenant context changed")
-            .containsExactly("bytechef_" + TENANT_ID + ", public", "bytechef_" + TENANT_ID + ", public");
+            .containsExactly(TENANT_FALLBACK_SEARCH_PATH, TENANT_FALLBACK_SEARCH_PATH);
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void testCallsPreviouslyServedByUninitializedStdJdbcDelegateSeeRowsOfConfiguredScheduler() throws Exception {
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(
+            createPostgreSQLDelegate(TABLE_PREFIX, "previouslyUninitialized"));
+        Connection connection = openTrackedConnection(TENANT_SCHEMA);
+        JobDetail jobDetail = JobBuilder.newJob(MultiTenantQuartzTestSupport.NoOpJob.class)
+            .withIdentity("job", ISOLATED_GROUP_NAME)
+            .storeDurably()
+            .build();
+        OperableTrigger operableTrigger = (OperableTrigger) TriggerBuilder.newTrigger()
+            .withIdentity("trigger", ISOLATED_GROUP_NAME)
+            .forJob(jobDetail)
+            .startAt(Date.from(Instant.now()
+                .plus(Duration.ofDays(1))))
+            .build();
+
+        operableTrigger.computeFirstFireTime(null);
+        operableTrigger.setFireInstanceId("fired-entry");
+
+        TenantContext.setCurrentTenantId(TENANT_ID);
+
+        multiTenantDriverDelegate.insertJobDetail(connection, jobDetail);
+        multiTenantDriverDelegate.insertTrigger(connection, operableTrigger, "WAITING", jobDetail);
+        multiTenantDriverDelegate.insertCalendar(connection, "holidays", new HolidayCalendar());
+        multiTenantDriverDelegate.insertPausedTriggerGroup(connection, ISOLATED_GROUP_NAME);
+        multiTenantDriverDelegate.insertFiredTrigger(connection, operableTrigger, "ACQUIRED", jobDetail);
+
+        assertThat(multiTenantDriverDelegate.selectNumJobs(connection)).isOne();
+        assertThat(multiTenantDriverDelegate.selectJobGroups(connection)).containsExactly(ISOLATED_GROUP_NAME);
+        assertThat(multiTenantDriverDelegate.selectNumTriggers(connection)).isOne();
+        assertThat(multiTenantDriverDelegate.selectTriggerGroups(connection)).containsExactly(ISOLATED_GROUP_NAME);
+        assertThat(multiTenantDriverDelegate.selectTriggerKeysForJob(connection, jobDetail.getKey()))
+            .containsExactly(operableTrigger.getKey());
+        assertThat(multiTenantDriverDelegate.selectNumCalendars(connection)).isOne();
+        assertThat(multiTenantDriverDelegate.selectCalendars(connection)).containsExactly("holidays");
+        assertThat(multiTenantDriverDelegate.selectNextFireTime(connection))
+            .isEqualTo(operableTrigger.getNextFireTime()
+                .getTime());
+        assertThat(multiTenantDriverDelegate.selectFiredTriggerInstanceNames(connection))
+            .containsExactly("NON_CLUSTERED");
+        assertThat(
+            multiTenantDriverDelegate.selectJobDetails(
+                connection, GroupMatcher.jobGroupEquals(ISOLATED_GROUP_NAME), createClassLoadHelper()))
+                    .extracting(JobDetail::getKey)
+                    .containsExactly(jobDetail.getKey());
+        assertThat(
+            multiTenantDriverDelegate.getTriggersByJobAndTriggerGroup(
+                connection, GroupMatcher.jobGroupEquals(ISOLATED_GROUP_NAME),
+                GroupMatcher.triggerGroupEquals(ISOLATED_GROUP_NAME)))
+                    .extracting(OperableTrigger::getKey)
+                    .containsExactly(operableTrigger.getKey());
+        assertThat(multiTenantDriverDelegate.selectPausedTriggerGroups(connection))
+            .containsExactly(ISOLATED_GROUP_NAME);
+        assertThat(multiTenantDriverDelegate.deleteAllPausedTriggerGroups(connection)).isOne();
+        assertThat(multiTenantDriverDelegate.deleteFiredTriggers(connection)).isOne();
+        assertThat(showSearchPath(connection)).isEqualTo(TENANT_SCHEMA);
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        delimiter = '|',
+        value = {
+            "bytechef_000002, public | 000002",
+            "bytechef_000002, public | 000005",
+            "public | 000005",
+            "bytechef_vectorstore_000002, \"$user\", public | 000002"
+        })
+    void testSearchPathOfConnectionIsRestoredUnchanged(String searchPath, String tenantId) throws Exception {
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(
+            createPostgreSQLDelegate(TABLE_PREFIX, "restoreSearchPath"));
+        Connection connection = openTrackedConnection(searchPath);
+
+        TenantContext.setCurrentTenantId(tenantId);
+
+        assertThat(multiTenantDriverDelegate.jobExists(connection, JobKey.jobKey("job", GROUP_NAME))).isFalse();
+
+        assertThat(showSearchPath(connection)).isEqualTo(searchPath);
+        assertThat(TenantContext.getCurrentTenantId()).isEqualTo(tenantId);
+    }
+
+    @Test
+    void testSqlExceptionOfDelegateIsPropagatedAndSearchPathRestored() throws Exception {
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(
+            createPostgreSQLDelegate(MISSING_TABLE_PREFIX, "sqlException"));
+        Connection connection = openTrackedConnection(TENANT_FALLBACK_SEARCH_PATH);
+
+        TenantContext.setCurrentTenantId(TENANT_ID);
+
+        assertThatThrownBy(
+            () -> multiTenantDriverDelegate.deleteTrigger(connection, TriggerKey.triggerKey("trigger", GROUP_NAME)))
+                .isInstanceOf(SQLException.class)
+                .hasMessageContaining("missing_");
+
+        assertThat(showSearchPath(connection)).isEqualTo(TENANT_FALLBACK_SEARCH_PATH);
+    }
+
+    @Test
+    void testIoExceptionOfDelegateIsPropagatedAndSearchPathRestored() throws Exception {
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(
+            createPostgreSQLDelegate(TABLE_PREFIX, "ioException"));
+        Connection connection = openTrackedConnection(TENANT_FALLBACK_SEARCH_PATH);
+        JobDataMap jobDataMap = new JobDataMap();
+
+        jobDataMap.put("notSerializable", new Object());
+
+        JobDetail jobDetail = JobBuilder.newJob(MultiTenantQuartzTestSupport.NoOpJob.class)
+            .withIdentity("job", GROUP_NAME)
+            .usingJobData(jobDataMap)
+            .storeDurably()
+            .build();
+
+        TenantContext.setCurrentTenantId(TENANT_ID);
+
+        assertThatThrownBy(() -> multiTenantDriverDelegate.insertJobDetail(connection, jobDetail))
+            .isInstanceOf(NotSerializableException.class)
+            .hasMessageContaining("'notSerializable'");
+
+        assertThat(showSearchPath(connection)).isEqualTo(TENANT_FALLBACK_SEARCH_PATH);
+    }
+
+    @Test
+    void testClassNotFoundExceptionOfDelegateIsPropagatedAndSearchPathRestored() throws Exception {
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(
+            createPostgreSQLDelegate(TABLE_PREFIX, "classNotFound"));
+        Connection connection = openTrackedConnection(TENANT_FALLBACK_SEARCH_PATH);
+        JobDetail jobDetail = createJobDetail("job");
+
+        TenantContext.setCurrentTenantId(TENANT_ID);
+
+        multiTenantDriverDelegate.insertJobDetail(connection, jobDetail);
+
+        jdbcTemplate.update(
+            "UPDATE public.qrtz_job_details SET job_class_name = 'com.example.MissingJob' WHERE sched_name = ?",
+            "classNotFound");
+
+        assertThatThrownBy(
+            () -> multiTenantDriverDelegate.selectJobDetail(
+                connection, jobDetail.getKey(), createClassLoadHelper()))
+                    .isInstanceOf(ClassNotFoundException.class)
+                    .hasMessageContaining("com.example.MissingJob");
+
+        assertThat(showSearchPath(connection)).isEqualTo(TENANT_FALLBACK_SEARCH_PATH);
+    }
+
+    @Test
+    void testJobPersistenceExceptionOfDelegateIsPropagatedAndSearchPathRestored() throws Exception {
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(
+            createPostgreSQLDelegate(TABLE_PREFIX, "jobPersistence"));
+        Connection connection = openTrackedConnection(TENANT_FALLBACK_SEARCH_PATH);
+        JobDetail jobDetail = createJobDetail("job");
+        OperableTrigger operableTrigger = (OperableTrigger) createTrigger("trigger", jobDetail);
+
+        TenantContext.setCurrentTenantId(TENANT_ID);
+
+        multiTenantDriverDelegate.insertJobDetail(connection, jobDetail);
+        multiTenantDriverDelegate.insertTrigger(connection, operableTrigger, "WAITING", jobDetail);
+
+        jdbcTemplate.update(
+            "UPDATE public.qrtz_triggers SET trigger_type = 'UNKNOWN' WHERE sched_name = ?", "jobPersistence");
+
+        assertThatThrownBy(() -> multiTenantDriverDelegate.selectTrigger(connection, operableTrigger.getKey()))
+            .isInstanceOf(JobPersistenceException.class)
+            .hasMessageContaining("UNKNOWN");
+
+        assertThat(showSearchPath(connection)).isEqualTo(TENANT_FALLBACK_SEARCH_PATH);
+    }
+
+    @Test
+    void testFailureToRestoreSearchPathIsSuppressedOnDelegateException() throws Exception {
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(
+            createPostgreSQLDelegate(MISSING_TABLE_PREFIX, "restoreFailure"));
+        Connection connection = openTrackedConnection(TENANT_FALLBACK_SEARCH_PATH);
+
+        connection.setAutoCommit(false);
+
+        TenantContext.setCurrentTenantId(TENANT_ID);
+
+        assertThatThrownBy(
+            () -> multiTenantDriverDelegate.deleteTrigger(connection, TriggerKey.triggerKey("trigger", GROUP_NAME)))
+                .isInstanceOf(SQLException.class)
+                .hasMessageContaining("missing_")
+                .satisfies(throwable -> assertThat(throwable.getSuppressed())
+                    .singleElement()
+                    .satisfies(suppressed -> assertThat(suppressed)
+                        .isInstanceOf(SQLException.class)
+                        .hasMessageContaining("current transaction is aborted")));
+
+        connection.rollback();
+    }
+
+    @Test
+    void testFailureToSwitchSearchPathIsPropagatedWithoutCallingDelegate() throws Exception {
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(
+            createPostgreSQLDelegate(TABLE_PREFIX, "switchFailure"));
+        Connection connection = openTrackedConnection(TENANT_FALLBACK_SEARCH_PATH);
+
+        connection.setAutoCommit(false);
+
+        abortTransaction(connection);
+
+        TenantContext.setCurrentTenantId(TENANT_ID);
+
+        assertThatThrownBy(
+            () -> multiTenantDriverDelegate.jobExists(connection, JobKey.jobKey("job", GROUP_NAME)))
+                .isInstanceOf(SQLException.class)
+                .hasMessageContaining("current transaction is aborted")
+                .satisfies(throwable -> assertThat(throwable.getSuppressed()).isEmpty());
+
+        connection.rollback();
+
+        assertThat(showSearchPath(connection)).isEqualTo(TENANT_FALLBACK_SEARCH_PATH);
+    }
+
+    @Test
+    void testInitializeIsForwardedToWrappedDelegate() throws Exception {
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(new PostgreSQLDelegate());
+        Connection connection = openTrackedConnection(TENANT_SCHEMA);
+
+        multiTenantDriverDelegate.initialize(
+            LoggerFactory.getLogger(MultiTenantDriverDelegateIntTest.class), TABLE_PREFIX, "initializeForwarded",
+            "NON_CLUSTERED", createClassLoadHelper(), false, null);
+
+        TenantContext.setCurrentTenantId(TENANT_ID);
+
+        JobDetail jobDetail = createJobDetail("job");
+
+        multiTenantDriverDelegate.insertJobDetail(connection, jobDetail);
+
+        assertThat(multiTenantDriverDelegate.jobExists(connection, jobDetail.getKey())).isTrue();
+        assertThat(
+            jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM public.qrtz_job_details WHERE sched_name = ?", Integer.class,
+                "initializeForwarded")).isOne();
+    }
+
+    @Test
+    void testEnhancedStatementsSettingIsForwardedToWrappedDelegate() throws Exception {
+        PostgreSQLDelegate postgreSQLDelegate = createPostgreSQLDelegate(TABLE_PREFIX, "enhancedStatements");
+
+        MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(postgreSQLDelegate);
+
+        multiTenantDriverDelegate.setUseEnhancedStatements(true);
+
+        assertThat(postgreSQLDelegate.isUsingEnhancedStatements()).isTrue();
+        assertThat(multiTenantDriverDelegate.isUsingEnhancedStatements()).isTrue();
+
+        multiTenantDriverDelegate.setUseEnhancedStatements(false);
+
+        assertThat(postgreSQLDelegate.isUsingEnhancedStatements()).isFalse();
+        assertThat(multiTenantDriverDelegate.isUsingEnhancedStatements()).isFalse();
+    }
+
+    @Test
+    void testEveryDriverDelegateMethodIsDeclaredByMultiTenantDriverDelegate() {
+        List<String> inheritedMethods = new ArrayList<>();
+
+        for (Method interfaceMethod : driverDelegateMethods()) {
+            Method implementationMethod = findImplementationMethod(interfaceMethod);
+
+            Class<?> declaringClass = implementationMethod.getDeclaringClass();
+
+            if (declaringClass != MultiTenantDriverDelegate.class) {
+                inheritedMethods.add(describe(interfaceMethod) + " served by " + declaringClass.getName());
+            }
+        }
+
+        assertThat(inheritedMethods)
+            .as(
+                "Every DriverDelegate method must be overridden by MultiTenantDriverDelegate and forwarded to the " +
+                    "wrapped delegate, otherwise it bypasses the delegate and the search_path switch")
+            .isEmpty();
     }
 
     private Scheduler createScheduler(String schedulerName, boolean clustered) throws Exception {
@@ -270,55 +552,44 @@ class MultiTenantDriverDelegateIntTest {
     private Scheduler createScheduler(String schedulerName, boolean clustered, DataSource schedulerDataSource)
         throws Exception {
 
-        ApplicationProperties applicationProperties = new ApplicationProperties();
-
-        ApplicationProperties.Tenant tenant = applicationProperties.getTenant();
-
-        tenant.setMode(ApplicationProperties.Tenant.Mode.MULTI);
-
-        QuartzProperties quartzProperties = new QuartzProperties();
-
-        Map<String, String> properties = quartzProperties.getProperties();
-
-        properties.put("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
-        properties.put("org.quartz.jobStore.tablePrefix", "QRTZ_");
-        properties.put("org.quartz.jobStore.isClustered", String.valueOf(clustered));
-        properties.put("org.quartz.jobStore.clusterCheckinInterval", "1000");
-        properties.put("org.quartz.scheduler.instanceId", clustered ? "AUTO" : "NON_CLUSTERED");
-        properties.put("org.quartz.threadPool.threadCount", "1");
-
-        MultiTenantQuartzTriggerSchedulerConfiguration multiTenantQuartzTriggerSchedulerConfiguration =
-            new MultiTenantQuartzTriggerSchedulerConfiguration(
-                applicationProperties, new AdaptableJobFactory(), quartzProperties);
-
-        SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
-
-        schedulerFactoryBean.setAutoStartup(false);
-        schedulerFactoryBean.setDataSource(schedulerDataSource);
-        schedulerFactoryBean.setSchedulerName(schedulerName);
-
-        multiTenantQuartzTriggerSchedulerConfiguration.customize(schedulerFactoryBean);
-
-        schedulerFactoryBean.afterPropertiesSet();
-
-        schedulerFactoryBeans.add(schedulerFactoryBean);
-
-        Scheduler scheduler = schedulerFactoryBean.getScheduler();
-
-        assertThat(scheduler.getMetaData()
-            .getJobStoreClass()).isEqualTo(MultiTenantLocalDataSourceJobStore.class);
-
-        return scheduler;
+        return MultiTenantQuartzTestSupport.createScheduler(
+            schedulerName, clustered, schedulerDataSource, schedulerFactoryBeans);
     }
 
-    private static <T> T callAsTenant(Callable<T> callable) throws Exception {
-        TenantContext.setCurrentTenantId(TENANT_ID);
+    private Connection openTrackedConnection(String searchPath) throws SQLException {
+        Connection connection = openConnection(databaseDataSource, searchPath);
 
-        try {
-            return callable.call();
-        } finally {
-            TenantContext.resetCurrentTenantId();
+        connections.add(connection);
+
+        return connection;
+    }
+
+    private static void abortTransaction(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("SELECT 1 / 0");
+        } catch (SQLException sqlException) {
+            assertThat(sqlException.getMessage()).contains("division by zero");
         }
+    }
+
+    private static PostgreSQLDelegate createPostgreSQLDelegate(String tablePrefix, String schedulerName)
+        throws NoSuchDelegateException {
+
+        PostgreSQLDelegate postgreSQLDelegate = new PostgreSQLDelegate();
+
+        postgreSQLDelegate.initialize(
+            LoggerFactory.getLogger(MultiTenantDriverDelegateIntTest.class), tablePrefix, schedulerName,
+            "NON_CLUSTERED", createClassLoadHelper(), false, null);
+
+        return postgreSQLDelegate;
+    }
+
+    private static CascadingClassLoadHelper createClassLoadHelper() {
+        CascadingClassLoadHelper cascadingClassLoadHelper = new CascadingClassLoadHelper();
+
+        cascadingClassLoadHelper.initialize();
+
+        return cascadingClassLoadHelper;
     }
 
     private static void callScheduler(SchedulerCall schedulerCall) {
@@ -327,36 +598,6 @@ class MultiTenantDriverDelegateIntTest {
         } catch (SchedulerException schedulerException) {
             throw new IllegalStateException(schedulerException);
         }
-    }
-
-    private static String showSearchPath(JdbcTemplate tenantJdbcTemplate) {
-        return tenantJdbcTemplate.queryForObject("SHOW search_path", String.class);
-    }
-
-    private static boolean isPublicFallbackProbeResolvable(JdbcTemplate tenantJdbcTemplate) {
-        return Boolean.TRUE.equals(
-            tenantJdbcTemplate.queryForObject(
-                "SELECT to_regtype('public_fallback_probe') IS NOT NULL", Boolean.class));
-    }
-
-    private static JobDetail createJobDetail(String jobName) {
-        return JobBuilder.newJob(NoOpJob.class)
-            .withIdentity(jobName, GROUP_NAME)
-            .storeDurably()
-            .build();
-    }
-
-    private static Trigger createTrigger(String triggerName, JobDetail jobDetail) {
-        Instant now = Instant.now();
-
-        Date startTime = Date.from(now.plus(Duration.ofDays(1)));
-
-        return TriggerBuilder.newTrigger()
-            .withIdentity(triggerName, GROUP_NAME)
-            .forJob(jobDetail)
-            .startAt(startTime)
-            .withSchedule(SimpleScheduleBuilder.repeatHourlyForever())
-            .build();
     }
 
     private static int countFiredTriggers(String schedulerName) {
@@ -384,57 +625,33 @@ class MultiTenantDriverDelegateIntTest {
             "job", GROUP_NAME, false, false);
     }
 
-    /**
-     * A no-op job; the triggers in these tests start a day from now, so it never runs.
-     */
-    public static class NoOpJob implements Job {
+    private static List<Method> driverDelegateMethods() {
+        return Arrays.stream(DriverDelegate.class.getMethods())
+            .filter(method -> !Modifier.isStatic(method.getModifiers()) && !method.isSynthetic())
+            .sorted(Comparator.comparing(MultiTenantDriverDelegateIntTest::describe))
+            .toList();
+    }
 
-        @Override
-        public void execute(JobExecutionContext context) {
-            JobKey jobKey = context.getJobDetail()
-                .getKey();
-
-            throw new IllegalStateException("Job " + jobKey + " is not expected to run");
+    private static Method findImplementationMethod(Method interfaceMethod) {
+        try {
+            return MultiTenantDriverDelegate.class.getMethod(
+                interfaceMethod.getName(), interfaceMethod.getParameterTypes());
+        } catch (NoSuchMethodException noSuchMethodException) {
+            throw new IllegalStateException(noSuchMethodException);
         }
+    }
+
+    private static String describe(Method method) {
+        String parameterTypeNames = Arrays.stream(method.getParameterTypes())
+            .map(Class::getSimpleName)
+            .collect(Collectors.joining(", "));
+
+        return method.getName() + "(" + parameterTypeNames + ")";
     }
 
     @FunctionalInterface
     private interface SchedulerCall {
 
         void call() throws SchedulerException;
-    }
-
-    /**
-     * Hands out connections the way the multi-tenant application data source does: {@link BaseDataSource} sets the
-     * search_path to the current tenant's schema followed by the {@code public} fallback.
-     */
-    private static final class TenantFallbackDataSource extends BaseDataSource {
-
-        private TenantFallbackDataSource(DataSource dataSource) {
-            super(dataSource);
-        }
-    }
-
-    /**
-     * Hands out connections whose search_path is the current tenant's schema only, without the {@code public} fallback,
-     * so that only statements run with the search_path switched to {@code public} can reach the Quartz tables.
-     */
-    private static final class TenantSearchPathDataSource extends DelegatingDataSource {
-
-        private TenantSearchPathDataSource(DataSource targetDataSource) {
-            super(targetDataSource);
-        }
-
-        @Override
-        @SuppressFBWarnings("SQL_INJECTION_JDBC")
-        public Connection getConnection() throws SQLException {
-            Connection connection = super.getConnection();
-
-            try (Statement statement = connection.createStatement()) {
-                statement.execute("SET search_path TO " + TenantContext.getCurrentDatabaseSchema());
-            }
-
-            return connection;
-        }
     }
 }
