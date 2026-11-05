@@ -167,6 +167,11 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             long branchesLeft = counterService.decrement(taskExecutionParentId);
 
             if (branchesLeft == 0) {
+                long jobId = Objects.requireNonNull(forkJoinTaskExecution.getJobId());
+
+                forkJoinTaskExecution.setOutput(
+                    taskFileStorage.storeTaskExecutionOutput(
+                        jobId, taskExecutionParentId, getBranchOutputs(taskExecutionParentId, branchesWorkflowTasks)));
                 forkJoinTaskExecution.setEndDate(Instant.now());
 
                 forkJoinTaskExecution = taskExecutionService.update(forkJoinTaskExecution);
@@ -174,5 +179,31 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 taskCompletionHandler.handle(forkJoinTaskExecution);
             }
         }
+    }
+
+    private Map<String, Object> getBranchOutputs(
+        long forkJoinTaskExecutionId, List<List<WorkflowTask>> branchesWorkflowTasks) {
+
+        Map<String, Object> branchOutputs = new HashMap<>();
+
+        for (TaskExecution branchTaskExecution : taskExecutionService.getParentTaskExecutions(
+            forkJoinTaskExecutionId)) {
+
+            Integer branch = MapUtils.getInteger(branchTaskExecution.getParameters(), BRANCH);
+
+            if (branch == null || branchTaskExecution.getStatus() != TaskExecution.Status.COMPLETED ||
+                branchTaskExecution.getTaskNumber() != branchesWorkflowTasks.get(branch)
+                    .size()) {
+
+                continue;
+            }
+
+            branchOutputs.put(
+                ForkJoinTaskDispatcherConstants.BRANCH_OUTPUT_KEY_PREFIX + branch,
+                branchTaskExecution.getOutput() == null
+                    ? null : taskFileStorage.readTaskExecutionOutput(branchTaskExecution.getOutput()));
+        }
+
+        return branchOutputs;
     }
 }

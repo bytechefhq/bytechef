@@ -12,6 +12,7 @@ import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository.GitWorkflows;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,17 +30,22 @@ public class ProjectGitService {
         return gitWorkflowRepository.getRemoteBranches();
     }
 
-    public GitWorkflows getWorkflows(String url, String branch, String username, String password) {
-        GitWorkflowRepository gitWorkflowRepository = new GitWorkflowRepository(url, branch, username, password);
+    public GitWorkflows getWorkflows(
+        String url, String branch, String username, String password, List<String> contentDirectories) {
+
+        GitWorkflowRepository gitWorkflowRepository = new GitWorkflowRepository(
+            url, branch, username, password, contentDirectories);
 
         return gitWorkflowRepository.findAllWithGitInfo();
     }
 
     public String save(
-        List<Workflow> workflows, String commitMessage, String url, String branch, String username, String password) {
+        List<Workflow> workflows, Map<String, byte[]> contentFiles, List<String> contentDirectories,
+        String commitMessage, String url, String branch, String username, String password) {
 
-        GitWorkflowRepository gitWorkflowRepository = new GitWorkflowRepository(url, branch, username, password);
+        GitWorkflowRepository gitWorkflowRepository = new GitWorkflowRepository(
+            url, branch, username, password, contentDirectories);
 
-        return gitWorkflowRepository.save(workflows, commitMessage);
+        return gitWorkflowRepository.save(workflows, contentFiles, commitMessage);
     }
 }

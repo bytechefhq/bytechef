@@ -16,11 +16,16 @@
 
 package com.bytechef.component.telegram.trigger;
 
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.telegram.constant.TelegramConstants.CHAT;
+import static com.bytechef.component.telegram.constant.TelegramConstants.ID;
+import static com.bytechef.component.telegram.constant.TelegramConstants.MESSAGE;
 import static com.bytechef.component.telegram.constant.TelegramConstants.MESSAGE_OUTPUT_PROPERTIES;
+import static com.bytechef.component.telegram.constant.TelegramConstants.TEXT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
@@ -50,8 +55,12 @@ public class TelegramNewMessageTrigger {
                 object()
                     .properties(
                         integer("update_id"),
-                        object("message")
+                        object(MESSAGE)
                             .properties(MESSAGE_OUTPUT_PROPERTIES))))
+        .agentRequest(
+            agentRequest()
+                .conversationId(MESSAGE + "." + CHAT + "." + ID)
+                .message(MESSAGE + "." + TEXT))
         .webhookEnable(TelegramNewMessageTrigger::webhookEnable)
         .webhookDisable(TelegramNewMessageTrigger::webhookDisable)
         .webhookRequest(TelegramNewMessageTrigger::webhookRequest)

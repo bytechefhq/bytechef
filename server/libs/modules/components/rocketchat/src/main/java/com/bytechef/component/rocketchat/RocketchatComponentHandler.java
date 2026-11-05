@@ -16,8 +16,10 @@
 
 package com.bytechef.component.rocketchat;
 
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.ROCKETCHAT;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -36,7 +38,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class RocketchatComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("rocketchat")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(ROCKETCHAT)
         .title("Rocket.Chat")
         .description(
             "Rocket.Chat is a communication platform that enables team collaboration through messaging, " +
@@ -56,6 +58,12 @@ public class RocketchatComponentHandler implements ComponentHandler {
             tool(RocketchatSendDirectMessageAction.ACTION_DEFINITION),
             tool(RocketchatSendChannelMessageAction.ACTION_DEFINITION),
             tool(RocketchatCreateChannelAction.ACTION_DEFINITION))
+        .agentChannels(
+            agentChannel(
+                ROCKETCHAT, RocketchatNewMessageTrigger.TRIGGER_DEFINITION,
+                RocketchatSendChannelMessageAction.ACTION_DEFINITION)
+                    .title("Rocket.Chat")
+                    .approvalChannel(ROCKETCHAT))
         .version(1);
 
     @Override

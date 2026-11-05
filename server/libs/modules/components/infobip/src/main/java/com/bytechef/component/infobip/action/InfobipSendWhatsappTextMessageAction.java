@@ -17,10 +17,12 @@
 package com.bytechef.component.infobip.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
+import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
 import static com.bytechef.component.infobip.constant.InfobipConstants.WHATSAPP_MESSAGE_OUTPUT_PROPERTY;
@@ -61,6 +63,11 @@ public class InfobipSendWhatsappTextMessageAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .output(outputSchema(WHATSAPP_MESSAGE_OUTPUT_PROPERTY))
+        .agentReply(
+            agentReply()
+                .conversationId(TO)
+                .message(TEXT)
+                .channelParameter(NUMBER, FROM))
         .help("", "https://docs.bytechef.io/reference/components/infobip_v1#send-whatsapp-text-message")
         .perform(InfobipSendWhatsappTextMessageAction::perform);
 

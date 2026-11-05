@@ -8,9 +8,36 @@ import {
     getResumeStreamRequest,
     hasLastAssistantMessageText,
     setLastAssistantMessageContent,
+    setLastAssistantMessageError,
 } from '../assistant-message-utils';
 
 describe('assistant-message-utils', () => {
+    describe('setLastAssistantMessageError', () => {
+        const errorStatus = {error: 'Boom', reason: 'error', type: 'incomplete'};
+
+        it('marks the last assistant message as failed and keeps its content', () => {
+            const messages: ThreadMessageLike[] = [
+                {content: 'First', role: 'assistant'},
+                {content: 'Hi', role: 'user'},
+                {content: 'Partial', role: 'assistant'},
+            ];
+
+            const result = setLastAssistantMessageError(messages, 'Boom');
+
+            expect(result[0].status).toBeUndefined();
+            expect(result[2]).toEqual({content: 'Partial', role: 'assistant', status: errorStatus});
+        });
+
+        it('adds an empty failed assistant message when there is none', () => {
+            const result = setLastAssistantMessageError([{content: 'Hi', role: 'user'}], 'Boom');
+
+            expect(result).toEqual([
+                {content: 'Hi', role: 'user'},
+                {content: '', role: 'assistant', status: errorStatus},
+            ]);
+        });
+    });
+
     describe('appendToLastAssistantMessage', () => {
         it('appends content to the last assistant message', () => {
             const messages: ThreadMessageLike[] = [

@@ -26,7 +26,8 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public interface ComponentDefinition
-    extends ClusterElementComponentDefinition, UnifiedApiComponentDefinition, WorkflowComponentDefinition {
+    extends AgentChannelComponentDefinition, ClusterElementComponentDefinition, UnifiedApiComponentDefinition,
+    WorkflowComponentDefinition {
 
     int VERSION_1 = 1;
 

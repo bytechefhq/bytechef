@@ -17,25 +17,37 @@
 package com.bytechef.platform.component.index;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.ComponentDsl.unifiedApi;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.AgentChannelDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAgentChannelDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableAgentReplyDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiablePropertyGroup;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
+import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoaderKind;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -45,9 +57,12 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,7 +197,119 @@ public record ComponentIndex(List<Entry> entries) {
             componentDefinition.unifiedApi(unifiedApi(unifiedApiCategory));
         }
 
-        return componentDefinition;
+        List<AgentChannelSummary> agentChannels = entry.agentChannels();
+
+        if (!agentChannels.isEmpty()) {
+            componentDefinition.agentChannels(
+                agentChannels.stream()
+                    .map(agentChannelSummary -> toStubAgentChannelDefinition(componentDefinition, agentChannelSummary))
+                    .toList());
+        }
+
+        List<ClusterElementTypeSummary> clusterElementTypes = entry.clusterElementTypes();
+
+        if (clusterElementTypes.isEmpty()) {
+            return componentDefinition;
+        }
+
+        return new StubClusterRootComponentDefinition(
+            componentDefinition,
+            clusterElementTypes.stream()
+                .map(
+                    clusterElementType -> new ClusterElementType(
+                        clusterElementType.name(), clusterElementType.key(), clusterElementType.label(),
+                        clusterElementType.multipleElements(), clusterElementType.required()))
+                .toList());
+    }
+
+    private static AgentChannelDefinition toStubAgentChannelDefinition(
+        ModifiableComponentDefinition componentDefinition, AgentChannelSummary agentChannelSummary) {
+
+        TriggerDefinition triggerDefinition = componentDefinition.getTriggers()
+            .stream()
+            .filter(candidate -> Objects.equals(candidate.getName(), agentChannelSummary.triggerName()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                "Index entry '%s' agent channel '%s' references unknown trigger '%s'".formatted(
+                    componentDefinition.getName(), agentChannelSummary.name(), agentChannelSummary.triggerName())));
+
+        if (triggerDefinition instanceof ModifiableTriggerDefinition modifiableTrigger) {
+            modifiableTrigger.agentRequest(
+                agentRequest()
+                    .conversationId(agentChannelSummary.conversationIdPath())
+                    .message(agentChannelSummary.messagePath())
+                    .attachments(agentChannelSummary.attachmentsPath()));
+
+            Map<String, String> replyChannelParameters = agentChannelSummary.replyChannelParameters();
+
+            if (modifiableTrigger.getProperties()
+                .isEmpty() && !replyChannelParameters.isEmpty()) {
+
+                modifiableTrigger.properties(
+                    replyChannelParameters.keySet()
+                        .stream()
+                        .map(ComponentDsl::string)
+                        .toArray(Property[]::new));
+            }
+        }
+
+        ModifiableAgentChannelDefinition agentChannelDefinition;
+
+        if (agentChannelSummary.replyActionName() == null) {
+            agentChannelDefinition = agentChannel(agentChannelSummary.name(), triggerDefinition);
+        } else {
+            ActionDefinition actionDefinition = componentDefinition.getActions()
+                .stream()
+                .filter(candidate -> Objects.equals(candidate.getName(), agentChannelSummary.replyActionName()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                    "Index entry '%s' agent channel '%s' references unknown action '%s'".formatted(
+                        componentDefinition.getName(), agentChannelSummary.name(),
+                        agentChannelSummary.replyActionName())));
+
+            if (actionDefinition instanceof ModifiableActionDefinition modifiableAction) {
+                if (modifiableAction.getProperties()
+                    .isEmpty()) {
+
+                    modifiableAction.properties(
+                        Stream.of(
+                            Stream.of(
+                                agentChannelSummary.replyMessageProperty(),
+                                agentChannelSummary.replyConversationIdProperty(),
+                                agentChannelSummary.replyAttachmentsProperty()),
+                            agentChannelSummary.replyChannelParameters()
+                                .values()
+                                .stream(),
+                            agentChannelSummary.replyFixedParameters()
+                                .keySet()
+                                .stream())
+                            .flatMap(Function.identity())
+                            .filter(Objects::nonNull)
+                            .map(propertyName -> string(propertyName.split("\\.")[0]))
+                            .distinct()
+                            .toList());
+                }
+
+                ModifiableAgentReplyDefinition agentReplyDefinition = agentReply()
+                    .conversationId(agentChannelSummary.replyConversationIdProperty())
+                    .message(agentChannelSummary.replyMessageProperty())
+                    .attachments(agentChannelSummary.replyAttachmentsProperty());
+
+                agentChannelSummary.replyChannelParameters()
+                    .forEach(agentReplyDefinition::channelParameter);
+                agentChannelSummary.replyFixedParameters()
+                    .forEach(agentReplyDefinition::fixedParameter);
+
+                modifiableAction.agentReply(agentReplyDefinition);
+            }
+
+            agentChannelDefinition = agentChannel(agentChannelSummary.name(), triggerDefinition, actionDefinition);
+        }
+
+        return agentChannelDefinition
+            .title(agentChannelSummary.title())
+            .description(agentChannelSummary.description())
+            .approvalChannel(agentChannelSummary.approvalChannelName());
     }
 
     private static ModifiableActionDefinition toStubActionDefinition(ItemSummary itemSummary) {
@@ -244,7 +371,9 @@ public record ComponentIndex(List<Entry> entries) {
         String name, int version, @Nullable String title, @Nullable String description, @Nullable String icon,
         List<CategorySummary> componentCategories, List<String> tags, @Nullable ConnectionSummary connection,
         List<ItemSummary> actions, List<TriggerSummary> triggers, List<ClusterElementSummary> clusterElements,
-        List<String> inputs, @Nullable UnifiedApiCategory unifiedApiCategory, String providerClassName,
+        List<ClusterElementTypeSummary> clusterElementTypes, List<AgentChannelSummary> agentChannels,
+        List<String> inputs,
+        @Nullable UnifiedApiCategory unifiedApiCategory, String providerClassName,
         ComponentHandlerLoaderKind loaderKind) {
 
         public Entry {
@@ -257,6 +386,8 @@ public record ComponentIndex(List<Entry> entries) {
             actions = copyOrEmpty(actions);
             triggers = copyOrEmpty(triggers);
             clusterElements = copyOrEmpty(clusterElements);
+            clusterElementTypes = copyOrEmpty(clusterElementTypes);
+            agentChannels = copyOrEmpty(agentChannels);
             inputs = copyOrEmpty(inputs);
         }
 
@@ -281,5 +412,37 @@ public record ComponentIndex(List<Entry> entries) {
     public record ClusterElementSummary(
         String name, @Nullable String title, @Nullable String description, String typeName, String typeKey,
         String typeLabel, boolean typeMultipleElements, boolean typeRequired) {
+    }
+
+    public record ClusterElementTypeSummary(
+        String name, String key, String label, boolean multipleElements, boolean required) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record AgentChannelSummary(
+        String name, @Nullable String title, @Nullable String description, String triggerName,
+        @Nullable String replyActionName, @Nullable String approvalChannelName, String conversationIdPath,
+        String messagePath, @Nullable String attachmentsPath, @Nullable String replyMessageProperty,
+        @Nullable String replyConversationIdProperty, @Nullable String replyAttachmentsProperty,
+        Map<String, String> replyChannelParameters, Map<String, Object> replyFixedParameters) {
+    }
+
+    private static final class StubClusterRootComponentDefinition extends AbstractComponentDefinitionWrapper
+        implements ClusterRootComponentDefinition {
+
+        private final List<ClusterElementType> clusterElementTypes;
+
+        private StubClusterRootComponentDefinition(
+            ModifiableComponentDefinition componentDefinition, List<ClusterElementType> clusterElementTypes) {
+
+            super(componentDefinition);
+
+            this.clusterElementTypes = List.copyOf(clusterElementTypes);
+        }
+
+        @Override
+        public List<ClusterElementType> getClusterElementTypes() {
+            return clusterElementTypes;
+        }
     }
 }
