@@ -18,7 +18,6 @@ bytechef:
       workspace:
         basedir: ${user.home}/bytechef/data/ai-agent-workspaces
     brave:
-      base-url: https://api.search.brave.com/res/v1
       enabled: false
   approval:
     signed-token:
