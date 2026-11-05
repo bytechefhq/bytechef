@@ -55,7 +55,6 @@ import {
     BranchCaseType,
     ComponentPropertiesType,
     DataPillType,
-    PropertyAllType,
     TabNameType,
     UpdateWorkflowMutationType,
     WorkflowNodeType,
@@ -98,6 +97,7 @@ import resolveNodeConnectionFields from './resolveNodeConnectionFields';
 import resolveShowOutputTab from './resolveShowOutputTab';
 import resolveSyncedOperationName from './resolveSyncedOperationName';
 import useDisplayConditionsRefreshAfterOperationChange from './useDisplayConditionsRefreshAfterOperationChange';
+import useNodeOperationProperties from './useNodeOperationProperties';
 import useRefreshAfterLookupFailure from './useRefreshAfterLookupFailure';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
@@ -132,7 +132,6 @@ export default function useWorkflowNodeDetailsPanel({
 }: UseWorkflowNodeDetailsPanelProps) {
     const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
     const [currentOperationName, setCurrentOperationName] = useState('');
-    const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
     const [currentActionDefinition, setCurrentActionDefinition] = useState<
         ActionDefinition | ClusterElementDefinition | TriggerDefinition | undefined
     >();
@@ -505,6 +504,11 @@ export default function useWorkflowNodeDetailsPanel({
         currentActionDefinition,
         currentClusterElementDefinition,
     ]);
+
+    const currentOperationProperties = useNodeOperationProperties({
+        currentNode,
+        operationDefinition: currentOperationDefinition,
+    });
 
     const currentNodeIndex = useMemo(
         () => currentNode && nodes?.findIndex((node) => node.data.name === currentNode?.workflowNodeName),
@@ -1144,10 +1148,6 @@ export default function useWorkflowNodeDetailsPanel({
 
     // Set current node name
     useEffect(() => {
-        if (currentOperationDefinition?.properties) {
-            setCurrentOperationProperties(currentOperationDefinition?.properties);
-        }
-
         if (currentNode?.name) {
             setCurrentNodeName(currentNode.name);
 
@@ -1159,7 +1159,7 @@ export default function useWorkflowNodeDetailsPanel({
         } else {
             setCurrentNodeName(undefined);
         }
-    }, [currentNode?.name, currentOperationDefinition?.properties, isClusterElement]);
+    }, [currentNode?.name, isClusterElement]);
 
     // Refetch missing required properties once a save is confirmed (workflow.version bumps only on success,
     // not the optimistic update). resolveMissingRequiredPropertiesRefetch replicates the queries' `enabled`
@@ -1207,13 +1207,6 @@ export default function useWorkflowNodeDetailsPanel({
 
         lastErrorsDataUpdatedAtRef.current = errorsDataUpdatedAt;
     }, [errorsDataUpdatedAt]);
-
-    // Set currentOperationProperties depending if the current node is a trigger or an action
-    useEffect(() => {
-        if (currentOperationDefinition?.properties) {
-            setCurrentOperationProperties(currentOperationDefinition?.properties);
-        }
-    }, [currentOperationDefinition?.properties]);
 
     // Set data pills only when the calculated data pills change
     useEffect(() => {
