@@ -19,8 +19,10 @@ import java.util.StringJoiner;
 import java.util.Objects;
 import java.util.Map;
 import java.util.HashMap;
+import com.bytechef.cli.client.embeddedconfiguration.model.ConnectionConfigModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.CredentialStatusModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.IntegrationInstanceWorkflowModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.IntegrationWorkflowModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.McpIntegrationInstanceToolModel;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -42,6 +44,10 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   IntegrationInstanceModel.JSON_PROPERTY_CONNECTION_ID,
   IntegrationInstanceModel.JSON_PROPERTY_CREDENTIAL_STATUS,
   IntegrationInstanceModel.JSON_PROPERTY_ENABLED,
+  IntegrationInstanceModel.JSON_PROPERTY_AVAILABLE_WORKFLOWS,
+  IntegrationInstanceModel.JSON_PROPERTY_CONNECTION_CONFIG,
+  IntegrationInstanceModel.JSON_PROPERTY_INTEGRATION_INSTANCE_CONFIGURATION_ID,
+  IntegrationInstanceModel.JSON_PROPERTY_INTEGRATION_VERSION,
   IntegrationInstanceModel.JSON_PROPERTY_MCP_TOOLS,
   IntegrationInstanceModel.JSON_PROPERTY_MCP_WORKFLOWS,
   IntegrationInstanceModel.JSON_PROPERTY_WORKFLOWS
@@ -64,6 +70,22 @@ public class IntegrationInstanceModel {
   @jakarta.annotation.Nonnull
   private Boolean enabled;
 
+  public static final String JSON_PROPERTY_AVAILABLE_WORKFLOWS = "availableWorkflows";
+  @jakarta.annotation.Nullable
+  private List<IntegrationWorkflowModel> availableWorkflows = new ArrayList<>();
+
+  public static final String JSON_PROPERTY_CONNECTION_CONFIG = "connectionConfig";
+  @jakarta.annotation.Nullable
+  private ConnectionConfigModel connectionConfig;
+
+  public static final String JSON_PROPERTY_INTEGRATION_INSTANCE_CONFIGURATION_ID = "integrationInstanceConfigurationId";
+  @jakarta.annotation.Nullable
+  private Long integrationInstanceConfigurationId;
+
+  public static final String JSON_PROPERTY_INTEGRATION_VERSION = "integrationVersion";
+  @jakarta.annotation.Nullable
+  private Integer integrationVersion;
+
   public static final String JSON_PROPERTY_MCP_TOOLS = "mcpTools";
   @jakarta.annotation.Nullable
   private List<McpIntegrationInstanceToolModel> mcpTools = new ArrayList<>();
@@ -82,11 +104,17 @@ public class IntegrationInstanceModel {
   @JsonCreator
   public IntegrationInstanceModel(
     @JsonProperty(JSON_PROPERTY_CONNECTION_ID) Long connectionId, 
+    @JsonProperty(JSON_PROPERTY_AVAILABLE_WORKFLOWS) List<IntegrationWorkflowModel> availableWorkflows, 
+    @JsonProperty(JSON_PROPERTY_INTEGRATION_INSTANCE_CONFIGURATION_ID) Long integrationInstanceConfigurationId, 
+    @JsonProperty(JSON_PROPERTY_INTEGRATION_VERSION) Integer integrationVersion, 
     @JsonProperty(JSON_PROPERTY_MCP_TOOLS) List<McpIntegrationInstanceToolModel> mcpTools, 
     @JsonProperty(JSON_PROPERTY_MCP_WORKFLOWS) List<IntegrationInstanceWorkflowModel> mcpWorkflows
   ) {
   this();
     this.connectionId = connectionId;
+    this.availableWorkflows = availableWorkflows;
+    this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
+    this.integrationVersion = integrationVersion;
     this.mcpTools = mcpTools;
     this.mcpWorkflows = mcpWorkflows;
   }
@@ -178,6 +206,72 @@ public class IntegrationInstanceModel {
 
 
   /**
+   * The workflows of the integration instance configuration this instance belongs to.
+   * @return availableWorkflows
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_AVAILABLE_WORKFLOWS, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public List<IntegrationWorkflowModel> getAvailableWorkflows() {
+    return availableWorkflows;
+  }
+
+
+
+
+  public IntegrationInstanceModel connectionConfig(@jakarta.annotation.Nullable ConnectionConfigModel connectionConfig) {
+    this.connectionConfig = connectionConfig;
+    return this;
+  }
+
+  /**
+   * Get connectionConfig
+   * @return connectionConfig
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_CONNECTION_CONFIG, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public ConnectionConfigModel getConnectionConfig() {
+    return connectionConfig;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_CONNECTION_CONFIG, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setConnectionConfig(@jakarta.annotation.Nullable ConnectionConfigModel connectionConfig) {
+    this.connectionConfig = connectionConfig;
+  }
+
+
+  /**
+   * The id of the integration instance configuration this instance belongs to.
+   * @return integrationInstanceConfigurationId
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_INTEGRATION_INSTANCE_CONFIGURATION_ID, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public Long getIntegrationInstanceConfigurationId() {
+    return integrationInstanceConfigurationId;
+  }
+
+
+
+
+  /**
+   * The integration version of the configuration this instance belongs to.
+   * @return integrationVersion
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_INTEGRATION_VERSION, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public Integer getIntegrationVersion() {
+    return integrationVersion;
+  }
+
+
+
+
+  /**
    * The array of MCP tools for this integration instance.
    * @return mcpTools
    */
@@ -253,6 +347,10 @@ public class IntegrationInstanceModel {
         Objects.equals(this.connectionId, integrationInstance.connectionId) &&
         Objects.equals(this.credentialStatus, integrationInstance.credentialStatus) &&
         Objects.equals(this.enabled, integrationInstance.enabled) &&
+        Objects.equals(this.availableWorkflows, integrationInstance.availableWorkflows) &&
+        Objects.equals(this.connectionConfig, integrationInstance.connectionConfig) &&
+        Objects.equals(this.integrationInstanceConfigurationId, integrationInstance.integrationInstanceConfigurationId) &&
+        Objects.equals(this.integrationVersion, integrationInstance.integrationVersion) &&
         Objects.equals(this.mcpTools, integrationInstance.mcpTools) &&
         Objects.equals(this.mcpWorkflows, integrationInstance.mcpWorkflows) &&
         Objects.equals(this.workflows, integrationInstance.workflows);
@@ -260,7 +358,7 @@ public class IntegrationInstanceModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, connectionId, credentialStatus, enabled, mcpTools, mcpWorkflows, workflows);
+    return Objects.hash(id, connectionId, credentialStatus, enabled, availableWorkflows, connectionConfig, integrationInstanceConfigurationId, integrationVersion, mcpTools, mcpWorkflows, workflows);
   }
 
   @Override
@@ -271,6 +369,10 @@ public class IntegrationInstanceModel {
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    availableWorkflows: ").append(toIndentedString(availableWorkflows)).append("\n");
+    sb.append("    connectionConfig: ").append(toIndentedString(connectionConfig)).append("\n");
+    sb.append("    integrationInstanceConfigurationId: ").append(toIndentedString(integrationInstanceConfigurationId)).append("\n");
+    sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    mcpTools: ").append(toIndentedString(mcpTools)).append("\n");
     sb.append("    mcpWorkflows: ").append(toIndentedString(mcpWorkflows)).append("\n");
     sb.append("    workflows: ").append(toIndentedString(workflows)).append("\n");
@@ -336,6 +438,31 @@ public class IntegrationInstanceModel {
     // add `enabled` to the URL query string
     if (getEnabled() != null) {
       joiner.add(String.format(java.util.Locale.ROOT, "%senabled%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getEnabled()))));
+    }
+
+    // add `availableWorkflows` to the URL query string
+    if (getAvailableWorkflows() != null) {
+      for (int i = 0; i < getAvailableWorkflows().size(); i++) {
+        if (getAvailableWorkflows().get(i) != null) {
+          joiner.add(getAvailableWorkflows().get(i).toUrlQueryString(String.format(java.util.Locale.ROOT, "%savailableWorkflows%s%s", prefix, suffix,
+          "".equals(suffix) ? "" : String.format(java.util.Locale.ROOT, "%s%d%s", containerPrefix, i, containerSuffix))));
+        }
+      }
+    }
+
+    // add `connectionConfig` to the URL query string
+    if (getConnectionConfig() != null) {
+      joiner.add(getConnectionConfig().toUrlQueryString(prefix + "connectionConfig" + suffix));
+    }
+
+    // add `integrationInstanceConfigurationId` to the URL query string
+    if (getIntegrationInstanceConfigurationId() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%sintegrationInstanceConfigurationId%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getIntegrationInstanceConfigurationId()))));
+    }
+
+    // add `integrationVersion` to the URL query string
+    if (getIntegrationVersion() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%sintegrationVersion%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getIntegrationVersion()))));
     }
 
     // add `mcpTools` to the URL query string
