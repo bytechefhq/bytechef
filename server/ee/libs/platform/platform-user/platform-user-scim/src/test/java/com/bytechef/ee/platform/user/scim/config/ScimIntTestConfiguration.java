@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.config;
 
+import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
@@ -18,7 +19,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
@@ -40,10 +40,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     },
     excludeFilters = @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class))
 @EnableAutoConfiguration
-@EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
-    AuditingJdbcConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
+    AuditingJdbcConfiguration.class, CacheConfiguration.class, LiquibaseConfiguration.class,
+    PostgreSQLContainerConfiguration.class
 })
 @Configuration
 public class ScimIntTestConfiguration extends AbstractJdbcConfiguration {
