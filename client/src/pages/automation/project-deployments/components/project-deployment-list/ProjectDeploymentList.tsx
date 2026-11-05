@@ -14,7 +14,6 @@ interface ProjectDeploymentListProps {
     newlyCreatedDeploymentId?: number;
     project: Project;
     projectDeployments: ProjectDeployment[];
-    showEnvironment?: boolean;
     showTags?: boolean;
     tags: Tag[];
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
@@ -27,7 +26,6 @@ const ProjectDeploymentList = ({
     newlyCreatedDeploymentId,
     project,
     projectDeployments,
-    showEnvironment,
     showTags,
     tags,
     taskDispatcherDefinitions,
@@ -85,7 +83,6 @@ const ProjectDeploymentList = ({
                             key={projectDeployment.id}
                             projectDeployment={projectDeployment}
                             remainingTags={tags?.filter((tag) => !projectTagIds?.includes(tag.id))}
-                            showEnvironment={showEnvironment}
                             showTags={showTags}
                         />
 

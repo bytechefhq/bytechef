@@ -168,6 +168,12 @@ describe('ProjectDeploymentListItem', () => {
         expect(screen.queryByText('Open Project')).not.toBeInTheDocument();
     });
 
+    it('does not show an environment badge for a development deployment', () => {
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        expect(screen.queryByText('DEV')).not.toBeInTheDocument();
+    });
+
     it('shows the tags by default', () => {
         render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
 

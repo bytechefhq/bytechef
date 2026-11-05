@@ -100,7 +100,6 @@ const ProjectDeploymentsSheet = ({
                         expandedProjectDeploymentId={expandedProjectDeploymentId}
                         onProjectDeploymentSaved={setExpandedProjectDeploymentId}
                         project={project}
-                        showEnvironment
                     />
                 </div>
 
