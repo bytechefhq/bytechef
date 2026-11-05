@@ -42,6 +42,12 @@ describe('WorkflowToolRowLabel', () => {
         expect(screen.getByTestId('trigger-and-components-row')).toHaveTextContent('webhook,slack');
     });
 
+    it('marks the workflow name with the workflow icon', () => {
+        const {container} = renderLabel();
+
+        expect(container.querySelector('svg.lucide-workflow')).toBeInTheDocument();
+    });
+
     it('keeps the name inert, hides the link and the components until the workflow is known', () => {
         renderLabel({canOpenExecutions: false, subLabel: <span>Skill: Qualify lead</span>});
 

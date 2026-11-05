@@ -151,6 +151,8 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         renderItem();
 
+        expect(document.querySelector('svg.lucide-settings-2')).toBeInTheDocument();
+
         await user.click(await screen.findByRole('button', {name: 'Mailer'}));
 
         const state = useAutomationWorkflowExecutionsSheetStore.getState();
@@ -261,16 +263,10 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         expect(screen.queryByText('Staging')).not.toBeInTheDocument();
     });
 
-    it('shows the connected user count', () => {
+    it('does not show the connected user count', () => {
         renderItem({configuration: {...configuration, connectedUserCount: 3}});
 
-        expect(screen.getByText('3 users')).toBeInTheDocument();
-    });
-
-    it('uses the singular for one connected user', () => {
-        renderItem({configuration: {...configuration, connectedUserCount: 1}});
-
-        expect(screen.getByText('1 user')).toBeInTheDocument();
+        expect(screen.queryByText('3 users')).not.toBeInTheDocument();
     });
 
     it('orders the menu as Edit, Update Project Version, Move Users, separator, Delete', async () => {

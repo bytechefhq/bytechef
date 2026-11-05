@@ -20,7 +20,7 @@ import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeplo
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
+import {ChevronDownIcon, Layers3Icon, SquareArrowOutUpRightIcon} from 'lucide-react';
 import {useCallback, useRef, useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -151,6 +151,11 @@ const ProjectDeploymentListItem = ({
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
+                                <Layers3Icon
+                                    aria-hidden="true"
+                                    className="size-6 shrink-0 text-content-neutral-secondary"
+                                />
+
                                 {environmentConfig && EnvironmentIcon && (
                                     <Badge
                                         icon={<EnvironmentIcon className="size-3" />}

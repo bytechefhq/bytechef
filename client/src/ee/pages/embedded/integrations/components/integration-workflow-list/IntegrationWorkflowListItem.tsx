@@ -16,6 +16,7 @@ import {
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
+import {WorkflowIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 
@@ -133,7 +134,11 @@ const IntegrationWorkflowListItem = ({
                 className="flex flex-1 items-center"
                 to={`/embedded/integrations/${integration.id}/integration-workflows/${workflow.integrationWorkflowId}?${searchParams}`}
             >
-                <div className="w-80 text-sm font-semibold">{workflow.label}</div>
+                <div className="flex w-80 items-center gap-2 text-sm font-semibold">
+                    <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
+
+                    {workflow.label}
+                </div>
 
                 <WorkflowTriggerAndComponentsRow
                     className="hidden sm:flex"

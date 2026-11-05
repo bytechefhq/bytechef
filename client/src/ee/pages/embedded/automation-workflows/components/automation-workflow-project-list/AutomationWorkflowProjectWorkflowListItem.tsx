@@ -9,7 +9,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {EllipsisVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
+import {EllipsisVerticalIcon, PencilIcon, Trash2Icon, WorkflowIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
 type AutomationWorkflowProjectWorkflowTemplateType =
@@ -70,7 +70,9 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                 role="button"
                 tabIndex={0}
             >
-                <div className="w-80 shrink-0 pr-1 text-sm font-semibold">
+                <div className="flex w-80 shrink-0 items-center gap-2 pr-1 text-sm font-semibold">
+                    <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
+
                     <Tooltip>
                         <TooltipTrigger className="line-clamp-1 text-start">
                             {workflow.label || workflow.workflowUuid}

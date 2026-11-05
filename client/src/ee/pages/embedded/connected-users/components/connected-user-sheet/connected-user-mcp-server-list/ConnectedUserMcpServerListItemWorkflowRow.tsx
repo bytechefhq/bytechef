@@ -16,6 +16,7 @@ import useWorkflowComponentDefinitions, {
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
 import {ConnectedUserMcpServerWorkflow} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
+import {WorkflowIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
 const ConnectedUserMcpServerListItemWorkflowRow = ({
@@ -72,7 +73,9 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
     return (
         <li className="-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
             <div className="flex min-w-0 flex-1 items-center">
-                <div className="flex w-full max-w-80 min-w-0 shrink flex-col items-start sm:w-80 sm:shrink-0">
+                <div className="flex w-full max-w-80 min-w-0 shrink items-center gap-2 sm:w-80 sm:shrink-0">
+                    <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
+
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button

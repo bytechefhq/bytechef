@@ -29,6 +29,7 @@ import {
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
+import {ComponentIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -130,12 +131,20 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                 <div className="flex items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover">
                     <CollapsibleTrigger className="flex-1 py-3">
                         <div className="flex flex-col items-start justify-center gap-y-2">
-                            <div className="flex min-h-8 flex-1 items-center gap-1">
-                                <InlineSVG
-                                    className="size-5 flex-none"
-                                    key={componentDefinition.name!}
-                                    src={componentDefinition.icon!}
-                                />
+                            <div className="flex min-h-8 flex-1 items-center gap-2">
+                                {componentDefinition.icon ? (
+                                    <InlineSVG
+                                        aria-hidden="true"
+                                        className="size-6 shrink-0"
+                                        key={componentDefinition.name!}
+                                        src={componentDefinition.icon}
+                                    />
+                                ) : (
+                                    <ComponentIcon
+                                        aria-hidden="true"
+                                        className="size-6 shrink-0 text-content-neutral-secondary"
+                                    />
+                                )}
 
                                 <div
                                     className={twMerge(

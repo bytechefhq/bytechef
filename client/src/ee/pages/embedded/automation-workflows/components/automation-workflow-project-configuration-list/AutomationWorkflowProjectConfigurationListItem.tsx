@@ -22,7 +22,15 @@ import {
     useEnableAutomationWorkflowProjectConfigurationMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, EllipsisVerticalIcon, PencilIcon, RefreshCcwIcon, Trash2Icon, UsersIcon} from 'lucide-react';
+import {
+    ChevronDownIcon,
+    EllipsisVerticalIcon,
+    PencilIcon,
+    RefreshCcwIcon,
+    Settings2Icon,
+    Trash2Icon,
+    UsersIcon,
+} from 'lucide-react';
 import {MouseEvent, useCallback, useRef, useState} from 'react';
 
 import AutomationWorkflowProjectConfigurationMoveUsersDialog from './AutomationWorkflowProjectConfigurationMoveUsersDialog';
@@ -122,7 +130,12 @@ const AutomationWorkflowProjectConfigurationListItem = ({
             >
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
-                        <div className="flex min-h-8 items-center">
+                        <div className="flex min-h-8 items-center gap-2">
+                            <Settings2Icon
+                                aria-hidden="true"
+                                className="size-6 shrink-0 text-content-neutral-secondary"
+                            />
+
                             <span className="text-base font-semibold text-content-neutral-primary">
                                 {configuration.name}
                             </span>
@@ -140,10 +153,6 @@ const AutomationWorkflowProjectConfigurationListItem = ({
 
                                 <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]/configuration:rotate-180" />
                             </CollapsibleTrigger>
-
-                            <span className="mr-4 text-xs font-semibold text-muted-foreground">
-                                {formatCount(configuration.connectedUserCount, 'user')}
-                            </span>
                         </div>
                     </div>
 

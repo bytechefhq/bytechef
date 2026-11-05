@@ -88,6 +88,8 @@ describe('AutomationWorkflowProjectListItem', () => {
         it('should render with the design-system DropdownMenu', async () => {
             await openMenu();
 
+            expect(screen.getByTestId('project-item').querySelector('svg.lucide-folder')).toBeInTheDocument();
+
             expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
             expect(screen.getByRole('menuitem', {name: 'Publish Project'})).toBeInTheDocument();
             expect(screen.getByRole('menuitem', {name: 'New Workflow'})).toBeInTheDocument();

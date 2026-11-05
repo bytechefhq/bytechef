@@ -204,6 +204,12 @@ describe('IntegrationWorkflowListItem', () => {
         });
     });
 
+    it('marks the workflow label with the workflow icon', () => {
+        const {container} = renderItem({});
+
+        expect(container.querySelector('svg.lucide-workflow')).toBeInTheDocument();
+    });
+
     it('shows the trigger as its own chip, matching the projects list', () => {
         renderItem({
             triggers: [{label: 'manual', name: 'trigger_1', type: 'manual/v1/manual'}],

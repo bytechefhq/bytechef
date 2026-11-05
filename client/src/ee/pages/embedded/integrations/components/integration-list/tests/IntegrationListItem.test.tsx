@@ -260,6 +260,18 @@ describe('IntegrationListItem', () => {
             expect(screen.queryByLabelText('Create Workflow')).not.toBeInTheDocument();
         });
 
+        it("marks the integration name with its component's icon", () => {
+            const {container} = renderItem({icon: '<svg data-testid="mailchimp-icon"></svg>'});
+
+            expect(container.querySelector('svg.lucide-component')).not.toBeInTheDocument();
+        });
+
+        it('falls back to the component icon when the integration has no icon', () => {
+            const {container} = renderItem();
+
+            expect(container.querySelector('svg.lucide-component')).toBeInTheDocument();
+        });
+
         it('shows configurations without a number when the server did not send a count', () => {
             renderItem({developmentConfigurationCount: undefined});
 

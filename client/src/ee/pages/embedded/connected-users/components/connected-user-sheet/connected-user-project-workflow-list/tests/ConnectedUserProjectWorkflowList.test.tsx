@@ -167,6 +167,11 @@ describe('ConnectedUserProjectWorkflowList', () => {
 
         expect(within(playgroundGroup).getByText('2 workflows')).toBeInTheDocument();
         expect(
+            within(playgroundGroup)
+                .getByRole('heading', {name: 'Automation Playground'})
+                .querySelector('svg.lucide-folder')
+        ).toBeInTheDocument();
+        expect(
             within(playgroundGroup).getByText(
                 `Executed at ${latestExecutionDate.toLocaleDateString()} ${latestExecutionDate.toLocaleTimeString()}`
             )

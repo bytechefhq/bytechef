@@ -177,15 +177,17 @@ describe('IntegrationInstanceConfigurationListItem integration icon', () => {
     });
 
     it('should show the integration icon by default', () => {
-        renderItem({integration});
+        const {container} = renderItem({integration});
 
         expect(screen.getByTestId('integration-icon')).toHaveAttribute('data-src', 'icon.svg');
+        expect(container.querySelector('svg.lucide-settings-2')).not.toBeInTheDocument();
     });
 
-    it('should hide the integration icon when showIntegrationIcon is false', () => {
-        renderItem({integration}, false);
+    it('should show the configuration icon when showIntegrationIcon is false', () => {
+        const {container} = renderItem({integration}, false);
 
         expect(screen.queryByTestId('integration-icon')).not.toBeInTheDocument();
+        expect(container.querySelector('svg.lucide-settings-2')).toBeInTheDocument();
     });
 });
 

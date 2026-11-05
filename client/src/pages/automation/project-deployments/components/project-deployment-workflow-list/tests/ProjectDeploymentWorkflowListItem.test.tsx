@@ -135,6 +135,12 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         expect(rowPropsMock.mock.lastCall?.[0]).not.toHaveProperty('fitToWidth');
     });
 
+    it('marks the workflow name with the workflow icon', () => {
+        const {container} = renderListItem('Subflow');
+
+        expect(container.querySelector('svg.lucide-workflow')).toBeInTheDocument();
+    });
+
     it('keeps the name column one width so every row starts its icons at the same position', () => {
         renderListItem('Subflow');
 

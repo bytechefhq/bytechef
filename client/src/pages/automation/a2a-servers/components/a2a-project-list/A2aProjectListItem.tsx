@@ -22,10 +22,10 @@ import {
     ChevronRightIcon,
     EditIcon,
     EllipsisVerticalIcon,
+    FolderIcon,
     RefreshCwIcon,
     SquareArrowOutUpRightIcon,
     Trash2Icon,
-    WorkflowIcon,
 } from 'lucide-react';
 import {useMemo, useState} from 'react';
 
@@ -123,7 +123,7 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
                         </button>
                     </CollapsibleTrigger>
 
-                    <WorkflowIcon className="size-6 shrink-0 text-content-neutral-secondary" />
+                    <FolderIcon aria-hidden="true" className="size-6 shrink-0 text-content-neutral-secondary" />
 
                     <span className="min-w-0 truncate text-sm font-medium">
                         {projectName || `Project #${a2aProject.projectId}`}
