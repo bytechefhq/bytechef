@@ -53,7 +53,7 @@ public class ToolInvocationFacadeImpl implements ToolInvocationFacade {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
         return toolInvocationLogService.getToolInvocationLogs(
-            PlatformType.EMBEDDED, environment.ordinal(), surface, outcome, null, connectedUser.getId(), null,
+            PlatformType.EMBEDDED, environment.ordinal(), surface, outcome, null, connectedUser.getId(), null, null,
             startDate, endDate, pageNumber);
     }
 }

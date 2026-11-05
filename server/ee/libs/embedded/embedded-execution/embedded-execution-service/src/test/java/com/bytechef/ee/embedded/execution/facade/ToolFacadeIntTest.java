@@ -258,7 +258,7 @@ class ToolFacadeIntTest {
     private List<ToolInvocationLog> getToolInvocationLogs(long connectedUserId) {
         return toolInvocationLogService
             .getToolInvocationLogs(
-                PlatformType.EMBEDDED, null, null, null, null, connectedUserId, null, null, null, 0)
+                PlatformType.EMBEDDED, null, null, null, null, connectedUserId, null, null, null, null, 0)
             .getContent();
     }
 
