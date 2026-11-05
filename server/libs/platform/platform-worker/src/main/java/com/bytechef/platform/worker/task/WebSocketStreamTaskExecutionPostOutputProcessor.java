@@ -27,6 +27,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
@@ -66,17 +67,24 @@ public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExec
             payload -> sendEvent(jobId, SseStreamEvent.EVENT_TYPE_DATA, payload, tenantId));
 
         CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean streamCompleted = new AtomicBoolean();
+        AtomicBoolean streamFailed = new AtomicBoolean();
 
         emitter.addCompletionListener(() -> {
-            sendEvent(jobId, SseStreamEvent.EVENT_TYPE_COMPLETE, null, tenantId);
+            streamCompleted.set(true);
 
             latch.countDown();
         });
 
-        emitter.addErrorListener(
-            throwable -> sendEvent(jobId, SseStreamEvent.EVENT_TYPE_ERROR, throwable.getMessage(), tenantId));
+        emitter.addErrorListener(throwable -> {
+            streamFailed.set(true);
+
+            sendEvent(jobId, SseStreamEvent.EVENT_TYPE_ERROR, throwable.getMessage(), tenantId);
+        });
 
         emitter.addTimeoutListener(() -> {
+            streamFailed.set(true);
+
             sendEvent(jobId, SseStreamEvent.EVENT_TYPE_ERROR,
                 "WebSocket stream timed out for job " + jobId, tenantId);
 
@@ -101,6 +109,10 @@ public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExec
             Thread thread = Thread.currentThread();
 
             thread.interrupt();
+        }
+
+        if (streamCompleted.get() && !streamFailed.get()) {
+            sendEvent(jobId, SseStreamEvent.EVENT_TYPE_COMPLETE, null, tenantId);
         }
 
         return null;
@@ -150,7 +162,7 @@ public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExec
         @Override
         public void addCloseListener(Runnable closeListener) {
             if (completed) {
-                closeListener.run();
+                run(closeListener);
             } else {
                 closeListeners.add(closeListener);
             }
@@ -158,7 +170,7 @@ public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExec
 
         public void addCompletionListener(Runnable callback) {
             if (completed) {
-                callback.run();
+                run(callback);
             } else {
                 completionListeners.add(callback);
             }
@@ -195,11 +207,11 @@ public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExec
             completed = true;
 
             for (Runnable listener : closeListeners) {
-                listener.run();
+                run(listener);
             }
 
             for (Runnable listener : completionListeners) {
-                listener.run();
+                run(listener);
             }
         }
 
@@ -210,7 +222,7 @@ public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExec
             }
 
             for (var listener : errorListeners) {
-                listener.accept(throwable);
+                accept(listener, throwable);
             }
 
             complete();
@@ -223,20 +235,40 @@ public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExec
         @Override
         public void send(Object data) {
             for (var listener : outboundListeners) {
-                listener.accept(data);
+                accept(listener, data);
             }
         }
 
         @Override
         public void sendBinary(byte[] data) {
             for (var listener : outboundBinaryListeners) {
-                listener.accept(data);
+                accept(listener, data);
             }
         }
 
         public void triggerTimeout() {
             for (Runnable listener : timeoutListeners) {
+                run(listener);
+            }
+        }
+
+        private static <T> void accept(Consumer<T> listener, T value) {
+            try {
+                listener.accept(value);
+            } catch (Exception exception) {
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
+                }
+            }
+        }
+
+        private static void run(Runnable listener) {
+            try {
                 listener.run();
+            } catch (Exception exception) {
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
+                }
             }
         }
     }

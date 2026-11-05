@@ -18,6 +18,7 @@ package com.bytechef.platform.worker.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -32,6 +33,7 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.tenant.TenantContext;
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -169,6 +171,77 @@ class WebSocketStreamTaskExecutionPostOutputProcessorTest {
     }
 
     @Test
+    void testProcessWithAFailedStreamSendsOnlyTheErrorEvent() {
+        WebSocketHandler webSocketHandler = emitter -> {
+            emitter.send("data");
+            emitter.error(new RuntimeException("stream failed"));
+        };
+
+        Object result = processor.process(createTaskExecution(), webSocketHandler);
+
+        assertThat(result).isNull();
+        assertThat(captureSentEvents())
+            .extracting(SseStreamEvent::getEventType)
+            .containsExactly(SseStreamEvent.EVENT_TYPE_DATA, SseStreamEvent.EVENT_TYPE_ERROR);
+    }
+
+    @Test
+    void testProcessWithAStreamThatFailsOnAnotherThreadSendsOnlyTheErrorEvent() {
+        WebSocketHandler webSocketHandler = emitter -> Thread.startVirtualThread(() -> {
+            emitter.send("late data");
+            emitter.error(new RuntimeException("stream failed"));
+        });
+
+        Object result = processor.process(createTaskExecution(), webSocketHandler);
+
+        assertThat(result).isNull();
+        assertThat(captureSentEvents())
+            .extracting(SseStreamEvent::getEventType)
+            .containsExactly(SseStreamEvent.EVENT_TYPE_DATA, SseStreamEvent.EVENT_TYPE_ERROR);
+    }
+
+    @Test
+    void testProcessCompletesWhenACloseListenerThrowsOnAnotherThread() {
+        WebSocketHandler webSocketHandler = emitter -> {
+            emitter.addCloseListener(() -> {
+                throw new IllegalStateException("close failed");
+            });
+
+            Thread.startVirtualThread(() -> {
+                emitter.send("data");
+                emitter.complete();
+            });
+        };
+
+        Object result = assertTimeoutPreemptively(
+            Duration.ofSeconds(10), () -> processInTenant(webSocketHandler));
+
+        assertThat(result).isNull();
+        assertThat(captureSentEvents())
+            .extracting(SseStreamEvent::getEventType)
+            .containsExactly(SseStreamEvent.EVENT_TYPE_DATA, SseStreamEvent.EVENT_TYPE_COMPLETE);
+    }
+
+    @Test
+    void testProcessSendsTheErrorEventWhenACloseListenerOfAFailedStreamThrows() {
+        WebSocketHandler webSocketHandler = emitter -> {
+            emitter.addCloseListener(() -> {
+                throw new IllegalStateException("close failed");
+            });
+
+            emitter.error(new RuntimeException("stream failed"));
+        };
+
+        Object result = assertTimeoutPreemptively(
+            Duration.ofSeconds(10), () -> processInTenant(webSocketHandler));
+
+        assertThat(result).isNull();
+        assertThat(captureSentEvents())
+            .extracting(SseStreamEvent::getEventType)
+            .containsExactly(SseStreamEvent.EVENT_TYPE_ERROR);
+    }
+
+    @Test
     void testProcessCompletesWhenTheMessageBrokerFails() {
         doThrow(new IllegalStateException("broker down")).when(messageBroker)
             .send(eq(SseStreamMessageRoute.SSE_STREAM_EVENTS), any());
@@ -205,6 +278,16 @@ class WebSocketStreamTaskExecutionPostOutputProcessorTest {
         assertThat(captureSentEvents())
             .extracting(SseStreamEvent::getEventType)
             .containsExactly(SseStreamEvent.EVENT_TYPE_DATA);
+    }
+
+    private Object processInTenant(WebSocketHandler webSocketHandler) {
+        TenantContext.setCurrentTenantId(TENANT_ID);
+
+        try {
+            return processor.process(createTaskExecution(), webSocketHandler);
+        } finally {
+            TenantContext.resetCurrentTenantId();
+        }
     }
 
     private List<SseStreamEvent> captureSentEvents() {

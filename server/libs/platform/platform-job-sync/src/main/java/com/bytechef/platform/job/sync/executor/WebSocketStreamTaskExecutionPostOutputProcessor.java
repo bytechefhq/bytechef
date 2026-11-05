@@ -26,6 +26,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -33,8 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Processes WebSocketHandler output from task execution. Creates a WebSocketEmitter, wires it with listeners that
- * dispatch events to registered SseStreamBridge instances, and blocks until the WebSocket session completes or times
- * out.
+ * dispatch events to registered SseStreamBridge instances, and blocks until the WebSocket session completes or fails.
  *
  * @author Ivica Cardic
  */
@@ -63,72 +64,32 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
 
         WebSocketEmitter emitter = new WebSocketEmitter();
 
-        emitter.addOutboundListener(payload -> {
-            var bridges = sseStreamBridges.getIfPresent(key);
-
-            if (bridges != null) {
-                for (var bridge : bridges) {
-                    try {
-                        bridge.onEvent(payload);
-                    } catch (Exception exception) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            }
-        });
+        emitter.addOutboundListener(
+            payload -> notifySseStreamBridges(key, sseStreamBridge -> sseStreamBridge.onEvent(payload)));
 
         CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean streamCompleted = new AtomicBoolean();
+        AtomicBoolean streamFailed = new AtomicBoolean();
 
         emitter.addCompletionListener(() -> {
-            var bridges = sseStreamBridges.getIfPresent(key);
-
-            if (bridges != null) {
-                for (var bridge : bridges) {
-                    try {
-                        bridge.onComplete();
-                    } catch (Exception exception) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            }
+            streamCompleted.set(true);
 
             latch.countDown();
         });
 
         emitter.addErrorListener(throwable -> {
-            var bridges = sseStreamBridges.getIfPresent(key);
+            streamFailed.set(true);
 
-            if (bridges != null) {
-                for (var bridge : bridges) {
-                    try {
-                        bridge.onError(throwable);
-                    } catch (Exception exception) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            }
+            notifySseStreamBridges(key, sseStreamBridge -> sseStreamBridge.onError(throwable));
         });
 
         emitter.addTimeoutListener(() -> {
-            var bridges = sseStreamBridges.getIfPresent(key);
+            streamFailed.set(true);
 
-            if (bridges != null) {
-                for (var bridge : bridges) {
-                    try {
-                        bridge.onError(new TimeoutException("WebSocket stream timed out for job " + jobId));
-                    } catch (Exception exception) {
-                        if (log.isTraceEnabled()) {
-                            log.trace(exception.getMessage(), exception);
-                        }
-                    }
-                }
-            }
+            notifySseStreamBridges(
+                key,
+                sseStreamBridge -> sseStreamBridge.onError(
+                    new TimeoutException("WebSocket stream timed out for job " + jobId)));
 
             latch.countDown();
         });
@@ -153,6 +114,28 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
             thread.interrupt();
         }
 
+        if (streamCompleted.get() && !streamFailed.get()) {
+            notifySseStreamBridges(key, SseStreamBridge::onComplete);
+        }
+
         return null;
+    }
+
+    private void notifySseStreamBridges(String key, Consumer<SseStreamBridge> sseStreamBridgeConsumer) {
+        var sseStreamBridges = this.sseStreamBridges.getIfPresent(key);
+
+        if (sseStreamBridges == null) {
+            return;
+        }
+
+        for (var sseStreamBridge : sseStreamBridges) {
+            try {
+                sseStreamBridgeConsumer.accept(sseStreamBridge);
+            } catch (Exception exception) {
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
+                }
+            }
+        }
     }
 }
