@@ -126,8 +126,69 @@ describe('IntegrationInstanceConfigurationDialog', () => {
         it('should title the dialog for a new configuration and name the current step', () => {
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
 
-            expect(screen.getByRole('heading', {name: /New Instance Configuration/})).toBeInTheDocument();
-            expect(screen.getByRole('heading', {name: /Basic/})).toBeInTheDocument();
+            expect(screen.getByRole('dialog', {name: 'New Instance Configuration - Basic'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'New Instance Configuration - Basic'})).toBeInTheDocument();
+        });
+
+        it('should show the wizard header with the subtitle, the steps and the step progress', () => {
+            hoisted.workflows = [{id: 'workflow-1', workflowUuid: 'workflow-uuid-1'}];
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            expect(screen.getByText('New Instance Configuration')).toBeInTheDocument();
+            expect(screen.getAllByText('Run an integration version for connected users.').length).toBeGreaterThan(0);
+            expect(screen.getByRole('navigation', {name: 'Steps'})).toHaveTextContent('BasicWorkflows');
+            expect(screen.getByRole('progressbar', {name: 'Step 1 of 2'})).toBeInTheDocument();
+        });
+
+        it('should replace the old thin progress bar', () => {
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            expect(screen.queryByRole('navigation', {name: 'Progress'})).not.toBeInTheDocument();
+        });
+
+        it('should list only the basic step and offer Save when the integration has no workflows', () => {
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.integration = {componentName: 'httpClient'};
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            expect(screen.getByRole('navigation', {name: 'Steps'})).toHaveTextContent(/^Basic$/);
+            expect(screen.getByRole('progressbar', {name: 'Step 1 of 1'})).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Next'})).not.toBeInTheDocument();
+        });
+
+        it('should move to the workflows step, go back with Previous and save from the last step', async () => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.integration = {componentName: 'httpClient'};
+            hoisted.workflows = [{id: 'workflow-1', workflowUuid: 'workflow-uuid-1'}];
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            expect(screen.queryByRole('button', {name: 'Previous'})).not.toBeInTheDocument();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            expect(await screen.findByTestId('workflows-step')).toBeInTheDocument();
+            expect(screen.getByRole('progressbar', {name: 'Step 2 of 2'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'New Instance Configuration - Workflows'})).toBeInTheDocument();
+
+            await user.click(screen.getByRole('button', {name: 'Previous'}));
+
+            expect(await screen.findByTestId('basic-step')).toBeInTheDocument();
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+
+            await user.click(await screen.findByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.createMutate).toHaveBeenCalledWith(
+                    expect.objectContaining({authorizationType: 'API_KEY', environmentId: 1})
+                )
+            );
         });
 
         it('should render the basic step', () => {
@@ -163,9 +224,12 @@ describe('IntegrationInstanceConfigurationDialog', () => {
 
             expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
 
+            expect(screen.getByRole('navigation', {name: 'Steps'})).toHaveTextContent('BasicOAuth2 Connection');
+
             await user.click(await screen.findByRole('button', {name: 'Next'}));
 
             expect(await screen.findByTestId('oauth2-step')).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
         });
 
         it('should fall back to the first authorization when the connection has no OAuth2 authorization', async () => {
@@ -263,7 +327,28 @@ describe('IntegrationInstanceConfigurationDialog', () => {
                 />
             );
 
-            expect(screen.getByRole('heading', {name: /Edit Instance Configuration/})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'Edit Instance Configuration'})).toBeInTheDocument();
+            expect(screen.queryByRole('navigation', {name: 'Steps'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Next'})).not.toBeInTheDocument();
+        });
+
+        it('should show the connection parameters of an existing configuration', () => {
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{
+                        id: 1,
+                        integrationId: 2,
+                        integrationVersion: 1,
+                        name: 'Existing',
+                    }}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.getByTestId('connection-parameters')).toBeInTheDocument();
         });
 
         it('should keep the stored authorization type when saving', async () => {
@@ -338,7 +423,53 @@ describe('IntegrationInstanceConfigurationDialog', () => {
         it('should title the dialog for a version upgrade', () => {
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} updateIntegrationVersion />);
 
-            expect(screen.getByRole('heading', {name: 'Upgrade Integration Version'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'Upgrade Integration Version - Basic'})).toBeInTheDocument();
+            expect(
+                screen.getAllByText('Move this configuration to another integration version.').length
+            ).toBeGreaterThan(0);
+        });
+
+        it('should step from the version to the workflows and save the upgrade', async () => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {
+                authorizations: [
+                    {title: 'API Key', type: 'API_KEY'},
+                    {title: 'OAuth2', type: 'OAUTH2_AUTHORIZATION_CODE'},
+                ],
+            };
+            hoisted.integration = {componentName: 'httpClient'};
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{
+                        authorizationType: 'API_KEY',
+                        id: 1,
+                        integrationId: 2,
+                        integrationVersion: 1,
+                        name: 'Existing',
+                    }}
+                    onClose={onClose}
+                    updateIntegrationVersion
+                />
+            );
+
+            expect(screen.getByRole('navigation', {name: 'Steps'})).toHaveTextContent('BasicWorkflows');
+            expect(screen.queryByTestId('connection-parameters')).not.toBeInTheDocument();
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+
+            expect(await screen.findByTestId('workflows-step')).toBeInTheDocument();
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.updateMutate).toHaveBeenCalledWith(
+                    expect.objectContaining({authorizationType: 'API_KEY', id: 1})
+                )
+            );
+
+            expect(hoisted.createMutate).not.toHaveBeenCalled();
         });
     });
 
