@@ -34,7 +34,8 @@ public class ClusterElementPropertyFacadeImpl implements ClusterElementPropertyF
 
     private static final String CONNECTION_ACCESS =
         "#connectionId == null or isTenantAdmin() or (hasPermission(#connectionId, 'Connection', 'WORKFLOW_VIEW') " +
-            "and @mcpComponentConnectionSecurity.isMcpComponentConnection(#mcpComponentId, #connectionId))";
+            "and @mcpComponentConnectionAccess.isMcpComponentConnection(" +
+            "#mcpComponentId, #componentName, #componentVersion, #connectionId))";
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
 
