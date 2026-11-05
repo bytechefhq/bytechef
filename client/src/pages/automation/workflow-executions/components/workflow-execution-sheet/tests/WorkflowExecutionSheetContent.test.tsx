@@ -11,6 +11,8 @@ vi.mock('@/shared/components/workflow-executions/providers/workflowExecutionDeta
     useWorkflowExecutionDetailQueries: () => ({useGetWorkflowExecutionTaskExecutionQuery: queryMock}),
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({useHasWorkspaceScope: () => true}));
+
 vi.mock('@/components/ui/resizable', () => ({
     ResizableHandle: () => null,
     ResizablePanel: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
