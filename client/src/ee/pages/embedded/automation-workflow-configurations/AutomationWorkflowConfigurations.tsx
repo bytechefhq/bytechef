@@ -71,7 +71,7 @@ const AutomationWorkflowConfigurations = () => {
     const isFirstRun = !projectsIsLoading && !projectId && configuredProjects.length === 0;
 
     const newConfigurationButton = (
-        <Button label="New Configuration" onClick={() => setConfigurationDialog({project: selectedProject})} />
+        <Button label="New Project Configuration" onClick={() => setConfigurationDialog({project: selectedProject})} />
     );
 
     const handleCreateConfiguration = useCallback(() => setConfigurationDialog({}), []);
