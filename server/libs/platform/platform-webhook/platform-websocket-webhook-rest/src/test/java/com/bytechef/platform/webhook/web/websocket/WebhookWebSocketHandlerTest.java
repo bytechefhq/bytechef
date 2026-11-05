@@ -18,11 +18,13 @@ package com.bytechef.platform.webhook.web.websocket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.after;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -36,9 +38,11 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.web.websocket.CallSessionRegistry.CallSession;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -48,10 +52,15 @@ import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.net.URI;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,6 +68,8 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
+import org.springframework.web.socket.handler.WebSocketSessionDecorator;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -115,7 +126,11 @@ class WebhookWebSocketHandlerTest {
 
         webhookWebSocketHandler.afterConnectionEstablished(webSocketSession);
 
-        assertThat(callSessionRegistry.getWebSocketSession(CALL_SID)).contains(webSocketSession);
+        WebSocketSession registeredWebSocketSession = callSessionRegistry.getWebSocketSession(CALL_SID)
+            .orElseThrow();
+
+        assertThat(registeredWebSocketSession).isInstanceOf(ConcurrentWebSocketSessionDecorator.class);
+        assertThat(WebSocketSessionDecorator.unwrap(registeredWebSocketSession)).isSameAs(webSocketSession);
 
         List<Map<String, Object>> sentMessages = getSentMessages(webSocketSession);
 
@@ -151,7 +166,7 @@ class WebhookWebSocketHandlerTest {
         CloseStatus closeStatus = closeStatusArgumentCaptor.getValue();
 
         assertThat(closeStatus.getCode()).isEqualTo(CloseStatus.NORMAL.getCode());
-        assertThat(callSessionRegistry.getWebSocketSession(CALL_SID)).contains(existingWebSocketSession);
+        assertThat(getRegisteredWebSocketSession()).isSameAs(existingWebSocketSession);
 
         verifyNoInteractions(workflowService);
     }
@@ -168,7 +183,7 @@ class WebhookWebSocketHandlerTest {
 
         webhookWebSocketHandler.afterConnectionEstablished(newWebSocketSession);
 
-        assertThat(callSessionRegistry.getWebSocketSession(CALL_SID)).contains(newWebSocketSession);
+        assertThat(getRegisteredWebSocketSession()).isSameAs(newWebSocketSession);
         assertThat(callSessionRegistry.getWebSocketSessionById("session-1")).isEmpty();
 
         verify(newWebSocketSession, never()).close(any(CloseStatus.class));
@@ -272,6 +287,204 @@ class WebhookWebSocketHandlerTest {
             Map.of("event", "error", "message", "workflowExecutionId is required"));
 
         verifyNoInteractions(webhookWorkflowExecutor);
+    }
+
+    @Test
+    void testExecuteWithAWorkflowExecutionIdStartsTheWorkflowWithTheParsedId() throws Exception {
+        WebSocketSession webSocketSession = mockWebSocketSession("session-1", "/webhooks/webhook-1");
+
+        webhookWebSocketHandler.handleTextMessage(
+            webSocketSession,
+            new TextMessage("{\"action\":\"execute\",\"workflowExecutionId\":\"" + createWebhookId() + "\"}"));
+
+        ArgumentCaptor<WorkflowExecutionId> workflowExecutionIdArgumentCaptor =
+            ArgumentCaptor.forClass(WorkflowExecutionId.class);
+
+        verify(webhookWorkflowExecutor).executeAsync(
+            workflowExecutionIdArgumentCaptor.capture(), any(WebhookRequest.class), any(SseStreamBridge.class));
+
+        WorkflowExecutionId workflowExecutionId = workflowExecutionIdArgumentCaptor.getValue();
+
+        assertThat(workflowExecutionId.getTenantId()).isEqualTo("public");
+        assertThat(workflowExecutionId.getType()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(workflowExecutionId.getJobPrincipalId()).isEqualTo(1L);
+        assertThat(workflowExecutionId.getWorkflowUuid()).isEqualTo(WORKFLOW_UUID);
+        assertThat(workflowExecutionId.getTriggerName()).isEqualTo(TRIGGER_NAME);
+
+        assertThat(getSentMessages(webSocketSession)).containsExactly(
+            Map.of("event", "start", "message", "Workflow execution started", "webhookId", "webhook-1"));
+    }
+
+    @Test
+    void testExecuteWithAnInvalidWorkflowExecutionIdIsAnsweredWithAnError() throws Exception {
+        WebSocketSession webSocketSession = mockWebSocketSession("session-1", "/webhooks/webhook-1");
+
+        webhookWebSocketHandler.handleTextMessage(
+            webSocketSession, new TextMessage("{\"action\":\"execute\",\"workflowExecutionId\":\"invalid\"}"));
+
+        assertThat(getSentMessages(webSocketSession)).containsExactly(
+            Map.of("event", "start", "message", "Workflow execution started", "webhookId", "webhook-1"),
+            Map.of("event", "error", "message", "workflowExecutionId is invalid"));
+
+        verifyNoInteractions(webhookWorkflowExecutor);
+    }
+
+    @Test
+    void testExecuteWithANonStringWorkflowExecutionIdIsAnsweredWithAnError() throws Exception {
+        WebSocketSession webSocketSession = mockWebSocketSession("session-1", "/webhooks/webhook-1");
+
+        webhookWebSocketHandler.handleTextMessage(
+            webSocketSession, new TextMessage("{\"action\":\"execute\",\"workflowExecutionId\":42}"));
+
+        assertThat(getSentMessages(webSocketSession)).containsExactly(
+            Map.of("event", "start", "message", "Workflow execution started", "webhookId", "webhook-1"),
+            Map.of("event", "error", "message", "workflowExecutionId is invalid"));
+
+        verifyNoInteractions(webhookWorkflowExecutor);
+    }
+
+    @Test
+    void testExecuteFromASessionWithoutACallSidStreamsTheEventsAndTheCompletionToThatSession() throws Exception {
+        WebSocketSession webSocketSession = mockWebSocketSession("session-1", "/webhooks/webhook-1");
+
+        webhookWebSocketHandler.afterConnectionEstablished(webSocketSession);
+
+        SseStreamBridge sseStreamBridge = execute(webSocketSession);
+
+        sseStreamBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", "5")));
+        sseStreamBridge.onEvent("chunk");
+        sseStreamBridge.onComplete();
+
+        assertThat(getSentMessages(webSocketSession)).containsExactly(
+            Map.of("event", "connected", "id", "webhook-1"),
+            Map.of("event", "start", "message", "Workflow execution started", "webhookId", "webhook-1"),
+            Map.of("data", Map.of("event", "start", "payload", Map.of("jobId", "5")), "event", "stream"),
+            Map.of("data", "chunk", "event", "stream"),
+            Map.of("event", "complete", "message", "Workflow execution completed"));
+
+        verify(webSocketSession).close(CloseStatus.NORMAL);
+    }
+
+    @Test
+    void testExecuteFromASessionWithoutACallSidStreamsAnErrorToThatSession() throws Exception {
+        WebSocketSession webSocketSession = mockWebSocketSession("session-1", "/webhooks/webhook-1");
+
+        SseStreamBridge sseStreamBridge = execute(webSocketSession);
+
+        sseStreamBridge.onEvent("chunk");
+        sseStreamBridge.onError(new IllegalStateException("job failed"));
+
+        assertThat(getSentMessages(webSocketSession)).containsExactly(
+            Map.of("event", "start", "message", "Workflow execution started", "webhookId", "webhook-1"),
+            Map.of("data", "chunk", "event", "stream"),
+            Map.of("event", "error", "message", "job failed"));
+
+        verify(webSocketSession).close(CloseStatus.SERVER_ERROR);
+    }
+
+    @Test
+    void testExecuteFromACallSessionStreamsTheEventsAndRemovesTheCallSessionOnError() throws Exception {
+        WebSocketSession webSocketSession = mockWebSocketSession("session-1", "/webhooks?callSid=" + CALL_SID);
+
+        webhookWebSocketHandler.afterConnectionEstablished(webSocketSession);
+
+        SseStreamBridge sseStreamBridge = execute(webSocketSession);
+
+        sseStreamBridge.onEvent("chunk");
+        sseStreamBridge.onError(new CancellationException());
+
+        List<Map<String, Object>> sentMessages = getSentMessages(webSocketSession);
+
+        assertThat(sentMessages).hasSize(4);
+        assertThat(sentMessages.subList(2, 4)).containsExactly(
+            Map.of("data", "chunk", "event", "stream"),
+            Map.of("event", "error", "message", "Workflow execution aborted"));
+        assertThat(callSessionRegistry.hasSession(CALL_SID)).isFalse();
+
+        verify(webSocketSession).close(CloseStatus.SERVER_ERROR);
+    }
+
+    @Test
+    void testExecuteDoesNotStreamToASessionThatHasClosed() throws Exception {
+        WebSocketSession webSocketSession = mockWebSocketSession("session-1", "/webhooks/webhook-1");
+
+        SseStreamBridge sseStreamBridge = execute(webSocketSession);
+
+        when(webSocketSession.isOpen()).thenReturn(false);
+
+        sseStreamBridge.onEvent("chunk");
+        sseStreamBridge.onComplete();
+
+        assertThat(getSentMessages(webSocketSession)).containsExactly(
+            Map.of("event", "start", "message", "Workflow execution started", "webhookId", "webhook-1"));
+
+        verify(webSocketSession, never()).close(any(CloseStatus.class));
+    }
+
+    @Test
+    void testConcurrentSendsFromTheHandlerAndTheStreamBridgeAreAllDeliveredOneAtATime() throws Exception {
+        WebSocketSession webSocketSession = mockWebSocketSession("session-1", "/webhooks/webhook-1");
+        AtomicBoolean sendInProgress = new AtomicBoolean();
+        List<String> deliveredPayloads = new CopyOnWriteArrayList<>();
+
+        doAnswer(invocation -> {
+            if (!sendInProgress.compareAndSet(false, true)) {
+                throw new IllegalStateException("The remote endpoint was in state [TEXT_PARTIAL_WRITING]");
+            }
+
+            try {
+                Thread.sleep(1);
+
+                TextMessage textMessage = invocation.getArgument(0);
+
+                deliveredPayloads.add(textMessage.getPayload());
+            } finally {
+                sendInProgress.set(false);
+            }
+
+            return null;
+        }).when(webSocketSession)
+            .sendMessage(any());
+
+        SseStreamBridge sseStreamBridge = execute(webSocketSession);
+
+        int threadCount = 8;
+        int messagesPerThread = 25;
+        CountDownLatch startLatch = new CountDownLatch(1);
+        List<Throwable> sendFailures = new CopyOnWriteArrayList<>();
+        List<Thread> threads = new ArrayList<>();
+
+        for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
+            boolean streamThread = threadIndex % 2 == 0;
+
+            threads.add(Thread.startVirtualThread(() -> {
+                try {
+                    startLatch.await();
+
+                    for (int messageIndex = 0; messageIndex < messagesPerThread; messageIndex++) {
+                        if (streamThread) {
+                            sseStreamBridge.onEvent("chunk");
+                        } else {
+                            webhookWebSocketHandler.handleTextMessage(
+                                webSocketSession, new TextMessage("{\"action\":\"ping\"}"));
+                        }
+                    }
+                } catch (Throwable throwable) {
+                    sendFailures.add(throwable);
+                }
+            }));
+        }
+
+        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
+            startLatch.countDown();
+
+            for (Thread thread : threads) {
+                thread.join();
+            }
+        });
+
+        assertThat(sendFailures).isEmpty();
+        assertThat(deliveredPayloads).hasSize(1 + threadCount * messagesPerThread);
     }
 
     @Test
@@ -405,6 +618,26 @@ class WebhookWebSocketHandlerTest {
         assertThat(callSessionRegistry.hasSession(CALL_SID)).isTrue();
 
         verifyNoInteractions(jobFacade, workflowContinuationHelper);
+    }
+
+    private WebSocketSession getRegisteredWebSocketSession() {
+        WebSocketSession webSocketSession = callSessionRegistry.getWebSocketSession(CALL_SID)
+            .orElseThrow();
+
+        return WebSocketSessionDecorator.unwrap(webSocketSession);
+    }
+
+    private SseStreamBridge execute(WebSocketSession webSocketSession) throws Exception {
+        webhookWebSocketHandler.handleTextMessage(
+            webSocketSession,
+            new TextMessage("{\"action\":\"execute\",\"workflowExecutionId\":\"" + createWebhookId() + "\"}"));
+
+        ArgumentCaptor<SseStreamBridge> sseStreamBridgeArgumentCaptor = ArgumentCaptor.forClass(SseStreamBridge.class);
+
+        verify(webhookWorkflowExecutor).executeAsync(
+            any(WorkflowExecutionId.class), any(WebhookRequest.class), sseStreamBridgeArgumentCaptor.capture());
+
+        return sseStreamBridgeArgumentCaptor.getValue();
     }
 
     private static String createWebhookId() {

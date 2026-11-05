@@ -35,12 +35,12 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +49,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
+import org.springframework.web.socket.handler.SessionLimitExceededException;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -63,6 +65,13 @@ import tools.jackson.databind.ObjectMapper;
  * the workflow trigger's extensions and executes it via the JobFacade.
  * </p>
  *
+ * <p>
+ * A session is sent to from the handler thread and from the threads that deliver workflow stream events, while a plain
+ * WebSocket session allows only one send at a time. Every session is therefore wrapped once, when the handler first
+ * sees it, in a {@link ConcurrentWebSocketSessionDecorator}, and only that decorator is used to send, to close and to
+ * register the session in the {@link CallSessionRegistry}.
+ * </p>
+ *
  * @author Ivica Cardic
  */
 @Component
@@ -70,7 +79,8 @@ import tools.jackson.databind.ObjectMapper;
 public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookWebSocketHandler.class);
-    private static final int MAX_PENDING_EVENTS = 100;
+    private static final int SEND_BUFFER_SIZE_LIMIT = 512 * 1024;
+    private static final int SEND_TIME_LIMIT = 10 * 1000;
     private static final String WEBSOCKET_TASKS = "websocketTasks";
 
     private final CallSessionRegistry callSessionRegistry;
@@ -81,8 +91,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
     private final WorkflowContinuationHelper workflowContinuationHelper;
     private final WorkflowService workflowService;
 
-    private final Cache<String, AutoCloseable> streamHandles;
-    private final Cache<String, List<Map<String, Object>>> pendingEvents;
+    private final Map<String, WebSocketSession> concurrentSessions = new ConcurrentHashMap<>();
     private final Cache<String, String> sessionIdToCallSid;
 
     @Autowired
@@ -101,21 +110,6 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         this.workflowContinuationHelper = workflowContinuationHelper;
         this.workflowService = workflowService;
 
-        this.streamHandles = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .maximumSize(1000)
-            .removalListener((key, value, cause) -> {
-                if (value != null) {
-                    closeHandle((AutoCloseable) value);
-                }
-            })
-            .build();
-
-        this.pendingEvents = Caffeine.newBuilder()
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .maximumSize(1000)
-            .build();
-
         this.sessionIdToCallSid = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .maximumSize(1000)
@@ -123,7 +117,9 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
+        WebSocketSession session = getConcurrentSession(webSocketSession);
+
         URI uri = session.getUri();
         String webhookId = extractId(uri);
         String sessionKey = session.getId();
@@ -199,7 +195,9 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    protected void handleTextMessage(WebSocketSession webSocketSession, TextMessage message) throws Exception {
+        WebSocketSession session = getConcurrentSession(webSocketSession);
+
         String sessionKey = session.getId();
         String payload = message.getPayload();
 
@@ -289,18 +287,10 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
             sessionIdToCallSid.invalidate(sessionKey);
         }
 
-        AutoCloseable handle = streamHandles.getIfPresent(sessionKey);
-
-        if (handle != null) {
-            closeHandle(handle);
-            streamHandles.invalidate(sessionKey);
-        }
-
-        pendingEvents.invalidate(sessionKey);
+        concurrentSessions.remove(sessionKey);
     }
 
     private void executeWorkflow(WebSocketSession session, Map<String, Object> request) throws Exception {
-        String sessionKey = session.getId();
         URI uri = session.getUri();
         String webhookId = extractId(uri);
 
@@ -314,13 +304,9 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         try {
             WebhookRequest webhookRequest = buildWebhookRequest(request);
 
-            WorkflowExecutionId workflowExecutionId = (WorkflowExecutionId) request.get("workflowExecutionId");
+            WorkflowExecutionId workflowExecutionId = getWorkflowExecutionId(request);
 
-            if (workflowExecutionId == null) {
-                throw new IllegalArgumentException("workflowExecutionId is required");
-            }
-
-            WebSocketStreamBridge streamBridge = new WebSocketStreamBridge(sessionKey);
+            WebSocketStreamBridge streamBridge = new WebSocketStreamBridge(session);
 
             webhookWorkflowExecutor.executeAsync(workflowExecutionId, webhookRequest, streamBridge);
         } catch (Exception exception) {
@@ -331,6 +317,34 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
             error.put("message", exception.getMessage());
 
             sendMessage(session, error);
+        }
+    }
+
+    private WebSocketSession getConcurrentSession(WebSocketSession session) {
+        return concurrentSessions.computeIfAbsent(
+            session.getId(),
+            sessionId -> new ConcurrentWebSocketSessionDecorator(session, SEND_TIME_LIMIT, SEND_BUFFER_SIZE_LIMIT));
+    }
+
+    private static WorkflowExecutionId getWorkflowExecutionId(Map<String, Object> request) {
+        Object workflowExecutionId = request.get("workflowExecutionId");
+
+        if (workflowExecutionId == null) {
+            throw new IllegalArgumentException("workflowExecutionId is required");
+        }
+
+        if (!(workflowExecutionId instanceof String workflowExecutionIdString)) {
+            throw new IllegalArgumentException("workflowExecutionId is invalid");
+        }
+
+        if (workflowExecutionIdString.isBlank()) {
+            throw new IllegalArgumentException("workflowExecutionId is required");
+        }
+
+        try {
+            return WorkflowExecutionId.parse(workflowExecutionIdString);
+        } catch (RuntimeException exception) {
+            throw new IllegalArgumentException("workflowExecutionId is invalid", exception);
         }
     }
 
@@ -449,8 +463,8 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
             if (log.isDebugEnabled()) {
                 log.debug("Sent WebSocket message: sessionId={}, event={}", session.getId(), data.get("event"));
             }
-        } catch (IOException ioException) {
-            log.error("Failed to send WebSocket message to session: {}", session.getId(), ioException);
+        } catch (IOException | SessionLimitExceededException exception) {
+            log.error("Failed to send WebSocket message to session: {}", session.getId(), exception);
         }
     }
 
@@ -506,102 +520,45 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         return null;
     }
 
-    private static void closeHandle(AutoCloseable handle) {
-        try {
-            handle.close();
-        } catch (Exception exception) {
-            if (log.isTraceEnabled()) {
-                log.trace("Failed to close handle", exception);
-            }
-        }
-    }
-
     private class WebSocketStreamBridge implements SseStreamBridge {
 
-        private final String sessionKey;
+        private final WebSocketSession session;
 
-        public WebSocketStreamBridge(String sessionKey) {
-            this.sessionKey = sessionKey;
+        WebSocketStreamBridge(WebSocketSession session) {
+            this.session = session;
         }
 
         @Override
         public void onEvent(Object payload) {
-            String callSid = sessionIdToCallSid.getIfPresent(sessionKey);
+            Map<String, Object> event = new LinkedHashMap<>();
 
-            if (callSid != null) {
-                Optional<WebSocketSession> sessionOpt = callSessionRegistry.getWebSocketSession(callSid);
+            event.put("event", "stream");
+            event.put("data", payload);
 
-                if (sessionOpt.isPresent() && sessionOpt.get()
-                    .isOpen()) {
-
-                    WebSocketSession session = sessionOpt.get();
-
-                    Map<String, Object> event = new LinkedHashMap<>();
-                    event.put("event", "stream");
-                    event.put("data", payload);
-
-                    sendMessage(session, event);
-                } else {
-                    bufferEvent(payload);
-                }
-            } else {
-                bufferEvent(payload);
-            }
+            sendMessage(session, event);
         }
 
         @Override
         public void onComplete() {
-            String callSid = sessionIdToCallSid.getIfPresent(sessionKey);
+            if (session.isOpen()) {
+                Map<String, Object> complete = new LinkedHashMap<>();
 
-            if (callSid != null) {
-                Optional<WebSocketSession> sessionOpt = callSessionRegistry.getWebSocketSession(callSid);
+                complete.put("event", "complete");
+                complete.put("message", "Workflow execution completed");
 
-                if (sessionOpt.isPresent() && sessionOpt.get()
-                    .isOpen()) {
+                sendMessage(session, complete);
 
-                    WebSocketSession session = sessionOpt.get();
-
-                    Map<String, Object> complete = new LinkedHashMap<>();
-                    complete.put("event", "complete");
-                    complete.put("message", "Workflow execution completed");
-
-                    sendMessage(session, complete);
-
-                    try {
-                        session.close(CloseStatus.NORMAL);
-                    } catch (IOException ioException) {
-                        log.error("Error closing WebSocket session: {}", sessionKey, ioException);
-                    }
-                }
-
-                callSessionRegistry.removeSessionByCallSid(callSid);
-                sessionIdToCallSid.invalidate(sessionKey);
+                closeSession(CloseStatus.NORMAL);
             }
 
-            AutoCloseable handle = streamHandles.getIfPresent(sessionKey);
-
-            if (handle != null) {
-                closeHandle(handle);
-                streamHandles.invalidate(sessionKey);
-            }
-
-            pendingEvents.invalidate(sessionKey);
+            removeCallSession();
         }
 
         @Override
         public void onError(Throwable throwable) {
-            String callSid = sessionIdToCallSid.getIfPresent(sessionKey);
-
-            WebSocketSession session = null;
-
-            if (callSid != null) {
-                Optional<WebSocketSession> sessionOpt = callSessionRegistry.getWebSocketSession(callSid);
-
-                session = sessionOpt.orElse(null);
-            }
-
-            if (session != null && session.isOpen()) {
+            if (session.isOpen()) {
                 Map<String, Object> error = new LinkedHashMap<>();
+
                 error.put("event", "error");
 
                 if (throwable instanceof CancellationException) {
@@ -612,36 +569,28 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
                 sendMessage(session, error);
 
-                try {
-                    session.close(CloseStatus.SERVER_ERROR);
-                } catch (IOException ioException) {
-                    log.error("Error closing WebSocket session: {}", sessionKey, ioException);
-                }
+                closeSession(CloseStatus.SERVER_ERROR);
             }
+
+            removeCallSession();
+        }
+
+        private void closeSession(CloseStatus closeStatus) {
+            try {
+                session.close(closeStatus);
+            } catch (IOException ioException) {
+                log.error("Error closing WebSocket session: {}", session.getId(), ioException);
+            }
+        }
+
+        private void removeCallSession() {
+            String sessionKey = session.getId();
+
+            String callSid = sessionIdToCallSid.getIfPresent(sessionKey);
 
             if (callSid != null) {
                 callSessionRegistry.removeSessionByCallSid(callSid);
                 sessionIdToCallSid.invalidate(sessionKey);
-            }
-
-            AutoCloseable handle = streamHandles.getIfPresent(sessionKey);
-
-            if (handle != null) {
-                closeHandle(handle);
-                streamHandles.invalidate(sessionKey);
-            }
-
-            pendingEvents.invalidate(sessionKey);
-        }
-
-        private void bufferEvent(Object payload) {
-            List<Map<String, Object>> events = pendingEvents.get(sessionKey, key -> new ArrayList<>());
-
-            if (events.size() < MAX_PENDING_EVENTS) {
-                Map<String, Object> event = new LinkedHashMap<>();
-                event.put("event", "stream");
-                event.put("data", payload);
-                events.add(event);
             }
         }
     }
