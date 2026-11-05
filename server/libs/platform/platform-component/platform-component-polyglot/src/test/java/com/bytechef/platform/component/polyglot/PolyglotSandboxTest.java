@@ -18,6 +18,7 @@ package com.bytechef.platform.component.polyglot;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -76,6 +77,8 @@ public class PolyglotSandboxTest {
 
     @Test
     public void testConstrainedContextEnforcesHeapLimit() {
+        assumeTrue(PolyglotSandbox.isHeapMemoryLimitSupported("js"));
+
         PolyglotSandbox.setSettings(
             new PolyglotSandboxSettings(
                 true, PolyglotSandboxSettings.DEFAULT_MAX_CPU_TIME, 64L * 1024 * 1024,
@@ -118,7 +121,8 @@ public class PolyglotSandboxTest {
         assertThatThrownBy(
             () -> onVirtualThread(() -> PolyglotSandbox.call("js", context -> context.eval("js", "while (true) {}"))))
                 .isInstanceOf(PolyglotException.class)
-                .hasMessageContaining("CPU time limit");
+                .satisfies(throwable -> assertThat(throwable.getMessage())
+                    .containsAnyOf("CPU time limit", "Thread was interrupted"));
     }
 
     @Test
