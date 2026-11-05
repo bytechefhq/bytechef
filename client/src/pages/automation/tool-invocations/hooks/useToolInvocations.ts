@@ -23,6 +23,7 @@ export interface UseToolInvocationsOptionsI {
 }
 
 interface ToolInvocationsFiltersI {
+    a2aServerId: string | undefined;
     endDate: Date | undefined;
     mcpServerId: string | undefined;
     outcome: string | undefined;
@@ -32,12 +33,14 @@ interface ToolInvocationsFiltersI {
 }
 
 interface UseToolInvocationsI {
+    filterA2aServerId: string | undefined;
     filterEndDate: Date | undefined;
     filterMcpServerId: string | undefined;
     filterOutcome: string | undefined;
     filterPageNumber: number;
     filterStartDate: Date | undefined;
     filterSurface: string | undefined;
+    handleA2aServerChange: (item?: ComboBoxItemType) => void;
     handleEndDateChange: (date: Date | undefined) => void;
     handleMcpServerChange: (item?: ComboBoxItemType) => void;
     handleOutcomeChange: (item?: ComboBoxItemType) => void;
@@ -57,6 +60,7 @@ const toFilterVariables = (
     type: PlatformType,
     environmentId?: number
 ): ToolInvocationLogsQueryVariables => ({
+    a2aServerId: filters.a2aServerId ? Number(filters.a2aServerId) : undefined,
     environmentId: environmentId != null ? String(environmentId) : undefined,
     fromDate: filters.startDate ? filters.startDate.getTime() : undefined,
     mcpServerId: filters.mcpServerId ? Number(filters.mcpServerId) : undefined,
@@ -72,6 +76,7 @@ export const useToolInvocations = ({
     type,
     workspaceScope,
 }: UseToolInvocationsOptionsI): UseToolInvocationsI => {
+    const [filterA2aServerId, setFilterA2aServerId] = useState<string | undefined>(undefined);
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(undefined);
     const [filterMcpServerId, setFilterMcpServerId] = useState<string | undefined>(undefined);
     const [filterOutcome, setFilterOutcome] = useState<string | undefined>(undefined);
@@ -81,6 +86,7 @@ export const useToolInvocations = ({
 
     const filterVariables = toFilterVariables(
         {
+            a2aServerId: filterA2aServerId,
             endDate: filterEndDate,
             mcpServerId: filterMcpServerId,
             outcome: filterOutcome,
@@ -108,6 +114,11 @@ export const useToolInvocations = ({
     const toolInvocationLogPage = workspaceScoped
         ? workspaceQuery.data?.workspaceToolInvocationLogs
         : tenantQuery.data?.toolInvocationLogs;
+
+    const handleA2aServerChange = (item?: ComboBoxItemType) => {
+        setFilterA2aServerId(item?.value ? String(item.value) : undefined);
+        setFilterPageNumber(0);
+    };
 
     const handleEndDateChange = (date: Date | undefined) => {
         setFilterEndDate(date);
@@ -137,12 +148,14 @@ export const useToolInvocations = ({
     };
 
     return {
+        filterA2aServerId,
         filterEndDate,
         filterMcpServerId,
         filterOutcome,
         filterPageNumber,
         filterStartDate,
         filterSurface,
+        handleA2aServerChange,
         handleEndDateChange,
         handleMcpServerChange,
         handleOutcomeChange,

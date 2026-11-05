@@ -93,6 +93,35 @@ describe('useToolInvocations', () => {
         );
     });
 
+    it('passes the A2A server filter to the workspace query and resets the page', () => {
+        const {result} = renderUseToolInvocations({environmentId: 2, workspaceId: 1049});
+
+        act(() => {
+            result.current.handlePaginationClick(3);
+        });
+
+        act(() => {
+            result.current.handleA2aServerChange({label: 'Research agent', value: '4'});
+        });
+
+        expect(result.current.filterA2aServerId).toBe('4');
+        expect(result.current.filterPageNumber).toBe(0);
+        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+            expect.objectContaining({a2aServerId: 4, environmentId: '2', page: 0, workspaceId: '1049'}),
+            {enabled: true}
+        );
+
+        act(() => {
+            result.current.handleA2aServerChange(undefined);
+        });
+
+        expect(result.current.filterA2aServerId).toBeUndefined();
+        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+            expect.objectContaining({a2aServerId: undefined}),
+            {enabled: true}
+        );
+    });
+
     it('waits for the workspace instead of falling back to the tenant-wide log', () => {
         renderUseToolInvocations({environmentId: 2, workspaceId: undefined});
 
@@ -174,6 +203,7 @@ describe('useToolInvocations', () => {
         expect(result.current.filterPageNumber).toBe(0);
         expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             {
+                a2aServerId: undefined,
                 environmentId: undefined,
                 fromDate: startDate.getTime(),
                 mcpServerId: undefined,
@@ -196,6 +226,7 @@ describe('useToolInvocations', () => {
 
         expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             {
+                a2aServerId: undefined,
                 environmentId: undefined,
                 fromDate: undefined,
                 mcpServerId: undefined,

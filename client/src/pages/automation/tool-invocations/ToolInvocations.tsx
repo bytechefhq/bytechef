@@ -34,7 +34,10 @@ const outcomeOptions = [
 ];
 
 const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
-    [PlatformType.Automation]: [{label: 'Automation MCP', value: 'MCP_AUTOMATION'}],
+    [PlatformType.Automation]: [
+        {label: 'Automation MCP', value: 'MCP_AUTOMATION'},
+        {label: 'A2A', value: 'A2A'},
+    ],
     [PlatformType.Embedded]: [
         {label: 'Embedded MCP', value: 'MCP_EMBEDDED'},
         {label: 'Embedded API (Action)', value: 'EMBEDDED_API_ACTION'},
@@ -43,6 +46,7 @@ const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
 };
 
 interface ToolInvocationsProps {
+    a2aServerOptions?: Array<ComboBoxItemType>;
     environmentId?: number;
     /* Shown instead of the filters and the table when nothing has been recorded yet and no filter is set. */
     firstRunEmptyState: ReactNode;
@@ -52,6 +56,7 @@ interface ToolInvocationsProps {
 }
 
 export const ToolInvocations = ({
+    a2aServerOptions,
     environmentId,
     firstRunEmptyState,
     mcpServerOptions,
@@ -59,12 +64,14 @@ export const ToolInvocations = ({
     workspaceScope,
 }: ToolInvocationsProps) => {
     const {
+        filterA2aServerId,
         filterEndDate,
         filterMcpServerId,
         filterOutcome,
         filterPageNumber,
         filterStartDate,
         filterSurface,
+        handleA2aServerChange,
         handleEndDateChange,
         handleMcpServerChange,
         handleOutcomeChange,
@@ -81,6 +88,12 @@ export const ToolInvocations = ({
 
     const initialLoadComplete = useInitialLoadComplete(toolInvocationLogsIsLoading);
 
+    const a2aServerNames = useMemo(
+        () =>
+            Object.fromEntries((a2aServerOptions ?? []).map((option) => [String(option.value), String(option.label)])),
+        [a2aServerOptions]
+    );
+
     const mcpServerNames = useMemo(
         () =>
             Object.fromEntries((mcpServerOptions ?? []).map((option) => [String(option.value), String(option.label)])),
@@ -92,7 +105,12 @@ export const ToolInvocations = ({
     const visibleSurfaceOptions = useMemo(() => [ANY_FILTER_OPTION, ...surfaceOptionsByType[type]], [type]);
 
     const hasActiveFilters =
-        !!filterEndDate || !!filterMcpServerId || !!filterOutcome || !!filterStartDate || !!filterSurface;
+        !!filterA2aServerId ||
+        !!filterEndDate ||
+        !!filterMcpServerId ||
+        !!filterOutcome ||
+        !!filterStartDate ||
+        !!filterSurface;
 
     const isFirstRun =
         !toolInvocationLogsIsLoading &&
@@ -178,6 +196,18 @@ export const ToolInvocations = ({
                         </div>
                     )}
 
+                    {a2aServerOptions && a2aServerOptions.length > 0 && (
+                        <div className="flex flex-col space-y-2">
+                            <Label>A2A Server</Label>
+
+                            <ComboBox
+                                items={[ANY_FILTER_OPTION, ...a2aServerOptions]}
+                                onChange={handleA2aServerChange}
+                                value={filterA2aServerId}
+                            />
+                        </div>
+                    )}
+
                     <div className="flex flex-col space-y-2">
                         <Label>Start date</Label>
 
@@ -199,6 +229,7 @@ export const ToolInvocations = ({
                 {toolInvocationLogs.length > 0 ? (
                     <div className="w-full self-start p-4 pt-0">
                         <ToolInvocationsTable
+                            a2aServerNames={a2aServerNames}
                             mcpServerNames={mcpServerNames}
                             showSurface={showSurface}
                             toolInvocationLogs={toolInvocationLogs}
