@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.audit.aspect;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
@@ -99,6 +100,10 @@ public class AuditedMethodValidator implements SmartInitializingSingleton {
             throw new IllegalStateException(
                 "@Audited method " + methodName + " declares an event longer than " + AuditAspect.COLUMN_MAX_LENGTH
                     + " characters");
+        }
+
+        if (audited.mapper() == AuditMapper.None.class) {
+            return;
         }
 
         int mapperBeanCount = listableBeanFactory.getBeanNamesForType(audited.mapper(), true, false).length;

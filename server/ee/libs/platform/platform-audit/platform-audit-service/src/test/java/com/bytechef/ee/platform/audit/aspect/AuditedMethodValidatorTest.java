@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.audit.aspect;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
@@ -29,6 +30,16 @@ class AuditedMethodValidatorTest {
         try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
             genericApplicationContext.registerBean(ValidService.class);
             genericApplicationContext.registerBean(FirstAuditMapper.class);
+            genericApplicationContext.refresh();
+
+            assertThatCode(() -> validate(genericApplicationContext)).doesNotThrowAnyException();
+        }
+    }
+
+    @Test
+    void testDeclaredDataWithoutMapperPasses() {
+        try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
+            genericApplicationContext.registerBean(DeclaredDataService.class);
             genericApplicationContext.refresh();
 
             assertThatCode(() -> validate(genericApplicationContext)).doesNotThrowAnyException();
@@ -156,6 +167,13 @@ class AuditedMethodValidatorTest {
         @Audited(event = "TEST_EVENT", mapper = FirstAuditMapper.class)
         public void write() {
             // Scanned for its annotation only.
+        }
+    }
+
+    static class DeclaredDataService {
+
+        @Audited(event = "TEST_EVENT", data = @AuditData(key = "id", value = "#id"))
+        public void write(long id) {
         }
     }
 

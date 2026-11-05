@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
@@ -23,6 +24,7 @@ import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -152,8 +154,10 @@ class WorkspaceConnectionAuditIntTest {
             ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), projectDeploymentWorkflowService,
-                mock(WorkflowTestConfigurationService.class), mock(WorkspaceConnectionService.class));
+                mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), mock(ConnectionService.class),
+                mock(PermissionService.class), projectDeploymentWorkflowService,
+                mock(WorkflowTestConfigurationService.class),
+                mock(WorkspaceConnectionService.class));
         }
     }
 }
