@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.execution.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.ee.embedded.execution.facade.ToolFacade;
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
@@ -17,7 +18,6 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

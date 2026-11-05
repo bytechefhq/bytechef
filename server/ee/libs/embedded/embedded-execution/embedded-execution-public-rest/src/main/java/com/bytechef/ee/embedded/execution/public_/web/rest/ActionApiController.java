@@ -12,6 +12,7 @@ import static com.bytechef.file.storage.base64.service.Base64FileStorageService.
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.ee.embedded.execution.facade.ActionFacade;
 import com.bytechef.ee.embedded.execution.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
@@ -20,7 +21,6 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;

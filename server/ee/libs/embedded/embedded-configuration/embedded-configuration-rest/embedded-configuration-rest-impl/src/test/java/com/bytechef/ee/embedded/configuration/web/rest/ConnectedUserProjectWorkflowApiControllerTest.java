@@ -15,9 +15,9 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.PublishConnectedUserProjectWorkflowRequestModel;
+import com.bytechef.ee.embedded.connected.user.security.TestConnectedUserAuthentication;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

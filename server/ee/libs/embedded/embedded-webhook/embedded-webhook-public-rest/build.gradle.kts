@@ -68,5 +68,6 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(testFixtures(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api")))
     testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

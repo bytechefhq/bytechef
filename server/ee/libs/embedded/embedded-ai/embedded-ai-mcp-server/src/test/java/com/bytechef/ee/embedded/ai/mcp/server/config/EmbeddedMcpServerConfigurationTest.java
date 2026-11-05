@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.ai.mcp.server.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
+import com.bytechef.ee.embedded.connected.user.security.TestConnectedUserAuthentication;
 import io.modelcontextprotocol.common.McpTransportContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

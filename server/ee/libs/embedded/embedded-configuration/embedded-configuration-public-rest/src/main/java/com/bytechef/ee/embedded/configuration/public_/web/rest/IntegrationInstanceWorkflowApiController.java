@@ -15,9 +15,9 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentIn
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Option;
-import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;

@@ -47,6 +47,7 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("org.springframework.security:spring-security-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
@@ -68,5 +69,6 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(testFixtures(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api")))
     testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

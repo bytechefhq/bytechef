@@ -20,12 +20,12 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserPathBindings;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserPathBindings.ExternalUserIdEndpoint;
+import com.bytechef.ee.embedded.connected.user.security.TestConnectedUserAuthentication;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.web.authentication.ConnectedUserPathBindings;
-import com.bytechef.platform.security.web.authentication.ConnectedUserPathBindings.ExternalUserIdEndpoint;
-import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;

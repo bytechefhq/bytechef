@@ -608,7 +608,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         assertThat(
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant"))
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null))
                     .isNotNull();
     }
 
@@ -632,7 +632,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null);
 
         assertThat(functionToolCallback).isNotNull();
 
@@ -665,7 +665,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null);
 
         assertThat(functionToolCallback).isNotNull();
 
@@ -696,7 +696,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         assertThat(
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant"))
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null))
                     .isNull();
     }
 
@@ -731,7 +731,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null);
 
         assertThat(functionToolCallback).isNotNull();
 
@@ -804,7 +804,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null);
 
         assertThat(functionToolCallback).isNotNull();
 

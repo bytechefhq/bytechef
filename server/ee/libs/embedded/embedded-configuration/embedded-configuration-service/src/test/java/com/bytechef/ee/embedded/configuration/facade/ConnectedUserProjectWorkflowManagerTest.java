@@ -24,7 +24,6 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
-import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.connection.domain.Connection;
@@ -74,7 +73,7 @@ class ConnectedUserProjectWorkflowManagerTest {
     void beforeEach() {
         connectedUserProjectWorkflowManager = new ConnectedUserProjectWorkflowManager(
             connectedUserConnectionMembership, connectedUserProjectService,
-            mock(ConnectedUserProjectWorkflowService.class), mock(ConnectedUserService.class), connectionService,
+            mock(ConnectedUserProjectWorkflowService.class), connectionService,
             mock(ProjectService.class), projectWorkflowFacade, mock(ProjectWorkflowService.class),
             mock(WorkflowService.class), workflowTestConfigurationFacade);
 

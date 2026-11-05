@@ -15,11 +15,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.embedded.connected.user.security.TestConnectedUserAuthentication;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;

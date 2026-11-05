@@ -32,12 +32,14 @@ import com.bytechef.automation.configuration.web.graphql.config.AutomationConfig
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.util.List;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
@@ -187,7 +189,9 @@ class WorkspaceApiKeyGraphQlControllerIntTest {
             @Lazy PermissionService permissionService) {
 
             AutomationMethodSecurityExpressionHandler expressionHandler =
-                new AutomationMethodSecurityExpressionHandler(permissionService);
+                new AutomationMethodSecurityExpressionHandler(
+                    permissionService,
+                    new StaticListableBeanFactory().getBeanProvider(MethodSecurityExpressionContributor.class));
 
             expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
 

@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.public_.web.rest.config;
 
-import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
+import com.bytechef.ee.embedded.connected.user.security.TestConnectedUserAuthentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;

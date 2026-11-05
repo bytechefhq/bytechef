@@ -26,7 +26,7 @@ import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.tenant.TenantContext;
 import java.util.HashMap;
 import java.util.List;
@@ -186,7 +186,7 @@ class RehydrateContextToolCallbackTest {
         ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
 
         Authentication authentication = mock(
-            Authentication.class, withSettings().extraInterfaces(ConnectedUserAuthentication.class));
+            Authentication.class, withSettings().extraInterfaces(NonPlatformUserAuthentication.class));
 
         Map<String, Object> map =
             new AgentToolInvocationContext(null, null, null, null, "acme", authentication).toToolContext();

@@ -15,12 +15,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.bytechef.ee.embedded.connected.user.security.TestConnectedUserAuthentication;
 import com.bytechef.ee.embedded.unified.facade.UnifiedApiFacade;
 import com.bytechef.ee.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreateUpdateAccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.ListAccountsPageableParameterModel;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

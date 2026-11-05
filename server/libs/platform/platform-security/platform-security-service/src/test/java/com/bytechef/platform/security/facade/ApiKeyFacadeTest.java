@@ -32,7 +32,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.ApiKeyRevoker;
 import com.bytechef.platform.user.service.UserService;
@@ -259,7 +259,7 @@ class ApiKeyFacadeTest {
         when(apiKeyService.getApiKey(1L)).thenReturn(ownerApiKey);
 
         Authentication connectedUser = mock(
-            Authentication.class, withSettings().extraInterfaces(ConnectedUserAuthentication.class));
+            Authentication.class, withSettings().extraInterfaces(NonPlatformUserAuthentication.class));
 
         when(connectedUser.isAuthenticated()).thenReturn(true);
 
@@ -275,7 +275,7 @@ class ApiKeyFacadeTest {
                 .isInstanceOf(AccessDeniedException.class);
             assertThatThrownBy(() -> apiKeyFacade.delete(1L))
                 .isInstanceOf(AccessDeniedException.class);
-            assertThatThrownBy(() -> apiKeyFacade.createAutomationApiKey(new ApiKey()))
+            assertThatThrownBy(() -> apiKeyFacade.createOwnedApiKey(new ApiKey(), PlatformType.AUTOMATION))
                 .isInstanceOf(AccessDeniedException.class);
         } finally {
             SecurityContextHolder.clearContext();

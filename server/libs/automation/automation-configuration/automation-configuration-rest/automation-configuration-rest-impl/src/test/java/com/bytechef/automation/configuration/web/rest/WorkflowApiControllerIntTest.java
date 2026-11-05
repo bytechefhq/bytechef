@@ -46,6 +46,7 @@ import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -56,6 +57,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -363,7 +365,9 @@ public class WorkflowApiControllerIntTest {
                 @Lazy PermissionService permissionService) {
 
                 AutomationMethodSecurityExpressionHandler expressionHandler =
-                    new AutomationMethodSecurityExpressionHandler(permissionService);
+                    new AutomationMethodSecurityExpressionHandler(
+                        permissionService,
+                        new StaticListableBeanFactory().getBeanProvider(MethodSecurityExpressionContributor.class));
 
                 expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
 

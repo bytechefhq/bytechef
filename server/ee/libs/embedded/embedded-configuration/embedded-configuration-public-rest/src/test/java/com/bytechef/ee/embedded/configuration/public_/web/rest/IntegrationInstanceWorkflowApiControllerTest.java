@@ -9,8 +9,8 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.platform.security.web.authentication.ConnectedUserPathBindings;
-import com.bytechef.platform.security.web.authentication.ConnectedUserPathBindings.ExternalUserIdEndpoint;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserPathBindings;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserPathBindings.ExternalUserIdEndpoint;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
