@@ -50,6 +50,8 @@ describe('Header', () => {
         const sidebarHeader = screen.getByText('Filters').closest('header');
 
         expect(sidebarHeader).toContainElement(toggleButton);
+        expect(sidebarHeader?.firstElementChild).not.toHaveClass('3xl:w-4/5');
+        expect(screen.getByText('Workflow Executions').closest('header')?.firstElementChild).toHaveClass('3xl:w-4/5');
         expect(toggleButton).toHaveClass(
             'hover:bg-surface-neutral-secondary-hover',
             'dark:hover:bg-surface-neutral-secondary-hover'

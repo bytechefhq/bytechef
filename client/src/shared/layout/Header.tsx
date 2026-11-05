@@ -36,7 +36,7 @@ const Header = ({
             <div
                 className={twMerge(
                     'flex items-center justify-between p-4',
-                    centerTitle ? '3xl:mx-auto 3xl:w-4/5' : '3xl:w-4/5',
+                    !insideLeftSidebar && (centerTitle ? '3xl:mx-auto 3xl:w-4/5' : '3xl:w-4/5'),
                     className
                 )}
             >
