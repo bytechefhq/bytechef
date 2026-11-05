@@ -124,11 +124,56 @@ class McpComponentServiceIntTest {
 
         mcpComponent.setConnectionId(2L);
 
-        mcpComponent = mcpComponentService.update(mcpComponent, null, List.of());
+        authenticate("ROLE_ADMIN");
+
+        try {
+            mcpComponent = mcpComponentService.update(mcpComponent, null, List.of());
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
 
         assertThat(mcpComponent)
             .hasFieldOrPropertyWithValue("connectionId", 2L)
             .hasFieldOrPropertyWithValue("mcpServerId", mcpServer.getId());
+    }
+
+    @Test
+    void testUpdateRejectsAConnectionNoResolverGrantsForANonAdmin() {
+        McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
+
+        Connection connection = new Connection();
+
+        connection.setComponentName("test-connection-component");
+        connection.setConnectionVersion(1);
+        connection.setId(3L);
+        connection.setName("test-connection");
+        connection.setParameters(Map.of());
+
+        connectionRepository.save(connection);
+
+        mcpComponent.setConnectionId(3L);
+
+        McpComponent updatedMcpComponent = mcpComponent;
+
+        authenticate("ROLE_USER");
+
+        try {
+            assertThatThrownBy(() -> mcpComponentService.update(updatedMcpComponent, null, List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+
+        McpComponent storedMcpComponent = mcpComponentRepository.findById(Validate.notNull(mcpComponent.getId(), "id"))
+            .orElseThrow();
+
+        assertThat(storedMcpComponent.getConnectionId()).isNull();
+    }
+
+    private static void authenticate(String authority) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority(authority))));
     }
 
     @Test
