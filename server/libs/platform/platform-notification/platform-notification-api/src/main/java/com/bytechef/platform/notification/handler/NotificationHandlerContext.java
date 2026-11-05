@@ -41,16 +41,11 @@ public class NotificationHandlerContext {
     public record ErrorSummary(String taskName, String taskType, String message, String stackTrace) {
     }
 
-    public record ApprovalSummary(String expiresAt, String formUrl) {
-    }
-
     public static class Builder {
 
         public NotificationHandlerContext build() {
             NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext();
 
-            notificationHandlerContext.approvalExpiresAt = approvalExpiresAt;
-            notificationHandlerContext.approvalFormUrl = approvalFormUrl;
             notificationHandlerContext.eventType = eventType;
             notificationHandlerContext.jobId = jobId;
             notificationHandlerContext.jobName = jobName;
@@ -65,18 +60,6 @@ public class NotificationHandlerContext {
             notificationHandlerContext.error = error;
 
             return notificationHandlerContext;
-        }
-
-        public Builder approvalExpiresAt(String approvalExpiresAt) {
-            this.approvalExpiresAt = approvalExpiresAt;
-
-            return this;
-        }
-
-        public Builder approvalFormUrl(String approvalFormUrl) {
-            this.approvalFormUrl = approvalFormUrl;
-
-            return this;
         }
 
         public Builder eventType(NotificationEvent.Type eventType) {
@@ -151,8 +134,6 @@ public class NotificationHandlerContext {
             return this;
         }
 
-        private String approvalExpiresAt;
-        private String approvalFormUrl;
         private NotificationEvent.Type eventType;
         private Long jobId;
         private String jobName;
@@ -186,14 +167,6 @@ public class NotificationHandlerContext {
                     "Send email", "email/v1/send", "Example error: connection refused",
                     "java.net.ConnectException: Example error: connection refused"))
             .build();
-    }
-
-    public String getApprovalExpiresAt() {
-        return approvalExpiresAt;
-    }
-
-    public String getApprovalFormUrl() {
-        return approvalFormUrl;
     }
 
     public NotificationEvent.Type getEventType() {
@@ -244,31 +217,12 @@ public class NotificationHandlerContext {
         return error;
     }
 
-    public ApprovalSummary getApproval() {
-        if (approvalExpiresAt == null && approvalFormUrl == null) {
-            return null;
-        }
-
-        return new ApprovalSummary(approvalExpiresAt, approvalFormUrl);
-    }
-
     public Map<String, Object> toMap() {
         Map<String, Object> map = new LinkedHashMap<>();
 
         map.put("eventType", eventType == null ? null : eventType.name());
         map.put("jobId", jobId);
         map.put("jobName", jobName);
-
-        boolean approvalEvent = eventType == NotificationEvent.Type.JOB_APPROVAL_EXPIRING
-            || eventType == NotificationEvent.Type.JOB_APPROVAL_ESCALATED;
-
-        if (approvalEvent || approvalExpiresAt != null) {
-            map.put("approvalExpiresAt", approvalExpiresAt);
-        }
-
-        if (approvalEvent || approvalFormUrl != null) {
-            map.put("approvalFormUrl", approvalFormUrl);
-        }
 
         Instant resolvedTimestamp = timestamp == null ? Instant.now() : timestamp;
 
@@ -326,17 +280,6 @@ public class NotificationHandlerContext {
 
         putIfPresent(map, "executionUrl", executionUrl);
 
-        ApprovalSummary approval = getApproval();
-
-        if (approval != null) {
-            Map<String, Object> approvalMap = new LinkedHashMap<>();
-
-            putIfPresent(approvalMap, "expiresAt", approval.expiresAt());
-            putIfPresent(approvalMap, "formUrl", approval.formUrl());
-
-            map.put("approval", approvalMap);
-        }
-
         return map;
     }
 
@@ -392,8 +335,6 @@ public class NotificationHandlerContext {
 
     }
 
-    private String approvalExpiresAt;
-    private String approvalFormUrl;
     private NotificationEvent.Type eventType;
     private Long jobId;
     private String jobName;
@@ -410,8 +351,6 @@ public class NotificationHandlerContext {
     private NotificationHandlerContext copy() {
         NotificationHandlerContext copy = new NotificationHandlerContext();
 
-        copy.approvalExpiresAt = approvalExpiresAt;
-        copy.approvalFormUrl = approvalFormUrl;
         copy.eventType = eventType;
         copy.jobId = jobId;
         copy.jobName = jobName;

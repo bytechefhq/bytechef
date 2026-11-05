@@ -319,7 +319,7 @@ bytechef:
     # Hosts that notification webhook and Slack URLs may use even when they resolve to a private or loopback address
     # (comma-separated, matched exactly). Empty blocks every private address.
     allowed-hosts:
-    # Outbound webhook POSTs (job status and task started webhooks, notification webhooks, Slack, approval reminders)
+    # Outbound webhook POSTs (job status and task started webhooks, notification webhooks, Slack)
     # in flight at once across all endpoints; each endpoint receives one delivery at a time.
     concurrency-limit: 10
     # Deliveries to one endpoint that may wait or run at the same time; further ones are dropped and logged.
@@ -348,16 +348,8 @@ bytechef:
       agent:
         # Maximum nesting depth of sub-workflows called by AI agent tools default: 10
         max-subflow-depth: 10
-      approval-escalation:
-        # Escalate a pending approval after this duration; the sweep is a no-op while unset
-        # after:
-        enabled: true
       approval-expiry:
         enabled: true
-      approval-reminder:
-        enabled: true
-        # Send one reminder this long before an approval expires default: PT24H
-        lead-time: PT24H
     output-storage:
       # Output storage provider for workflow output data (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
       provider: JDBC

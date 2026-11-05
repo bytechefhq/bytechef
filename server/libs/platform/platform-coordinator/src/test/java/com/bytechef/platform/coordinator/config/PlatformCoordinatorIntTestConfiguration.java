@@ -46,25 +46,11 @@ import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.coordinator.notification.ApprovalEscalationEmailNotificationHandler;
-import com.bytechef.platform.coordinator.notification.ApprovalEscalationWebhookNotificationHandler;
-import com.bytechef.platform.coordinator.notification.ApprovalReminderEmailNotificationHandler;
-import com.bytechef.platform.coordinator.notification.ApprovalReminderWebhookNotificationHandler;
 import com.bytechef.platform.coordinator.notification.JobStatusEmailNotificationHandler;
 import com.bytechef.platform.coordinator.notification.JobStatusSlackNotificationHandler;
 import com.bytechef.platform.coordinator.notification.JobStatusWebhookNotificationHandler;
 import com.bytechef.platform.coordinator.notification.NotificationHandlerContexts;
 import com.bytechef.platform.data.storage.jdbc.config.JdbcDataStorageConfiguration;
-import com.bytechef.platform.notification.domain.Notification;
-import com.bytechef.platform.notification.handler.NotificationHandlerContext;
-import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
-import com.bytechef.platform.notification.handler.NotificationSender;
-import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
-import com.bytechef.platform.notification.handler.NotificationTestResult;
-import com.bytechef.platform.notification.handler.SlackNotificationHandler;
-import com.bytechef.platform.notification.repository.NotificationRepository;
-import com.bytechef.platform.notification.service.NotificationService;
-import com.bytechef.platform.notification.service.NotificationServiceImpl;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.tenant.TenantContext;
@@ -74,7 +60,6 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -87,10 +72,9 @@ import tools.jackson.databind.ObjectMapper;
  */
 @EnableAutoConfiguration
 @Import({
-    ApprovalEscalationEmailNotificationHandler.class, ApprovalReminderEmailNotificationHandler.class,
-    ApprovalReminderWebhookNotificationHandler.class, JacksonConfiguration.class, JdbcDataStorageConfiguration.class,
-    JobStatusEmailNotificationHandler.class, JobStatusSlackNotificationHandler.class,
-    JobStatusWebhookNotificationHandler.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
+    JacksonConfiguration.class, JdbcDataStorageConfiguration.class, JobStatusEmailNotificationHandler.class,
+    JobStatusSlackNotificationHandler.class, JobStatusWebhookNotificationHandler.class, LiquibaseConfiguration.class,
+    PostgreSQLContainerConfiguration.class
 })
 @Configuration
 public class PlatformCoordinatorIntTestConfiguration {
@@ -120,31 +104,6 @@ public class PlatformCoordinatorIntTestConfiguration {
     }
 
     @Bean
-    NotificationHandlerRegistry notificationHandlerRegistry() {
-        return new NotificationHandlerRegistry(
-            List.of(
-                new ApprovalEscalationWebhookNotificationHandler(), new ApprovalReminderWebhookNotificationHandler()));
-    }
-
-    @Bean
-    NotificationSenderRegistry notificationSenderRegistry(
-        RecordingWebhookNotificationSender recordingWebhookNotificationSender) {
-
-        return new NotificationSenderRegistry(
-            List.of(recordingWebhookNotificationSender, new UnreachableSlackNotificationSender()));
-    }
-
-    @Bean
-    NotificationService notificationService(NotificationRepository notificationRepository) {
-        return new NotificationServiceImpl(notificationRepository);
-    }
-
-    @Bean
-    RecordingWebhookNotificationSender recordingWebhookNotificationSender() {
-        return new RecordingWebhookNotificationSender();
-    }
-
-    @Bean
     TaskExecutionService taskExecutionService(TaskExecutionRepository taskExecutionRepository) {
         return new TaskExecutionServiceImpl(taskExecutionRepository);
     }
@@ -156,31 +115,6 @@ public class PlatformCoordinatorIntTestConfiguration {
         when(tenantService.getTenantIds()).thenReturn(List.of(TenantContext.DEFAULT_TENANT_ID));
 
         return tenantService;
-    }
-
-    private static final class UnreachableSlackNotificationSender
-        implements NotificationSender<SlackNotificationHandler> {
-
-        @Override
-        public Notification.Type getType() {
-            return Notification.Type.SLACK;
-        }
-
-        @Override
-        public CompletableFuture<Void> send(
-            Notification notification, SlackNotificationHandler notificationHandler,
-            NotificationHandlerContext notificationHandlerContext) {
-
-            throw new AssertionError("No Slack handler is registered, so nothing should reach the Slack sender");
-        }
-
-        @Override
-        public NotificationTestResult sendTest(
-            Notification notification, SlackNotificationHandler notificationHandler,
-            NotificationHandlerContext notificationHandlerContext) {
-
-            throw new AssertionError("No Slack handler is registered, so nothing should reach the Slack sender");
-        }
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

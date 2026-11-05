@@ -5330,7 +5330,7 @@ public class ApplicationProperties {
     }
 
     /**
-     * Outbound webhook delivery, such as job status, task started, notification, Slack and approval reminder webhooks.
+     * Outbound webhook delivery, such as job status, task started, notification and Slack webhooks.
      */
     public static class WebhookDelivery {
 
@@ -5542,42 +5542,22 @@ public class ApplicationProperties {
              */
             private Agent agent = new Agent();
 
-            private ApprovalEscalation approvalEscalation = new ApprovalEscalation();
-
             private ApprovalExpiry approvalExpiry = new ApprovalExpiry();
-
-            private ApprovalReminder approvalReminder = new ApprovalReminder();
 
             public Agent getAgent() {
                 return agent;
-            }
-
-            public ApprovalEscalation getApprovalEscalation() {
-                return approvalEscalation;
             }
 
             public ApprovalExpiry getApprovalExpiry() {
                 return approvalExpiry;
             }
 
-            public ApprovalReminder getApprovalReminder() {
-                return approvalReminder;
-            }
-
             public void setAgent(Agent agent) {
                 this.agent = agent;
             }
 
-            public void setApprovalEscalation(ApprovalEscalation approvalEscalation) {
-                this.approvalEscalation = approvalEscalation;
-            }
-
             public void setApprovalExpiry(ApprovalExpiry approvalExpiry) {
                 this.approvalExpiry = approvalExpiry;
-            }
-
-            public void setApprovalReminder(ApprovalReminder approvalReminder) {
-                this.approvalReminder = approvalReminder;
             }
 
             /**
@@ -5599,29 +5579,6 @@ public class ApplicationProperties {
                 }
             }
 
-            public static class ApprovalEscalation {
-
-                private Duration after;
-
-                private boolean enabled;
-
-                public Duration getAfter() {
-                    return after;
-                }
-
-                public boolean isEnabled() {
-                    return enabled;
-                }
-
-                public void setAfter(Duration after) {
-                    this.after = after;
-                }
-
-                public void setEnabled(boolean enabled) {
-                    this.enabled = enabled;
-                }
-            }
-
             public static class ApprovalExpiry {
 
                 private boolean enabled;
@@ -5632,29 +5589,6 @@ public class ApplicationProperties {
 
                 public void setEnabled(boolean enabled) {
                     this.enabled = enabled;
-                }
-            }
-
-            public static class ApprovalReminder {
-
-                private boolean enabled;
-
-                private Duration leadTime;
-
-                public Duration getLeadTime() {
-                    return leadTime;
-                }
-
-                public boolean isEnabled() {
-                    return enabled;
-                }
-
-                public void setEnabled(boolean enabled) {
-                    this.enabled = enabled;
-                }
-
-                public void setLeadTime(Duration leadTime) {
-                    this.leadTime = leadTime;
                 }
             }
         }

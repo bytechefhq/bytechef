@@ -92,11 +92,7 @@ class ApplicationPropertiesTest {
         properties.put("bytechef.automation.approval-task.reconciliation.enabled", "false");
         properties.put("bytechef.webhook.discord.public-key", "discord-public-key");
         properties.put("bytechef.webhook.whatsapp.verify-token", "whatsapp-verify-token");
-        properties.put("bytechef.workflow.execution.approval-escalation.enabled", "false");
-        properties.put("bytechef.workflow.execution.approval-escalation.after", "PT48H");
         properties.put("bytechef.workflow.execution.approval-expiry.enabled", "false");
-        properties.put("bytechef.workflow.execution.approval-reminder.enabled", "false");
-        properties.put("bytechef.workflow.execution.approval-reminder.lead-time", "PT12H");
 
         Binder binder = new Binder(new MapConfigurationPropertySource(properties));
 
@@ -132,19 +128,8 @@ class ApplicationPropertiesTest {
 
         ApplicationProperties.Workflow.Execution execution = workflow.getExecution();
 
-        ApplicationProperties.Workflow.Execution.ApprovalEscalation approvalEscalation =
-            execution.getApprovalEscalation();
-
-        assertThat(approvalEscalation.isEnabled()).isFalse();
-        assertThat(approvalEscalation.getAfter()).isEqualTo(Duration.ofHours(48));
-
         assertThat(execution.getApprovalExpiry()
             .isEnabled()).isFalse();
-
-        ApplicationProperties.Workflow.Execution.ApprovalReminder approvalReminder = execution.getApprovalReminder();
-
-        assertThat(approvalReminder.isEnabled()).isFalse();
-        assertThat(approvalReminder.getLeadTime()).isEqualTo(Duration.ofHours(12));
     }
 
     @Test
@@ -156,8 +141,8 @@ class ApplicationPropertiesTest {
 
         ApplicationProperties.Workflow.Execution execution = workflow.getExecution();
 
-        assertThat(execution.getApprovalEscalation()
-            .getAfter()).isNull();
+        assertThat(execution.getApprovalExpiry()
+            .isEnabled()).isTrue();
 
         ApplicationProperties.Approval approval = applicationProperties.getApproval();
 

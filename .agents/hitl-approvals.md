@@ -98,22 +98,16 @@ User docs: `docs/content/docs/platform/automation/build/workflows/human-in-the-l
   Every path fails through `JobSuspends.failExpiredApproval`, which spends the resume id and records it as
   `expiredJobResumeId`; the resume and timer paths also fail the suspended task execution. All paths that fail or
   cancel publish `JobApprovalClosedEvent`, and `ApprovalTaskExpiryListener` marks that job's open rows EXPIRED.
-- **Reminder/escalation act only on approval suspends** (`JobSuspends`). One `ApprovalNotificationMonitor` sweep runs
-  both every 15 min, reads each suspended task execution once, and sends through `ApprovalNotificationDispatcher`,
-  which counts a send as delivered when any subscribed `Notification` succeeded.
-  - The reminder fires `JOB_APPROVAL_EXPIRING` within `lead-time` of expiry.
-  - The escalation fires `JOB_APPROVAL_ESCALATED` once `after` has elapsed since `approvalRaisedAt` (falling back to
-    the task's startDate) and the approval has not expired. `after` has no default, so escalation does nothing until
-    it is set. A disabled policy (`approval-reminder.enabled` / `approval-escalation.enabled`) is skipped.
-  - The notification and expiry sweeps hold a ShedLock lock, so only one coordinator runs each sweep: JDBC
-    (`public.shedlock`) in server-app, Redis in the distributed coordinator-app.
-  - Handlers: `Approval{Reminder,Escalation}{Email,Slack,Webhook}NotificationHandler`.
-  - Each claims a job-metadata marker (`approvalReminderSentAt` / `approvalEscalatedAt`) BEFORE sending and keeps it
-    only when something was delivered; it is released on failure and when no notification is configured, so the next
-    sweep retries.
-  - `SuspendTaskDispatcherPreSendProcessor` clears both markers on resume, so they apply per suspend.
-  - Notification, inbox, MCP and A2A form links are signed to expire with the approval.
-  - `NotificationEvent.Type` ordinals are append-only: escalated is ordinal 7, notification_event id 8.
+- **No approval reminders or escalation.** Approvers get the request through the approval channels and the
+  pending-approvals inbox, and an expired approval fails the run, which fires `JOB_FAILED`.
+  - `ApprovalExpiryMonitor` holds a ShedLock lock, so only one coordinator runs the sweep: JDBC (`public.shedlock`)
+    in server-app, Redis in the distributed coordinator-app.
+  - Inbox, MCP and A2A form links are signed to expire with the approval.
+  - `NotificationEvent.Type` ordinals are append-only and persisted. `JOB_APPROVAL_EXPIRING` (ordinal 6) and
+    `JOB_APPROVAL_ESCALATED` (ordinal 7) stay as `@Deprecated` placeholders with no handlers; their
+    `notification_event` rows (ids 7 and 8) and subscriptions were deleted by an Upgrade changelog. Never reuse
+    them. Real escalation, if wanted, belongs on the approval step (extra approvers or channels after a delay), not
+    in a server-wide admin notification.
 - **Approval-task rows** (`ApprovalTask.Status`: OPEN, IN_PROGRESS, COMPLETED, EXPIRED, appended in that order) close
   three ways:
   - `ApprovalTaskCompletionListener` on `JobResumedEvent` → COMPLETED.
@@ -187,10 +181,6 @@ User docs: `docs/content/docs/platform/automation/build/workflows/human-in-the-l
   | `bytechef.webhook.discord.public-key` | unset |
   | `bytechef.webhook.whatsapp.verify-token` | unset |
   | `bytechef.workflow.execution.approval-expiry.enabled` | `true` |
-  | `bytechef.workflow.execution.approval-reminder.enabled` | `true` |
-  | `bytechef.workflow.execution.approval-reminder.lead-time` | `PT24H` |
-  | `bytechef.workflow.execution.approval-escalation.enabled` | `true` |
-  | `bytechef.workflow.execution.approval-escalation.after` | unset (sweep does nothing) |
   | `bytechef.automation.approval-task.reconciliation.enabled` | `true` |
   | `bytechef.workflow.execution.agent.max-subflow-depth` | `10` |
 
