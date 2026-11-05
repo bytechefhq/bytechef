@@ -41,6 +41,7 @@ import org.springframework.web.client.RestClient;
 @Conditional(BraveWebSearchCondition.class)
 public class BraveWebSearchTools {
 
+    private static final String BASE_URL = "https://api.search.brave.com/res/v1";
     private static final int MAX_COUNT = 20;
     private static final int MIN_COUNT = 1;
 
@@ -53,7 +54,7 @@ public class BraveWebSearchTools {
             .getBrave();
 
         this.restClient = restClientBuilder
-            .baseUrl(brave.getBaseUrl())
+            .baseUrl(BASE_URL)
             .defaultHeader("X-Subscription-Token", brave.getApiKey())
             .defaultHeader("Accept", "application/json")
             .build();
