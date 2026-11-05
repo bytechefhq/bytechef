@@ -37,7 +37,8 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   AutomationWorkflowProjectComponentModel.JSON_PROPERTY_TITLE,
   AutomationWorkflowProjectComponentModel.JSON_PROPERTY_ICON,
   AutomationWorkflowProjectComponentModel.JSON_PROPERTY_CONNECTION_REQUIRED,
-  AutomationWorkflowProjectComponentModel.JSON_PROPERTY_INTEGRATION_ID
+  AutomationWorkflowProjectComponentModel.JSON_PROPERTY_INTEGRATION_ID,
+  AutomationWorkflowProjectComponentModel.JSON_PROPERTY_PROVIDED
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AutomationWorkflowProjectComponentModel {
@@ -60,6 +61,10 @@ public class AutomationWorkflowProjectComponentModel {
   public static final String JSON_PROPERTY_INTEGRATION_ID = "integrationId";
   @jakarta.annotation.Nullable
   private Long integrationId;
+
+  public static final String JSON_PROPERTY_PROVIDED = "provided";
+  @jakarta.annotation.Nullable
+  private Boolean provided;
 
   public AutomationWorkflowProjectComponentModel() { 
   }
@@ -184,6 +189,30 @@ public class AutomationWorkflowProjectComponentModel {
   }
 
 
+  public AutomationWorkflowProjectComponentModel provided(@jakarta.annotation.Nullable Boolean provided) {
+    this.provided = provided;
+    return this;
+  }
+
+  /**
+   * Whether the configuration provides the connection of this component, so the connected user cannot choose one. The provided connection is neither listed among the connected user&#39;s connections nor returned.
+   * @return provided
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_PROVIDED, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public Boolean getProvided() {
+    return provided;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_PROVIDED, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setProvided(@jakarta.annotation.Nullable Boolean provided) {
+    this.provided = provided;
+  }
+
+
   /**
    * Return true if this AutomationWorkflowProjectComponent object is equal to o.
    */
@@ -200,12 +229,13 @@ public class AutomationWorkflowProjectComponentModel {
         Objects.equals(this.title, automationWorkflowProjectComponent.title) &&
         Objects.equals(this.icon, automationWorkflowProjectComponent.icon) &&
         Objects.equals(this.connectionRequired, automationWorkflowProjectComponent.connectionRequired) &&
-        Objects.equals(this.integrationId, automationWorkflowProjectComponent.integrationId);
+        Objects.equals(this.integrationId, automationWorkflowProjectComponent.integrationId) &&
+        Objects.equals(this.provided, automationWorkflowProjectComponent.provided);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, title, icon, connectionRequired, integrationId);
+    return Objects.hash(name, title, icon, connectionRequired, integrationId, provided);
   }
 
   @Override
@@ -217,6 +247,7 @@ public class AutomationWorkflowProjectComponentModel {
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    connectionRequired: ").append(toIndentedString(connectionRequired)).append("\n");
     sb.append("    integrationId: ").append(toIndentedString(integrationId)).append("\n");
+    sb.append("    provided: ").append(toIndentedString(provided)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -284,6 +315,11 @@ public class AutomationWorkflowProjectComponentModel {
     // add `integrationId` to the URL query string
     if (getIntegrationId() != null) {
       joiner.add(String.format(java.util.Locale.ROOT, "%sintegrationId%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getIntegrationId()))));
+    }
+
+    // add `provided` to the URL query string
+    if (getProvided() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%sprovided%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getProvided()))));
     }
 
     return joiner.toString();
