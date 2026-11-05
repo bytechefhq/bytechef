@@ -405,7 +405,6 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_VIEW')")
     @Transactional(readOnly = true)
     public Set<Long> getOwnedProjectDeploymentIds(
         Collection<Long> projectDeploymentIds, ProjectDeploymentOwner projectDeploymentOwner) {
@@ -414,6 +413,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_VIEW')")
     @Transactional(readOnly = true)
     public ProjectDeploymentDTO getProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
