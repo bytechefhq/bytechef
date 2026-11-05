@@ -310,6 +310,7 @@ describe('PropertyDynamicProperties', () => {
                 componentVersion: 1,
                 connectionId: 42,
                 inputParameters: {serverId: 'srv-1'},
+                mcpComponentId: '7',
             });
         });
 
@@ -323,6 +324,17 @@ describe('PropertyDynamicProperties', () => {
 
             expect(screen.getByTestId('property-field1')).toBeInTheDocument();
             expect(screen.getByTestId('property-field2')).toBeInTheDocument();
+        });
+
+        it('should send the MCP component id of the cluster element context', () => {
+            hoisted.mockClusterElementDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: false});
+
+            render(<PropertyDynamicProperties {...defaultProps} />);
+
+            const queryCall = hoisted.mockClusterElementDynamicPropertiesQuery.mock.calls[0];
+            const queryArgs = queryCall[0];
+
+            expect(queryArgs.mcpComponentId).toBe('7');
         });
 
         it('should show skeletons when cluster element context query is loading', () => {
@@ -340,6 +352,7 @@ describe('PropertyDynamicProperties', () => {
                 componentName: 'mcpServer',
                 componentVersion: 1,
                 inputParameters: {serverId: '=expression'},
+                mcpComponentId: '7',
             });
 
             hoisted.mockClusterElementDynamicPropertiesQuery.mockReturnValue({data: undefined, isLoading: false});

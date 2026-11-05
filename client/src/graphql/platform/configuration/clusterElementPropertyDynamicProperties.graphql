@@ -6,6 +6,7 @@ query clusterElementDynamicProperties(
     $connectionId: Long
     $inputParameters: Map
     $lookupDependsOnPaths: [String!]
+    $mcpComponentId: ID!
 ) {
     clusterElementDynamicProperties(
         componentName: $componentName
@@ -15,6 +16,7 @@ query clusterElementDynamicProperties(
         connectionId: $connectionId
         inputParameters: $inputParameters
         lookupDependsOnPaths: $lookupDependsOnPaths
+        mcpComponentId: $mcpComponentId
     ) {
         advancedOption
         description

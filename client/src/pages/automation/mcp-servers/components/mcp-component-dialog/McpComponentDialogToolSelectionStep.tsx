@@ -211,6 +211,7 @@ const McpComponentDialogToolSelectionStep = ({
                                                 connectionId={selectedConnection?.id?.toString()}
                                                 connectionRequired={componentDefinition?.connectionRequired ?? true}
                                                 isNew={!savedParametersByToolName.has(tool.name)}
+                                                mcpComponentId={mcpComponent?.id}
                                                 onFormChange={onToolFormChange}
                                                 savedParameters={savedParametersByToolName.get(tool.name)}
                                                 toolName={tool.name}
