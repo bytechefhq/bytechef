@@ -4293,6 +4293,7 @@ export type QueryToolEligibleProjectVersionWorkflowsArgs = {
 
 
 export type QueryToolInvocationLogsArgs = {
+  a2aServerId?: InputMaybe<Scalars['Long']['input']>;
   connectedUserId?: InputMaybe<Scalars['Long']['input']>;
   environmentId?: InputMaybe<Scalars['ID']['input']>;
   fromDate?: InputMaybe<Scalars['Long']['input']>;
@@ -4417,6 +4418,7 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
 
 
 export type QueryWorkspaceToolInvocationLogsArgs = {
+  a2aServerId?: InputMaybe<Scalars['Long']['input']>;
   connectedUserId?: InputMaybe<Scalars['Long']['input']>;
   environmentId: Scalars['ID']['input'];
   fromDate?: InputMaybe<Scalars['Long']['input']>;
@@ -4621,6 +4623,7 @@ export type ToolInvocationLogPageType = {
 
 export type ToolInvocationLogType = {
   __typename?: 'ToolInvocationLogType';
+  a2aServerId?: Maybe<Scalars['Long']['output']>;
   componentName?: Maybe<Scalars['String']['output']>;
   componentVersion?: Maybe<Scalars['Int']['output']>;
   connectedUserId?: Maybe<Scalars['Long']['output']>;
