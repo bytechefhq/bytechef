@@ -67,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -112,7 +113,6 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             new AiAgentUtilsGlobTool(agentWorkspaceResolver).clusterElementDefinition,
             new AiAgentUtilsListDirectoryTool(agentWorkspaceResolver).clusterElementDefinition,
             agentUtilsSmartWebFetchTool.clusterElementDefinition,
-            AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
             agentUtilsAutoMemoryTool.clusterElementDefinition,
             AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
             agentUtilsTaskTool.clusterElementDefinition,
@@ -122,6 +122,13 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             tool(AiAgentUtilsDeleteAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsRemoveFileFromAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsUpdateAiSkillAction.of(aiSkillFacade))));
+
+        ApplicationProperties.Ai.Brave brave = applicationProperties.getAi()
+            .getBrave();
+
+        if (brave.isEnabled() && StringUtils.hasText(brave.getApiKey())) {
+            clusterElements.add(new AiAgentUtilsBraveWebSearchTool(brave.getApiKey()).clusterElementDefinition);
+        }
 
         ApplicationProperties.Ai.AgentUtils.Shell shell = agentUtils.getShell();
 

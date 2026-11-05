@@ -36,14 +36,26 @@ public class AiAgentUtilsComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/ai_agent-utils_v1.json", createComponentHandler(true).getDefinition());
+            "definition/ai_agent-utils_v1.json", createComponentHandler(true, true, "test-key").getDefinition());
     }
 
     @Test
     public void testGetComponentDefinitionLeavesOutShellToolsUnlessEnabled() {
-        assertThat(clusterElementNames(createComponentHandler(false))).doesNotContain("shellTools")
+        assertThat(clusterElementNames(createComponentHandler(false, false, null))).doesNotContain("shellTools")
             .contains("fileSystemTools");
-        assertThat(clusterElementNames(createComponentHandler(true))).contains("shellTools");
+        assertThat(clusterElementNames(createComponentHandler(true, false, null))).contains("shellTools");
+    }
+
+    @Test
+    public void testGetComponentDefinitionIncludesBraveWebSearchToolOnlyWhenEnabledWithApiKey() {
+        assertThat(clusterElementNames(createComponentHandler(false, true, "test-key")))
+            .contains("braveWebSearchTool");
+        assertThat(clusterElementNames(createComponentHandler(false, false, "test-key")))
+            .doesNotContain("braveWebSearchTool");
+        assertThat(clusterElementNames(createComponentHandler(false, true, null)))
+            .doesNotContain("braveWebSearchTool");
+        assertThat(clusterElementNames(createComponentHandler(false, true, " ")))
+            .doesNotContain("braveWebSearchTool");
     }
 
     private static List<String> clusterElementNames(AiAgentUtilsComponentHandler componentHandler) {
@@ -56,11 +68,19 @@ public class AiAgentUtilsComponentHandlerTest {
             .toList();
     }
 
-    private static AiAgentUtilsComponentHandler createComponentHandler(boolean shellEnabled) {
+    private static AiAgentUtilsComponentHandler createComponentHandler(
+        boolean shellEnabled, boolean braveEnabled, String braveApiKey) {
+
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
-        ApplicationProperties.Ai.AgentUtils agentUtils = applicationProperties.getAi()
-            .getAgentUtils();
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        ApplicationProperties.Ai.Brave brave = ai.getBrave();
+
+        brave.setApiKey(braveApiKey);
+        brave.setEnabled(braveEnabled);
+
+        ApplicationProperties.Ai.AgentUtils agentUtils = ai.getAgentUtils();
 
         agentUtils.getShell()
             .setEnabled(shellEnabled);
