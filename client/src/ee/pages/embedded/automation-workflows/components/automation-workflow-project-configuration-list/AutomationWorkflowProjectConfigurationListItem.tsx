@@ -25,6 +25,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     ChevronDownIcon,
     EllipsisVerticalIcon,
+    FolderIcon,
     PencilIcon,
     RefreshCcwIcon,
     SlidersHorizontalIcon,
@@ -47,6 +48,7 @@ interface AutomationWorkflowProjectConfigurationListItemProps {
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     project: AutomationWorkflowProjectType;
+    showProjectName?: boolean;
 }
 
 const formatCount = (count: number, noun: string): string => `${count} ${count === 1 ? noun : `${noun}s`}`;
@@ -58,6 +60,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
     onEdit,
     onUpdateVersion,
     project,
+    showProjectName = false,
 }: AutomationWorkflowProjectConfigurationListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showMoveUsersDialog, setShowMoveUsersDialog] = useState(false);
@@ -142,6 +145,14 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                         </div>
 
                         <div className="mt-2 flex min-h-7 items-center">
+                            {showProjectName && (
+                                <span className="mr-4 flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+                                    <FolderIcon aria-hidden="true" className="size-4 shrink-0" />
+
+                                    {project.name}
+                                </span>
+                            )}
+
                             <CollapsibleTrigger
                                 className="group/configuration mr-4 flex items-center text-xs font-semibold text-muted-foreground"
                                 disabled={workflowCount === 0}

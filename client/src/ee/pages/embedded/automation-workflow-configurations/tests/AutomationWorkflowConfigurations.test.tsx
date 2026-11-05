@@ -7,7 +7,7 @@ import {
     userEvent,
     windowResizeObserver,
 } from '@/shared/util/test-utils';
-import {render} from '@testing-library/react';
+import {render, within} from '@testing-library/react';
 import {MemoryRouter, Route, Routes, useLocation} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -124,6 +124,10 @@ const renderPage = (initialEntry = '/embedded/automation-configurations') => {
     );
 };
 
+const listedProjectIds = () => [
+    ...new Set((mocks.configurationsVariables as {projectId: string}[]).map((variables) => variables.projectId)),
+];
+
 describe('AutomationWorkflowConfigurations', () => {
     beforeEach(() => {
         windowResizeObserver();
@@ -155,12 +159,11 @@ describe('AutomationWorkflowConfigurations', () => {
 
         expect(mocks.projectsVariables).toEqual({environmentId: '2'});
         expect(screen.getByText('Projects: All Projects')).toBeInTheDocument();
-        expect(screen.getByRole('region', {name: 'Live Project'})).toBeInTheDocument();
+        expect(listedProjectIds()).toEqual(['live']);
+        expect(screen.queryByRole('heading', {name: 'Live Project'})).not.toBeInTheDocument();
         expect(
-            screen.getByRole('region', {name: 'Live Project'}).querySelector('svg.lucide-folder')
+            within(screen.getByText('PRODUCTION').closest('[data-state]') as HTMLElement).getByText('Live Project')
         ).toBeInTheDocument();
-        expect(screen.queryByRole('region', {name: 'Other Project'})).not.toBeInTheDocument();
-        expect(screen.queryByRole('region', {name: 'Draft Project'})).not.toBeInTheDocument();
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'New Configuration'})).toBeInTheDocument();
         expect(mocks.configurationsVariables).toContainEqual({environmentId: '2', projectId: 'live'});
@@ -203,7 +206,7 @@ describe('AutomationWorkflowConfigurations', () => {
 
         expect(screen.getByText('Create your first configuration')).toBeInTheDocument();
         expect(screen.getByRole('link', {name: /How configurations work/})).toBeInTheDocument();
-        expect(screen.queryByRole('region', {name: 'Other Project'})).not.toBeInTheDocument();
+        expect(listedProjectIds()).toEqual([]);
         expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('button', {name: 'Create Configuration'}));
@@ -219,8 +222,7 @@ describe('AutomationWorkflowConfigurations', () => {
         expect(screen.getByText('Projects: Other Project')).toBeInTheDocument();
         expect(screen.getByText('No Matching Configurations')).toBeInTheDocument();
         expect(screen.getByText('Other Project has no configurations in this environment.')).toBeInTheDocument();
-        expect(screen.queryByRole('region', {name: 'Other Project'})).not.toBeInTheDocument();
-        expect(screen.queryByRole('region', {name: 'Live Project'})).not.toBeInTheDocument();
+        expect(listedProjectIds()).toEqual([]);
         expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'New Configuration'})).not.toHaveAttribute('aria-haspopup');
     });
@@ -231,7 +233,7 @@ describe('AutomationWorkflowConfigurations', () => {
         renderPage('/embedded/automation-configurations?projectId=live');
 
         expect(screen.getByText('Projects: Live Project')).toBeInTheDocument();
-        expect(screen.getByRole('region', {name: 'Live Project'})).toBeInTheDocument();
+        expect(listedProjectIds()).toEqual(['live']);
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
     });
 

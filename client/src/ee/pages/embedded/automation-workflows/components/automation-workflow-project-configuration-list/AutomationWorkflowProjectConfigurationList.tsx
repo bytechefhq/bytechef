@@ -21,6 +21,7 @@ interface AutomationWorkflowProjectConfigurationListProps {
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     project: AutomationWorkflowProjectType;
+    showProjectName?: boolean;
 }
 
 const AutomationWorkflowProjectConfigurationList = ({
@@ -29,6 +30,7 @@ const AutomationWorkflowProjectConfigurationList = ({
     onEdit,
     onUpdateVersion,
     project,
+    showProjectName = false,
 }: AutomationWorkflowProjectConfigurationListProps) => {
     const queryClient = useQueryClient();
 
@@ -76,6 +78,7 @@ const AutomationWorkflowProjectConfigurationList = ({
                     onEdit={onEdit}
                     onUpdateVersion={onUpdateVersion}
                     project={project}
+                    showProjectName={showProjectName}
                 />
             ))}
         </div>
