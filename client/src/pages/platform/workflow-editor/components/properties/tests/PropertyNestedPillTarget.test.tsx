@@ -429,6 +429,10 @@ describe('pill target inside an object or array builder', () => {
 
         await settle();
 
+        fireEvent.click(screen.getByRole('button', {name: 'Replace'}));
+
+        await settle();
+
         await act(async () => {
             await new Promise<void>((resolve) => setTimeout(resolve, 700));
         });
@@ -685,6 +689,70 @@ describe('pill target inside an object or array builder', () => {
             expect(clearRequest?.value).toBeNull();
         }
     );
+
+    it('turns Formula on for an empty array without asking', async () => {
+        setParameters({counts: []});
+
+        renderUncontrolled(arrayProperty);
+
+        await settle();
+
+        fireEvent.click(screen.getAllByRole('switch', {name: 'Formula'})[0]);
+
+        await settle();
+
+        expect(screen.queryByRole('alertdialog')).toBeNull();
+        expect(screen.getAllByRole('switch', {name: 'Formula'})[0]).toBeChecked();
+    });
+
+    it.each([
+        ['an array', arrayProperty, 'counts', 'items'],
+        ['an object', objectProperty, 'settings', 'properties'],
+    ])('keeps the entries of %s when replacing them with a formula is cancelled', async (_, property, path, noun) => {
+        const {container} = renderUncontrolled(property);
+
+        await settle();
+
+        fireEvent.click(screen.getAllByRole('switch', {name: 'Formula'})[0]);
+
+        await settle();
+
+        const alertDialog = screen.getByRole('alertdialog');
+
+        expect(alertDialog).toHaveTextContent('Replace with a formula?');
+        expect(alertDialog).toHaveTextContent(`The ${noun} in ${property.label} will be removed.`);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        await settle();
+
+        expect(screen.queryByRole('alertdialog')).toBeNull();
+        expect(screen.getAllByRole('switch', {name: 'Formula'})[0]).not.toBeChecked();
+        expect(container.querySelector('input[type=number]')).not.toBeNull();
+        expect(savedPaths()).not.toContain(path);
+    });
+
+    it.each([
+        ['an array', arrayProperty, 'counts'],
+        ['an object', objectProperty, 'settings'],
+    ])('clears the entries of %s and turns Formula on once the replacement is confirmed', async (_, property, path) => {
+        const {container} = renderUncontrolled(property);
+
+        await settle();
+
+        fireEvent.click(screen.getAllByRole('switch', {name: 'Formula'})[0]);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Replace'}));
+
+        await settle();
+
+        expect(screen.queryByRole('alertdialog')).toBeNull();
+        expect(screen.getAllByRole('switch', {name: 'Formula'})[0]).toBeChecked();
+        expect(container.querySelector('input[type=number]')).toBeNull();
+        expect(savedPaths()).toContain(path);
+    });
 
     it('asks before replacing an item that was added but not saved yet', async () => {
         setParameters({counts: []});
