@@ -48,7 +48,7 @@ current values loaded.
 
 ## Events
 
-Events are job lifecycle transitions, plus two reminders about runs paused on an approval. The full set:
+Events are job lifecycle transitions. The full set:
 
 | Event | Fires when |
 |---|---|
@@ -58,13 +58,9 @@ Events are job lifecycle transitions, plus two reminders about runs paused on an
 | `JOB_FAILED` | A run failed. |
 | `JOB_CANCELLED` | A run was cancelled before it ever started. |
 | `JOB_STOPPED` | A run was stopped mid-execution. |
-| `JOB_APPROVAL_EXPIRING` | A run paused on an approval is about to expire. Sent once, a configurable lead time (24 hours by default) before the approval expires. |
-| `JOB_APPROVAL_ESCALATED` | A run has been waiting on an approval past the configured escalation window. Off until an escalation window is set. |
 
 The list is not per-workspace or per-project: a notification subscribes to an event across the whole
-deployment. The approval reminder and escalation timings are set with environment variables; see
-[Human in the loop](/platform/automation/build/workflows/human-in-the-loop) and
-[Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables).
+deployment.
 
 ## Delivery types
 
@@ -81,8 +77,7 @@ but skipped, with a warning in the server log, while the deployment runs as Comm
 ### Message content
 
 Email subject and body come from the platform's message bundle, parameterised with the workflow's
-label and the job id; the approval events also carry the approval's expiry time and a link to resolve
-it. A Slack message carries the same text as the email body, prefixed with an emoji. There is no
+label and the job id. A Slack message carries the same text as the email body, prefixed with an emoji. There is no
 per-notification template for Email and Slack; only Webhook has a [body template](#body-template).
 
 Email and Slack messages now end with the same details lines, one per line, each shown only when the
@@ -92,8 +87,7 @@ value is known: `Workflow`, `Project` (with the version, for example `CRM (v3)`)
 ### Webhook requests
 
 Each delivery is a single `POST` with a `Content-Type: application/json` body. The body starts with the
-fields it has always had (`eventType`, `jobId`, `jobName`, `timestamp`, and on approval events
-`approvalExpiresAt` and `approvalFormUrl`). These are unchanged. A summary of the event is added beside
+fields it has always had (`eventType`, `jobId`, `jobName` and `timestamp`). These are unchanged. A summary of the event is added beside
 them:
 
 | Field | Type | Present when |
@@ -101,8 +95,6 @@ them:
 | `eventType` | string | Always. |
 | `jobId` | number | Always. |
 | `jobName` | string | Always. |
-| `approvalExpiresAt` | string | Approval events. |
-| `approvalFormUrl` | string | Approval events. |
 | `timestamp` | string | Always. ISO-8601, for example `2026-11-03T10:00:00Z`. |
 | `deliveryId` | string | Always. Unique per delivery: each notification gets its own id, and the value equals the `X-ByteChef-Delivery` header. |
 | `source` | string | The job belongs to an automation project (`AUTOMATION`) or an embedded integration (`EMBEDDED`). |
@@ -123,10 +115,8 @@ them:
 | `error.message` | string | `JOB_FAILED` only, and only when the failing task's error has a message. Cut to 1000 characters. |
 | `error.stackTrace` | string | `JOB_FAILED` only, when the error has a stack trace. Cut to 2000 characters. |
 | `executionUrl` | string | `bytechef.public-url` is set and the run's project or integration could be resolved. Opens the execution. |
-| `approval.expiresAt` | string | Approval events. Same value as `approvalExpiresAt`. |
-| `approval.formUrl` | string | Approval events. Same value as `approvalFormUrl`. |
 
-A field that has no value is left out of the body, not sent as `null`. The one exception is `approvalExpiresAt` and `approvalFormUrl`, which are always present on approval events and can be `null`. If a lookup fails (for example
+A field that has no value is left out of the body, not sent as `null`. If a lookup fails (for example
 the workflow was deleted), the field is left out and the notification is still sent.
 
 `deliveryId` is the same value as the `X-ByteChef-Delivery` header, and `timestamp` is the same moment
@@ -177,43 +167,6 @@ A `JOB_FAILED` event from an automation run:
 }
 ```
 
-A `JOB_APPROVAL_EXPIRING` event. The two top-level approval fields come right after `jobName`, and the
-`approval` object comes last:
-
-```json
-{
-  "eventType": "JOB_APPROVAL_EXPIRING",
-  "jobId": 1043,
-  "jobName": "Approve refund",
-  "approvalExpiresAt": "2026-11-04T10:00:00Z",
-  "approvalFormUrl": "https://bytechef.example.com/resume/eyJ0b2tlbiI6Li4ufQ",
-  "timestamp": "2026-11-03T10:00:00Z",
-  "deliveryId": "0b7d9a51-2c3e-4f60-8a71-5d4c3b2a1f09",
-  "source": "AUTOMATION",
-  "job": {
-    "id": 1043,
-    "name": "Approve refund",
-    "status": "STARTED",
-    "startDate": "2026-11-02T10:00:00Z"
-  },
-  "workflow": {
-    "id": "wf-8d2e4b",
-    "name": "Approve refund"
-  },
-  "project": {
-    "id": 7,
-    "name": "CRM",
-    "version": 3
-  },
-  "environment": "PRODUCTION",
-  "executionUrl": "https://bytechef.example.com/automation/executions?id=1043",
-  "approval": {
-    "expiresAt": "2026-11-04T10:00:00Z",
-    "formUrl": "https://bytechef.example.com/resume/eyJ0b2tlbiI6Li4ufQ"
-  }
-}
-```
-
 Every request carries these headers:
 
 | Header | Value |
@@ -228,9 +181,8 @@ link-local and carrier-grade NAT ranges are refused. On a self-hosted instance, 
 receiver, list its host in `bytechef.webhook-delivery.allowed-hosts` (comma-separated, for example
 `alerts.internal,10.0.0.5`). A listed host must match the URL's host exactly and skips the address
 check. The same list applies to Slack notifications. Each request has a 10-second connect timeout and
-a 30-second read timeout, and a `4xx` or `5xx` response counts as a failure. A failed job-status
-delivery is logged and not retried. For the two approval events, if every subscribed notification
-fails, the next approval sweep tries again.
+a 30-second read timeout, and a `4xx` or `5xx` response counts as a failure. A failed delivery is
+logged and not retried.
 
 ### Custom headers
 

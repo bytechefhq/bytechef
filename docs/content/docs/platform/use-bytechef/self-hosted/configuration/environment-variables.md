@@ -195,10 +195,6 @@ fragment while this heading was hidden - give it back.
 | `BYTECHEF_APPROVAL_SIGNED_TOKEN_DEFAULT_TTL` | Lifetime of a signed link that does not set its own expiry (ISO-8601 duration) | `P30D` |
 | `BYTECHEF_APPROVAL_SIGNED_TOKEN_CLOCK_SKEW` | Tolerance added to a link's expiry when it is checked, for clocks that differ between apps (ISO-8601 duration) | `PT60S` |
 | `BYTECHEF_WORKFLOW_EXECUTION_APPROVAL_EXPIRY_ENABLED` | Enable the sweep that fails a run shortly after its pending approval expires | `true` |
-| `BYTECHEF_WORKFLOW_EXECUTION_APPROVAL_REMINDER_ENABLED` | Enable the reminder sent once before a pending approval expires | `true` |
-| `BYTECHEF_WORKFLOW_EXECUTION_APPROVAL_REMINDER_LEAD_TIME` | How long before expiry the reminder is sent (ISO-8601 duration) | `PT24H` |
-| `BYTECHEF_WORKFLOW_EXECUTION_APPROVAL_ESCALATION_ENABLED` | Enable the escalation sweep. It does nothing until `BYTECHEF_WORKFLOW_EXECUTION_APPROVAL_ESCALATION_AFTER` is set | `true` |
-| `BYTECHEF_WORKFLOW_EXECUTION_APPROVAL_ESCALATION_AFTER` | Escalate an approval once it has been pending this long (ISO-8601 duration). Unset turns escalation off | - |
 | `BYTECHEF_AUTOMATION_APPROVAL_TASK_RECONCILIATION_ENABLED` | Mark an open Approval Tasks entry as expired when its approval expires, instead of leaving it open with a dead link | `true` |
 | `BYTECHEF_WEBHOOK_DISCORD_PUBLIC_KEY` | Public key of the Discord app whose Interactions Endpoint URL is `<public-url>/discord/interactivity`. It verifies the signature of the Approve and Discard button callbacks; set the same key on the Discord connection | - |
 | `BYTECHEF_WEBHOOK_WHATSAPP_VERIFY_TOKEN` | Token that Meta sends back when it verifies the WhatsApp interactivity webhook at `<public-url>/whatsapp/interactivity`. Without it, the verification request is refused | - |

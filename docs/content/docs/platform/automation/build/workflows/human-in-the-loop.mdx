@@ -238,8 +238,8 @@ itself - its filters, the fields on a request, and why an inbox can look empty.
 
 <Callout type="warn" title="Coming soon">
   The capabilities in this section - the extra delivery channels, in-place
-  messenger resolution, the Approval Gate for AI-agent tools, expiry
-  reminders and escalation, and MCP/A2A approval elicitation - are on the
+  messenger resolution, the Approval Gate for AI-agent tools, approval
+  expiry, and MCP/A2A approval elicitation - are on the
   upcoming release track and are not yet available in the latest released
   version of ByteChef.
 </Callout>
@@ -334,13 +334,12 @@ The Approval Tasks page will also gain a **pending run approvals** section
 listing every run currently blocked on an approval, regardless of which
 channel delivered it.
 
-### Expiry, reminders, and escalation
+### Expiry
 
 Today the expiry is a fixed 60 days, set by the action itself and not
 configurable (see [Lifecycle & limits](#lifecycle--limits) above). Coming with
 this work: **Expires In** / **Expires In Unit** properties that make the window
-per-request, plus automatic reminders and escalation layered on top of it and
-operator-facing controls for all three.
+per-request, plus operator-facing controls for the expiry sweep.
 
 An expired approval can no longer be resolved. A background sweep
 (`bytechef.workflow.execution.approval-expiry.enabled`, on by default) fails
@@ -353,18 +352,6 @@ approval) and `bytechef_approval_expired` (a counter of approvals that
 lapsed, tagged by source); per-channel delivery is tracked separately by
 `bytechef_approval_request` (successes) and
 `bytechef_approval_delivery_failure` (failures), both tagged by channel.
-
-A subscribed notification (email, webhook, or Slack) will fire once, a
-configurable lead time before an approval expires - default 24 hours,
-`bytechef.workflow.execution.approval-reminder.lead-time`, disable with
-`bytechef.workflow.execution.approval-reminder.enabled=false`. A separate
-notification will fire once an approval has sat unresolved past a
-configured duration, routed to a different audience than the reminder (an
-on-call channel or a manager, for example) - set
-`bytechef.workflow.execution.approval-escalation.after` to a duration to
-enable it; with no default set, escalation is opt-in and does nothing until
-`after` is configured. Disable the escalation sweep on its own with
-`bytechef.workflow.execution.approval-escalation.enabled=false`.
 
 ### Outcome shape
 
