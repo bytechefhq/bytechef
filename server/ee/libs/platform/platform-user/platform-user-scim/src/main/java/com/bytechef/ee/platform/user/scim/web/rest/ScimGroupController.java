@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.exception.ScimBadRequestException;
 import com.bytechef.ee.platform.user.scim.facade.ScimGroupFacade;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser.ScimFilter;
@@ -26,6 +27,7 @@ import java.util.function.Predicate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -105,6 +107,8 @@ class ScimGroupController {
 
     @PostMapping
     ResponseEntity<ScimGroup> createGroup(@RequestBody ScimGroup scimGroup) {
+        ScimGroupFacade.validate(scimGroup);
+
         Authority createdAuthority = scimGroupFacade.createGroup(scimGroup);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -113,6 +117,8 @@ class ScimGroupController {
 
     @PutMapping("/{id}")
     ResponseEntity<Object> replaceGroup(@PathVariable long id, @RequestBody ScimGroup scimGroup) {
+        ScimGroupFacade.validate(scimGroup);
+
         Optional<Authority> updatedAuthority = scimGroupFacade.replaceGroup(id, scimGroup);
 
         if (updatedAuthority.isEmpty()) {
@@ -143,6 +149,11 @@ class ScimGroupController {
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @ExceptionHandler(ScimBadRequestException.class)
+    ResponseEntity<Object> handleScimBadRequestException(ScimBadRequestException scimBadRequestException) {
+        return ScimErrors.badRequest(scimBadRequestException);
     }
 
     private Map<String, Object> notFoundError(String resourceType, String id) {

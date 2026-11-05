@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,8 +40,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.dao.DuplicateKeyException;
@@ -706,6 +710,163 @@ class ScimUserControllerTest {
     }
 
     @Test
+    void testCreateUserRejectsAnExternalIdLongerThan255CharactersWithInvalidValue() throws Exception {
+        mockMvc.perform(
+            post(USERS_PATH)
+                .contentType(SCIM_JSON)
+                .content(userBody("john.doe", "john@example.com", "John", "Doe", "x".repeat(256))))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(SCIM_JSON))
+            .andExpect(jsonPath("$.schemas[0]").value(ERROR_SCHEMA))
+            .andExpect(jsonPath("$.scimType").value("invalidValue"))
+            .andExpect(jsonPath("$.detail").value("externalId must not be longer than 255 characters"))
+            .andExpect(jsonPath("$.status").value("400"));
+
+        verifyNoInteractions(scimUserFacade, userService);
+    }
+
+    @ParameterizedTest
+    @MethodSource("tooLongUserBodies")
+    void testCreateUserRejectsValuesLongerThanTheirColumnsWithInvalidValue(String body) throws Exception {
+        mockMvc.perform(
+            post(USERS_PATH)
+                .contentType(SCIM_JSON)
+                .content(body))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.scimType").value("invalidValue"))
+            .andExpect(jsonPath("$.status").value("400"));
+
+        verifyNoInteractions(scimUserFacade, userService);
+    }
+
+    @Test
+    void testCreateUserRejectsAMissingUserNameWithInvalidValue() throws Exception {
+        mockMvc.perform(
+            post(USERS_PATH)
+                .contentType(SCIM_JSON)
+                .content("{\"emails\": [{\"value\": \"john@example.com\", \"primary\": true}], \"active\": true}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.scimType").value("invalidValue"))
+            .andExpect(jsonPath("$.detail").value("userName is required"));
+
+        verifyNoInteractions(scimUserFacade, userService);
+    }
+
+    @Test
+    void testCreateUserAcceptsAnExternalIdOf255Characters() throws Exception {
+        when(scimUserFacade.createUser(any(ScimUser.class)))
+            .thenReturn(createUser(USER_ID, "john.doe", "john@example.com", true));
+
+        mockMvc.perform(
+            post(USERS_PATH)
+                .contentType(SCIM_JSON)
+                .content(userBody("john.doe", "john@example.com", "John", "Doe", "x".repeat(255))))
+            .andExpect(status().isCreated());
+
+        verify(scimUserFacade).createUser(any(ScimUser.class));
+    }
+
+    @Test
+    void testReplaceUserRejectsAnExternalIdLongerThan255CharactersWithInvalidValue() throws Exception {
+        mockMvc.perform(
+            put(USERS_PATH + "/" + USER_ID)
+                .contentType(SCIM_JSON)
+                .content(userBody("john.doe", "john@example.com", "John", "Doe", "x".repeat(256))))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(SCIM_JSON))
+            .andExpect(jsonPath("$.schemas[0]").value(ERROR_SCHEMA))
+            .andExpect(jsonPath("$.scimType").value("invalidValue"))
+            .andExpect(jsonPath("$.status").value("400"));
+
+        verifyNoInteractions(scimUserFacade, userService);
+    }
+
+    @Test
+    void testPatchUserRejectsAnExternalIdLongerThan255CharactersWithInvalidValue() throws Exception {
+        mockMvc.perform(
+            patch(USERS_PATH + "/" + USER_ID)
+                .contentType(SCIM_JSON)
+                .content(
+                    patchBody("\"op\": \"Add\", \"path\": \"externalId\", \"value\": \"" + "x".repeat(256) + "\"")))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(SCIM_JSON))
+            .andExpect(jsonPath("$.schemas[0]").value(ERROR_SCHEMA))
+            .andExpect(jsonPath("$.scimType").value("invalidValue"))
+            .andExpect(jsonPath("$.detail").value("externalId must not be longer than 255 characters"))
+            .andExpect(jsonPath("$.status").value("400"));
+
+        verifyNoInteractions(scimUserFacade, userService);
+    }
+
+    @Test
+    void testPatchUserDelegatesAzureStyleAddOperationsToPatch() throws Exception {
+        when(userService.fetchUser(USER_ID))
+            .thenReturn(Optional.of(createUser(USER_ID, "john.doe", "john@example.com", true)));
+        when(scimUserFacade.patchUser(eq(USER_ID), any(ScimPatchRequest.class)))
+            .thenReturn(Optional.of(createUser(USER_ID, "john.doe", "john@example.com", true)));
+
+        mockMvc.perform(
+            patch(USERS_PATH + "/" + USER_ID)
+                .contentType(SCIM_JSON)
+                .content(patchBody("\"op\": \"Add\", \"path\": \"externalId\", \"value\": \"00u-added\"")))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<ScimPatchRequest> scimPatchRequestArgumentCaptor =
+            ArgumentCaptor.forClass(ScimPatchRequest.class);
+
+        verify(scimUserFacade).patchUser(eq(USER_ID), scimPatchRequestArgumentCaptor.capture());
+        verify(scimUserFacade, never()).deactivateUser(anyLong(), any(ScimPatchRequest.class));
+
+        ScimPatchRequest scimPatchRequest = scimPatchRequestArgumentCaptor.getValue();
+
+        assertThat(scimPatchRequest.operations()).containsExactly(
+            new ScimPatchOperation("Add", "externalId", "00u-added"));
+    }
+
+    @Test
+    void testPatchUserDelegatesToDeactivateForAddActiveFalseOperation() throws Exception {
+        when(userService.fetchUser(USER_ID))
+            .thenReturn(Optional.of(createUser(USER_ID, "john.doe", "john@example.com", true)));
+        when(scimUserFacade.deactivateUser(eq(USER_ID), any(ScimPatchRequest.class)))
+            .thenReturn(Optional.of(createUser(USER_ID, "john.doe", "john@example.com", false)));
+
+        mockMvc.perform(
+            patch(USERS_PATH + "/" + USER_ID)
+                .contentType(SCIM_JSON)
+                .content(patchBody("\"op\": \"Add\", \"value\": {\"active\": false}")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.active").value(false));
+
+        verify(scimUserFacade).deactivateUser(eq(USER_ID), any(ScimPatchRequest.class));
+        verify(scimUserFacade, never()).patchUser(anyLong(), any(ScimPatchRequest.class));
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+        "\"op\": \"move\", \"path\": \"externalId\", \"value\": \"x\" | invalidSyntax",
+        "\"path\": \"externalId\", \"value\": \"x\" | invalidSyntax",
+        "\"op\": \"add\", \"value\": \"x\" | invalidSyntax",
+        "\"op\": \"Remove\" | noTarget",
+        "\"op\": \"remove\", \"path\": \"userName\" | mutability",
+        "\"op\": \"remove\", \"path\": \"active\" | mutability",
+        "\"op\": \"replace\", \"path\": \"active\", \"value\": \"yes\" | invalidValue",
+        "\"op\": \"add\", \"path\": \"userName\", \"value\": \"\" | invalidValue"
+    })
+    void testPatchUserRejectsInvalidOperationsWithScimError(String operation, String scimType) throws Exception {
+        mockMvc.perform(
+            patch(USERS_PATH + "/" + USER_ID)
+                .contentType(SCIM_JSON)
+                .content(patchBody(operation)))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(SCIM_JSON))
+            .andExpect(jsonPath("$.schemas[0]").value(ERROR_SCHEMA))
+            .andExpect(jsonPath("$.scimType").value(scimType))
+            .andExpect(jsonPath("$.status").value("400"));
+
+        verifyNoInteractions(scimUserFacade, userService);
+    }
+
+    @Test
     void testDeleteUserReturnsNoContent() throws Exception {
         when(scimUserFacade.deleteUser(USER_ID)).thenReturn(true);
 
@@ -721,6 +882,30 @@ class ScimUserControllerTest {
 
         mockMvc.perform(delete(USERS_PATH + "/" + USER_ID))
             .andExpect(status().isNotFound());
+    }
+
+    private static Stream<String> tooLongUserBodies() {
+        return Stream.of(
+            userBody("u".repeat(51), "john@example.com", "John", "Doe", null),
+            userBody("john.doe", "e".repeat(180) + "@example.com", "John", "Doe", null),
+            userBody("john.doe", "john@example.com", "g".repeat(51), "Doe", null),
+            userBody("john.doe", "john@example.com", "John", "f".repeat(51), null));
+    }
+
+    private static String userBody(
+        String userName, String email, String givenName, String familyName, String externalId) {
+
+        return """
+            { \
+              "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"], \
+              "externalId": %s, \
+              "userName": "%s", \
+              "name": {"givenName": "%s", "familyName": "%s"}, \
+              "emails": [{"value": "%s", "type": "work", "primary": true}], \
+              "active": true \
+            } \
+            """.formatted(
+            externalId == null ? "null" : "\"" + externalId + "\"", userName, givenName, familyName, email);
     }
 
     private static String patchBody(String operation) {

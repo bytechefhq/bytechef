@@ -544,6 +544,211 @@ public class ScimAuditIntTest {
     }
 
     @Test
+    public void testAzureStyleAddOfTheExternalIdReplacesItAndRecordsAPatch() throws Exception {
+        long userId = createUser("jane", "jane@example.com", true);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.patch("/api/scim/v2/Users/" + userId))
+                    .content(
+                        patchOperationsJson(
+                            "{\"op\": \"Add\", \"path\": \"externalId\", \"value\": \"00u-added\"}")))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.externalId")
+                .value("00u-added"));
+
+        assertThat(findUserColumn(userId, "external_id")).isEqualTo("00u-added");
+        assertThat(findUserColumn(userId, "login")).isEqualTo("jane");
+
+        AuditEventRow auditEventRow = getSingleAuditEvent();
+
+        assertThat(auditEventRow.eventType()).isEqualTo(ScimUserAuditEvents.SCIM_USER_PATCHED);
+        assertThat(auditEventRow.principal()).isEqualTo(SCIM_PRINCIPAL);
+        assertThat(auditEventRow.data())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("userId", String.valueOf(userId))
+            .containsEntry("externalId", "00u-added")
+            .containsEntry("previousExternalId", EXTERNAL_ID)
+            .containsEntry("changedFields", "externalId");
+    }
+
+    @Test
+    public void testPathlessAddAppliesEveryAttributeOfTheValue() throws Exception {
+        long userId = createUser("jane", "jane@example.com", true);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.patch("/api/scim/v2/Users/" + userId))
+                    .content(
+                        patchOperationsJson(
+                            """
+                                {"op": "Add", "value": {"externalId": "00u-added", "name.givenName": "Janet", \
+                                "name": {"familyName": "Roe"}, "title": "ignored"}}\
+                                """)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk());
+
+        assertThat(findUserColumn(userId, "external_id")).isEqualTo("00u-added");
+        assertThat(findUserColumn(userId, "first_name")).isEqualTo("Janet");
+        assertThat(findUserColumn(userId, "last_name")).isEqualTo("Roe");
+        assertThat(findUserColumn(userId, "activated")).isEqualTo("true");
+
+        AuditEventRow auditEventRow = getSingleAuditEvent();
+
+        assertThat(auditEventRow.eventType()).isEqualTo(ScimUserAuditEvents.SCIM_USER_PATCHED);
+        assertThat(auditEventRow.data())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("changedFields", "externalId,firstName,lastName");
+    }
+
+    @Test
+    public void testPathlessAddOfActiveFalseRecordsOneDeactivation() throws Exception {
+        long userId = createUser("jane", "jane@example.com", true);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.patch("/api/scim/v2/Users/" + userId))
+                    .content(patchOperationsJson("{\"op\": \"add\", \"value\": {\"active\": false}}")))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk());
+
+        assertThat(findUserColumn(userId, "activated")).isEqualTo("false");
+
+        AuditEventRow auditEventRow = getSingleAuditEvent();
+
+        assertThat(auditEventRow.eventType()).isEqualTo(ScimUserAuditEvents.SCIM_USER_DEACTIVATED);
+        assertThat(auditEventRow.data())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("previousActive", "true")
+            .containsEntry("changedFields", "active");
+    }
+
+    @Test
+    public void testRemoveOfTheExternalIdUnassignsItAndRecordsTheRemovedValue() throws Exception {
+        long userId = createUser("jane", "jane@example.com", true);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.patch("/api/scim/v2/Users/" + userId))
+                    .content(patchOperationsJson("{\"op\": \"Remove\", \"path\": \"externalId\"}")))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk());
+
+        assertThat(findUserColumn(userId, "external_id")).isNull();
+        assertThat(findUserColumn(userId, "login")).isEqualTo("jane");
+
+        AuditEventRow auditEventRow = getSingleAuditEvent();
+
+        assertThat(auditEventRow.eventType()).isEqualTo(ScimUserAuditEvents.SCIM_USER_PATCHED);
+        assertThat(auditEventRow.data())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("changedFields", "externalId")
+            .containsEntry("previousExternalId", EXTERNAL_ID)
+            .doesNotContainKey("externalId");
+    }
+
+    @Test
+    public void testRemoveOfTheUserNameIsRejectedWithoutChangingOrRecordingAnything() throws Exception {
+        long userId = createUser("jane", "jane@example.com", true);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.patch("/api/scim/v2/Users/" + userId))
+                    .content(
+                        patchOperationsJson(
+                            "{\"op\": \"Remove\", \"path\": \"externalId\"}, " +
+                                "{\"op\": \"remove\", \"path\": \"userName\"}")))
+            .andExpect(MockMvcResultMatchers.status()
+                .isBadRequest())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.scimType")
+                .value("mutability"));
+
+        assertThat(findUserColumn(userId, "login")).isEqualTo("jane");
+        assertThat(findUserColumn(userId, "external_id")).isEqualTo(EXTERNAL_ID);
+
+        assertNoAuditEvents();
+    }
+
+    @Test
+    public void testUnknownPatchOperationIsRejectedWithInvalidSyntax() throws Exception {
+        long userId = createUser("jane", "jane@example.com", true);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.patch("/api/scim/v2/Users/" + userId))
+                    .content(patchOperationsJson("{\"op\": \"Move\", \"path\": \"externalId\", \"value\": \"x\"}")))
+            .andExpect(MockMvcResultMatchers.status()
+                .isBadRequest())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.scimType")
+                .value("invalidSyntax"));
+
+        assertThat(findUserColumn(userId, "external_id")).isEqualTo(EXTERNAL_ID);
+
+        assertNoAuditEvents();
+    }
+
+    @Test
+    public void testExternalIdLongerThan255CharactersIsRejectedBeforeAnythingIsWritten() throws Exception {
+        String tooLongExternalId = "x".repeat(256);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Users"))
+                    .content(userJson("john", "john@example.com", "John", "Doe", true, tooLongExternalId)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isBadRequest())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.schemas[0]")
+                .value("urn:ietf:params:scim:api:messages:2.0:Error"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.scimType")
+                .value("invalidValue"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status")
+                .value("400"));
+
+        assertThat(countUsers(TENANT_SCHEMA, "john")).isZero();
+
+        long userId = createUser("jane", "jane@example.com", true);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.put("/api/scim/v2/Users/" + userId))
+                    .content(userJson("jane", "jane@example.com", "Jane", "Doe", true, tooLongExternalId)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isBadRequest())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.scimType")
+                .value("invalidValue"));
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.patch("/api/scim/v2/Users/" + userId))
+                    .content(
+                        patchOperationsJson(
+                            "{\"op\": \"Add\", \"path\": \"externalId\", \"value\": \"" + tooLongExternalId + "\"}")))
+            .andExpect(MockMvcResultMatchers.status()
+                .isBadRequest())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.scimType")
+                .value("invalidValue"));
+
+        assertThat(findUserColumn(userId, "external_id")).isEqualTo(EXTERNAL_ID);
+
+        assertNoAuditEvents();
+    }
+
+    @Test
+    public void testExternalIdOf255CharactersIsStored() throws Exception {
+        String externalId = "x".repeat(255);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Users"))
+                    .content(userJson("john", "john@example.com", "John", "Doe", true, externalId)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isCreated());
+
+        assertThat(findUserColumn(findUserId("john"), "external_id")).isEqualTo(externalId);
+    }
+
+    @Test
     public void testDeleteUserRecordsTheUserCapturedBeforeTheDelete() throws Exception {
         long userId = createUser("jane", "jane@example.com", true);
 
@@ -675,6 +880,37 @@ public class ScimAuditIntTest {
     }
 
     @Test
+    public void testGroupDisplayNameLongerThan50CharactersIsRejectedBeforeAnythingIsWritten() throws Exception {
+        String tooLongDisplayName = "G".repeat(51);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Groups"))
+                    .content(groupJson(tooLongDisplayName)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isBadRequest())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.scimType")
+                .value("invalidValue"));
+
+        assertThat(countAuthorities(TENANT_SCHEMA, tooLongDisplayName)).isZero();
+
+        long groupId = createGroup("ROLE_ENGINEERING");
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.put("/api/scim/v2/Groups/" + groupId))
+                    .content(groupJson(tooLongDisplayName)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isBadRequest())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.scimType")
+                .value("invalidValue"));
+
+        assertThat(countAuthorities(TENANT_SCHEMA, "ROLE_ENGINEERING")).isEqualTo(1);
+
+        assertNoAuditEvents();
+    }
+
+    @Test
     public void testDeleteOfMissingGroupRecordsNothing() throws Exception {
         mockMvc
             .perform(scimRequest(MockMvcRequestBuilders.delete("/api/scim/v2/Groups/" + Long.MAX_VALUE)))
@@ -797,6 +1033,15 @@ public class ScimAuditIntTest {
               "Operations": [{"op": "Replace", %s}] \
             } \
             """.formatted(operationBody);
+    }
+
+    private static String patchOperationsJson(String operations) {
+        return """
+            { \
+              "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"], \
+              "Operations": [%s] \
+            } \
+            """.formatted(operations);
     }
 
     private static MockHttpServletRequestBuilder scimRequest(MockHttpServletRequestBuilder requestBuilder) {

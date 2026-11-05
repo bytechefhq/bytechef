@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.exception.ScimBadRequestException;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,11 @@ final class ScimErrors {
     static final String UNIQUENESS = "uniqueness";
 
     private ScimErrors() {
+    }
+
+    static ResponseEntity<Object> badRequest(ScimBadRequestException scimBadRequestException) {
+        return error(
+            HttpStatus.BAD_REQUEST, scimBadRequestException.getScimType(), scimBadRequestException.getMessage());
     }
 
     static ResponseEntity<Object> invalidFilter(String filter) {

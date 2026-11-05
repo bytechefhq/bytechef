@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.exception.ScimBadRequestException;
 import com.bytechef.ee.platform.user.scim.facade.ScimUserFacade;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser.ScimFilter;
@@ -132,6 +133,8 @@ class ScimUserController {
 
     @PostMapping
     ResponseEntity<ScimUser> createUser(@RequestBody ScimUser scimUser) {
+        ScimUserFacade.validate(scimUser);
+
         User createdUser = scimUserFacade.createUser(scimUser);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -140,6 +143,8 @@ class ScimUserController {
 
     @PutMapping("/{id}")
     ResponseEntity<Object> replaceUser(@PathVariable long id, @RequestBody ScimUser scimUser) {
+        ScimUserFacade.validate(scimUser);
+
         Optional<User> existingUser = userService.fetchUser(id);
 
         if (existingUser.isEmpty()) {
@@ -160,6 +165,8 @@ class ScimUserController {
 
     @PatchMapping("/{id}")
     ResponseEntity<Object> patchUser(@PathVariable long id, @RequestBody ScimPatchRequest patchRequest) {
+        ScimUserFacade.validate(patchRequest);
+
         Optional<User> existingUser = userService.fetchUser(id);
 
         if (existingUser.isEmpty()) {
@@ -187,6 +194,11 @@ class ScimUserController {
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @ExceptionHandler(ScimBadRequestException.class)
+    ResponseEntity<Object> handleScimBadRequestException(ScimBadRequestException scimBadRequestException) {
+        return ScimErrors.badRequest(scimBadRequestException);
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
