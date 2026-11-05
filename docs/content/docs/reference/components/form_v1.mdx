@@ -21,7 +21,7 @@ Type: form/v1
 ### New Form Request
 Name: newFormRequest
 
-`Triggers when a new form request is received.`
+`Triggers when a new form request is received. The submitter waits until the workflow finishes.`
 
 Type: STATIC_WEBHOOK
 
@@ -75,6 +75,68 @@ The output for this action is dynamic and may vary depending on the input parame
     } ]
   },
   "type" : "form/v1/newFormRequest"
+}
+```
+
+
+
+### New Form Request (Respond Immediately)
+Name: newFormRequestRespondImmediately
+
+`Triggers when a new form request is received. The submitter gets a response right away while the workflow runs in the background.`
+
+Type: STATIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| formTitle | Form Title | STRING | The title for your form. Displayed as the main page title (h1). | false |
+| formDescription | Form Description | STRING | A subtitle shown under the form title. Use 
+ or &lt;br&gt; for line breaks. | false |
+| buttonLabel | Button Label | STRING | Label for the submit button. | false |
+| ignoreBots | Ignore Bots | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Ignore requests from bots and link previewers. | false |
+| useWorkflowTimezone | Use Workflow Timezone | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Use the workflow timezone for the submittedAt timestamp instead of UTC. | false |
+| appendAttribution | Append Attribution | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Show an attribution footer on the public form. | false |
+| customFormStyling | Custom Form Styling (CSS) | STRING | Override default form styles with custom CSS. | false |
+| inputs | Form Inputs | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(fieldType), STRING\(fieldLabel), STRING\(fieldName), STRING\(fieldDescription), STRING\(placeholder), STRING\(defaultValue), STRING\(defaultValue), [&#123;STRING\(label), STRING\(value)&#125;]\(fieldOptions), BOOLEAN\(multipleChoice), INTEGER\(minSelection), INTEGER\(maxSelection), BOOLEAN\(required)&#125;] </details> | Define the form input fields | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Form Request (Respond Immediately)",
+  "name" : "newFormRequestRespondImmediately",
+  "parameters" : {
+    "formTitle" : "",
+    "formDescription" : "",
+    "buttonLabel" : "",
+    "ignoreBots" : false,
+    "useWorkflowTimezone" : false,
+    "appendAttribution" : false,
+    "customFormStyling" : "",
+    "inputs" : [ {
+      "fieldType" : 1,
+      "fieldLabel" : "",
+      "fieldName" : "",
+      "fieldDescription" : "",
+      "placeholder" : "",
+      "defaultValue" : "",
+      "fieldOptions" : [ {
+        "label" : "",
+        "value" : ""
+      } ],
+      "multipleChoice" : false,
+      "minSelection" : 1,
+      "maxSelection" : 1,
+      "required" : false
+    } ]
+  },
+  "type" : "form/v1/newFormRequestRespondImmediately"
 }
 ```
 
