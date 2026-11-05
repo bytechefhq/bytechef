@@ -15,7 +15,7 @@ export default function getParameterItemType(parameterItemValue: unknown): Prope
             return 'STRING';
         }
     } else if (typeof parameterItemValue === 'number') {
-        if (/^\d+$/.test(parameterItemValue.toString())) {
+        if (Number.isInteger(parameterItemValue)) {
             return 'INTEGER';
         } else {
             return 'NUMBER';
