@@ -3610,9 +3610,9 @@ class WorkflowNodeParameterFacadeIntTest {
     }
 
     @Test
-    void testUpdateWorkflowNodeParameterRemovesEmptyMapsInsideLists() {
+    void testUpdateWorkflowNodeParameterKeepsEmptyMapsInsideListsAtTheirIndexes() {
         // Given: parameters have a list containing a mix of empty and non-empty map elements;
-        // removeEmptyCollections should recurse into lists and remove empty map elements
+        // removeEmptyCollections must not drop list elements, because that shifts every later sibling
 
         String workflowNodeName = "task1";
         String parameterPath = "newParam";
@@ -3664,16 +3664,17 @@ class WorkflowNodeParameterFacadeIntTest {
 
         List<?> resultItems = (List<?>) resultParameters.get("items");
 
-        assertEquals(2, resultItems.size(), "Empty map element should be removed from list");
+        assertEquals(3, resultItems.size(), "Empty map element should keep its index in the list");
+        assertEquals(Map.of(), resultItems.get(1));
+        assertEquals(Map.of("name", "test"), resultItems.get(2));
         assertEquals("newValue", resultParameters.get("newParam"));
         assertPersisted(workflowId, workflowNodeName, result);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    void testUpdateWorkflowNodeParameterRemovesNestedEmptyCollectionsInsideLists() {
+    void testUpdateWorkflowNodeParameterRemovesNestedEmptyCollectionsInsideListElements() {
         // Given: parameters have a list containing maps with nested empty collections;
-        // removeEmptyCollections should recursively clean up nested empty structures within list elements
+        // removeEmptyCollections should clean up nested empty structures within list elements and keep the elements
 
         String workflowNodeName = "task1";
         String parameterPath = "newParam";
@@ -3737,13 +3738,10 @@ class WorkflowNodeParameterFacadeIntTest {
 
         List<?> resultItems = (List<?>) resultParameters.get("items");
 
-        assertEquals(
-            1, resultItems.size(),
-            "Only the map with 'key'='value' should remain; empty nested map and empty inner list should be removed");
-
-        Map<String, ?> remainingItem = (Map<String, ?>) resultItems.getFirst();
-
-        assertEquals("value", remainingItem.get("key"));
+        assertEquals(3, resultItems.size(), "List elements should keep their indexes");
+        assertEquals(Map.of(), resultItems.get(0), "The empty nested map should be removed from the first element");
+        assertEquals(Map.of("key", "value"), resultItems.get(1));
+        assertEquals(List.of(), resultItems.get(2), "An inner list holding only empty elements should be emptied");
         assertEquals("newValue", resultParameters.get("newParam"));
         assertPersisted(workflowId, workflowNodeName, result);
     }
@@ -3888,6 +3886,170 @@ class WorkflowNodeParameterFacadeIntTest {
         when(actionDefinition.getProperties()).thenReturn((List) properties);
 
         return actionDefinition;
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUpdateWorkflowNodeParameterEmptyObjectArrayItemKeepsSiblingOrder() {
+        String workflowNodeName = "formTrigger";
+
+        mockFormTriggerInputsDefinition();
+
+        String workflowId = createFormTriggerWorkflow(workflowNodeName, new HashMap<>());
+
+        workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            workflowId, workflowNodeName, "inputs[1]", null, "OBJECT", true, 0);
+
+        ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            workflowId, workflowNodeName, "inputs[1]", new HashMap<>(), "OBJECT", false, 0);
+
+        Map<String, ?> parameters = result.parameters();
+
+        List<Map<String, Object>> inputs = (List<Map<String, Object>>) parameters.get("inputs");
+
+        assertThat(inputs).hasSize(4);
+        assertThat(inputs.get(0)).containsEntry("fieldName", "investitor");
+        assertThat(inputs.get(1)).isEmpty();
+        assertThat(inputs.get(2)).containsEntry("fieldName", "opisObjektaIZahtjeva");
+        assertThat(inputs.get(3)).containsEntry("fieldName", "zeljeniRok");
+        assertThat(getDynamicPropertyTypes(result)).containsOnlyKeys("inputs[1]");
+        assertPersisted(workflowId, workflowNodeName, result);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUpdateWorkflowNodeParameterEmptyObjectAppendedArrayItemLeavesNoPhantomType() {
+        String workflowNodeName = "formTrigger";
+
+        mockFormTriggerInputsDefinition();
+
+        String workflowId = createFormTriggerWorkflow(workflowNodeName, new HashMap<>());
+
+        workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            workflowId, workflowNodeName, "inputs[4]", null, "OBJECT", true, 0);
+
+        ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            workflowId, workflowNodeName, "inputs[4]", new HashMap<>(), "OBJECT", false, 0);
+
+        Map<String, ?> parameters = result.parameters();
+
+        List<Map<String, Object>> inputs = (List<Map<String, Object>>) parameters.get("inputs");
+
+        assertThat(inputs).hasSize(5);
+        assertThat(inputs.get(3)).containsEntry("fieldName", "zeljeniRok");
+        assertThat(inputs.get(4)).isEmpty();
+        assertThat(getDynamicPropertyTypes(result)).containsOnlyKeys("inputs[4]");
+        assertPersisted(workflowId, workflowNodeName, result);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUpdateWorkflowNodeParameterNullObjectArrayItemKeepsSiblings() {
+        String workflowNodeName = "formTrigger";
+
+        mockFormTriggerInputsDefinition();
+
+        String workflowId = createFormTriggerWorkflow(workflowNodeName, new HashMap<>());
+
+        ParameterResultDTO result = workflowNodeParameterFacade.updateWorkflowNodeParameter(
+            workflowId, workflowNodeName, "inputs[3]", "=", "OBJECT", true, 0);
+
+        Map<String, ?> parameters = result.parameters();
+
+        List<Object> inputs = (List<Object>) parameters.get("inputs");
+
+        assertThat(inputs).hasSize(4);
+        assertThat((Map<String, Object>) inputs.get(0)).containsEntry("fieldName", "investitor");
+        assertThat((Map<String, Object>) inputs.get(1)).containsEntry("fieldName", "lokacija");
+        assertThat((Map<String, Object>) inputs.get(2)).containsEntry("fieldName", "opisObjektaIZahtjeva");
+        assertThat(inputs.get(3)).isEqualTo("=");
+        assertThat(getDynamicPropertyTypes(result)).containsOnlyKeys("inputs[3]");
+        assertPersisted(workflowId, workflowNodeName, result);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> getDynamicPropertyTypes(ParameterResultDTO result) {
+        Map<String, ?> metadata = result.metadata();
+
+        Map<String, Object> uiMap = (Map<String, Object>) metadata.get("ui");
+
+        return (Map<String, Object>) uiMap.get("dynamicPropertyTypes");
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private void mockFormTriggerInputsDefinition() {
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+
+        ArrayProperty inputsArrayProperty = mock(ArrayProperty.class);
+
+        when(inputsArrayProperty.getName()).thenReturn("inputs");
+
+        ObjectProperty inputObjectProperty = mock(ObjectProperty.class);
+
+        Property fieldTypeProperty = mock(Property.class);
+
+        when(fieldTypeProperty.getName()).thenReturn("fieldType");
+
+        Property fieldLabelProperty = mock(Property.class);
+
+        when(fieldLabelProperty.getName()).thenReturn("fieldLabel");
+
+        Property fieldNameProperty = mock(Property.class);
+
+        when(fieldNameProperty.getName()).thenReturn("fieldName");
+        when(fieldNameProperty.getDisplayCondition()).thenReturn("inputs[index].fieldType != 12");
+
+        Property placeholderProperty = mock(Property.class);
+
+        when(placeholderProperty.getName()).thenReturn("placeholder");
+        when(placeholderProperty.getDisplayCondition()).thenReturn("contains({8,6,9,10,5}, inputs[index].fieldType)");
+
+        Property requiredProperty = mock(Property.class);
+
+        when(requiredProperty.getName()).thenReturn("required");
+
+        when(inputObjectProperty.getProperties()).thenReturn(
+            (List) List.of(
+                fieldTypeProperty, fieldLabelProperty, fieldNameProperty, placeholderProperty, requiredProperty));
+        when(inputsArrayProperty.getItems()).thenReturn((List) List.of(inputObjectProperty));
+        when(triggerDefinition.getProperties()).thenReturn((List) List.of(inputsArrayProperty));
+        when(triggerDefinitionService.getTriggerDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(triggerDefinition);
+    }
+
+    private String createFormTriggerWorkflow(String workflowNodeName, Map<String, Object> metadata) {
+        List<Map<String, Object>> inputs = new ArrayList<>();
+
+        inputs.add(createFormInput("Investitor", "investitor", 6));
+        inputs.add(createFormInput("Lokacija", "lokacija", 6));
+        inputs.add(createFormInput("Opis objekta i zahtjeva", "opisObjektaIZahtjeva", 5));
+        inputs.add(createFormInput("Zeljeni rok", "zeljeniRok", 2));
+
+        Map<String, Object> parameters = new HashMap<>();
+
+        parameters.put("inputs", inputs);
+
+        Map<String, Object> trigger = new HashMap<>();
+
+        trigger.put("metadata", metadata);
+        trigger.put("name", workflowNodeName);
+        trigger.put("parameters", parameters);
+        trigger.put("type", "form/v1/newFormRequest");
+
+        return createWorkflow(Map.of("triggers", List.of(trigger)));
+    }
+
+    private static Map<String, Object> createFormInput(String fieldLabel, String fieldName, int fieldType) {
+        Map<String, Object> input = new HashMap<>();
+
+        input.put("fieldLabel", fieldLabel);
+        input.put("fieldName", fieldName);
+        input.put("fieldType", fieldType);
+        input.put("required", true);
+
+        return input;
     }
 
     private void assertPersisted(String workflowId, String workflowNodeName, ParameterResultDTO result) {
