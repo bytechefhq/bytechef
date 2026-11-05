@@ -16,6 +16,7 @@ type AdminUser {
     firstName: String
     lastName: String
     email: String
+    externalId: String
     imageUrl: String
     activated: Boolean
     langKey: String
