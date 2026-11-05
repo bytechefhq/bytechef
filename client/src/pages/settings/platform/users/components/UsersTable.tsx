@@ -36,6 +36,10 @@ const UsersTable = ({pageNumber}: UsersTableProps) => {
                     </TableHead>
 
                     <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
+                        External ID
+                    </TableHead>
+
+                    <TableHead className="sticky top-0 z-10 bg-surface-neutral-primary p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Role
                     </TableHead>
 
@@ -59,6 +63,8 @@ const UsersTable = ({pageNumber}: UsersTableProps) => {
                                 <TableCell className="whitespace-nowrap">
                                     {[user?.firstName, user?.lastName].filter(Boolean).join(' ')}
                                 </TableCell>
+
+                                <TableCell className="whitespace-nowrap">{user?.externalId || '—'}</TableCell>
 
                                 <TableCell className="whitespace-nowrap">
                                     {user?.authorities?.[0] ? getRoleLabel(user.authorities[0]) : ''}
@@ -90,7 +96,7 @@ const UsersTable = ({pageNumber}: UsersTableProps) => {
 
                         {users.length === 0 && (
                             <TableRow>
-                                <TableCell className="px-4 py-6 text-center text-muted-foreground" colSpan={5}>
+                                <TableCell className="px-4 py-6 text-center text-muted-foreground" colSpan={6}>
                                     No users found.
                                 </TableCell>
                             </TableRow>

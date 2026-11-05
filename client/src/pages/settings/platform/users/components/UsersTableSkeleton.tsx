@@ -15,6 +15,10 @@ export default function UsersTableSkeleton() {
                     </TableCell>
 
                     <TableCell>
+                        <Skeleton className="h-4 w-32" />
+                    </TableCell>
+
+                    <TableCell>
                         <Skeleton className="h-4 w-24" />
                     </TableCell>
 

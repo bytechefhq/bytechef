@@ -1,4 +1,4 @@
-import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import UsersTable from '../UsersTable';
@@ -8,6 +8,7 @@ const mockUsers = [
         activated: true,
         authorities: ['ROLE_ADMIN'],
         email: 'admin@test.com',
+        externalId: 'idp-admin-1',
         firstName: 'Admin',
         id: '1',
         lastName: 'User',
@@ -17,6 +18,7 @@ const mockUsers = [
         activated: false,
         authorities: ['ROLE_USER'],
         email: 'user@test.com',
+        externalId: null,
         firstName: 'Regular',
         id: '2',
         lastName: 'User',
@@ -116,6 +118,12 @@ describe('UsersTable', () => {
 
             expect(screen.getByText('Status')).toBeInTheDocument();
         });
+
+        it('should render External ID header', () => {
+            renderUsersTable();
+
+            expect(screen.getByText('External ID')).toBeInTheDocument();
+        });
     });
 
     describe('user data display', () => {
@@ -150,6 +158,45 @@ describe('UsersTable', () => {
             renderUsersTable();
 
             expect(screen.getByText('Pending')).toBeInTheDocument();
+        });
+
+        it('should render the external ID when present', () => {
+            renderUsersTable();
+
+            const adminRow = screen.getByText('admin@test.com').closest('tr');
+
+            expect(adminRow).toHaveTextContent('idp-admin-1');
+        });
+
+        it('should render an em dash when the external ID is absent', () => {
+            renderUsersTable();
+
+            const userRow = screen.getByText('user@test.com').closest('tr');
+            const userCells = within(userRow as HTMLElement).getAllByRole('cell');
+
+            expect(userCells[2]).toHaveTextContent(/^—$/);
+        });
+
+        it('should render an em dash when the external ID is an empty string', () => {
+            hoisted.mockUseUsersTable.mockReturnValue({
+                ...defaultMockReturn,
+                users: [{...mockUsers[0], externalId: ''}],
+            });
+
+            renderUsersTable();
+
+            const adminCells = within(screen.getByText('admin@test.com').closest('tr') as HTMLElement).getAllByRole(
+                'cell'
+            );
+
+            expect(adminCells[2]).toHaveTextContent(/^—$/);
+        });
+
+        it('should not render the external ID as an editable field', () => {
+            renderUsersTable();
+
+            expect(screen.queryByDisplayValue('idp-admin-1')).not.toBeInTheDocument();
+            expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
         });
     });
 
@@ -194,13 +241,12 @@ describe('UsersTable', () => {
             expect(rows.length).toBe(3);
         });
 
-        it('should render 5 columns per user row', () => {
+        it('should render 6 columns per user row', () => {
             renderUsersTable();
 
-            // First user has 5 cells
             const cells = screen.getAllByRole('cell');
 
-            expect(cells.length).toBe(10); // 5 cells per user * 2 users
+            expect(cells.length).toBe(12);
         });
     });
 });
