@@ -59,6 +59,7 @@ const McpComponentToolPropertiesPopover = ({
                         connectionId: connectionId ? Number(connectionId) : undefined,
                         connectionRequired,
                         inputParameters: formValues,
+                        mcpComponentId: mcpTool.mcpComponentId,
                     }}
                 >
                     <Properties
@@ -83,6 +84,7 @@ const McpComponentToolPropertiesPopover = ({
         formValues,
         isEvaluating,
         isLoading,
+        mcpTool.mcpComponentId,
         mcpTool.name,
         properties,
     ]);
