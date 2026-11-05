@@ -11,4 +11,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
+
+    testImplementation("org.awaitility:awaitility")
+    testImplementation(project(":server:libs:test:test-support"))
 }
