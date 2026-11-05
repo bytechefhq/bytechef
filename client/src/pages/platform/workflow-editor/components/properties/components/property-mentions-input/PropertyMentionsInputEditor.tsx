@@ -24,7 +24,7 @@ import {Paragraph} from '@tiptap/extension-paragraph';
 import {Placeholder} from '@tiptap/extension-placeholder';
 import {Text} from '@tiptap/extension-text';
 import {Slice} from '@tiptap/pm/model';
-import {TextSelection} from '@tiptap/pm/state';
+import {Selection} from '@tiptap/pm/state';
 import {EditorView} from '@tiptap/pm/view';
 import {Editor, EditorContent, ReactNodeViewRenderer, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
@@ -371,7 +371,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 typeof transformedValue === 'string' &&
                 !transformedValue.includes('${')
             ) {
-                transformedValue = parseInt(transformedValue);
+                transformedValue = type === 'NUMBER' ? parseFloat(transformedValue) : parseInt(transformedValue);
             }
 
             if (typeof transformedValue === 'string') {
@@ -495,7 +495,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             const valueSize = view.state.doc.content.size;
 
             if (valueSize > 0 && pos === 0) {
-                view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, valueSize)));
+                view.dispatch(view.state.tr.setSelection(Selection.atEnd(view.state.doc)));
             }
         }, []);
 
