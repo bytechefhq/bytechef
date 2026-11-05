@@ -1,12 +1,14 @@
 import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import LoadingIcon from '@/components/LoadingIcon';
+import {Skeleton} from '@/components/ui/skeleton';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectDeploymentList from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentList';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
@@ -79,12 +81,40 @@ const ProjectDeploymentsPanel = ({
 
     const projectDeploymentsLoadFailed = !!projectDeploymentsError && projectDeployments === undefined;
 
+    const knownProjectDeploymentCount =
+        currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? project.developmentDeploymentCount : undefined;
+
+    const skeletonProjectDeploymentCount = Math.min(knownProjectDeploymentCount ?? 1, 3);
+
     return (
         <>
-            {projectDeploymentsIsLoading && (
+            {projectDeploymentsIsLoading && knownProjectDeploymentCount === 0 && (
                 <div className="flex items-center justify-center py-6">
                     <LoadingIcon />
                 </div>
+            )}
+
+            {projectDeploymentsIsLoading && knownProjectDeploymentCount !== 0 && (
+                <ul aria-busy="true" aria-label="Loading deployments">
+                    {Array.from({length: skeletonProjectDeploymentCount}, (_, index) => (
+                        <li
+                            className="mb-2 flex items-center justify-between rounded border border-border/50 p-3"
+                            key={index}
+                        >
+                            <div className="space-y-2">
+                                <Skeleton className="h-5 w-40" />
+
+                                <Skeleton className="h-4 w-24" />
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                <Skeleton className="h-6 w-9 rounded-full" />
+
+                                <Skeleton className="h-6 w-11 rounded-full" />
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             )}
 
             {projectDeploymentsLoadFailed && (
