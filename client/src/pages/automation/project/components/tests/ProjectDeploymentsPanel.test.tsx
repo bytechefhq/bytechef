@@ -3,11 +3,12 @@ import ProjectDeploymentsPanel from '@/pages/automation/project/components/Proje
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Project, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
+import {fireEvent, render, screen, within} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     error: null as Error | null,
+    isLoading: false,
     navigate: vi.fn(),
     projectDeployments: [] as ProjectDeployment[] | undefined,
     refetch: vi.fn(),
@@ -24,7 +25,7 @@ vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
         data: hoisted.projectDeployments,
         error: hoisted.error,
         isFetching: false,
-        isLoading: false,
+        isLoading: hoisted.isLoading,
         refetch: hoisted.refetch,
     }),
 }));
@@ -117,14 +118,14 @@ const onProjectDeploymentSaved = vi.fn();
 
 const project = {id: 7, lastProjectVersion: 3, lastPublishedDate: new Date(), name: 'Orders'} as Project;
 
-const renderProjectDeploymentsPanel = (expandedProjectDeploymentId?: number) =>
+const renderProjectDeploymentsPanel = (expandedProjectDeploymentId?: number, renderedProject: Project = project) =>
     render(
         <TooltipProvider>
             <ProjectDeploymentsPanel
                 enabled
                 expandedProjectDeploymentId={expandedProjectDeploymentId}
                 onProjectDeploymentSaved={onProjectDeploymentSaved}
-                project={project}
+                project={renderedProject}
             />
         </TooltipProvider>
     );
@@ -132,6 +133,7 @@ const renderProjectDeploymentsPanel = (expandedProjectDeploymentId?: number) =>
 describe('ProjectDeploymentsPanel', () => {
     beforeEach(() => {
         hoisted.error = null;
+        hoisted.isLoading = false;
         hoisted.navigate.mockReset();
         hoisted.refetch.mockReset();
         hoisted.projectDeployments = [
@@ -144,6 +146,39 @@ describe('ProjectDeploymentsPanel', () => {
 
         useWorkspaceStore.setState({currentWorkspaceId: 1});
         environmentStore.setState({currentEnvironmentId: 0});
+    });
+
+    it('shows a skeleton card for each known deployment while the deployments load', () => {
+        hoisted.isLoading = true;
+        hoisted.projectDeployments = undefined;
+
+        renderProjectDeploymentsPanel(undefined, {...project, developmentDeploymentCount: 2} as Project);
+
+        expect(within(screen.getByRole('list', {name: 'Loading deployments'})).getAllByRole('listitem')).toHaveLength(
+            2
+        );
+    });
+
+    it('shows one skeleton card while deployments of an environment without a known count load', () => {
+        hoisted.isLoading = true;
+        hoisted.projectDeployments = undefined;
+
+        environmentStore.setState({currentEnvironmentId: 2});
+
+        renderProjectDeploymentsPanel(undefined, {...project, developmentDeploymentCount: 2} as Project);
+
+        expect(within(screen.getByRole('list', {name: 'Loading deployments'})).getAllByRole('listitem')).toHaveLength(
+            1
+        );
+    });
+
+    it('shows no skeleton while the deployments of a project without deployments load', () => {
+        hoisted.isLoading = true;
+        hoisted.projectDeployments = undefined;
+
+        renderProjectDeploymentsPanel(undefined, {...project, developmentDeploymentCount: 0} as Project);
+
+        expect(screen.queryByRole('list', {name: 'Loading deployments'})).not.toBeInTheDocument();
     });
 
     it('shows only the deployments of the current environment', () => {
