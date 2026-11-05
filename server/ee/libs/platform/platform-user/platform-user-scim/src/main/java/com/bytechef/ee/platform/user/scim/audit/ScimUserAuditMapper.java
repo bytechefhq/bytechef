@@ -124,6 +124,8 @@ public class ScimUserAuditMapper implements AuditMapper {
 
         if (!Objects.equals(previousUserState.externalId(), userState.externalId())) {
             changedFields.add("externalId");
+
+            putIfNotNull(data, "previousExternalId", previousUserState.externalId());
         }
 
         if (!Objects.equals(previousUserState.firstName(), userState.firstName())) {

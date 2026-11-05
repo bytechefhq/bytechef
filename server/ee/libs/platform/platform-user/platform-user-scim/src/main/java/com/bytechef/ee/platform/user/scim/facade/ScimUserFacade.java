@@ -9,9 +9,10 @@ package com.bytechef.ee.platform.user.scim.facade;
 
 import com.bytechef.ee.platform.user.scim.audit.ScimUserAuditEvents;
 import com.bytechef.ee.platform.user.scim.audit.ScimUserAuditMapper;
+import com.bytechef.ee.platform.user.scim.facade.ScimUserPatchOperations.Attribute;
+import com.bytechef.ee.platform.user.scim.facade.ScimUserPatchOperations.AttributeChange;
 import com.bytechef.ee.platform.user.scim.model.ScimEmail;
 import com.bytechef.ee.platform.user.scim.model.ScimName;
-import com.bytechef.ee.platform.user.scim.model.ScimPatchOperation;
 import com.bytechef.ee.platform.user.scim.model.ScimPatchRequest;
 import com.bytechef.ee.platform.user.scim.model.ScimUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -23,7 +24,6 @@ import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,9 +38,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ScimUserFacade {
 
-    private static final String ACTIVE = "active";
+    private static final String EMAILS = "emails";
     private static final String EXTERNAL_ID = "externalId";
-    private static final String REPLACE = "replace";
+    private static final String FAMILY_NAME = "name.familyName";
+    private static final String GIVEN_NAME = "name.givenName";
+    private static final String USER_NAME = "userName";
 
     private final UserService userService;
 
@@ -58,27 +60,44 @@ public class ScimUserFacade {
             return false;
         }
 
-        Boolean active = null;
+        String active = null;
 
-        for (ScimPatchOperation scimPatchOperation : scimPatchRequest.operations()) {
-            if (!REPLACE.equalsIgnoreCase(scimPatchOperation.operation())) {
-                continue;
-            }
-
-            if (ACTIVE.equals(scimPatchOperation.path())) {
-                active = Boolean.parseBoolean(String.valueOf(scimPatchOperation.value()));
-            } else if (scimPatchOperation.path() == null && scimPatchOperation.value() instanceof Map<?, ?> valueMap
-                && valueMap.containsKey(ACTIVE)) {
-
-                active = Boolean.parseBoolean(String.valueOf(valueMap.get(ACTIVE)));
+        for (AttributeChange attributeChange : ScimUserPatchOperations.parse(scimPatchRequest)) {
+            if (attributeChange.attribute() == Attribute.ACTIVE) {
+                active = attributeChange.value();
             }
         }
 
-        return Boolean.FALSE.equals(active);
+        return "false".equals(active);
+    }
+
+    public static void validate(ScimUser scimUser) {
+        String userName = ScimValues.checkRequired(USER_NAME, scimUser.userName());
+
+        ScimValues.checkMaxLength(USER_NAME, toLogin(userName), UserConstants.LOGIN_MAX_LENGTH);
+
+        String email = extractPrimaryEmail(scimUser);
+
+        ScimValues.checkMaxLength(
+            EMAILS, email == null ? null : email.toLowerCase(Locale.ROOT), UserConstants.EMAIL_MAX_LENGTH);
+        ScimValues.checkMaxLength(EXTERNAL_ID, scimUser.externalId(), ScimValues.EXTERNAL_ID_MAX_LENGTH);
+
+        ScimName scimName = scimUser.name();
+
+        if (scimName != null) {
+            ScimValues.checkMaxLength(GIVEN_NAME, scimName.givenName(), ScimValues.NAME_MAX_LENGTH);
+            ScimValues.checkMaxLength(FAMILY_NAME, scimName.familyName(), ScimValues.NAME_MAX_LENGTH);
+        }
+    }
+
+    public static void validate(ScimPatchRequest scimPatchRequest) {
+        ScimUserPatchOperations.parse(scimPatchRequest);
     }
 
     @Audited(event = ScimUserAuditEvents.SCIM_USER_CREATED, mapper = ScimUserAuditMapper.class)
     public User createUser(ScimUser scimUser) {
+        validate(scimUser);
+
         AdminUserDTO adminUserDTO = new AdminUserDTO();
 
         applyScimUser(adminUserDTO, scimUser);
@@ -130,6 +149,8 @@ public class ScimUserFacade {
     }
 
     private Optional<User> applyPatch(long id, ScimPatchRequest scimPatchRequest) {
+        List<AttributeChange> attributeChanges = ScimUserPatchOperations.parse(scimPatchRequest);
+
         Optional<User> userOptional = userService.fetchUser(id);
 
         if (userOptional.isEmpty()) {
@@ -138,10 +159,8 @@ public class ScimUserFacade {
 
         User user = userOptional.get();
 
-        for (ScimPatchOperation scimPatchOperation : scimPatchRequest.operations()) {
-            if (REPLACE.equalsIgnoreCase(scimPatchOperation.operation())) {
-                applyReplaceOperation(user, scimPatchOperation);
-            }
+        for (AttributeChange attributeChange : attributeChanges) {
+            applyAttributeChange(user, attributeChange);
         }
 
         userService.save(user);
@@ -150,6 +169,8 @@ public class ScimUserFacade {
     }
 
     private Optional<User> applyReplace(long id, ScimUser scimUser) {
+        validate(scimUser);
+
         Optional<User> userOptional = userService.fetchUser(id);
 
         if (userOptional.isEmpty()) {
@@ -171,29 +192,16 @@ public class ScimUserFacade {
         return userService.update(adminUserDTO);
     }
 
-    private static void applyReplaceOperation(User user, ScimPatchOperation scimPatchOperation) {
-        String path = scimPatchOperation.path();
-        Object value = scimPatchOperation.value();
+    private static void applyAttributeChange(User user, AttributeChange attributeChange) {
+        String value = attributeChange.value();
 
-        if (path != null) {
-            applyAttribute(user, path, value);
-        } else if (value instanceof Map<?, ?> valueMap) {
-            // Without a path the value holds the attributes to replace (RFC 7644 Section 3.5.2.3)
-            for (Map.Entry<?, ?> entry : valueMap.entrySet()) {
-                applyAttribute(user, String.valueOf(entry.getKey()), entry.getValue());
-            }
-        }
-    }
-
-    private static void applyAttribute(User user, String path, Object value) {
-        switch (path) {
-            case ACTIVE -> user.setActivated(Boolean.parseBoolean(String.valueOf(value)));
-            case EXTERNAL_ID -> user.setExternalId(value == null ? null : String.valueOf(value));
-            case "userName" -> user.setLogin(toLogin(String.valueOf(value)));
-            case "name.givenName" -> user.setFirstName(String.valueOf(value));
-            case "name.familyName" -> user.setLastName(String.valueOf(value));
-            default -> {
-            }
+        switch (attributeChange.attribute()) {
+            case ACTIVE -> user.setActivated(Boolean.parseBoolean(value));
+            case EXTERNAL_ID -> user.setExternalId(value);
+            case FAMILY_NAME -> user.setLastName(value);
+            case GIVEN_NAME -> user.setFirstName(value);
+            case USER_NAME -> user.setLogin(value);
+            default -> throw new IllegalStateException("Unexpected attribute: " + attributeChange.attribute());
         }
     }
 

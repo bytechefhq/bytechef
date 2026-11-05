@@ -140,7 +140,54 @@ class ScimUserAuditMapperTest {
                 ScimUserAuditEvents.SCIM_USER_PATCHED, arguments, Optional.of(patchedUser), captured));
 
         assertThat(data).containsEntry("externalId", "ext-2")
+            .containsEntry("previousExternalId", "ext-1")
             .containsEntry("changedFields", "externalId");
+    }
+
+    @Test
+    void testMapPatchedEventRecordsARemovedExternalId() {
+        User previousUser = createUser("john.doe", "john@example.com", "John", "Doe", true, List.of());
+        User patchedUser = createUser("john.doe", "john@example.com", "John", "Doe", true, List.of());
+
+        previousUser.setExternalId("ext-1");
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(previousUser));
+
+        Map<String, Object> arguments = Map.of("id", USER_ID);
+
+        Object captured = scimUserAuditMapper.capture(
+            createAuditInvocation(ScimUserAuditEvents.SCIM_USER_PATCHED, arguments, null, null));
+
+        Map<String, String> data = scimUserAuditMapper.map(
+            createAuditInvocation(
+                ScimUserAuditEvents.SCIM_USER_PATCHED, arguments, Optional.of(patchedUser), captured));
+
+        assertThat(data).containsEntry("changedFields", "externalId")
+            .containsEntry("previousExternalId", "ext-1")
+            .doesNotContainKey("externalId");
+    }
+
+    @Test
+    void testMapPatchedEventRecordsAnAddedExternalIdWithoutAPreviousValue() {
+        User previousUser = createUser("john.doe", "john@example.com", "John", "Doe", true, List.of());
+        User patchedUser = createUser("john.doe", "john@example.com", "John", "Doe", true, List.of());
+
+        patchedUser.setExternalId("ext-1");
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(previousUser));
+
+        Map<String, Object> arguments = Map.of("id", USER_ID);
+
+        Object captured = scimUserAuditMapper.capture(
+            createAuditInvocation(ScimUserAuditEvents.SCIM_USER_PATCHED, arguments, null, null));
+
+        Map<String, String> data = scimUserAuditMapper.map(
+            createAuditInvocation(
+                ScimUserAuditEvents.SCIM_USER_PATCHED, arguments, Optional.of(patchedUser), captured));
+
+        assertThat(data).containsEntry("changedFields", "externalId")
+            .containsEntry("externalId", "ext-1")
+            .doesNotContainKey("previousExternalId");
     }
 
     @Test

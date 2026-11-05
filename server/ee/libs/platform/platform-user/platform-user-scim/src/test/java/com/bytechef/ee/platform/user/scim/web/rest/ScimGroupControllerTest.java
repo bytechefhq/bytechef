@@ -237,6 +237,48 @@ class ScimGroupControllerTest {
     }
 
     @Test
+    void testCreateGroupRejectsADisplayNameLongerThan50CharactersWithInvalidValue() throws Exception {
+        mockMvc.perform(
+            post(GROUPS_PATH)
+                .contentType(SCIM_JSON)
+                .content("{\"displayName\": \"" + "G".repeat(51) + "\"}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(SCIM_JSON))
+            .andExpect(jsonPath("$.schemas[0]").value(ERROR_SCHEMA))
+            .andExpect(jsonPath("$.scimType").value("invalidValue"))
+            .andExpect(jsonPath("$.detail").value("displayName must not be longer than 50 characters"))
+            .andExpect(jsonPath("$.status").value("400"));
+
+        verifyNoInteractions(scimGroupFacade, authorityService);
+    }
+
+    @Test
+    void testCreateGroupRejectsAMissingDisplayNameWithInvalidValue() throws Exception {
+        mockMvc.perform(
+            post(GROUPS_PATH)
+                .contentType(SCIM_JSON)
+                .content("{\"schemas\": [\"urn:ietf:params:scim:schemas:core:2.0:Group\"]}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.scimType").value("invalidValue"))
+            .andExpect(jsonPath("$.detail").value("displayName is required"));
+
+        verifyNoInteractions(scimGroupFacade, authorityService);
+    }
+
+    @Test
+    void testReplaceGroupRejectsADisplayNameLongerThan50CharactersWithInvalidValue() throws Exception {
+        mockMvc.perform(
+            put(GROUPS_PATH + "/" + GROUP_ID)
+                .contentType(SCIM_JSON)
+                .content("{\"displayName\": \"" + "G".repeat(51) + "\"}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.scimType").value("invalidValue"))
+            .andExpect(jsonPath("$.status").value("400"));
+
+        verifyNoInteractions(scimGroupFacade, authorityService);
+    }
+
+    @Test
     void testPatchGroupIsNotImplemented() throws Exception {
         mockMvc.perform(
             patch(GROUPS_PATH + "/" + GROUP_ID)
