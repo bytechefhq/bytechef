@@ -34,7 +34,7 @@ function encodeParametersGeneric({
 
         if (key.match(matchPattern)) {
             const newKey = replacementFn
-                ? key.replace(matchPattern, replacementFn(key))
+                ? key.replace(matchPattern, replacementFn)
                 : key.replace(matchPattern, replacement!);
 
             encodedParameters[newKey] = encodedParameters[key];
