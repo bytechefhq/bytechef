@@ -6,6 +6,7 @@ query clusterElementOptions(
     $connectionId: Long
     $inputParameters: Map
     $lookupDependsOnPaths: [String!]
+    $mcpComponentId: ID!
 ) {
     clusterElementOptions(
         componentName: $componentName
@@ -15,6 +16,7 @@ query clusterElementOptions(
         connectionId: $connectionId
         inputParameters: $inputParameters
         lookupDependsOnPaths: $lookupDependsOnPaths
+        mcpComponentId: $mcpComponentId
     ) {
         description
         label

@@ -47,6 +47,7 @@ const McpComponentToolPropertiesPopover = ({
                 connectionId={connectionId}
                 connectionRequired={connectionRequired}
                 form={form}
+                mcpComponentId={mcpTool.mcpComponentId}
                 properties={properties}
                 toolName={mcpTool.name}
             />
