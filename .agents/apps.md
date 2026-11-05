@@ -39,7 +39,7 @@ Touched outside the module:
   `ConnectionFacadeImpl` wiring.
 - `platform-tool-execution-api`: `ToolExecutionSurface.AUTOMATION_APP_ACTION|TOOL|PROXY`,
   `ToolExecutionKind.HTTP_PROXY`, `ToolExecutionEvent.appId`. `platform-tool-invocation-log-*`: `app_id` column
-  (`20261006000002_tool_invocation_log_added_app_id.xml`), an `appId` filter on `toolInvocationLogs`. Reads go
+  (`20261105000001_tool_invocation_log_added_app_id.xml`), an `appId` filter on `toolInvocationLogs`. Reads go
   through `ToolInvocationLogFacade`: `workspaceToolInvocationLogs(workspaceId, environmentId, ...)` needs
   `EXECUTION_VIEW` in that workspace and environment and is what the automation Tool Invocations page and the app
   Activity tab call; the tenant-wide `toolInvocationLogs` is `isTenantAdmin()` and serves the embedded Tool
