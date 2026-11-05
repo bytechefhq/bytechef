@@ -36,6 +36,8 @@ interface ExecutionColumnI {
     pinned?: boolean;
 }
 
+const getTimedExecution = (execution: WorkflowExecution) => execution.job ?? execution.triggerExecution;
+
 const columns: ExecutionColumnI[] = [
     {
         cell: (execution) => (
@@ -72,10 +74,12 @@ const columns: ExecutionColumnI[] = [
     },
     {
         cell: (execution) => {
-            const startDate = (execution.job?.startDate || execution.triggerExecution?.startDate)?.getTime();
-            const endDate = (execution.job?.endDate || execution.triggerExecution?.endDate)?.getTime();
+            const timedExecution = getTimedExecution(execution);
 
-            if (startDate && endDate) {
+            const startDate = timedExecution?.startDate?.getTime();
+            const endDate = timedExecution?.endDate?.getTime();
+
+            if (startDate && endDate && endDate >= startDate) {
                 return `${Math.round(endDate - startDate)}ms`;
             }
         },
@@ -93,7 +97,7 @@ const columns: ExecutionColumnI[] = [
     },
     {
         cell: (execution) => {
-            const endDate = execution.job?.endDate || execution.triggerExecution?.endDate;
+            const endDate = getTimedExecution(execution)?.endDate;
 
             return endDate ? formatDateTime(endDate) : null;
         },
