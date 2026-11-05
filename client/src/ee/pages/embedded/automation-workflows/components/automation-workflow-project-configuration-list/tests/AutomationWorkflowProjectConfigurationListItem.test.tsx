@@ -151,7 +151,7 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         renderItem();
 
-        expect(document.querySelector('svg.lucide-settings-2')).toBeInTheDocument();
+        expect(document.querySelector('svg.lucide-sliders-horizontal')).toBeInTheDocument();
 
         await user.click(await screen.findByRole('button', {name: 'Mailer'}));
 
