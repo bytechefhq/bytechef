@@ -196,7 +196,8 @@ describe('AutomationWorkflowProjectConfigurationWorkflowDialog', () => {
 
         renderDialog();
 
-        expect(screen.getByText('Provided Values')).toBeInTheDocument();
+        expect(screen.getByText('Edit Summarize Email')).toBeInTheDocument();
+        expect(screen.queryByText('Provided Values')).not.toBeInTheDocument();
         expect(
             screen.getByText(
                 'Connections and inputs set here are used by every connected user and cannot be changed by them.'
