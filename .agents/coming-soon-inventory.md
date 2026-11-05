@@ -34,6 +34,7 @@ Both are reversible and neither deletes anything.
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
 | Memories | [`/platform/automation/ai/memories`](/platform/automation/ai/memories) | CE | visible |
+| AI Agents | [`/platform/automation/build/ai-agents`](/platform/automation/build/ai-agents) | — | visible |
 | AI Copilot | [`/platform/automation/build/ai-copilot`](/platform/automation/build/ai-copilot) | EE | visible |
 | AI Building Examples | [`/platform/automation/build/ai-examples`](/platform/automation/build/ai-examples) | — | visible |
 | AI Hub | [`/platform/automation/build/hub`](/platform/automation/build/hub) | — | **hidden** |

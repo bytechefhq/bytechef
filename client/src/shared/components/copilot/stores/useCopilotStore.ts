@@ -42,6 +42,10 @@ export enum Source {
 export const isWorkflowEditorSource = (source: Source) =>
     source === Source.WORKFLOW_EDITOR || source === Source.WORKFLOW_EDITOR_EMBEDDED;
 
+export interface AiAgentCopilotParametersI {
+    aiAgentId?: string;
+}
+
 export interface CodeEditorCopilotParametersI {
     language: string;
 }
@@ -79,6 +83,7 @@ export interface WorkflowNodeCopilotParametersI {
 
 export type CopilotContextParametersType =
     | Record<string, never>
+    | AiAgentCopilotParametersI
     | CodeEditorCopilotParametersI
     | ClusterElementCopilotParametersI
     | IntentCopilotParametersI

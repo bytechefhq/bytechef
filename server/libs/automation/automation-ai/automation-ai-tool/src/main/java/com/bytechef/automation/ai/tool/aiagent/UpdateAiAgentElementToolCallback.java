@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool.aiagent;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -39,7 +40,7 @@ public class UpdateAiAgentElementToolCallback implements ToolCallback {
             Update an AI Agent element's parameters and/or connectionId: pass the agentId and the element id
             from that agent's getAiAgent elements list; an id from another agent is rejected. Only the fields you supply are changed; an omitted field keeps its current
             value. To reconfigure a TOOL's requiresApproval flag, pass the full parameters object with the
-            updated value — parameters is replaced wholesale, not merged.""";
+            updated value; parameters is replaced wholesale, not merged.""";
 
     private static final String INPUT_SCHEMA = """
         {
@@ -100,7 +101,7 @@ public class UpdateAiAgentElementToolCallback implements ToolCallback {
             return writeResult(Map.of("updated", true, "elementId", input.elementId()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (IllegalArgumentException exception) {
+        } catch (ConfigurationException | IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(

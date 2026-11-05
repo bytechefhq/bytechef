@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool.aiagent;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -38,7 +39,7 @@ public class DeleteAiAgentChannelToolCallback implements ToolCallback {
         Delete a channel from an AI Agent: pass the agentId and the channel id from that agent's getAiAgent
         channels list; an id from another agent is rejected. The permanent
         chat and workflowCall channels cannot be deleted and this call is rejected for them. Always
-        confirm with the user before calling — the agent stops being reachable through this channel.""";
+        confirm with the user before calling, because the agent stops being reachable through this channel.""";
 
     private static final String INPUT_SCHEMA = """
         {
@@ -97,7 +98,7 @@ public class DeleteAiAgentChannelToolCallback implements ToolCallback {
             return writeResult(Map.of("deleted", true, "channelId", input.channelId()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (IllegalArgumentException exception) {
+        } catch (ConfigurationException | IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(

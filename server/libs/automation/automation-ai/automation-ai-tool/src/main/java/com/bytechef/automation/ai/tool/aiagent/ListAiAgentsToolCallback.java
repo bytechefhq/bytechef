@@ -37,7 +37,7 @@ public class ListAiAgentsToolCallback implements ToolCallback {
     private static final String TOOL_NAME = "listAiAgents";
 
     private static final String DESCRIPTION = """
-        List every AI Agent in the current workspace. An AI Agent is a chat-first automation entity — a
+        List every AI Agent in the current workspace. An AI Agent is a chat-first automation entity: a
         persona (model, instructions) reachable through one or more channels (chat, workflowCall,
         schedule, slack, telegram, rocketchat) and equipped with elements (tools, skills, sub-agents,
         knowledge bases). Returns a JSON array of summaries: id, name, title, description, published

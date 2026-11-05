@@ -22,6 +22,7 @@ import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
 import com.bytechef.automation.ai.agent.dto.AiAgentDTO;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +42,8 @@ public class GetAiAgentToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Get the full configuration of one AI Agent by id: its title/description/instructions, every
-        channel (inbound trigger — channelType, parameters, connectionId), every element (building
-        block — kind, referenceId, parameters, connectionId; kinds are MODEL, TOOL, SKILL, SUB_AGENT,
+        channel (inbound trigger: channelType, parameters, connectionId), every element (building
+        block: kind, referenceId, parameters, connectionId; kinds are MODEL, TOOL, SKILL, SUB_AGENT,
         KNOWLEDGE_BASE, CHAT_MEMORY, APPROVAL_GATE, APPROVAL_CHANNEL, APPROVAL_TOOL), the settings
         object (streamResponse plus the builtInTools on/off switches), and
         unpublishedChanges/lastPublishedVersion. Always call
@@ -95,7 +96,7 @@ public class GetAiAgentToolCallback implements ToolCallback {
             return writeResult(toOutput(agentDTO));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (IllegalArgumentException exception) {
+        } catch (ConfigurationException | IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(jsonMapper, GetAiAgentToolCallback.class, TOOL_NAME, exception);

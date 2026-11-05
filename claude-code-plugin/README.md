@@ -1,7 +1,7 @@
 # claude-code-plugin
 
-Skills that let Claude, Claude Code, Codex and other coding agents build ByteChef workflows over the
-management MCP server, packaged as the `bytechef-dev` Claude Code plugin.
+Skills that let Claude, Claude Code, Codex and other coding agents build ByteChef workflows and AI
+Agents over the management MCP server, packaged as the `bytechef-dev` Claude Code plugin.
 
 ## Layout
 
@@ -10,6 +10,7 @@ claude-code-plugin/
   bytechef-dev/
     .claude-plugin/plugin.json      plugin manifest (name, version, description, author)
     skills/
+      bytechef-ai-agents/SKILL.md         create, configure and publish an AI Agent
       bytechef-mcp-setup/SKILL.md         connect a client to the management MCP server
       bytechef-workflow-builder/SKILL.md  author, save, connect and publish a workflow
 ```

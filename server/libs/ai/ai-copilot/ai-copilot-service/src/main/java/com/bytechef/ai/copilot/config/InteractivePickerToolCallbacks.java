@@ -120,7 +120,7 @@ public class InteractivePickerToolCallbacks {
             new CreateConnectionToolCallback(componentDefinitionService));
     }
 
-    private ToolCallback listConnectionsForComponent() {
+    public ToolCallback listConnectionsForComponent() {
         List<CopilotConnectionLister> connectionListers = new ArrayList<>();
 
         connectionListers.add(new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, propertyOptionsResolver));

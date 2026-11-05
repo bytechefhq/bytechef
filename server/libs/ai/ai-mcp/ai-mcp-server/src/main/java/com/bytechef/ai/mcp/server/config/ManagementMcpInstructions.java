@@ -27,7 +27,13 @@ import java.util.Set;
 final class ManagementMcpInstructions {
 
     private static final List<String> INTELLIGENT_TOOL_NAMES = List.of(
-        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer");
+        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer",
+        "buildAiAgent");
+
+    private static final List<String> AI_AGENT_TOOL_NAMES = List.of(
+        "listAiAgents", "getAiAgent", "createAiAgent", "updateAiAgent", "addAiAgentElement", "updateAiAgentElement",
+        "deleteAiAgentElement", "addAiAgentChannel", "deleteAiAgentChannel", "updateAiAgentSettings",
+        "searchAiAgentTools", "searchAiAgentReferences");
 
     private static final List<String> MCP_SERVER_TOOL_NAMES = List.of(
         "createMcpServer", "createMcpProject", "updateMcpServer", "listMcpServers");
@@ -73,6 +79,16 @@ final class ManagementMcpInstructions {
 
         if (names.contains("authorSkill")) {
             paragraphs.add(authorSkill());
+        }
+
+        boolean aiAgentsServed = names.containsAll(AI_AGENT_TOOL_NAMES);
+
+        if (aiAgentsServed) {
+            paragraphs.add(aiAgents(names));
+        }
+
+        if (names.contains("buildAiAgent")) {
+            paragraphs.add(buildAiAgent(aiAgentsServed));
         }
 
         paragraphs.add(search());
@@ -170,6 +186,39 @@ final class ManagementMcpInstructions {
     private static String authorSkill() {
         return """
             Skills are read-only through the ordinary tools; author or change a skill with authorSkill.""";
+    }
+
+    private static String aiAgents(Set<String> names) {
+        String text =
+            """
+                To build an AI Agent (a chat-first automation that runs on a model instead of a hand-built \
+                workflow) yourself, use the agent tools: listAiAgents and createAiAgent take a workspaceId; \
+                getAiAgent, updateAiAgent, addAiAgentElement, updateAiAgentElement, deleteAiAgentElement, \
+                addAiAgentChannel, deleteAiAgentChannel and updateAiAgentSettings act on an agent by id. \
+                searchAiAgentTools finds the componentName, componentVersion and actionName of a TOOL element and \
+                searchAiAgentReferences finds the referenceId of a skill or knowledge base. An agent's MODEL \
+                element needs a connectionId""";
+
+        if (names.contains("listConnections")) {
+            return text + "; find one with listConnections.";
+        }
+
+        return text + ".";
+    }
+
+    private static String buildAiAgent(boolean aiAgentsServed) {
+        String text =
+            """
+                To have the server build an AI Agent: createProject (if needed) → buildAiAgent with a \
+                plain-language instruction and the projectId for a new agent or the aiAgentId for an existing \
+                one; it looks up tools and connections itself. buildAiAgent runs a server-side AI model and needs \
+                an AI provider enabled""";
+
+        if (aiAgentsServed) {
+            return text + "; if it reports none, build the agent yourself with the agent tools.";
+        }
+
+        return text + ".";
     }
 
     private static String search() {

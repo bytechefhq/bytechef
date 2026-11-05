@@ -20,6 +20,7 @@ import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.ai.agent.dto.AiAgentDTO;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
@@ -41,7 +42,7 @@ public class CreateAiAgentToolCallback implements ToolCallback {
         names a project to put the agent in, create or find that project first and pass its id: never call
         createProject and createAiAgent in the same step, or the agent lands in a second project of its own.
         The agent starts with no MODEL, no tools, and only the two permanent channels (chat,
-        workflowCall) — it cannot be published until a MODEL element is added via addAiAgentElement.
+        workflowCall), so it cannot be published until a MODEL element is added via addAiAgentElement.
         Returns the new agent's id, name (slugified from the title), title, and projectId.""";
 
     private static final String INPUT_SCHEMA =
@@ -111,7 +112,7 @@ public class CreateAiAgentToolCallback implements ToolCallback {
                     agentDTO.projectId()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (IllegalArgumentException exception) {
+        } catch (ConfigurationException | IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(jsonMapper, CreateAiAgentToolCallback.class, TOOL_NAME, exception);
