@@ -2430,7 +2430,7 @@ export type UsersQueryVariables = Exact<{
 }>;
 
 
-export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
+export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, externalId: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
 
 export type ToolInvocationLogsQueryVariables = Exact<{
   type: Types.PlatformType;
@@ -11573,6 +11573,7 @@ export const UsersDocument = new TypedDocumentString(`
       id
       login
       email
+      externalId
       firstName
       lastName
       activated
