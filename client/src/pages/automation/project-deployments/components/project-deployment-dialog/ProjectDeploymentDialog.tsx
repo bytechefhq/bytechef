@@ -9,12 +9,9 @@ import {
     DialogMain,
     DialogNextButton,
     DialogPreviousButton,
-    DialogSidebar,
     type DialogStepI,
-    DialogStepIndicator,
-    DialogSteps,
-    DialogStepsProvider,
     DialogTrigger,
+    DialogWizard,
     useDialogSteps,
 } from '@/components/Dialog';
 import LoadingDots from '@/components/LoadingDots';
@@ -639,28 +636,9 @@ const ProjectDeploymentDialog = ({
                 onInteractOutside={(event) => event.preventDefault()}
             >
                 {isWizard ? (
-                    <DialogStepsProvider onComplete={handleCompleteClick} steps={steps} validateStep={validateStep}>
-                        <DialogSidebar description={wizardDescription} icon={<RocketIcon />} title={wizardTitle}>
-                            <DialogSteps />
-
-                            <DialogStepIndicator />
-                        </DialogSidebar>
-
-                        <DialogMain>
-                            <DialogHeader dialogDescription={wizardDescription} dialogTitle={wizardTitle} />
-
-                            <DialogBody>
-                                <WorkflowMockProvider>
-                                    <Form {...form}>
-                                        <ProjectDeploymentDialogStepContent
-                                            basicStepContent={basicStepContent}
-                                            isWorkflowsPending={isWorkflowsPending}
-                                            workflowsStepContent={workflowsStepContent}
-                                        />
-                                    </Form>
-                                </WorkflowMockProvider>
-                            </DialogBody>
-
+                    <DialogWizard
+                        description={wizardDescription}
+                        footer={
                             <ProjectDeploymentDialogFooter
                                 connectionsGrouped={connectionsGrouped}
                                 hasEnabledWorkflows={hasEnabledWorkflows}
@@ -668,8 +646,23 @@ const ProjectDeploymentDialog = ({
                                 isDeploymentPending={isDeploymentPending}
                                 onConnectionsGroupedChange={handleConnectionsGroupedChange}
                             />
-                        </DialogMain>
-                    </DialogStepsProvider>
+                        }
+                        icon={<RocketIcon />}
+                        onComplete={handleCompleteClick}
+                        steps={steps}
+                        title={wizardTitle}
+                        validateStep={validateStep}
+                    >
+                        <WorkflowMockProvider>
+                            <Form {...form}>
+                                <ProjectDeploymentDialogStepContent
+                                    basicStepContent={basicStepContent}
+                                    isWorkflowsPending={isWorkflowsPending}
+                                    workflowsStepContent={workflowsStepContent}
+                                />
+                            </Form>
+                        </WorkflowMockProvider>
+                    </DialogWizard>
                 ) : (
                     <DialogMain>
                         <DialogHeader

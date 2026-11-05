@@ -43,3 +43,5 @@ export {
 } from './DialogStepsProvider';
 
 export {useDialogSteps} from './hooks/useDialogSteps';
+
+export {DialogWizard, type DialogWizardProps} from './DialogWizard';
