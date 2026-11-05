@@ -155,7 +155,6 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import com.bytechef.platform.mcp.service.McpToolServiceImpl;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.platform.security.audit.ApiKeyAuditPublisher;
 import com.bytechef.platform.security.facade.ApiKeyFacadeImpl;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.service.ApiKeyServiceImpl;
@@ -251,7 +250,7 @@ class EmbeddedGatesIntTest {
         AUTOMATION_EDITOR, 9904L, AUTOMATION_VIEWER, 9905L);
 
     @Autowired
-    private AutomationWorkflowProjectAdminFacade automationWorkflowProjectAdminFacade;
+    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @Autowired
     private ComponentDefinitionService componentDefinitionService;
@@ -369,7 +368,7 @@ class EmbeddedGatesIntTest {
         when(componentDefinitionService.getComponentDefinition(anyString(), any()))
             .thenReturn(new ComponentDefinition("componentName"));
         when(connectionDefinitionService.getConnectionDefinition(anyString(), any()))
-            .thenReturn(new ConnectionDefinition(ComponentDsl.connection(), "componentName", null, null));
+            .thenReturn(new ConnectionDefinition(ComponentDsl.connection(), "componentName", "componentTitle", null));
         when(workflowValidatorFacade.getReservedNodeNames(anyString()))
             .thenAnswer(invocation -> WorkflowValidator.getReservedNodeNames(invocation.getArgument(0)));
         when(principalJobService.getJobIds(
@@ -497,11 +496,11 @@ class EmbeddedGatesIntTest {
         assertThatThrownBy(() -> embeddedApiKeyFacade.getApiKeys(Environment.PRODUCTION.ordinal()))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
-            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, 0))
+            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, null, 0))
                 .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectAdminFacade.getProjects())
+        assertThatThrownBy(() -> automationWorkflowProjectFacade.getProjects())
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectAdminFacade.deleteProject(hubProjectId))
+        assertThatThrownBy(() -> automationWorkflowProjectFacade.deleteProject(hubProjectId))
             .isInstanceOf(AccessDeniedException.class);
 
         assertThat(integrationRepository.findAll()).hasSize(1);
@@ -522,7 +521,7 @@ class EmbeddedGatesIntTest {
             .getName()).isEqualTo("renamed");
         assertThat(embeddedApiKeyFacade.getApiKeys(Environment.DEVELOPMENT.ordinal())).isEmpty();
         assertThat(integrationWorkflowExecutionFacade.getWorkflowExecutions(
-            (long) Environment.DEVELOPMENT.ordinal(), null, null, null, null, null, null, 0)
+            (long) Environment.DEVELOPMENT.ordinal(), null, null, null, null, null, null, null, 0)
             .getContent()).isEmpty();
         assertThat(embeddedMcpServerFacade.getEmbeddedMcpServers())
             .extracting(McpServer::getId)
@@ -540,11 +539,11 @@ class EmbeddedGatesIntTest {
         assertThatThrownBy(() -> embeddedApiKeyFacade.getApiKeys(Environment.PRODUCTION.ordinal()))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
-            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, 0))
+            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, null, 0))
                 .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> embeddedMcpServerFacade.deleteEmbeddedMcpServer(developmentServerId))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectAdminFacade.deleteProject(hubProjectId))
+        assertThatThrownBy(() -> automationWorkflowProjectFacade.deleteProject(hubProjectId))
             .isInstanceOf(AccessDeniedException.class);
 
         assertThat(permissionService.hasResourceScopeInEnvironment(
@@ -586,7 +585,7 @@ class EmbeddedGatesIntTest {
         assertThatThrownBy(() -> embeddedApiKeyFacade.getApiKeys(Environment.DEVELOPMENT.ordinal()))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
-            (long) Environment.DEVELOPMENT.ordinal(), null, null, null, null, null, null, 0))
+            (long) Environment.DEVELOPMENT.ordinal(), null, null, null, null, null, null, null, 0))
                 .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> integrationWorkflowFacade.addWorkflow(integrationId, DEFINITION))
             .isInstanceOf(AccessDeniedException.class);
@@ -610,7 +609,7 @@ class EmbeddedGatesIntTest {
             .extracting(McpServer::getId)
             .containsExactlyInAnyOrder(productionServerId, developmentServerId);
         assertThat(integrationWorkflowExecutionFacade.getWorkflowExecutions(
-            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, 0)
+            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, null, 0)
             .getContent()).isEmpty();
         assertThat(connectedUserFacade.getConnectedUser(connectedUser.getId())).isNotNull();
         assertThat(permissionService.hasResourceScope(hubProjectId, "AutomationWorkflowProject", "WORKFLOW_VIEW"))
@@ -635,7 +634,7 @@ class EmbeddedGatesIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectedUserFacade.deleteConnectedUser(connectedUser.getId()))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectAdminFacade.deleteProject(hubProjectId))
+        assertThatThrownBy(() -> automationWorkflowProjectFacade.deleteProject(hubProjectId))
             .isInstanceOf(AccessDeniedException.class);
 
         assertThat(permissionService.hasResourceScopeInEnvironment(
@@ -668,7 +667,7 @@ class EmbeddedGatesIntTest {
         assertThat(embeddedApiKeyFacade.getApiKeys(Environment.DEVELOPMENT.ordinal())).isEmpty();
         assertThat(embeddedApiKeyFacade.getApiKeys(Environment.PRODUCTION.ordinal())).isEmpty();
         assertThat(integrationWorkflowExecutionFacade.getWorkflowExecutions(
-            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, 0)
+            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, null, 0)
             .getContent()).isEmpty();
         assertThat(permissionService.hasWorkspaceScopeForProject(hubProjectId, "PROJECT_SETTINGS")).isTrue();
         assertThat(permissionService.hasWorkspaceScopeForProject(connectedUserProjectId, "PROJECT_SETTINGS"))
@@ -703,9 +702,9 @@ class EmbeddedGatesIntTest {
         assertThatThrownBy(() -> embeddedApiKeyFacade.getApiKeys(Environment.PRODUCTION.ordinal()))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
-            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, 0))
+            (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, null, 0))
                 .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectAdminFacade.getProjects())
+        assertThatThrownBy(() -> automationWorkflowProjectFacade.getProjects())
             .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -795,7 +794,7 @@ class EmbeddedGatesIntTest {
             WorkspaceMcpServerService workspaceMcpServerService = applicationContext.getBean(
                 WorkspaceMcpServerService.class);
 
-            when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(2L)).thenReturn(Optional.of(77L));
+            when(workspaceMcpServerService.fetchMcpServerWorkspaceId(2L)).thenReturn(Optional.of(77L));
 
             PrincipalJobService chainedPrincipalJobService = applicationContext.getBean(PrincipalJobService.class);
 
@@ -1061,7 +1060,7 @@ class EmbeddedGatesIntTest {
     @EnableMethodSecurity
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        ApiKeyAuditPublisher.class, ApiKeyEnvironmentResolver.class, ApiKeyFacadeImpl.class,
+        ApiKeyEnvironmentResolver.class, ApiKeyFacadeImpl.class,
         ApiKeyOwnershipResolver.class, ApiKeyPermissionScopeProvider.class, ApiKeyServiceImpl.class,
         ApiPlatformPermissionScopeProvider.class, AppEventPermissionScopeProvider.class,
         ConnectedUserPermissionScopeProvider.class, ConnectionPermissionScopeProvider.class,
