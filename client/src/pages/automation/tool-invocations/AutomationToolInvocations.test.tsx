@@ -10,6 +10,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {AutomationToolInvocations} from './AutomationToolInvocations';
 
 const hoisted = vi.hoisted(() => ({
+    useA2aServersQueryMock: vi.fn(),
     useToolInvocationLogsQueryMock: vi.fn(),
     useWorkspaceMcpServersQueryMock: vi.fn(),
     useWorkspaceToolInvocationLogsQueryMock: vi.fn(),
@@ -17,6 +18,7 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     PlatformType: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
+    useA2aServersQuery: hoisted.useA2aServersQueryMock,
     useEnvironmentsQuery: () => ({data: undefined}),
     useToolInvocationLogsQuery: hoisted.useToolInvocationLogsQueryMock,
     useWorkspaceMcpServersQuery: hoisted.useWorkspaceMcpServersQueryMock,
@@ -25,18 +27,22 @@ vi.mock('@/shared/middleware/graphql', () => ({
 
 vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
     ToolInvocations: ({
+        a2aServerOptions,
         firstRunEmptyState,
         mcpServerOptions,
         type,
         workspaceScope,
     }: {
+        a2aServerOptions: Array<{label: string; value: string}>;
         firstRunEmptyState: ReactNode;
         mcpServerOptions: Array<{label: string; value: string}>;
     } & Parameters<typeof useToolInvocations>[0]) => {
         const {
+            filterA2aServerId,
             filterMcpServerId,
             filterOutcome,
             filterPageNumber,
+            handleA2aServerChange,
             handleMcpServerChange,
             handleOutcomeChange,
             handlePaginationClick,
@@ -45,8 +51,10 @@ vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
         return (
             <div>
                 <span data-testid="filters">
-                    {`mcp=${filterMcpServerId ?? ''};outcome=${filterOutcome ?? ''};page=${filterPageNumber}`}
+                    {`a2a=${filterA2aServerId ?? ''};mcp=${filterMcpServerId ?? ''};outcome=${filterOutcome ?? ''};page=${filterPageNumber}`}
                 </span>
+
+                <button onClick={() => handleA2aServerChange({label: 'Agent', value: '4'})}>pick a2a server</button>
 
                 <button onClick={() => handleMcpServerChange({label: 'Server', value: '9'})}>pick server</button>
 
@@ -58,6 +66,14 @@ vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
                     {mcpServerOptions.map((mcpServerOption) => (
                         <li data-testid="mcp-server-option" key={mcpServerOption.value}>
                             {`${mcpServerOption.value}:${mcpServerOption.label}`}
+                        </li>
+                    ))}
+                </ul>
+
+                <ul>
+                    {a2aServerOptions.map((a2aServerOption) => (
+                        <li data-testid="a2a-server-option" key={a2aServerOption.value}>
+                            {`${a2aServerOption.value}:${a2aServerOption.label}`}
                         </li>
                     ))}
                 </ul>
@@ -85,6 +101,8 @@ const renderPage = () =>
 
 describe('AutomationToolInvocations', () => {
     beforeEach(() => {
+        hoisted.useA2aServersQueryMock.mockReset();
+        hoisted.useA2aServersQueryMock.mockReturnValue({data: undefined});
         hoisted.useToolInvocationLogsQueryMock.mockReset();
         hoisted.useToolInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
         hoisted.useWorkspaceMcpServersQueryMock.mockReset();
@@ -108,7 +126,7 @@ describe('AutomationToolInvocations', () => {
             await userEvent.click(screen.getByRole('button', {name: 'pick outcome'}));
             await userEvent.click(screen.getByRole('button', {name: 'next pages'}));
 
-            expect(screen.getByTestId('filters')).toHaveTextContent('mcp=9;outcome=ERROR;page=3');
+            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=9;outcome=ERROR;page=3');
             expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     environmentId: '2',
@@ -125,7 +143,7 @@ describe('AutomationToolInvocations', () => {
                 switchScope();
             });
 
-            expect(screen.getByTestId('filters')).toHaveTextContent('mcp=;outcome=;page=0');
+            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=;outcome=;page=0');
             expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     environmentId,
@@ -152,6 +170,32 @@ describe('AutomationToolInvocations', () => {
             '11:Sales tools',
             '12:Support tools',
         ]);
+    });
+
+    it('offers the A2A servers of the current workspace as filter options', () => {
+        hoisted.useA2aServersQueryMock.mockReturnValue({
+            data: {a2aServers: [{id: '4', name: 'Research agent'}, null, {id: '5', name: 'Billing agent'}]},
+        });
+
+        renderPage();
+
+        expect(hoisted.useA2aServersQueryMock).toHaveBeenCalledWith({workspaceId: '7'}, {enabled: true});
+        expect(screen.getAllByTestId('a2a-server-option').map((option) => option.textContent)).toEqual([
+            '4:Research agent',
+            '5:Billing agent',
+        ]);
+    });
+
+    it('queries the tool invocations of the picked A2A server', async () => {
+        renderPage();
+
+        await userEvent.click(screen.getByRole('button', {name: 'pick a2a server'}));
+
+        expect(screen.getByTestId('filters')).toHaveTextContent('a2a=4;mcp=;outcome=;page=0');
+        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+            expect.objectContaining({a2aServerId: 4, mcpServerId: undefined, type: 'AUTOMATION'}),
+            {enabled: true}
+        );
     });
 
     it('waits for a workspace before loading its MCP servers', () => {

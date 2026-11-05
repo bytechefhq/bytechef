@@ -4,6 +4,7 @@ import {describe, expect, it} from 'vitest';
 import ToolInvocationsTable from './ToolInvocationsTable';
 
 const baseLog = {
+    a2aServerId: null,
     componentName: 'slack',
     componentVersion: 1,
     connectedUserId: null,
@@ -47,6 +48,7 @@ describe('ToolInvocationsTable', () => {
     });
 
     it.each([
+        ['A2A', 'A2A'],
         ['EMBEDDED_API_ACTION', 'Embedded API (Action)'],
         ['EMBEDDED_API_TOOL', 'Embedded API (Tool)'],
         ['MCP_AUTOMATION', 'Automation MCP'],
@@ -131,13 +133,36 @@ describe('ToolInvocationsTable', () => {
         expect(unknownServerRow).toHaveTextContent('—');
     });
 
+    it('shows the A2A server name of an A2A skill call', () => {
+        render(
+            <ToolInvocationsTable
+                a2aServerNames={{'4': 'Research agent'}}
+                mcpServerNames={{'4': 'Sales MCP'}}
+                toolInvocationLogs={[
+                    {
+                        ...baseLog,
+                        a2aServerId: 4,
+                        componentName: null,
+                        kind: 'WORKFLOW',
+                        operationName: null,
+                        surface: 'A2A',
+                        toolName: 'Summarize',
+                    },
+                ]}
+            />
+        );
+
+        expect(screen.getByText('Research agent')).toBeInTheDocument();
+        expect(screen.queryByText('Sales MCP')).not.toBeInTheDocument();
+    });
+
     it('hides the surface column when showSurface is false', () => {
         render(<ToolInvocationsTable showSurface={false} toolInvocationLogs={[baseLog]} />);
 
         expect(screen.queryByText('Surface')).not.toBeInTheDocument();
         expect(screen.queryByText('Automation MCP')).not.toBeInTheDocument();
         expect(screen.getByText('Source')).toBeInTheDocument();
-        expect(screen.getByText('MCP Server')).toBeInTheDocument();
+        expect(screen.getByText('Server')).toBeInTheDocument();
     });
 
     it('formats the created date and leaves the cell empty when it is missing', () => {

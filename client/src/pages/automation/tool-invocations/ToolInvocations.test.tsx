@@ -57,6 +57,7 @@ const renderToolInvocations = (props: Partial<Parameters<typeof ToolInvocations>
     );
 
 const toolInvocationLog = {
+    a2aServerId: null,
     componentName: 'slack',
     componentVersion: 1,
     connectedUserId: null,
@@ -89,16 +90,40 @@ describe('ToolInvocations', () => {
         hoisted.useToolInvocationsMock.mockReturnValue(toolInvocationsState());
     });
 
-    it('shows no surface filter or column on the automation page, which has a single surface', () => {
+    it('offers the automation MCP and A2A surfaces on the automation page', () => {
         hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
 
         renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         const itemValues = renderedItemValues();
 
-        expect(itemValues).not.toContain('MCP_AUTOMATION');
-        expect(screen.queryByText('Surface')).not.toBeInTheDocument();
-        expect(screen.queryByText('Automation MCP')).not.toBeInTheDocument();
+        expect(itemValues).toEqual(expect.arrayContaining(['A2A', 'MCP_AUTOMATION']));
+        expect(itemValues).not.toContain('MCP_EMBEDDED');
+        expect(screen.getByText('Surface', {selector: 'label'})).toBeInTheDocument();
+        expect(screen.getByRole('cell', {name: 'Automation MCP'})).toBeInTheDocument();
+    });
+
+    it('shows the name of the A2A server an A2A skill call came through', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue({
+            ...toolInvocationsState(),
+            toolInvocationLogs: [
+                {
+                    ...toolInvocationLog,
+                    a2aServerId: 4,
+                    componentName: null,
+                    kind: 'WORKFLOW',
+                    mcpServerId: null,
+                    operationName: null,
+                    surface: 'A2A',
+                    toolName: 'Summarize',
+                },
+            ],
+        });
+
+        renderToolInvocations({a2aServerOptions: [{label: 'Research agent', value: '4'}]});
+
+        expect(screen.getByRole('cell', {name: 'Research agent'})).toBeInTheDocument();
+        expect(screen.getByRole('cell', {name: 'A2A'})).toBeInTheDocument();
     });
 
     it('shows the name of the MCP server each invocation came through', () => {
@@ -217,6 +242,21 @@ describe('ToolInvocations', () => {
 
         expect(screen.getByText('Some error occurred.')).toBeInTheDocument();
         expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
+    });
+
+    it('offers the A2A server filter only when the workspace has A2A servers', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+
+        const {unmount} = renderToolInvocations({a2aServerOptions: []});
+
+        expect(screen.queryByText('A2A Server', {selector: 'label'})).not.toBeInTheDocument();
+
+        unmount();
+
+        renderToolInvocations({a2aServerOptions: [{label: 'Research agent', value: '4'}]});
+
+        expect(screen.getByText('A2A Server', {selector: 'label'})).toBeInTheDocument();
+        expect(renderedItemValues()).toContain('4');
     });
 
     it('offers the MCP server filter only when the workspace has MCP servers', () => {

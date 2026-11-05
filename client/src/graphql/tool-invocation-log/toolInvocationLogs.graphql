@@ -4,6 +4,7 @@ query ToolInvocationLogs(
     $surface: String
     $outcome: String
     $mcpServerId: Long
+    $a2aServerId: Long
     $connectedUserId: Long
     $integrationInstanceId: Long
     $fromDate: Long
@@ -16,6 +17,7 @@ query ToolInvocationLogs(
         surface: $surface
         outcome: $outcome
         mcpServerId: $mcpServerId
+        a2aServerId: $a2aServerId
         connectedUserId: $connectedUserId
         integrationInstanceId: $integrationInstanceId
         fromDate: $fromDate
@@ -36,6 +38,7 @@ query ToolInvocationLogs(
             connectedUserId
             integrationInstanceId
             mcpServerId
+            a2aServerId
             jobId
             workflowName
             outcome

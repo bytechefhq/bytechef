@@ -5,12 +5,14 @@ import {ToolInvocationLogsQuery} from '@/shared/middleware/graphql';
 type ToolInvocationLogItemType = ToolInvocationLogsQuery['toolInvocationLogs']['content'][number];
 
 interface ToolInvocationsTableProps {
+    a2aServerNames?: Record<string, string>;
     mcpServerNames?: Record<string, string>;
     showSurface?: boolean;
     toolInvocationLogs: Array<ToolInvocationLogItemType>;
 }
 
 const SURFACE_LABELS: Record<string, string> = {
+    A2A: 'A2A',
     EMBEDDED_API_ACTION: 'Embedded API (Action)',
     EMBEDDED_API_TOOL: 'Embedded API (Tool)',
     MCP_AUTOMATION: 'Automation MCP',
@@ -25,15 +27,20 @@ const OUTCOME_STYLE_TYPES: Record<string, BadgeStyleType> = {
     TIMEOUT: 'destructive-outline',
 };
 
-const mcpServerLabel = (
+const serverLabel = (
     toolInvocationLog: ToolInvocationLogItemType,
-    mcpServerNames: Record<string, string> | undefined
+    mcpServerNames: Record<string, string> | undefined,
+    a2aServerNames: Record<string, string> | undefined
 ): string => {
-    if (toolInvocationLog.mcpServerId == null) {
-        return '—';
+    if (toolInvocationLog.mcpServerId != null) {
+        return mcpServerNames?.[String(toolInvocationLog.mcpServerId)] || '—';
     }
 
-    return mcpServerNames?.[String(toolInvocationLog.mcpServerId)] || '—';
+    if (toolInvocationLog.a2aServerId != null) {
+        return a2aServerNames?.[String(toolInvocationLog.a2aServerId)] || '—';
+    }
+
+    return '—';
 };
 
 const sourceLabel = (toolInvocationLog: ToolInvocationLogItemType): string => {
@@ -54,7 +61,12 @@ const formatCreatedDate = (createdDate: unknown): string => {
     return new Date(Number(createdDate)).toLocaleString();
 };
 
-const ToolInvocationsTable = ({mcpServerNames, showSurface = true, toolInvocationLogs}: ToolInvocationsTableProps) => (
+const ToolInvocationsTable = ({
+    a2aServerNames,
+    mcpServerNames,
+    showSurface = true,
+    toolInvocationLogs,
+}: ToolInvocationsTableProps) => (
     <Table>
         <TableHeader>
             <TableRow>
@@ -62,7 +74,7 @@ const ToolInvocationsTable = ({mcpServerNames, showSurface = true, toolInvocatio
 
                 {showSurface && <TableHead>Surface</TableHead>}
 
-                <TableHead>MCP Server</TableHead>
+                <TableHead>Server</TableHead>
 
                 <TableHead>Source</TableHead>
 
@@ -83,7 +95,7 @@ const ToolInvocationsTable = ({mcpServerNames, showSurface = true, toolInvocatio
                         <TableCell>{SURFACE_LABELS[toolInvocationLog.surface] || toolInvocationLog.surface}</TableCell>
                     )}
 
-                    <TableCell>{mcpServerLabel(toolInvocationLog, mcpServerNames)}</TableCell>
+                    <TableCell>{serverLabel(toolInvocationLog, mcpServerNames, a2aServerNames)}</TableCell>
 
                     <TableCell>{sourceLabel(toolInvocationLog)}</TableCell>
 
