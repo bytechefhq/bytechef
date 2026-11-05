@@ -24,21 +24,28 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
-import java.util.List;
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
  */
 public class AiAgentUtilsBraveWebSearchTool {
 
-    public static final String BRAVE_API_KEY = "braveApiKey";
     public static final String RESULT_COUNT = "resultCount";
 
-    public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ToolCallbackProviderFunction>clusterElement("braveWebSearchTool")
+    private final String apiKey;
+
+    public final ClusterElementDefinition<ToolCallbackProviderFunction> clusterElementDefinition;
+
+    public AiAgentUtilsBraveWebSearchTool(String apiKey) {
+        Assert.hasText(apiKey, "apiKey must not be blank");
+
+        this.apiKey = apiKey;
+
+        this.clusterElementDefinition = ComponentDsl.<ToolCallbackProviderFunction>clusterElement("braveWebSearchTool")
             .title("Brave Web Search Tool")
             .description("Web search with domain filtering using the Brave Search API.")
             .type(TOOLS)
@@ -49,17 +56,12 @@ public class AiAgentUtilsBraveWebSearchTool {
                     .minValue(1)
                     .maxValue(20)
                     .advancedOption(true))
-            .object(() -> AiAgentUtilsBraveWebSearchTool::apply);
+            .object(() -> this::apply);
+    }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static ToolCallbackProvider apply(
+    private ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        String apiKey = connectionParameters.getString(BRAVE_API_KEY);
-
-        if (apiKey == null || apiKey.isBlank()) {
-            return ToolCallbackProvider.from(List.of());
-        }
 
         BraveWebSearchTool.Builder builder = BraveWebSearchTool.builder(apiKey);
 
