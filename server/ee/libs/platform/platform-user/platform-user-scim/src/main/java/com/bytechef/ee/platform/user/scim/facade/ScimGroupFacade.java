@@ -29,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ScimGroupFacade {
 
+    private static final String DISPLAY_NAME = "displayName";
+
     private final AuthorityService authorityService;
 
     @SuppressFBWarnings("EI")
@@ -36,8 +38,16 @@ public class ScimGroupFacade {
         this.authorityService = authorityService;
     }
 
+    public static void validate(ScimGroup scimGroup) {
+        String displayName = ScimValues.checkRequired(DISPLAY_NAME, scimGroup.displayName());
+
+        ScimValues.checkMaxLength(DISPLAY_NAME, displayName, ScimValues.GROUP_NAME_MAX_LENGTH);
+    }
+
     @Audited(event = ScimGroupAuditEvents.SCIM_GROUP_CREATED, mapper = ScimGroupAuditMapper.class)
     public Authority createGroup(ScimGroup scimGroup) {
+        validate(scimGroup);
+
         Authority authority = new Authority();
 
         authority.setName(scimGroup.displayName());
@@ -60,6 +70,8 @@ public class ScimGroupFacade {
 
     @Audited(event = ScimGroupAuditEvents.SCIM_GROUP_UPDATED, mapper = ScimGroupAuditMapper.class)
     public Optional<Authority> replaceGroup(long id, ScimGroup scimGroup) {
+        validate(scimGroup);
+
         Optional<Authority> authorityOptional = authorityService.fetchAuthority(id);
 
         if (authorityOptional.isEmpty()) {

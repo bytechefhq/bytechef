@@ -8,19 +8,25 @@
 package com.bytechef.ee.platform.user.scim.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.platform.user.scim.exception.ScimBadRequestException;
 import com.bytechef.ee.platform.user.scim.model.ScimGroup;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.service.AuthorityService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -92,6 +98,48 @@ class ScimGroupFacadeTest {
         assertThat(scimGroupFacade.replaceGroup(GROUP_ID, createScimGroup("ROLE_NEW"))).isEmpty();
 
         verify(authorityService, never()).update(any(Authority.class));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {
+        "", " "
+    })
+    void testCreateGroupRejectsAMissingDisplayName(String displayName) {
+        assertThatThrownBy(() -> scimGroupFacade.createGroup(createScimGroup(displayName)))
+            .isInstanceOf(ScimBadRequestException.class)
+            .hasFieldOrPropertyWithValue("scimType", ScimBadRequestException.INVALID_VALUE)
+            .hasMessage("displayName is required");
+
+        verifyNoInteractions(authorityService);
+    }
+
+    @Test
+    void testCreateGroupRejectsADisplayNameLongerThan50Characters() {
+        assertThatThrownBy(() -> scimGroupFacade.createGroup(createScimGroup("G".repeat(51))))
+            .isInstanceOf(ScimBadRequestException.class)
+            .hasFieldOrPropertyWithValue("scimType", ScimBadRequestException.INVALID_VALUE)
+            .hasMessage("displayName must not be longer than 50 characters");
+
+        verifyNoInteractions(authorityService);
+    }
+
+    @Test
+    void testCreateGroupAcceptsADisplayNameOf50Characters() {
+        when(authorityService.create(any(Authority.class))).thenReturn(createAuthority(GROUP_ID, "G".repeat(50)));
+
+        scimGroupFacade.createGroup(createScimGroup("G".repeat(50)));
+
+        verify(authorityService).create(any(Authority.class));
+    }
+
+    @Test
+    void testReplaceGroupRejectsADisplayNameLongerThan50Characters() {
+        assertThatThrownBy(() -> scimGroupFacade.replaceGroup(GROUP_ID, createScimGroup("G".repeat(51))))
+            .isInstanceOf(ScimBadRequestException.class)
+            .hasFieldOrPropertyWithValue("scimType", ScimBadRequestException.INVALID_VALUE);
+
+        verifyNoInteractions(authorityService);
     }
 
     private static Authority createAuthority(long id, String name) {
