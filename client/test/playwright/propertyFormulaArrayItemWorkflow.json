@@ -1,0 +1,41 @@
+{
+    "label": "Playwright Property Formula Array Item Workflow",
+    "description": "",
+    "inputs": [],
+    "triggers": [
+        {
+            "label": "New Form",
+            "name": "trigger_1",
+            "parameters": {
+                "inputs": [
+                    {
+                        "fieldLabel": "Investitor",
+                        "fieldName": "investitor",
+                        "fieldType": 6,
+                        "required": true
+                    },
+                    {
+                        "fieldLabel": "Lokacija",
+                        "fieldName": "lokacija",
+                        "fieldType": 6,
+                        "required": true
+                    },
+                    {
+                        "fieldLabel": "Opis objekta i zahtjeva",
+                        "fieldName": "opis",
+                        "fieldType": 5,
+                        "required": true
+                    },
+                    {
+                        "fieldLabel": "Željeni rok",
+                        "fieldName": "zeljeniRok",
+                        "fieldType": 2,
+                        "required": true
+                    }
+                ]
+            },
+            "type": "form/v1/newFormRequest"
+        }
+    ],
+    "tasks": []
+}
