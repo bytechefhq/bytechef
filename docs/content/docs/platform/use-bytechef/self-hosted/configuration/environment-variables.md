@@ -50,6 +50,8 @@ Settings of the [Agent Utils](/platform/automation/build/workflows/ai/agent/agen
 | `BYTECHEF_AI_BRAVE_BASE_URL` | Brave Search API base URL | `https://api.search.brave.com/res/v1` |
 | `BYTECHEF_AI_BRAVE_ENABLED` | Enable or disable Brave Search | `false` |
 
+Brave web search is offered to the AI Copilot and as the AI Agent Utils Brave Web Search tool only when `BYTECHEF_AI_BRAVE_ENABLED` is `true` and `BYTECHEF_AI_BRAVE_API_KEY` is set.
+
 ## AI Firecrawl Configuration
 
 | Environment Variable | Description | Default Value |

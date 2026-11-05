@@ -55,6 +55,8 @@ Lets the agent **consult operator-authored [skills](/platform/automation/ai/skil
 
 Searches the web (with optional domain filtering) via the Brave Search API and returns results the agent can reason over.
 
+Brave Web Search uses the server's Brave Search API key, so it needs no connection. It is offered only when the server enables Brave and sets its key ([`BYTECHEF_AI_BRAVE_ENABLED` and `BYTECHEF_AI_BRAVE_API_KEY`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-brave-configuration)); otherwise the tool does not appear in the Tools slot. To give an agent web search with its own key, add the [Brave](/reference/components/brave_v1) component's Web Search action as a tool instead.
+
 ### Smart Web Fetch
 
 Fetches a web page and returns an AI-summarized version of its content, with caching - useful for pulling in a specific page the agent already has a URL for.
