@@ -53,6 +53,13 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<Long> createConnection(ConnectionModel connectionModel) {
+        // A request that names no visibility gets the shared default: a connection is visible to its workspace
+        // unless its owner says otherwise. CE overwrites this with WORKSPACE and embedded with PRIVATE further
+        // down, in ConnectionFacadeImpl.
+        if (connectionModel.getVisibility() == null) {
+            connectionModel.setVisibility(ConnectionModel.VisibilityEnum.WORKSPACE);
+        }
+
         return ResponseEntity.ok(
             workspaceConnectionFacade.create(
                 Objects.requireNonNull(connectionModel.getWorkspaceId()),

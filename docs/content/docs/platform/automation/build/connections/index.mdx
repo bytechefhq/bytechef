@@ -40,26 +40,46 @@ The **Connections** page lists every connection with its component icon, name, t
 
 Each connection has an ellipsis (three-dots) menu with the following actions:
 
-- **Edit**: Rename the connection or update its tags.
-- **Disconnect from all**: Detach the connection from every workflow currently using it. A connection must be disconnected before it can be deleted.
+- **Edit**: Rename the connection or update its tags. The edit dialog also offers **Update credentials** (see below).
+- **Disconnect from all**: Detach the connection from every workflow currently using it. A connection must be disconnected before it can be deleted. Only organization admins are offered this action.
 - **Delete**: Permanently remove the connection.
+
+In the Enterprise Edition, **Edit** needs the `CONNECTION_EDIT` scope and **Delete** the `CONNECTION_DELETE` scope in the connection's workspace, **and** you must be the connection's owner (the member who created it, or the member it was reassigned to) or an organization admin (the `ROLE_ADMIN` authority). Both conditions apply: an owner without the scope cannot change the connection, and a member who holds the scope but does not own the connection cannot either. With the built-in roles, both scopes come with Editor, so an Editor or Admin can edit and delete the connections they own, and a Viewer cannot. Organization admins pass the scope check in every workspace. The row offers only the actions you may use; if none is available, it shows no menu.
+
+### Replacing a connection's credentials
+
+<Callout type="warn" title="Coming soon">
+  Credential replacement is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+</Callout>
+
+When an account's password, API key or token changes, replace the credentials instead of creating a new connection. The connection keeps its id, so every workflow and deployment that uses it picks up the new credentials without being rewired.
+
+1. Open the connection's menu and choose **Edit**.
+2. Click **Update credentials**. The name and tag fields are replaced by the connection's authorization fields.
+3. Enter the new credentials (an OAuth2 connection repeats the consent step) and save.
+
+The authorization fields you submit replace the stored ones as a whole: a credential you leave empty is cleared, not kept. Connection-level settings outside the authorization fields are unchanged. Saving reports **Credentials updated** and marks the connection's credentials as valid again; the new values are verified the next time the connection runs. If the connection's credentials were already rejected, the edit dialog opens straight into this mode.
+
+Replacing credentials needs the `CONNECTION_EDIT` scope in the connection's workspace **and** being the connection's owner. Unlike **Edit**, being an organization admin is not enough, except on an organization connection, whose credentials every organization admin can replace. See [Who can see and replace credentials](#who-can-see-and-replace-credentials). Platform-managed connections do not offer **Update credentials**. A connection that is not active (for example, one waiting to be reassigned) cannot have its credentials replaced.
 
 <Callout type="warn" title="Coming soon">
   Connection visibility is on the upcoming release track and is not yet available in the latest released version of ByteChef. Once available, an Enterprise Edition connection carries a **visibility** scope shown as a badge on its row, and a **Change visibility** control offers **Shared with workspace** (the default), **Private**, and **Specific people** - the last granting named workspace members access to a connection that stays private to everyone else.
 </Callout>
 
+Connection visibility is set per connection at the workspace level: **Private**, **Shared with workspace**, or **Organization** for connections an organization admin creates under **Settings → Connections**. There is no project-level connection visibility; a connection is shared with a workspace, not with a project. The visibility control is offered to the connection's owner and to organization admins. See [Settings → Connections](/platform/settings/connections) for the full model, including what happens to a member's connections when they leave a workspace.
+
 ## Who can see and replace credentials
 
-A connection's secret values, such as API keys, tokens and passwords, are shown and can be replaced only by the member who created the connection. Using a connection in a workflow never requires seeing them.
+A connection's secret values, such as API keys, tokens and passwords, are shown and can be replaced only by the connection's owner: the member who created it, or the member an organization admin reassigned it to. Reassigning a connection gives the new owner access to its secrets and takes it from the previous owner. Using a connection in a workflow never requires seeing them.
 
 | Connection | View and replace its secrets | Use it in workflows | Rename, tag and delete it |
 |---|---|---|---|
-| A connection you created | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
-| A connection another member owns | Nobody but its owner, not even an organization admin | Yes, where you can reach it | Organization admins |
+| A connection you own (you created it, or it was reassigned to you) | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| A connection another member owns | Nobody but its owner, not even an organization admin | Yes, where you can reach it | Organization admins, who can also reassign it to another member |
 | An organization connection | Every organization admin | Every member | Organization admins |
 | An embedded connection created for a connected user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
 
-Anyone else who opens the connection sees each credential field as **Hidden**, and the server leaves the secret values out of every connection it returns to them. A request to replace the credentials of a connection you did not create is refused with HTTP **403**.
+Anyone else who opens the connection sees each credential field as **Hidden**, and the server leaves the secret values out of every connection it returns to them. A request to replace the credentials of a connection you do not own is refused (HTTP **403**, or a GraphQL `FORBIDDEN` error).
 
 ## Popular Integrations
 

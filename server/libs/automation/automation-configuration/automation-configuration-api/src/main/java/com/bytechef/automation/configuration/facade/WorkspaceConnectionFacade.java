@@ -19,8 +19,14 @@ package com.bytechef.automation.configuration.facade;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 
 /**
+ * Workspace-scoped connection CRUD. The base contract carries only edition-agnostic operations (create, register,
+ * delete, disconnect, read); the EE-only visibility transitions (promote/demote/share/revoke) live on the EE
+ * {@code com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionSharingFacade} sub-interface so no
+ * EE-licensed visibility logic ships in the CE artifact.
+ *
  * @author Ivica Cardic
  */
 public interface WorkspaceConnectionFacade {
@@ -39,6 +45,8 @@ public interface WorkspaceConnectionFacade {
     List<Tag> getConnectionTags(long workspaceId, Long environmentId);
 
     void update(long connectionId, String name, List<Tag> tags, int version);
+
+    void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version);
 
     void updateTags(long connectionId, List<Tag> tags);
 }

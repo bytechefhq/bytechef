@@ -44,15 +44,13 @@ Each entry is a row in `persistent_audit_event` plus its data map in `persistent
 
 Anything you want to filter on later has to be in the **Data** map - that is what **Search** matches besides the principal.
 
-### Correlation IDs for bulk operations
+### Bulk operations
 
-A single admin action that fans out into many writes - reassigning every connection in a workspace, for example - would otherwise read as dozens of unrelated entries. When a bulk operation establishes a correlation scope, every audit event raised beneath it picks up the same id and records it under the `correlationId` data key, so the timeline can be reassembled without relying on timestamps being close together.
+A single admin action that changes many resources is recorded as one entry that lists them. Reassigning every connection a former member owned, for example, records one `CONNECTION_REASSIGNED` entry whose data holds the affected `connectionIds` and their `connectionCount`.
 
-The correlation id is carried in a plain thread-local, deliberately not an inheritable one: work handed to another thread does not inherit it, because leaking a correlation id across a recycled pool thread is worse than losing the grouping.
+### Failed audit writes
 
-### Strict-audit events
-
-Some events are marked *strict*: if the audit entry cannot be written, the operation itself fails rather than proceeding unrecorded. The events that can remove someone's access are the ones marked this way - `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_REASSIGNED`, and `AI_HUB_CHAT_DELETED`. A failed non-strict write is counted on the `bytechef_connection_audit_failed` / `bytechef_ai_hub_audit_failed` counters instead of failing the request.
+Writing an audit entry never fails or rolls back the operation it records. If an entry cannot be built or written, the operation still completes, the failure is logged, and the `bytechef_audit_failure` counter is incremented with a `reason` tag.
 
 ## Event types
 
@@ -68,7 +66,7 @@ The **Event type** group of the filter menu is populated from the events your in
 | **Workspace membership** | `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, `WORKSPACE_USER_ROLE_UPDATED`, `WORKSPACE_MEMBERSHIPS_REMOVED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED` |
 | **Embedded membership** | `EMBEDDED_USER_ADDED`, `EMBEDDED_USER_ROLE_UPDATED`, `EMBEDDED_USER_REMOVED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_UPDATED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_REMOVED` |
 | **Custom roles** | `CUSTOM_ROLE_CREATED`, `CUSTOM_ROLE_UPDATED`, `CUSTOM_ROLE_DELETED` |
-| **Projects** | `PROJECT_CREATED`, `PROJECT_UPDATED`, `PROJECT_DELETED`, `PROJECT_PUBLISHED`, `PROJECT_VERSION_DELETED`, `PROJECT_EXPORTED`, `PROJECT_SHARED_EXPORTED`, `PROJECT_IMPORTED`, `PROJECT_TEMPLATE_IMPORTED`, `PROJECT_DUPLICATED`, `PROJECT_SHARED_DELETED`, `PROJECT_VERSION_RESTORED` - publishing records the new project version; a duplicate records the source and the new project |
+| **Projects** | `PROJECT_CREATED`, `PROJECT_UPDATED`, `PROJECT_DELETED`, `PROJECT_PUBLISHED`, `PROJECT_VERSION_DELETED`, `PROJECT_EXPORTED`, `PROJECT_SHARED_EXPORTED`, `PROJECT_IMPORTED`, `PROJECT_TEMPLATE_IMPORTED`, `PROJECT_DUPLICATED`, `PROJECT_SHARED_DELETED`, `PROJECT_VERSION_RESTORED`, `PROJECT_VISIBILITY_CHANGED`, `PROJECT_ACCESS_GRANTED`, `PROJECT_ACCESS_REVOKED` - publishing records the new project version; a duplicate records the source and the new project |
 | **Workflows** | `WORKFLOW_CREATED`, `WORKFLOW_DELETED`, `WORKFLOW_DUPLICATED`, `WORKFLOW_VERSION_RESTORED`, `WORKFLOW_EXPORTED`, `WORKFLOW_SHARED`, `WORKFLOW_UNSHARED`, `WORKFLOW_TEMPLATE_IMPORTED`, `INTEGRATION_WORKFLOW_CREATED`, `INTEGRATION_WORKFLOW_DELETED`, `AUTOMATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED`, `INTEGRATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED` - `AUTOMATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED` covers the workflows of embedded automation projects; edits to a workflow definition are not recorded one by one; an export, share or template import records the workflow or template id, never the definition; publishing the project or integration records the result |
 | **Deployments** | `DEPLOYMENT_CREATED`, `DEPLOYMENT_UPDATED`, `DEPLOYMENT_ENABLED_UPDATED`, `DEPLOYMENT_WORKFLOW_ENABLED_UPDATED`, `DEPLOYMENT_WORKFLOW_RUN`, `DEPLOYMENT_DELETED` - enabling or disabling records `enabled` as `true` or `false`; running a workflow by hand records who ran it and the `jobId` |
 | **Git** | `GIT_CONFIGURATION_SAVED`, `PROJECT_GIT_CONFIGURATION_SAVED`, `PROJECT_GIT_PUSHED`, `PROJECT_GIT_PULLED` - a workspace's repository settings, a project's branch and sync flag, and the commit a push created; the repository URL, username and password are never recorded |
@@ -76,7 +74,7 @@ The **Event type** group of the filter menu is populated from the events your in
 | **AI agent evaluations** | `AI_AGENT_EVAL_TEST_CREATED`, `AI_AGENT_EVAL_TEST_UPDATED`, `AI_AGENT_EVAL_TEST_DELETED`, `AI_AGENT_EVAL_SCENARIO_CREATED`, `AI_AGENT_EVAL_SCENARIO_UPDATED`, `AI_AGENT_EVAL_SCENARIO_DELETED`, `AI_AGENT_JUDGE_CREATED`, `AI_AGENT_JUDGE_UPDATED`, `AI_AGENT_JUDGE_DELETED`, `AI_AGENT_SCENARIO_JUDGE_CREATED`, `AI_AGENT_SCENARIO_JUDGE_UPDATED`, `AI_AGENT_SCENARIO_JUDGE_DELETED`, `AI_AGENT_SCENARIO_TOOL_SIMULATION_CREATED`, `AI_AGENT_SCENARIO_TOOL_SIMULATION_UPDATED`, `AI_AGENT_SCENARIO_TOOL_SIMULATION_DELETED`, `AI_AGENT_EVAL_RUN_STARTED`, `AI_AGENT_EVAL_RUN_CANCELLED` - the ids and names of eval tests, scenarios, judges and tool simulations; messages, prompts and judge configuration are never recorded |
 | **AI agent memories** | `AI_AUTO_MEMORY_UPDATED`, `AI_AUTO_MEMORY_DELETED` - a user editing or deleting an agent memory; the entry holds the memory's id, workspace and environment, plus `principalType` and `principalId` when the request names whose memory it is (without them it is the caller's own); the memory text is never recorded, and memories an agent writes while it runs are not recorded |
 | **AI skills** | `AI_SKILL_CREATED`, `AI_SKILL_UPDATED`, `AI_SKILL_CONTENT_UPDATED`, `AI_SKILL_FILES_ADDED`, `AI_SKILL_FILE_REMOVED`, `AI_SKILL_DELETED` - the skill id and name, and the path of an edited or removed file; skill instructions and file content are never recorded |
-| **Connections** | `CONNECTION_CREATED`, `CONNECTION_UPDATED`, `CONNECTION_DISCONNECTED`, `CONNECTION_DELETED` - connections of automation workspaces, recorded by id, name and component; credentials and connection parameters are never recorded |
+| **Connections** | `CONNECTION_CREATED`, `CONNECTION_UPDATED`, `CONNECTION_DISCONNECTED`, `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_GRANTED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_CREDENTIALS_UPDATED`, `CONNECTION_PENDING_REASSIGNMENT`, `CONNECTION_REASSIGNED`, `WORKFLOW_PAUSED` - connections of automation workspaces and organization connections, recorded by id, name and component; `CONNECTION_PENDING_REASSIGNMENT` records each connection a removed member owned, and a skipped connection, one that can no longer move or has changed owner, is not recorded; credentials and connection parameters are never recorded |
 | **Connections (embedded)** | `CONNECTION_CREATED`, `CONNECTION_UPDATED`, `CONNECTION_REAUTHORIZED`, `CONNECTION_DISCONNECTED`, `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_GRANTED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_REASSIGNED`, `WORKFLOW_PAUSED` - connections managed through the embedded admin and connected-user APIs |
 | **API keys** | `API_KEY_CREATED`, `API_KEY_UPDATED`, `API_KEY_DELETED`, `WORKSPACE_API_KEY_CREATED`, `WORKSPACE_API_KEY_DELETED` |
 | **Notifications** | `NOTIFICATION_CREATED`, `NOTIFICATION_UPDATED`, `NOTIFICATION_DELETED`, `NOTIFICATION_TESTED`, `NOTIFICATION_SIGNING_SECRET_REGENERATED` - the entry holds the notification id (and name and type, except for the signing secret regeneration, which holds only the id, and the test, which holds the id and type); notification settings are never recorded |
@@ -110,6 +108,26 @@ API keys, embedded connected-user tokens, MCP tokens and the system user's HTTP 
 ### Permission checks
 
 A guarded call that is denied or fails is recorded with `DENIED` or `ERROR` as its result: under its own event type when it has one, for example `PROJECT_DELETED`, and as `PERMISSION_CHECK` otherwise. Passed checks are not recorded as `PERMISSION_CHECK`: an operation with its own event type above is recorded with the result `SUCCESS`, carrying the affected resource, unless the call changed nothing, such as a SCIM request that matched no user or the deletion of a workspace API key that did not exist. A successful audited operation called from inside another audited operation is recorded with the result `ROLLED_BACK` when the transaction it ran in does not commit while the outer operation's entries are still saved, for example when it ran in a transaction of its own. Entries are saved inside the caller's transaction when there is one, so if that transaction rolls back, its entries roll back with it, whatever their result; the server logs an `AUDIT PERSISTENCE FAILURE` line instead. Set `bytechef.audit.record-allowed-permission-checks` to `true` to record passed checks on calls that change something as well; passed checks recorded this way have the result `ALLOWED`. Passed checks on reads are never recorded: calls whose method name starts with `count`, `exists`, `fetch`, `find`, `get`, `has`, `is`, `list`, `load`, `read` or `search` followed by an uppercase letter, or is exactly one of those words.
+
+### Connection and project sharing events
+
+These events are recorded under the login of the user who acted. Every entry also carries `method` (the operation that ran) and `result` (`SUCCESS`, `DENIED` or `ERROR`, or `ROLLED_BACK` when an enclosing transaction rolled back; an error adds `errorClass`), so an attempt the platform refused is recorded as well as one it allowed.
+
+| Event | Recorded when | Data |
+|---|---|---|
+| `CONNECTION_CREATED` | A workspace or organization connection is created. | `connectionId`, `workspaceId` (workspace connections only), `visibility` as stored |
+| `CONNECTION_DELETED` | A workspace or organization connection is deleted. | `connectionId` |
+| `CONNECTION_VISIBILITY_CHANGED` | A connection's visibility is changed. | `connectionId`, `workspaceId`, `fromVisibility`, `toVisibility` |
+| `CONNECTION_ACCESS_GRANTED` | A member is named on a private connection. | `connectionId`, `workspaceId`, `targetUserId` |
+| `CONNECTION_ACCESS_REVOKED` | A member's access to a private connection is removed. | `connectionId`, `workspaceId`, `targetUserId` |
+| `CONNECTION_CREDENTIALS_UPDATED` | A connection's credentials are replaced. No credential values are recorded. | `connectionId` |
+| `CONNECTION_REASSIGNED` | An organization admin gives a connection a new owner. | `connectionId`, `workspaceId`, `newOwnerUserId`; for a bulk reassignment, `previousOwnerUserId`, `connectionIds` and `connectionCount` instead of `connectionId` |
+| `WORKFLOW_PAUSED` | A deployed workflow run is refused because a connection it uses is not active. The `result` is `ERROR`. | `jobPrincipalId` (the project deployment), `workflowId`, `connectionIds`, `connectionStatuses` |
+| `PROJECT_VISIBILITY_CHANGED` | A project's visibility is changed. | `workspaceId`, `projectId`, `fromVisibility`, `toVisibility` |
+| `PROJECT_ACCESS_GRANTED` | A member is named on a private project. | `workspaceId`, `projectId`, `targetUserId` |
+| `PROJECT_ACCESS_REVOKED` | A member's access to a private project is removed. | `workspaceId`, `projectId`, `targetUserId` |
+
+Users are recorded by id, never by email address. `WORKFLOW_PAUSED` for a manual run is recorded under the user who started it; for a run fired by a webhook trigger it is recorded under `anonymousUser`, the principal of the webhook request, and under `SYSTEM` where no security context exists.
 
 ## What is not logged
 

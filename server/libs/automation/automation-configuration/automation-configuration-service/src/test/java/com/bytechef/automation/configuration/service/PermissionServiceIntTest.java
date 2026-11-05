@@ -17,25 +17,32 @@
 package com.bytechef.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.WorkspaceApiKeyIntTestConfigurationSharedMocks;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,6 +75,9 @@ class PermissionServiceIntTest {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Autowired
     private UserService userService;
@@ -128,10 +138,9 @@ class PermissionServiceIntTest {
     }
 
     @Test
-    void testHasWorkspaceScopeForProjectTrueForAuthenticatedUser() {
-        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isTrue();
-        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "PROJECT_DELETE")).isTrue();
-        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "ANY_UNRECOGNIZED_SCOPE")).isTrue();
+    void testHasWorkspaceScopeForProjectDeniesAProjectThatCannotBeResolved() {
+        assertThat(permissionService.hasWorkspaceScopeForProject(Long.MAX_VALUE, "WORKFLOW_VIEW")).isFalse();
+        assertThat(permissionService.hasWorkspaceScopeForProject(Long.MAX_VALUE, "PROJECT_DELETE")).isFalse();
     }
 
     @Test
@@ -217,11 +226,70 @@ class PermissionServiceIntTest {
     @Test
     void testCePermissionServiceAcceptsTwoResolversForOneType() {
         PermissionService twoResolverPermissionService = new PermissionServiceImpl(
-            userService,
+            projectRepository, userService,
             List.of(resolver("Connection", ResourceOwner.unknown()),
-                resolver("Connection", ResourceOwner.ofWorkspace(42L))));
+                resolver("Connection", ResourceOwner.ofWorkspace(42L))),
+            List.of(), permissiveResolver());
 
         assertThat(twoResolverPermissionService.hasResourceScope(1L, "Connection", "CONNECTION_VIEW")).isTrue();
+    }
+
+    @Test
+    void testVisibilityBearingResourceDropsOwnerIsolationInCe() {
+        setCurrentUser(99L);
+
+        PermissionService visibilityPermissionService = new PermissionServiceImpl(
+            projectRepository, userService, List.of(resolver("Connection", ResourceOwner.ofUser(OWNER_USER_ID))),
+            List.of(visibilityProvider("Connection")), permissiveResolver());
+
+        assertThat(visibilityPermissionService.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isTrue();
+    }
+
+    @Test
+    void testPrivateProjectWorkflowIsDeniedToANonCreatorThroughEveryWorkflowScopeCheckInCe() {
+        PermissionService service = privateProjectWorkflowService("someone-else");
+
+        assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isFalse();
+        assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT)).isFalse();
+        assertThat(service.hasWorkflowScopeIfProjectWorkflow("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testPrivateProjectWorkflowIsAllowedToItsCreatorThroughEveryWorkflowScopeCheckInCe() {
+        PermissionService service = privateProjectWorkflowService("user");
+
+        assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
+        assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT)).isTrue();
+        assertThat(service.hasWorkflowScopeIfProjectWorkflow("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+            .isTrue();
+    }
+
+    private PermissionService privateProjectWorkflowService(String createdBy) {
+        Project project = new Project();
+
+        project.setId(3L);
+
+        ProjectRepository mockProjectRepository = mock(ProjectRepository.class);
+
+        when(mockProjectRepository.findByWorkflowId("wf-uuid")).thenReturn(Optional.of(project));
+
+        ResourceVisibilityProvider projectVisibilityProvider = new ResourceVisibilityProvider() {
+
+            @Override
+            public String resourceType() {
+                return "Project";
+            }
+
+            @Override
+            public Optional<VisibilityRecord> fetchVisibility(long id) {
+                return Optional.of(new VisibilityRecord(id, ResourceVisibility.PRIVATE, createdBy));
+            }
+        };
+
+        return new PermissionServiceImpl(
+            mockProjectRepository, userService, List.of(resolver("Project", ResourceOwner.ofWorkspace(42L))),
+            List.of(projectVisibilityProvider), new DefaultResourceVisibilityResolver());
     }
 
     @Test
@@ -269,6 +337,27 @@ class PermissionServiceIntTest {
                 List.of(new SimpleGrantedAuthority(authority))));
 
         SecurityContextHolder.setContext(securityContext);
+    }
+
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
+    }
+
+    private static ResourceVisibilityProvider visibilityProvider(String resourceType) {
+        return new ResourceVisibilityProvider() {
+
+            @Override
+            public String resourceType() {
+                return resourceType;
+            }
+
+            @Override
+            public Optional<VisibilityRecord> fetchVisibility(long id) {
+                return Optional.of(new VisibilityRecord(id, ResourceVisibility.WORKSPACE, "someone-else"));
+            }
+        };
     }
 
     private static ResourceOwnershipResolver resolver(String resourceType, ResourceOwner resourceOwner) {

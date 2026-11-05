@@ -21,16 +21,20 @@ import com.bytechef.commons.util.FormatUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.connection.audit.WorkflowPausedAuditMapper;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -116,6 +120,12 @@ public class ConnectionServiceImpl implements ConnectionService {
     public List<Connection> getConnections(PlatformType type) {
         return CollectionUtils.filter(
             connectionRepository.findAll(Sort.by("name", "id")), connection -> connection.getType() == type);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Connection> getConnectionsByVisibility(ResourceVisibility visibility, PlatformType type) {
+        return connectionRepository.findAllByVisibilityAndTypeOrderByName(visibility.ordinal(), type.ordinal());
     }
 
     @Override
@@ -222,11 +232,37 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection updateCreatedBy(long id, String newCreatedBy) {
+    public boolean updateConnectionStatusIfOwnedBy(long connectionId, String ownerLogin, ConnectionStatus status) {
+        Assert.notNull(status, "'status' must not be null");
+
+        Connection connection = connectionRepository.findById(connectionId)
+            .orElseThrow(() -> new NoSuchElementException("Connection not found: " + connectionId));
+
+        if (!Objects.equals(connection.getCreatedBy(), ownerLogin)) {
+            return false;
+        }
+
+        try {
+            connection.setStatus(status);
+        } catch (IllegalStateException exception) {
+            throw new ConfigurationException(exception.getMessage(), ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        connectionRepository.save(connection);
+
+        return true;
+    }
+
+    @Override
+    public Connection reassignOwner(long id, String newOwnerLogin) {
         Connection connection = connectionRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
 
-        connection.setCreatedBy(newCreatedBy);
+        try {
+            connection.reassignOwner(newOwnerLogin);
+        } catch (IllegalStateException exception) {
+            throw new ConfigurationException(exception.getMessage(), ConnectionErrorType.INVALID_CONNECTION);
+        }
 
         return connectionRepository.save(connection);
     }
@@ -267,5 +303,49 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setParameters(new HashMap<>(parameters));
 
         return connectionRepository.save(connection);
+    }
+
+    @Override
+    public Connection updateVisibility(long id, ResourceVisibility visibility) {
+        Connection connection = connectionRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
+
+        connection.setVisibility(visibility);
+
+        return connectionRepository.save(connection);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Connection> getInactiveConnections(List<Long> connectionIds) {
+        if (connectionIds == null || connectionIds.isEmpty()) {
+            return List.of();
+        }
+
+        return connectionRepository.findAllByIdIn(connectionIds)
+            .stream()
+            .filter(connection -> connection.getStatus() != ConnectionStatus.ACTIVE)
+            .toList();
+    }
+
+    @Override
+    @Audited(event = WorkflowPausedAuditMapper.WORKFLOW_PAUSED, mapper = WorkflowPausedAuditMapper.class)
+    @Transactional(readOnly = true)
+    public void validateConnectionsActive(long jobPrincipalId, String workflowId, List<Long> connectionIds) {
+        List<Connection> inactive = getInactiveConnections(connectionIds);
+
+        if (inactive.isEmpty()) {
+            return;
+        }
+
+        String detail = inactive.stream()
+            .map(connection -> "id=%s status=%s".formatted(connection.getId(), connection.getStatus()))
+            .reduce((left, right) -> left + ", " + right)
+            .orElse("");
+
+        throw new ConfigurationException(
+            "Workflow execution blocked: %d non-ACTIVE connection(s): %s. Reassign or reactivate to resume."
+                .formatted(inactive.size(), detail),
+            ConnectionErrorType.CONNECTION_NOT_ACTIVE);
     }
 }

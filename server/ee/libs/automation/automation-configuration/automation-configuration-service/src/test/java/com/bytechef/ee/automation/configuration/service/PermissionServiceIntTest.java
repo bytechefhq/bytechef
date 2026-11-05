@@ -40,6 +40,8 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -67,9 +69,11 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -614,6 +618,16 @@ class PermissionServiceIntTest {
 
         assertThat(permissionService.hasWorkspaceScopeForProject(project.getId(), "WORKFLOW_VIEW")).isTrue();
         assertThat(permissionService.hasWorkspaceScopeForProject(project.getId(), "WORKFLOW_DELETE")).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceScopeForProjectDeniesAProjectThatCannotBeResolved() {
+        addMember(WorkspaceRole.ADMIN);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("Connection", ResourceOwner.ofWorkspace(workspaceId)));
+
+        assertThat(resourcePermissionService.hasWorkspaceScopeForProject(Long.MAX_VALUE, "WORKFLOW_EDIT")).isFalse();
     }
 
     @Test
@@ -1529,6 +1543,24 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testIsResourceOwnerAllowsAnOwnerWhoIsStillAWorkspaceMember() {
+        addMember(WorkspaceRole.EDITOR);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("Connection", ResourceOwner.of(OptionalLong.of(workspaceId), OptionalLong.of(USER_ID))));
+
+        assertThat(resourcePermissionService.isResourceOwner("Connection", 1L)).isTrue();
+    }
+
+    @Test
+    void testIsResourceOwnerDeniesAnOwnerRemovedFromTheWorkspace() {
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("Connection", ResourceOwner.of(OptionalLong.of(workspaceId), OptionalLong.of(USER_ID))));
+
+        assertThat(resourcePermissionService.isResourceOwner("Connection", 1L)).isFalse();
+    }
+
+    @Test
     void testHasResourceRoleChecksWorkspaceRole() {
         addMember(WorkspaceRole.EDITOR);
 
@@ -1655,6 +1687,7 @@ class PermissionServiceIntTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
+            List.of(), permissiveResolver(),
             List.of(connectionEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
@@ -1677,7 +1710,8 @@ class PermissionServiceIntTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
+            workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+            resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -1717,7 +1751,8 @@ class PermissionServiceIntTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
+            workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+            resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
             embeddedResourceResolverBeanFactory.getBeanProvider(EmbeddedResourceResolver.class),
@@ -1733,7 +1768,11 @@ class PermissionServiceIntTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(), List.of(),
+            workspaceUserRepository,
+            List.of(
+                new ProjectOwnershipResolver(
+                    beanFactory.getBeanProvider(EmbeddedResourceResolver.class), projectRepository, userService)),
+            List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
             beanFactory.getBeanProvider(EmbeddedResourceResolver.class),
@@ -1743,7 +1782,7 @@ class PermissionServiceIntTest {
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resourceOwnershipResolver), List.of(),
+            workspaceUserRepository, List.of(resourceOwnershipResolver), List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -1943,5 +1982,11 @@ class PermissionServiceIntTest {
 
             return (ProjectDeploymentFacade) constructor.newInstance(arguments);
         }
+    }
+
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

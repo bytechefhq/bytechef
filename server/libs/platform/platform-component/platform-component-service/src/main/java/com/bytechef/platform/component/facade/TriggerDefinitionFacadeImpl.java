@@ -18,6 +18,7 @@ package com.bytechef.platform.component.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -25,6 +26,8 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
@@ -78,7 +81,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, Long connectionId) {
 
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
+        ComponentConnection componentConnection = getComponentConnectionForDisable(connectionId);
 
         triggerDefinitionService.executeListenerDisable(
             componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, componentConnection);
@@ -137,7 +140,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, Map<String, ?> outputParameters, Long connectionId) {
 
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
+        ComponentConnection componentConnection = getComponentConnectionForDisable(connectionId);
 
         triggerDefinitionService.executeWebhookDisable(
             componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, outputParameters,
@@ -180,16 +183,39 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {
-        ComponentConnection componentConnection = null;
-
-        if (connectionId != null) {
-            Connection connection = connectionService.getConnection(connectionId);
-
-            componentConnection = new ComponentConnection(
-                connection.getComponentName(), connection.getConnectionVersion(), connectionId,
-                connection.getParameters(), connection.getAuthorizationType());
+        if (connectionId == null) {
+            return null;
         }
 
-        return componentConnection;
+        Connection connection = connectionService.getConnection(connectionId);
+
+        validateConnectionActive(connection);
+
+        return toComponentConnection(connection, connectionId);
+    }
+
+    private ComponentConnection getComponentConnectionForDisable(Long connectionId) {
+        if (connectionId == null) {
+            return null;
+        }
+
+        return toComponentConnection(connectionService.getConnection(connectionId), connectionId);
+    }
+
+    private static ComponentConnection toComponentConnection(Connection connection, long connectionId) {
+        return new ComponentConnection(
+            connection.getComponentName(), connection.getConnectionVersion(), connectionId,
+            connection.getParameters(), connection.getAuthorizationType());
+    }
+
+    private static void validateConnectionActive(Connection connection) {
+        ConnectionStatus status = connection.getStatus();
+
+        if (status != ConnectionStatus.ACTIVE) {
+            throw new ConfigurationException(
+                "Connection '%s' has status %s and cannot be used for execution.".formatted(
+                    connection.getName(), status),
+                ConnectionErrorType.CONNECTION_NOT_ACTIVE);
+        }
     }
 }

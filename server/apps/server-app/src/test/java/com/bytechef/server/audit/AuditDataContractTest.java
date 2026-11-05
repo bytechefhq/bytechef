@@ -115,6 +115,7 @@ class AuditDataContractTest {
         Map.entry("AutomationWorkflowProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("AutomationWorkflowProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
         Map.entry("ConnectionAdminFacadeImpl.updateConnectionTags", TAGS),
+        Map.entry("ConnectionReassignmentFacadeImpl.markConnectionsPendingReassignment", DELEGATES),
         Map.entry("CustomRoleFacadeImpl.createCustomRole", DELEGATES),
         Map.entry("CustomRoleFacadeImpl.deleteCustomRole", DELEGATES),
         Map.entry("CustomRoleFacadeImpl.updateCustomRole", DELEGATES),

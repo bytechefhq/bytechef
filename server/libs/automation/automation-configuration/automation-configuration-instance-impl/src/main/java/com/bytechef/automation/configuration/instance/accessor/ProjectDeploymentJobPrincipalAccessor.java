@@ -19,18 +19,22 @@ package com.bytechef.automation.configuration.instance.accessor;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,17 +43,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccessor {
 
+    private static final Logger log = LoggerFactory.getLogger(ProjectDeploymentJobPrincipalAccessor.class);
+
+    private final ConnectionService connectionService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectDeploymentJobPrincipalAccessor(
+    public ProjectDeploymentJobPrincipalAccessor(ConnectionService connectionService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService) {
 
+        this.connectionService = connectionService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
@@ -143,5 +151,20 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
         ProjectWorkflow workflowProjectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
         return workflowProjectWorkflow.getUuidAsString();
+    }
+
+    @Override
+    public void validateConnectionsForJob(long jobPrincipalId, String workflowUuid) {
+        String workflowId = getWorkflowId(jobPrincipalId, workflowUuid);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflow(jobPrincipalId, workflowId);
+
+        List<Long> connectionIds = projectDeploymentWorkflow.getConnections()
+            .stream()
+            .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .toList();
+
+        connectionService.validateConnectionsActive(jobPrincipalId, workflowId, connectionIds);
     }
 }

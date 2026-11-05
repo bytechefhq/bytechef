@@ -1,0 +1,632 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.automation.configuration.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
+import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
+import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
+import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
+import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.user.service.UserService;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+/**
+ * Pins that visibility is a precondition of every resource-scope check rather than a filter running beside it.
+ *
+ * <p>
+ * The regression this guards: a workspace member holding {@code CONNECTION_EDIT} used to pass {@code hasResourceScope}
+ * for <em>any</em> connection in their workspace, including one a colleague had made PRIVATE. The connections list hid
+ * it; the by-id path did not. If this class is ever deleted or weakened, the list and by-id halves of the same
+ * authorization question can silently disagree again.
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+class PermissionServiceVisibilityTest {
+
+    private static final String CONNECTION = "Connection";
+    private static final long PRIVATE_CONNECTION_ID = 10L;
+    private static final long WORKSPACE_CONNECTION_ID = 11L;
+    private static final long ORGANIZATION_CONNECTION_ID = 12L;
+    private static final long EMBEDDED_CONNECTION_ID = 13L;
+    private static final long OTHER_WORKSPACE_ID = 8L;
+    private static final long WORKSPACE_ID = 7L;
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
+    private static void authenticate(String login, String... authorities) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    login, "password", List.of(authorities)
+                        .stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .toList()));
+    }
+
+    @Test
+    void testPrivateResourceDeniedToNonOwnerHoldingTheScope() {
+        authenticate("ana");
+
+        assertThat(
+            permissionService(Set.of()).hasResourceScope(PRIVATE_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+                .as("ana holds CONNECTION_EDIT in the workspace, but the connection is ivica's and PRIVATE")
+                .isFalse();
+    }
+
+    @Test
+    void testEmbeddedOwnerIsAnsweredByTheEmbeddedScopeNotByVisibility() {
+        authenticate("ana");
+
+        CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+
+        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(7L)).thenReturn(Set.of("CONNECTION_VIEW"));
+
+        ResourceOwnershipResolver embeddedConnectionOwnershipResolver = new ResourceOwnershipResolver() {
+
+            @Override
+            public String resourceType() {
+                return CONNECTION;
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(long id) {
+                return ResourceOwner.ofEmbedded();
+            }
+        };
+
+        PermissionServiceImpl permissionService = new PermissionServiceImpl(
+            currentUserResolver, mock(PermissionScopeRegistry.class), mock(ProjectRepository.class),
+            mock(WorkspaceScopeCacheService.class), mock(WorkspaceUserRepository.class),
+            List.of(embeddedConnectionOwnershipResolver), List.of(connectionVisibilityProvider()),
+            visibilityResolver(Set.of()), List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+
+        assertThat(permissionService.hasResourceScope(EMBEDDED_CONNECTION_ID, CONNECTION, "CONNECTION_VIEW"))
+            .as("embedded resources have no visibility model, so the provider's silence must not deny")
+            .isTrue();
+        assertThat(permissionService.hasResourceScope(EMBEDDED_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+            .isFalse();
+    }
+
+    @Test
+    void testPrivateResourceAllowedToGrantee() {
+        authenticate("ana");
+
+        assertThat(
+            permissionService(Set.of(PRIVATE_CONNECTION_ID))
+                .hasResourceScope(PRIVATE_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+                    .as("a grant restores the access ana would have had if the connection were workspace-visible")
+                    .isTrue();
+    }
+
+    @Test
+    void testWorkspaceResourceAllowedToMemberHoldingTheScope() {
+        authenticate("ana");
+
+        assertThat(
+            permissionService(Set.of()).hasResourceScope(WORKSPACE_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+                .isTrue();
+    }
+
+    @Test
+    void testPrivateResourceAllowedToOwner() {
+        authenticate("ivica");
+
+        assertThat(
+            permissionService(Set.of()).hasResourceScope(PRIVATE_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+                .isTrue();
+    }
+
+    @Test
+    void testGrantingAndRevokingTogglesAccessToAPrivateConnection() {
+        authenticate("ana");
+
+        Set<Long> grantedConnectionIds = new HashSet<>();
+
+        PermissionServiceImpl permissionService = permissionService(grantedConnectionIds);
+
+        assertThat(permissionService.hasResourceScope(PRIVATE_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+            .isFalse();
+
+        grantedConnectionIds.add(PRIVATE_CONNECTION_ID);
+
+        assertThat(permissionService.hasResourceScope(PRIVATE_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+            .isTrue();
+
+        grantedConnectionIds.remove(PRIVATE_CONNECTION_ID);
+
+        assertThat(permissionService.hasResourceScope(PRIVATE_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+            .isFalse();
+    }
+
+    @Test
+    void testTenantAdminBypassesVisibility() {
+        authenticate("marko", AuthorityConstants.ADMIN);
+
+        assertThat(
+            permissionService(Set.of()).hasResourceScope(PRIVATE_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+                .isTrue();
+    }
+
+    @Test
+    void testUnknownResourceFailsClosed() {
+        authenticate("ana");
+
+        assertThat(permissionService(Set.of()).hasResourceScope(999L, CONNECTION, "CONNECTION_EDIT"))
+            .as("a registered resource type whose row does not exist must deny, not fall through to allow")
+            .isFalse();
+    }
+
+    @Test
+    void testResourceTypeWithoutProviderIsUnrestrictedByVisibility() {
+        authenticate("ana");
+
+        assertThat(permissionService(Set.of()).hasResourceScope(5L, "ApiKey", "API_KEY_EDIT"))
+            .as("a resource family that has not opted into visibility keeps its previous behaviour")
+            .isTrue();
+    }
+
+    @Test
+    void testOrganizationConnectionIsViewableByAnyMember() {
+        authenticate("ana");
+
+        assertThat(
+            permissionService(Set.of()).hasResourceScope(ORGANIZATION_CONNECTION_ID, CONNECTION, "CONNECTION_VIEW"))
+                .isTrue();
+    }
+
+    @Test
+    void testOrganizationConnectionIsNotEditableThroughAWorkspaceScope() {
+        authenticate("ana");
+
+        assertThat(
+            permissionService(Set.of()).hasResourceScope(ORGANIZATION_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+                .isFalse();
+    }
+
+    @Test
+    void testPrivateConnectionCannotBeAttachedToAProjectWorkflowByANonOwner() {
+        authenticate("ana");
+
+        ProjectRepository projectRepository = mock(ProjectRepository.class);
+
+        when(projectRepository.findByWorkflowId("workflow-1")).thenReturn(Optional.of(new Project()));
+
+        assertThat(
+            permissionService(Set.of(), projectRepository)
+                .hasResourceScopeIfProjectWorkflow("workflow-1", PRIVATE_CONNECTION_ID, CONNECTION,
+                    "CONNECTION_EDIT"))
+                        .isFalse();
+    }
+
+    @Test
+    void testWorkspaceConnectionCanBeAttachedToAProjectWorkflow() {
+        authenticate("ana");
+
+        ProjectRepository projectRepository = mock(ProjectRepository.class);
+
+        when(projectRepository.findByWorkflowId("workflow-1")).thenReturn(Optional.of(new Project()));
+
+        assertThat(
+            permissionService(Set.of(), projectRepository)
+                .hasResourceScopeIfProjectWorkflow(
+                    "workflow-1", WORKSPACE_CONNECTION_ID, CONNECTION, "CONNECTION_EDIT"))
+                        .isTrue();
+    }
+
+    @Test
+    void testConnectionCheckIsSkippedForAWorkflowOutsideAnyProject() {
+        authenticate("ana");
+
+        assertThat(
+            permissionService(Set.of())
+                .hasResourceScopeIfProjectWorkflow("workflow-1", PRIVATE_CONNECTION_ID, CONNECTION,
+                    "CONNECTION_EDIT"))
+                        .isTrue();
+    }
+
+    @Test
+    void testOrganizationConnectionIsUsableInAnyWorkspaceOfItsEnvironment() {
+        authenticate("ana");
+
+        PermissionServiceImpl permissionService = connectionUsageService(
+            Environment.DEVELOPMENT, mock(ProjectRepository.class));
+
+        assertThat(
+            permissionService.canUseConnectionInWorkspace(
+                ORGANIZATION_CONNECTION_ID, OTHER_WORKSPACE_ID, Environment.DEVELOPMENT))
+                    .isTrue();
+    }
+
+    @Test
+    void testOrganizationConnectionIsUsableInAProjectWorkflowOfAnyWorkspace() {
+        authenticate("ana");
+
+        ProjectRepository projectRepository = mock(ProjectRepository.class);
+        Project project = new Project();
+
+        project.setWorkspaceId(OTHER_WORKSPACE_ID);
+
+        when(projectRepository.findByWorkflowId("workflow-1")).thenReturn(Optional.of(project));
+
+        assertThat(
+            connectionUsageService(Environment.DEVELOPMENT, projectRepository)
+                .canUseConnectionInWorkflow(ORGANIZATION_CONNECTION_ID, "workflow-1", Environment.DEVELOPMENT))
+                    .isTrue();
+    }
+
+    @Test
+    void testOrganizationConnectionOfAnotherEnvironmentIsNotUsable() {
+        authenticate("ana");
+
+        PermissionServiceImpl permissionService = connectionUsageService(
+            Environment.PRODUCTION, mock(ProjectRepository.class));
+
+        assertThat(
+            permissionService.canUseConnectionInWorkspace(
+                ORGANIZATION_CONNECTION_ID, OTHER_WORKSPACE_ID, Environment.DEVELOPMENT))
+                    .isFalse();
+    }
+
+    @Test
+    void testPrivateConnectionOfAnotherMemberIsNotUsable() {
+        authenticate("ana");
+
+        PermissionServiceImpl permissionService = connectionUsageService(
+            Environment.DEVELOPMENT, mock(ProjectRepository.class));
+
+        assertThat(
+            permissionService.canUseConnectionInWorkspace(
+                PRIVATE_CONNECTION_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+                    .isFalse();
+    }
+
+    @Test
+    void testOrganizationConnectionIsNotUsableWithoutTheConnectionViewScope() {
+        authenticate("ana");
+
+        CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+
+        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+
+        PermissionServiceImpl permissionService = new PermissionServiceImpl(
+            currentUserResolver, mock(PermissionScopeRegistry.class), mock(ProjectRepository.class),
+            mock(WorkspaceScopeCacheService.class), mock(WorkspaceUserRepository.class),
+            List.of(connectionOwnershipResolver()), List.of(connectionVisibilityProvider()),
+            visibilityResolver(Set.of()), List.of(connectionEnvironmentResolver(Environment.DEVELOPMENT)),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+
+        assertThat(
+            permissionService.canUseConnectionInWorkspace(
+                ORGANIZATION_CONNECTION_ID, OTHER_WORKSPACE_ID, Environment.DEVELOPMENT))
+                    .isFalse();
+    }
+
+    private static PermissionServiceImpl connectionUsageService(
+        Environment connectionEnvironment, ProjectRepository projectRepository) {
+
+        CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+
+        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+
+        WorkspaceScopeCacheService workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+
+        when(workspaceScopeCacheService.getWorkspaceScopes(anyLong(), anyLong(), any()))
+            .thenReturn(Set.of("CONNECTION_VIEW"));
+
+        return new PermissionServiceImpl(
+            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository,
+            workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
+            List.of(connectionOwnershipResolver()), List.of(connectionVisibilityProvider()),
+            visibilityResolver(Set.of()), List.of(connectionEnvironmentResolver(connectionEnvironment)),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+    }
+
+    private static ResourceEnvironmentResolver connectionEnvironmentResolver(Environment environment) {
+        return new ResourceEnvironmentResolver() {
+
+            @Override
+            public String resourceType() {
+                return CONNECTION;
+            }
+
+            @Override
+            public Optional<Environment> fetchEnvironment(Serializable id) {
+                return Optional.of(environment);
+            }
+        };
+    }
+
+    /**
+     * Builds the EE service with a stubbed workspace-scope check that always grants, so any denial in these tests can
+     * only come from the visibility precondition.
+     */
+    private static PermissionServiceImpl permissionService(Set<Long> grantedConnectionIds) {
+        return permissionService(grantedConnectionIds, mock(ProjectRepository.class));
+    }
+
+    private static PermissionServiceImpl permissionService(
+        Set<Long> grantedConnectionIds, ProjectRepository projectRepository) {
+
+        CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+
+        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+
+        WorkspaceScopeCacheService workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+
+        when(workspaceScopeCacheService.getWorkspaceScopes(anyLong(), anyLong()))
+            .thenReturn(Set.of("CONNECTION_EDIT", "API_KEY_EDIT"));
+
+        return new PermissionServiceImpl(
+            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository,
+            workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
+            List.of(connectionOwnershipResolver(), apiKeyOwnershipResolver()),
+            List.of(connectionVisibilityProvider()), visibilityResolver(grantedConnectionIds), List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+    }
+
+    private static ResourceOwnershipResolver connectionOwnershipResolver() {
+        return ownershipResolver(CONNECTION);
+    }
+
+    private static ResourceOwnershipResolver apiKeyOwnershipResolver() {
+        return ownershipResolver("ApiKey");
+    }
+
+    private static ResourceOwnershipResolver ownershipResolver(String resourceType) {
+        return new ResourceOwnershipResolver() {
+
+            @Override
+            public String resourceType() {
+                return resourceType;
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(long id) {
+                return id == ORGANIZATION_CONNECTION_ID ? ResourceOwner.unknown()
+                    : ResourceOwner.ofWorkspace(WORKSPACE_ID);
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(Serializable id) {
+                return resolveOwner(((Number) id).longValue());
+            }
+        };
+    }
+
+    private static ResourceVisibilityProvider connectionVisibilityProvider() {
+        return new ResourceVisibilityProvider() {
+
+            @Override
+            public String resourceType() {
+                return CONNECTION;
+            }
+
+            @Override
+            public Optional<VisibilityRecord> fetchVisibility(long id) {
+                if (id == PRIVATE_CONNECTION_ID) {
+                    return Optional.of(new VisibilityRecord(id, ResourceVisibility.PRIVATE, "ivica"));
+                }
+
+                if (id == WORKSPACE_CONNECTION_ID) {
+                    return Optional.of(new VisibilityRecord(id, ResourceVisibility.WORKSPACE, "ivica"));
+                }
+
+                if (id == ORGANIZATION_CONNECTION_ID) {
+                    return Optional.of(new VisibilityRecord(id, ResourceVisibility.ORGANIZATION, "admin"));
+                }
+
+                return Optional.empty();
+            }
+        };
+    }
+
+    /**
+     * The production resolver, with the grant table replaced by {@code grantedIds} read at call time, so a test can
+     * grant and revoke between checks.
+     */
+    private static ResourceVisibilityResolver visibilityResolver(Set<Long> grantedIds) {
+        CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+
+        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+
+        ResourceGrantService resourceGrantService = mock(ResourceGrantService.class);
+
+        when(resourceGrantService.filterGrantedResourceIds(eq(CONNECTION), eq(7L), anyCollection()))
+            .thenAnswer(invocation -> {
+                Collection<Long> resourceIds = invocation.getArgument(2);
+
+                return resourceIds.stream()
+                    .filter(grantedIds::contains)
+                    .collect(Collectors.toSet());
+            });
+
+        return new ResourceVisibilityResolverImpl(currentUserResolver, resourceGrantService);
+    }
+
+    @Nested
+    class ProjectWorkflowVisibility {
+
+        private static final long PRIVATE_PROJECT_ID = 3L;
+        private static final long USER_ID = 7L;
+        private static final long WORKSPACE_ID = 42L;
+        private static final String WORKFLOW_ID = "private-project-workflow";
+
+        private final Set<Long> grantedProjectIds = new HashSet<>();
+
+        @BeforeEach
+        void setUp() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken("ana", "password", List.of()));
+        }
+
+        @AfterEach
+        void tearDown() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testMemberWithoutVisibilityIsDeniedThroughEveryWorkflowScopeCheck() {
+            PermissionServiceImpl service = service();
+
+            assertThat(service.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT")).isFalse();
+            assertThat(service.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .as("ana holds WORKFLOW_EDIT in DEVELOPMENT, but the project is ivica's and PRIVATE")
+                .isFalse();
+            assertThat(service.hasWorkflowScopeIfProjectWorkflow(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
+        }
+
+        @Test
+        void testGranteeIsAllowedThroughEveryWorkflowScopeCheck() {
+            grantedProjectIds.add(PRIVATE_PROJECT_ID);
+
+            PermissionServiceImpl service = service();
+
+            assertThat(service.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT")).isTrue();
+            assertThat(service.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT)).isTrue();
+            assertThat(service.hasWorkflowScopeIfProjectWorkflow(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isTrue();
+        }
+
+        @Test
+        void testGranteeStillNeedsTheScopeInTheNamedEnvironment() {
+            grantedProjectIds.add(PRIVATE_PROJECT_ID);
+
+            PermissionServiceImpl service = service();
+
+            assertThat(service.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.PRODUCTION)).isFalse();
+            assertThat(service.hasWorkflowScopeIfProjectWorkflow(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.PRODUCTION))
+                .isFalse();
+        }
+
+        private PermissionServiceImpl service() {
+            Project project = new Project();
+
+            project.setId(PRIVATE_PROJECT_ID);
+            project.setWorkspaceId(WORKSPACE_ID);
+
+            ProjectRepository projectRepository = mock(ProjectRepository.class);
+
+            when(projectRepository.findByWorkflowId(WORKFLOW_ID)).thenReturn(Optional.of(project));
+            when(projectRepository.findById(PRIVATE_PROJECT_ID)).thenReturn(Optional.of(project));
+
+            CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+
+            when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(USER_ID));
+
+            WorkspaceScopeCacheService workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+
+            when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+                .thenReturn(Set.of("WORKFLOW_EDIT"));
+            when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+                .thenReturn(Set.of("WORKFLOW_EDIT"));
+            when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+                .thenReturn(Set.of("WORKFLOW_VIEW"));
+
+            ResourceGrantService resourceGrantService = mock(ResourceGrantService.class);
+
+            when(resourceGrantService.filterGrantedResourceIds(eq("Project"), eq(USER_ID), anyCollection()))
+                .thenAnswer(invocation -> {
+                    Collection<Long> resourceIds = invocation.getArgument(2);
+
+                    return resourceIds.stream()
+                        .filter(grantedProjectIds::contains)
+                        .collect(Collectors.toSet());
+                });
+
+            return new PermissionServiceImpl(
+                currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository,
+                workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
+                List.of(new ProjectOwnershipResolver(
+                    new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository,
+                    mock(UserService.class))),
+                List.of(privateProjectVisibilityProvider()),
+                new ResourceVisibilityResolverImpl(currentUserResolver, resourceGrantService), List.of(),
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+        }
+
+        private static ResourceVisibilityProvider privateProjectVisibilityProvider() {
+            return new ResourceVisibilityProvider() {
+
+                @Override
+                public String resourceType() {
+                    return "Project";
+                }
+
+                @Override
+                public Optional<VisibilityRecord> fetchVisibility(long id) {
+                    if (id == PRIVATE_PROJECT_ID) {
+                        return Optional.of(new VisibilityRecord(id, ResourceVisibility.PRIVATE, "ivica"));
+                    }
+
+                    return Optional.empty();
+                }
+            };
+        }
+    }
+}
