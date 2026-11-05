@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.scheduler.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.RETURNS_DEFAULTS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -21,13 +22,19 @@ import static org.mockito.Mockito.when;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +56,7 @@ import org.quartz.impl.jdbcjobstore.TriggerStatus;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.ClassLoadHelper;
 import org.quartz.spi.OperableTrigger;
+import org.slf4j.Logger;
 
 /**
  * @version ee
@@ -95,7 +103,8 @@ class MultiTenantDriverDelegateTest {
 
     @ParameterizedTest
     @MethodSource({
-        "misfireAndJobCalls", "triggerCalls", "calendarFiredTriggerAndSchedulerStateCalls"
+        "misfireAndJobCalls", "triggerCalls", "calendarFiredTriggerAndSchedulerStateCalls",
+        "callsPreviouslyServedByUninitializedStdJdbcDelegate"
     })
     void testDelegatedCallRunsOnPublicSchemaAndRestoresTenantSchema(DelegateCall delegateCall, Object expectedResult)
         throws Exception {
@@ -212,7 +221,7 @@ class MultiTenantDriverDelegateTest {
         TenantContext.setCurrentTenantId("000002");
 
         assertThatThrownBy(() -> multiTenantDriverDelegate.insertJobDetail(connection, JOB_DETAIL))
-            .satisfies(throwable -> assertThat(findCause(throwable, IOException.class)).isSameAs(ioException));
+            .isSameAs(ioException);
 
         assertThat(statements).hasSize(2);
 
@@ -249,6 +258,225 @@ class MultiTenantDriverDelegateTest {
         }
 
         verify(connection, times(4)).createStatement();
+    }
+
+    @Test
+    void testEveryDriverDelegateMethodIsDeclaredByMultiTenantDriverDelegate() {
+        List<String> inheritedMethods = new ArrayList<>();
+
+        for (Method interfaceMethod : driverDelegateMethods()) {
+            Method implementationMethod = findImplementationMethod(interfaceMethod);
+
+            Class<?> declaringClass = implementationMethod.getDeclaringClass();
+
+            if (declaringClass != MultiTenantDriverDelegate.class) {
+                inheritedMethods.add(describe(interfaceMethod) + " served by " + declaringClass.getName());
+            }
+        }
+
+        assertThat(inheritedMethods)
+            .as(
+                "Every DriverDelegate method must be overridden by MultiTenantDriverDelegate and forwarded to the " +
+                    "wrapped delegate, otherwise it bypasses the delegate and the search_path switch")
+            .isEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("connectionMethods")
+    void testEveryConnectionMethodIsForwardedWithSameArgumentsOnPublicSchema(Method method) throws Throwable {
+        Class<?> returnType = method.getReturnType();
+
+        Object[] arguments = createArguments(method);
+        Object expectedResult = createReturnValue(returnType);
+
+        DriverDelegate forwardingDelegate = mock(DriverDelegate.class, invocation -> {
+            if (method.equals(invocation.getMethod())) {
+                return expectedResult;
+            }
+
+            return RETURNS_DEFAULTS.answer(invocation);
+        });
+
+        TenantContext.setCurrentTenantId("000002");
+
+        Object result = invoke(new MultiTenantDriverDelegate(forwardingDelegate), method, arguments);
+
+        if (returnType.isPrimitive()) {
+            assertThat(result).isEqualTo(expectedResult);
+        } else {
+            assertThat(result).isSameAs(expectedResult);
+        }
+
+        assertThat(statements).hasSize(2);
+
+        InOrder inOrder = inOrder(statements.get(0), forwardingDelegate, statements.get(1));
+
+        inOrder.verify(statements.get(0))
+            .execute(PUBLIC_SEARCH_PATH);
+
+        invoke(inOrder.verify(forwardingDelegate), method, arguments);
+
+        inOrder.verify(statements.get(1))
+            .execute("SET search_path TO bytechef_000002");
+    }
+
+    @ParameterizedTest
+    @MethodSource("connectionMethodCheckedExceptions")
+    void testEveryDeclaredCheckedExceptionIsPropagatedUnwrapped(
+        Method method, Class<? extends Exception> exceptionClass)
+        throws Throwable {
+
+        Object[] arguments = createArguments(method);
+        Exception exception = exceptionClass.getConstructor(String.class)
+            .newInstance("delegate failed");
+
+        invoke(doThrow(exception).when(driverDelegate), method, arguments);
+
+        TenantContext.setCurrentTenantId("000002");
+
+        assertThatThrownBy(() -> invoke(multiTenantDriverDelegate, method, arguments))
+            .isSameAs(exception);
+
+        assertThat(statements).hasSize(2);
+
+        verify(statements.get(1)).execute("SET search_path TO bytechef_000002");
+    }
+
+    @Test
+    void testSelectTriggerKeysForJobIsForwardedSoRemoveJobCanDeleteTriggersFirst() throws Exception {
+        List<TriggerKey> triggerKeys = List.of(TRIGGER_KEY);
+
+        doReturn(triggerKeys).when(driverDelegate)
+            .selectTriggerKeysForJob(connection, JOB_KEY);
+
+        assertThat(multiTenantDriverDelegate.selectTriggerKeysForJob(connection, JOB_KEY)).isSameAs(triggerKeys);
+
+        verify(driverDelegate).selectTriggerKeysForJob(connection, JOB_KEY);
+    }
+
+    @Test
+    @SuppressFBWarnings(value = {
+        "OBL", "ODR"
+    }, justification = "Statements are Mockito mocks")
+    void testFailureToRestoreTenantSchemaIsSuppressedOnDelegateException() throws Exception {
+        SQLException delegateException = new SQLException("deadlock detected");
+        SQLException restoreException = new SQLException("current transaction is aborted");
+
+        Statement publicSchemaStatement = mock(Statement.class);
+        Statement tenantSchemaStatement = mock(Statement.class);
+
+        when(connection.createStatement()).thenReturn(publicSchemaStatement, tenantSchemaStatement);
+        when(tenantSchemaStatement.execute("SET search_path TO bytechef_000002")).thenThrow(restoreException);
+
+        doThrow(delegateException).when(driverDelegate)
+            .deleteTrigger(connection, TRIGGER_KEY);
+
+        TenantContext.setCurrentTenantId("000002");
+
+        assertThatThrownBy(() -> multiTenantDriverDelegate.deleteTrigger(connection, TRIGGER_KEY))
+            .isSameAs(delegateException)
+            .satisfies(throwable -> assertThat(throwable.getSuppressed()).containsExactly(restoreException));
+
+        verify(tenantSchemaStatement).close();
+    }
+
+    @Test
+    @SuppressFBWarnings(value = {
+        "OBL", "ODR"
+    }, justification = "Statements are Mockito mocks")
+    void testFailureToRestoreTenantSchemaIsThrownWhenDelegateSucceeds() throws Exception {
+        SQLException restoreException = new SQLException("connection reset");
+
+        Statement publicSchemaStatement = mock(Statement.class);
+        Statement tenantSchemaStatement = mock(Statement.class);
+
+        when(connection.createStatement()).thenReturn(publicSchemaStatement, tenantSchemaStatement);
+        when(tenantSchemaStatement.execute("SET search_path TO bytechef_000002")).thenThrow(restoreException);
+
+        TenantContext.setCurrentTenantId("000002");
+
+        assertThatThrownBy(() -> multiTenantDriverDelegate.jobExists(connection, JOB_KEY))
+            .isSameAs(restoreException);
+
+        verify(driverDelegate).jobExists(connection, JOB_KEY);
+    }
+
+    @Test
+    void testInitializeIsForwardedWithoutTouchingConnection() throws Exception {
+        Logger logger = mock(Logger.class);
+
+        multiTenantDriverDelegate.initialize(
+            logger, "QRTZ_", "scheduler", INSTANCE_ID, CLASS_LOAD_HELPER, true, "triggerPersistenceDelegateClasses=");
+
+        verify(driverDelegate).initialize(
+            logger, "QRTZ_", "scheduler", INSTANCE_ID, CLASS_LOAD_HELPER, true, "triggerPersistenceDelegateClasses=");
+        verifyNoInteractions(connection);
+    }
+
+    @Test
+    void testEnhancedStatementsSettingIsForwarded() {
+        when(driverDelegate.isUsingEnhancedStatements()).thenReturn(true);
+
+        multiTenantDriverDelegate.setUseEnhancedStatements(true);
+
+        assertThat(multiTenantDriverDelegate.isUsingEnhancedStatements()).isTrue();
+
+        verify(driverDelegate).setUseEnhancedStatements(true);
+        verifyNoInteractions(connection);
+    }
+
+    /**
+     * Calls that were served by the never-initialized {@code StdJDBCDelegate} superclass (which queried
+     * {@code SCHED_NAME = 'null'}), stubbed to return empty, or not overridden at all.
+     */
+    @SuppressWarnings("deprecation")
+    static Stream<Arguments> callsPreviouslyServedByUninitializedStdJdbcDelegate() {
+        GroupMatcher<JobKey> anyJobGroup = GroupMatcher.anyJobGroup();
+        GroupMatcher<TriggerKey> anyTriggerGroup = GroupMatcher.anyTriggerGroup();
+
+        return Stream.of(
+            arguments("deleteFiredTriggers", DriverDelegate::deleteFiredTriggers, 3),
+            arguments("selectNumJobs", DriverDelegate::selectNumJobs, 5),
+            arguments("selectJobGroups", DriverDelegate::selectJobGroups, List.of(GROUP_NAME)),
+            arguments("selectNumTriggers", DriverDelegate::selectNumTriggers, 7),
+            arguments(
+                "selectTriggerGroups", (delegate, connection) -> delegate.selectTriggerGroups(connection),
+                List.of(GROUP_NAME)),
+            arguments("deleteAllPausedTriggerGroups", DriverDelegate::deleteAllPausedTriggerGroups, 2),
+            arguments("selectPausedTriggerGroups", DriverDelegate::selectPausedTriggerGroups, Set.of(GROUP_NAME)),
+            arguments("selectNumCalendars", DriverDelegate::selectNumCalendars, 1),
+            arguments("selectCalendars", DriverDelegate::selectCalendars, List.of(CALENDAR_NAME)),
+            arguments("selectNextFireTime", DriverDelegate::selectNextFireTime, 1_700_000_000_000L),
+            arguments(
+                "selectFiredTriggerInstanceNames", DriverDelegate::selectFiredTriggerInstanceNames,
+                Set.of(INSTANCE_ID)),
+            arguments(
+                "selectTriggerKeysForJob",
+                (delegate, connection) -> delegate.selectTriggerKeysForJob(connection, JOB_KEY), List.of(TRIGGER_KEY)),
+            arguments(
+                "selectJobDetails",
+                (delegate, connection) -> delegate.selectJobDetails(connection, anyJobGroup, CLASS_LOAD_HELPER),
+                List.of(JOB_DETAIL)),
+            arguments(
+                "getTriggersByJobAndTriggerGroup",
+                (delegate, connection) -> delegate.getTriggersByJobAndTriggerGroup(
+                    connection, anyJobGroup, anyTriggerGroup),
+                List.of(TRIGGER)));
+    }
+
+    static Stream<Arguments> connectionMethods() {
+        return driverDelegateMethods().stream()
+            .filter(MultiTenantDriverDelegateTest::takesConnection)
+            .map(method -> Arguments.of(Named.of(describe(method), method)));
+    }
+
+    static Stream<Arguments> connectionMethodCheckedExceptions() {
+        return driverDelegateMethods().stream()
+            .filter(MultiTenantDriverDelegateTest::takesConnection)
+            .flatMap(method -> Arrays.stream(method.getExceptionTypes())
+                .map(exceptionType -> Arguments.of(
+                    Named.of(describe(method), method),
+                    Named.of(exceptionType.getSimpleName(), exceptionType))));
     }
 
     static Stream<Arguments> misfireAndJobCalls() {
@@ -486,14 +714,117 @@ class MultiTenantDriverDelegateTest {
         return Arguments.of(Named.of(name, delegateCall), expectedResult);
     }
 
-    private static Throwable findCause(Throwable throwable, Class<? extends Throwable> causeClass) {
-        Throwable current = throwable;
+    private static List<Method> driverDelegateMethods() {
+        return Arrays.stream(DriverDelegate.class.getMethods())
+            .filter(method -> !Modifier.isStatic(method.getModifiers()) && !method.isSynthetic())
+            .sorted(Comparator.comparing(MultiTenantDriverDelegateTest::describe))
+            .toList();
+    }
 
-        while (current != null && !causeClass.isInstance(current)) {
-            current = current.getCause();
+    private static Method findImplementationMethod(Method interfaceMethod) {
+        try {
+            return MultiTenantDriverDelegate.class.getMethod(
+                interfaceMethod.getName(), interfaceMethod.getParameterTypes());
+        } catch (NoSuchMethodException noSuchMethodException) {
+            throw new IllegalStateException(noSuchMethodException);
+        }
+    }
+
+    private static boolean takesConnection(Method method) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+
+        return parameterTypes.length > 0 && parameterTypes[0] == Connection.class;
+    }
+
+    private static String describe(Method method) {
+        String parameterTypeNames = Arrays.stream(method.getParameterTypes())
+            .map(Class::getSimpleName)
+            .collect(Collectors.joining(", "));
+
+        return method.getName() + "(" + parameterTypeNames + ")";
+    }
+
+    private Object[] createArguments(Method method) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        Object[] arguments = new Object[parameterTypes.length];
+
+        for (int index = 0; index < parameterTypes.length; index++) {
+            arguments[index] = createArgument(parameterTypes[index], index);
         }
 
-        return current;
+        return arguments;
+    }
+
+    private Object createArgument(Class<?> parameterType, int index) {
+        if (parameterType == Connection.class) {
+            return connection;
+        }
+
+        if (parameterType == boolean.class) {
+            return true;
+        }
+
+        if (parameterType == int.class) {
+            return index + 10;
+        }
+
+        if (parameterType == long.class) {
+            return index + 1_000L;
+        }
+
+        if (parameterType == String.class) {
+            return "argument" + index;
+        }
+
+        if (parameterType == JobKey.class) {
+            return JobKey.jobKey("job" + index, GROUP_NAME);
+        }
+
+        if (parameterType == TriggerKey.class) {
+            return TriggerKey.triggerKey("trigger" + index, GROUP_NAME);
+        }
+
+        if (parameterType == GroupMatcher.class) {
+            return GroupMatcher.groupEquals(GROUP_NAME + index);
+        }
+
+        if (parameterType == List.class) {
+            return new ArrayList<>();
+        }
+
+        return mock(parameterType);
+    }
+
+    private static Object createReturnValue(Class<?> returnType) {
+        if (returnType == void.class) {
+            return null;
+        }
+
+        if (returnType == boolean.class) {
+            return true;
+        }
+
+        if (returnType == int.class) {
+            return 42;
+        }
+
+        if (returnType == long.class) {
+            return 4_242L;
+        }
+
+        if (returnType == String.class) {
+            return "result";
+        }
+
+        return mock(returnType);
+    }
+
+    private static Object invoke(Object target, Method method, Object[] arguments) throws Throwable {
+        try {
+            return method.invoke(target, arguments);
+        } catch (InvocationTargetException invocationTargetException) {
+            throw invocationTargetException.getCause();
+        }
     }
 
     @FunctionalInterface
