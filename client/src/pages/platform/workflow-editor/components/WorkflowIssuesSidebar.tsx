@@ -80,7 +80,12 @@ const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
 
                         {nodeIssues.map((issue) => (
                             <button
-                                className="flex items-start gap-2 rounded-md border-2 border-transparent bg-surface-neutral-primary px-2 py-1.5 text-left text-sm hover:border-stroke-brand-secondary"
+                                className={twMerge(
+                                    'flex items-start gap-2 rounded-md border px-2 py-1.5 text-left text-sm',
+                                    issue.severity === 'ERROR'
+                                        ? 'border-stroke-destructive-secondary bg-surface-destructive-secondary hover:bg-surface-destructive-secondary-hover'
+                                        : 'border-stroke-warning-secondary bg-surface-warning-secondary hover:bg-surface-warning-secondary-hover'
+                                )}
                                 key={getWorkflowIssueKey(issue)}
                                 onClick={() => handleIssueClick(issue)}
                                 type="button"
