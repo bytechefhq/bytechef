@@ -26,9 +26,17 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
+import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import tools.jackson.databind.JsonNode;
@@ -57,7 +65,8 @@ class RollbackProjectDeploymentToolCallbackTest {
 
         when(facade.getProjectDeployment(7L)).thenReturn(existing);
 
-        RollbackProjectDeploymentToolCallback callback = new RollbackProjectDeploymentToolCallback(facade);
+        RollbackProjectDeploymentToolCallback callback =
+            new RollbackProjectDeploymentToolCallback(facade, mock(ProjectWorkflowService.class));
 
         String result = callback.call("{\"projectDeploymentId\":\"7\",\"projectVersion\":2}", toolContext());
 
@@ -84,6 +93,57 @@ class RollbackProjectDeploymentToolCallbackTest {
     }
 
     @Test
+    void testRollbackRepointsEachWorkflowToTheTargetVersionByUuid() throws Exception {
+        ProjectDeploymentFacade facade = workspaceFacade(7L);
+        ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+
+        List<ProjectDeploymentWorkflowConnection> connections = List.of(
+            new ProjectDeploymentWorkflowConnection(11L, "connection", "trigger_1"));
+
+        ProjectDeploymentDTO existing = ProjectDeploymentDTO.builder()
+            .id(7L)
+            .projectId(42L)
+            .projectVersion(3)
+            .environment(Environment.PRODUCTION)
+            .enabled(true)
+            .projectDeploymentWorkflows(
+                List.of(
+                    new ProjectDeploymentWorkflowDTO(
+                        connections, null, null, Map.of("key", "value"), true, 70L, null, null, null, null, 7L, null,
+                        0, "workflow-v3", "uuid-1"),
+                    new ProjectDeploymentWorkflowDTO(
+                        List.of(), null, null, Map.of(), false, 71L, null, null, null, null, 7L, null, 0,
+                        "added-in-v3", "uuid-2")))
+            .build();
+
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(42L, 2, "workflow-v2", UUID.randomUUID());
+
+        when(facade.getProjectDeployment(7L)).thenReturn(existing);
+        when(projectWorkflowService.fetchProjectWorkflow(42L, 2, "uuid-1")).thenReturn(Optional.of(projectWorkflow));
+        when(projectWorkflowService.fetchProjectWorkflow(42L, 2, "uuid-2")).thenReturn(Optional.empty());
+
+        RollbackProjectDeploymentToolCallback callback = new RollbackProjectDeploymentToolCallback(
+            facade, projectWorkflowService);
+
+        callback.call("{\"projectDeploymentId\":\"7\",\"projectVersion\":2}", toolContext());
+
+        ArgumentCaptor<ProjectDeploymentDTO> captor = ArgumentCaptor.forClass(ProjectDeploymentDTO.class);
+
+        verify(facade).updateProjectDeployment(captor.capture());
+
+        ProjectDeploymentDTO captured = captor.getValue();
+
+        assertThat(captured.projectDeploymentWorkflows())
+            .singleElement()
+            .satisfies(projectDeploymentWorkflow -> {
+                assertThat(projectDeploymentWorkflow.workflowId()).isEqualTo("workflow-v2");
+                assertThat(projectDeploymentWorkflow.enabled()).isTrue();
+                assertThat(projectDeploymentWorkflow.connections()).isEqualTo(connections);
+                assertThat(projectDeploymentWorkflow.inputs()).isEqualTo(Map.of("key", "value"));
+            });
+    }
+
+    @Test
     void testRejectsRollbackToCurrentVersion() throws Exception {
         ProjectDeploymentFacade facade = workspaceFacade(7L);
 
@@ -97,7 +157,8 @@ class RollbackProjectDeploymentToolCallbackTest {
 
         when(facade.getProjectDeployment(7L)).thenReturn(existing);
 
-        RollbackProjectDeploymentToolCallback callback = new RollbackProjectDeploymentToolCallback(facade);
+        RollbackProjectDeploymentToolCallback callback =
+            new RollbackProjectDeploymentToolCallback(facade, mock(ProjectWorkflowService.class));
 
         String result = callback.call("{\"projectDeploymentId\":\"7\",\"projectVersion\":3}", toolContext());
 
@@ -113,7 +174,7 @@ class RollbackProjectDeploymentToolCallbackTest {
     @Test
     void testRejectsMissingId() throws Exception {
         RollbackProjectDeploymentToolCallback callback = new RollbackProjectDeploymentToolCallback(
-            mock(ProjectDeploymentFacade.class));
+            mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowService.class));
 
         String result = callback.call("{\"projectVersion\":2}");
 
@@ -128,7 +189,8 @@ class RollbackProjectDeploymentToolCallbackTest {
     void testRefusesDeploymentOutsideTheCurrentWorkspace() throws Exception {
         ProjectDeploymentFacade facade = workspaceFacade(7L);
 
-        RollbackProjectDeploymentToolCallback callback = new RollbackProjectDeploymentToolCallback(facade);
+        RollbackProjectDeploymentToolCallback callback =
+            new RollbackProjectDeploymentToolCallback(facade, mock(ProjectWorkflowService.class));
 
         String result = callback.call("{\"projectDeploymentId\":\"8\",\"projectVersion\":2}", toolContext());
 
@@ -145,7 +207,8 @@ class RollbackProjectDeploymentToolCallbackTest {
     void testRefusesWithoutWorkspaceContext() throws Exception {
         ProjectDeploymentFacade facade = workspaceFacade(7L);
 
-        RollbackProjectDeploymentToolCallback callback = new RollbackProjectDeploymentToolCallback(facade);
+        RollbackProjectDeploymentToolCallback callback =
+            new RollbackProjectDeploymentToolCallback(facade, mock(ProjectWorkflowService.class));
 
         String result = callback.call("{\"projectDeploymentId\":\"7\",\"projectVersion\":2}");
 
