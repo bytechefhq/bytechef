@@ -1,6 +1,6 @@
 import {type Locator, type Page, expect} from '@playwright/test';
 
-export type NotificationEventType = 'JOB_APPROVAL_ESCALATED' | 'JOB_APPROVAL_EXPIRING' | 'JOB_COMPLETED' | 'JOB_FAILED';
+export type NotificationEventType = 'JOB_COMPLETED' | 'JOB_FAILED';
 
 export type WebhookPresetLabelType = 'Custom' | 'Datadog' | 'New Relic';
 
