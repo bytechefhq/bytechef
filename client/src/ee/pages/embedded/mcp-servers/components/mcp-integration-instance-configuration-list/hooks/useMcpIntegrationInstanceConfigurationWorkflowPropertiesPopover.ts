@@ -76,20 +76,24 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowProperties
     const {control, formState, handleSubmit} = form;
 
     const handleFormSubmit = (values: Record<string, unknown>) => {
+        const sanitizeValue = (value: unknown): unknown => {
+            if (value === '') {
+                return null;
+            }
+
+            if (Array.isArray(value)) {
+                return value.map((item) => sanitizeValue(item));
+            }
+
+            if (value && typeof value === 'object') {
+                return sanitize(value as Record<string, unknown>);
+            }
+
+            return value;
+        };
+
         const sanitize = (record: Record<string, unknown>): Record<string, unknown> =>
-            Object.fromEntries(
-                Object.entries(record).map(([key, value]) => {
-                    if (value === '') {
-                        return [key, null];
-                    }
-
-                    if (value && typeof value === 'object' && !Array.isArray(value)) {
-                        return [key, sanitize(value as Record<string, unknown>)];
-                    }
-
-                    return [key, value];
-                })
-            );
+            Object.fromEntries(Object.entries(record).map(([key, value]) => [key, sanitizeValue(value)]));
 
         updateMcpIntegrationInstanceConfigurationWorkflowMutation.mutate({
             id: mcpIntegrationInstanceConfigurationWorkflow.id,
