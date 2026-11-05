@@ -7,12 +7,10 @@
 
 package com.bytechef.ee.platform.scheduler.tenant;
 
-import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Set;
 import org.quartz.Calendar;
@@ -33,34 +31,21 @@ import org.quartz.utils.Key;
 import org.slf4j.Logger;
 
 /**
- * Multi-tenant Quartz scheduler driver delegate that sets PostgreSQL search_path per tenant.
- *
- * <p>
- * Every call is forwarded to the wrapped, already initialized delegate (e.g. {@code PostgreSQLDelegate}) with the
- * connection's search_path switched to {@code public}, where the Quartz tables live, and switched back to the current
- * tenant's schema afterwards. Checked exceptions the wrapped delegate throws are propagated unchanged, so that
- * {@code JobStoreSupport} can handle them as it does for a plain delegate.
- *
- * <p>
- * The class deliberately implements {@link DriverDelegate} instead of extending {@code StdJDBCDelegate}: an inherited
- * {@code StdJDBCDelegate} was never initialized (its scheduler name is {@code null} and its table prefix the default),
- * so any method it served instead of the wrapper silently queried {@code SCHED_NAME = 'null'}. Implementing the
- * interface makes the compiler require every abstract method, and {@code MultiTenantDriverDelegateTest} checks that the
- * default methods are overridden as well.
- *
  * @version ee
  *
  * @author Ivica Cardic
  */
 public class MultiTenantDriverDelegate implements DriverDelegate {
 
-    private static final String PUBLIC_SCHEMA = "public";
-
     private final DriverDelegate delegate;
 
     @SuppressFBWarnings("EI")
     public MultiTenantDriverDelegate(DriverDelegate delegate) {
         this.delegate = delegate;
+    }
+
+    boolean wraps(DriverDelegate driverDelegate) {
+        return delegate == driverDelegate;
     }
 
     @Override
@@ -607,54 +592,9 @@ public class MultiTenantDriverDelegate implements DriverDelegate {
         }
     }
 
-    /**
-     * Sets the PostgreSQL search_path to the specified schema.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL injection suppression is for schema name injection which cannot be parameterized in
-     * PostgreSQL. The search_path is set using a tenant ID that is validated to contain only alphanumeric characters,
-     * underscores, and hyphens. This is a PostgreSQL limitation for DDL/schema operations, not a security
-     * vulnerability.
-     */
-    @SuppressFBWarnings("SQL_INJECTION_JDBC")
-    private static void setSearchPath(Connection connection, String databaseSchemaName) throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            statement.execute("SET search_path TO " + databaseSchemaName);
-        }
-    }
-
     @FunctionalInterface
     private interface SqlDelegateCall<T> {
 
         T apply(Connection connection) throws SQLException;
-    }
-
-    /**
-     * Switches a connection's search_path to {@code public} when entered and back to the current tenant's schema when
-     * closed. Used with try-with-resources, so that an exception thrown by the delegate stays the primary exception and
-     * a failure to restore the tenant schema is attached to it as suppressed, instead of replacing it.
-     */
-    private static final class PublicSearchPathScope implements AutoCloseable {
-
-        private final Connection connection;
-
-        private PublicSearchPathScope(Connection connection) {
-            this.connection = connection;
-        }
-
-        static PublicSearchPathScope enter(Connection connection) throws SQLException {
-            setSearchPath(connection, PUBLIC_SCHEMA);
-
-            return new PublicSearchPathScope(connection);
-        }
-
-        Connection connection() {
-            return connection;
-        }
-
-        @Override
-        public void close() throws SQLException {
-            setSearchPath(connection, TenantContext.getCurrentDatabaseSchema());
-        }
     }
 }

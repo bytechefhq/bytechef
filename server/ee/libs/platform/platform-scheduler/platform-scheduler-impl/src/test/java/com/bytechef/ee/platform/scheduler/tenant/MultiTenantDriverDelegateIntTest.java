@@ -13,6 +13,7 @@ import static org.awaitility.Awaitility.await;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.scheduler.config.MultiTenantQuartzTriggerSchedulerConfiguration;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.sql.BaseDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -34,6 +35,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
@@ -43,11 +45,13 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.boot.quartz.autoconfigure.QuartzProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DelegatingDataSource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.scheduling.quartz.AdaptableJobFactory;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -72,6 +76,7 @@ class MultiTenantDriverDelegateIntTest {
 
     private static DataSource dataSource;
     private static JdbcTemplate jdbcTemplate;
+    private static DataSource tenantFallbackDataSource;
 
     private final List<SchedulerFactoryBean> schedulerFactoryBeans = new ArrayList<>();
 
@@ -89,7 +94,11 @@ class MultiTenantDriverDelegateIntTest {
 
         jdbcTemplate.execute("CREATE SCHEMA bytechef_" + TENANT_ID);
 
+        // Stands in for an object only the public fallback resolves for a tenant, such as the pgvector vector type
+        jdbcTemplate.execute("CREATE TYPE public.public_fallback_probe AS ENUM ('resolved')");
+
         dataSource = new TenantSearchPathDataSource(driverManagerDataSource);
+        tenantFallbackDataSource = new TenantFallbackDataSource(driverManagerDataSource);
     }
 
     @AfterEach
@@ -190,7 +199,77 @@ class MultiTenantDriverDelegateIntTest {
             .untilAsserted(() -> assertThat(countFiredTriggers("orphanedInstance")).isZero());
     }
 
+    @Test
+    void testQuartzCallsInTenantTransactionKeepSearchPathOfTransactionConnection() throws Exception {
+        Scheduler scheduler = createScheduler("tenantTransaction", false, tenantFallbackDataSource);
+        JobDetail jobDetail = createJobDetail("job");
+        JdbcTemplate tenantJdbcTemplate = new JdbcTemplate(tenantFallbackDataSource);
+        TransactionTemplate transactionTemplate = new TransactionTemplate(
+            new DataSourceTransactionManager(tenantFallbackDataSource));
+
+        List<Object> observations = callAsTenant(() -> transactionTemplate.execute(transactionStatus -> {
+            List<Object> currentObservations = new ArrayList<>();
+
+            currentObservations.add(showSearchPath(tenantJdbcTemplate));
+
+            callScheduler(() -> scheduler.scheduleJob(jobDetail, createTrigger("trigger", jobDetail)));
+
+            currentObservations.add(showSearchPath(tenantJdbcTemplate));
+
+            callScheduler(() -> scheduler.checkExists(jobDetail.getKey()));
+
+            currentObservations.add(showSearchPath(tenantJdbcTemplate));
+
+            callScheduler(() -> scheduler.deleteJob(jobDetail.getKey()));
+
+            currentObservations.add(showSearchPath(tenantJdbcTemplate));
+            currentObservations.add(isPublicFallbackProbeResolvable(tenantJdbcTemplate));
+
+            return currentObservations;
+        }));
+
+        assertThat(observations)
+            .as("search_path before and after each Quartz call in the tenant transaction, then whether an object in " +
+                "public still resolves")
+            .containsExactly(
+                "bytechef_" + TENANT_ID + ", public", "bytechef_" + TENANT_ID + ", public",
+                "bytechef_" + TENANT_ID + ", public", "bytechef_" + TENANT_ID + ", public", true);
+        assertThat(countTriggers("tenantTransaction")).isZero();
+    }
+
+    @Test
+    void testQuartzCallUnderOtherTenantContextKeepsSearchPathOfTransactionConnection() throws Exception {
+        Scheduler scheduler = createScheduler("otherTenantContext", false, tenantFallbackDataSource);
+        JdbcTemplate tenantJdbcTemplate = new JdbcTemplate(tenantFallbackDataSource);
+        TransactionTemplate transactionTemplate = new TransactionTemplate(
+            new DataSourceTransactionManager(tenantFallbackDataSource));
+
+        List<String> searchPaths = callAsTenant(() -> transactionTemplate.execute(transactionStatus -> {
+            String originalSearchPath = showSearchPath(tenantJdbcTemplate);
+
+            TenantContext.setCurrentTenantId("000003");
+
+            try {
+                callScheduler(() -> scheduler.checkExists(JobKey.jobKey("job", GROUP_NAME)));
+            } finally {
+                TenantContext.setCurrentTenantId(TENANT_ID);
+            }
+
+            return List.of(originalSearchPath, showSearchPath(tenantJdbcTemplate));
+        }));
+
+        assertThat(searchPaths)
+            .as("The connection was obtained, and its search_path set, before the tenant context changed")
+            .containsExactly("bytechef_" + TENANT_ID + ", public", "bytechef_" + TENANT_ID + ", public");
+    }
+
     private Scheduler createScheduler(String schedulerName, boolean clustered) throws Exception {
+        return createScheduler(schedulerName, clustered, dataSource);
+    }
+
+    private Scheduler createScheduler(String schedulerName, boolean clustered, DataSource schedulerDataSource)
+        throws Exception {
+
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         ApplicationProperties.Tenant tenant = applicationProperties.getTenant();
@@ -215,7 +294,7 @@ class MultiTenantDriverDelegateIntTest {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
 
         schedulerFactoryBean.setAutoStartup(false);
-        schedulerFactoryBean.setDataSource(dataSource);
+        schedulerFactoryBean.setDataSource(schedulerDataSource);
         schedulerFactoryBean.setSchedulerName(schedulerName);
 
         multiTenantQuartzTriggerSchedulerConfiguration.customize(schedulerFactoryBean);
@@ -240,6 +319,24 @@ class MultiTenantDriverDelegateIntTest {
         } finally {
             TenantContext.resetCurrentTenantId();
         }
+    }
+
+    private static void callScheduler(SchedulerCall schedulerCall) {
+        try {
+            schedulerCall.call();
+        } catch (SchedulerException schedulerException) {
+            throw new IllegalStateException(schedulerException);
+        }
+    }
+
+    private static String showSearchPath(JdbcTemplate tenantJdbcTemplate) {
+        return tenantJdbcTemplate.queryForObject("SHOW search_path", String.class);
+    }
+
+    private static boolean isPublicFallbackProbeResolvable(JdbcTemplate tenantJdbcTemplate) {
+        return Boolean.TRUE.equals(
+            tenantJdbcTemplate.queryForObject(
+                "SELECT to_regtype('public_fallback_probe') IS NOT NULL", Boolean.class));
     }
 
     private static JobDetail createJobDetail(String jobName) {
@@ -298,6 +395,23 @@ class MultiTenantDriverDelegateIntTest {
                 .getKey();
 
             throw new IllegalStateException("Job " + jobKey + " is not expected to run");
+        }
+    }
+
+    @FunctionalInterface
+    private interface SchedulerCall {
+
+        void call() throws SchedulerException;
+    }
+
+    /**
+     * Hands out connections the way the multi-tenant application data source does: {@link BaseDataSource} sets the
+     * search_path to the current tenant's schema followed by the {@code public} fallback.
+     */
+    private static final class TenantFallbackDataSource extends BaseDataSource {
+
+        private TenantFallbackDataSource(DataSource dataSource) {
+            super(dataSource);
         }
     }
 

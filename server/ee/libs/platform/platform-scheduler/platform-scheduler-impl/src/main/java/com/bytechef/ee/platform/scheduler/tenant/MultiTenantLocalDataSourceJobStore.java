@@ -19,19 +19,36 @@ import org.springframework.scheduling.quartz.LocalDataSourceJobStore;
  */
 public class MultiTenantLocalDataSourceJobStore extends LocalDataSourceJobStore {
 
+    private MultiTenantDriverDelegate multiTenantDriverDelegate;
+    private MultiTenantSemaphore multiTenantSemaphore;
+
     @Override
     protected DriverDelegate getDelegate() throws NoSuchDelegateException {
-        return new MultiTenantDriverDelegate(super.getDelegate());
+        synchronized (this) {
+            DriverDelegate driverDelegate = super.getDelegate();
+
+            if (multiTenantDriverDelegate == null || !multiTenantDriverDelegate.wraps(driverDelegate)) {
+                multiTenantDriverDelegate = new MultiTenantDriverDelegate(driverDelegate);
+            }
+
+            return multiTenantDriverDelegate;
+        }
     }
 
     @Override
     protected Semaphore getLockHandler() {
-        Semaphore semaphore = super.getLockHandler();
+        synchronized (this) {
+            Semaphore semaphore = super.getLockHandler();
 
-        if (semaphore == null) {
-            return null;
+            if (semaphore == null) {
+                return null;
+            }
+
+            if (multiTenantSemaphore == null || !multiTenantSemaphore.wraps(semaphore)) {
+                multiTenantSemaphore = new MultiTenantSemaphore(semaphore);
+            }
+
+            return multiTenantSemaphore;
         }
-
-        return new MultiTenantSemaphore(semaphore);
     }
 }

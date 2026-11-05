@@ -10,24 +10,21 @@ package com.bytechef.ee.platform.scheduler.tenant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.RETURNS_DEFAULTS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.tenant.TenantContext;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -43,7 +40,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InOrder;
 import org.quartz.Calendar;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -71,29 +67,29 @@ class MultiTenantDriverDelegateTest {
     private static final JobDetail JOB_DETAIL = mock(JobDetail.class);
     private static final JobKey JOB_KEY = JobKey.jobKey("job", GROUP_NAME);
     private static final GroupMatcher<JobKey> JOB_KEY_GROUP_MATCHER = GroupMatcher.jobGroupEquals(GROUP_NAME);
-    private static final String PUBLIC_SEARCH_PATH = "SET search_path TO public";
+    private static final String PUBLIC_SCHEMA = "public";
+
+    /**
+     * The search_path {@code BaseDataSource} gives a tenant connection: the tenant schema with the {@code public}
+     * fallback.
+     */
+    private static final String TENANT_SEARCH_PATH = "bytechef_000002, public";
+
     private static final OperableTrigger TRIGGER = mock(OperableTrigger.class);
     private static final TriggerKey TRIGGER_KEY = TriggerKey.triggerKey("trigger", GROUP_NAME);
     private static final GroupMatcher<TriggerKey> TRIGGER_KEY_GROUP_MATCHER =
         GroupMatcher.triggerGroupEquals(GROUP_NAME);
 
-    private final Connection connection = mock(Connection.class);
     private final DriverDelegate driverDelegate = mock(DriverDelegate.class);
     private final MultiTenantDriverDelegate multiTenantDriverDelegate = new MultiTenantDriverDelegate(driverDelegate);
-    private final List<Statement> statements = new ArrayList<>();
+    private SearchPathConnection searchPathConnection;
+    private Connection connection;
 
     @BeforeEach
-    @SuppressFBWarnings(value = {
-        "OBL", "ODR"
-    }, justification = "Statements are Mockito mocks")
     void beforeEach() throws SQLException {
-        when(connection.createStatement()).thenAnswer(invocation -> {
-            Statement statement = mock(Statement.class);
+        searchPathConnection = new SearchPathConnection(TENANT_SEARCH_PATH);
 
-            statements.add(statement);
-
-            return statement;
-        });
+        connection = searchPathConnection.getConnection();
     }
 
     @AfterEach
@@ -106,80 +102,96 @@ class MultiTenantDriverDelegateTest {
         "misfireAndJobCalls", "triggerCalls", "calendarFiredTriggerAndSchedulerStateCalls",
         "callsPreviouslyServedByUninitializedStdJdbcDelegate"
     })
-    void testDelegatedCallRunsOnPublicSchemaAndRestoresTenantSchema(DelegateCall delegateCall, Object expectedResult)
-        throws Exception {
+    void testDelegatedCallRunsOnPublicSchemaAndRestoresConnectionSearchPath(
+        DelegateCall delegateCall, Object expectedResult) throws Exception {
 
-        delegateCall.invoke(doReturn(expectedResult).when(driverDelegate), connection);
+        List<String> searchPathsDuringCall = new ArrayList<>();
+
+        delegateCall.invoke(
+            doAnswer(invocation -> {
+                searchPathsDuringCall.add(searchPathConnection.getSearchPath());
+
+                return expectedResult;
+            }).when(driverDelegate),
+            connection);
 
         TenantContext.setCurrentTenantId("000002");
 
         Object result = delegateCall.invoke(multiTenantDriverDelegate, connection);
 
         assertThat(result).isEqualTo(expectedResult);
-        assertThat(statements).hasSize(2);
+        assertThat(searchPathsDuringCall).containsExactly(PUBLIC_SCHEMA);
+        assertThat(searchPathConnection.getSearchPath()).isEqualTo(TENANT_SEARCH_PATH);
         assertThat(TenantContext.getCurrentTenantId()).isEqualTo("000002");
 
-        InOrder inOrder = inOrder(statements.get(0), driverDelegate, statements.get(1));
-
-        inOrder.verify(statements.get(0))
-            .execute(PUBLIC_SEARCH_PATH);
-        inOrder.verify(statements.get(0))
-            .close();
-
-        delegateCall.invoke(inOrder.verify(driverDelegate), connection);
-
-        inOrder.verify(statements.get(1))
-            .execute("SET search_path TO bytechef_000002");
-        inOrder.verify(statements.get(1))
-            .close();
+        delegateCall.invoke(verify(driverDelegate), connection);
     }
 
     @Test
-    void testClearDataRunsOnPublicSchemaAndRestoresTenantSchema() throws Exception {
-        TenantContext.setCurrentTenantId("000003");
+    void testClearDataRunsOnPublicSchemaAndRestoresConnectionSearchPath() throws Exception {
+        List<String> searchPathsDuringCall = new ArrayList<>();
+
+        doAnswer(invocation -> searchPathsDuringCall.add(searchPathConnection.getSearchPath()))
+            .when(driverDelegate)
+            .clearData(connection);
+
+        TenantContext.setCurrentTenantId("000002");
 
         multiTenantDriverDelegate.clearData(connection);
 
-        InOrder inOrder = inOrder(statements.get(0), driverDelegate, statements.get(1));
+        assertThat(searchPathsDuringCall).containsExactly(PUBLIC_SCHEMA);
+        assertThat(searchPathConnection.getSearchPath()).isEqualTo(TENANT_SEARCH_PATH);
+    }
 
-        inOrder.verify(statements.get(0))
-            .execute(PUBLIC_SEARCH_PATH);
-        inOrder.verify(driverDelegate)
-            .clearData(connection);
-        inOrder.verify(statements.get(1))
-            .execute("SET search_path TO bytechef_000003");
+    @Test
+    void testPublicFallbackOfTenantSearchPathIsKeptAfterCall() throws Exception {
+        TenantContext.setCurrentTenantId("000002");
+
+        multiTenantDriverDelegate.jobExists(connection, JOB_KEY);
+
+        assertThat(searchPathConnection.getSearchPath())
+            .as("Application code running on the connection after a Quartz call must still resolve public objects")
+            .isEqualTo(TENANT_SEARCH_PATH)
+            .isNotEqualTo(TenantContext.getCurrentDatabaseSchema());
     }
 
     @Test
     void testDefaultTenantRestoresPublicSchema() throws Exception {
+        SearchPathConnection publicSearchPathConnection = new SearchPathConnection(PUBLIC_SCHEMA);
+
+        Connection publicConnection = publicSearchPathConnection.getConnection();
+
         doReturn(true).when(driverDelegate)
-            .jobExists(connection, JOB_KEY);
+            .jobExists(publicConnection, JOB_KEY);
 
-        assertThat(multiTenantDriverDelegate.jobExists(connection, JOB_KEY)).isTrue();
+        assertThat(multiTenantDriverDelegate.jobExists(publicConnection, JOB_KEY)).isTrue();
 
-        assertThat(statements).hasSize(2);
-
-        verify(statements.get(0)).execute(PUBLIC_SEARCH_PATH);
-        verify(statements.get(1)).execute(PUBLIC_SEARCH_PATH);
+        assertThat(publicSearchPathConnection.getSearchPath()).isEqualTo(PUBLIC_SCHEMA);
     }
 
     @Test
-    void testSearchPathFollowsTenantContextAcrossCalls() throws Exception {
-        TenantContext.runWithTenantId("000004", () -> multiTenantDriverDelegate.jobExists(connection, JOB_KEY));
+    void testSearchPathOfConnectionIsRestoredWhenTenantContextChangedSinceConnectionWasObtained() throws Exception {
         TenantContext.runWithTenantId("000005", () -> multiTenantDriverDelegate.jobExists(connection, JOB_KEY));
 
-        assertThat(statements).hasSize(4);
-
-        verify(statements.get(0)).execute(PUBLIC_SEARCH_PATH);
-        verify(statements.get(1)).execute("SET search_path TO bytechef_000004");
-        verify(statements.get(2)).execute(PUBLIC_SEARCH_PATH);
-        verify(statements.get(3)).execute("SET search_path TO bytechef_000005");
-
+        assertThat(searchPathConnection.getSearchPath()).isEqualTo(TENANT_SEARCH_PATH);
         assertThat(TenantContext.getCurrentTenantId()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
     }
 
     @Test
-    void testTenantSchemaIsRestoredWhenDelegateThrowsSqlException() throws Exception {
+    void testCustomSearchPathOfConnectionIsRestoredUnchanged() throws Exception {
+        SearchPathConnection customSearchPathConnection = new SearchPathConnection(
+            "bytechef_vectorstore_000002, \"$user\", public");
+
+        TenantContext.setCurrentTenantId("000002");
+
+        multiTenantDriverDelegate.selectNumJobs(customSearchPathConnection.getConnection());
+
+        assertThat(customSearchPathConnection.getSearchPath())
+            .isEqualTo("bytechef_vectorstore_000002, \"$user\", public");
+    }
+
+    @Test
+    void testConnectionSearchPathIsRestoredWhenDelegateThrowsSqlException() throws Exception {
         SQLException sqlException = new SQLException("deadlock detected");
 
         doThrow(sqlException).when(driverDelegate)
@@ -190,14 +202,11 @@ class MultiTenantDriverDelegateTest {
         assertThatThrownBy(() -> multiTenantDriverDelegate.deleteTrigger(connection, TRIGGER_KEY))
             .isSameAs(sqlException);
 
-        assertThat(statements).hasSize(2);
-
-        verify(statements.get(0)).execute(PUBLIC_SEARCH_PATH);
-        verify(statements.get(1)).execute("SET search_path TO bytechef_000002");
+        assertThat(searchPathConnection.getSearchPath()).isEqualTo(TENANT_SEARCH_PATH);
     }
 
     @Test
-    void testTenantSchemaIsRestoredWhenDelegateThrowsRuntimeException() throws Exception {
+    void testConnectionSearchPathIsRestoredWhenDelegateThrowsRuntimeException() throws Exception {
         IllegalStateException illegalStateException = new IllegalStateException("unexpected");
 
         doThrow(illegalStateException).when(driverDelegate)
@@ -208,11 +217,11 @@ class MultiTenantDriverDelegateTest {
         assertThatThrownBy(() -> multiTenantDriverDelegate.selectTriggerState(connection, TRIGGER_KEY))
             .isSameAs(illegalStateException);
 
-        verify(statements.get(1)).execute("SET search_path TO bytechef_000002");
+        assertThat(searchPathConnection.getSearchPath()).isEqualTo(TENANT_SEARCH_PATH);
     }
 
     @Test
-    void testTenantSchemaIsRestoredWhenDelegateThrowsCheckedSerializationException() throws Exception {
+    void testConnectionSearchPathIsRestoredWhenDelegateThrowsCheckedSerializationException() throws Exception {
         IOException ioException = new IOException("cannot serialize job data");
 
         doThrow(ioException).when(driverDelegate)
@@ -223,41 +232,33 @@ class MultiTenantDriverDelegateTest {
         assertThatThrownBy(() -> multiTenantDriverDelegate.insertJobDetail(connection, JOB_DETAIL))
             .isSameAs(ioException);
 
-        assertThat(statements).hasSize(2);
-
-        verify(statements.get(1)).execute("SET search_path TO bytechef_000002");
+        assertThat(searchPathConnection.getSearchPath()).isEqualTo(TENANT_SEARCH_PATH);
     }
 
     @Test
-    @SuppressFBWarnings(value = {
-        "OBL", "ODR"
-    }, justification = "Statements are Mockito mocks")
     void testDelegateIsNotCalledWhenSwitchingToPublicSchemaFails() throws Exception {
         SQLException sqlException = new SQLException("connection closed");
 
-        when(connection.createStatement()).thenThrow(sqlException);
+        searchPathConnection.failSearchPathChange(1, sqlException);
 
         assertThatThrownBy(() -> multiTenantDriverDelegate.jobExists(connection, JOB_KEY))
             .isSameAs(sqlException);
 
         verifyNoInteractions(driverDelegate);
+
+        assertThat(searchPathConnection.getSearchPath()).isEqualTo(TENANT_SEARCH_PATH);
     }
 
     @Test
-    @SuppressFBWarnings(value = {
-        "OBL", "ODR"
-    }, justification = "Statements are Mockito mocks")
-    void testEveryCallUsesFreshStatementsThatAreClosed() throws Exception {
+    void testEveryCallSwitchesAndRestoresInOneStatementEachAndClosesThem() throws Exception {
         multiTenantDriverDelegate.jobExists(connection, JOB_KEY);
         multiTenantDriverDelegate.triggerExists(connection, TRIGGER_KEY);
 
-        assertThat(statements).hasSize(4);
+        assertThat(searchPathConnection.getExecutedStatementCount())
+            .as("Capturing the search_path must not add a round trip to the switch and the restore of each call")
+            .isEqualTo(4);
 
-        for (Statement statement : statements) {
-            verify(statement).close();
-        }
-
-        verify(connection, times(4)).createStatement();
+        searchPathConnection.verifyEveryStatementAndResultSetClosed();
     }
 
     @Test
@@ -288,9 +289,12 @@ class MultiTenantDriverDelegateTest {
 
         Object[] arguments = createArguments(method);
         Object expectedResult = createReturnValue(returnType);
+        List<String> searchPathsDuringCall = new ArrayList<>();
 
         DriverDelegate forwardingDelegate = mock(DriverDelegate.class, invocation -> {
             if (method.equals(invocation.getMethod())) {
+                searchPathsDuringCall.add(searchPathConnection.getSearchPath());
+
                 return expectedResult;
             }
 
@@ -307,17 +311,10 @@ class MultiTenantDriverDelegateTest {
             assertThat(result).isSameAs(expectedResult);
         }
 
-        assertThat(statements).hasSize(2);
+        assertThat(searchPathsDuringCall).containsExactly(PUBLIC_SCHEMA);
+        assertThat(searchPathConnection.getSearchPath()).isEqualTo(TENANT_SEARCH_PATH);
 
-        InOrder inOrder = inOrder(statements.get(0), forwardingDelegate, statements.get(1));
-
-        inOrder.verify(statements.get(0))
-            .execute(PUBLIC_SEARCH_PATH);
-
-        invoke(inOrder.verify(forwardingDelegate), method, arguments);
-
-        inOrder.verify(statements.get(1))
-            .execute("SET search_path TO bytechef_000002");
+        invoke(verify(forwardingDelegate), method, arguments);
     }
 
     @ParameterizedTest
@@ -337,9 +334,7 @@ class MultiTenantDriverDelegateTest {
         assertThatThrownBy(() -> invoke(multiTenantDriverDelegate, method, arguments))
             .isSameAs(exception);
 
-        assertThat(statements).hasSize(2);
-
-        verify(statements.get(1)).execute("SET search_path TO bytechef_000002");
+        assertThat(searchPathConnection.getSearchPath()).isEqualTo(TENANT_SEARCH_PATH);
     }
 
     @Test
@@ -355,18 +350,11 @@ class MultiTenantDriverDelegateTest {
     }
 
     @Test
-    @SuppressFBWarnings(value = {
-        "OBL", "ODR"
-    }, justification = "Statements are Mockito mocks")
-    void testFailureToRestoreTenantSchemaIsSuppressedOnDelegateException() throws Exception {
+    void testFailureToRestoreSearchPathIsSuppressedOnDelegateException() throws Exception {
         SQLException delegateException = new SQLException("deadlock detected");
         SQLException restoreException = new SQLException("current transaction is aborted");
 
-        Statement publicSchemaStatement = mock(Statement.class);
-        Statement tenantSchemaStatement = mock(Statement.class);
-
-        when(connection.createStatement()).thenReturn(publicSchemaStatement, tenantSchemaStatement);
-        when(tenantSchemaStatement.execute("SET search_path TO bytechef_000002")).thenThrow(restoreException);
+        searchPathConnection.failSearchPathChange(2, restoreException);
 
         doThrow(delegateException).when(driverDelegate)
             .deleteTrigger(connection, TRIGGER_KEY);
@@ -377,21 +365,14 @@ class MultiTenantDriverDelegateTest {
             .isSameAs(delegateException)
             .satisfies(throwable -> assertThat(throwable.getSuppressed()).containsExactly(restoreException));
 
-        verify(tenantSchemaStatement).close();
+        searchPathConnection.verifyEveryStatementAndResultSetClosed();
     }
 
     @Test
-    @SuppressFBWarnings(value = {
-        "OBL", "ODR"
-    }, justification = "Statements are Mockito mocks")
-    void testFailureToRestoreTenantSchemaIsThrownWhenDelegateSucceeds() throws Exception {
+    void testFailureToRestoreSearchPathIsThrownWhenDelegateSucceeds() throws Exception {
         SQLException restoreException = new SQLException("connection reset");
 
-        Statement publicSchemaStatement = mock(Statement.class);
-        Statement tenantSchemaStatement = mock(Statement.class);
-
-        when(connection.createStatement()).thenReturn(publicSchemaStatement, tenantSchemaStatement);
-        when(tenantSchemaStatement.execute("SET search_path TO bytechef_000002")).thenThrow(restoreException);
+        searchPathConnection.failSearchPathChange(2, restoreException);
 
         TenantContext.setCurrentTenantId("000002");
 
