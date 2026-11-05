@@ -70,24 +70,6 @@ java {
     }
 }
 
-val graalVmVersion = libs.findVersion("graalvm").get().requiredVersion
-
-tasks.withType<Test>().configureEach {
-    val requiredGraalVmVersion = graalVmVersion
-
-    doFirst {
-        verifyGraalVmToolchain((this as Test).javaLauncher.get().metadata, requiredGraalVmVersion)
-    }
-}
-
-tasks.withType<JavaExec>().configureEach {
-    val requiredGraalVmVersion = graalVmVersion
-
-    doFirst {
-        verifyGraalVmToolchain((this as JavaExec).javaLauncher.get().metadata, requiredGraalVmVersion)
-    }
-}
-
 pmd {
     toolVersion = "${libs.findVersion("pmd").get()}"
     ruleSetFiles = files(
