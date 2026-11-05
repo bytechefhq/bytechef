@@ -18,6 +18,7 @@ import com.bytechef.automation.ai.mcp.audit.McpProjectAuditMapper;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacadeImpl;
+import com.bytechef.automation.ai.mcp.security.McpComponentConnectionSecurity;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
@@ -64,7 +65,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     McpProjectAuditMapper.class, McpProjectFacadeImpl.class, PostgreSQLContainerConfiguration.class
 })
 @MockitoBean(types = {
-    ComponentConnectionFacade.class, ConnectionService.class, McpProjectService.class,
+    ComponentConnectionFacade.class, ConnectionService.class, McpComponentConnectionSecurity.class,
+    McpProjectService.class,
     McpProjectWorkflowService.class, McpServerService.class, ProjectDeploymentFacade.class,
     ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class, ProjectService.class,
     ProjectWorkflowService.class, WorkflowService.class, WorkflowTestConfigurationService.class,

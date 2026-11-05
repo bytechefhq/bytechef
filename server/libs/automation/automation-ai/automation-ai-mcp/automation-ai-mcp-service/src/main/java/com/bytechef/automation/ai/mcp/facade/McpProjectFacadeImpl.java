@@ -23,6 +23,7 @@ import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvents;
 import com.bytechef.automation.ai.mcp.audit.McpProjectAuditMapper;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.ai.mcp.security.McpComponentConnectionSecurity;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
@@ -53,6 +54,8 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +79,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
     private final ComponentConnectionFacade componentConnectionFacade;
     private final ConnectionService connectionService;
+    private final McpComponentConnectionSecurity mcpComponentConnectionSecurity;
     private final McpProjectService mcpProjectService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final McpServerService mcpServerService;
@@ -91,7 +95,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     @SuppressFBWarnings("EI")
     public McpProjectFacadeImpl(
         ComponentConnectionFacade componentConnectionFacade, ConnectionService connectionService,
-        McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
+        McpComponentConnectionSecurity mcpComponentConnectionSecurity, McpProjectService mcpProjectService,
+        McpProjectWorkflowService mcpProjectWorkflowService,
         McpServerService mcpServerService, ProjectDeploymentFacade projectDeploymentFacade,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
@@ -101,6 +106,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
         this.componentConnectionFacade = componentConnectionFacade;
         this.connectionService = connectionService;
+        this.mcpComponentConnectionSecurity = mcpComponentConnectionSecurity;
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.mcpServerService = mcpServerService;
@@ -145,7 +151,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
 
         Map<String, WorkflowDeploymentSettings> workflowDeploymentSettingsMap = resolveWorkflowDeploymentSettings(
-            projectId, selectedWorkflowIds, workflowConfigurations, mcpServer.getEnvironment());
+            mcpServerId, projectId, selectedWorkflowIds, workflowConfigurations, mcpServer.getEnvironment());
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
@@ -253,7 +259,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
                 validateCallableWorkflows(addedWorkflowIds);
 
                 addedWorkflowDeploymentSettingsMap = resolveWorkflowDeploymentSettings(
-                    projectDeployment.getProjectId(), addedWorkflowIds, workflowConfigurations,
+                    mcpProject.getMcpServerId(), projectDeployment.getProjectId(), addedWorkflowIds,
+                    workflowConfigurations,
                     projectDeployment.getEnvironment());
             }
 
@@ -265,7 +272,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
                 projectDeploymentWorkflow.setConnections(
                     toProjectDeploymentWorkflowConnections(
-                        workflowConfiguration.workflowId(), workflowConfiguration.connections(),
+                        mcpProject.getMcpServerId(), workflowConfiguration.workflowId(),
+                        workflowConfiguration.connections(), projectDeploymentWorkflow.getConnections(),
                         projectDeployment.getEnvironment()));
                 projectDeploymentWorkflow.setInputs(workflowConfiguration.inputs());
 
@@ -393,12 +401,28 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     private boolean isConnectionUsable(
-        long connectionId, ComponentConnection componentConnection, Environment environment) {
+        long mcpServerId, long connectionId, ComponentConnection componentConnection, Environment environment) {
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        return connection.getEnvironmentId() == environment.ordinal() &&
-            Objects.equals(connection.getComponentName(), componentConnection.componentName());
+        if (connection.getEnvironmentId() != environment.ordinal() ||
+            !Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
+
+            return false;
+        }
+
+        return SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN) ||
+            mcpComponentConnectionSecurity.isMcpServerWorkspaceConnection(mcpServerId, connectionId);
+    }
+
+    private static boolean isStoredConnection(
+        List<ProjectDeploymentWorkflowConnection> storedConnections, long connectionId,
+        ComponentConnection componentConnection) {
+
+        return storedConnections.stream()
+            .anyMatch(storedConnection -> Objects.equals(storedConnection.getConnectionId(), connectionId) &&
+                Objects.equals(storedConnection.getWorkflowNodeName(), componentConnection.workflowNodeName()) &&
+                Objects.equals(storedConnection.getWorkflowConnectionKey(), componentConnection.key()));
     }
 
     private static boolean isSameConnectionSlot(
@@ -411,7 +435,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     private List<ProjectDeploymentWorkflowConnection> resolveConnections(
-        long projectId, String workflowId, Environment environment) {
+        long mcpServerId, long projectId, String workflowId, Environment environment) {
 
         List<ComponentConnection> componentConnections = getComponentConnections(
             workflowService.getWorkflow(workflowId));
@@ -431,7 +455,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
                     workflowTestConfigurationConnection, componentConnection))
                 .map(WorkflowTestConfigurationConnection::getConnectionId)
                 .filter(Objects::nonNull)
-                .filter(curConnectionId -> isConnectionUsable(curConnectionId, componentConnection, environment))
+                .filter(curConnectionId -> isConnectionUsable(
+                    mcpServerId, curConnectionId, componentConnection, environment))
                 .findFirst();
 
             if (connectionId.isPresent()) {
@@ -450,7 +475,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     private Map<String, WorkflowDeploymentSettings> resolveWorkflowDeploymentSettings(
-        long projectId, List<String> workflowIds, List<WorkflowConfigurationDTO> workflowConfigurations,
+        long mcpServerId, long projectId, List<String> workflowIds,
+        List<WorkflowConfigurationDTO> workflowConfigurations,
         Environment environment) {
 
         Map<String, WorkflowConfigurationDTO> workflowConfigurationMap = new HashMap<>();
@@ -467,13 +493,14 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
             if (workflowConfiguration == null) {
                 workflowDeploymentSettingsMap.put(
                     workflowId,
-                    new WorkflowDeploymentSettings(resolveConnections(projectId, workflowId, environment), Map.of()));
+                    new WorkflowDeploymentSettings(
+                        resolveConnections(mcpServerId, projectId, workflowId, environment), Map.of()));
             } else {
                 workflowDeploymentSettingsMap.put(
                     workflowId,
                     new WorkflowDeploymentSettings(
                         toProjectDeploymentWorkflowConnections(
-                            workflowId, workflowConfiguration.connections(), environment),
+                            mcpServerId, workflowId, workflowConfiguration.connections(), List.of(), environment),
                         workflowConfiguration.inputs()));
             }
         }
@@ -482,7 +509,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     private List<ProjectDeploymentWorkflowConnection> toProjectDeploymentWorkflowConnections(
-        String workflowId, List<WorkflowConnectionDTO> workflowConnections, Environment environment) {
+        long mcpServerId, String workflowId, List<WorkflowConnectionDTO> workflowConnections,
+        List<ProjectDeploymentWorkflowConnection> storedConnections, Environment environment) {
 
         List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections = new ArrayList<>();
 
@@ -499,11 +527,13 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
                 long connectionId = workflowConnection.get()
                     .connectionId();
 
-                if (!isConnectionUsable(connectionId, componentConnection, environment)) {
+                if (!isStoredConnection(storedConnections, connectionId, componentConnection) &&
+                    !isConnectionUsable(mcpServerId, connectionId, componentConnection, environment)) {
+
                     throw new IllegalArgumentException(
                         "Connection " + connectionId + " cannot be used for " + componentConnection.workflowNodeName() +
                             " of workflow " + workflowId + ": it must be a " + componentConnection.componentName() +
-                            " connection in the " + environment + " environment");
+                            " connection of the MCP server's workspace in the " + environment + " environment");
                 }
 
                 projectDeploymentWorkflowConnections.add(
