@@ -31,7 +31,7 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
+import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -200,7 +200,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     private void requireAutomation(long connectionId) {
-        if (ConnectedUserAuthentications.isConnectedUser()) {
+        if (NonPlatformUserAuthentication.isCurrent()) {
             return;
         }
 
