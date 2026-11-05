@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.mcp.domain.McpComponent;
+import com.bytechef.platform.mcp.security.McpServerConnectionAccessResolver;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component("mcpComponentConnectionSecurity")
-public class McpComponentConnectionSecurity {
+public class McpComponentConnectionSecurity implements McpServerConnectionAccessResolver {
 
     private final ConnectionService connectionService;
     private final McpComponentService mcpComponentService;
@@ -64,27 +65,33 @@ public class McpComponentConnectionSecurity {
 
         McpComponent mcpComponent = mcpComponentOptional.get();
 
-        Long mcpServerId = mcpComponent.getMcpServerId();
+        return isMcpServerConnection(mcpComponent.getMcpServerId(), connectionId);
+    }
 
-        Optional<Long> workspaceIdOptional = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId);
+    @Override
+    public boolean isMcpServerConnection(long mcpServerId, long connectionId) {
         Optional<Long> environmentIdOptional = mcpServerService.fetchMcpServerEnvironmentId(mcpServerId);
 
-        if (workspaceIdOptional.isEmpty() || environmentIdOptional.isEmpty()) {
-            return false;
-        }
-
-        List<WorkspaceConnection> workspaceConnections = workspaceConnectionService.getWorkspaceConnections(
-            workspaceIdOptional.get());
-
-        boolean workspaceConnection = workspaceConnections.stream()
-            .anyMatch(curWorkspaceConnection -> Objects.equals(curWorkspaceConnection.getConnectionId(), connectionId));
-
-        if (!workspaceConnection) {
+        if (environmentIdOptional.isEmpty() || !isMcpServerWorkspaceConnection(mcpServerId, connectionId)) {
             return false;
         }
 
         Connection connection = connectionService.getConnection(connectionId);
 
         return connection.getEnvironmentId() == environmentIdOptional.get();
+    }
+
+    public boolean isMcpServerWorkspaceConnection(long mcpServerId, long connectionId) {
+        Optional<Long> workspaceIdOptional = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId);
+
+        if (workspaceIdOptional.isEmpty()) {
+            return false;
+        }
+
+        List<WorkspaceConnection> workspaceConnections = workspaceConnectionService.getWorkspaceConnections(
+            workspaceIdOptional.get());
+
+        return workspaceConnections.stream()
+            .anyMatch(curWorkspaceConnection -> Objects.equals(curWorkspaceConnection.getConnectionId(), connectionId));
     }
 }
