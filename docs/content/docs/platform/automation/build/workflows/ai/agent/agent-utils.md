@@ -81,6 +81,8 @@ Shell Tools are offered only when the server enables them ([`BYTECHEF_AI_AGENT_U
 
 By default commands run in a **Docker** container that sees only the agent's workspace, mounted at the same path. Each workspace gets its own container, reused by every command of the agent and removed after it has been unused for a while (10 minutes by default). The server needs a Docker-compatible CLI (`docker` or `podman`) on its `PATH`, and the container image must provide `/bin/bash` and `sleep`.
 
+The container uses Docker's default network and runs as the image's default user, usually root. Commands can reach the internet, and they can also reach the server host, other containers and internal addresses such as a cloud metadata endpoint. The private-address rules of Smart Web Fetch do not apply to shell commands. Enable Shell Tools only where the people who build agents are trusted with that network access.
+
 The advanced **Execution Backend** option can switch a Shell Tools element to **Local**, which runs commands directly on the server. Local is offered only when the server allows it ([`BYTECHEF_AI_AGENT_UTILS_SHELL_ALLOW_LOCAL`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)). Local commands start in the workspace with a clean environment, so none of the server's environment variables reach them, but they are not confined to the workspace: allow Local only on a trusted single-tenant installation.
 
 ---
