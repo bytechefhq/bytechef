@@ -208,12 +208,12 @@ describe('ClusterElementsCanvasDialog - read-only mode', () => {
         expect(screen.queryByRole('button', {name: 'Test agent'})).not.toBeInTheDocument();
     });
 
-    it('shows an open testing panel when the workflow is editable', () => {
+    it('shows an open testing panel when the workflow is editable', async () => {
         hoisted.testingPanelOpen = true;
 
         renderReadOnlyAwareDialog(false);
 
-        expect(screen.getByText('Agent Playbook')).toBeInTheDocument();
+        expect(await screen.findByText('Agent Playbook')).toBeInTheDocument();
     });
 
     it('hides an open testing panel from a viewer who cannot edit the workflow', () => {

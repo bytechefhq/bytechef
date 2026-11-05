@@ -160,7 +160,7 @@ describe('ProjectWorkflowListItem', () => {
     it('should show Duplicate and Delete when WORKFLOW_CREATE, WORKFLOW_VIEW and WORKFLOW_DELETE are granted', async () => {
         renderProjectWorkflowListItem();
 
-        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+        await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
 
         expect(screen.getByText('Duplicate')).toBeInTheDocument();
         expect(screen.getByText('Delete')).toBeInTheDocument();
@@ -171,7 +171,7 @@ describe('ProjectWorkflowListItem', () => {
 
         renderProjectWorkflowListItem();
 
-        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+        await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
 
         expect(screen.getByRole('menu')).toBeInTheDocument();
         expect(screen.queryByText('Duplicate')).not.toBeInTheDocument();
@@ -183,7 +183,7 @@ describe('ProjectWorkflowListItem', () => {
 
         renderProjectWorkflowListItem();
 
-        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+        await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
 
         expect(screen.getByRole('menu')).toBeInTheDocument();
         expect(screen.queryByText('Duplicate')).not.toBeInTheDocument();
@@ -195,7 +195,7 @@ describe('ProjectWorkflowListItem', () => {
 
         renderProjectWorkflowListItem();
 
-        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+        await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
 
         expect(screen.getByRole('menu')).toBeInTheDocument();
         expect(screen.queryByText('Edit')).not.toBeInTheDocument();
@@ -208,7 +208,7 @@ describe('ProjectWorkflowListItem', () => {
 
         const {unmount} = renderProjectWorkflowListItem();
 
-        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+        await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
 
         expect(screen.getByText('Edit')).toBeInTheDocument();
         expect(screen.getByText('Share')).toBeInTheDocument();
@@ -219,7 +219,7 @@ describe('ProjectWorkflowListItem', () => {
 
         renderProjectWorkflowListItem();
 
-        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+        await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
 
         expect(screen.queryByText('Edit')).not.toBeInTheDocument();
         expect(screen.queryByText('Share')).not.toBeInTheDocument();
