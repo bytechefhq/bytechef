@@ -36,7 +36,8 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_NAME,
   AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_LABEL,
   AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_TYPE,
-  AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_REQUIRED
+  AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_REQUIRED,
+  AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_PROVIDED
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
 public class AutomationWorkflowProjectWorkflowInputModel {
@@ -55,6 +56,10 @@ public class AutomationWorkflowProjectWorkflowInputModel {
   public static final String JSON_PROPERTY_REQUIRED = "required";
   @jakarta.annotation.Nullable
   private Boolean required;
+
+  public static final String JSON_PROPERTY_PROVIDED = "provided";
+  @jakarta.annotation.Nullable
+  private Boolean provided;
 
   public AutomationWorkflowProjectWorkflowInputModel() { 
   }
@@ -155,6 +160,30 @@ public class AutomationWorkflowProjectWorkflowInputModel {
   }
 
 
+  public AutomationWorkflowProjectWorkflowInputModel provided(@jakarta.annotation.Nullable Boolean provided) {
+    this.provided = provided;
+    return this;
+  }
+
+  /**
+   * Whether the configuration provides the value of this input, so the connected user cannot set it. The value itself is not returned.
+   * @return provided
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_PROVIDED, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public Boolean getProvided() {
+    return provided;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_PROVIDED, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setProvided(@jakarta.annotation.Nullable Boolean provided) {
+    this.provided = provided;
+  }
+
+
   /**
    * Return true if this AutomationWorkflowProjectWorkflowInput object is equal to o.
    */
@@ -170,12 +199,13 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     return Objects.equals(this.name, automationWorkflowProjectWorkflowInput.name) &&
         Objects.equals(this.label, automationWorkflowProjectWorkflowInput.label) &&
         Objects.equals(this.type, automationWorkflowProjectWorkflowInput.type) &&
-        Objects.equals(this.required, automationWorkflowProjectWorkflowInput.required);
+        Objects.equals(this.required, automationWorkflowProjectWorkflowInput.required) &&
+        Objects.equals(this.provided, automationWorkflowProjectWorkflowInput.provided);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, label, type, required);
+    return Objects.hash(name, label, type, required, provided);
   }
 
   @Override
@@ -186,6 +216,7 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
+    sb.append("    provided: ").append(toIndentedString(provided)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -248,6 +279,11 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     // add `required` to the URL query string
     if (getRequired() != null) {
       joiner.add(String.format(java.util.Locale.ROOT, "%srequired%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getRequired()))));
+    }
+
+    // add `provided` to the URL query string
+    if (getProvided() != null) {
+      joiner.add(String.format(java.util.Locale.ROOT, "%sprovided%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getProvided()))));
     }
 
     return joiner.toString();

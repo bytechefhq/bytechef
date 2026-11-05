@@ -527,7 +527,7 @@ public class ConnectedUserProjectWorkflowModel {
   }
 
   /**
-   * The values the connected user has already supplied, keyed by input name.
+   * The values the connected user has already supplied, keyed by input name. Values of inputs the configuration provides are left out.
    * @return inputValues
    */
   @jakarta.annotation.Nullable
@@ -551,7 +551,7 @@ public class ConnectedUserProjectWorkflowModel {
   }
 
   /**
-   * Why a REFERENCE needs attention: MISSING_CONNECTION:&lt;component&gt;, INPUT_REQUIRED:&lt;input&gt; or UPDATE_PENDING. Null when healthy or for COPY rows.
+   * Why the automation needs attention: MISSING_CONNECTION:&lt;component&gt;, INPUT_REQUIRED:&lt;input&gt;, UPDATE_PENDING or INVALID_WORKFLOW:&lt;errorCount&gt;. A COPY only reports INVALID_WORKFLOW. Null when healthy.
    * @return attentionReason
    */
   @jakarta.annotation.Nullable
