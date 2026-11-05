@@ -17,6 +17,9 @@ bytechef:
         enabled: false
       workspace:
         basedir: ${user.home}/bytechef/data/ai-agent-workspaces
+    brave:
+      base-url: https://api.search.brave.com/res/v1
+      enabled: false
   approval:
     signed-token:
       # Tolerance applied to signed approval link expiry checks default: PT60S
