@@ -40,6 +40,7 @@ import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -88,6 +89,9 @@ class McpComponentConnectionSecurityIntTest {
     private McpComponentRepository mcpComponentRepository;
 
     @Autowired
+    private McpComponentService mcpComponentService;
+
+    @Autowired
     private McpServerRepository mcpServerRepository;
 
     @Autowired
@@ -104,6 +108,7 @@ class McpComponentConnectionSecurityIntTest {
 
     private long embeddedMcpComponentId;
     private long mcpComponentId;
+    private long mcpServerId;
 
     @BeforeEach
     void beforeEach() {
@@ -119,7 +124,9 @@ class McpComponentConnectionSecurityIntTest {
         McpServer mcpServer = mcpServerRepository.save(
             new McpServer("mcp-component-connection", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
-        workspaceMcpServerRepository.save(new WorkspaceMcpServer(mcpServer.getId(), workspace.getId()));
+        mcpServerId = mcpServer.getId();
+
+        workspaceMcpServerRepository.save(new WorkspaceMcpServer(mcpServerId, workspace.getId()));
 
         McpComponent mcpComponent = mcpComponentRepository.save(
             new McpComponent("slack", 1, mcpServer.getId(), null));
@@ -155,6 +162,95 @@ class McpComponentConnectionSecurityIntTest {
         workspaceRepository.deleteAll();
 
         SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testCreateMcpComponentAcceptsAConnectionOfTheMcpServerWorkspaceAndEnvironment() {
+        authenticate(AuthorityConstants.USER);
+
+        McpComponent mcpComponent = mcpComponentService.create(
+            new McpComponent("gmail", 1, mcpServerId, SAME_ENVIRONMENT_CONNECTION_ID), List.of());
+
+        assertThat(mcpComponent.getConnectionId()).isEqualTo(SAME_ENVIRONMENT_CONNECTION_ID);
+    }
+
+    @Test
+    void testCreateMcpComponentRejectsAConnectionOfAnotherWorkspace() {
+        authenticate(AuthorityConstants.USER);
+
+        McpComponent mcpComponent = new McpComponent("gmail", 1, mcpServerId, FOREIGN_WORKSPACE_CONNECTION_ID);
+
+        assertThatThrownBy(() -> mcpComponentService.create(mcpComponent, List.of()))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> mcpComponentService.create(mcpComponent))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testCreateMcpComponentRejectsAConnectionOfTheSameWorkspaceInAnotherEnvironment() {
+        authenticate(AuthorityConstants.USER);
+
+        McpComponent mcpComponent = new McpComponent("gmail", 1, mcpServerId, OTHER_ENVIRONMENT_CONNECTION_ID);
+
+        assertThatThrownBy(() -> mcpComponentService.create(mcpComponent, List.of()))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testCreateMcpComponentLetsATenantAdminUseAConnectionOfAnotherWorkspace() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        McpComponent mcpComponent = mcpComponentService.create(
+            new McpComponent("gmail", 1, mcpServerId, FOREIGN_WORKSPACE_CONNECTION_ID), List.of());
+
+        assertThat(mcpComponent.getConnectionId()).isEqualTo(FOREIGN_WORKSPACE_CONNECTION_ID);
+    }
+
+    @Test
+    void testUpdateMcpComponentAcceptsAConnectionOfTheMcpServerWorkspaceAndEnvironment() {
+        authenticate(AuthorityConstants.USER);
+
+        McpComponent mcpComponent = mcpComponentService.update(
+            createMcpComponentUpdate(SAME_ENVIRONMENT_CONNECTION_ID), null, List.of());
+
+        assertThat(mcpComponent.getConnectionId()).isEqualTo(SAME_ENVIRONMENT_CONNECTION_ID);
+    }
+
+    @Test
+    void testUpdateMcpComponentRejectsAConnectionOfAnotherWorkspace() {
+        authenticate(AuthorityConstants.USER);
+
+        McpComponent mcpComponentUpdate = createMcpComponentUpdate(FOREIGN_WORKSPACE_CONNECTION_ID);
+
+        assertThatThrownBy(() -> mcpComponentService.update(mcpComponentUpdate, null, List.of()))
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(mcpComponentRepository.findById(mcpComponentId))
+            .hasValueSatisfying(mcpComponent -> assertThat(mcpComponent.getConnectionId()).isNull());
+    }
+
+    @Test
+    void testUpdateMcpComponentRejectsAConnectionOfTheSameWorkspaceInAnotherEnvironment() {
+        authenticate(AuthorityConstants.USER);
+
+        McpComponent mcpComponentUpdate = createMcpComponentUpdate(OTHER_ENVIRONMENT_CONNECTION_ID);
+
+        assertThatThrownBy(() -> mcpComponentService.update(mcpComponentUpdate, null, List.of()))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testUpdateMcpComponentKeepsAnUnchangedConnectionATenantAdminBound() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        mcpComponentService.update(createMcpComponentUpdate(FOREIGN_WORKSPACE_CONNECTION_ID), null, List.of());
+
+        authenticate(AuthorityConstants.USER);
+
+        McpComponent mcpComponent = mcpComponentService.update(
+            createMcpComponentUpdate(FOREIGN_WORKSPACE_CONNECTION_ID), null, List.of());
+
+        assertThat(mcpComponent.getConnectionId()).isEqualTo(FOREIGN_WORKSPACE_CONNECTION_ID);
     }
 
     @Test
@@ -251,6 +347,15 @@ class McpComponentConnectionSecurityIntTest {
             .setAuthentication(
                 UsernamePasswordAuthenticationToken.authenticated(
                     "user@localhost.com", null, List.of(new SimpleGrantedAuthority(authority))));
+    }
+
+    private McpComponent createMcpComponentUpdate(long connectionId) {
+        McpComponent currentMcpComponent = mcpComponentRepository.findById(mcpComponentId)
+            .orElseThrow();
+
+        currentMcpComponent.setConnectionId(connectionId);
+
+        return currentMcpComponent;
     }
 
     private static Connection createConnection(Environment environment) {
