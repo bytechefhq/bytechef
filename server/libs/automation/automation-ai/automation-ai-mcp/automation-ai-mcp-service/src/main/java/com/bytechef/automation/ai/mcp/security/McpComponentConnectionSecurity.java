@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.mcp.security;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
+import com.bytechef.platform.configuration.security.McpComponentConnectionAccessResolver;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -34,8 +35,9 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component("mcpComponentConnectionSecurity")
-public class McpComponentConnectionSecurity implements McpServerConnectionAccessResolver {
+@Component
+public class McpComponentConnectionSecurity
+    implements McpComponentConnectionAccessResolver, McpServerConnectionAccessResolver {
 
     private final ConnectionService connectionService;
     private final McpComponentService mcpComponentService;
@@ -56,7 +58,10 @@ public class McpComponentConnectionSecurity implements McpServerConnectionAccess
         this.workspaceMcpServerService = workspaceMcpServerService;
     }
 
-    public boolean isMcpComponentConnection(long mcpComponentId, long connectionId) {
+    @Override
+    public boolean isMcpComponentConnection(
+        long mcpComponentId, String componentName, int componentVersion, long connectionId) {
+
         Optional<McpComponent> mcpComponentOptional = mcpComponentService.fetchMcpComponent(mcpComponentId);
 
         if (mcpComponentOptional.isEmpty()) {
@@ -64,6 +69,13 @@ public class McpComponentConnectionSecurity implements McpServerConnectionAccess
         }
 
         McpComponent mcpComponent = mcpComponentOptional.get();
+
+        if (!Objects.equals(mcpComponent.getConnectionId(), connectionId) ||
+            !Objects.equals(mcpComponent.getComponentName(), componentName) ||
+            mcpComponent.getComponentVersion() != componentVersion) {
+
+            return false;
+        }
 
         return isMcpServerConnection(mcpComponent.getMcpServerId(), connectionId);
     }
