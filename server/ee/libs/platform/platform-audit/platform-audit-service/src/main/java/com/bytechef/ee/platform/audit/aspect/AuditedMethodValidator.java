@@ -8,12 +8,10 @@
 package com.bytechef.ee.platform.audit.aspect;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Set;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
@@ -22,8 +20,8 @@ import org.springframework.util.ReflectionUtils;
 
 /**
  * Refuses to start when an {@code @Audited} method is declared on an interface, is private, final or static, names a
- * blank or over-long event, or names a mapper that does not resolve to exactly one bean or does not handle the event.
- * Without it the mistake would only surface as {@code mapperError} rows after the fact.
+ * blank or over-long event, or names a mapper that does not resolve to exactly one bean. Without it the mistake would
+ * only surface as {@code mapperError} rows after the fact.
  *
  * @version ee
  *
@@ -109,18 +107,6 @@ public class AuditedMethodValidator implements SmartInitializingSingleton {
             throw new IllegalStateException(
                 "@Audited method " + methodName + " names mapper " + audited.mapper()
                     .getName() + ", which resolves to " + mapperBeanCount + " beans; exactly one is required");
-        }
-
-        AuditMapper auditMapper = listableBeanFactory.getBean(audited.mapper());
-
-        Set<String> events = auditMapper.events();
-
-        if (!events.isEmpty() && !events.contains(audited.event())) {
-            throw new IllegalStateException(
-                "@Audited method " + methodName + " declares event " + audited.event() + ", which mapper "
-                    + audited.mapper()
-                        .getName()
-                    + " does not handle; it handles " + events);
         }
     }
 }

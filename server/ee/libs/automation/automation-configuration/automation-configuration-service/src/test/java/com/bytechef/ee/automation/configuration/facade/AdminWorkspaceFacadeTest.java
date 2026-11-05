@@ -17,6 +17,7 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityEx
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceService;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
@@ -125,7 +127,9 @@ class AdminWorkspaceFacadeTest {
         SecurityContextHolder.setContext(securityContext);
 
         AutomationMethodSecurityExpressionHandler expressionHandler =
-            new AutomationMethodSecurityExpressionHandler(permissionService);
+            new AutomationMethodSecurityExpressionHandler(
+                permissionService,
+                new StaticListableBeanFactory().getBeanProvider(MethodSecurityExpressionContributor.class));
 
         expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
 

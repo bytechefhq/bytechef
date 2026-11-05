@@ -37,6 +37,7 @@ import com.bytechef.automation.configuration.web.graphql.config.AutomationConfig
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import java.time.Instant;
@@ -48,6 +49,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.context.annotation.Bean;
@@ -453,10 +455,12 @@ public class ProjectGraphQlControllerIntTest {
 
             @Bean
             static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
-                @Lazy PermissionService permissionService) {
+                @Lazy PermissionService permissionService,
+                ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
                 AutomationMethodSecurityExpressionHandler expressionHandler =
-                    new AutomationMethodSecurityExpressionHandler(permissionService);
+                    new AutomationMethodSecurityExpressionHandler(
+                        permissionService, methodSecurityExpressionContributorProvider);
 
                 expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
 

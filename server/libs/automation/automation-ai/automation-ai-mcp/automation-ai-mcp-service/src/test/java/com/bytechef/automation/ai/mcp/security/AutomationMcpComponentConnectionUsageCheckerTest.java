@@ -75,7 +75,7 @@ class AutomationMcpComponentConnectionUsageCheckerTest {
     @Test
     void testRefusesANonAdminForAServerOfNoWorkspace() {
         when(mcpServerRepository.findById(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(MCP_SERVER_ID)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(
             () -> automationMcpComponentConnectionUsageChecker.checkConnectionUsage(MCP_SERVER_ID, CONNECTION_ID))
@@ -85,7 +85,7 @@ class AutomationMcpComponentConnectionUsageCheckerTest {
     @Test
     void testAllowsATenantAdminForAServerOfNoWorkspace() {
         when(mcpServerRepository.findById(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(MCP_SERVER_ID)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID)).thenReturn(Optional.empty());
         when(permissionService.isTenantAdmin()).thenReturn(true);
 
         assertThatCode(
@@ -95,7 +95,7 @@ class AutomationMcpComponentConnectionUsageCheckerTest {
 
     private void givenServerInWorkspace() {
         when(mcpServerRepository.findById(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(MCP_SERVER_ID))
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID))
             .thenReturn(Optional.of(WORKSPACE_ID));
     }
 

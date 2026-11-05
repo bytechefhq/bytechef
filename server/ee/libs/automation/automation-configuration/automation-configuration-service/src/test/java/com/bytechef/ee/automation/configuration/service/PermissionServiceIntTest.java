@@ -503,7 +503,7 @@ class PermissionServiceIntTest {
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resourceOwnershipResolver));
+            workspaceUserRepository, List.of(resourceOwnershipResolver), List.of());
     }
 
     private static void authenticate(String login, String authority) {

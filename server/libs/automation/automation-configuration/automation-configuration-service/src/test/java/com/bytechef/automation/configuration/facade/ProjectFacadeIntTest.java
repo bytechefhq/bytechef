@@ -1464,14 +1464,14 @@ public class ProjectFacadeIntTest {
         void testExportProjectDeniesWithoutTheViewScope() {
             denyOnly(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
 
-            assertDenied(() -> projectFacade.exportProject(PROJECT_ID));
+            assertDenied(() -> projectFacade.exportProject(PROJECT_ID, null));
         }
 
         @Test
         void testExportProjectAllowsWithTheViewScope() {
             grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
 
-            assertBodyReached(() -> projectFacade.exportProject(PROJECT_ID));
+            assertBodyReached(() -> projectFacade.exportProject(PROJECT_ID, null));
         }
 
         @Test

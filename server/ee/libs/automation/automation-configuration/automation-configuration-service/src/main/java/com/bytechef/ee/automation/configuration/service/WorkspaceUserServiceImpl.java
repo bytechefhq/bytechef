@@ -388,6 +388,7 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     }
 
     @Override
+    @Audited(event = WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED, mapper = WorkspaceUserAuditMapper.class)
     public boolean removeWorkspaceUser(long userId, long workspaceId) {
         workspaceUserRepository.lockWorkspace(workspaceId);
 
@@ -407,6 +408,7 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     }
 
     @Override
+    @Audited(event = WorkspaceUserAuditEvents.WORKSPACE_USER_ROLE_UPDATED, mapper = WorkspaceUserAuditMapper.class)
     public WorkspaceUser updateWorkspaceUserRole(long userId, long workspaceId, WorkspaceRole workspaceRole) {
         workspaceUserRepository.lockWorkspace(workspaceId);
 

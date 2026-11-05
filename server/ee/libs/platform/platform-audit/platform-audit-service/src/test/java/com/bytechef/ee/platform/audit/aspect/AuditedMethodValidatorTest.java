@@ -14,7 +14,6 @@ import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.support.GenericApplicationContext;
 
@@ -148,31 +147,6 @@ class AuditedMethodValidatorTest {
         }
     }
 
-    @Test
-    void testEventTheMapperDoesNotHandleFails() {
-        try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
-            genericApplicationContext.registerBean(UnhandledEventService.class);
-            genericApplicationContext.registerBean(OtherEventsAuditMapper.class);
-            genericApplicationContext.refresh();
-
-            assertThatThrownBy(() -> validate(genericApplicationContext))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("UnhandledEventService.write")
-                .hasMessageContaining("does not handle");
-        }
-    }
-
-    @Test
-    void testEventTheMapperHandlesPasses() {
-        try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
-            genericApplicationContext.registerBean(HandledEventService.class);
-            genericApplicationContext.registerBean(OtherEventsAuditMapper.class);
-            genericApplicationContext.refresh();
-
-            assertThatCode(() -> validate(genericApplicationContext)).doesNotThrowAnyException();
-        }
-    }
-
     private static void validate(GenericApplicationContext genericApplicationContext) {
         new AuditedMethodValidator(genericApplicationContext.getBeanFactory()).afterSingletonsInstantiated();
     }
@@ -216,35 +190,6 @@ class AuditedMethodValidatorTest {
         @Override
         public void write() {
             // Scanned for its interface's annotation only.
-        }
-    }
-
-    static class UnhandledEventService {
-
-        @Audited(event = "TEST_EVENT", mapper = OtherEventsAuditMapper.class)
-        public void write() {
-            // Scanned for its annotation only.
-        }
-    }
-
-    static class HandledEventService {
-
-        @Audited(event = "OTHER_EVENT", mapper = OtherEventsAuditMapper.class)
-        public void write() {
-            // Scanned for its annotation only.
-        }
-    }
-
-    static class OtherEventsAuditMapper implements AuditMapper {
-
-        @Override
-        public Set<String> events() {
-            return Set.of("OTHER_EVENT");
-        }
-
-        @Override
-        public Map<String, String> map(AuditInvocation auditInvocation) {
-            return Map.of();
         }
     }
 

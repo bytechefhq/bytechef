@@ -84,7 +84,7 @@ public class McpProjectWorkspaceGuard {
     }
 
     private void requireSameWorkspace(long mcpServerId, Optional<Long> projectWorkspaceId) {
-        Optional<Long> serverWorkspaceId = workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServerId);
+        Optional<Long> serverWorkspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId);
 
         if (serverWorkspaceId.isEmpty() || projectWorkspaceId.isEmpty() ||
             !Objects.equals(serverWorkspaceId.get(), projectWorkspaceId.get())) {

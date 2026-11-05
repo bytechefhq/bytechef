@@ -26,6 +26,7 @@ import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import com.bytechef.platform.tag.service.TagService;
 import java.io.Serializable;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
@@ -74,6 +76,7 @@ class McpServerFacadeTest {
                 mock(McpServerService.class, invocation -> {
                     throw new IllegalStateException(BODY_REACHED);
                 }),
+                new StaticListableBeanFactory().getBeanProvider(McpServerTypeDefinition.class),
                 mock(McpToolService.class, invocation -> {
                     throw new IllegalStateException(BODY_REACHED);
                 }),

@@ -25,6 +25,7 @@ import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomCompo
 import com.bytechef.ee.platform.customcomponent.configuration.service.CustomComponentService;
 import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFileStorage;
 import com.bytechef.ee.platform.customcomponent.loader.ComponentHandlerLoader;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.util.List;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
@@ -32,6 +33,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -134,7 +136,9 @@ class CustomComponentFacadeTest {
         SecurityContextHolder.setContext(securityContext);
 
         AutomationMethodSecurityExpressionHandler expressionHandler =
-            new AutomationMethodSecurityExpressionHandler(permissionService);
+            new AutomationMethodSecurityExpressionHandler(
+                permissionService,
+                new StaticListableBeanFactory().getBeanProvider(MethodSecurityExpressionContributor.class));
 
         expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
 

@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
+import com.bytechef.platform.mcp.repository.McpToolRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -43,9 +44,10 @@ class McpComponentServiceTest {
     private final McpComponentConnectionUsageChecker mcpComponentConnectionUsageChecker =
         mock(McpComponentConnectionUsageChecker.class);
     private final McpComponentRepository mcpComponentRepository = mock(McpComponentRepository.class);
+    private final McpToolRepository mcpToolRepository = mock(McpToolRepository.class);
 
     private final McpComponentServiceImpl mcpComponentService = new McpComponentServiceImpl(
-        mcpComponentRepository, List.of(mcpComponentConnectionUsageChecker));
+        mcpComponentRepository, List.of(mcpComponentConnectionUsageChecker), mcpToolRepository);
 
     @Test
     void testCreateChecksTheConnectionAgainstTheServer() {
@@ -91,7 +93,7 @@ class McpComponentServiceTest {
 
         mcpComponent.setId(4L);
 
-        assertThatThrownBy(() -> mcpComponentService.update(mcpComponent, null))
+        assertThatThrownBy(() -> mcpComponentService.update(mcpComponent, null, List.of()))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(mcpComponentRepository, never()).save(any());

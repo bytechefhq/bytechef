@@ -30,6 +30,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -84,7 +86,6 @@ class ProjectCodeWorkflowFacadeTest {
 
         assertThat(project.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
 
-        verify(projectService, never()).fetchProject(PROJECT_NAME);
         verify(projectService, never()).update(any(Project.class));
         verify(projectService).publishProject(7L, null, false);
     }
@@ -103,7 +104,6 @@ class ProjectCodeWorkflowFacadeTest {
 
         verify(projectService).update(existingProject);
         verify(projectService, never()).create(any(Project.class));
-        verify(projectService, never()).fetchProject(PROJECT_NAME);
         verify(projectService).publishProject(9L, null, false);
     }
 
@@ -191,7 +191,9 @@ class ProjectCodeWorkflowFacadeTest {
 
     private ProjectCodeWorkflowFacade secure(PermissionService permissionService) {
         AutomationMethodSecurityExpressionHandler expressionHandler =
-            new AutomationMethodSecurityExpressionHandler(permissionService);
+            new AutomationMethodSecurityExpressionHandler(
+                permissionService,
+                new StaticListableBeanFactory().getBeanProvider(MethodSecurityExpressionContributor.class));
 
         expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
 

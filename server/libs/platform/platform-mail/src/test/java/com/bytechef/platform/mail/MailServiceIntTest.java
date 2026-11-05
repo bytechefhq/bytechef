@@ -386,20 +386,6 @@ class MailServiceIntTest {
         }
     }
 
-    void testCreationEmailThrowsWhenDeliveryFails() {
-        doThrow(MailSendException.class).when(javaMailSender)
-            .send(any(MimeMessage.class));
-
-        User user = new User();
-
-        user.setLangKey(UserConstants.DEFAULT_LANGUAGE);
-        user.setLogin("john");
-        user.setEmail("john.doe@example.com");
-
-        assertThatThrownBy(() -> mailService.sendCreationEmail(user))
-            .isInstanceOf(MailSendException.class);
-    }
-
     @Test
     void testSendEmailWithException() {
         doThrow(MailSendException.class).when(javaMailSender)

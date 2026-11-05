@@ -10,4 +10,5 @@ dependencies {
 
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 }

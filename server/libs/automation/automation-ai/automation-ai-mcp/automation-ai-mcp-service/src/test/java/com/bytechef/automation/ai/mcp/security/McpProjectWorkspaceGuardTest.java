@@ -56,7 +56,7 @@ class McpProjectWorkspaceGuardTest {
         mcpProjectWorkspaceGuard = new McpProjectWorkspaceGuard(
             projectDeploymentService, projectService, workspaceMcpServerService);
 
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(MCP_SERVER_ID))
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID))
             .thenReturn(Optional.of(SERVER_WORKSPACE_ID));
     }
 
@@ -89,7 +89,7 @@ class McpProjectWorkspaceGuardTest {
     void testRequireProjectInServerWorkspaceDeniesAServerInNoWorkspace() {
         stubProjectWorkspace(SERVER_WORKSPACE_ID);
 
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(MCP_SERVER_ID))
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID))
             .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> mcpProjectWorkspaceGuard.requireProjectInServerWorkspace(MCP_SERVER_ID, PROJECT_ID))

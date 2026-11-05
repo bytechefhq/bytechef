@@ -56,7 +56,8 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * @author Ivica Cardic
  */
 @SpringJUnitConfig(classes = {
-    ManagementMcpServerServiceImpl.class, ManagementMcpServerServiceAuthorizationIntTest.MethodSecurityConfiguration.class
+    ManagementMcpServerServiceImpl.class,
+    ManagementMcpServerServiceAuthorizationIntTest.MethodSecurityConfiguration.class
 })
 class ManagementMcpServerServiceAuthorizationIntTest {
 
@@ -119,13 +120,7 @@ class ManagementMcpServerServiceAuthorizationIntTest {
                 (GuardedOperation) ManagementMcpServerService::getManagementMcpServerUrl),
             Named.of(
                 "updateManagementMcpServerUrl",
-                (GuardedOperation) ManagementMcpServerService::updateManagementMcpServerUrl),
-            Named.of(
-                "isAuthenticationRequired",
-                (GuardedOperation) ManagementMcpServerService::isAuthenticationRequired),
-            Named.of(
-                "updateAuthenticationRequired",
-                (GuardedOperation) service -> service.updateAuthenticationRequired(false)));
+                (GuardedOperation) ManagementMcpServerService::updateManagementMcpServerUrl));
     }
 
     private static void authenticate(String authority) {

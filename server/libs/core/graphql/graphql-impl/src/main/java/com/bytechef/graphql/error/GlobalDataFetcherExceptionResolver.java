@@ -51,8 +51,7 @@ import org.springframework.stereotype.Component;
  * validation.</li>
  * <li>{@link IllegalArgumentException} \u2192 {@code BAD_REQUEST}, matching the REST handler.</li>
  * <li>{@link AccessDeniedException}, directly or anywhere in the cause chain, \u2192 {@code FORBIDDEN}. Returns a
- * generic message (never the detail) so error shape cannot be used to enumerate resources the caller does not
- * own.</li>
+ * generic message (never the detail) so error shape cannot be used to enumerate resources the caller does not own.</li>
  * <li>{@link AuthenticationCredentialsNotFoundException} \u2192 {@code UNAUTHORIZED} \u2014 protected mutation invoked
  * without a SecurityContext; distinct from {@code FORBIDDEN} so clients can prompt for re-authentication.</li>
  * </ul>

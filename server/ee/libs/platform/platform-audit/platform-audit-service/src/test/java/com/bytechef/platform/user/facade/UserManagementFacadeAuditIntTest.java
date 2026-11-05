@@ -23,9 +23,11 @@ import com.bytechef.platform.user.audit.UserAuditEvents;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.UserNotFoundException;
+import com.bytechef.platform.user.service.ApiKeyRevoker;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -33,6 +35,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -95,7 +98,7 @@ class UserManagementFacadeAuditIntTest {
     void testInviteUserRecordsTheEmailAndRole() {
         when(userService.fetchUserByEmail("carol@localhost.com")).thenReturn(Optional.empty());
 
-        userManagementFacade.inviteUser("carol@localhost.com", "ROLE_USER");
+        userManagementFacade.inviteUser("carol@localhost.com", "ROLE_USER", List.of());
 
         verify(userInvitationService).inviteUser("carol@localhost.com", "ROLE_USER");
 
@@ -190,10 +193,13 @@ class UserManagementFacadeAuditIntTest {
 
         @Bean
         UserManagementFacade userManagementFacade(
-            AuthorityService authorityService, TenantService tenantService,
-            UserInvitationService userInvitationService, UserService userService) {
+            ObjectProvider<ApiKeyRevoker> apiKeyRevokerProvider, AuthorityService authorityService,
+            TenantService tenantService, UserInvitationService userInvitationService, UserService userService,
+            ObjectProvider<WorkspaceMembershipAssigner> workspaceMembershipAssignerProvider) {
 
-            return new UserManagementFacadeImpl(authorityService, tenantService, userInvitationService, userService);
+            return new UserManagementFacadeImpl(
+                apiKeyRevokerProvider, authorityService, tenantService, userInvitationService, userService,
+                workspaceMembershipAssignerProvider);
         }
     }
 }

@@ -32,6 +32,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.domain.LogEntry;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +53,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -201,7 +203,9 @@ class EditorLogFileStorageTest {
 
         private EditorLogFileStorage secure(EditorLogFileStorage targetEditorLogFileStorage) {
             AutomationMethodSecurityExpressionHandler expressionHandler =
-                new AutomationMethodSecurityExpressionHandler(permissionService);
+                new AutomationMethodSecurityExpressionHandler(
+                    permissionService,
+                    new StaticListableBeanFactory().getBeanProvider(MethodSecurityExpressionContributor.class));
 
             expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
             expressionHandler.setRoleHierarchy(

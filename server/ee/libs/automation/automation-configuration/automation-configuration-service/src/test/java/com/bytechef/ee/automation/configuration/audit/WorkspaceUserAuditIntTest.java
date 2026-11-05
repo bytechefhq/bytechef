@@ -10,7 +10,9 @@ package com.bytechef.ee.automation.configuration.audit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -21,8 +23,11 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
+import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
+import com.bytechef.ee.automation.configuration.service.WorkspaceService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserServiceImpl;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
@@ -31,6 +36,8 @@ import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -70,6 +77,9 @@ class WorkspaceUserAuditIntTest {
     private PermissionService permissionService;
 
     @Autowired
+    private WorkspaceService workspaceService;
+
+    @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
 
     @Autowired
@@ -77,7 +87,9 @@ class WorkspaceUserAuditIntTest {
 
     @BeforeEach
     void beforeEach() {
-        reset(auditEventService, permissionService, workspaceUserRepository);
+        reset(auditEventService, permissionService, workspaceService, workspaceUserRepository);
+
+        when(workspaceService.workspaceExists(WORKSPACE_ID)).thenReturn(true);
 
         SecurityContextHolder.getContext()
             .setAuthentication(
@@ -94,7 +106,7 @@ class WorkspaceUserAuditIntTest {
 
     @Test
     void testRoleUpdateRecordsPreviousAndNewRole() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
 
         workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
@@ -113,7 +125,8 @@ class WorkspaceUserAuditIntTest {
 
     @Test
     void testAddRecordsExactlyOneRow() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.empty());
 
         workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER);
 
@@ -128,8 +141,10 @@ class WorkspaceUserAuditIntTest {
 
     @Test
     void testRemoveRecordsTheRemovedMemberAndTheirPreviousRole() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
 
         assertThat(workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID)).isTrue();
 
@@ -147,8 +162,9 @@ class WorkspaceUserAuditIntTest {
 
     @Test
     void testAddingAnExistingMemberRecordsAnErrorAndStillFails() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(true);
 
         assertThatThrownBy(() -> workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR))
             .isInstanceOf(ConfigurationException.class);
@@ -167,10 +183,13 @@ class WorkspaceUserAuditIntTest {
 
     @Test
     void testRemovingTheLastAdminRecordsAnErrorWithThePreviousRole() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN)));
-        when(workspaceUserRepository.countByWorkspaceIdAndWorkspaceRole(WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal()))
-            .thenReturn(1L);
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN)));
+        when(workspaceUserRepository.countAdminsForEnvironment(eq(WORKSPACE_ID), eq(WorkspaceRole.ADMIN.ordinal()),
+            anyInt()))
+                .thenReturn(1L);
 
         assertThatThrownBy(() -> workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID))
             .isInstanceOf(ConfigurationException.class);
@@ -190,7 +209,8 @@ class WorkspaceUserAuditIntTest {
     void testMembershipChangeWithoutAnAuthenticatedUserIsRecordedUnderSystem() {
         SecurityContextHolder.clearContext();
 
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.empty());
 
         workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER);
 
@@ -234,9 +254,34 @@ class WorkspaceUserAuditIntTest {
             return mock(AuditEventService.class);
         }
 
+        @Bean
+        CustomRoleRepository customRoleRepository() {
+            return mock(CustomRoleRepository.class);
+        }
+
         @Bean("permissionService")
         PermissionService permissionService() {
             return mock(PermissionService.class);
+        }
+
+        @Bean
+        PermissionScopeRegistry permissionScopeRegistry() {
+            return mock(PermissionScopeRegistry.class);
+        }
+
+        @Bean
+        UserInvitationService userInvitationService() {
+            return mock(UserInvitationService.class);
+        }
+
+        @Bean
+        UserService userService() {
+            return mock(UserService.class);
+        }
+
+        @Bean
+        WorkspaceService workspaceService() {
+            return mock(WorkspaceService.class);
         }
 
         @Bean

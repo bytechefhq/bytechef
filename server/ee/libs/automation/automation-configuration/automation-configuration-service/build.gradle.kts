@@ -42,6 +42,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     testImplementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))

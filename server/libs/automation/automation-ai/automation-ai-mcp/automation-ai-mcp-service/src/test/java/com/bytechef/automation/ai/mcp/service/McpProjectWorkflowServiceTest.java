@@ -37,6 +37,7 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityEx
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,6 +47,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
@@ -359,7 +361,9 @@ class McpProjectWorkflowServiceTest {
         @SuppressWarnings("unchecked")
         private <T> T secure(T target, PermissionService permissionService) {
             AutomationMethodSecurityExpressionHandler expressionHandler =
-                new AutomationMethodSecurityExpressionHandler(permissionService);
+                new AutomationMethodSecurityExpressionHandler(
+                    permissionService,
+                    new StaticListableBeanFactory().getBeanProvider(MethodSecurityExpressionContributor.class));
 
             expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
 

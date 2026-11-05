@@ -62,7 +62,7 @@ public class AutomationMcpComponentConnectionUsageChecker implements McpComponen
     private boolean canUseConnection(long mcpServerId, long connectionId) {
         Optional<Environment> environment = mcpServerRepository.findById(mcpServerId)
             .map(McpServer::getEnvironment);
-        Optional<Long> workspaceId = workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServerId);
+        Optional<Long> workspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId);
 
         if (environment.isEmpty() || workspaceId.isEmpty()) {
             return permissionService.isTenantAdmin();
