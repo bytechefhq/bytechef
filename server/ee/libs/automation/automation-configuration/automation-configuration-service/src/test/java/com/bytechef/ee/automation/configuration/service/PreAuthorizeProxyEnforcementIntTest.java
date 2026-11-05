@@ -28,6 +28,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
+import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -408,6 +409,7 @@ class PreAuthorizeProxyEnforcementIntTest {
             return new ProjectWorkflowExecutionFacadeImpl(
                 mock(ComponentDefinitionService.class),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserWorkflowCopyResolver.class),
                 mock(ContextService.class), mock(Evaluator.class), mock(EnvironmentService.class),
                 mock(WorkflowExecutionRowService.class), mock(JobService.class), permissionService,
                 mock(PrincipalJobService.class), projectFacade, mock(ProjectDeploymentService.class),
