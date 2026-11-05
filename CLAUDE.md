@@ -374,8 +374,8 @@ The resume contract:
 - Restarting a run that waits on an approval answers 409, and stop cancels the approval.
 
 An expired approval FAILS the run, and its links answer 410. A synchronous run cannot pause: a workflow with a
-step that could pause it, an approval gate included, is rejected before it starts. Expiry, reminders and escalation
-each run a 15-minute platform-coordinator sweep, acting only on approval suspends.
+step that could pause it, an approval gate included, is rejected before it starts. Expiry runs a 15-minute
+platform-coordinator sweep, acting only on approval suspends. There are no approval reminders or escalation.
 
 Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-approvals.md`.
 
@@ -392,7 +392,7 @@ Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-appro
   `bytechef.worker.task.subscriptions.default`), `syncWorkerExecutor` (the API-Platform sync path and the editor's
   Test button, limit `bytechef.worker.task.sync-concurrency-limit`), `messageEventExecutor` (Spring-event→broker
   bridge, unbounded) and `webhookDeliveryExecutor` (outbound webhook POSTs: job status and task started webhooks,
-  notification webhooks, Slack, approval reminders; unbounded). The sync lane is a bulkhead, not extra capacity:
+  notification webhooks, Slack; unbounded). The sync lane is a bulkhead, not extra capacity:
   without it a burst of scheduled runs saturates the worker lane and an interactive caller blocks on a permit while
   holding a request thread.
   All are queue-less `SimpleAsyncTaskExecutor`s: a submitter waits for a permit. Anything that runs component code

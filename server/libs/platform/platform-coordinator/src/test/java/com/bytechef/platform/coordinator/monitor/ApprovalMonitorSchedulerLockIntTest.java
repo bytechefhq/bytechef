@@ -23,12 +23,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.platform.coordinator.config.PlatformCoordinatorIntTestConfiguration;
-import com.bytechef.platform.coordinator.notification.NotificationHandlerContexts;
-import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
-import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
-import com.bytechef.platform.notification.service.NotificationService;
 import com.bytechef.tenant.service.TenantService;
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CyclicBarrier;
@@ -75,41 +70,31 @@ class ApprovalMonitorSchedulerLockIntTest {
     }
 
     @Test
-    void testEachApprovalSweepRunsOnOneCoordinatorWhenEveryCoordinatorFiresIt() throws Exception {
+    void testApprovalExpirySweepRunsOnOneCoordinatorWhenEveryCoordinatorFiresIt() throws Exception {
         AtomicInteger expirySweeps = new AtomicInteger();
-        AtomicInteger notificationSweeps = new AtomicInteger();
 
-        try (AnnotationConfigApplicationContext firstCoordinator = createCoordinator(
-            expirySweeps, notificationSweeps);
-            AnnotationConfigApplicationContext secondCoordinator = createCoordinator(
-                expirySweeps, notificationSweeps)) {
+        try (AnnotationConfigApplicationContext firstCoordinator = createCoordinator(expirySweeps);
+            AnnotationConfigApplicationContext secondCoordinator = createCoordinator(expirySweeps)) {
 
             fireConcurrently(firstCoordinator, secondCoordinator);
 
             assertThat(expirySweeps).hasValue(1);
-            assertThat(notificationSweeps).hasValue(1);
 
             fireConcurrently(secondCoordinator, firstCoordinator);
 
             assertThat(expirySweeps).hasValue(1);
-            assertThat(notificationSweeps).hasValue(1);
         }
 
         assertThat(jdbcTemplate.queryForList("SELECT name FROM shedlock ORDER BY name", String.class))
-            .containsExactly("approvalExpiryMonitor", "approvalNotificationMonitor");
+            .containsExactly("approvalExpiryMonitor");
     }
 
-    private AnnotationConfigApplicationContext createCoordinator(
-        AtomicInteger expirySweeps, AtomicInteger notificationSweeps) {
-
+    private AnnotationConfigApplicationContext createCoordinator(AtomicInteger expirySweeps) {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
 
         applicationContext.registerBean(DataSource.class, () -> new DelegatingDataSource(dataSource));
         applicationContext.registerBean(
             ApprovalExpiryMonitor.class, () -> createApprovalExpiryMonitor(countingTenantService(expirySweeps)));
-        applicationContext.registerBean(
-            ApprovalNotificationMonitor.class,
-            () -> createApprovalNotificationMonitor(countingTenantService(notificationSweeps)));
         applicationContext.register(SchedulerLockTestConfiguration.class);
 
         applicationContext.refresh();
@@ -122,14 +107,6 @@ class ApprovalMonitorSchedulerLockIntTest {
         return new ApprovalExpiryMonitor(
             mock(ApplicationEventPublisher.class), mock(JobService.class), mock(ObjectProvider.class),
             mock(TaskExecutionService.class), null, tenantService);
-    }
-
-    private static ApprovalNotificationMonitor createApprovalNotificationMonitor(TenantService tenantService) {
-        return new ApprovalNotificationMonitor(
-            null, Duration.ofHours(4), mock(JobService.class), mock(NotificationHandlerContexts.class),
-            new NotificationHandlerRegistry(List.of()),
-            new NotificationSenderRegistry(List.of()), mock(NotificationService.class), null, Duration.ofHours(24),
-            mock(TaskExecutionService.class), tenantService);
     }
 
     private static TenantService countingTenantService(AtomicInteger sweeps) {
@@ -148,20 +125,14 @@ class ApprovalMonitorSchedulerLockIntTest {
         AnnotationConfigApplicationContext firstCoordinator, AnnotationConfigApplicationContext secondCoordinator)
         throws Exception {
 
-        CyclicBarrier cyclicBarrier = new CyclicBarrier(4);
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
 
         ApprovalExpiryMonitor firstApprovalExpiryMonitor = firstCoordinator.getBean(ApprovalExpiryMonitor.class);
         ApprovalExpiryMonitor secondApprovalExpiryMonitor = secondCoordinator.getBean(ApprovalExpiryMonitor.class);
-        ApprovalNotificationMonitor firstApprovalNotificationMonitor = firstCoordinator.getBean(
-            ApprovalNotificationMonitor.class);
-        ApprovalNotificationMonitor secondApprovalNotificationMonitor = secondCoordinator.getBean(
-            ApprovalNotificationMonitor.class);
 
         List<CompletableFuture<Void>> firings = List.of(
             fire(firstApprovalExpiryMonitor::sweepExpiredApprovals, cyclicBarrier),
-            fire(secondApprovalExpiryMonitor::sweepExpiredApprovals, cyclicBarrier),
-            fire(firstApprovalNotificationMonitor::notifyPendingApprovals, cyclicBarrier),
-            fire(secondApprovalNotificationMonitor::notifyPendingApprovals, cyclicBarrier));
+            fire(secondApprovalExpiryMonitor::sweepExpiredApprovals, cyclicBarrier));
 
         CompletableFuture<Void> allFirings = CompletableFuture.allOf(firings.toArray(CompletableFuture[]::new));
 

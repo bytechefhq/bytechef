@@ -34,9 +34,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 class JobStatusWebhookNotificationHandlerIntTest {
 
     @Autowired
-    private ApprovalReminderWebhookNotificationHandler approvalReminderWebhookNotificationHandler;
-
-    @Autowired
     private JobStatusWebhookNotificationHandler jobStatusWebhookNotificationHandler;
 
     @Test
@@ -55,41 +52,5 @@ class JobStatusWebhookNotificationHandlerIntTest {
             .containsKeys("eventType", "jobId", "jobName", "timestamp");
         assertThat(((Map<?, ?>) payload.get("error")).get("message"))
             .isEqualTo("boom");
-    }
-
-    @Test
-    void testPayloadForApprovalEventKeepsTopLevelApprovalKeys() {
-        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
-            .approvalExpiresAt("2026-10-17T13:39:23Z")
-            .approvalFormUrl("https://example.com/resume/v1.token")
-            .eventType(Type.JOB_APPROVAL_EXPIRING)
-            .jobId(4L)
-            .jobName("Order approval")
-            .build();
-
-        Map<String, ?> payload = JsonUtils.readMap(
-            approvalReminderWebhookNotificationHandler.getPayload(notificationHandlerContext));
-
-        assertThat(payload.get("approvalExpiresAt"))
-            .isEqualTo("2026-10-17T13:39:23Z");
-        assertThat(payload.get("approvalFormUrl"))
-            .isEqualTo("https://example.com/resume/v1.token");
-        assertThat(((Map<?, ?>) payload.get("approval")).get("formUrl"))
-            .isEqualTo("https://example.com/resume/v1.token");
-    }
-
-    @Test
-    void testPayloadForApprovalEventKeepsNullApprovalKeysInJson() {
-        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
-            .approvalExpiresAt("2026-10-17T13:39:23Z")
-            .eventType(Type.JOB_APPROVAL_EXPIRING)
-            .jobId(4L)
-            .jobName("Order approval")
-            .build();
-
-        String payload = approvalReminderWebhookNotificationHandler.getPayload(notificationHandlerContext);
-
-        assertThat(payload)
-            .contains("\"approvalFormUrl\":null");
     }
 }

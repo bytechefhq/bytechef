@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.platform.notification.domain.NotificationEvent;
-import com.bytechef.platform.notification.handler.NotificationHandlerContext.ApprovalSummary;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext.ErrorSummary;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext.JobSummary;
 import com.bytechef.platform.notification.handler.NotificationHandlerContext.ProjectSummary;
@@ -55,26 +54,6 @@ class NotificationHandlerContextTest {
     }
 
     @Test
-    void testToMapKeepsNullApprovalKeysOnApprovalEvents() {
-        NotificationHandlerContext context = new NotificationHandlerContext.Builder()
-            .eventType(NotificationEvent.Type.JOB_APPROVAL_EXPIRING)
-            .jobId(42L)
-            .jobName("Daily sync")
-            .approvalExpiresAt("2026-11-04T10:00:00Z")
-            .timestamp(Instant.parse("2026-11-03T10:00:00Z"))
-            .build();
-
-        Map<String, Object> map = context.toMap();
-
-        assertEquals(
-            List.of("eventType", "jobId", "jobName", "approvalExpiresAt", "approvalFormUrl", "timestamp"),
-            List.copyOf(map.keySet())
-                .subList(0, 6));
-        assertTrue(map.containsKey("approvalFormUrl"));
-        assertNull(map.get("approvalFormUrl"));
-    }
-
-    @Test
     void testWithTimestampCopiesEveryField() {
         NotificationHandlerContext sample = NotificationHandlerContext.sample();
         Instant timestamp = Instant.parse("2027-02-03T04:05:06Z");
@@ -93,7 +72,6 @@ class NotificationHandlerContextTest {
         assertEquals(sample.getJobId(), copy.getJobId());
         assertEquals(sample.getEnvironment(), copy.getEnvironment());
         assertEquals(sample.getExecutionUrl(), copy.getExecutionUrl());
-        assertEquals(sample.getApproval(), copy.getApproval());
     }
 
     @Test
@@ -117,8 +95,6 @@ class NotificationHandlerContextTest {
             .eventType(NotificationEvent.Type.JOB_FAILED)
             .jobId(42L)
             .jobName("Daily sync")
-            .approvalExpiresAt("2026-11-04T10:00:00Z")
-            .approvalFormUrl("https://x/resume/t")
             .timestamp(Instant.parse("2026-11-03T10:00:00Z"))
             .deliveryId("d-1")
             .source("AUTOMATION")
@@ -148,27 +124,6 @@ class NotificationHandlerContextTest {
         assertFalse(((String) context.toMap()
             .get("timestamp")).isEmpty());
         assertNull(context.getTimestamp());
-    }
-
-    @Test
-    void testToMapIncludesApprovalKeysAtTopLevelAndNested() {
-        NotificationHandlerContext context = new NotificationHandlerContext.Builder()
-            .eventType(NotificationEvent.Type.JOB_FAILED)
-            .jobId(42L)
-            .jobName("Daily sync")
-            .approvalExpiresAt("2026-11-04T10:00:00Z")
-            .approvalFormUrl("https://x/resume/t")
-            .timestamp(Instant.parse("2026-11-03T10:00:00Z"))
-            .build();
-
-        Map<String, Object> map = context.toMap();
-
-        assertEquals(
-            List.of(
-                "eventType", "jobId", "jobName", "approvalExpiresAt", "approvalFormUrl", "timestamp", "approval"),
-            List.copyOf(map.keySet()));
-        assertEquals("https://x/resume/t", ((Map<?, ?>) map.get("approval")).get("formUrl"));
-        assertEquals(new ApprovalSummary("2026-11-04T10:00:00Z", "https://x/resume/t"), context.getApproval());
     }
 
     @Test
