@@ -121,6 +121,8 @@ export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOp
         completedCountRef.current = 0;
         successCountRef.current = 0;
 
+        const uploadedFiles: File[] = [];
+
         for (const file of selectedFiles) {
             try {
                 const extension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -159,6 +161,8 @@ export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOp
                 }
 
                 successCountRef.current++;
+
+                uploadedFiles.push(file);
             } catch (error) {
                 toast.error(`Failed to create skill: ${file.name}`, {
                     description: error instanceof Error ? error.message : 'An unexpected error occurred',
@@ -171,6 +175,8 @@ export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOp
                 }
             }
         }
+
+        setSelectedFiles((previous) => previous.filter((file) => !uploadedFiles.includes(file)));
     }, [createSkillFromInstructionsMutation, createSkillMutation, handleUploadBatchComplete, selectedFiles]);
 
     return {
