@@ -339,6 +339,65 @@ describe('TASK_DISPATCHER_CONFIG', () => {
             it('adds a suffix when the computed key already exists', () => {
                 expect(branchConfig.getNewCaseKey([{key: 'case_1', tasks: []}])).toBe('case_1 (1)');
             });
+
+            it('increments the suffix until the key is unused', () => {
+                expect(
+                    branchConfig.getNewCaseKey([
+                        {key: 'case_2', tasks: []},
+                        {key: 'case_2 (1)', tasks: []},
+                    ])
+                ).toBe('case_2 (2)');
+
+                expect(
+                    branchConfig.getNewCaseKey([
+                        {key: 'case_3', tasks: []},
+                        {key: 'case_3 (1)', tasks: []},
+                        {key: 'case_3 (2)', tasks: []},
+                    ])
+                ).toBe('case_3 (3)');
+            });
+
+            it('reuses a freed suffix', () => {
+                expect(
+                    branchConfig.getNewCaseKey([
+                        {key: 'case_2', tasks: []},
+                        {key: 'case_2 (2)', tasks: []},
+                    ])
+                ).toBe('case_2 (1)');
+            });
+
+            it('treats numeric keys as equal to their string form', () => {
+                expect(
+                    branchConfig.getNewCaseKey([
+                        {key: 0, tasks: []},
+                        {key: 'case_2', tasks: []},
+                    ])
+                ).toBe('case_2 (1)');
+            });
+
+            it('returns an unused key after cases are added and deleted', () => {
+                const deleteCase = (cases: Array<BranchCaseType>, caseKey: string | number) =>
+                    cases.filter((caseItem) => caseItem.key !== caseKey);
+
+                const addCase = (cases: Array<BranchCaseType>) => [
+                    ...cases,
+                    {key: branchConfig.getNewCaseKey(cases), tasks: []},
+                ];
+
+                let cases: Array<BranchCaseType> = [
+                    {key: 'case_0', tasks: []},
+                    {key: 'case_1', tasks: []},
+                    {key: 'case_2', tasks: []},
+                ];
+
+                cases = deleteCase(addCase(cases), 'case_0');
+                cases = deleteCase(addCase(cases), 'case_1');
+                cases = addCase(cases);
+
+                const caseKeys = cases.map((caseItem) => caseItem.key);
+
+                expect(caseKeys).toEqual(['case_2', 'case_3', 'case_3 (1)', 'case_3 (2)']);
+            });
         });
 
         describe('getSubtasks', () => {

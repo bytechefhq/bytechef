@@ -149,18 +149,17 @@ export const TASK_DISPATCHER_CONFIG = {
                 return 'case_0';
             }
 
-            const newCaseKey = `case_${cases.length}`;
+            const existingCaseKeys = new Set(cases.map((caseItem) => String(caseItem.key)));
 
-            const isNewCaseKeyDuplicate = cases.some((caseItem) => caseItem.key === newCaseKey);
+            const baseCaseKey = `case_${cases.length}`;
 
-            if (isNewCaseKeyDuplicate) {
-                return `${newCaseKey} (1)`;
-            }
+            let newCaseKey = baseCaseKey;
+            let duplicateSuffix = 0;
 
-            const existingCaseIndex = cases.findIndex((caseItem) => caseItem.key === newCaseKey);
+            while (existingCaseKeys.has(newCaseKey)) {
+                duplicateSuffix++;
 
-            if (existingCaseIndex >= 0) {
-                return TASK_DISPATCHER_CONFIG.branch.getNewCaseKey(cases);
+                newCaseKey = `${baseCaseKey} (${duplicateSuffix})`;
             }
 
             return newCaseKey;
