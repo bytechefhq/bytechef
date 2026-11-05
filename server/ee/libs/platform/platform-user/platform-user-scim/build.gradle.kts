@@ -16,4 +16,18 @@ dependencies {
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework:spring-test")
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation(project(":server:libs:config:app-config"))
+    testImplementation(project(":server:libs:config:jdbc-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:config:security-config"))
+    testImplementation(project(":server:libs:core:encryption:encryption-api"))
+    testImplementation(project(":server:libs:core:encryption:encryption-impl"))
+    testImplementation(project(":server:libs:platform:platform-mail"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
+    testImplementation(project(":server:libs:test:test-int-support"))
 }
