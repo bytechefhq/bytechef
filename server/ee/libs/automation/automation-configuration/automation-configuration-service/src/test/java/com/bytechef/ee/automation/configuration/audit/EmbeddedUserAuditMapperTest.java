@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,14 +41,6 @@ class EmbeddedUserAuditMapperTest {
     void beforeEach() {
         embeddedUserRepository = mock(EmbeddedUserRepository.class);
         embeddedUserAuditMapper = new EmbeddedUserAuditMapper(embeddedUserRepository);
-    }
-
-    @Test
-    void testEventsAreExactlyTheFiveEmbeddedUserEvents() {
-        assertThat(embeddedUserAuditMapper.events()).isEqualTo(
-            Set.of(
-                "EMBEDDED_USER_ADDED", "EMBEDDED_USER_ENVIRONMENT_ROLE_REMOVED",
-                "EMBEDDED_USER_ENVIRONMENT_ROLE_UPDATED", "EMBEDDED_USER_REMOVED", "EMBEDDED_USER_ROLE_UPDATED"));
     }
 
     @Test

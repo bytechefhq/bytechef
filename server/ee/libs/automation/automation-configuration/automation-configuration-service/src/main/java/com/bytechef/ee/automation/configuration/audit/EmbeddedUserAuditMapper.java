@@ -19,7 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -39,16 +38,6 @@ public class EmbeddedUserAuditMapper implements AuditMapper {
     @SuppressFBWarnings("EI")
     public EmbeddedUserAuditMapper(EmbeddedUserRepository embeddedUserRepository) {
         this.embeddedUserRepository = embeddedUserRepository;
-    }
-
-    @Override
-    public Set<String> events() {
-        return Set.of(
-            EmbeddedUserAuditEvents.EMBEDDED_USER_ADDED,
-            EmbeddedUserAuditEvents.EMBEDDED_USER_ENVIRONMENT_ROLE_REMOVED,
-            EmbeddedUserAuditEvents.EMBEDDED_USER_ENVIRONMENT_ROLE_UPDATED,
-            EmbeddedUserAuditEvents.EMBEDDED_USER_REMOVED,
-            EmbeddedUserAuditEvents.EMBEDDED_USER_ROLE_UPDATED);
     }
 
     @Override

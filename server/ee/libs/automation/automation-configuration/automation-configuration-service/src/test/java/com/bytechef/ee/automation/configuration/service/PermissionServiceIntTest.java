@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -28,6 +29,7 @@ import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepositor
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
 import java.util.Set;
@@ -509,7 +511,9 @@ class PermissionServiceIntTest {
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resourceOwnershipResolver), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
-            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private static void authenticate(String login, String authority) {
