@@ -94,6 +94,7 @@ import resolveFallbackTab from './resolveFallbackTab';
 import resolveMissingDefinitionMessage from './resolveMissingDefinitionMessage';
 import {resolveMissingRequiredPropertiesRefetch} from './resolveMissingRequiredPropertiesRefetch';
 import resolveNodeConnectionFields from './resolveNodeConnectionFields';
+import resolveNodeOpenTab from './resolveNodeOpenTab';
 import resolveShowOutputTab from './resolveShowOutputTab';
 import resolveSyncedOperationName from './resolveSyncedOperationName';
 import useDisplayConditionsRefreshAfterOperationChange from './useDisplayConditionsRefreshAfterOperationChange';
@@ -144,6 +145,7 @@ export default function useWorkflowNodeDetailsPanel({
 
     const errorsLoadingArmedRef = useRef(false);
     const lastErrorsDataUpdatedAtRef = useRef(0);
+    const nodeOpenTabResolvedNodeNameRef = useRef<string | undefined>(undefined);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -215,19 +217,20 @@ export default function useWorkflowNodeDetailsPanel({
 
     const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
 
-    const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery(
-        {
-            environmentId: currentEnvironmentId,
-            workflowId: workflow.id as string,
-            workflowNodeName: currentNode?.clusterElementType
-                ? (mainClusterRootName as string)
-                : (currentNode?.workflowNodeName as string),
-        },
-        !!workflow.id &&
-            !!currentNode &&
-            (!!currentComponentDefinition?.connection ||
-                (!!currentNode.clusterRoot && !currentNode.isNestedClusterRoot))
-    );
+    const {data: workflowTestConfigurationConnections, isFetched: workflowTestConfigurationConnectionsFetched} =
+        useGetWorkflowTestConfigurationConnectionsQuery(
+            {
+                environmentId: currentEnvironmentId,
+                workflowId: workflow.id as string,
+                workflowNodeName: currentNode?.clusterElementType
+                    ? (mainClusterRootName as string)
+                    : (currentNode?.workflowNodeName as string),
+            },
+            !!workflow.id &&
+                !!currentNode &&
+                (!!currentComponentDefinition?.connection ||
+                    (!!currentNode.clusterRoot && !currentNode.isNestedClusterRoot))
+        );
 
     const {data: currentClusterElementDefinition} = useGetClusterElementDefinitionQuery(
         {
@@ -1260,14 +1263,43 @@ export default function useWorkflowNodeDetailsPanel({
         currentWorkflowNodeConnections.length,
     ]);
 
-    // If the current component requires a connection, set the active tab to 'connection'
     useEffect(() => {
-        if (currentComponentDefinition?.connectionRequired && !workflowTestConfigurationConnections?.length) {
-            setActiveTab('connection');
+        const workflowNodeName = currentNode?.workflowNodeName;
+
+        if (!workflowNodeName) {
+            nodeOpenTabResolvedNodeNameRef.current = undefined;
+
+            return;
         }
 
+        if (nodeOpenTabResolvedNodeNameRef.current === workflowNodeName) {
+            return;
+        }
+
+        const nodeOpenTabResolution = resolveNodeOpenTab({
+            componentDefinition: currentComponentDefinition,
+            connectionsFetched: workflowTestConfigurationConnectionsFetched,
+            nodeComponentName: currentNode?.componentName,
+            testConfigurationConnectionsCount: workflowTestConfigurationConnections?.length ?? 0,
+        });
+
+        if (nodeOpenTabResolution === 'WAIT') {
+            return;
+        }
+
+        nodeOpenTabResolvedNodeNameRef.current = workflowNodeName;
+
+        if (nodeOpenTabResolution === 'CONNECTION') {
+            setActiveTab('connection');
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentComponentDefinition]);
+    }, [
+        currentComponentDefinition,
+        currentNode?.componentName,
+        currentNode?.workflowNodeName,
+        workflowTestConfigurationConnections,
+        workflowTestConfigurationConnectionsFetched,
+    ]);
 
     // Update currentNode with connection data, operationName and type
     useEffect(() => {
