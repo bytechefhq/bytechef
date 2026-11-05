@@ -12,6 +12,7 @@ const hoisted = vi.hoisted(() => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    PlatformType: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
     useWorkspaceToolInvocationLogsQuery: hoisted.useWorkspaceToolInvocationLogsQueryMock,
 }));
 
@@ -59,7 +60,7 @@ describe('AppActivityTab', () => {
         renderTab();
 
         expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenCalledWith(
-            {appId: 1, environmentId: '2', page: 0, workspaceId: '7'},
+            {appId: 1, environmentId: '2', page: 0, type: 'AUTOMATION', workspaceId: '7'},
             {enabled: true}
         );
         expect(screen.getByText('SALES_SLACK__SEND_MESSAGE')).toBeInTheDocument();
@@ -124,7 +125,7 @@ describe('AppActivityTab', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Load more'}));
 
         expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
-            {appId: 1, environmentId: '2', page: 1, workspaceId: '7'},
+            {appId: 1, environmentId: '2', page: 1, type: 'AUTOMATION', workspaceId: '7'},
             {enabled: true}
         );
     });
@@ -180,7 +181,7 @@ describe('AppActivityTab', () => {
             expect(screen.getByText('NEW_PAGE_0')).toBeInTheDocument();
             expect(screen.queryByText('NEW_PAGE_1')).not.toBeInTheDocument();
             expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
-                {appId: 1, environmentId, page: 0, workspaceId},
+                {appId: 1, environmentId, page: 0, type: 'AUTOMATION', workspaceId},
                 {enabled: true}
             );
         }

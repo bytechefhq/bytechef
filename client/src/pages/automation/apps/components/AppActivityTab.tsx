@@ -2,7 +2,11 @@ import Button from '@/components/Button/Button';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ToolInvocationsTable from '@/pages/automation/tool-invocations/components/ToolInvocationsTable';
 import {parseAppId} from '@/pages/automation/tool-invocations/utils/parseAppId';
-import {WorkspaceToolInvocationLogsQuery, useWorkspaceToolInvocationLogsQuery} from '@/shared/middleware/graphql';
+import {
+    PlatformType,
+    WorkspaceToolInvocationLogsQuery,
+    useWorkspaceToolInvocationLogsQuery,
+} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ArrowUpRightIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
@@ -26,6 +30,7 @@ const AppActivityLogList = ({appId}: {appId: number}) => {
             appId,
             environmentId: String(currentEnvironmentId),
             page: pageNumber,
+            type: PlatformType.Automation,
             workspaceId: String(currentWorkspaceId),
         },
         {enabled: currentEnvironmentId != null && currentWorkspaceId != null}
