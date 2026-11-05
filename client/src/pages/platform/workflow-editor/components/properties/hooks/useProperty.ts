@@ -13,10 +13,12 @@ import {
     registerPendingSave,
 } from '@/pages/platform/workflow-editor/components/properties/pendingPropertySaves';
 import {
+    EMPTY_FORMULA_VALUE,
     PropertyInputModeI,
     fitsNativeControl,
     fromFormulaValue,
     getPropertyInputMode,
+    isBuilderControlType,
     isSingleDataPill,
     isStringSelect,
     shouldIncludeInMetadata,
@@ -1113,7 +1115,11 @@ export const useProperty = ({
 
         const toFormula = !isFormulaMode;
 
-        const convertedValue = toFormula ? toFormulaValue(switchedValue, type) : fromFormulaValue(switchedValue, type);
+        let convertedValue = toFormula ? toFormulaValue(switchedValue, type) : fromFormulaValue(switchedValue, type);
+
+        if (toFormula && convertedValue === undefined && isBuilderControlType(controlType)) {
+            convertedValue = EMPTY_FORMULA_VALUE;
+        }
 
         if (!toFormula && !fitsNativeControl(controlType, convertedValue, getSelectOptionValues())) {
             return;

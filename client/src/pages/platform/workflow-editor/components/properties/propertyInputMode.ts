@@ -8,6 +8,8 @@ const DATE_LITERAL_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const DATE_TIME_LITERAL_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/;
 const TIME_LITERAL_REGEX = /^\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/;
 
+export const EMPTY_FORMULA_VALUE = '=';
+
 export interface PropertyInputModeI {
     legacyMixed: boolean;
     mode: 'formula' | 'text';
@@ -37,6 +39,10 @@ function isTextLikeControlType(controlType: string | undefined, hasControl: bool
     }
 
     return controlType === 'FILE_ENTRY' || MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
+}
+
+export function isBuilderControlType(controlType: string | undefined): boolean {
+    return controlType === 'ARRAY_BUILDER' || controlType === 'OBJECT_BUILDER';
 }
 
 export function isStringSelect(controlType: string | undefined, type: string | undefined): boolean {
