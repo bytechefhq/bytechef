@@ -17,6 +17,7 @@
 package com.bytechef.atlas.configuration.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
@@ -70,4 +71,21 @@ class DeferredEvaluationParameterKeysTest {
             .isEmpty());
     }
 
+    @Test
+    void testCommandsAreSeededWithoutLoadingTheCommandsComponent() {
+        assertThrows(
+            ClassNotFoundException.class,
+            () -> Class.forName("com.bytechef.component.commands.CommandsComponentHandler"));
+
+        assertEquals(Set.of("commands"), DeferredEvaluationParameterKeys.forTaskType("commands/v1"));
+    }
+
+    @Test
+    void testScriptIsSeededWithoutLoadingTheScriptComponent() {
+        assertThrows(
+            ClassNotFoundException.class,
+            () -> Class.forName("com.bytechef.component.script.ScriptComponentHandler"));
+
+        assertEquals(Set.of("script"), DeferredEvaluationParameterKeys.forTaskType("script/v1"));
+    }
 }

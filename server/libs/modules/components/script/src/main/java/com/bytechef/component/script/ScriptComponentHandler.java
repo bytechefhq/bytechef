@@ -22,15 +22,17 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.script.action.ScriptBashAction;
 import com.bytechef.component.script.action.ScriptJavaScriptAction;
 import com.bytechef.component.script.action.ScriptPythonAction;
 import com.bytechef.component.script.cluster.datastream.ScriptJavaScriptItemProcessor;
 import com.bytechef.component.script.cluster.datastream.ScriptPythonItemProcessor;
 import com.bytechef.component.script.cluster.tool.ScriptJavaScriptTool;
 import com.bytechef.component.script.cluster.tool.ScriptPythonTool;
-import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
+import com.bytechef.platform.component.runner.PolyglotEngine;
+import com.bytechef.platform.component.runner.TaskRunnerRegistry;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,8 +44,8 @@ public class ScriptComponentHandler implements ComponentHandler {
 
     private final ScriptComponentDefinition componentDefinition;
 
-    public ScriptComponentHandler(PolyglotEngine polyglotEngine) {
-        this.componentDefinition = new ScriptComponentDefinitionImpl(polyglotEngine);
+    public ScriptComponentHandler(PolyglotEngine polyglotEngine, TaskRunnerRegistry taskRunnerRegistry) {
+        this.componentDefinition = new ScriptComponentDefinitionImpl(polyglotEngine, taskRunnerRegistry);
     }
 
     @Override
@@ -54,24 +56,22 @@ public class ScriptComponentHandler implements ComponentHandler {
     private static class ScriptComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
         implements ScriptComponentDefinition {
 
-        private ScriptComponentDefinitionImpl(PolyglotEngine polyglotEngine) {
+        private ScriptComponentDefinitionImpl(PolyglotEngine polyglotEngine, TaskRunnerRegistry taskRunnerRegistry) {
             super(
                 component(SCRIPT)
                     .title("Script")
                     .description(
-                        "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python or R programming languages.")
+                        "Executes user-defined code. User can write custom workflow logic in Bash, Java, JavaScript, Python or R programming languages.")
                     .icon("path:assets/script.svg")
                     .categories(ComponentCategory.HELPERS, ComponentCategory.DEVELOPER_TOOLS)
                     .actions(
-                        ScriptJavaScriptAction.of(polyglotEngine),
-                        ScriptPythonAction.of(polyglotEngine))
-//                        ScriptRAction.of(polyglotEngine),
-//                        ScriptJavaAction.of(polyglotEngine),
+                        ScriptJavaScriptAction.of(taskRunnerRegistry),
+                        ScriptPythonAction.of(taskRunnerRegistry),
+                        ScriptBashAction.of(taskRunnerRegistry))
                     .clusterElements(
                         ScriptJavaScriptTool.of(polyglotEngine),
                         ScriptPythonTool.of(polyglotEngine),
 //                        ScriptJavaItemProcessor.of(polyglotEngine),
-//                        ScriptRAction.of(polyglotEngine),
                         ScriptJavaScriptItemProcessor.of(polyglotEngine),
                         ScriptPythonItemProcessor.of(polyglotEngine)));
         }
