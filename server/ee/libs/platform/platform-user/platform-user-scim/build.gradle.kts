@@ -22,6 +22,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:config:app-config"))
+    testImplementation(project(":server:libs:config:cache-config"))
     testImplementation(project(":server:libs:config:jdbc-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:config:security-config"))
