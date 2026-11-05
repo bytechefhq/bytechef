@@ -24,12 +24,14 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
@@ -91,7 +93,9 @@ class KnowledgeBaseDocumentFacadeAuthorizationTest {
         SecurityContextHolder.setContext(securityContext);
 
         AutomationMethodSecurityExpressionHandler expressionHandler =
-            new AutomationMethodSecurityExpressionHandler(permissionService);
+            new AutomationMethodSecurityExpressionHandler(
+                permissionService,
+                new StaticListableBeanFactory().getBeanProvider(MethodSecurityExpressionContributor.class));
 
         expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
 
