@@ -72,8 +72,8 @@ describe('WorkflowNodeDetailsPanel errors chip', () => {
 
         expect(chip).toHaveAccessibleName('Errors (1)');
         expect(chip).toHaveTextContent('1');
-        expect(screen.getByText('Missing required property:')).toBeInTheDocument();
-        expect(screen.queryByLabelText('Warning')).not.toBeInTheDocument();
+        expect(screen.getByRole('region', {name: 'Errors (1)'})).toHaveTextContent('Missing required property:');
+        expect(screen.queryByRole('region', {name: /^Warnings/})).not.toBeInTheDocument();
     });
 
     it('titles a node with only warnings as warnings and styles the chip as a warning', () => {
@@ -81,7 +81,10 @@ describe('WorkflowNodeDetailsPanel errors chip', () => {
 
         expect(chip).toHaveAccessibleName('Warnings (1)');
         expect(chip).toHaveClass('border-stroke-warning-primary');
-        expect(screen.getByLabelText('Warning')).toBeInTheDocument();
+        expect(screen.getByRole('region', {name: 'Warnings (1)'})).toHaveTextContent(
+            'Missing recommended field: label'
+        );
+        expect(screen.queryByRole('region', {name: /^Errors/})).not.toBeInTheDocument();
     });
 
     it('counts errors and warnings separately and keeps the error styling when both are present', () => {
@@ -93,8 +96,10 @@ describe('WorkflowNodeDetailsPanel errors chip', () => {
         expect(chip).toHaveAccessibleName('Errors (1), Warnings (1)');
         expect(chip).toHaveTextContent('2');
         expect(chip).toHaveClass('border-stroke-destructive-primary');
-        expect(screen.getByText('Missing required connection:')).toBeInTheDocument();
-        expect(screen.getAllByLabelText('Warning')).toHaveLength(1);
+        expect(screen.getByRole('region', {name: 'Errors (1)'})).toHaveTextContent('Missing required connection:');
+        expect(screen.getByRole('region', {name: 'Warnings (1)'})).toHaveTextContent(
+            'Missing recommended field: label'
+        );
     });
 
     it('keeps the heading as the chip name while errors are rechecked', () => {

@@ -145,6 +145,16 @@ const WorkflowNodeDetailsPanel = ({
         [errors]
     );
 
+    const errorsSections = useMemo(() => {
+        const errorIssues = errors.filter((error) => error.severity !== 'WARNING');
+        const warningIssues = errors.filter((error) => error.severity === 'WARNING');
+
+        return [
+            {heading: `Errors (${errorIssues.length})`, issues: errorIssues, warning: false},
+            {heading: `Warnings (${warningIssues.length})`, issues: warningIssues, warning: true},
+        ].filter((section) => section.issues.length > 0);
+    }, [errors]);
+
     const missingRequiredProperties = useMemo(
         () => getMissingRequiredPropertyLabels(errors, currentOperationProperties),
         [currentOperationProperties, errors]
@@ -306,81 +316,91 @@ const WorkflowNodeDetailsPanel = ({
                                         className={twMerge(
                                             'w-[28rem] max-w-[calc(100vw-2rem)] overflow-hidden p-0',
                                             errorsWarningOnly
-                                                ? 'border-stroke-warning-secondary bg-surface-warning-secondary'
-                                                : 'border-stroke-destructive-primary bg-surface-destructive-secondary'
+                                                ? 'border-stroke-warning-secondary'
+                                                : 'border-stroke-destructive-secondary'
                                         )}
                                     >
-                                        <div className="flex items-center gap-2 px-3 py-2 text-sm font-semibold">
-                                            {errorsWarningOnly ? (
-                                                <TriangleAlertIcon
-                                                    aria-hidden="true"
-                                                    className="size-4 text-content-warning-primary"
-                                                />
-                                            ) : (
-                                                <InfoIcon
-                                                    aria-hidden="true"
-                                                    className="size-4 text-content-destructive-primary"
-                                                />
-                                            )}
+                                        <ScrollArea className="max-h-80">
+                                            {errorsSections.map(({heading, issues, warning}) => (
+                                                <section aria-label={heading} key={heading}>
+                                                    <div className="flex items-center gap-2 px-3 py-2 text-sm font-semibold">
+                                                        {warning ? (
+                                                            <TriangleAlertIcon
+                                                                aria-hidden="true"
+                                                                className="size-4 text-content-warning-primary"
+                                                            />
+                                                        ) : (
+                                                            <InfoIcon
+                                                                aria-hidden="true"
+                                                                className="size-4 text-content-destructive-primary"
+                                                            />
+                                                        )}
 
-                                            {errorsHeading}
-                                        </div>
+                                                        {heading}
+                                                    </div>
 
-                                        <ScrollArea className="max-h-60">
-                                            <ul className="flex flex-col gap-2 px-3 pb-3">
-                                                {errors.map((error, index) => {
-                                                    const errorTabName = getErrorTabName(error);
-                                                    const errorTabAvailable =
-                                                        !!errorTabName &&
-                                                        nodeTabs.some((tab) => tab.name === errorTabName);
+                                                    <ul className="flex flex-col gap-2 px-3 pb-3">
+                                                        {issues.map((error, index) => {
+                                                            const errorTabName = getErrorTabName(error);
+                                                            const errorTabAvailable =
+                                                                !!errorTabName &&
+                                                                nodeTabs.some((tab) => tab.name === errorTabName);
 
-                                                    const errorContent = (
-                                                        <>
-                                                            {error.severity === 'WARNING' && (
-                                                                <TriangleAlertIcon
-                                                                    aria-label="Warning"
-                                                                    className="mb-0.5 inline size-3.5 text-content-warning-primary"
-                                                                />
-                                                            )}
+                                                            const errorRowClassName = twMerge(
+                                                                'space-x-1 rounded-md border px-3 py-1.5 text-sm',
+                                                                warning
+                                                                    ? 'border-stroke-warning-secondary bg-surface-warning-secondary'
+                                                                    : 'border-stroke-destructive-secondary bg-surface-destructive-secondary'
+                                                            );
 
-                                                            {error.kind !== 'ISSUE' && (
-                                                                <span className="font-light">
-                                                                    {ERROR_KIND_LABELS[error.kind]}
-                                                                </span>
-                                                            )}
+                                                            const errorContent = (
+                                                                <>
+                                                                    {error.kind !== 'ISSUE' && (
+                                                                        <span className="font-light">
+                                                                            {ERROR_KIND_LABELS[error.kind]}
+                                                                        </span>
+                                                                    )}
 
-                                                            {error.propertyLabel && (
-                                                                <span className="font-light">
-                                                                    {error.propertyLabel}:
-                                                                </span>
-                                                            )}
+                                                                    {error.propertyLabel && (
+                                                                        <span className="font-light">
+                                                                            {error.propertyLabel}:
+                                                                        </span>
+                                                                    )}
 
-                                                            <span>{error.name}</span>
-                                                        </>
-                                                    );
+                                                                    <span>{error.name}</span>
+                                                                </>
+                                                            );
 
-                                                    return (
-                                                        <li key={`${error.kind}_${error.name}_${index}`}>
-                                                            {errorTabAvailable ? (
-                                                                <button
-                                                                    className="w-full space-x-1 rounded-md border-2 border-transparent bg-surface-neutral-primary px-3 py-1.5 text-left text-sm hover:border-blue-200 dark:bg-surface-neutral-secondary"
-                                                                    onClick={() => {
-                                                                        setActiveTab(errorTabName);
-                                                                        setErrorsPopoverOpen(false);
-                                                                    }}
-                                                                    type="button"
-                                                                >
-                                                                    {errorContent}
-                                                                </button>
-                                                            ) : (
-                                                                <div className="space-x-1 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm dark:bg-surface-neutral-secondary">
-                                                                    {errorContent}
-                                                                </div>
-                                                            )}
-                                                        </li>
-                                                    );
-                                                })}
-                                            </ul>
+                                                            return (
+                                                                <li key={`${error.kind}_${error.name}_${index}`}>
+                                                                    {errorTabAvailable ? (
+                                                                        <button
+                                                                            className={twMerge(
+                                                                                errorRowClassName,
+                                                                                'w-full text-left',
+                                                                                warning
+                                                                                    ? 'hover:bg-surface-warning-secondary-hover'
+                                                                                    : 'hover:bg-surface-destructive-secondary-hover'
+                                                                            )}
+                                                                            onClick={() => {
+                                                                                setActiveTab(errorTabName);
+                                                                                setErrorsPopoverOpen(false);
+                                                                            }}
+                                                                            type="button"
+                                                                        >
+                                                                            {errorContent}
+                                                                        </button>
+                                                                    ) : (
+                                                                        <div className={errorRowClassName}>
+                                                                            {errorContent}
+                                                                        </div>
+                                                                    )}
+                                                                </li>
+                                                            );
+                                                        })}
+                                                    </ul>
+                                                </section>
+                                            ))}
                                         </ScrollArea>
                                     </PopoverContent>
                                 </Popover>
