@@ -18,6 +18,7 @@ package com.bytechef.platform.job.sync.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -33,6 +34,7 @@ import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.AfterEach;
@@ -141,6 +143,60 @@ class WebSocketStreamTaskExecutionPostOutputProcessorTest {
 
         verify(sseStreamBridge).onEvent("chunk");
         verify(sseStreamBridge).onError(streamException);
+    }
+
+    @Test
+    void testProcessWithAFailedStreamReportsOnlyTheError() {
+        RuntimeException streamException = new RuntimeException("stream failed");
+
+        ActionDefinition.WebSocketHandler webSocketHandler = emitter -> {
+            emitter.send("chunk");
+            emitter.error(streamException);
+        };
+
+        Object result = processor.process(createTaskExecution(), webSocketHandler);
+
+        assertThat(result).isNull();
+
+        verify(sseStreamBridge).onEvent("chunk");
+        verify(sseStreamBridge).onError(streamException);
+        verify(sseStreamBridge, never()).onComplete();
+    }
+
+    @Test
+    void testProcessWithAStreamThatFailsOnAnotherThreadReportsOnlyTheError() {
+        RuntimeException streamException = new RuntimeException("stream failed");
+
+        ActionDefinition.WebSocketHandler webSocketHandler = emitter -> Thread.startVirtualThread(() -> {
+            emitter.send("late chunk");
+            emitter.error(streamException);
+        });
+
+        Object result = processor.process(createTaskExecution(), webSocketHandler);
+
+        assertThat(result).isNull();
+
+        verify(sseStreamBridge).onEvent("late chunk");
+        verify(sseStreamBridge).onError(streamException);
+        verify(sseStreamBridge, never()).onComplete();
+    }
+
+    @Test
+    void testProcessCompletesWhenACloseListenerThrows() {
+        ActionDefinition.WebSocketHandler webSocketHandler = emitter -> {
+            emitter.addCloseListener(() -> {
+                throw new IllegalStateException("close failed");
+            });
+
+            Thread.startVirtualThread(emitter::complete);
+        };
+
+        Object result = assertTimeoutPreemptively(
+            Duration.ofSeconds(10), () -> processor.process(createTaskExecution(), webSocketHandler));
+
+        assertThat(result).isNull();
+
+        verify(sseStreamBridge).onComplete();
     }
 
     @Test
