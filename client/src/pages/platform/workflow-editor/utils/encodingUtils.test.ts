@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 
-import {safeResolvePath} from './encodingUtils';
+import {decodePath, encodeParameters, encodePath, safeResolvePath} from './encodingUtils';
 
 describe('safeResolvePath', () => {
     it('resolves a value at a valid path', () => {
@@ -22,5 +22,29 @@ describe('safeResolvePath', () => {
     it('returns undefined instead of throwing when the object is undefined', () => {
         expect(() => safeResolvePath(undefined, 'input.name')).not.toThrow();
         expect(safeResolvePath(undefined, 'input.name')).toBeUndefined();
+    });
+});
+
+describe('encodeParameters', () => {
+    it('encodes each non-ASCII character of a key with its own character code', () => {
+        const encodedParameters = encodeParameters({Broj_etaža: 'a', Hlađenje: 'b', Sažetak: 'c'});
+
+        expect(Object.keys(encodedParameters)).toEqual([
+            encodePath('Broj_etaža'),
+            encodePath('Hlađenje'),
+            encodePath('Sažetak'),
+        ]);
+    });
+
+    it('round-trips non-ASCII keys through decodePath', () => {
+        const encodedParameters = encodeParameters({Broj_etaža: 'a', Željeni_rok: 'b'});
+
+        expect(Object.keys(encodedParameters).map(decodePath)).toEqual(['Broj_etaža', 'Željeni_rok']);
+    });
+
+    it('resolves a nested non-ASCII key with the path the editor builds for it', () => {
+        const encodedParameters = encodeParameters({row: {values: {Sažetak: '${aiText_1.sazetak}'}}});
+
+        expect(safeResolvePath(encodedParameters, encodePath('row.values.Sažetak'))).toBe('${aiText_1.sazetak}');
     });
 });
