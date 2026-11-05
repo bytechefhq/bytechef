@@ -41,7 +41,7 @@ class ScimSecurityConfiguration {
 
             @Override
             public List<String> getApiPermitAllRequestMatcherPaths() {
-                return List.of("/api/scim/v2/**");
+                return List.of(ScimHttpConfigurer.SCIM_PATH_PATTERN);
             }
         };
     }
