@@ -451,17 +451,10 @@ interface ProvidedValuesFormProps {
     configuration: AutomationWorkflowProjectConfigurationType;
     onClose: () => void;
     providableValues: ProvidableValuesType;
-    title: string;
     workflowUuid: string;
 }
 
-const ProvidedValuesForm = ({
-    configuration,
-    onClose,
-    providableValues,
-    title,
-    workflowUuid,
-}: ProvidedValuesFormProps) => {
+const ProvidedValuesForm = ({configuration, onClose, providableValues, workflowUuid}: ProvidedValuesFormProps) => {
     const [providedConnections, setProvidedConnections] = useState<Record<string, string>>(() =>
         Object.fromEntries(
             Object.entries((providableValues.providedConnections ?? {}) as Record<string, unknown>).map(
@@ -560,7 +553,7 @@ const ProvidedValuesForm = ({
         >
             <DialogHeader
                 description="Connections and inputs set here are used by every connected user and cannot be changed by them."
-                title={title}
+                title="Provided Values"
             />
 
             <DialogBody>
@@ -654,8 +647,6 @@ const AutomationWorkflowProjectConfigurationWorkflowDialog = ({
 
     const providableValues = data?.automationWorkflowProjectConfigurationWorkflowProvidableValues;
 
-    const title = `Edit ${workflow.label || workflow.workflowUuid}`;
-
     return (
         <Dialog
             onOpenChange={(open) => {
@@ -672,14 +663,13 @@ const AutomationWorkflowProjectConfigurationWorkflowDialog = ({
                             configuration={configuration}
                             onClose={onClose}
                             providableValues={providableValues}
-                            title={title}
                             workflowUuid={workflow.workflowUuid}
                         />
                     ) : (
                         <>
                             <DialogHeader
                                 description="Connections and inputs set here are used by every connected user and cannot be changed by them."
-                                title={title}
+                                title="Provided Values"
                             />
 
                             <DialogBody>
