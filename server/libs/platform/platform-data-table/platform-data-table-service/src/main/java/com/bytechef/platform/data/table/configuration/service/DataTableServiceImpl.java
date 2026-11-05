@@ -17,11 +17,6 @@
 package com.bytechef.platform.data.table.configuration.service;
 
 import com.bytechef.exception.ExecutionException;
-import com.bytechef.platform.audit.AuditData;
-import com.bytechef.platform.audit.Audited;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
-import com.bytechef.platform.data.table.audit.DataTableAuditMapper;
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
@@ -66,12 +61,6 @@ public class DataTableServiceImpl implements DataTableService {
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
-    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_ADDED, platform = PlatformType.AUTOMATION, data = {
-        @AuditData(key = "baseName", value = "#baseName"),
-        @AuditData(key = "columnName", value = "#columnSpec.name"),
-        @AuditData(key = "columnType", value = "#columnSpec.type"),
-        @AuditData(key = "environmentId", value = "#environmentId")
-    })
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void addColumn(String baseName, ColumnSpec columnSpec, long environmentId) {
         String normalizedBaseName = normalizeBaseName(baseName);
@@ -136,12 +125,6 @@ public class DataTableServiceImpl implements DataTableService {
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
-    @Audited(
-        event = DataTableAuditEvents.DATA_TABLE_DELETED, mapper = DataTableAuditMapper.class,
-        platform = PlatformType.AUTOMATION, data = {
-            @AuditData(key = "baseName", value = "#baseName"),
-            @AuditData(key = "environmentId", value = "#environmentId")
-        })
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public boolean dropTable(String baseName, long environmentId) {
         String normalizedBaseName = normalizeBaseName(baseName);
@@ -282,11 +265,6 @@ public class DataTableServiceImpl implements DataTableService {
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
-    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_REMOVED, platform = PlatformType.AUTOMATION, data = {
-        @AuditData(key = "baseName", value = "#baseName"),
-        @AuditData(key = "columnName", value = "#columnName"),
-        @AuditData(key = "environmentId", value = "#environmentId")
-    })
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void removeColumn(String baseName, String columnName, long environmentId) {
         String normalizedBaseName = normalizeBaseName(baseName);
@@ -309,12 +287,6 @@ public class DataTableServiceImpl implements DataTableService {
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
-    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_RENAMED, platform = PlatformType.AUTOMATION, data = {
-        @AuditData(key = "baseName", value = "#baseName"),
-        @AuditData(key = "fromColumnName", value = "#fromColumnName"),
-        @AuditData(key = "toColumnName", value = "#toColumnName"),
-        @AuditData(key = "environmentId", value = "#environmentId")
-    })
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void renameColumn(String baseName, String fromColumnName, String toColumnName, long environmentId) {
         String normalizedBaseName = normalizeBaseName(baseName);
@@ -341,11 +313,6 @@ public class DataTableServiceImpl implements DataTableService {
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
-    @Audited(event = DataTableAuditEvents.DATA_TABLE_RENAMED, platform = PlatformType.AUTOMATION, data = {
-        @AuditData(key = "fromBaseName", value = "#fromBaseName"),
-        @AuditData(key = "toBaseName", value = "#toBaseName"),
-        @AuditData(key = "environmentId", value = "#environmentId")
-    })
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void renameTable(String fromBaseName, String toBaseName, long environmentId) {
         String normalizedFromBaseName = normalizeBaseName(fromBaseName);

@@ -5,8 +5,9 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useOpenInProject from '../useOpenInProject';
 
-const {fetchQueryMock, navigateMock, toastMock} = vi.hoisted(() => ({
+const {fetchQueryMock, grantedScopesByEnvironment, navigateMock, toastMock} = vi.hoisted(() => ({
     fetchQueryMock: vi.fn(),
+    grantedScopesByEnvironment: {} as Record<number, string[]>,
     navigateMock: vi.fn(),
     toastMock: vi.fn(),
 }));
@@ -31,6 +32,18 @@ vi.mock('react-router-dom', async (importOriginal) => {
 
 vi.mock('sonner', () => ({toast: toastMock}));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', async () => {
+    const {environmentStore: mockedEnvironmentStore} = await import('@/shared/stores/useEnvironmentStore');
+
+    return {
+        useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string, environmentId?: number) =>
+            (
+                grantedScopesByEnvironment[environmentId ?? mockedEnvironmentStore.getState().currentEnvironmentId] ??
+                []
+            ).includes(scope),
+    };
+});
+
 describe('useOpenInProject', () => {
     beforeEach(() => {
         fetchQueryMock.mockReset();
@@ -38,6 +51,37 @@ describe('useOpenInProject', () => {
         toastMock.mockReset();
 
         environmentStore.setState({currentEnvironmentId: DEVELOPMENT_ENVIRONMENT});
+
+        grantedScopesByEnvironment[DEVELOPMENT_ENVIRONMENT] = ['WORKFLOW_VIEW'];
+        grantedScopesByEnvironment[STAGING_ENVIRONMENT] = ['WORKFLOW_VIEW'];
+    });
+
+    it('allows opening in the project with WORKFLOW_VIEW in the current environment and in Development', () => {
+        environmentStore.setState({currentEnvironmentId: STAGING_ENVIRONMENT});
+
+        const {result} = renderHook(() => useOpenInProject());
+
+        expect(result.current.canOpenInProject).toBe(true);
+    });
+
+    it('refuses opening in the project without WORKFLOW_VIEW in Development', () => {
+        environmentStore.setState({currentEnvironmentId: STAGING_ENVIRONMENT});
+
+        grantedScopesByEnvironment[DEVELOPMENT_ENVIRONMENT] = [];
+
+        const {result} = renderHook(() => useOpenInProject());
+
+        expect(result.current.canOpenInProject).toBe(false);
+    });
+
+    it('refuses opening in the project without WORKFLOW_VIEW in the current environment', () => {
+        environmentStore.setState({currentEnvironmentId: STAGING_ENVIRONMENT});
+
+        grantedScopesByEnvironment[STAGING_ENVIRONMENT] = ['DEPLOYMENT_VIEW'];
+
+        const {result} = renderHook(() => useOpenInProject());
+
+        expect(result.current.canOpenInProject).toBe(false);
     });
 
     it('switches to Development before opening the project from another environment', async () => {

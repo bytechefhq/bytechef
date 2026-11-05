@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     api(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-api"))
 
     implementation("com.github.ben-manes.caffeine:caffeine")
@@ -17,8 +18,11 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:ee:libs:config:tenant-multi-data-config"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     testImplementation(project(":server:libs:test:test-support"))
 
     testRuntimeOnly("org.postgresql:postgresql")

@@ -9,6 +9,8 @@ import {
 import EditKnowledgeBaseDialog from '@/pages/automation/knowledge-base/components/EditKnowledgeBaseDialog';
 import KnowledgeBaseDeleteAlertDialog from '@/pages/automation/knowledge-base/components/KnowledgeBaseDeleteAlertDialog';
 import useKnowledgeBaseDropdownMenu from '@/pages/automation/knowledge-base/components/hooks/useKnowledgeBaseDropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {KnowledgeBase} from '@/shared/middleware/graphql';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
@@ -26,31 +28,44 @@ const KnowledgeBaseDropdownMenu = ({knowledgeBase}: KnowledgeBaseDropdownMenuPro
         showEditDialog,
     } = useKnowledgeBaseDropdownMenu();
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    // Delete is ADMIN-tier on the server (WorkspaceKnowledgeBaseFacadeImpl.deleteWorkspaceKnowledgeBase), so offering it
+    // to a member without KNOWLEDGE_BASE_DELETE means a confirm dialog that ends in a 403.
+    const canDelete = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_DELETE');
+    const canEditKnowledgeBase = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_EDIT');
+
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        aria-label="More Knowledge Base Actions"
-                        icon={<EllipsisVerticalIcon />}
-                        size="icon"
-                        variant="ghost"
-                    />
-                </DropdownMenuTrigger>
+            {(canEditKnowledgeBase || canDelete) && (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            aria-label="More Knowledge Base Actions"
+                            icon={<EllipsisVerticalIcon />}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={handleShowEditDialog} />
+                    <DropdownMenuContent align="end">
+                        {canEditKnowledgeBase && (
+                            <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={handleShowEditDialog} />
+                        )}
 
-                    <DropdownMenuSeparator />
+                        {canEditKnowledgeBase && canDelete && <DropdownMenuSeparator />}
 
-                    <DropdownMenuItem
-                        icon={<Trash2Icon />}
-                        label="Delete"
-                        onClick={handleShowDeleteDialog}
-                        variant="destructive"
-                    />
-                </DropdownMenuContent>
-            </DropdownMenu>
+                        {canDelete && (
+                            <DropdownMenuItem
+                                icon={<Trash2Icon />}
+                                label="Delete"
+                                onClick={handleShowDeleteDialog}
+                                variant="destructive"
+                            />
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )}
 
             <EditKnowledgeBaseDialog
                 knowledgeBase={knowledgeBase}

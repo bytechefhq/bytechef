@@ -11,6 +11,7 @@ import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/Ai
 import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
 import AiSkillListItemTagList from '@/pages/automation/ai/skills/components/AiSkillListItemTagList';
 import useAiSkillListItem from '@/pages/automation/ai/skills/hooks/useAiSkillListItem';
+import useCanManageAiSkill from '@/pages/automation/ai/skills/hooks/useCanManageAiSkill';
 import {AiSkill} from '@/shared/middleware/graphql';
 import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon} from 'lucide-react';
 
@@ -34,6 +35,8 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
         showEditDialog,
     } = useAiSkillListItem({deleteSkill, onDownload, onUpdate, skill});
 
+    const canManage = useCanManageAiSkill(skill.createdBy);
+
     return (
         <>
             <div
@@ -54,7 +57,7 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
                         onClick={(event) => event.stopPropagation()}
                         role="presentation"
                     >
-                        <AiSkillListItemTagList skillId={skill.id} tags={skill.tags ?? []} />
+                        <AiSkillListItemTagList readOnly={!canManage} skillId={skill.id} tags={skill.tags ?? []} />
                     </div>
                 </div>
 
@@ -83,20 +86,24 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
                         <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
                             <DropdownMenuItem icon={<DownloadIcon />} label="Download" onClick={handleDownloadClick} />
 
-                            <DropdownMenuItem
-                                icon={<PencilIcon />}
-                                label="Edit"
-                                onClick={() => setShowEditDialog(true)}
-                            />
+                            {canManage && (
+                                <>
+                                    <DropdownMenuItem
+                                        icon={<PencilIcon />}
+                                        label="Edit"
+                                        onClick={() => setShowEditDialog(true)}
+                                    />
 
-                            <DropdownMenuSeparator />
+                                    <DropdownMenuSeparator />
 
-                            <DropdownMenuItem
-                                icon={<TrashIcon />}
-                                label="Delete"
-                                onClick={() => setShowDeleteDialog(true)}
-                                variant="destructive"
-                            />
+                                    <DropdownMenuItem
+                                        icon={<TrashIcon />}
+                                        label="Delete"
+                                        onClick={() => setShowDeleteDialog(true)}
+                                        variant="destructive"
+                                    />
+                                </>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

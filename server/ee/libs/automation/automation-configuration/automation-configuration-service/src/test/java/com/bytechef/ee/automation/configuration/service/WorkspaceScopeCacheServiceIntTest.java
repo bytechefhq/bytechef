@@ -18,8 +18,10 @@ import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -44,7 +46,11 @@ import org.springframework.transaction.support.TransactionTemplate;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = WorkspacePermissionIntTestConfiguration.class, properties = "bytechef.edition=ee")
+@SpringBootTest(
+    classes = WorkspacePermissionIntTestConfiguration.class,
+    properties = {
+        "bytechef.edition=ee", "spring.liquibase.contexts=mono,dev"
+    })
 class WorkspaceScopeCacheServiceIntTest {
 
     private static final long USER_ID = 2L;
@@ -92,12 +98,111 @@ class WorkspaceScopeCacheServiceIntTest {
 
     @Test
     void testGetWorkspaceScopesResolvesCustomRole() {
+        createCustomRole(WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_ID);
+
         workspaceUserRepository.save(
             WorkspaceUser.forCustomRole(USER_ID, workspaceId, WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_ID));
 
         Set<String> scopes = workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId);
 
         assertThat(scopes).containsExactly(WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_SCOPE);
+    }
+
+    @Test
+    void testGetWorkspaceScopesForAnEnvironmentIsEmptyWhereTheMemberHoldsNoRole() {
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.EDITOR, Environment.DEVELOPMENT));
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.DEVELOPMENT))
+            .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+            .isEmpty();
+    }
+
+    @Test
+    void testGetWorkspaceScopesForAnEnvironmentResolvesThatEnvironmentsRole() {
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.ADMIN, Environment.PRODUCTION));
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.DEVELOPMENT))
+            .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER));
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+            .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.ADMIN));
+    }
+
+    @Test
+    void testGetWorkspaceScopesForAnEnvironmentIgnoresAnImplicitRowBesideEnvironmentRows() {
+        workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.ADMIN));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT));
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+            .isEmpty();
+    }
+
+    @Test
+    void testGetWorkspaceScopesIgnoresAnImplicitRowBesideEnvironmentRows() {
+        workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.ADMIN));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT));
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId))
+            .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER));
+    }
+
+    @Test
+    void testTwoEnvironmentsDoNotShareACacheEntry() {
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.EDITOR, Environment.DEVELOPMENT));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.PRODUCTION));
+
+        Set<String> developmentScopes =
+            workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.DEVELOPMENT);
+        Set<String> productionScopes =
+            workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION);
+
+        assertThat(developmentScopes).isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
+        assertThat(productionScopes).isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER));
+        assertThat(developmentScopes).isNotEqualTo(productionScopes);
+    }
+
+    @Test
+    void testEvictionClearsEveryEnvironmentEntry() {
+        WorkspaceUser workspaceUser = workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.PRODUCTION));
+
+        Set<String> viewerScopes = permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER);
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+            .isEqualTo(viewerScopes);
+
+        changeRole(workspaceUser, WorkspaceRole.EDITOR);
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+            .isEqualTo(viewerScopes);
+
+        workspaceScopeCacheService.evictWorkspaceScopeCache(USER_ID, workspaceId);
+
+        assertThat(getCachedScopes(Environment.PRODUCTION)).isNull();
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId, Environment.PRODUCTION))
+            .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
+    }
+
+    @Test
+    void testEnvironmentUnawareReadUnionsTheEnvironmentRoles() {
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.EDITOR, Environment.DEVELOPMENT));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER, Environment.PRODUCTION));
+
+        Set<String> expectedScopes = new HashSet<>(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
+
+        expectedScopes.addAll(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER));
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId)).isEqualTo(expectedScopes);
     }
 
     @Test
@@ -268,6 +373,14 @@ class WorkspaceScopeCacheServiceIntTest {
         workspaceUserRepository.save(persistedWorkspaceUser);
     }
 
+    private void createCustomRole(long customRoleId) {
+        jdbcTemplate.update(
+            "INSERT INTO custom_role (id, name, created_date, created_by, last_modified_date, last_modified_by, " +
+                "version) VALUES (?, ?, CURRENT_TIMESTAMP, 'test', CURRENT_TIMESTAMP, 'test', 0) " +
+                "ON CONFLICT (id) DO NOTHING",
+            customRoleId, "Custom Role " + customRoleId);
+    }
+
     @SuppressWarnings("unchecked")
     private @Nullable Set<String> getCachedScopes() {
         Cache cache = cacheManager.getCache(WORKSPACE_SCOPES_CACHE);
@@ -275,6 +388,17 @@ class WorkspaceScopeCacheServiceIntTest {
         assertThat(cache).isNotNull();
 
         Cache.ValueWrapper valueWrapper = cache.get(TenantCacheKeyUtils.getKey(USER_ID, workspaceId));
+
+        return valueWrapper == null ? null : (Set<String>) valueWrapper.get();
+    }
+
+    @SuppressWarnings("unchecked")
+    private @Nullable Set<String> getCachedScopes(Environment environment) {
+        Cache cache = cacheManager.getCache(WORKSPACE_SCOPES_CACHE);
+
+        assertThat(cache).isNotNull();
+
+        Cache.ValueWrapper valueWrapper = cache.get(TenantCacheKeyUtils.getKey(USER_ID, workspaceId, environment));
 
         return valueWrapper == null ? null : (Set<String>) valueWrapper.get();
     }

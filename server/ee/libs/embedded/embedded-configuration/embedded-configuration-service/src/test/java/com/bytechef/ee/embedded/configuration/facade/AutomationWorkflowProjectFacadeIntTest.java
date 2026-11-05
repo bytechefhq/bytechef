@@ -234,7 +234,7 @@ class AutomationWorkflowProjectFacadeIntTest {
     void testCopyWorkflowTemplate() {
         long projectId = automationWorkflowProjectFacade.createProject("Onboarding", "", null, List.of(), null);
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         createEnabledConfiguration(projectId, 1);
 
@@ -258,7 +258,7 @@ class AutomationWorkflowProjectFacadeIntTest {
     void testCopyWorkflowTemplateRecordsCopiedFromWorkflowUuid() {
         long projectId = automationWorkflowProjectFacade.createProject("Onboarding", "", null, List.of(), null);
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         createEnabledConfiguration(projectId, 1);
 
@@ -350,7 +350,7 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         VersionWorkflowChanges versionWorkflowChanges =
             automationWorkflowProjectFacade.getProjectVersionWorkflowChanges(projectId, 1);
@@ -465,7 +465,7 @@ class AutomationWorkflowProjectFacadeIntTest {
             "PublishedAutomationWorkflow", "", null, List.of(), null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(publishedProjectId, null, null);
-        automationWorkflowProjectFacade.publishProject(publishedProjectId);
+        automationWorkflowProjectFacade.publishProject(publishedProjectId, null);
 
         long unpublishedProjectId = automationWorkflowProjectFacade.createProject(
             "UnpublishedAutomationWorkflow", "", null, List.of(), null);
@@ -500,8 +500,8 @@ class AutomationWorkflowProjectFacadeIntTest {
             .workflowTemplates()
             .size();
 
-        automationWorkflowProjectFacade.publishProject(projectId);
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         assertThat(automationWorkflowProjectFacade.getProject(projectId)
             .workflowTemplates()).hasSize(workflowTemplateCountBeforePublish);
@@ -517,7 +517,7 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         assertThat(draftBeforePublish.workflowUuid()).isEqualTo(workflowUuid);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         ConnectedUserWorkflowTemplateDTO draftAfterPublish = getDraftTemplate(projectId);
 
@@ -533,7 +533,7 @@ class AutomationWorkflowProjectFacadeIntTest {
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             projectId, "{\"label\":\"Original\",\"tasks\":[]}", null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         automationWorkflowProjectFacade.updateProjectWorkflow(workflowUuid, "Renamed", "");
 
@@ -559,7 +559,7 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         String duplicateWorkflowUuid = automationWorkflowProjectFacade.duplicateProjectWorkflow(workflowUuid);
 
@@ -770,7 +770,7 @@ class AutomationWorkflowProjectFacadeIntTest {
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             projectId, null, "metadata['tier'] == 'pro'");
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         assertThat(getPublishedTemplate(projectId, workflowUuid)
             .permissionExpression()).isEqualTo("metadata['tier'] == 'pro'");
@@ -879,7 +879,7 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         String secondWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         createConfiguration(projectId, 1, true, true);
 
@@ -901,7 +901,7 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         String secondWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         AutomationWorkflowProjectConfiguration configuration = createConfiguration(projectId, 2, true, true);
 
@@ -944,7 +944,7 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         long projectId = createPublishedProject("Assigned Visibility");
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         automationWorkflowProjectConfigurationService.create(
             projectId, Environment.PRODUCTION.ordinal(), "A", null, 2, true, true);
@@ -996,11 +996,11 @@ class AutomationWorkflowProjectFacadeIntTest {
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             projectId, "{\"label\":\"Original\",\"tasks\":[]}", null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         automationWorkflowProjectFacade.updateProjectWorkflow(workflowUuid, "Renamed", "");
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         createConfiguration(projectId, 1, true, true);
 
@@ -1039,7 +1039,7 @@ class AutomationWorkflowProjectFacadeIntTest {
             name + " " + UUID.randomUUID(), "", null, List.of(), null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         return projectId;
     }
@@ -1182,7 +1182,7 @@ class AutomationWorkflowProjectFacadeIntTest {
                 "\"type\":\"hubspot/v1/newContact\",\"parameters\":{}}],\"tasks\":[]}",
             null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         createEnabledConfiguration(projectId, 1);
 
@@ -1256,7 +1256,7 @@ class AutomationWorkflowProjectFacadeIntTest {
             "{\"label\":\"Slack digest\",\"tasks\":[{\"name\":\"post\",\"type\":\"slack/v1/sendMessage\",\"parameters\":{}}]}",
             null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         createEnabledConfiguration(projectId, 1);
 

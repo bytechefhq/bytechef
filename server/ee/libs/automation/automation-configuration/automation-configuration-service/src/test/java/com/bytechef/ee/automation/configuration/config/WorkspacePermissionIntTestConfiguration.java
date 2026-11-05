@@ -7,35 +7,44 @@
 
 package com.bytechef.ee.automation.configuration.config;
 
+import static org.mockito.Mockito.mock;
+
 import com.bytechef.automation.configuration.callback.ProjectCallback;
 import com.bytechef.automation.configuration.callback.ProjectWorkflowCallback;
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
 import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.ConnectionPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.ExecutionPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolver;
+import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.encryption.Encryption;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.service.UserServiceImpl;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.CacheManager;
@@ -60,8 +69,9 @@ import tools.jackson.databind.ObjectMapper;
 @EnableMethodSecurity
 @Import({
     A2aPermissionScopeProvider.class, ApiKeyPermissionScopeProvider.class, CacheConfiguration.class,
-    CurrentUserResolver.class, DeploymentPermissionScopeProvider.class,
-    EmbeddedOwnerContributorsTestConfiguration.class, LiquibaseConfiguration.class, McpPermissionScopeProvider.class,
+    ConnectionPermissionScopeProvider.class, CurrentUserResolver.class, DeploymentPermissionScopeProvider.class,
+    EmbeddedOwnerContributorsTestConfiguration.class, EmbeddedScopeCacheService.class,
+    ExecutionPermissionScopeProvider.class, LiquibaseConfiguration.class, McpPermissionScopeProvider.class,
     PermissionScopeRegistry.class, PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class,
     ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectWorkflowCallback.class,
     WorkflowPermissionScopeProvider.class,
@@ -73,6 +83,16 @@ public class WorkspacePermissionIntTestConfiguration {
 
     public static final long CUSTOM_ROLE_ID = 900L;
     public static final String CUSTOM_ROLE_SCOPE = "PROJECT_SETTINGS";
+
+    @Bean
+    ApplicationProperties applicationProperties() {
+        return new ApplicationProperties();
+    }
+
+    @Bean
+    Encryption encryption() {
+        return mock(Encryption.class);
+    }
 
     @Bean
     CustomRoleScopeResolver customRoleScopeResolver() {
@@ -88,10 +108,12 @@ public class WorkspacePermissionIntTestConfiguration {
     @Bean
     UserService userService(
         AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
-        PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
+        PersistentTokenRepository persistentTokenRepository, UserRepository userRepository,
+        ObjectProvider<WorkspaceMembershipAssigner> workspaceMembershipAssignerProvider) {
 
         return new UserServiceImpl(
-            authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, userRepository);
+            authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, userRepository,
+            workspaceMembershipAssignerProvider);
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

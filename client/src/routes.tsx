@@ -23,7 +23,11 @@ import EEVersion from '@/shared/edition/EEVersion';
 import ErrorPage from '@/shared/error/ErrorPage';
 import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
 import PageNotFound from '@/shared/error/PageNotFound';
+import AutomationEnvironmentAccessGuard from '@/shared/layout/AutomationEnvironmentAccessGuard';
+import EmbeddedEnvironmentAccessGuard from '@/shared/layout/EmbeddedEnvironmentAccessGuard';
+import EmbeddedIndexRedirect from '@/shared/layout/EmbeddedIndexRedirect';
 import Settings from '@/shared/layout/Settings';
+import SettingsIndexRedirect from '@/shared/layout/SettingsIndexRedirect';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {EnvironmentApi} from '@/shared/middleware/platform/configuration';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
@@ -86,6 +90,7 @@ const ApiConnectorImportPage = lazy(
 );
 const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
+const EmbeddedMembers = lazy(() => import('@/ee/pages/settings/embedded/members/EmbeddedMembers'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
 const AuditEvents = lazy(() => import('@/ee/pages/settings/platform/audit-events/AuditEvents'));
@@ -123,6 +128,8 @@ const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integrati
 const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
 const WorkspaceApiKeys = lazy(() => import('@/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
+const WorkspaceUsers = lazy(() => import('@/ee/pages/settings/automation/users/WorkspaceUsers'));
+const GlobalCustomRoles = lazy(() => import('@/ee/pages/settings/platform/custom-roles/GlobalCustomRoles'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const UsersPage = lazy(() => import('@/pages/settings/platform/users/UsersPage'));
 
@@ -185,6 +192,24 @@ const getAccountRoutes = (path: string) => ({
 const currentWorkspaceSettingsRoutes = {
     children: [
         {
+            // ADMIN *or* USER: a workspace admin need not be a tenant admin, and gating this on ROLE_ADMIN would
+            // reinstate the very problem the page exists to solve. The page itself checks the
+            // WORKSPACE_MEMBER_MANAGE scope for the current workspace.
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <WorkspaceUsers />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            // Not 'users': the tenant Users page already claims that path, and both route sets are spread into the
+            // same children array under /automation/settings — so sharing it made this page shadow the tenant one,
+            // and the sidebar's `href === 'users'` feature-flag filter hid this one behind a flag meant for that one.
+            path: 'workspace-users',
+        },
+        {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
@@ -210,6 +235,10 @@ const currentWorkspaceSettingsRoutes = {
     navItems: [
         {
             title: 'Current Workspace',
+        },
+        {
+            href: 'workspace-users',
+            title: 'Users',
         },
         {
             href: 'git-configuration',
@@ -250,6 +279,19 @@ const platformSettingsRoutes = {
             path: 'users',
         },
         {
+            // Tenant-global roles are assignable in every workspace, so managing them is a tenant-wide act.
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <GlobalCustomRoles />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'global-custom-roles',
+        },
+        {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <LazyLoadWrapper>
@@ -281,7 +323,7 @@ const platformSettingsRoutes = {
         },
         {
             element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <LazyLoadWrapper>
                         <AiAutoMemories />
                     </LazyLoadWrapper>
@@ -315,7 +357,7 @@ const platformSettingsRoutes = {
             children: [
                 {
                     element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
                                     <ApiConnectors />
@@ -327,7 +369,7 @@ const platformSettingsRoutes = {
                 },
                 {
                     element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
                                     <ApiConnectorManualPage />
@@ -339,7 +381,7 @@ const platformSettingsRoutes = {
                 },
                 {
                     element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
                                     <ApiConnectorImportPage />
@@ -351,7 +393,7 @@ const platformSettingsRoutes = {
                 },
                 {
                     element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
                                     <ApiConnectorAiPage />
@@ -429,6 +471,10 @@ const platformSettingsRoutes = {
             title: 'Users',
         },
         {
+            href: 'global-custom-roles',
+            title: 'Roles',
+        },
+        {
             href: 'billing',
             title: 'Billing',
         },
@@ -484,6 +530,33 @@ const platformSettingsRoutes = {
     ],
 };
 
+const automationSettingsNavItems = [
+    ...currentWorkspaceSettingsRoutes.navItems,
+    organizationSettingsNavItem,
+    {
+        href: '/automation/settings/workspaces',
+        title: 'Workspaces',
+    },
+    ...platformSettingsRoutes.navItems,
+];
+
+const embeddedSettingsNavItems = [
+    {
+        href: '/embedded/settings/members',
+        title: 'Members',
+    },
+    {
+        href: '/embedded/settings/signing-keys',
+        title: 'Signing Keys',
+    },
+    {
+        href: '/embedded/settings/api-keys',
+        title: 'API Keys',
+    },
+    organizationSettingsNavItem,
+    ...platformSettingsRoutes.navItems,
+];
+
 export const loadEnvironments = async (queryClient: QueryClient) => {
     if (authenticationStore.getState().authenticated) {
         const environments = await queryClient.query({
@@ -494,6 +567,14 @@ export const loadEnvironments = async (queryClient: QueryClient) => {
         environmentStore.getState().setEnvironments(environments);
     }
 };
+
+export const loadProjectWorkflowEditor = async (queryClient: QueryClient, projectId: number) =>
+    redirectOutsideDevelopmentEnvironment('/automation/deployments') ??
+    queryClient.query({
+        queryFn: () => new ProjectApi().getProject({id: projectId}),
+        queryKey: ProjectKeys.project(projectId),
+        staleTime: 'static',
+    });
 
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
@@ -665,15 +746,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     loader: async ({params}) =>
-                                        redirectOutsideDevelopmentEnvironment('/automation/deployments') ??
-                                        queryClient.query({
-                                            queryFn: () =>
-                                                new ProjectApi().getProject({
-                                                    id: parseInt(params.projectId!),
-                                                }),
-                                            queryKey: ProjectKeys.project(parseInt(params.projectId!)),
-                                            staleTime: 'static',
-                                        }),
+                                        loadProjectWorkflowEditor(queryClient, Number.parseInt(params.projectId!)),
                                     path: 'projects/:projectId/project-workflows/:projectWorkflowId',
                                 },
                                 {
@@ -750,7 +823,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         },
                                         {
                                             element: (
-                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                                     <EEVersion>
                                                         <LazyLoadWrapper>
                                                             <ApiClients />
@@ -921,10 +994,14 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     children: [
                                         {
+                                            element: (
+                                                <SettingsIndexRedirect
+                                                    fallbackHref="/automation/account"
+                                                    sidebarNavItems={automationSettingsNavItems}
+                                                    tenantAdminHref="workspaces"
+                                                />
+                                            ),
                                             index: true,
-                                            loader: async () => {
-                                                return redirect('workspaces');
-                                            },
                                         },
                                         {
                                             element: (
@@ -941,32 +1018,21 @@ export const getRouter = (queryClient: QueryClient) =>
                                         ...currentWorkspaceSettingsRoutes.children,
                                         ...platformSettingsRoutes.children,
                                     ],
-                                    element: (
-                                        <Settings
-                                            sidebarNavItems={[
-                                                ...currentWorkspaceSettingsRoutes.navItems,
-                                                organizationSettingsNavItem,
-                                                {
-                                                    href: '/automation/settings/workspaces',
-                                                    title: 'Workspaces',
-                                                },
-                                                ...platformSettingsRoutes.navItems,
-                                            ]}
-                                        />
-                                    ),
+                                    element: <Settings sidebarNavItems={automationSettingsNavItems} />,
                                     path: 'settings',
                                 },
                             ],
+                            element: <AutomationEnvironmentAccessGuard />,
                             errorElement: <ErrorPage />,
                             path: 'automation',
                         },
                         {
                             children: [
                                 {
+                                    element: (
+                                        <EmbeddedIndexRedirect fallbackHref="account" tenantAdminHref="integrations" />
+                                    ),
                                     index: true,
-                                    loader: async () => {
-                                        return redirect('integrations');
-                                    },
                                 },
                                 getAccountRoutes('/embedded'),
                                 {
@@ -1148,14 +1214,30 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     children: [
                                         {
+                                            element: (
+                                                <SettingsIndexRedirect
+                                                    fallbackHref="/embedded/account"
+                                                    sidebarNavItems={embeddedSettingsNavItems}
+                                                    tenantAdminHref="signing-keys"
+                                                />
+                                            ),
                                             index: true,
-                                            loader: async () => {
-                                                return redirect('signing-keys');
-                                            },
                                         },
                                         {
                                             element: (
-                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <EmbeddedMembers />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'members',
+                                        },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <EEVersion>
                                                         <LazyLoadWrapper>
                                                             <SigningKeys />
@@ -1167,7 +1249,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         },
                                         {
                                             element: (
-                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <EEVersion>
                                                         <LazyLoadWrapper>
                                                             <EmbeddedApiKeys />
@@ -1179,25 +1261,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                         },
                                         ...platformSettingsRoutes.children,
                                     ],
-                                    element: (
-                                        <Settings
-                                            sidebarNavItems={[
-                                                {
-                                                    href: '/embedded/settings/signing-keys',
-                                                    title: 'Signing Keys',
-                                                },
-                                                {
-                                                    href: '/embedded/settings/api-keys',
-                                                    title: 'API Keys',
-                                                },
-                                                organizationSettingsNavItem,
-                                                ...platformSettingsRoutes.navItems,
-                                            ]}
-                                        />
-                                    ),
+                                    element: <Settings sidebarNavItems={embeddedSettingsNavItems} />,
                                     path: 'settings',
                                 },
                             ],
+                            element: <EmbeddedEnvironmentAccessGuard />,
                             errorElement: <ErrorPage />,
                             path: 'embedded',
                         },

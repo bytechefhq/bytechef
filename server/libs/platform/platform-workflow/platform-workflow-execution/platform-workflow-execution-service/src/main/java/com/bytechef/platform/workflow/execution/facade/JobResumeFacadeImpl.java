@@ -24,12 +24,16 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ApprovalFormInputs;
 import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.JobSuspends;
+import com.bytechef.platform.workflow.execution.audit.JobApprovalAuditEvents;
+import com.bytechef.platform.workflow.execution.audit.JobApprovalAuditMapper;
 import com.bytechef.platform.workflow.execution.event.JobApprovalClosedEvent;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
@@ -52,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionCallback;
@@ -112,6 +117,10 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     }
 
     @Override
+    @Audited(
+        event = JobApprovalAuditEvents.JOB_APPROVAL_CANCELLED, mapper = JobApprovalAuditMapper.class,
+        data = @AuditData(key = "jobId", value = "#jobId"))
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'DEPLOYMENT_EDIT')")
     public boolean cancelApproval(long jobId) {
         return Objects.requireNonNull(transactionOperations.execute(transactionStatus -> {
             Job job = jobService.getJob(jobId);

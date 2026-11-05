@@ -40,7 +40,7 @@ public class IntegrationCategoryFacadeImpl implements IntegrationCategoryFacade 
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('WORKFLOW_VIEW')")
     public List<Category> getIntegrationCategories() {
         List<Integration> integrations = integrationService.getIntegrations();
 

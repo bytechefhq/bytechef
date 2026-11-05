@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20261020100000" author="Ivica Cardic">
+        <createTable tableName="embedded_user">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="embedded_role" type="INT"/>
+            <column name="custom_role_id" type="BIGINT"/>
+            <column name="environment" type="INT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="embedded_user"
+            baseColumnNames="custom_role_id"
+            constraintName="fk_embedded_user_custom_role"
+            referencedTableName="custom_role"
+            referencedColumnNames="id"
+            onDelete="RESTRICT"/>
+
+        <sql>
+            ALTER TABLE embedded_user ADD CONSTRAINT chk_embedded_user_role_xor
+            CHECK ((embedded_role IS NOT NULL AND custom_role_id IS NULL) OR
+                   (embedded_role IS NULL AND custom_role_id IS NOT NULL));
+        </sql>
+    </changeSet>
+
+    <changeSet id="20261020100001" author="Ivica Cardic" contextFilter="mono">
+        <addForeignKeyConstraint
+            baseTableName="embedded_user"
+            baseColumnNames="user_id"
+            constraintName="embedded_user_user"
+            referencedTableName="user"
+            referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20261020100002" author="Ivica Cardic" dbms="postgresql">
+        <sql>
+            CREATE UNIQUE INDEX uk_embedded_user_implicit ON embedded_user (user_id) WHERE environment IS NULL;
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX IF EXISTS uk_embedded_user_implicit;</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261020100003" author="Ivica Cardic" dbms="postgresql">
+        <sql>
+            CREATE UNIQUE INDEX uk_embedded_user_explicit
+                ON embedded_user (user_id, environment) WHERE environment IS NOT NULL;
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX IF EXISTS uk_embedded_user_explicit;</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261020100002-h2" author="Ivica Cardic" dbms="h2">
+        <sql>
+            ALTER TABLE embedded_user ADD COLUMN environment_key INT GENERATED ALWAYS AS (COALESCE(environment, -1));
+            CREATE UNIQUE INDEX uk_embedded_user_environment ON embedded_user (user_id, environment_key);
+        </sql>
+
+        <rollback>
+            <sql>
+                DROP INDEX IF EXISTS uk_embedded_user_environment;
+                ALTER TABLE embedded_user DROP COLUMN environment_key;
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

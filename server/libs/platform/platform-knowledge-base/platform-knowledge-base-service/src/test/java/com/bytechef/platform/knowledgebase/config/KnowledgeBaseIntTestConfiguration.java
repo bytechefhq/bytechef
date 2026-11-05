@@ -53,6 +53,7 @@ import tools.jackson.databind.json.JsonMapper;
     },
     excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = KnowledgeBasePgVectorConfiguration.class))
 @EnableAutoConfiguration(excludeName = {
+    "com.bytechef.automation.configuration.config.AutomationConfigurationJdbcRepositoryConfiguration",
     "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration",
     "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionAutoConfiguration",
     "org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration",

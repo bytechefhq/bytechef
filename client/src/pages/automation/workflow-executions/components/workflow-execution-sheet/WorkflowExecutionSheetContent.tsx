@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import SubflowExecutionBreadcrumb, {
     BreadcrumbEntryI,
@@ -17,6 +18,8 @@ import {getExecutionSelectionKey} from '@/shared/components/workflow-executions/
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {isClusterElementCallTaskExecution} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {ReactNode, useCallback, useMemo} from 'react';
@@ -27,6 +30,7 @@ import {type FocusedExecutionI} from './hooks/useWorkflowExecutionDetail';
 interface WorkflowExecutionSheetContentProps {
     activeTab: TabValueType;
     dialogOpen: boolean;
+    embedded?: boolean;
     focusedExecution?: FocusedExecutionI;
     focusedTaskExecutionError?: boolean;
     handleBreadcrumbNavigate: (index: number) => void;
@@ -54,6 +58,7 @@ interface WorkflowExecutionSheetContentProps {
 const WorkflowExecutionSheetContent = ({
     activeTab,
     dialogOpen,
+    embedded = false,
     focusedExecution,
     focusedTaskExecutionError,
     handleBreadcrumbNavigate,
@@ -77,6 +82,13 @@ const WorkflowExecutionSheetContent = ({
     taskExecutionCount,
     triggerExecution,
 }: WorkflowExecutionSheetContentProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const hasWorkspaceExecutionDetailsScope = useHasWorkspaceScope(currentWorkspaceId, 'EXECUTION_DETAILS_VIEW');
+    const hasEmbeddedExecutionDetailsScope = useHasEmbeddedScope('EXECUTION_DETAILS_VIEW');
+
+    const canViewExecutionDetails = embedded ? hasEmbeddedExecutionDetailsScope : hasWorkspaceExecutionDetailsScope;
+
     const isTaskSelected =
         !!selectedItem &&
         !isTriggerExecution &&
@@ -88,7 +100,7 @@ const WorkflowExecutionSheetContent = ({
     const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
         useGetWorkflowExecutionTaskExecutionQuery(
             {id: lazy.workflowExecutionId, taskExecutionId: Number(selectedItem?.id)},
-            isTaskSelected,
+            isTaskSelected && canViewExecutionDetails,
             false
         );
 
@@ -228,6 +240,7 @@ const WorkflowExecutionSheetContent = ({
                     <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={66} minSize={20}>
                         <WorkflowExecutionsTabsPanel
                             activeTab={activeTab}
+                            detailsHidden={!canViewExecutionDetails}
                             dialogOpen={dialogOpen}
                             job={job}
                             onSeeExecutionsClick={handleSeeExecutions}

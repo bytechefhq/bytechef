@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.test.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -33,9 +34,12 @@ import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
+import com.bytechef.platform.workflow.test.web.rest.AiAgentTestApiController.AiAgentTestRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +50,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -336,5 +344,47 @@ class AiAgentTestApiControllerIntTest {
         AiAgentTestApiController aiAgentTestApiController(AiAgentTestFacade aiAgentTestFacade) {
             return new AiAgentTestApiController(aiAgentTestFacade, Runnable::run);
         }
+    }
+
+    @Test
+    void testTestAiAgentCallsTheFacadeAsTheCallerOnTheExecutorThread() throws InterruptedException {
+        AtomicReference<Authentication> authenticationReference = new AtomicReference<>();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        when(aiAgentTestFacade.executeAiAgentAction(
+            anyString(), anyString(), anyLong(), anyString(), anyString(), any())).thenAnswer(invocation -> {
+                SecurityContext securityContext = SecurityContextHolder.getContext();
+
+                authenticationReference.set(securityContext.getAuthentication());
+
+                countDownLatch.countDown();
+
+                return "done";
+            });
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("alice", "credentials", List.of()));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        try {
+            // A real second thread, as in production: the facade's guard must see the caller there, not an
+            // empty context.
+            AiAgentTestApiController aiAgentTestApiController = new AiAgentTestApiController(
+                aiAgentTestFacade, task -> new Thread(task).start());
+
+            aiAgentTestApiController.testAiAgent(
+                new AiAgentTestRequest(
+                    "workflow-1", "aiAgent_1", Environment.PRODUCTION.ordinal(), "conversation-1", "hello", null));
+
+            assertThat(countDownLatch.await(5, TimeUnit.SECONDS)).isTrue();
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+
+        assertThat(authenticationReference.get())
+            .extracting(Authentication::getName)
+            .isEqualTo("alice");
     }
 }

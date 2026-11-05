@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -35,10 +36,11 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.task.config.ApprovalTaskMethodSecurityTestConfiguration;
-import com.bytechef.automation.task.config.ApprovalTaskMethodSecurityTestConfiguration.TenantAdminCheck;
+import com.bytechef.automation.task.config.ApprovalTaskMethodSecurityTestConfiguration.AuthorizationCheck;
 import com.bytechef.automation.task.config.AutomationTaskIntTestConfiguration;
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.domain.PendingApproval;
+import com.bytechef.automation.task.security.ApprovalTaskJobResolver;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -64,6 +66,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -299,7 +302,7 @@ class ApprovalTaskFacadeIntTest {
 
     @Nested
     @Import({
-        ApprovalTaskMethodSecurityTestConfiguration.class,
+        ApprovalTaskJobResolver.class, ApprovalTaskMethodSecurityTestConfiguration.class,
         ApprovalTaskFacadeIntTest.MethodSecurityFacadeConfiguration.class
     })
     class MethodSecurity {
@@ -308,7 +311,7 @@ class ApprovalTaskFacadeIntTest {
         private ApprovalTaskFacade securedApprovalTaskFacade;
 
         @Autowired
-        private TenantAdminCheck tenantAdminCheck;
+        private AuthorizationCheck authorizationCheck;
 
         @BeforeEach
         void setAuthentication() {
@@ -322,7 +325,7 @@ class ApprovalTaskFacadeIntTest {
         void clearAuthentication() {
             SecurityContextHolder.clearContext();
 
-            reset(tenantAdminCheck);
+            reset(authorizationCheck);
         }
 
         @Test
@@ -337,10 +340,8 @@ class ApprovalTaskFacadeIntTest {
                 .isThrownBy(() -> securedApprovalTaskFacade.deleteApprovalTask(approvalTaskId));
             assertThatExceptionOfType(AccessDeniedException.class)
                 .isThrownBy(() -> securedApprovalTaskFacade.getApprovalTask(approvalTaskId));
-            assertThatExceptionOfType(AccessDeniedException.class)
-                .isThrownBy(() -> securedApprovalTaskFacade.getApprovalTasks((Integer) null));
-            assertThatExceptionOfType(AccessDeniedException.class)
-                .isThrownBy(() -> securedApprovalTaskFacade.getApprovalTasks(List.of(approvalTaskId)));
+            assertThat(securedApprovalTaskFacade.getApprovalTasks((Integer) null)).isEmpty();
+            assertThat(securedApprovalTaskFacade.getApprovalTasks(List.of(approvalTaskId))).isEmpty();
             assertThatExceptionOfType(AccessDeniedException.class)
                 .isThrownBy(() -> securedApprovalTaskFacade.getPendingApprovals(null));
             assertThatExceptionOfType(AccessDeniedException.class)
@@ -353,7 +354,7 @@ class ApprovalTaskFacadeIntTest {
 
         @Test
         void testAdminManagesManualApprovalTasks() {
-            when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
+            when(authorizationCheck.isTenantAdmin()).thenReturn(true);
 
             ApprovalTask manualApprovalTask = manualApprovalTask("Review");
 
@@ -369,22 +370,73 @@ class ApprovalTaskFacadeIntTest {
                 .containsExactly(approvalTask.getId());
             assertThat(securedApprovalTaskFacade.getApprovalTasks(Environment.DEVELOPMENT.ordinal())).isEmpty();
 
+            when(authorizationCheck.hasPermission(approvalTask.getId(), "ApprovalTask", "DEPLOYMENT_EDIT"))
+                .thenReturn(true);
+
             securedApprovalTaskFacade.deleteApprovalTask(Objects.requireNonNull(approvalTask.getId()));
 
             assertThat(approvalTaskService.countApprovalTasks()).isZero();
         }
 
         @Test
-        void testRunCreatesItsApprovalTaskWithoutAnAdmin() {
-            SecurityContextHolder.clearContext();
+        void testOwnerReadsAndUpdatesTheirTaskWithoutAnAdmin() {
+            ApprovalTask approvalTask = approvalTaskService.create(manualApprovalTask("Review"));
 
+            long approvalTaskId = Objects.requireNonNull(approvalTask.getId());
+
+            when(authorizationCheck.isResourceOwner(approvalTaskId, "ApprovalTask")).thenReturn(true);
+
+            assertThat(securedApprovalTaskFacade.getApprovalTask(approvalTaskId))
+                .extracting(ApprovalTask::getName)
+                .isEqualTo("Review");
+            assertThat(securedApprovalTaskFacade.getApprovalTasks(List.of(approvalTaskId)))
+                .extracting(ApprovalTask::getId)
+                .containsExactly(approvalTaskId);
+
+            approvalTask.setName("Reviewed");
+
+            assertThat(securedApprovalTaskFacade.updateApprovalTask(approvalTask))
+                .extracting(ApprovalTask::getName)
+                .isEqualTo("Reviewed");
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.deleteApprovalTask(approvalTaskId));
+        }
+
+        @Test
+        void testRunCreatesItsApprovalTaskWithoutAnAdmin() {
             long jobId = saveJob(Job.Status.STOPPED, null);
+
+            when(authorizationCheck.hasPermission(jobId, "Job", "DEPLOYMENT_EDIT")).thenReturn(true);
 
             ApprovalTask approvalTask = securedApprovalTaskFacade.createApprovalTask(approvalTask(jobResumeId(jobId)));
 
             assertThat(approvalTaskService.getApprovalTask(Objects.requireNonNull(approvalTask.getId())))
                 .extracting(ApprovalTask::getEnvironment)
                 .isEqualTo(Environment.DEVELOPMENT);
+        }
+
+        @Test
+        void testRunWithoutDeploymentEditOnItsJobCannotCreateItsApprovalTask() {
+            long jobId = saveJob(Job.Status.STOPPED, null);
+
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> securedApprovalTaskFacade.createApprovalTask(approvalTask(signedToken(jobId))));
+
+            verify(authorizationCheck).hasPermission(jobId, "Job", "DEPLOYMENT_EDIT");
+
+            assertThat(approvalTaskService.countApprovalTasks()).isZero();
+        }
+
+        @Test
+        void testUnauthenticatedRunCannotCreateItsApprovalTask() {
+            SecurityContextHolder.clearContext();
+
+            long jobId = saveJob(Job.Status.STOPPED, null);
+
+            assertThatThrownBy(() -> securedApprovalTaskFacade.createApprovalTask(approvalTask(jobResumeId(jobId))))
+                .isInstanceOfAny(AccessDeniedException.class, AuthenticationCredentialsNotFoundException.class);
+
+            assertThat(approvalTaskService.countApprovalTasks()).isZero();
         }
 
         private static ApprovalTask manualApprovalTask(String name) {

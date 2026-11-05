@@ -14,6 +14,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {IntegrationInstanceKeys} from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
@@ -33,6 +34,8 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     integrationInstanceWorkflow?: IntegrationInstanceWorkflow;
     workflow: Workflow;
 }) => {
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
+
     const {workflowComponentDefinitions, workflowTaskDispatcherDefinitions} = useWorkflowComponentDefinitions(
         useGetComponentDefinitionsQuery
     );
@@ -109,7 +112,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
                     <Switch
                         checked={integrationInstanceWorkflow?.enabled}
-                        disabled={!integrationInstanceConfigurationWorkflow?.enabled}
+                        disabled={!canManageConnectedUser || !integrationInstanceConfigurationWorkflow?.enabled}
                         onCheckedChange={(value) => {
                             enableIntegrationInstanceWorkflowMutation.mutate({
                                 enable: value,

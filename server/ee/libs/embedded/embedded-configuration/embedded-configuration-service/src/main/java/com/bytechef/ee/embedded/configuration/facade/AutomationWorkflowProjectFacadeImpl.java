@@ -14,9 +14,9 @@ import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.audit.AutomationWorkflowProjectAuditEvents;
@@ -81,6 +81,10 @@ import tools.jackson.core.type.TypeReference;
 @Transactional
 @ConditionalOnEEVersion
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
+    private static final String DEVELOPMENT = "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT";
+    private static final String PERMISSION_EXPRESSION_UNSET =
+        "#permissionExpression == null or #permissionExpression.isBlank()";
+
     private static final String DEFAULT_DEFINITION = """
         {
             "label": "New Workflow",
@@ -103,6 +107,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final IntegrationService integrationService;
     private final ProjectService projectService;
     private final ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
+    private final ProjectWorkflowCreator projectWorkflowCreator;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
@@ -123,7 +128,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, ProjectService projectService,
         ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
-        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
+        ProjectWorkflowCreator projectWorkflowCreator, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
@@ -140,6 +146,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.integrationService = integrationService;
         this.projectService = projectService;
         this.projectVersionWorkflowChangeService = projectVersionWorkflowChangeService;
+        this.projectWorkflowCreator = projectWorkflowCreator;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
@@ -151,7 +158,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('INTEGRATION_CREATE') and (" + PERMISSION_EXPRESSION_UNSET
+        + " or hasEmbeddedScope('INTEGRATION_SETTINGS'))")
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_CREATED, data = {
         @AuditData(key = "projectId", value = "#result"),
         @AuditData(key = "name", value = "#name"),
@@ -177,7 +185,9 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasResourceScopeInEnvironment(#projectId, 'AutomationWorkflowProject', 'WORKFLOW_CREATE', "
+        + DEVELOPMENT + ") and (" + PERMISSION_EXPRESSION_UNSET
+        + " or hasPermission(#projectId, 'AutomationWorkflowProject', 'INTEGRATION_SETTINGS'))")
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_CREATED, data = {
         @AuditData(key = "projectId", value = "#projectId"),
         @AuditData(key = "workflowUuid", value = "#result"),
@@ -186,7 +196,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public String createProjectWorkflow(long projectId, String definition, String permissionExpression) {
         getProjectOfAutomationWorkflowProject(projectId);
 
-        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
+        ProjectWorkflow projectWorkflow = projectWorkflowCreator.addWorkflow(
             projectId, StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition);
 
         String normalized = normalizePermissionExpression(permissionExpression);
@@ -200,7 +210,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#projectId, 'AutomationWorkflowProject', 'INTEGRATION_DELETE')")
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_DELETED, data = {
         @AuditData(key = "projectId", value = "#projectId")
     })
@@ -238,7 +248,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasResourceScopeInEnvironment(#workflowUuid, 'AutomationWorkflowProjectWorkflow', "
+        + "'WORKFLOW_DELETE', " + DEVELOPMENT + ")")
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_DELETED, data = {
         @AuditData(key = "workflowUuid", value = "#workflowUuid")
     })
@@ -255,7 +266,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasResourceScopeInEnvironment(#workflowUuid, 'AutomationWorkflowProjectWorkflow', "
+        + "'WORKFLOW_CREATE', " + DEVELOPMENT + ")")
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_DUPLICATED, data = {
         @AuditData(key = "sourceWorkflowUuid", value = "#workflowUuid"),
         @AuditData(key = "workflowUuid", value = "#result")
@@ -279,7 +291,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         String newDefinition = JsonUtils.writeWithDefaultPrettyPrinter(definitionMap);
 
-        ProjectWorkflow newProjectWorkflow = projectWorkflowFacade.addWorkflow(projectId, newDefinition);
+        ProjectWorkflow newProjectWorkflow = projectWorkflowCreator.addWorkflow(projectId, newDefinition);
 
         workflowTestConfigurationService.copyWorkflowTestConfigurations(
             workflowId, newProjectWorkflow.getWorkflowId());
@@ -288,7 +300,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#projectId, 'AutomationWorkflowProject', 'WORKFLOW_VIEW') "
+        + "and hasEmbeddedScope('INTEGRATION_CREATE')")
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_DUPLICATED, data = {
         @AuditData(key = "sourceProjectId", value = "#projectId"),
         @AuditData(key = "projectId", value = "#result")
@@ -318,14 +331,14 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         for (ProjectWorkflow sourceProjectWorkflow : sourceProjectWorkflows) {
             Workflow sourceWorkflow = workflowService.getWorkflow(sourceProjectWorkflow.getWorkflowId());
 
-            projectWorkflowFacade.addWorkflow(newProject.getId(), sourceWorkflow.getDefinition());
+            projectWorkflowCreator.addWorkflow(newProject.getId(), sourceWorkflow.getDefinition());
         }
 
         return newProject.getId();
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#projectId, 'AutomationWorkflowProject', 'WORKFLOW_VIEW')")
     public List<AutomationWorkflowProjectVersionDTO> getProjectVersions(long projectId) {
         Project project = getProjectOfAutomationWorkflowProject(projectId);
 
@@ -341,7 +354,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#projectId, 'AutomationWorkflowProject', 'WORKFLOW_VIEW')")
     public VersionWorkflowChange getProjectVersionWorkflowChange(
         long projectId, int projectVersion, String workflowUuid) {
 
@@ -351,7 +364,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#projectId, 'AutomationWorkflowProject', 'WORKFLOW_VIEW')")
     public VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion) {
         getProjectOfAutomationWorkflowProject(projectId);
 
@@ -359,7 +372,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#projectId, 'AutomationWorkflowProject', 'WORKFLOW_VIEW')")
     public AutomationWorkflowProjectDTO getProject(long projectId) {
         Project project = getProjectOfAutomationWorkflowProject(projectId);
 
@@ -371,13 +384,13 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('WORKFLOW_VIEW')")
     public List<AutomationWorkflowProjectDTO> getProjects() {
         return getProjectsWithConfigurationCounts(null);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('WORKFLOW_VIEW')")
     public List<AutomationWorkflowProjectDTO> getProjects(long environmentId) {
         return getProjectsWithConfigurationCounts(environmentId);
     }
@@ -396,7 +409,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @SkipAutomationAuthorization
     public List<AutomationWorkflowProjectDTO> getPublishedProjects() {
         Map<Long, AutomationWorkflowProject> automationWorkflowProjects = getAutomationWorkflowProjects();
 
@@ -407,7 +419,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @SkipAutomationAuthorization
     public List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
@@ -445,7 +456,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @SkipAutomationAuthorization
     public List<AutomationWorkflowProjectConfigurationReleaseDTO> getPublishedProjectConfigurations(
         String externalUserId, Environment environment) {
 
@@ -493,7 +503,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#projectId, 'AutomationWorkflowProject', 'WORKFLOW_EDIT') "
+        + "and hasPermission(#projectId, 'AutomationWorkflowProject', 'INTEGRATION_PUBLISH')")
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_PUBLISHED, data = {
         @AuditData(key = "projectId", value = "#projectId"),
         @AuditData(key = "projectVersion", value = "#result")
@@ -527,7 +538,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#projectId, 'AutomationWorkflowProject', 'INTEGRATION_SETTINGS')")
     @Audited(event = AutomationWorkflowProjectAuditEvents.AUTOMATION_WORKFLOW_PROJECT_UPDATED, data = {
         @AuditData(key = "projectId", value = "#projectId"),
         @AuditData(key = "name", value = "#name"),
@@ -553,7 +564,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasResourceScopeInEnvironment(#workflowUuid, 'AutomationWorkflowProjectWorkflow', "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
     public void updateProjectWorkflow(String workflowUuid, String label, String description) {
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
 
@@ -573,7 +585,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#workflowUuid, 'AutomationWorkflowProjectWorkflow', "
+        + "'INTEGRATION_SETTINGS')")
     @Audited(event = WorkflowAuditEvents.AUTOMATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED, data = {
         @AuditData(key = "workflowUuid", value = "#workflowUuid"),
         @AuditData(key = "permissionExpression", value = "#permissionExpression")
@@ -591,7 +604,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('WORKFLOW_VIEW')")
     public List<AutomationWorkflowProjectCategoryDTO> getCategories() {
         Set<Long> categoryIds = getProjects().stream()
             .map(AutomationWorkflowProjectDTO::categoryId)
@@ -607,7 +620,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('WORKFLOW_VIEW')")
     public List<AutomationWorkflowProjectTagDTO> getTags() {
         Set<Long> tagIds = getProjects().stream()
             .flatMap(project -> project.tagIds()

@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -18,6 +19,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -40,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +65,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final TagService tagService;
     private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
+    private final IntegrationInstanceService integrationInstanceService;
+    private final PermissionService permissionService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
@@ -74,6 +79,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         IntegrationWorkflowService integrationWorkflowService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        IntegrationInstanceService integrationInstanceService, @Lazy PermissionService permissionService,
         TagService tagService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService,
@@ -85,6 +91,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         this.integrationWorkflowService = integrationWorkflowService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
+        this.integrationInstanceService = integrationInstanceService;
+        this.permissionService = permissionService;
         this.tagService = tagService;
         this.workflowService = workflowService;
         this.workflowPreDeleteListeners = workflowPreDeleteListeners;
@@ -98,7 +106,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         @AuditData(key = "name", value = "#integrationDTO.name"),
         @AuditData(key = "componentName", value = "#integrationDTO.componentName")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('INTEGRATION_CREATE')")
     public long createIntegration(IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
         Category category = integrationDTO.category();
@@ -124,12 +132,15 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Audited(event = IntegrationAuditEvents.INTEGRATION_DELETED, data = {
         @AuditData(key = "integrationId", value = "#id")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'INTEGRATION_DELETE')")
     public void deleteIntegration(long id) {
         integrationService.getIntegration(id);
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(id);
+
+        ConfigurationDeletionGuard.assertMayDelete(
+            integrationInstanceConfigurations, integrationInstanceService, permissionService);
 
         for (IntegrationInstanceConfiguration integrationInstanceConfiguration : integrationInstanceConfigurations) {
             integrationInstanceConfigurationFacade.deleteIntegrationInstanceConfiguration(
@@ -168,7 +179,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_VIEW')")
     public IntegrationDTO getIntegration(long id) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -177,14 +188,14 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_VIEW')")
     public List<IntegrationVersion> getIntegrationVersions(long id) {
         return integrationService.getIntegrationVersions(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('WORKFLOW_VIEW')")
     public List<IntegrationDTO> getIntegrations(
         Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status,
         boolean includeAllFields) {
@@ -251,7 +262,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         @AuditData(key = "integrationId", value = "#id"),
         @AuditData(key = "integrationVersion", value = "#result")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_EDIT') and "
+        + "hasPermission(#id, 'Integration', 'INTEGRATION_PUBLISH')")
     public int publishIntegration(long id, String description) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -285,7 +297,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         @AuditData(key = "integrationId", value = "#integrationDTO.id"),
         @AuditData(key = "name", value = "#integrationDTO.name")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationDTO.id, 'Integration', 'WORKFLOW_EDIT')")
     public void updateIntegration(IntegrationDTO integrationDTO) {
         List<Tag> tags = CollectionUtils.isEmpty(integrationDTO.tags())
             ? Collections.emptyList()

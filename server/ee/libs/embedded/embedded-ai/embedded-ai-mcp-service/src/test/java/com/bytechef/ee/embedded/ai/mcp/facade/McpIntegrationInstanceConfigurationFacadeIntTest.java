@@ -10,6 +10,8 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -51,6 +53,7 @@ import com.bytechef.platform.connection.service.ConnectionServiceImpl;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -64,6 +67,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -133,6 +137,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
                     "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
         when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(permissionService.canUseConnectionInWorkflow(anyLong(), anyString(), any())).thenReturn(true);
 
         persistenceAuditEventRepository.deleteAll();
 
@@ -246,12 +251,50 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testCreateRejectsAConnectionTheCallerMayNotUse() {
+        long connectionId = createConnection("slack", Environment.DEVELOPMENT);
+
+        when(permissionService.canUseConnectionInWorkflow(connectionId, WORKFLOW_ID, Environment.DEVELOPMENT))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID),
+            List.of(slackWorkflowConfiguration(connectionId, Map.of()))))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("Connection " + connectionId);
+
+        assertNothingWasStored();
+    }
+
+    @Test
     void testCreateRejectsAConfigurationWithoutARequiredNonIntegrationConnection() {
         assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
             mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID),
             List.of(new WorkflowConfigurationDTO(WORKFLOW_ID, List.of(), Map.of()))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("requires a slack connection");
+
+        assertNothingWasStored();
+    }
+
+    @Test
+    void testCreateRejectsAServerFromAnotherEnvironment() {
+        McpServer productionMcpServer = mcpServerRepository.save(
+            new McpServer("Production", PlatformType.EMBEDDED, Environment.PRODUCTION));
+
+        long productionMcpServerId = productionMcpServer.getId();
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                productionMcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("environment");
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                productionMcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID), List.of()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("environment");
 
         assertNothingWasStored();
     }
@@ -428,11 +471,12 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     @Configuration
     @EnableCaching
     @Import({
-        ConnectionServiceImpl.class, IntegrationInstanceConfigurationServiceImpl.class,
+        ConnectionServiceImpl.class, EmbeddedMcpReader.class, IntegrationInstanceConfigurationServiceImpl.class,
         IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceWorkflowServiceImpl.class,
         IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class,
         McpIntegrationInstanceConfigurationFacadeImpl.class, McpIntegrationInstanceConfigurationServiceImpl.class,
-        McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class
+        McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpServerServiceImpl.class,
+        EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class McpIntegrationInstanceConfigurationFacadeIntTestConfiguration {
 

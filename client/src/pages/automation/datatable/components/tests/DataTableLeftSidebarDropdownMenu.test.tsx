@@ -10,6 +10,15 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+const hoistedScope = vi.hoisted(() => ({
+    grantedScopes: ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'] as string[],
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 vi.mock('../../hooks/useDeleteDataTableAlertDialog', () => ({
     default: () => ({
         handleOpen: hoisted.mockHandleDeleteOpen,
@@ -28,6 +37,8 @@ const defaultProps = {
 };
 
 beforeEach(() => {
+    hoistedScope.grantedScopes = ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'];
+
     windowResizeObserver();
 });
 
@@ -64,6 +75,42 @@ describe('DataTableLeftSidebarDropdownMenu', () => {
 
             expect(screen.getByText('Rename')).toBeInTheDocument();
             expect(screen.getByText('Delete')).toBeInTheDocument();
+        });
+    });
+
+    describe('menu items without data table scopes', () => {
+        it('should hide Rename without DATA_TABLE_EDIT', async () => {
+            hoistedScope.grantedScopes = ['DATA_TABLE_DELETE'];
+
+            const user = userEvent.setup();
+
+            render(<DataTableLeftSidebarDropdownMenu {...defaultProps} />);
+
+            await user.click(screen.getByRole('button', {name: 'Table menu'}));
+
+            expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
+            expect(screen.queryByRole('menuitem', {name: 'Rename'})).not.toBeInTheDocument();
+        });
+
+        it('should hide Delete without DATA_TABLE_DELETE', async () => {
+            hoistedScope.grantedScopes = ['DATA_TABLE_EDIT'];
+
+            const user = userEvent.setup();
+
+            render(<DataTableLeftSidebarDropdownMenu {...defaultProps} />);
+
+            await user.click(screen.getByRole('button', {name: 'Table menu'}));
+
+            expect(screen.getByRole('menuitem', {name: 'Rename'})).toBeInTheDocument();
+            expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
+        });
+
+        it('should hide the menu trigger when neither scope is granted', () => {
+            hoistedScope.grantedScopes = [];
+
+            render(<DataTableLeftSidebarDropdownMenu {...defaultProps} />);
+
+            expect(screen.queryByRole('button', {name: 'Table menu'})).not.toBeInTheDocument();
         });
     });
 

@@ -5,6 +5,12 @@ import {act, render, screen, userEvent} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 const hoisted = vi.hoisted(() => ({
     integrationWorkflowsQueryResult: {data: null as unknown, isFetching: false},
     invalidateQueries: vi.fn(),

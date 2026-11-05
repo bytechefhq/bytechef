@@ -1,0 +1,13 @@
+mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole!) {
+    addEmbeddedUser(userId: $userId, role: $role) {
+        id
+        userId
+        embeddedRole
+        customRoleId
+        user {
+            email
+            firstName
+            lastName
+        }
+    }
+}

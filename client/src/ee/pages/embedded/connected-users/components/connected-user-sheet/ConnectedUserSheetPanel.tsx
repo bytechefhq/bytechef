@@ -5,6 +5,7 @@ import ConnectedUserSheetPanelProfile from '@/ee/pages/embedded/connected-users/
 import ConnectedUserSheetPanelToolInvocationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelToolInvocationList';
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 
 const tabsTriggerClassName =
     'grow rounded-none border-0 border-b border-border py-2.5 text-content-neutral-secondary shadow-none hover:text-content-brand-primary group-data-[variant=default]/tabs-list:data-[state=active]:shadow-none data-[state=active]:border-stroke-brand-primary data-[state=active]:bg-transparent data-[state=active]:text-content-brand-primary data-[state=active]:shadow-none';
@@ -14,6 +15,8 @@ interface ConnectedUserSheetPanelProps {
 }
 
 const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) => {
+    const canViewMcpServers = useHasEmbeddedScope('MCP_VIEW');
+
     return (
         <div className="flex min-h-full w-full shrink-0 flex-col space-y-10 rounded-lg bg-background p-3">
             <div className="w-full space-y-2">
@@ -28,9 +31,11 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                         Integrations
                     </TabsTrigger>
 
-                    <TabsTrigger className={tabsTriggerClassName} value="mcp-servers">
-                        MCP Servers
-                    </TabsTrigger>
+                    {canViewMcpServers && (
+                        <TabsTrigger className={tabsTriggerClassName} value="mcp-servers">
+                            MCP Servers
+                        </TabsTrigger>
+                    )}
 
                     <TabsTrigger className={tabsTriggerClassName} value="workflows">
                         Automation Workflows
@@ -51,14 +56,16 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     )}
                 </TabsContent>
 
-                <TabsContent value="mcp-servers">
-                    {connectedUser.id != null && (
-                        <ConnectedUserSheetPanelMcpServerList
-                            connectedUserId={connectedUser.id}
-                            connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
-                        />
-                    )}
-                </TabsContent>
+                {canViewMcpServers && (
+                    <TabsContent value="mcp-servers">
+                        {connectedUser.id != null && (
+                            <ConnectedUserSheetPanelMcpServerList
+                                connectedUserId={connectedUser.id}
+                                connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
+                            />
+                        )}
+                    </TabsContent>
+                )}
 
                 <TabsContent value="workflows">
                     {connectedUser.id != null && (

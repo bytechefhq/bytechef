@@ -10,6 +10,7 @@ import {useNavigate} from 'react-router-dom';
 export const AI_PROVIDERS_PATH = '/automation/settings/ai-providers';
 
 interface KnowledgeBasesEmptyStateProps {
+    canCreateKnowledgeBase: boolean;
     embeddingActive: boolean;
     workspaceId: string;
 }
@@ -18,7 +19,11 @@ interface KnowledgeBasesEmptyStateProps {
  * A knowledge base can only ingest documents once the environment has an embedding model, so a new user is shown both
  * steps: turning on an embedding provider, then creating the first knowledge base.
  */
-const KnowledgeBasesEmptyState = ({embeddingActive, workspaceId}: KnowledgeBasesEmptyStateProps) => {
+const KnowledgeBasesEmptyState = ({
+    canCreateKnowledgeBase,
+    embeddingActive,
+    workspaceId,
+}: KnowledgeBasesEmptyStateProps) => {
     const navigate = useNavigate();
 
     const steps: JourneyStepI[] = useMemo(
@@ -36,12 +41,12 @@ const KnowledgeBasesEmptyState = ({embeddingActive, workspaceId}: KnowledgeBases
             },
             {
                 ...(embeddingActive && {
-                    action: (
+                    action: canCreateKnowledgeBase ? (
                         <CreateKnowledgeBaseDialog
                             trigger={<Button label="Create Knowledge Base" size="sm" />}
                             workspaceId={workspaceId}
                         />
-                    ),
+                    ) : undefined,
                     description: 'Name it, then upload your documents.',
                 }),
                 id: 'createKnowledgeBase',
@@ -49,7 +54,7 @@ const KnowledgeBasesEmptyState = ({embeddingActive, workspaceId}: KnowledgeBases
                 status: embeddingActive ? 'current' : 'upcoming',
             },
         ],
-        [embeddingActive, navigate, workspaceId]
+        [canCreateKnowledgeBase, embeddingActive, navigate, workspaceId]
     );
 
     return (

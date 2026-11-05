@@ -20,6 +20,7 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFa
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.AbstractException;
@@ -41,7 +42,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -100,7 +100,7 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetAllFrontendConnectionsListsEveryComponent() {
         ConnectionDTO slackConnection = ConnectionDTO.builder()
             .id(1L)
@@ -139,7 +139,7 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetAllFrontendConnectionsReturnsCredentialStatus() {
         ConnectionDTO rejectedConnection = ConnectionDTO.builder()
             .id(1L)
@@ -171,7 +171,7 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testCreateFrontendConnectionReturnsId() {
         when(connectedUserConnectionFacade.createConnectedUserConnection(eq(CONNECTED_USER_ID), any()))
             .thenReturn(42L);
@@ -202,7 +202,7 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDeleteFrontendConnectionSucceeds() {
         webTestClient
             .delete()
@@ -215,7 +215,7 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDeleteFrontendConnectionMapsInUseTo409() {
         doThrow(new ConfigurationException("used", ConnectionErrorType.CONNECTION_IS_USED))
             .when(connectedUserConnectionFacade)
@@ -233,7 +233,7 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDeleteFrontendConnectionForeignReturns404() {
         doThrow(new NoSuchElementException("Connection id=5 not found"))
             .when(connectedUserConnectionFacade)
@@ -248,7 +248,7 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDeleteFrontendConnectionOtherConfigurationExceptionReturns400() {
         doThrow(new ConfigurationException("invalid", ConnectionErrorType.INVALID_CONNECTION))
             .when(connectedUserConnectionFacade)
@@ -263,7 +263,7 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testReauthorizeFrontendConnection() {
         webTestClient
             .post()

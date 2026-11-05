@@ -8,7 +8,13 @@ const mocks = vi.hoisted(() => ({
     configurations: [] as unknown[],
     configurationsVariables: undefined as unknown,
     deleteMutate: vi.fn(),
+    deniedScopes: new Set<string>(),
     invalidateQueries: vi.fn(),
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => !mocks.deniedScopes.has(scope),
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -84,6 +90,8 @@ const renderList = (onEdit = vi.fn(), projectOverrides: Partial<typeof project> 
 
 describe('AutomationWorkflowProjectConfigurationList', () => {
     beforeEach(() => {
+        mocks.deniedScopes.clear();
+
         windowResizeObserver();
 
         mocks.configurations = [];
@@ -170,5 +178,14 @@ describe('AutomationWorkflowProjectConfigurationList', () => {
         await user.click(await screen.findByRole('menuitem', {name: 'Edit Configuration'}));
 
         expect(onEdit).toHaveBeenCalledWith(configuration);
+    });
+
+    it('offers no creation from the empty state without the create scope', () => {
+        mocks.deniedScopes = new Set(['INTEGRATION_INSTANCE_CONFIGURATION_CREATE']);
+
+        renderList();
+
+        expect(screen.getByText('No Configurations')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
     });
 });

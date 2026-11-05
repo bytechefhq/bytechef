@@ -20,6 +20,14 @@ const hoisted = vi.hoisted(() => ({
     useMcpServerList: (mcpServers: unknown[]) => ({createHandleRefresh: () => () => {}, sortedMcpServers: mcpServers}),
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    useHasEmbeddedScope: () => true,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/components/ui/collapsible', () => ({
     Collapsible: hoisted.renderChildren,
     CollapsibleContent: hoisted.renderChildren,
@@ -78,7 +86,7 @@ vi.mock('@/ee/pages/embedded/mcp-servers/components/mcp-server-list/hooks/useMcp
     default: hoisted.useMcpServerList,
 }));
 
-const mcpServers = [{id: '1', name: 'mcpserver1'} as McpServer];
+const mcpServers = [{id: '1', name: 'mcpserver1', url: 'http://127.0.0.1/api/embedded/abc/mcp'} as McpServer];
 
 const editions: {
     componentDialogLabel: string;

@@ -19,10 +19,12 @@ package com.bytechef.platform.workflow.test.web.rest;
 import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.COMPLETED;
 import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.STARTED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -51,10 +53,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentMap;
@@ -73,6 +73,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -459,8 +460,8 @@ class WorkflowTestApiControllerIntTest {
             });
 
             future.whenComplete((result, throwable) -> whenCompleteCallback.accept(key));
-            afterFutureCallback.accept(key, future);
             actualBridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId)));
+            afterFutureCallback.accept(key, future);
 
             return null;
         }).when(testWorkflowExecutor)
@@ -485,7 +486,7 @@ class WorkflowTestApiControllerIntTest {
 
         Thread.sleep(duration.toMillis());
 
-        String key = waitForRunKey();
+        String key = waitForRunKey(String.valueOf(jobId));
 
         Object emitter = ReflectionTestUtils.getField(controller, "emitter");
 
@@ -577,8 +578,8 @@ class WorkflowTestApiControllerIntTest {
             });
 
             future.whenComplete((result, throwable) -> whenCompleteCallback.accept(key));
-            afterFutureCallback.accept(key, future);
             bridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId)));
+            afterFutureCallback.accept(key, future);
 
             return null;
         }).when(testWorkflowExecutor)
@@ -601,7 +602,7 @@ class WorkflowTestApiControllerIntTest {
         Thread.sleep(Duration.ofMillis(75)
             .toMillis());
 
-        String key = waitForRunKey();
+        String key = waitForRunKey("test-key-" + jobId);
 
         Object emitter = ReflectionTestUtils.getField(controller, "emitter");
 
@@ -809,43 +810,33 @@ class WorkflowTestApiControllerIntTest {
         assertThat(future.isCancelled()).isTrue();
     }
 
-    private String waitForRunKey() throws InterruptedException {
+    private String waitForRunKey(String expectedKey) throws InterruptedException {
         long deadline = System.currentTimeMillis() + 1000;
 
         while (System.currentTimeMillis() < deadline) {
-            Object runs = ReflectionTestUtils.getField(controller, "workflowExecutions");
+            @SuppressWarnings("unchecked")
+            Cache<String, CompletableFuture<WorkflowTestExecutionModel>> workflowExecutions =
+                (Cache<String, CompletableFuture<WorkflowTestExecutionModel>>) ReflectionTestUtils.getField(
+                    controller, "workflowExecutions");
 
-            if (runs instanceof Cache<?, ?> cache) {
-                @SuppressWarnings("unchecked")
-                Cache<String, CompletableFuture<WorkflowTestExecutionModel>> r =
-                    (Cache<String, CompletableFuture<WorkflowTestExecutionModel>>) cache;
-
-                ConcurrentMap<String, CompletableFuture<WorkflowTestExecutionModel>> map = r.asMap();
-
-                if (!map.isEmpty()) {
-                    Set<String> keySet = map.keySet();
-
-                    Iterator<String> iterator = keySet.iterator();
-
-                    return iterator.next();
-                }
-            } else if (runs instanceof ConcurrentMap<?, ?>) {
-                @SuppressWarnings("unchecked")
-                ConcurrentMap<String, CompletableFuture<WorkflowTestExecutionModel>> r =
-                    (ConcurrentMap<String, CompletableFuture<WorkflowTestExecutionModel>>) runs;
-
-                if (!r.isEmpty()) {
-                    Set<String> keySet = r.keySet();
-
-                    Iterator<String> iterator = keySet.iterator();
-
-                    return iterator.next();
-                }
+            if (workflowExecutions != null && workflowExecutions.getIfPresent(expectedKey) != null) {
+                return expectedKey;
             }
 
             Thread.sleep(10);
         }
 
         throw new AssertionError("Run key not available in time");
+    }
+
+    @Test
+    void testAttachWorkflowTestStopsWhenTheExecutorRefusesTheAttach() {
+        doThrow(new AccessDeniedException("Access Denied")).when(testWorkflowExecutor)
+            .attach(7L);
+
+        assertThatThrownBy(() -> controller.attachWorkflowTest(7L))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(testWorkflowExecutor).attach(7L);
     }
 }

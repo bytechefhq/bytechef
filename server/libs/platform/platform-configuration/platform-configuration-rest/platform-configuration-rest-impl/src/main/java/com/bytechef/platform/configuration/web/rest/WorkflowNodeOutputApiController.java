@@ -23,9 +23,11 @@ import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeOutputModel;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -76,6 +78,7 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     public ResponseEntity<WorkflowNodeOutputModel> getWorkflowNodeOutput(
         String workflowId, String workflowNodeName, Long environmentId) {
 
@@ -89,12 +92,18 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
     public ResponseEntity<List<WorkflowNodeOutputModel>> getPreviousWorkflowNodeOutputs(
         String workflowId, Long environmentId, String lastWorkflowNodeName) {
 
-        workflowNodeOutputFacade.checkWorkflowCache(workflowId, lastWorkflowNodeName, environmentId);
+        if (environmentId == null) {
+            throw new IllegalArgumentException("environmentId is required");
+        }
+
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId.longValue());
+
+        workflowNodeOutputFacade.checkWorkflowCache(workflowId, lastWorkflowNodeName, effectiveEnvironmentId);
 
         return ResponseEntity.ok(
             CollectionUtils.map(
                 workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
-                    workflowId, lastWorkflowNodeName, environmentId),
+                    workflowId, lastWorkflowNodeName, effectiveEnvironmentId),
                 workflowNodeOutputDTO -> conversionService.convert(
                     workflowNodeOutputDTO, WorkflowNodeOutputModel.class)));
     }

@@ -24,6 +24,9 @@ import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.WorkspaceApiKeyIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
@@ -139,6 +142,11 @@ class PermissionServiceIntTest {
         assertThat(permissionService.hasWorkspaceScope(1L, "WORKFLOW_VIEW")).isFalse();
         assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isFalse();
         assertThat(permissionService.hasWorkflowScope("workflow-1", "WORKFLOW_VIEW")).isFalse();
+        assertThat(permissionService.hasWorkflowScope("workflow-1", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+            .isFalse();
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow("workflow-1", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
         assertThat(permissionService.hasResourceRole(1L, "project", "ADMIN")).isFalse();
         assertThat(permissionService.isResourceOwner("project", 1L)).isFalse();
     }
@@ -154,6 +162,11 @@ class PermissionServiceIntTest {
     @Test
     void testGetMyWorkspaceScopesReturnsEmpty() {
         assertThat(permissionService.getMyWorkspaceScopes(1L)).isEmpty();
+    }
+
+    @Test
+    void testGetMyWorkspaceScopesForAnEnvironmentReturnsEmpty() {
+        assertThat(permissionService.getMyWorkspaceScopes(1L, Environment.PRODUCTION)).isEmpty();
     }
 
     @Test
@@ -202,6 +215,16 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testCePermissionServiceAcceptsTwoResolversForOneType() {
+        PermissionService twoResolverPermissionService = new PermissionServiceImpl(
+            userService,
+            List.of(resolver("Connection", ResourceOwner.unknown()),
+                resolver("Connection", ResourceOwner.ofWorkspace(42L))));
+
+        assertThat(twoResolverPermissionService.hasResourceScope(1L, "Connection", "CONNECTION_VIEW")).isTrue();
+    }
+
+    @Test
     void testHasResourceScopeUnregisteredTypeFailsClosed() {
         assertThat(permissionService.hasResourceScope(1L, "Nope", "X")).isFalse();
     }
@@ -246,5 +269,20 @@ class PermissionServiceIntTest {
                 List.of(new SimpleGrantedAuthority(authority))));
 
         SecurityContextHolder.setContext(securityContext);
+    }
+
+    private static ResourceOwnershipResolver resolver(String resourceType, ResourceOwner resourceOwner) {
+        return new ResourceOwnershipResolver() {
+
+            @Override
+            public String resourceType() {
+                return resourceType;
+            }
+
+            @Override
+            public ResourceOwner resolveOwner(long id) {
+                return resourceOwner;
+            }
+        };
     }
 }

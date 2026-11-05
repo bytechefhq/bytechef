@@ -24,9 +24,10 @@ interface EnvironmentOptionI {
 interface EnvironmentSelectPropsI {
     onChange?: (environmentId: number) => void;
     variant?: 'compact' | 'default' | 'icon';
+    visibleEnvironmentIds?: number[];
 }
 
-const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPropsI = {}) => {
+const EnvironmentSelect = ({onChange, variant = 'default', visibleEnvironmentIds}: EnvironmentSelectPropsI = {}) => {
     const application = useApplicationInfoStore((state) => state.application);
 
     const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
@@ -48,6 +49,10 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
                 return options;
             }
 
+            if (visibleEnvironmentIds && !visibleEnvironmentIds.includes(+environment.id)) {
+                return options;
+            }
+
             const config = ENVIRONMENT_CONFIGS[+environment.id];
 
             if (config) {
@@ -56,7 +61,7 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
 
             return options;
         }, []);
-    }, [environmentsData?.environments]);
+    }, [environmentsData?.environments, visibleEnvironmentIds]);
 
     if (application?.edition !== 'EE' || environmentOptions.length === 0) {
         return null;

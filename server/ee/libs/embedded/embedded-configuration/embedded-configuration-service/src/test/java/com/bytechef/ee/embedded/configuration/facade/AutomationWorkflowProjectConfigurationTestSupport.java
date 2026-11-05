@@ -27,7 +27,7 @@ public final class AutomationWorkflowProjectConfigurationTestSupport {
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService, long projectId) {
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         int publishedVersion = automationWorkflowProjectFacade.getPublishedProjects()
             .stream()

@@ -18,6 +18,7 @@ package com.bytechef.platform.user.facade;
 
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner.WorkspaceAssignment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public interface UserManagementFacade {
 
     void deleteUser(String login);
 
-    void inviteUser(String email, String role);
+    void inviteUser(String email, String role, List<WorkspaceAssignment> workspaces);
 
     Optional<UserWithAuthorities> fetchUser(String login);
 

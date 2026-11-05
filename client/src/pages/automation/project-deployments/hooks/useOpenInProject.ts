@@ -1,4 +1,6 @@
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ProjectApi, WorkflowApi} from '@/shared/middleware/automation/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
@@ -14,6 +16,14 @@ const PROJECTS_HREF = '/automation/projects';
 export default function useOpenInProject({onBeforeNavigate}: {onBeforeNavigate?: () => void} = {}) {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setCurrentEnvironmentId = useEnvironmentStore((state) => state.setCurrentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canViewWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_VIEW');
+    const canViewDevelopmentWorkflow = useHasWorkspaceScope(
+        currentWorkspaceId,
+        'WORKFLOW_VIEW',
+        DEVELOPMENT_ENVIRONMENT
+    );
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -83,5 +93,5 @@ export default function useOpenInProject({onBeforeNavigate}: {onBeforeNavigate?:
         [navigateInDevelopment, queryClient]
     );
 
-    return {openProject, openProjectWorkflow};
+    return {canOpenInProject: canViewWorkflow && canViewDevelopmentWorkflow, openProject, openProjectWorkflow};
 }

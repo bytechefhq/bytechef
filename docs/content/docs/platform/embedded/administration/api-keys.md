@@ -23,6 +23,10 @@ They act on behalf of a connected user, just like a Signing Key JWT does; the di
 | Environment scoping | API keys are created against a specific environment (Development / Stage / Production). |
 | Last Used Date | When the key was last used to authenticate a request. |
 
+### Who can use API Keys
+
+In Enterprise Edition, API Keys are shared per environment. Members with `API_KEY_VIEW` (Editor and above) see every embedded API key in the environment, and `API_KEY_CREATE` and `API_KEY_DELETE` apply to all of them. Removing a member does not revoke the keys they created. See [Users and Roles](/platform/embedded/administration/users-and-roles).
+
 ### Table Columns
 
 | Column | Description |

@@ -1,76 +1,121 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {render, screen, within} from '@testing-library/react';
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
+import {render, screen, within} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
-import {describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import AiAgentTools from './AiAgentTools';
+const {useAiAgentToolsMock} = vi.hoisted(() => ({
+    useAiAgentToolsMock: vi.fn(),
+}));
 
-vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu', () => ({
-    default: ({children}: {children: ReactNode}) => <>{children}</>,
+vi.mock('./hooks/useAiAgentTools', () => ({
+    default: useAiAgentToolsMock,
 }));
 
 vi.mock('./AiAgentTool', () => ({
-    default: ({tool}: {tool: {name: string}}) => <span>{`Tool ${tool.name}`}</span>,
+    default: ({tool}: {tool: {label: string; name: string}}) => <span>{`Tool ${tool.name}: ${tool.label}`}</span>,
 }));
 
 vi.mock('./AiAgentToolDropdownMenu', () => ({
     default: ({tool}: {tool: {name: string}}) => <button type="button">{`Tool menu of ${tool.name}`}</button>,
 }));
 
-vi.mock('./hooks/useAiAgentTools', () => ({
-    default: () => ({
-        configuredConnectionKeys: [],
-        rootWorkflowNodeName: 'aiAgent_1',
-        toolGroups: [
-            {
-                channels: [
-                    {
-                        clusterElementType: 'approvalChannels',
-                        componentName: 'slack',
-                        componentVersion: 1,
-                        label: 'slack_1',
-                        name: 'slack_1',
-                        operationName: 'approvalChannel',
-                        title: 'Slack',
-                        type: 'slack/v1/approvalChannel',
-                    },
-                ],
-                label: 'Approval Gate',
-                name: 'approvalGate_1',
-                tool: {
-                    clusterElementType: 'tools',
-                    componentName: 'aiAgentUtils',
-                    componentVersion: 1,
-                    label: 'Approval Gate',
-                    name: 'approvalGate_1',
-                    operationName: 'approvalGate',
-                    title: 'AI Agent Utils',
-                    type: 'aiAgentUtils/v1/approvalGate',
-                },
-                tools: [],
-            },
-        ],
-        tools: [],
-    }),
+vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu', () => ({
+    default: ({children}: {children: ReactNode}) => <div data-testid="add-tool-popover">{children}</div>,
 }));
 
-describe('AiAgentTools', () => {
-    it('names each gated tool group for assistive technology', () => {
-        render(
+import AiAgentTools from './AiAgentTools';
+
+const approvalGateToolGroup = {
+    channels: [
+        {
+            clusterElementType: 'approvalChannels',
+            componentName: 'slack',
+            componentVersion: 1,
+            label: 'slack_1',
+            name: 'slack_1',
+            operationName: 'approvalChannel',
+            title: 'Slack',
+            type: 'slack/v1/approvalChannel',
+        },
+    ],
+    label: 'Approval Gate',
+    name: 'approvalGate_1',
+    tool: {
+        clusterElementType: 'tools',
+        componentName: 'aiAgentUtils',
+        componentVersion: 1,
+        label: 'Approval Gate',
+        name: 'approvalGate_1',
+        operationName: 'approvalGate',
+        title: 'AI Agent Utils',
+        type: 'aiAgentUtils/v1/approvalGate',
+    },
+    tools: [],
+};
+
+const renderTools = (readOnly = false) =>
+    render(
+        <WorkflowEditorReadOnlyContext.Provider value={readOnly}>
             <TooltipProvider>
                 <AiAgentTools />
             </TooltipProvider>
-        );
+        </WorkflowEditorReadOnlyContext.Provider>
+    );
+
+const mockTools = (tools: Array<{label: string; name: string}>, toolGroups: Array<typeof approvalGateToolGroup> = []) =>
+    useAiAgentToolsMock.mockReturnValue({
+        configuredConnectionKeys: new Set(),
+        rootWorkflowNodeName: 'aiAgent_1',
+        toolGroups,
+        tools,
+    });
+
+describe('AiAgentTools', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('offers Add Tool when the editor is editable', () => {
+        mockTools([]);
+
+        renderTools(false);
+
+        expect(screen.getByRole('button', {name: 'Add Tool'})).toBeInTheDocument();
+        expect(screen.getByTestId('add-tool-popover')).toBeInTheDocument();
+        expect(screen.getByText(/Click "Add tool"/)).toBeInTheDocument();
+    });
+
+    it('offers no Add Tool affordance in read-only mode', () => {
+        mockTools([]);
+
+        renderTools(true);
+
+        expect(screen.queryByRole('button', {name: 'Add Tool'})).not.toBeInTheDocument();
+        expect(screen.queryByTestId('add-tool-popover')).not.toBeInTheDocument();
+        expect(screen.getByText('No tools added yet.')).toBeInTheDocument();
+    });
+
+    it('still lists the configured tools in read-only mode', () => {
+        mockTools([{label: 'Get a random quote', name: 'httpClient_1'}]);
+
+        renderTools(true);
+
+        expect(screen.getByText('Tool httpClient_1: Get a random quote')).toBeInTheDocument();
+    });
+
+    it('names each gated tool group for assistive technology', () => {
+        mockTools([], [approvalGateToolGroup]);
+
+        renderTools();
 
         expect(screen.getByRole('group', {name: 'Approval Gate requires approval'})).toBeInTheDocument();
     });
 
     it("offers the gate's configure and remove menu in its group heading", () => {
-        render(
-            <TooltipProvider>
-                <AiAgentTools />
-            </TooltipProvider>
-        );
+        mockTools([], [approvalGateToolGroup]);
+
+        renderTools();
 
         const toolGroup = screen.getByRole('group', {name: 'Approval Gate requires approval'});
 
@@ -78,14 +123,24 @@ describe('AiAgentTools', () => {
     });
 
     it('lists each approval channel as an item with its configure and remove menu', () => {
-        render(
-            <TooltipProvider>
-                <AiAgentTools />
-            </TooltipProvider>
-        );
+        mockTools([], [approvalGateToolGroup]);
+
+        renderTools();
 
         const toolGroup = screen.getByRole('group', {name: 'Approval Gate requires approval'});
 
-        expect(within(toolGroup).getByText('Tool slack_1')).toBeInTheDocument();
+        expect(within(toolGroup).getByText('Tool slack_1: slack_1')).toBeInTheDocument();
+    });
+
+    it('offers no way to add a gated tool or channel in read-only mode', () => {
+        mockTools([], [approvalGateToolGroup]);
+
+        renderTools(true);
+
+        const toolGroup = screen.getByRole('group', {name: 'Approval Gate requires approval'});
+
+        expect(within(toolGroup).queryByRole('button', {name: 'Add Tool'})).not.toBeInTheDocument();
+        expect(within(toolGroup).queryByRole('button', {name: 'Add Channel'})).not.toBeInTheDocument();
+        expect(within(toolGroup).getByText('Tool slack_1: slack_1')).toBeInTheDocument();
     });
 });

@@ -11,10 +11,13 @@ const handlers = {
     onUpdateIntegrationVersionClick: vi.fn(),
 };
 
-const openMenu = async (moveUsersDisabledReason?: string) => {
+const openMenu = async (moveUsersDisabledReason?: string, canMoveUsers = true) => {
     render(
         <TooltipProvider>
             <IntegrationInstanceConfigurationListItemDropdownMenu
+                canDelete
+                canEdit
+                canMoveUsers={canMoveUsers}
                 {...handlers}
                 moveUsersDisabledReason={moveUsersDisabledReason}
             />
@@ -67,6 +70,16 @@ describe('IntegrationInstanceConfigurationListItemDropdownMenu', () => {
         ]);
         expect(screen.getByRole('menuitem', {name: 'Move Users'})).not.toHaveAttribute('aria-disabled', 'true');
         expect(screen.getByRole('separator')).toBeInTheDocument();
+    });
+
+    it('should hide Move Users from a member who may not move users', async () => {
+        await openMenu(undefined, false);
+
+        expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
+            'Edit',
+            'Update Integration Version',
+            'Delete',
+        ]);
     });
 
     it('should disable Move Users with the given reason', async () => {

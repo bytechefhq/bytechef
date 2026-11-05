@@ -7,8 +7,10 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditMapper;
 import com.bytechef.ee.automation.configuration.service.WorkspaceService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
@@ -20,12 +22,16 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
+ * Implementation of {@link AdminWorkspaceFacade}. Carries the {@code ROLE_ADMIN} guard and delegates to
+ * {@link WorkspaceService} (which keeps its own finer-grained per-workspace permission checks).
+ *
  * @version ee
  *
  * @author Ivica Cardic
  */
 @Service
 @ConditionalOnEEVersion
+@ConditionalOnCoordinator
 public class AdminWorkspaceFacadeImpl implements AdminWorkspaceFacade {
 
     private final WorkspaceService workspaceService;
@@ -46,9 +52,7 @@ public class AdminWorkspaceFacadeImpl implements AdminWorkspaceFacade {
     }
 
     @Override
-    @Audited(event = WorkspaceAuditEvents.WORKSPACE_DELETED, data = {
-        @AuditData(key = "workspaceId", value = "#id")
-    })
+    @Audited(event = WorkspaceAuditEvents.WORKSPACE_DELETED, mapper = WorkspaceAuditMapper.class)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteWorkspace(long id) {
         workspaceService.getWorkspace(id);

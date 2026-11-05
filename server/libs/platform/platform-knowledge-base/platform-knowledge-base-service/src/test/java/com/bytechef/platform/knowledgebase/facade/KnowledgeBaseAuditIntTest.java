@@ -42,13 +42,11 @@ import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentChunkRepository;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentRepository;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,9 +92,6 @@ class KnowledgeBaseAuditIntTest {
 
     @Autowired
     private KnowledgeBaseRepository knowledgeBaseRepository;
-
-    @Autowired
-    private KnowledgeBaseService knowledgeBaseService;
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
@@ -200,47 +195,6 @@ class KnowledgeBaseAuditIntTest {
             .containsEntry("result", "ERROR")
             .containsEntry("errorClass", KnowledgeBaseDocumentNotFoundException.class.getName())
             .containsEntry("knowledgeBaseDocumentId", String.valueOf(Long.MAX_VALUE));
-    }
-
-    @Test
-    void testUpdateKnowledgeBaseRecordsTheNewName() {
-        KnowledgeBase renamedKnowledgeBase = new KnowledgeBase();
-
-        renamedKnowledgeBase.setName("Renamed articles");
-
-        knowledgeBaseService.updateKnowledgeBase(knowledgeBase.getId(), renamedKnowledgeBase);
-
-        PersistentAuditEvent persistentAuditEvent = findSingleEvent(KnowledgeBaseAuditEvents.KB_UPDATED);
-
-        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
-        assertThat(persistentAuditEvent.getData())
-            .containsEntry("result", "SUCCESS")
-            .containsEntry("knowledgeBaseId", String.valueOf(knowledgeBase.getId()))
-            .containsEntry("name", "Renamed articles")
-            .doesNotContainKeys("dataError", "errorClass", "mapperError");
-
-        KnowledgeBase savedKnowledgeBase = knowledgeBaseService.getKnowledgeBase(knowledgeBase.getId());
-
-        assertThat(savedKnowledgeBase.getName()).isEqualTo("Renamed articles");
-    }
-
-    @Test
-    void testUpdateOfAnUnknownKnowledgeBaseRecordsAnError() {
-        KnowledgeBase renamedKnowledgeBase = new KnowledgeBase();
-
-        renamedKnowledgeBase.setName("Renamed articles");
-
-        assertThatThrownBy(() -> knowledgeBaseService.updateKnowledgeBase(Long.MAX_VALUE, renamedKnowledgeBase))
-            .isInstanceOf(NoSuchElementException.class);
-
-        PersistentAuditEvent persistentAuditEvent = findSingleEvent(KnowledgeBaseAuditEvents.KB_UPDATED);
-
-        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
-        assertThat(persistentAuditEvent.getData())
-            .containsEntry("result", "ERROR")
-            .containsEntry("errorClass", NoSuchElementException.class.getName())
-            .containsEntry("knowledgeBaseId", String.valueOf(Long.MAX_VALUE))
-            .doesNotContainKey("name");
     }
 
     private void deleteKnowledgeBases() {

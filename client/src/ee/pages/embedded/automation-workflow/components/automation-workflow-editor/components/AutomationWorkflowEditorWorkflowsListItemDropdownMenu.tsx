@@ -3,6 +3,8 @@ import AutomationWorkflowDialog, {
     AutomationWorkflowFormValuesI,
 } from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-dialog/AutomationWorkflowDialog';
 import WorkflowListItemDropdownMenu from '@/shared/components/workflow/WorkflowListItemDropdownMenu';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationWorkflowProjectsQuery,
     useDeleteAutomationWorkflowProjectWorkflowMutation,
@@ -33,6 +35,10 @@ const AutomationWorkflowEditorWorkflowsListItemDropdownMenu = ({
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
+
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteWorkflow = useHasEmbeddedScope('WORKFLOW_DELETE', DEVELOPMENT_ENVIRONMENT);
+    const canEditWorkflow = useHasEmbeddedScope('WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
 
     const deleteWorkflowMutation = useDeleteAutomationWorkflowProjectWorkflowMutation();
     const duplicateWorkflowMutation = useDuplicateAutomationWorkflowProjectWorkflowMutation();
@@ -108,9 +114,13 @@ const AutomationWorkflowEditorWorkflowsListItemDropdownMenu = ({
             }
             onDelete={handleDeleteWorkflowClick}
             onEditClick={() => setShowEditWorkflowDialog(true)}
+            showDeleteAction={canDeleteWorkflow}
+            showEditAction={canEditWorkflow}
             workflowLabel={workflow.label ?? workflow.workflowUuid}
         >
-            <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onClick={handleDuplicateWorkflowClick} />
+            {canCreateWorkflow && (
+                <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onClick={handleDuplicateWorkflowClick} />
+            )}
         </WorkflowListItemDropdownMenu>
     );
 };

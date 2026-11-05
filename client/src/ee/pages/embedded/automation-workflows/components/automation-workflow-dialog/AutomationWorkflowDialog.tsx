@@ -11,6 +11,7 @@ import {
 import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useForm} from 'react-hook-form';
 
 export interface AutomationWorkflowFormValuesI {
@@ -26,6 +27,8 @@ interface AutomationWorkflowDialogProps {
 }
 
 const AutomationWorkflowDialog = ({onClose, onSubmit, workflow}: AutomationWorkflowDialogProps) => {
+    const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+
     const isEditMode = workflow !== undefined;
 
     const form = useForm<AutomationWorkflowFormValuesI>({
@@ -98,25 +101,27 @@ const AutomationWorkflowDialog = ({onClose, onSubmit, workflow}: AutomationWorkf
                                     )}
                                 />
 
-                                <FormField
-                                    control={control}
-                                    name="permissionExpression"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Permission Expression</FormLabel>
+                                {canManageSettings && (
+                                    <FormField
+                                        control={control}
+                                        name="permissionExpression"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Permission Expression</FormLabel>
 
-                                            <FormControl>
-                                                <Textarea
-                                                    placeholder="e.g. metadata['tier'] == 'gold'"
-                                                    rows={3}
-                                                    {...field}
-                                                />
-                                            </FormControl>
+                                                <FormControl>
+                                                    <Textarea
+                                                        placeholder="e.g. metadata['tier'] == 'gold'"
+                                                        rows={3}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
 
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
                             </DialogBody>
 
                             <DialogFooter>

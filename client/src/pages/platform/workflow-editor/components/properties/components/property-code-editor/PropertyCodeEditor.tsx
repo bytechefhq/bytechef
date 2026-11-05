@@ -3,6 +3,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorDialog from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialog';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {Workflow} from '@/shared/middleware/platform/configuration';
@@ -53,6 +54,8 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
             }))
         );
 
+        const readOnly = useWorkflowEditorReadOnly();
+
         return (
             <>
                 <fieldset className="mb-3 w-full">
@@ -84,13 +87,29 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                                 </div>
                             )}
 
-                            <Button
-                                className="ml-10 flex-1 rounded-l-none"
-                                label="Open Code Editor"
-                                onClick={() => setShowPropertyCodeEditorSheet(true)}
-                                ref={ref}
-                                variant="outline"
-                            />
+                            {readOnly ? (
+                                <span
+                                    className="ml-10 inline-flex h-9 flex-1 cursor-pointer items-center justify-center rounded-md rounded-l-none border border-input bg-background px-4 text-sm font-medium hover:bg-surface-neutral-primary-hover"
+                                    onClick={() => setShowPropertyCodeEditorSheet(true)}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter' || event.key === ' ') {
+                                            setShowPropertyCodeEditorSheet(true);
+                                        }
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                >
+                                    View Code
+                                </span>
+                            ) : (
+                                <Button
+                                    className="ml-10 flex-1 rounded-l-none"
+                                    label="Open Code Editor"
+                                    onClick={() => setShowPropertyCodeEditorSheet(true)}
+                                    ref={ref}
+                                    variant="outline"
+                                />
+                            )}
                         </div>
                     </div>
 

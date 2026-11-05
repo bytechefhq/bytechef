@@ -64,6 +64,8 @@ public interface McpServerService {
 
     String getMcpServerSecretKey(long mcpServerId);
 
+    String getEditableMcpServerSecretKey(long mcpServerId);
+
     Optional<McpServer> fetchMcpServer(String secretKey);
 
     /**
@@ -73,6 +75,15 @@ public interface McpServerService {
      * @return the MCP server associated with the specified secret key
      */
     McpServer getMcpServer(String secretKey);
+
+    /**
+     * Gets the enabled MCP servers of the given platform type; ungated, meant for internal callers that already
+     * authenticated the caller.
+     *
+     * @param type the type to filter by
+     * @return a list of the enabled MCP servers with the given type
+     */
+    List<McpServer> getEnabledMcpServers(PlatformType type);
 
     /**
      * Gets MCP servers filtered by type.

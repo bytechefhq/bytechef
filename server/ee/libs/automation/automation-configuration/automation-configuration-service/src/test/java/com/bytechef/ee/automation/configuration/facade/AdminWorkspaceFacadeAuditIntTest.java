@@ -11,10 +11,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.configuration.domain.Workspace;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditMapper;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
+import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.service.WorkspaceServiceImpl;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
@@ -34,7 +37,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -54,7 +56,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
         WorkspacePermissionIntTestConfiguration.class, AdminWorkspaceFacadeAuditIntTest.AuditConfiguration.class
     },
     properties = {
-        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+        "bytechef.edition=ee", "bytechef.audit.enabled=true", "spring.liquibase.contexts=mono,dev"
     })
 class AdminWorkspaceFacadeAuditIntTest {
 
@@ -71,6 +73,9 @@ class AdminWorkspaceFacadeAuditIntTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    @Autowired
+    private WorkspaceUserRepository workspaceUserRepository;
+
     @BeforeEach
     void beforeEach() {
         SecurityContextHolder.setContext(
@@ -85,7 +90,11 @@ class AdminWorkspaceFacadeAuditIntTest {
     void afterEach() {
         SecurityContextHolder.clearContext();
 
-        workspaceIds.forEach(workspaceRepository::deleteById);
+        for (Long workspaceId : workspaceIds) {
+            workspaceUserRepository.deleteAll(workspaceUserRepository.findAllByWorkspaceId(workspaceId));
+
+            workspaceRepository.deleteById(workspaceId);
+        }
 
         workspaceIds.clear();
 
@@ -167,6 +176,23 @@ class AdminWorkspaceFacadeAuditIntTest {
     }
 
     @Test
+    void testDeleteWorkspaceRecordsTheRemovedMembers() {
+        Workspace workspace = saveWorkspace();
+
+        workspaceUserRepository.save(WorkspaceUser.forRole(2L, workspace.getId(), WorkspaceRole.EDITOR));
+
+        adminWorkspaceFacade.deleteWorkspace(workspace.getId());
+
+        assertThat(workspaceUserRepository.findAllByWorkspaceId(workspace.getId())).isEmpty();
+
+        assertThat(findSingleEvent(WorkspaceAuditEvents.WORKSPACE_DELETED).getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("workspaceId", String.valueOf(workspace.getId()))
+            .containsEntry("removedUserIds", "2")
+            .containsEntry("removedUserCount", "1");
+    }
+
+    @Test
     void testDeleteOfAnUnknownWorkspaceRecordsAFailure() {
         assertThatThrownBy(() -> adminWorkspaceFacade.deleteWorkspace(Long.MAX_VALUE))
             .isInstanceOf(NoSuchElementException.class);
@@ -207,13 +233,8 @@ class AdminWorkspaceFacadeAuditIntTest {
     @Configuration
     @Import({
         AdminWorkspaceFacadeImpl.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class,
-        AuditMapperResolver.class, WorkspaceServiceImpl.class
+        AuditMapperResolver.class, WorkspaceAuditMapper.class, WorkspaceServiceImpl.class
     })
     static class AuditConfiguration {
-
-        @Bean
-        ApplicationProperties applicationProperties() {
-            return new ApplicationProperties();
-        }
     }
 }

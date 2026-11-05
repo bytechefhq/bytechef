@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -53,6 +54,10 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
             .fetchApiKey(automationApiKeyAuthenticationToken.getSecretKey(),
                 automationApiKeyAuthenticationToken.getEnvironmentId())
             .orElseThrow(() -> new BadCredentialsException("Unknown API secret key"));
+
+        if (apiKey.getType() != PlatformType.AUTOMATION) {
+            throw new BadCredentialsException("Unknown API secret key");
+        }
 
         Long userId = apiKey.getUserId();
 

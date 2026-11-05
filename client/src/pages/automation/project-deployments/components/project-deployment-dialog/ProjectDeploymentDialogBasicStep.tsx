@@ -17,6 +17,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
+import {useWorkspaceScopeEnvironmentIds} from '@/shared/hooks/useWorkspaceScopeEnvironmentIds';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -72,6 +73,11 @@ const ProjectDeploymentDialogBasicStep = ({
 
     const {data: environmentsData} = useEnvironmentsQuery(undefined, {enabled: environmentEditable});
 
+    const deployableEnvironmentIds = useWorkspaceScopeEnvironmentIds(
+        environmentEditable ? currentWorkspaceId : undefined,
+        'DEPLOYMENT_CREATE'
+    );
+
     const [resetWorkflowsEnabledStore] = useWorkflowsEnabledStore(useShallow(({reset}) => [reset]));
 
     const isDevelopmentEnvironment = (environmentId ?? currentEnvironmentId) === DEVELOPMENT_ENVIRONMENT;
@@ -85,8 +91,12 @@ const ProjectDeploymentDialogBasicStep = ({
 
         return environmentsData.environments
             .filter((environment) => environment?.id != null && environment.name != null)
-            .map((environment) => ({id: environment!.id!, label: environment!.name!}));
-    }, [environmentsData?.environments]);
+            .map((environment) => ({id: environment!.id!, label: environment!.name!}))
+            .filter(
+                (environment) =>
+                    deployableEnvironmentIds === undefined || deployableEnvironmentIds.includes(Number(environment.id))
+            );
+    }, [deployableEnvironmentIds, environmentsData?.environments]);
 
     const handleDeploymentSelectChange = (value: string) => {
         setSelectedDeploymentId(value);

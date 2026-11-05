@@ -27,6 +27,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -86,6 +87,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -183,10 +185,20 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
     private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
 
     @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
     private PrincipalJobService principalJobService;
+
+    @AfterEach
+    void afterEach() {
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(false);
+    }
 
     @Test
     void testGetReferencesJoinsBackToTheOwningConnectedUserInBatch() {
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(true);
+
         givenSlackAutomationWorkflowEnvironment();
 
         long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(

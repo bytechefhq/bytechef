@@ -9,6 +9,7 @@ import {
     DialogMain,
 } from '@/components/Dialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {getRoleLabel} from '@/shared/util/role-utils';
 
 import useEditUserDialog from './hooks/useEditUserDialog';
 
@@ -53,7 +54,7 @@ const EditUserDialog = () => {
                                     <SelectContent>
                                         {authorities.map((authority) => (
                                             <SelectItem key={authority} value={authority}>
-                                                {authority}
+                                                {getRoleLabel(authority)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

@@ -71,6 +71,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.exception.ProvidedValueLockedException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
@@ -238,7 +239,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
     @MockitoBean
-    private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+    private ConnectedUserConnectionReader connectedUserConnectionReader;
 
     @MockitoBean
     private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
@@ -333,7 +334,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration configurationA = automationWorkflowProjectConfigurationService.create(
             automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "A", null, 1, true, true);
@@ -357,7 +358,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             secondExternalUserId, workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         automationWorkflowProjectConfigurationService.update(
             configurationA.getId(), configurationA.getName(), configurationA.getPermissionExpression(), 2, true, true);
@@ -376,7 +377,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration assignedConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Assigned", null, 1, true, true);
@@ -392,7 +393,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         connectedUserProjectConfigurationService.deleteByConfigurationId(assignedConfiguration.getId());
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         automationWorkflowProjectConfigurationService.create(
             automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Newer", null, 2, true, true);
@@ -573,7 +574,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
@@ -600,7 +601,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(reference.isEnabled()).isTrue();
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.enableReference(
@@ -630,7 +631,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(reference.isEnabled()).isTrue();
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
@@ -656,7 +657,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
@@ -682,7 +683,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
@@ -854,7 +855,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
@@ -875,7 +876,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
 
@@ -968,7 +969,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow developmentReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             developmentExternalUserId, workflowUuid, Environment.DEVELOPMENT);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
 
@@ -1004,8 +1005,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             createConnectedUser(), workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
         updateProductionConfigurationVersion(automationWorkflowProjectId, 3);
@@ -1057,8 +1058,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
 
@@ -1143,7 +1144,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
 
@@ -1203,7 +1204,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                 case "createIssue1" -> List.of(new ComponentConnection("jira", 1, "createIssue1", "jira", true));
                 default -> List.of();
             });
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("jira"), eq(List.of()))).thenReturn(List.of());
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("jira"), eq(List.of()))).thenReturn(List.of());
 
         publishAndPinProject(automationWorkflowProjectId);
 
@@ -1462,7 +1463,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUser failingConnectedUser = connectedUserService.getConnectedUser(
             failingExternalUserId, Environment.PRODUCTION);
 
-        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         assertThatCode(
@@ -1513,10 +1514,10 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUser failingConnectedUser = connectedUserService.getConnectedUser(
             failingExternalUserId, Environment.PRODUCTION);
 
-        when(connectedUserConnectionFacade.getConnections(concurrentConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(concurrentConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException(
                 "Failed to execute DbAction", new OptimisticLockingFailureException("Row was updated concurrently")));
-        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
@@ -1619,7 +1620,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         setProductionConfigurationEnabled(automationWorkflowProjectId, false);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         assertThatCode(() -> connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION)).doesNotThrowAnyException();
@@ -1829,7 +1830,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration remainingConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Remaining", null, 1, true, true);
@@ -1888,7 +1889,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration configurationA = automationWorkflowProjectConfigurationService.create(
             automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "A", null, 1, true, true);
@@ -1906,7 +1907,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         assertThat(automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(configurationA.getId(), 2)
             .workflows())
@@ -1923,7 +1924,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration configurationA = automationWorkflowProjectConfigurationService.create(
             automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "A", null, 1, true, true);
@@ -1976,7 +1977,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -1991,7 +1992,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             secondConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -2035,7 +2036,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         String secondWorkflowUuid = addWorkflow(
             automationWorkflowProjectId, LABELED_SLACK_WORKFLOW_DEFINITION.formatted("Fetch Recent Emails"));
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2052,7 +2053,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(secondWorkflowUuid);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -2086,7 +2087,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2121,7 +2122,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2160,7 +2161,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2200,7 +2201,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2236,7 +2237,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2280,8 +2281,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
         addWorkflow(otherAutomationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-        automationWorkflowProjectFacade.publishProject(otherAutomationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
+        automationWorkflowProjectFacade.publishProject(otherAutomationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2319,7 +2320,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2334,12 +2335,12 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow otherReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             otherConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
 
-        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         ConfigurationMoveResultDTO moveResult = automationWorkflowProjectConfigurationAdminFacade.moveConnectedUsers(
@@ -2368,7 +2369,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2389,7 +2390,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -2413,7 +2414,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         String secondWorkflowUuid = addWorkflow(
             automationWorkflowProjectId, LABELED_SLACK_WORKFLOW_DEFINITION.formatted("Fetch Recent Emails"));
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2433,7 +2434,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(secondWorkflowUuid);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -2461,7 +2462,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration firstSourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "First Source", null, 1, true, true);
@@ -2481,7 +2482,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             secondConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -2514,7 +2515,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration sourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2557,8 +2558,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
         addWorkflow(otherAutomationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-        automationWorkflowProjectFacade.publishProject(otherAutomationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
+        automationWorkflowProjectFacade.publishProject(otherAutomationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration stagingConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, Environment.STAGING.ordinal(), "Staging", null, 1, true, true);
@@ -2611,7 +2612,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         String secondWorkflowUuid = addWorkflow(
             automationWorkflowProjectId, LABELED_SLACK_WORKFLOW_DEFINITION.formatted("Fetch Recent Emails"));
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration firstSourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "First Source", null, 1, true, true);
@@ -2633,7 +2634,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(secondWorkflowUuid);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -2673,7 +2674,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration firstSourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "First Source", null, 1, true, true);
@@ -2715,7 +2716,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration firstSourceConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "First Source", null, 1, true, true);
@@ -2743,7 +2744,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration targetConfiguration = automationWorkflowProjectConfigurationService
             .create(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -2779,7 +2780,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration configurationA = automationWorkflowProjectConfigurationService.create(
             automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "A", null, 1, true, true);
@@ -3675,8 +3676,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             createConnectedUser(), workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         return reference;
     }
@@ -3801,7 +3802,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     private void stubNoEntitledSlackConnection() {
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
     }
 
@@ -3955,7 +3956,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         when(connectionDTO.id()).thenReturn(connectionId);
         when(connectionDTO.componentName()).thenReturn("slack");
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of(connectionDTO));
         when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class))).thenReturn(List.of(slot));
         when(componentConnectionFacade.getComponentConnection(anyString(), eq("postMessage1"), eq("slack")))
@@ -4024,7 +4025,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration configurationA = automationWorkflowProjectConfigurationService.create(
             automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, "A", null, 1, true, true);

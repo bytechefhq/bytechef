@@ -16,8 +16,7 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
+import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -34,26 +33,21 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class KnowledgeBaseDocumentTagGraphQlController {
 
-    private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
-    private final KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService;
+    private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseDocumentTagGraphQlController(
-        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
-
-        this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
-        this.knowledgeBaseDocumentTagService = knowledgeBaseDocumentTagService;
+    public KnowledgeBaseDocumentTagGraphQlController(WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
+        this.workspaceKnowledgeBaseFacade = workspaceKnowledgeBaseFacade;
     }
 
     @QueryMapping
     public List<String> knowledgeBaseDocumentTags(@Argument Long knowledgeBaseId) {
-        return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseId(knowledgeBaseId);
+        return workspaceKnowledgeBaseFacade.getKnowledgeBaseDocumentTagNames(knowledgeBaseId);
     }
 
     @QueryMapping
     public List<KnowledgeBaseDocumentTagsEntry> knowledgeBaseDocumentTagsByDocument(@Argument Long knowledgeBaseId) {
-        return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseDocumentId(knowledgeBaseId)
+        return workspaceKnowledgeBaseFacade.getKnowledgeBaseDocumentTagNamesByDocument(knowledgeBaseId)
             .entrySet()
             .stream()
             .map(entry -> new KnowledgeBaseDocumentTagsEntry(entry.getKey(), entry.getValue()))
@@ -64,7 +58,7 @@ public class KnowledgeBaseDocumentTagGraphQlController {
     public boolean updateKnowledgeBaseDocumentTags(@Argument UpdateKnowledgeBaseDocumentTagsInput input) {
         List<String> tagNames = input.tags() == null ? List.of() : input.tags();
 
-        knowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentTags(input.knowledgeBaseDocumentId(), tagNames);
+        workspaceKnowledgeBaseFacade.updateKnowledgeBaseDocumentTags(input.knowledgeBaseDocumentId(), tagNames);
 
         return true;
     }

@@ -11,9 +11,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -34,8 +37,6 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
-import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -60,7 +61,6 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -86,6 +86,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.NestedTestConfiguration;
 import org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.util.AopTestUtils;
 
 /**
@@ -105,8 +106,8 @@ class IntegrationWorkflowExecutionFacadeIntTest {
     @MockitoBean(types = {
         ComponentDefinitionService.class, ContextService.class, EnvironmentService.class,
         Evaluator.class, IntegrationInstanceConfigurationService.class, IntegrationInstanceService.class,
-        IntegrationService.class, IntegrationWorkflowFacade.class, IntegrationWorkflowService.class,
-        TaskDispatcherDefinitionService.class, TaskFileStorage.class, TriggerExecutionService.class,
+        IntegrationService.class, IntegrationWorkflowService.class, TaskDispatcherDefinitionService.class,
+        TaskFileStorage.class, TriggerExecutionService.class,
         TriggerFileStorage.class, WorkflowService.class
     })
     class MethodSecurityIntTest {
@@ -142,8 +143,9 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         }
 
         @Test
-        void testNonAdminIsDeniedEveryAdminReadBeforeAnyLookup() {
-            when(permissionService.isTenantAdmin()).thenReturn(false);
+        void testCallerWithoutExecutionViewIsDeniedEveryRunReadBeforeAnyLookup() {
+            when(permissionService.hasResourceScope(1L, "Job", "EXECUTION_VIEW")).thenReturn(false);
+            when(permissionService.hasEmbeddedScopeInEveryEnvironment("EXECUTION_VIEW")).thenReturn(false);
 
             assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecution(1L))
                 .isInstanceOf(AccessDeniedException.class);
@@ -163,13 +165,28 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         }
 
         @Test
-        void testTenantAdminPassesTheGate() {
-            when(permissionService.isTenantAdmin()).thenReturn(true);
+        void testCallerWithExecutionViewPassesTheGate() {
+            when(permissionService.hasResourceScope(1L, "Job", "EXECUTION_VIEW")).thenReturn(true);
 
             assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecution(1L))
                 .isNotInstanceOf(AccessDeniedException.class);
 
             verify(jobService).getJob(1L);
+        }
+
+        @Test
+        void testRunListGateRequiresExecutionViewInTheRequestedEnvironment() {
+            when(permissionService.hasEmbeddedScope("EXECUTION_VIEW", Environment.PRODUCTION)).thenReturn(true);
+            when(permissionService.hasEmbeddedScope("EXECUTION_VIEW", Environment.DEVELOPMENT)).thenReturn(false);
+
+            assertThatThrownBy(
+                () -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
+                    Environment.DEVELOPMENT.ordinal() + 0L, null, null, null, null, null, null, null, 0))
+                        .isInstanceOf(AccessDeniedException.class);
+            assertThat(
+                integrationWorkflowExecutionFacade.getWorkflowExecutions(
+                    Environment.PRODUCTION.ordinal() + 0L, null, null, null, null, null, null, null, 0)
+                    .getContent()).isEmpty();
         }
 
         @SpringBootConfiguration
@@ -203,6 +220,7 @@ class IntegrationWorkflowExecutionFacadeIntTest {
     @Import(PostgreSQLContainerConfiguration.class)
     class PersistenceIntTest {
 
+        private static final Map<String, Object> JOB_INPUTS = Map.of("jobInput", "value");
         private static final String TASK_TYPE = "myComponent/v1/myAction";
 
         @MockitoBean
@@ -226,9 +244,6 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         @Autowired
         private IntegrationWorkflowExecutionFacade integrationWorkflowExecutionFacade;
 
-        @MockitoBean
-        private IntegrationWorkflowFacade integrationWorkflowFacade;
-
         @Autowired
         private IntegrationWorkflowRepository integrationWorkflowRepository;
 
@@ -238,7 +253,10 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         @Autowired
         private JobService jobService;
 
-        @Autowired
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @MockitoSpyBean
         private PrincipalJobService principalJobService;
 
         @MockitoBean
@@ -263,6 +281,10 @@ class IntegrationWorkflowExecutionFacadeIntTest {
                 .thenReturn(true);
             when(componentDefinitionService.getComponentDefinition(anyString(), any()))
                 .thenReturn(componentDefinition);
+            when(permissionService.hasResourceScope(anyLong(), anyString(), anyString()))
+                .thenReturn(true);
+            when(permissionService.hasEmbeddedScope(anyString(), any(Environment.class)))
+                .thenReturn(true);
         }
 
         @AfterEach
@@ -290,8 +312,6 @@ class IntegrationWorkflowExecutionFacadeIntTest {
 
             addIntegrationWorkflow(integration, 1, publishedWorkflowId, UUID.randomUUID());
             addIntegrationWorkflow(integration, 2, draftWorkflowId, UUID.randomUUID());
-
-            stubIntegrationWorkflowFacade(publishedWorkflowId, draftWorkflowId);
 
             IntegrationInstanceConfiguration integrationInstanceConfiguration = createIntegrationInstanceConfiguration(
                 integration);
@@ -325,8 +345,6 @@ class IntegrationWorkflowExecutionFacadeIntTest {
 
             addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
 
-            stubIntegrationWorkflowFacade(workflowId);
-
             IntegrationInstanceConfiguration integrationInstanceConfiguration = createIntegrationInstanceConfiguration(
                 integration);
             IntegrationInstanceConfiguration otherIntegrationInstanceConfiguration =
@@ -353,8 +371,6 @@ class IntegrationWorkflowExecutionFacadeIntTest {
             String workflowId = createWorkflowId();
 
             addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
-
-            stubIntegrationWorkflowFacade(workflowId);
 
             IntegrationInstanceConfiguration integrationInstanceConfiguration = createIntegrationInstanceConfiguration(
                 integration);
@@ -383,8 +399,6 @@ class IntegrationWorkflowExecutionFacadeIntTest {
             String workflowId = createWorkflowId();
 
             addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
-
-            stubIntegrationWorkflowFacade(workflowId);
 
             IntegrationInstanceConfiguration integrationInstanceConfiguration = createIntegrationInstanceConfiguration(
                 integration);
@@ -428,8 +442,6 @@ class IntegrationWorkflowExecutionFacadeIntTest {
             assertThat(workflowExecutionPage.getContent())
                 .extracting(WorkflowExecutionDTO::id)
                 .containsExactly(publishedJob.getId());
-
-            verifyNoInteractions(integrationWorkflowFacade);
         }
 
         @Test
@@ -709,6 +721,137 @@ class IntegrationWorkflowExecutionFacadeIntTest {
             assertThat(taskExecutionDTO.output()).isNull();
         }
 
+        @Test
+        void testATaskExecutionIsNotReadWithoutDetails() {
+            Job job = createJob("workflow", null);
+
+            long jobId = Objects.requireNonNull(job.getId());
+
+            TaskExecution taskExecution = createTaskExecutionWithData(job, null);
+
+            when(permissionService.hasResourceScope(jobId, "Job", "EXECUTION_DETAILS_VIEW"))
+                .thenReturn(false);
+
+            TaskExecutionDTO taskExecutionDTO = integrationWorkflowExecutionFacade.getWorkflowExecutionTaskExecution(
+                jobId, Objects.requireNonNull(taskExecution.getId()));
+
+            assertThat(taskExecutionDTO.input()).isNull();
+            assertThat(taskExecutionDTO.output()).isNull();
+            assertThat(taskExecutionDTO.error()).isNull();
+        }
+
+        @Test
+        void testRunListsRedactPerConfigurationEnvironment() {
+            Integration integration = createIntegration();
+
+            String workflowId = createWorkflowId();
+
+            addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
+
+            IntegrationInstanceConfiguration developmentConfiguration = createIntegrationInstanceConfiguration(
+                integration, Environment.DEVELOPMENT);
+            IntegrationInstanceConfiguration productionConfiguration = createIntegrationInstanceConfiguration(
+                integration, Environment.PRODUCTION);
+
+            Job developmentJob = createPrincipalJobWithInputs(
+                workflowId, createIntegrationInstance("user-1", developmentConfiguration));
+            Job productionJob = createPrincipalJobWithInputs(
+                workflowId, createIntegrationInstance("user-2", productionConfiguration));
+            Job otherProductionJob = createPrincipalJobWithInputs(
+                workflowId, createIntegrationInstance("user-3", productionConfiguration));
+
+            when(permissionService.hasEmbeddedScope("EXECUTION_DETAILS_VIEW", Environment.PRODUCTION))
+                .thenReturn(true);
+            when(permissionService.hasEmbeddedScope("EXECUTION_DETAILS_VIEW", Environment.DEVELOPMENT))
+                .thenReturn(false);
+
+            Page<WorkflowExecutionDTO> workflowExecutionPage = integrationWorkflowExecutionFacade
+                .getWorkflowExecutions(null, null, null, null, null, null, null, null, 0);
+
+            assertThat(workflowExecutionPage.getContent())
+                .extracting(WorkflowExecutionDTO::id, IntegrationWorkflowExecutionFacadeIntTest::getJobInputs)
+                .containsExactlyInAnyOrder(
+                    tuple(developmentJob.getId(), Map.of()),
+                    tuple(productionJob.getId(), JOB_INPUTS),
+                    tuple(otherProductionJob.getId(), JOB_INPUTS));
+
+            verify(permissionService, times(1)).hasEmbeddedScope("EXECUTION_DETAILS_VIEW", Environment.PRODUCTION);
+            verify(permissionService, times(1)).hasEmbeddedScope("EXECUTION_DETAILS_VIEW", Environment.DEVELOPMENT);
+        }
+
+        @Test
+        void testARowWithoutAConfigurationIsRedactedUnlessTheCallerIsTenantAdmin() {
+            Integration integration = createIntegration();
+
+            String workflowId = createWorkflowId();
+
+            addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
+
+            Job job = createPrincipalJobWithInputs(
+                workflowId, createIntegrationInstance(
+                    "user-1", createIntegrationInstanceConfiguration(integration, Environment.PRODUCTION)));
+
+            doReturn(List.of()).when(principalJobService)
+                .getPrincipalJobs(List.of(job.getId()), PlatformType.EMBEDDED);
+
+            when(permissionService.isTenantAdmin()).thenReturn(false);
+
+            assertThat(integrationWorkflowExecutionFacade.getWorkflowExecutions(
+                null, null, null, null, null, null, null, null, 0)
+                .getContent())
+                    .extracting(WorkflowExecutionDTO::id, IntegrationWorkflowExecutionFacadeIntTest::getJobInputs)
+                    .containsExactly(tuple(job.getId(), Map.of()));
+
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+
+            assertThat(integrationWorkflowExecutionFacade.getWorkflowExecutions(
+                null, null, null, null, null, null, null, null, 0)
+                .getContent())
+                    .extracting(WorkflowExecutionDTO::id, IntegrationWorkflowExecutionFacadeIntTest::getJobInputs)
+                    .containsExactly(tuple(job.getId(), JOB_INPUTS));
+        }
+
+        @Test
+        void testAConfigurationFilterOutsideTheRequestedEnvironmentListsNothing() {
+            Integration integration = createIntegration();
+
+            String workflowId = createWorkflowId();
+
+            addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
+
+            IntegrationInstanceConfiguration developmentConfiguration = createIntegrationInstanceConfiguration(
+                integration);
+
+            createPrincipalJob(workflowId, createIntegrationInstance("user-1", developmentConfiguration));
+
+            Page<WorkflowExecutionDTO> workflowExecutionPage = integrationWorkflowExecutionFacade
+                .getWorkflowExecutions(
+                    (long) Environment.PRODUCTION.ordinal(), null, null, null, null,
+                    developmentConfiguration.getId(), null, null, 0);
+
+            assertThat(workflowExecutionPage.getContent()).isEmpty();
+        }
+
+        @Test
+        void testANonexistentConfigurationFilterWithAnEnvironmentListsNothing() {
+            Integration integration = createIntegration();
+
+            String workflowId = createWorkflowId();
+
+            addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
+
+            createPrincipalJob(
+                workflowId,
+                createIntegrationInstance(
+                    "user-1", createIntegrationInstanceConfiguration(integration, Environment.PRODUCTION)));
+
+            Page<WorkflowExecutionDTO> workflowExecutionPage = integrationWorkflowExecutionFacade
+                .getWorkflowExecutions(
+                    (long) Environment.PRODUCTION.ordinal(), null, null, null, null, Long.MAX_VALUE, null, null, 0);
+
+            assertThat(workflowExecutionPage.getContent()).isEmpty();
+        }
+
         private void addIntegrationWorkflow(
             Integration integration, int integrationVersion, String workflowId, UUID uuid) {
 
@@ -756,10 +899,16 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         }
 
         private IntegrationInstanceConfiguration createIntegrationInstanceConfiguration(Integration integration) {
+            return createIntegrationInstanceConfiguration(integration, Environment.DEVELOPMENT);
+        }
+
+        private IntegrationInstanceConfiguration createIntegrationInstanceConfiguration(
+            Integration integration, Environment environment) {
+
             IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
             integrationInstanceConfiguration.setConnectionParameters(Map.of());
-            integrationInstanceConfiguration.setEnvironment(Environment.DEVELOPMENT);
+            integrationInstanceConfiguration.setEnvironment(environment);
             integrationInstanceConfiguration.setIntegrationId(integration.getId());
             integrationInstanceConfiguration.setIntegrationVersion(1);
             integrationInstanceConfiguration.setName("Configuration " + UUID.randomUUID());
@@ -779,6 +928,22 @@ class IntegrationWorkflowExecutionFacadeIntTest {
 
         private Job createPrincipalJob(String workflowId, IntegrationInstance integrationInstance) {
             Job job = createJob(workflowId, null);
+
+            principalJobService.create(
+                Objects.requireNonNull(job.getId()), Objects.requireNonNull(integrationInstance.getId()),
+                PlatformType.EMBEDDED);
+
+            return job;
+        }
+
+        private Job createPrincipalJobWithInputs(String workflowId, IntegrationInstance integrationInstance) {
+            Job job = new Job();
+
+            job.setInputs(JOB_INPUTS);
+            job.setStatus(Job.Status.COMPLETED);
+            job.setWorkflowId(workflowId);
+
+            job = jobService.update(job);
 
             principalJobService.create(
                 Objects.requireNonNull(job.getId()), Objects.requireNonNull(integrationInstance.getId()),
@@ -836,19 +1001,11 @@ class IntegrationWorkflowExecutionFacadeIntTest {
 
             return Objects.requireNonNull(workflow.getId());
         }
+    }
 
-        private void stubIntegrationWorkflowFacade(String... workflowIds) {
-            List<IntegrationWorkflowDTO> integrationWorkflowDTOs = Arrays.stream(workflowIds)
-                .map(workflowId -> {
-                    IntegrationWorkflowDTO integrationWorkflowDTO = mock(IntegrationWorkflowDTO.class);
+    private static Map<String, ?> getJobInputs(WorkflowExecutionDTO workflowExecutionDTO) {
+        JobDTO jobDTO = workflowExecutionDTO.job();
 
-                    when(integrationWorkflowDTO.getId()).thenReturn(workflowId);
-
-                    return integrationWorkflowDTO;
-                })
-                .toList();
-
-            when(integrationWorkflowFacade.getIntegrationWorkflows()).thenReturn(integrationWorkflowDTOs);
-        }
+        return jobDTO.inputs();
     }
 }

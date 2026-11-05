@@ -15,8 +15,14 @@ import AutomationWorkflowConfigurations from '../AutomationWorkflowConfiguration
 
 const mocks = vi.hoisted(() => ({
     configurationsVariables: [] as unknown[],
+    deniedScopes: new Set<string>(),
     projects: [] as unknown[],
     projectsVariables: undefined as unknown,
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => !mocks.deniedScopes.has(scope),
 }));
 
 vi.mock(
@@ -126,6 +132,8 @@ const renderPage = (initialEntry = '/embedded/automation-configurations') => {
 
 describe('AutomationWorkflowConfigurations', () => {
     beforeEach(() => {
+        mocks.deniedScopes.clear();
+
         windowResizeObserver();
 
         environmentStore.setState({currentEnvironmentId: 2});
@@ -244,5 +252,24 @@ describe('AutomationWorkflowConfigurations', () => {
 
         expect(environmentStore.getState().currentEnvironmentId).toBe(0);
         expect(screen.getByTestId('location')).toHaveTextContent('/embedded/automation-workflows');
+    });
+
+    it('offers no configuration creation without the create scope', () => {
+        mocks.deniedScopes = new Set(['INTEGRATION_INSTANCE_CONFIGURATION_CREATE']);
+
+        renderPage();
+
+        expect(screen.getByRole('region', {name: 'Live Project'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
+    });
+
+    it('guides to the first configuration without offering creation when the create scope is missing', () => {
+        mocks.deniedScopes = new Set(['INTEGRATION_INSTANCE_CONFIGURATION_CREATE']);
+        mocks.projects = [makeProject('other', 'Other Project', true)];
+
+        renderPage();
+
+        expect(screen.getByText('Create your first configuration')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
     });
 });

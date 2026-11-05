@@ -17,8 +17,9 @@
 package com.bytechef.automation.data.table.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.data.table.configuration.service.DataTableService;
-import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -37,27 +38,35 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class DataTableTagGraphQlController {
 
-    private final DataTableTagService dataTableTagService;
-    private final DataTableService dataTableService;
+    private final EnvironmentService environmentService;
+    private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
     @SuppressFBWarnings("EI")
-    public DataTableTagGraphQlController(DataTableTagService dataTableTagService, DataTableService dataTableService) {
-        this.dataTableTagService = dataTableTagService;
-        this.dataTableService = dataTableService;
+    public DataTableTagGraphQlController(
+        EnvironmentService environmentService, WorkspaceDataTableFacade workspaceDataTableFacade) {
+
+        this.environmentService = environmentService;
+        this.workspaceDataTableFacade = workspaceDataTableFacade;
     }
 
     @QueryMapping
-    public List<Tag> dataTableTags() {
-        return dataTableTagService.getAllTags();
-    }
+    public List<Tag> dataTableTags(@Argument Long environmentId, @Argument Long workspaceId) {
+        Map<Long, List<Tag>> tagsByTableId = getTagsByTableId(environmentId, workspaceId);
 
-    @QueryMapping
-    public List<DataTableTagsEntry> dataTableTagsByTable() {
-        Map<String, List<Tag>> tagsByTableName = dataTableTagService.getTagsByTableName();
-
-        return tagsByTableName.entrySet()
+        return tagsByTableId.values()
             .stream()
-            .map(entry -> new DataTableTagsEntry(dataTableService.getIdByBaseName(entry.getKey()), entry.getValue()))
+            .flatMap(List::stream)
+            .distinct()
+            .toList();
+    }
+
+    @QueryMapping
+    public List<DataTableTagsEntry> dataTableTagsByTable(@Argument Long environmentId, @Argument Long workspaceId) {
+        Map<Long, List<Tag>> tagsByTableId = getTagsByTableId(environmentId, workspaceId);
+
+        return tagsByTableId.entrySet()
+            .stream()
+            .map(entry -> new DataTableTagsEntry(entry.getKey(), entry.getValue()))
             .toList();
     }
 
@@ -78,9 +87,15 @@ public class DataTableTagGraphQlController {
             })
             .collect(Collectors.toList());
 
-        dataTableTagService.updateTags(input.tableId(), tags);
+        workspaceDataTableFacade.updateTags(input.tableId(), tags);
 
         return true;
+    }
+
+    private Map<Long, List<Tag>> getTagsByTableId(Long environmentId, Long workspaceId) {
+        Environment environment = environmentService.getEnvironment(environmentId);
+
+        return workspaceDataTableFacade.getTagsByTableId(workspaceId, environment.ordinal());
     }
 
     public record DataTableTagsEntry(Long tableId, List<Tag> tags) {

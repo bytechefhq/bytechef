@@ -2,10 +2,16 @@ import {Collapsible} from '@/components/ui/collapsible';
 import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationListItem from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItem';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient} from '@tanstack/react-query';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
 
 const hoisted = vi.hoisted(() => ({
     captureIntegrationInstanceConfigurationEnabledMock: vi.fn(),
@@ -125,6 +131,13 @@ const openMenu = async () => {
 };
 
 const getWorkflowsTrigger = () => screen.getByRole('button', {hidden: true, name: /2 workflows/});
+
+beforeEach(() => {
+    authenticationStore.setState({
+        account: {authorities: ['ROLE_ADMIN'], login: 'admin@localhost.com'} as never,
+        authenticated: true,
+    });
+});
 
 describe('IntegrationInstanceConfigurationListItem row click', () => {
     beforeEach(() => {

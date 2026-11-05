@@ -8,13 +8,18 @@ import DataTablesFilterTitle from '@/pages/automation/datatables/components/Data
 import DataTablesLeftSidebarNav from '@/pages/automation/datatables/components/DataTablesLeftSidebarNav';
 import useDataTables from '@/pages/automation/datatables/components/hooks/useDataTables';
 import {DATA_TABLES_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Table2Icon} from 'lucide-react';
 
 const DataTables = () => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {allTags, error, filteredTables, isLoading, tables, tagId, tagsByTableData} = useDataTables();
+    const canCreateDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_CREATE');
 
     const initialLoadComplete = useInitialLoadComplete(isLoading);
 
@@ -26,7 +31,10 @@ const DataTables = () => {
                 <Header
                     centerTitle={true}
                     position="main"
-                    right={tables.length > 0 && <CreateDataTableDialog trigger={<Button>New Table</Button>} />}
+                    right={
+                        tables.length > 0 &&
+                        canCreateDataTable && <CreateDataTableDialog trigger={<Button>New Table</Button>} />
+                    }
                     title={
                         tables.length > 0 ? (
                             <DataTablesFilterTitle allTags={allTags} tagsByTableData={tagsByTableData} />
@@ -52,7 +60,11 @@ const DataTables = () => {
                     />
                 ) : (
                     <EmptyState
-                        actions={<CreateDataTableDialog trigger={<Button>Create Table</Button>} />}
+                        actions={
+                            canCreateDataTable ? (
+                                <CreateDataTableDialog trigger={<Button>Create Table</Button>} />
+                            ) : undefined
+                        }
                         description="A data table stores structured rows inside ByteChef, like lookup values, settings or records your workflows have already handled. Workflows can read and write it with no external database to set up."
                         docsLink={{href: DATA_TABLES_DOCUMENTATION_URL, label: 'How data tables work'}}
                         icon={<Table2Icon />}

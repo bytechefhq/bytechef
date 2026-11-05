@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.mcp.event;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -52,7 +53,12 @@ public class McpServerBeforeDeleteEventListener extends AbstractRelationalEventL
     protected void onBeforeDelete(BeforeDeleteEvent<McpServer> beforeDeleteEvent) {
         Identifier identifier = beforeDeleteEvent.getId();
 
-        deleteMcpProjects((Long) identifier.getValue());
+        long mcpServerId = (Long) identifier.getValue();
+
+        // Deleting the server's projects deletes their deployments, which needs DEPLOYMENT_DELETE on each; the caller
+        // was already authorized to delete the server itself, so the cascade must not stop half way on a narrower
+        // scope.
+        AutomationAuthorizationContext.runSkippingChecks(() -> deleteMcpProjects(mcpServerId));
     }
 
     private void deleteMcpProjects(long mcpServerId) {

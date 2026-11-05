@@ -33,6 +33,14 @@ import java.util.function.Function;
 public interface TestWorkflowExecutor {
 
     /**
+     * Authorizes joining the event stream of a running test job. The stream itself is held by the caller, which keeps
+     * the job's events, so this is where the caller learns whether it may hand them out.
+     *
+     * @param jobId The unique identifier of the test job whose events are to be streamed.
+     */
+    void attach(long jobId);
+
+    /**
      * Executes a workflow asynchronously.
      *
      * @param workflowId           The unique identifier of the workflow to execute.

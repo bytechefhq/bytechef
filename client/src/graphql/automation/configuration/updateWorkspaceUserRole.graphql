@@ -1,0 +1,6 @@
+mutation UpdateWorkspaceUserRole($workspaceId: ID!, $userId: ID!, $role: WorkspaceRole!) {
+    updateWorkspaceUserRole(workspaceId: $workspaceId, userId: $userId, role: $role) {
+        id
+        workspaceRole
+    }
+}

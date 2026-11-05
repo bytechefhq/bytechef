@@ -15,6 +15,7 @@ import {
     NO_CONNECTED_USERS_REASON,
     NO_OTHER_CONFIGURATION_REASON,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
@@ -55,6 +56,14 @@ const AutomationWorkflowProjectConfigurationListItem = ({
     const [showMoveUsersDialog, setShowMoveUsersDialog] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+    const environmentId = Number(configuration.environmentId);
+
+    const canDelete = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_DELETE', environmentId);
+    const canEdit = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT', environmentId);
+    const canViewConnectedUsers = useHasEmbeddedScope('CONNECTED_USER_VIEW', environmentId);
+
+    const canMoveUsers = canEdit && canViewConnectedUsers;
 
     const queryClient = useQueryClient();
 
@@ -171,7 +180,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                                 <Switch
                                     aria-label="Enable Configuration"
                                     checked={configuration.enabled}
-                                    disabled={enableConfigurationMutation.isPending}
+                                    disabled={!canEdit || enableConfigurationMutation.isPending}
                                     onCheckedChange={(enable) =>
                                         enableConfigurationMutation.mutate(
                                             {enable, id: configuration.id},
@@ -205,60 +214,70 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                             </Tooltip>
                         </div>
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    aria-label="Configuration Actions"
-                                    icon={<EllipsisVerticalIcon />}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </DropdownMenuTrigger>
+                        {(canEdit || canDelete) && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        aria-label="Configuration Actions"
+                                        icon={<EllipsisVerticalIcon />}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    aria-label="Edit Configuration"
-                                    icon={<PencilIcon />}
-                                    label="Edit"
-                                    onClick={() => onEdit(configuration)}
-                                />
-
-                                <DropdownMenuItem
-                                    aria-label="Update Project Version"
-                                    icon={<RefreshCcwIcon />}
-                                    label="Update Project Version"
-                                    onClick={() => onUpdateVersion(configuration)}
-                                />
-
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span className="block">
+                                <DropdownMenuContent align="end">
+                                    {canEdit && (
+                                        <>
                                             <DropdownMenuItem
-                                                aria-label="Move Users"
-                                                disabled={!!moveUsersDisabledReason}
-                                                icon={<UsersIcon />}
-                                                label="Move Users…"
-                                                onClick={() => setShowMoveUsersDialog(true)}
+                                                aria-label="Edit Configuration"
+                                                icon={<PencilIcon />}
+                                                label="Edit"
+                                                onClick={() => onEdit(configuration)}
                                             />
-                                        </span>
-                                    </TooltipTrigger>
 
-                                    {moveUsersDisabledReason && (
-                                        <TooltipContent side="left">{moveUsersDisabledReason}</TooltipContent>
+                                            <DropdownMenuItem
+                                                aria-label="Update Project Version"
+                                                icon={<RefreshCcwIcon />}
+                                                label="Update Project Version"
+                                                onClick={() => onUpdateVersion(configuration)}
+                                            />
+                                        </>
                                     )}
-                                </Tooltip>
 
-                                <DropdownMenuSeparator />
+                                    {canMoveUsers && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className="block">
+                                                    <DropdownMenuItem
+                                                        aria-label="Move Users"
+                                                        disabled={!!moveUsersDisabledReason}
+                                                        icon={<UsersIcon />}
+                                                        label="Move Users…"
+                                                        onClick={() => setShowMoveUsersDialog(true)}
+                                                    />
+                                                </span>
+                                            </TooltipTrigger>
 
-                                <DropdownMenuItem
-                                    aria-label="Delete Configuration"
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                    variant="destructive"
-                                />
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                            {moveUsersDisabledReason && (
+                                                <TooltipContent side="left">{moveUsersDisabledReason}</TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    )}
+
+                                    {canEdit && canDelete && <DropdownMenuSeparator />}
+
+                                    {canDelete && (
+                                        <DropdownMenuItem
+                                            aria-label="Delete Configuration"
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={() => setShowDeleteDialog(true)}
+                                            variant="destructive"
+                                        />
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
                     </div>
                 </div>
             </div>

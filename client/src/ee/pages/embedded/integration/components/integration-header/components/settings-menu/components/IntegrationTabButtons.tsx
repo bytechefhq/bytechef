@@ -1,6 +1,8 @@
 import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {Separator} from '@/components/ui/separator';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {EditIcon, HistoryIcon, PlusIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 import {ChangeEvent, MouseEvent, useRef} from 'react';
 
@@ -21,6 +23,10 @@ const IntegrationTabButtons = ({
 }) => {
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteIntegration = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
+    const canEditIntegration = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
             onCloseDropdownMenuClick();
@@ -40,40 +46,48 @@ const IntegrationTabButtons = ({
     return (
         <>
             <div className="flex flex-col" onClick={handleButtonClick}>
-                <Button
-                    aria-label="Edit Integration Button"
-                    className="dropdown-menu-item"
-                    icon={<EditIcon />}
-                    label="Edit"
-                    onClick={() => onShowEditIntegrationDialogClick()}
-                    variant="ghost"
-                />
+                {canEditIntegration && (
+                    <>
+                        <Button
+                            aria-label="Edit Integration Button"
+                            className="dropdown-menu-item"
+                            icon={<EditIcon />}
+                            label="Edit"
+                            onClick={() => onShowEditIntegrationDialogClick()}
+                            variant="ghost"
+                        />
 
-                <Separator />
+                        <Separator />
+                    </>
+                )}
 
-                <Button
-                    aria-label="New Workflow"
-                    className="dropdown-menu-item"
-                    icon={<PlusIcon />}
-                    label="New Workflow"
-                    onClick={onNewWorkflowClick}
-                    variant="ghost"
-                />
+                {canCreateWorkflow && (
+                    <>
+                        <Button
+                            aria-label="New Workflow"
+                            className="dropdown-menu-item"
+                            icon={<PlusIcon />}
+                            label="New Workflow"
+                            onClick={onNewWorkflowClick}
+                            variant="ghost"
+                        />
 
-                <Button
-                    aria-label="Import Workflow Button"
-                    className="dropdown-menu-item"
-                    icon={<UploadIcon />}
-                    label="Import Workflow"
-                    onClick={() => {
-                        if (hiddenFileInputRef.current) {
-                            hiddenFileInputRef.current.click();
-                        }
-                    }}
-                    variant="ghost"
-                />
+                        <Button
+                            aria-label="Import Workflow Button"
+                            className="dropdown-menu-item"
+                            icon={<UploadIcon />}
+                            label="Import Workflow"
+                            onClick={() => {
+                                if (hiddenFileInputRef.current) {
+                                    hiddenFileInputRef.current.click();
+                                }
+                            }}
+                            variant="ghost"
+                        />
 
-                <Separator />
+                        <Separator />
+                    </>
+                )}
 
                 <Button
                     aria-label="Integration History"
@@ -84,16 +98,20 @@ const IntegrationTabButtons = ({
                     variant="ghost"
                 />
 
-                <Separator />
+                {canDeleteIntegration && (
+                    <>
+                        <Separator />
 
-                <Button
-                    aria-label="Delete Integration"
-                    className="dropdown-menu-item-destructive"
-                    icon={<Trash2Icon />}
-                    label="Delete"
-                    onClick={onDeleteIntegrationClick}
-                    variant="ghost"
-                />
+                        <Button
+                            aria-label="Delete Integration"
+                            className="dropdown-menu-item-destructive"
+                            icon={<Trash2Icon />}
+                            label="Delete"
+                            onClick={onDeleteIntegrationClick}
+                            variant="ghost"
+                        />
+                    </>
+                )}
             </div>
 
             <input

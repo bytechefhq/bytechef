@@ -12,6 +12,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {useGetIntegrationCategoriesQuery} from '@/ee/shared/queries/embedded/integrationCategories.queries';
 import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
@@ -43,6 +44,8 @@ const Integrations = () => {
     const categoryId = searchParams.get('categoryId');
     const tagId = searchParams.get('tagId');
     const unifiedApiCategory = searchParams.get('unifiedApiCategory') ?? undefined;
+
+    const canCreateIntegration = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
 
     const ff_743 = useFeatureFlagsStore()('ff-743');
 
@@ -86,6 +89,7 @@ const Integrations = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateIntegration &&
                         integrations &&
                         integrations.length > 0 && (
                             <Button
@@ -140,7 +144,7 @@ const Integrations = () => {
                         message="No integrations match the selected filter."
                         title="No Matching Integrations"
                     />
-                ) : (
+                ) : canCreateIntegration ? (
                     <EmptyState
                         actions={
                             <Button
@@ -156,6 +160,12 @@ const Integrations = () => {
                     >
                         <JourneySteps aria-label="Getting started" steps={INTEGRATION_STEPS} />
                     </EmptyState>
+                ) : (
+                    <EmptyList
+                        icon={<SquareIcon className="size-24 text-stroke-neutral-tertiary" />}
+                        message="There are no integrations yet."
+                        title="No Integrations"
+                    />
                 )}
             </PageLoader>
 

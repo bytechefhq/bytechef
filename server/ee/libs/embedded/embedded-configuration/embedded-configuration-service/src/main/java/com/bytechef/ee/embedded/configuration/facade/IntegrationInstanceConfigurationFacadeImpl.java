@@ -11,6 +11,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
@@ -53,6 +54,7 @@ import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
+import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
@@ -63,9 +65,11 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -81,6 +85,8 @@ import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -100,6 +106,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationInstanceConfigurationFacade {
 
     private static final Logger log = LoggerFactory.getLogger(IntegrationInstanceConfigurationFacadeImpl.class);
+    private static final String INSTANCE_CONFIGURATION_EDIT = "INTEGRATION_INSTANCE_CONFIGURATION_EDIT";
+    private static final String INSTANCE_CONFIGURATION_TYPE = "IntegrationInstanceConfiguration";
+    private static final String INSTANCE_CONFIGURATION_VIEW = "INTEGRATION_INSTANCE_CONFIGURATION_VIEW";
 
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
@@ -123,6 +132,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final TriggerExecutionService triggerExecutionService;
     private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
+    private final PermissionService permissionService;
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationFacadeImpl(
@@ -140,7 +150,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         OAuth2Service oAuth2Service,
         TagService tagService,
         TriggerExecutionService triggerExecutionService, ComponentConnectionFacade componentConnectionFacade,
-        WorkflowService workflowService) {
+        WorkflowService workflowService, @Lazy PermissionService permissionService) {
 
         this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
@@ -163,6 +173,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.triggerExecutionService = triggerExecutionService;
         this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
+        this.permissionService = permissionService;
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
@@ -178,7 +189,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "name", value = "#integrationInstanceConfigurationDTO.name"),
         @AuditData(key = "environment", value = "#integrationInstanceConfigurationDTO.environment")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', " +
+        "#integrationInstanceConfigurationDTO.environment)")
     public long createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
@@ -250,7 +262,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "jobId", value = "#result")
     })
     @Transactional(propagation = Propagation.NEVER)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public long createIntegrationInstanceConfigurationWorkflowJob(Long id, String workflowId) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(id, workflowId);
@@ -264,10 +276,13 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_DELETED, data = {
         @AuditData(key = "integrationInstanceConfigurationId", value = "#id")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_DELETE')")
     public void deleteIntegrationInstanceConfiguration(long id) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);
+
+        ConfigurationDeletionGuard.assertMayDelete(
+            List.of(integrationInstanceConfiguration), integrationInstanceService, permissionService);
 
         if (integrationInstanceConfiguration.isEnabled()) {
             enableIntegrationInstanceConfiguration(integrationInstanceConfiguration.getId(), false);
@@ -312,7 +327,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceConfigurationId, " +
+        "'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void enableIntegrationInstanceConfiguration(long integrationInstanceConfigurationId, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
             integrationInstanceConfigurationId);
@@ -340,7 +356,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "workflowId", value = "#workflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceConfigurationId, " +
+        "'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void enableIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId, boolean enable) {
 
@@ -427,7 +444,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfiguration(long id) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);
@@ -437,19 +454,56 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfiguration.getIntegrationVersion());
         List<String> workflowIds = getWorkflowIds(integrationInstanceConfiguration);
 
-        return integrationInstanceConfigurationDTOAssembler.toIntegrationInstanceConfigurationDTO(
-            integrationInstanceConfiguration,
-            CollectionUtils.filter(
-                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                    integrationInstanceConfiguration.getId()),
-                integrationInstanceConfigurationWorkflow -> workflowIds
-                    .contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
-            integrationWorkflows);
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            integrationInstanceConfigurationDTOAssembler.toIntegrationInstanceConfigurationDTO(
+                integrationInstanceConfiguration,
+                CollectionUtils.filter(
+                    integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                        integrationInstanceConfiguration.getId()),
+                    integrationInstanceConfigurationWorkflow -> workflowIds
+                        .contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
+                integrationWorkflows);
+
+        boolean canEdit = permissionService.hasResourceScope(
+            id, INSTANCE_CONFIGURATION_TYPE, INSTANCE_CONFIGURATION_EDIT);
+
+        return canSeeCredentials(integrationInstanceConfigurationDTO, canEdit)
+            ? integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTO.withoutCredentials();
+    }
+
+    private List<IntegrationInstanceConfigurationDTO> redactCredentials(
+        List<IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationDTOs) {
+
+        Map<Environment, Boolean> canEditByEnvironment = new HashMap<>();
+        List<IntegrationInstanceConfigurationDTO> redactedDTOs = new ArrayList<>();
+
+        for (IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTOs) {
+
+            boolean canEdit = canEditByEnvironment.computeIfAbsent(
+                integrationInstanceConfigurationDTO.environment(),
+                environment -> permissionService.hasResourceScope(
+                    integrationInstanceConfigurationDTO.id(), INSTANCE_CONFIGURATION_TYPE,
+                    INSTANCE_CONFIGURATION_EDIT));
+
+            redactedDTOs.add(
+                canSeeCredentials(integrationInstanceConfigurationDTO, canEdit)
+                    ? integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTO.withoutCredentials());
+        }
+
+        return redactedDTOs;
+    }
+
+    private static boolean canSeeCredentials(
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO, boolean canEdit) {
+
+        return canEdit && ConnectionSecrets.isCurrentUserCreator(integrationInstanceConfigurationDTO.createdBy());
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'IntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW') and " +
+        "hasPermission(#id, 'IntegrationInstanceConfiguration', 'CONNECTED_USER_VIEW')")
     public List<IntegrationInstanceConfigurationConnectedUserDTO> getIntegrationInstanceConfigurationConnectedUsers(
         long id) {
 
@@ -478,7 +532,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#sourceId, 'IntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW') and " +
+        "hasPermission(#targetId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public ConfigurationMoveImpactDTO getMoveImpact(long sourceId, long targetId, List<Long> connectedUserIds) {
         IntegrationInstanceConfiguration sourceConfiguration =
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(sourceId);
@@ -498,14 +554,20 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public List<Tag> getIntegrationInstanceConfigurationTags() {
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations();
 
+        Set<Environment> viewableEnvironments = Arrays.stream(Environment.values())
+            .filter(environment -> permissionService.hasEmbeddedScope(INSTANCE_CONFIGURATION_VIEW, environment))
+            .collect(Collectors.toCollection(() -> EnumSet.noneOf(Environment.class)));
+
         return tagService.getTags(
             integrationInstanceConfigurations
                 .stream()
+                .filter(integrationInstanceConfiguration -> viewableEnvironments.contains(
+                    integrationInstanceConfiguration.getEnvironment()))
                 .map(IntegrationInstanceConfiguration::getTagIds)
                 .flatMap(Collection::stream)
                 .toList());
@@ -513,7 +575,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('INTEGRATION_INSTANCE_CONFIGURATION_VIEW', #environmentId)")
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
         Long environmentId, Long integrationId, Long tagId, boolean includeAllFields) {
 
@@ -539,7 +601,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             List<IntegrationWorkflow> allIntegrationWorkflows =
                 integrationWorkflowService.getIntegrationWorkflows(integrationIds);
 
-            return CollectionUtils.map(
+            return redactCredentials(CollectionUtils.map(
                 integrationInstanceConfigurations,
                 integrationInstanceConfiguration -> {
                     Integer integrationVersion = integrationInstanceConfiguration.getIntegrationVersion();
@@ -572,15 +634,16 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                                 workflowIds.contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
                         configIntegrationWorkflows,
                         tags);
-                });
+                }));
         } else {
-            return CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfigurationDTO::new);
+            return redactCredentials(
+                CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfigurationDTO::new));
         }
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#targetId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public ConfigurationMoveImpactDTO getUpgradeImpact(long targetId, List<Long> connectedUserIds) {
         IntegrationInstanceConfiguration targetConfiguration =
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(targetId);
@@ -622,7 +685,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "targetIntegrationInstanceConfigurationId", value = "#targetId"),
         @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#sourceId, 'IntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT') and " +
+        "hasPermission(#targetId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ConfigurationMoveResultDTO moveConnectedUsers(long sourceId, long targetId, List<Long> connectedUserIds) {
         if (sourceId == targetId) {
@@ -647,7 +712,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "integrationId", value = "#integrationInstanceConfigurationDTO.integrationId"),
         @AuditData(key = "name", value = "#integrationInstanceConfigurationDTO.name")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceConfigurationDTO.id, " +
+        "'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
@@ -675,17 +741,37 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateIntegrationInstanceConfigurationTags(long id, List<Tag> tags) {
         integrationInstanceConfigurationService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceConfigurationWorkflow.integrationInstanceConfigurationId, " +
+        "'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateIntegrationInstanceConfigurationWorkflow(
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
 
-        validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
+        IntegrationInstanceConfigurationWorkflow storedIntegrationInstanceConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                Validate.notNull(integrationInstanceConfigurationWorkflow.getId(), "id"));
+
+        if (!Objects.equals(
+            storedIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
+            integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId())) {
+
+            throw new AccessDeniedException(
+                "Integration instance configuration workflow " + integrationInstanceConfigurationWorkflow.getId()
+                    + " does not belong to integration instance configuration "
+                    + integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId());
+        }
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                storedIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId());
+
+        validateIntegrationInstanceConfigurationWorkflow(
+            integrationInstanceConfigurationWorkflow, integrationInstanceConfiguration.getEnvironment());
 
         IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
@@ -703,7 +789,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "targetIntegrationInstanceConfigurationId", value = "#targetId"),
         @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#targetId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ConfigurationMoveResultDTO upgradeConnectedUsers(long targetId, List<Long> connectedUserIds) {
         IntegrationInstanceConfiguration targetConfiguration =
@@ -1039,7 +1125,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 }
             }
 
-            validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
+            validateIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationWorkflow, integrationInstanceConfiguration.getEnvironment());
 
             if (oldIntegrationInstanceConfigurationWorkflow == null) {
                 integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
@@ -1560,7 +1647,21 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     private void validateIntegrationInstanceConfigurationWorkflow(
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, Environment environment) {
+
+        for (IntegrationInstanceConfigurationWorkflowConnection integrationInstanceConfigurationWorkflowConnection : integrationInstanceConfigurationWorkflow
+            .getConnections()) {
+
+            long connectionId = integrationInstanceConfigurationWorkflowConnection.getConnectionId();
+
+            if (!permissionService.canUseConnectionInWorkflow(
+                connectionId, integrationInstanceConfigurationWorkflow.getWorkflowId(), environment)) {
+
+                throw new AccessDeniedException(
+                    "Connection " + connectionId + " cannot be used in workflow "
+                        + integrationInstanceConfigurationWorkflow.getWorkflowId());
+            }
+        }
 
         if (integrationInstanceConfigurationWorkflow.isEnabled()) {
             List<IntegrationInstanceConfigurationWorkflowConnection> integrationInstanceConfigurationWorkflowConnections =

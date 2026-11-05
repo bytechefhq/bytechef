@@ -1,29 +1,85 @@
-import {render} from '@testing-library/react';
+import {render, screen} from '@/shared/util/test-utils';
+import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionSheetContent from '../WorkflowExecutionSheetContent';
 
-const {queryMock} = vi.hoisted(() => ({
-    queryMock: vi.fn(() => ({data: undefined, isLoading: false})),
+const hoisted = vi.hoisted(() => ({
+    embeddedGranted: false,
+    taskExecutionQuery: vi.fn(),
+    workspaceGranted: false,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoisted.workspaceGranted,
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    useHasEmbeddedScope: () => hoisted.embeddedGranted,
+}));
+
+vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
+    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
+        selector({currentWorkspaceId: 1}),
 }));
 
 vi.mock('@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider', () => ({
-    useWorkflowExecutionDetailQueries: () => ({useGetWorkflowExecutionTaskExecutionQuery: queryMock}),
+    useWorkflowExecutionDetailQueries: () => ({
+        useGetWorkflowExecutionTaskExecutionQuery: (...args: unknown[]) => hoisted.taskExecutionQuery(...args),
+    }),
 }));
 
 vi.mock('@/components/ui/resizable', () => ({
-    ResizableHandle: () => null,
-    ResizablePanel: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
-    ResizablePanelGroup: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
+    ResizableHandle: () => <div />,
+    ResizablePanel: ({children}: {children: ReactNode}) => <div>{children}</div>,
+    ResizablePanelGroup: ({children}: {children: ReactNode}) => <div>{children}</div>,
 }));
 
-vi.mock('@/shared/components/workflow-executions/WorkflowExecutionsHeader', () => ({default: () => null}));
+vi.mock('@/components/ui/scroll-area', () => ({
+    ScrollArea: ({children}: {children: ReactNode}) => <div>{children}</div>,
+}));
 
-vi.mock('@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem', () => ({default: () => null}));
+vi.mock('@/shared/components/workflow-executions/WorkflowExecutionsHeader', () => ({default: () => <div />}));
 
-vi.mock('@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel', () => ({default: () => null}));
+vi.mock('@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem', () => ({
+    default: ({children}: {children: ReactNode}) => <div>{children}</div>,
+}));
 
-const renderContent = (selectedItem: object) =>
+vi.mock('@/shared/components/workflow-executions/WorkflowTaskExecutionItem', () => ({default: () => <div />}));
+
+vi.mock('@/shared/components/workflow-executions/WorkflowTriggerExecutionItem', () => ({default: () => <div />}));
+
+vi.mock('@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel', () => ({
+    default: ({detailsHidden}: {detailsHidden?: boolean}) => (
+        <div data-testid="tabs-panel">{`detailsHidden=${String(detailsHidden)}`}</div>
+    ),
+}));
+
+const job = {id: '1', status: 'COMPLETED', taskExecutions: [{id: '11', name: 'task'}]} as never;
+
+const renderContent = (embedded?: boolean) =>
+    render(
+        <WorkflowExecutionSheetContent
+            activeTab="input"
+            dialogOpen={false}
+            embedded={embedded}
+            handleBreadcrumbNavigate={vi.fn()}
+            handleSeeExecutions={vi.fn()}
+            handleTaskClick={vi.fn()}
+            isTriggerExecution={false}
+            job={job}
+            jobFailedWithNoExecutions={false}
+            jobFailureError={{message: '', stackTrace: []} as never}
+            lazy={{workflowExecutionId: 1} as never}
+            selectedItem={{id: '11'} as never}
+            setActiveTab={vi.fn()}
+            setDialogOpen={vi.fn()}
+            subflowStack={[]}
+            taskExecutionAttempts={[]}
+        />
+    );
+
+const renderSelectedItem = (selectedItem: object) =>
     render(
         <WorkflowExecutionSheetContent
             activeTab="input"
@@ -43,21 +99,75 @@ const renderContent = (selectedItem: object) =>
         />
     );
 
+const lastQueryEnabledArgument = () => {
+    const calls = hoisted.taskExecutionQuery.mock.calls;
+
+    return calls[calls.length - 1][1];
+};
+
 describe('automation WorkflowExecutionSheetContent', () => {
     beforeEach(() => {
-        queryMock.mockClear();
+        hoisted.embeddedGranted = false;
+        hoisted.workspaceGranted = false;
+
+        hoisted.taskExecutionQuery.mockReset();
+        hoisted.taskExecutionQuery.mockReturnValue({data: undefined, isLoading: false});
+    });
+
+    it('gates details on the workspace scope on the automation page', () => {
+        hoisted.workspaceGranted = true;
+        hoisted.embeddedGranted = false;
+
+        renderContent();
+
+        expect(screen.getByTestId('tabs-panel')).toHaveTextContent('detailsHidden=false');
+        expect(lastQueryEnabledArgument()).toBe(true);
+    });
+
+    it('hides details on the automation page without the workspace scope even with the embedded scope', () => {
+        hoisted.workspaceGranted = false;
+        hoisted.embeddedGranted = true;
+
+        renderContent();
+
+        expect(screen.getByTestId('tabs-panel')).toHaveTextContent('detailsHidden=true');
+        expect(lastQueryEnabledArgument()).toBe(false);
+    });
+
+    it('gates details on the embedded scope when shown from the embedded executions page', () => {
+        hoisted.workspaceGranted = false;
+        hoisted.embeddedGranted = true;
+
+        renderContent(true);
+
+        expect(screen.getByTestId('tabs-panel')).toHaveTextContent('detailsHidden=false');
+        expect(lastQueryEnabledArgument()).toBe(true);
+    });
+
+    it('hides details on the embedded executions page without the embedded scope even with the workspace scope', () => {
+        hoisted.workspaceGranted = true;
+        hoisted.embeddedGranted = false;
+
+        renderContent(true);
+
+        expect(screen.getByTestId('tabs-panel')).toHaveTextContent('detailsHidden=true');
+        expect(lastQueryEnabledArgument()).toBe(false);
     });
 
     it('does not request the task execution of a tool call row', () => {
-        renderContent({clusterElementCallId: 'call-uuid', id: 'call-uuid'});
+        hoisted.workspaceGranted = true;
 
-        expect(queryMock).toHaveBeenCalledWith(expect.anything(), false, false);
-        expect(queryMock).not.toHaveBeenCalledWith(expect.anything(), true, false);
+        renderSelectedItem({clusterElementCallId: 'call-uuid', id: 'call-uuid'});
+
+        expect(hoisted.taskExecutionQuery).toHaveBeenCalledWith(expect.anything(), false, false);
+        expect(hoisted.taskExecutionQuery).not.toHaveBeenCalledWith(expect.anything(), true, false);
     });
 
     it('requests the task execution of a normal task', () => {
-        renderContent({id: '42'});
+        hoisted.workspaceGranted = true;
 
-        expect(queryMock).toHaveBeenCalledWith({id: 7, taskExecutionId: 42}, true, false);
+        renderSelectedItem({id: '42'});
+
+        expect(hoisted.taskExecutionQuery).toHaveBeenCalledWith({id: 7, taskExecutionId: 42}, true, false);
     });
 });

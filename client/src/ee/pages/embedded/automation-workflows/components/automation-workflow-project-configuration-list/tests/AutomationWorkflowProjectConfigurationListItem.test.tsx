@@ -11,9 +11,15 @@ const mocks = vi.hoisted(() => ({
     deleteImpact: {connectedUserCount: 3, referenceWorkflowCount: 2} as
         {connectedUserCount: number; referenceWorkflowCount: number} | undefined,
     deleteImpactError: false,
+    deniedScopes: new Set<string>(),
     enableConfigurationMutate: vi.fn(),
     enableWorkflowMutate: vi.fn(),
     invalidateQueries: vi.fn(),
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => !mocks.deniedScopes.has(scope),
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -128,6 +134,8 @@ const renderItem = (
 
 describe('AutomationWorkflowProjectConfigurationListItem', () => {
     beforeEach(() => {
+        mocks.deniedScopes.clear();
+
         windowResizeObserver();
 
         mocks.deleteImpact = {connectedUserCount: 3, referenceWorkflowCount: 2};
@@ -445,5 +453,38 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
             workflowUuid: 'wf-1',
         });
         expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationWorkflowProjectConfigurations']});
+    });
+
+    it('offers no configuration actions and disables the toggle without edit and delete scopes', () => {
+        mocks.deniedScopes = new Set([
+            'INTEGRATION_INSTANCE_CONFIGURATION_DELETE',
+            'INTEGRATION_INSTANCE_CONFIGURATION_EDIT',
+        ]);
+
+        renderItem();
+
+        expect(screen.getByRole('switch', {name: 'Enable Configuration'})).toBeDisabled();
+        expect(screen.queryByRole('button', {name: 'Configuration Actions'})).not.toBeInTheDocument();
+    });
+
+    it('offers only Delete with the delete scope alone', async () => {
+        mocks.deniedScopes = new Set(['INTEGRATION_INSTANCE_CONFIGURATION_EDIT']);
+
+        renderItem();
+
+        await userEvent.setup().click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        expect((await screen.findAllByRole('menuitem')).map((item) => item.textContent)).toEqual(['Delete']);
+    });
+
+    it('hides Move Users without the connected user view scope', async () => {
+        mocks.deniedScopes = new Set(['CONNECTED_USER_VIEW']);
+
+        renderItem();
+
+        await userEvent.setup().click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        expect(await screen.findByRole('menuitem', {name: 'Edit Configuration'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Move Users'})).not.toBeInTheDocument();
     });
 });

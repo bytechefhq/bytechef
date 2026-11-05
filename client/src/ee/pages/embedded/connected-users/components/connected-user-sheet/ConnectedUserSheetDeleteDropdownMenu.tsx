@@ -12,7 +12,7 @@ interface ConnectedUserSheetDeleteDropdownMenuProps {
     changeConfigurationDisabled?: boolean;
     changeConfigurationDisabledReason?: string;
     onChangeConfigurationClick?: () => void;
-    onDeleteClick: () => void;
+    onDeleteClick?: () => void;
 }
 
 const ConnectedUserSheetDeleteDropdownMenu = ({
@@ -52,7 +52,9 @@ const ConnectedUserSheetDeleteDropdownMenu = ({
                 </Tooltip>
             )}
 
-            <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
+            {onDeleteClick && (
+                <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
+            )}
         </DropdownMenuContent>
     </DropdownMenu>
 );

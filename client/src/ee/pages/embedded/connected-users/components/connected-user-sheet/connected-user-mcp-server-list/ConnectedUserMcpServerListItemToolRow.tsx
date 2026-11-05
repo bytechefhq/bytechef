@@ -1,10 +1,13 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ConnectedUserMcpServerTool, useEnableConnectedUserMcpToolMutation} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 
 const ConnectedUserMcpServerListItemToolRow = ({tool}: {tool: ConnectedUserMcpServerTool}) => {
+    const canEditMcpServer = useHasEmbeddedScope('MCP_EDIT');
+
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: tool.componentName,
         componentVersion: tool.componentVersion,
@@ -39,6 +42,7 @@ const ConnectedUserMcpServerListItemToolRow = ({tool}: {tool: ConnectedUserMcpSe
 
                 <Switch
                     checked={tool.enabled}
+                    disabled={!canEditMcpServer}
                     onCheckedChange={(value) => {
                         enableConnectedUserMcpToolMutation.mutate({enable: value, id: tool.id});
                     }}

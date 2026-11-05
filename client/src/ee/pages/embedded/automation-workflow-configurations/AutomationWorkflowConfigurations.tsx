@@ -5,6 +5,7 @@ import AutomationWorkflowExecutionsSheet from '@/ee/pages/embedded/automation-wo
 import AutomationWorkflowProjectConfigurationDialog from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-dialog/AutomationWorkflowProjectConfigurationDialog';
 import AutomationWorkflowProjectConfigurationList from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationList';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -39,6 +40,8 @@ const AutomationWorkflowConfigurations = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setCurrentEnvironmentId = useEnvironmentStore((state) => state.setCurrentEnvironmentId);
 
+    const canCreate = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', currentEnvironmentId);
+
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -70,7 +73,7 @@ const AutomationWorkflowConfigurations = () => {
 
     const isFirstRun = !projectsIsLoading && !projectId && configuredProjects.length === 0;
 
-    const newConfigurationButton = (
+    const newConfigurationButton = canCreate && (
         <Button label="New Configuration" onClick={() => setConfigurationDialog({project: selectedProject})} />
     );
 
@@ -151,7 +154,7 @@ const AutomationWorkflowConfigurations = () => {
                     <AutomationWorkflowConfigurationsEmptyState
                         hasProject={(projectsData?.automationWorkflowProjects ?? []).length > 0}
                         hasPublishedProject={publishedProjects.length > 0}
-                        onCreateConfiguration={handleCreateConfiguration}
+                        onCreateConfiguration={canCreate ? handleCreateConfiguration : undefined}
                         onGoToAutomations={handleGoToAutomations}
                     />
                 )}

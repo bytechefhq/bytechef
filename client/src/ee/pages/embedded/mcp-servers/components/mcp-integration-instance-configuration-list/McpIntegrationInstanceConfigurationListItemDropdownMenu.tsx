@@ -7,6 +7,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {EditIcon, EllipsisVerticalIcon, RefreshCwIcon, Trash2Icon} from 'lucide-react';
 
 import {McpIntegrationInstanceConfigurationItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
@@ -23,33 +24,56 @@ const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
     onEditWorkflowsClick,
     onUpdateIntegrationVersionClick,
 }: McpIntegrationInstanceConfigurationListItemDropdownMenuProps) => {
+    const canDeleteConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_DELETE');
+    const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
+
     const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
         useMcpIntegrationInstanceConfigurationListItemDropdownMenu(mcpIntegrationInstanceConfiguration.id.toString());
+
+    if (!canEditConfiguration && !canDeleteConfiguration) {
+        return null;
+    }
 
     return (
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button className="relative z-10" icon={<EllipsisVerticalIcon />} size="iconSm" variant="ghost" />
+                    <Button
+                        aria-label="MCP Integration Actions"
+                        className="relative z-10"
+                        icon={<EllipsisVerticalIcon />}
+                        size="iconSm"
+                        variant="ghost"
+                    />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem icon={<EditIcon />} label="Edit Workflows" onClick={onEditWorkflowsClick} />
+                    {canEditConfiguration && (
+                        <>
+                            <DropdownMenuItem
+                                icon={<EditIcon />}
+                                label="Edit Workflows"
+                                onClick={onEditWorkflowsClick}
+                            />
 
-                    <DropdownMenuItem
-                        icon={<RefreshCwIcon />}
-                        label="Update Integration Version"
-                        onClick={onUpdateIntegrationVersionClick}
-                    />
+                            <DropdownMenuItem
+                                icon={<RefreshCwIcon />}
+                                label="Update Integration Version"
+                                onClick={onUpdateIntegrationVersionClick}
+                            />
+                        </>
+                    )}
 
-                    <DropdownMenuSeparator />
+                    {canEditConfiguration && canDeleteConfiguration && <DropdownMenuSeparator />}
 
-                    <DropdownMenuItem
-                        icon={<Trash2Icon />}
-                        label="Delete"
-                        onClick={() => setShowDeleteDialog(true)}
-                        variant="destructive"
-                    />
+                    {canDeleteConfiguration && (
+                        <DropdownMenuItem
+                            icon={<Trash2Icon />}
+                            label="Delete"
+                            onClick={() => setShowDeleteDialog(true)}
+                            variant="destructive"
+                        />
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
 

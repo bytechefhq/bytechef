@@ -29,12 +29,15 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.calls;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -56,6 +59,8 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -101,6 +106,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.NestedTestConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -193,6 +199,7 @@ public class ProjectDeploymentFacadeIntTest {
         categoryRepository.deleteAll();
         tagRepository.deleteAll();
 
+        SecurityContextHolder.clearContext();
     }
 
     @BeforeEach
@@ -350,6 +357,37 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     @Test
+    public void testGetProjectDeploymentsReturnsOnlyTheNonEmbeddedDeploymentsOfTheEnvironment() {
+        ProjectDTO automationWorkflowProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDTO plainProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDTO productionProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO automationWorkflowProjectDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), automationWorkflowProjectDTO);
+        ProjectDeploymentDTO plainDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), plainProjectDTO);
+
+        projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), productionProjectDTO);
+
+        ProjectDeploymentDTO productionDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeploymentForEnvironment(
+                workspace.getId(), productionProjectDTO, Environment.PRODUCTION);
+
+        renameProjectDeployment(automationWorkflowProjectDeploymentDTO.id(), "admin");
+        renameProjectDeployment(plainDeploymentDTO.id(), "plain");
+        renameProjectDeployment(productionDeploymentDTO.id(), "production");
+
+        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectDTO.id());
+
+        List<ProjectDeployment> projectDeployments = projectDeploymentFacade.getProjectDeployments(
+            workspace.getId(), Environment.DEVELOPMENT, null, null);
+
+        assertThat(projectDeployments).extracting(ProjectDeployment::getName)
+            .contains("plain")
+            .doesNotContain("admin", "production");
+    }
+
+    @Test
     public void testDeleteProjectDeploymentRemovesAllPrincipalJobsBeforeAnyJob() {
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDeploymentDTO projectDeploymentDTO =
@@ -397,7 +435,7 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.updateProjectDeploymentTags(
             otherProjectDeploymentDTO.id(), List.of(new Tag("deployment-tag-z")));
 
-        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags();
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(workspace.getId(), null);
 
         assertThat(tags)
             .extracting(Tag::getName)
@@ -764,6 +802,11 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testUpdateProjectDeploymentWorkflowConnectionDisablesTriggersWithPreviousConnection() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+
         long oldConnectionId = 1001L;
         long newConnectionId = 1002L;
 
@@ -1141,6 +1184,7 @@ public class ProjectDeploymentFacadeIntTest {
     @ContextConfiguration(classes = PreAuthorizeEnforcement.MethodSecurityConfiguration.class)
     class PreAuthorizeEnforcement {
 
+        private static final long PROJECT_DEPLOYMENT_ID = 13L;
         private static final long PROJECT_ID = 11L;
         private static final String WORKFLOW_ID = "workflow-41";
 
@@ -1160,34 +1204,28 @@ public class ProjectDeploymentFacadeIntTest {
         }
 
         @Test
-        void testEveryOverloadChecksDeploymentPush() {
-            ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
-                .projectId(PROJECT_ID)
-                .projectVersion(1)
-                .build();
-
+        void testEveryProjectKeyedOverloadChecksDeploymentCreate() {
             ProjectDeployment projectDeployment = new ProjectDeployment();
 
             projectDeployment.setProjectId(PROJECT_ID);
 
+            ProjectDeployment existingProjectDeployment = new ProjectDeployment();
+
+            existingProjectDeployment.setId(PROJECT_DEPLOYMENT_ID);
+            existingProjectDeployment.setProjectId(PROJECT_ID);
+
             assertRequiresScope(
-                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
-                () -> projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO));
-            assertRequiresScope(
-                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
+                PROJECT_ID, "Project", "DEPLOYMENT_CREATE",
                 () -> projectDeploymentFacade.createProjectDeployment(projectDeployment, WORKFLOW_ID, List.of()));
             assertRequiresScope(
-                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
+                PROJECT_ID, "Project", "DEPLOYMENT_CREATE",
                 () -> projectDeploymentFacade.createProjectDeployment(projectDeployment, List.of(), List.of()));
             assertRequiresScope(
-                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
-                () -> projectDeploymentFacade.updateProjectDeployment(projectDeploymentDTO));
-            assertRequiresScope(
-                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
+                PROJECT_ID, "Project", "DEPLOYMENT_CREATE",
                 () -> projectDeploymentFacade.updateProjectDeployment(PROJECT_ID, 1, "uuid", List.of(), null));
             assertRequiresScope(
-                PROJECT_ID, "Project", "DEPLOYMENT_PUSH",
-                () -> projectDeploymentFacade.updateProjectDeployment(projectDeployment, List.of(), List.of()));
+                PROJECT_DEPLOYMENT_ID, "ProjectDeployment", "DEPLOYMENT_CREATE",
+                () -> projectDeploymentFacade.updateProjectDeployment(existingProjectDeployment, List.of(), List.of()));
 
             assertThat(countOverloads(ProjectDeploymentFacadeImpl.class, "createProjectDeployment")).isEqualTo(3);
             assertThat(countOverloads(ProjectDeploymentFacadeImpl.class, "updateProjectDeployment")).isEqualTo(3);
@@ -1238,6 +1276,299 @@ public class ProjectDeploymentFacadeIntTest {
 
         @EnableMethodSecurity
         static class MethodSecurityConfiguration {
+        }
+    }
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @SpringBootTest(
+        classes = {
+            ProjectIntTestConfiguration.class, MethodSecurityEnforcement.Config.class
+        },
+        properties = {
+            "bytechef.workflow.repository.jdbc.enabled=true"
+        })
+    @Import(PostgreSQLContainerConfiguration.class)
+    @ProjectIntTestConfigurationSharedMocks
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+        private static final long PROJECT_DEPLOYMENT_ID = 11L;
+        private static final long PROJECT_DEPLOYMENT_WORKFLOW_ID = 77L;
+        private static final long PROJECT_ID = 42L;
+        private static final String WORKFLOW_ID = "workflow-1";
+        private static final long WORKSPACE_ID = 5L;
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @MockitoBean
+        private ProjectDeploymentService projectDeploymentService;
+
+        @MockitoBean
+        private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+
+        @BeforeEach
+        void authenticateAsNonAdmin() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            // Re-established each test because the mocks are shared through the cached Spring context. Every guard
+            // denies by default, and every collaborator the guarded bodies touch first throws, so reaching a body is
+            // visible.
+            reset(permissionService, projectDeploymentService, projectDeploymentWorkflowService);
+
+            when(permissionService.isTenantAdmin()).thenReturn(false);
+            when(permissionService.hasResourceScope(any(), anyString(), anyString())).thenReturn(false);
+
+            when(projectDeploymentService.getProjectDeployment(anyLong()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectDeploymentService.update(anyLong(), any()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(anyLong(), anyString()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(anyLong()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(anyLong()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectDeploymentService.getProjectDeploymentId(anyLong(), any()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectDeploymentWorkflowService.update(any(ProjectDeploymentWorkflow.class)))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectDeploymentService.getProjectDeployments(any(), any(), any(), any(), any()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+        }
+
+        @AfterEach
+        void clearSecurityContext() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testDeleteProjectDeploymentIsDeniedWithoutTheDeploymentScope() {
+            assertThatThrownBy(() -> projectDeploymentFacade.deleteProjectDeployment(PROJECT_DEPLOYMENT_ID))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testDeleteProjectDeploymentIsAllowedWithTheDeploymentScope() {
+            grant("DEPLOYMENT_DELETE");
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deleteProjectDeployment(PROJECT_DEPLOYMENT_ID))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testCreateProjectDeploymentWorkflowJobIsDeniedWithoutTheDeploymentScope() {
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.createProjectDeploymentWorkflowJob(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testCreateProjectDeploymentWorkflowJobIsAllowedWithTheDeploymentScope() {
+            grant("DEPLOYMENT_EDIT");
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.createProjectDeploymentWorkflowJob(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testUpdateProjectDeploymentTagsIsDeniedWithoutTheDeploymentScope() {
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.updateProjectDeploymentTags(PROJECT_DEPLOYMENT_ID, List.<Tag>of()))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateProjectDeploymentTagsIsAllowedWithTheDeploymentScope() {
+            grant("DEPLOYMENT_EDIT");
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.updateProjectDeploymentTags(PROJECT_DEPLOYMENT_ID, List.<Tag>of()))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testUpdateProjectDeploymentWorkflowIsDeniedWithoutTheDeploymentWorkflowScope() {
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow()))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateProjectDeploymentWorkflowIsAllowedWithTheDeploymentWorkflowScope() {
+            grant(PROJECT_DEPLOYMENT_WORKFLOW_ID, "ProjectDeploymentWorkflow", "DEPLOYMENT_EDIT");
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow()))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage(BODY_REACHED);
+        }
+
+        /**
+         * The scope held on the deployment id the caller put in the path must not authorize a row belonging to a
+         * different deployment. This is the enforcement half of the same claim {@code ProjectDeploymentFacadeTest}
+         * makes about the expression.
+         */
+        @Test
+        void testUpdateProjectDeploymentWorkflowIsDeniedWhenOnlyTheSuppliedDeploymentIdIsHeld() {
+            grant(PROJECT_DEPLOYMENT_ID, "ProjectDeployment", "DEPLOYMENT_EDIT");
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow()))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateProjectDeploymentWorkflowRefusesAConnectionTheWorkflowMayNotUse() {
+            grant(PROJECT_DEPLOYMENT_WORKFLOW_ID, "ProjectDeploymentWorkflow", "DEPLOYMENT_EDIT");
+
+            ProjectDeploymentWorkflow storedProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            storedProjectDeploymentWorkflow.setProjectDeploymentId(PROJECT_DEPLOYMENT_ID);
+            storedProjectDeploymentWorkflow.setWorkflowId(WORKFLOW_ID);
+
+            ProjectDeployment projectDeployment = new ProjectDeployment();
+
+            projectDeployment.setEnvironment(Environment.PRODUCTION);
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setConnections(
+                List.of(new ProjectDeploymentWorkflowConnection(9L, "connection", "node_1")));
+
+            doReturn(storedProjectDeploymentWorkflow).when(projectDeploymentWorkflowService)
+                .getProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_WORKFLOW_ID);
+            doReturn(projectDeployment).when(projectDeploymentService)
+                .getProjectDeployment(PROJECT_DEPLOYMENT_ID);
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).canUseConnectionInWorkflow(9L, WORKFLOW_ID, Environment.PRODUCTION);
+            verify(projectDeploymentWorkflowService, never()).update(any(ProjectDeploymentWorkflow.class));
+        }
+
+        @Test
+        void testEnableProjectDeploymentIsDeniedWithoutTheDeploymentScope() {
+            assertThatThrownBy(() -> projectDeploymentFacade.enableProjectDeployment(PROJECT_DEPLOYMENT_ID, true))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testEnableProjectDeploymentIsAllowedWithTheDeploymentScope() {
+            grant("DEPLOYMENT_EDIT");
+
+            assertThatThrownBy(() -> projectDeploymentFacade.enableProjectDeployment(PROJECT_DEPLOYMENT_ID, true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testEnableProjectDeploymentWorkflowIsDeniedWithoutTheDeploymentScope() {
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.enableProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, true))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testEnableProjectDeploymentWorkflowIsAllowedWithTheDeploymentScope() {
+            grant("DEPLOYMENT_EDIT");
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.enableProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, true))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testEnableProjectDeploymentWorkflowByEnvironmentIsDeniedWithoutTheProjectScope() {
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.enableProjectDeploymentWorkflow(
+                    PROJECT_ID, WORKFLOW_ID, true, Environment.PRODUCTION))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testEnableProjectDeploymentWorkflowByEnvironmentIsAllowedWithTheProjectScope() {
+            grant(PROJECT_ID, "Project", "DEPLOYMENT_EDIT");
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.enableProjectDeploymentWorkflow(
+                    PROJECT_ID, WORKFLOW_ID, true, Environment.PRODUCTION))
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testUpdateProjectDeploymentIsDeniedWithoutTheDeploymentScope() {
+            assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeployment(projectDeploymentDTO()))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateProjectDeploymentIsAllowedWithTheDeploymentScope() {
+            grant("DEPLOYMENT_CREATE");
+
+            assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeployment(projectDeploymentDTO()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testProjectDeploymentTagsRequireTheDeploymentViewScopeInTheRequestedEnvironment() {
+            long environmentId = Environment.PRODUCTION.ordinal();
+
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", Environment.DEVELOPMENT))
+                .thenReturn(true);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
+                .isInstanceOf(AccessDeniedException.class);
+
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", Environment.PRODUCTION))
+                .thenReturn(true);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        private void grant(String scope) {
+            grant(PROJECT_DEPLOYMENT_ID, "ProjectDeployment", scope);
+        }
+
+        private void grant(long id, String resourceType, String scope) {
+            when(permissionService.hasResourceScope(id, resourceType, scope)).thenReturn(true);
+        }
+
+        // The row id and the deployment id differ deliberately: the REST path supplies them independently, so a guard
+        // keyed on the wrong one cannot be caught by a fixture that gives them the same value.
+        private static ProjectDeploymentWorkflow projectDeploymentWorkflow() {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setId(PROJECT_DEPLOYMENT_WORKFLOW_ID);
+            projectDeploymentWorkflow.setProjectDeploymentId(PROJECT_DEPLOYMENT_ID);
+
+            return projectDeploymentWorkflow;
+        }
+
+        private static ProjectDeploymentDTO projectDeploymentDTO() {
+            return new ProjectDeploymentDTO(
+                null, null, null, true, Environment.PRODUCTION, PROJECT_DEPLOYMENT_ID, "deployment", null, null, null,
+                null,
+                PROJECT_ID, 1, List.of(), List.of(), 0);
+        }
+
+        @EnableMethodSecurity
+        static class Config {
         }
     }
 }

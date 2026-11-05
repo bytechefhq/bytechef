@@ -81,19 +81,48 @@ class AuditDataContractTest {
         "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
-    private static final String TAGS = "tag assignment";
+    private static final String EDITOR_TEST = "editor-time test run";
+    private static final String EDITOR_TEST_DATA = "editor-time test output or configuration";
+    private static final String EXECUTION_LOGS = "execution log data";
+    private static final String EXISTENCE_CHECK = "read-only existence check";
+    private static final String JOB_STATUS = "job status change recorded by the job status listener";
+    private static final String PREVIEW = "returns a generated preview without saving it";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
+    private static final String ROW_DATA = "data table rows";
+    private static final String RUNTIME_APPROVAL = "approval task opened by a workflow run";
+    private static final String TAGS = "tag assignment";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
     private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
+    private static final String WEBHOOK_TRIGGER_TEST = "editor-time webhook trigger test";
     private static final String WORKFLOW_INPUTS = "workflow input or connection values";
     private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
         "IntegrationInstanceAdminFacadeImpl", DELEGATES,
-        "WebhookTriggerTestAdminFacadeImpl", "editor-time webhook trigger test");
+        "ProjectWebhookTriggerTestFacadeImpl", WEBHOOK_TRIGGER_TEST,
+        "TestWorkflowExecutorImpl", EDITOR_TEST,
+        "WebhookTriggerTestAdminFacadeImpl", WEBHOOK_TRIGGER_TEST,
+        "WorkflowNodeParameterFacadeImpl", DEFINITION_EDIT,
+        "WorkflowNodeScriptFacadeImpl", EDITOR_TEST,
+        "WorkflowNodeTestOutputFacadeImpl", EDITOR_TEST_DATA,
+        "WorkflowTestConfigurationFacadeImpl", EDITOR_TEST_DATA);
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
+        Map.entry("AiAgentTestFacadeImpl.executeAiAgentAction", EDITOR_TEST),
+        Map.entry("AiSkillFacadeImpl.updateAiSkillTags", TAGS),
+        Map.entry("ApiCollectionFacadeImpl.updateApiCollectionTags", TAGS),
+        Map.entry("ApiConnectorFacadeImpl.generateSpecification", PREVIEW),
+        Map.entry("ApprovalTaskFacadeImpl.createApprovalTask", RUNTIME_APPROVAL),
         Map.entry("AutomationWorkflowProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("AutomationWorkflowProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
+        Map.entry("ConnectionAdminFacadeImpl.updateConnectionTags", TAGS),
+        Map.entry("CustomRoleFacadeImpl.createCustomRole", DELEGATES),
+        Map.entry("CustomRoleFacadeImpl.deleteCustomRole", DELEGATES),
+        Map.entry("CustomRoleFacadeImpl.updateCustomRole", DELEGATES),
+        Map.entry("EditorLogFileStorageImpl.deleteLogEntries", EDITOR_TEST_DATA),
+        Map.entry("EditorLogFileStorageImpl.logsExist", EXISTENCE_CHECK),
+        Map.entry("EmbeddedApiKeyFacadeImpl.createApiKey", DELEGATES),
+        Map.entry("EmbeddedApiKeyFacadeImpl.deleteApiKey", DELEGATES),
+        Map.entry("EmbeddedApiKeyFacadeImpl.updateApiKey", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),
@@ -113,6 +142,10 @@ class AuditDataContractTest {
         Map.entry("IntegrationInstanceFacadeImpl.updateIntegrationInstanceWorkflow", WORKFLOW_INPUTS),
         Map.entry("IntegrationTagFacadeImpl.updateIntegrationTags", TAGS),
         Map.entry("IntegrationWorkflowFacadeImpl.updateWorkflow", DEFINITION_EDIT),
+        Map.entry("JobFacadeImpl.resumeJob", JOB_STATUS),
+        Map.entry("JobFacadeImpl.stopJob", JOB_STATUS),
+        Map.entry("LogFileStorageImpl.deleteLogEntries", EXECUTION_LOGS),
+        Map.entry("LogFileStorageImpl.logsExist", EXISTENCE_CHECK),
         Map.entry(
             "McpIntegrationInstanceConfigurationWorkflowFacadeImpl.updateMcpIntegrationInstanceConfigurationWorkflow",
             TOOL_SETTING),
@@ -137,9 +170,23 @@ class AuditDataContractTest {
         Map.entry("McpServerFacadeImpl.updateMcpServerTags", TAGS),
         Map.entry("McpServerFacadeImpl.updateMcpTool", DELEGATES),
         Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
+        Map.entry("ProjectDeploymentFacadeImpl.updateProjectDeploymentTags", TAGS),
+        Map.entry("ProjectDeploymentFacadeImpl.updateProjectDeploymentWorkflow", WORKFLOW_INPUTS),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
+        Map.entry("ProjectWorkflowFacadeImpl.updateWorkflow", DEFINITION_EDIT),
+        Map.entry("TriggerLogFileStorageImpl.deleteLogEntries", EXECUTION_LOGS),
+        Map.entry("TriggerLogFileStorageImpl.logsExist", EXISTENCE_CHECK),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
+        Map.entry("WorkspaceConnectionFacadeImpl.updateTags", TAGS),
+        Map.entry("WorkspaceDataTableFacadeImpl.deleteRow", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.importCsv", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.insertRow", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.updateRow", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.updateTags", TAGS),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.deleteKnowledgeBaseDocument", DELEGATES),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseDocumentTags", TAGS),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseTags", TAGS),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.updateWorkspaceMcpServer", DELEGATES));
