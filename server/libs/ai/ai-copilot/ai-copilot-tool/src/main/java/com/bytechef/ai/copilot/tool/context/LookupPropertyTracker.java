@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 
@@ -99,13 +100,21 @@ public final class LookupPropertyTracker {
                 continue;
             }
 
-            for (String word : toSignificantWords(propertyName)) {
-                if (Pattern.compile("[^a-z0-9]" + Pattern.quote(word) + "s?[^a-z0-9]")
-                    .matcher(joinedText)
-                    .find()) {
+            List<String> significantWords = toSignificantWords(propertyName);
 
-                    return propertyName;
-                }
+            if (significantWords.isEmpty()) {
+                continue;
+            }
+
+            String phrase = significantWords.stream()
+                .map(Pattern::quote)
+                .collect(Collectors.joining("[^a-z0-9]?"));
+
+            if (Pattern.compile("[^a-z0-9]" + phrase + "s?[^a-z0-9]")
+                .matcher(joinedText)
+                .find()) {
+
+                return propertyName;
             }
         }
 

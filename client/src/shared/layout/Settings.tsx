@@ -2,7 +2,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import SettingsNavGroup, {SettingsNavGroupItemI} from '@/shared/layout/SettingsNavGroup';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useEffect, useMemo} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
@@ -28,6 +28,8 @@ interface SettingsProps {
 
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
+    const edition = useApplicationInfoStore((state) => state.application?.edition);
+    const aiHubEnabled = useApplicationInfoStore((state) => state.ai.hub.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
 
     const location = useLocation();
@@ -55,6 +57,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
         if (navItem.href === 'identity-providers') {
             return isFeatureFlagEnabled('ff-1040');
+        }
+
+        if (navItem.href === 'ai-hub/tool-approvals') {
+            return edition === EditionType.EE && aiHubEnabled;
         }
 
         if (navItem.href === 'billing') {

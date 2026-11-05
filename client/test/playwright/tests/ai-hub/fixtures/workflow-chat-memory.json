@@ -1,0 +1,54 @@
+{
+    "label": "Trip planner chat",
+    "description": "A hosted chat workflow whose AI Agent keeps memory per conversation and can ask the user a question.",
+    "inputs": [],
+    "triggers": [
+        {
+            "label": "New Chat Request",
+            "name": "trigger_1",
+            "parameters": {
+                "mode": 1
+            },
+            "type": "chat/v1/newChatRequest"
+        }
+    ],
+    "tasks": [
+        {
+            "clusterElements": {
+                "chatMemory": {
+                    "label": "Chat Memory",
+                    "name": "chatMemory_1",
+                    "parameters": {
+                        "conversationId": "${trigger_1.conversationId}"
+                    },
+                    "type": "chatMemory/v2/chatMemory"
+                },
+                "model": {
+                    "label": "Anthropic Model",
+                    "name": "anthropic_1",
+                    "parameters": {
+                        "maxTokens": 4096,
+                        "model": "claude-haiku-4-5"
+                    },
+                    "type": "anthropic/v1/model"
+                },
+                "tools": [
+                    {
+                        "label": "Ask User Question Tool",
+                        "name": "aiAgentUtils_1",
+                        "parameters": {},
+                        "type": "aiAgentUtils/v1/askUserQuestionTool"
+                    }
+                ]
+            },
+            "label": "AI Agent",
+            "name": "aiAgent_1",
+            "parameters": {
+                "format": "SIMPLE",
+                "systemPrompt": "Remember the user's name when told. When asked to plan a trip, call the ask-user-question tool exactly once with exactly one single-select question asking which city, with exactly the options Lisbon, Porto and Madrid, and no other questions. After the user answers, answer in one sentence that names the chosen city.",
+                "userPrompt": "${trigger_1.message}"
+            },
+            "type": "aiAgent/v1/streamChat"
+        }
+    ]
+}

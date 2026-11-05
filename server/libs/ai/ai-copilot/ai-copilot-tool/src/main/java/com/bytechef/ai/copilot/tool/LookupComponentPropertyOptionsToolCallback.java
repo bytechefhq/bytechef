@@ -50,13 +50,14 @@ public class LookupComponentPropertyOptionsToolCallback implements ToolCallback 
         Fetch the real selectable options for a component ACTION or TRIGGER property whose descriptor shows
         "lookupRequired": true (e.g. a Slack channel, a Google Sheets sheet). Supply kind (ACTION or TRIGGER) and
         operationName (the canonical action/trigger name from the descriptor, never the human label). Call this before
-        asking the user, then render the returned options via askUserQuestion. First satisfy any "lookupDependsOn"
+        asking the user, then ask the user to choose from the returned options. First satisfy any "lookupDependsOn"
         siblings by placing their values in inputParameters, and pass connectionId when the component needs a
         connection. Returns componentName, the operation name, propertyName, an options array of {label, value}, and a
         truncated flag (true when the list was capped). Error envelopes: action_not_found / trigger_not_found (with the
-        valid names — retry with one of those), property_not_found, no_options_for_property, dependency_missing,
-        connection_required. In an embedded chat, a connectionId the user is not entitled to use is rejected; ask the
-        user to pick one of their own connections instead of retrying.""";
+        valid names; retry with one of those), property_not_found, no_options_for_property, dependency_missing,
+        connection_required. A connectionId the caller may not use is rejected (one outside the target workspace and
+        environment or, in an embedded chat, one the user is not entitled to); pick one of the caller's own connections
+        instead of retrying.""";
 
     private static final String INPUT_SCHEMA = """
         {

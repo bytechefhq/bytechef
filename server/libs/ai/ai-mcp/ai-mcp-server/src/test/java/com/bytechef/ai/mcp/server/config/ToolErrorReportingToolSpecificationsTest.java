@@ -38,6 +38,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
@@ -87,9 +88,13 @@ class ToolErrorReportingToolSpecificationsTest {
             mock(ProjectTools.class), mock(ProjectWorkflowLifecycleTools.class), mock(WorkspaceTools.class),
             List.of(() -> List.of(failingToolCallback)));
 
-        McpServerFeatures.AsyncToolSpecification toolSpecification = managementMcpServerConfiguration
-            .toolSpecifications()
-            .stream()
+        ToolCallbackProvider toolCallbackProvider = managementMcpServerConfiguration.toolCallbackProvider();
+
+        List<McpServerFeatures.AsyncToolSpecification> toolSpecifications =
+            ToolErrorReportingToolSpecifications.toAsyncToolSpecifications(
+                List.of(toolCallbackProvider.getToolCallbacks()));
+
+        McpServerFeatures.AsyncToolSpecification toolSpecification = toolSpecifications.stream()
             .filter(specification -> "failingTool".equals(specification.tool()
                 .name()))
             .findFirst()

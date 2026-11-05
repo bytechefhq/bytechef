@@ -162,13 +162,21 @@ class PropertyValidator {
             if (shouldReportMissingProperty(nestedPropertyInfo)) {
                 String nestedPath = PropertyUtils.buildPropertyPath(propertyPath, nestedPropertyInfo.name());
 
-                StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(nestedPath), errors);
+                StringUtils.appendWithNewline(missingProperty(nestedPropertyInfo, nestedPath), errors);
 
                 if ("OBJECT".equalsIgnoreCase(nestedPropertyInfo.type())) {
                     reportMissingNestedRequiredProperties(nestedPropertyInfo, nestedPath, errors);
                 }
             }
         }
+    }
+
+    private static String missingProperty(PropertyInfo propertyInfo, String propertyPath) {
+        if (propertyInfo.resourceType() != null) {
+            return ValidationErrorUtils.missingResource(propertyPath, "none is selected yet");
+        }
+
+        return ValidationErrorUtils.missingProperty(propertyPath);
     }
 
     private static boolean shouldReportMissingProperty(PropertyInfo propertyInfo) {
@@ -190,7 +198,7 @@ class PropertyValidator {
             (!"NULL".equalsIgnoreCase(type) && isEmptyValue(taskParametersJsonNode.get(fieldName)))) {
 
             if (isRequired) {
-                StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(propertyPath), errors);
+                StringUtils.appendWithNewline(missingProperty(propertyInfo, propertyPath), errors);
 
                 if ("OBJECT".equalsIgnoreCase(type)) {
                     reportMissingNestedRequiredProperties(propertyInfo, propertyPath, errors);

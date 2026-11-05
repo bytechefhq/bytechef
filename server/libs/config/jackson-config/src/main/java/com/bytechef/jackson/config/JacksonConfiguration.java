@@ -31,7 +31,9 @@ import tools.jackson.dataformat.xml.XmlMapper;
 @Configuration
 public class JacksonConfiguration {
 
-    @Configuration
+    public static final String JSON_UTILS_CONFIGURATION = "jsonUtilsConfiguration";
+
+    @Configuration(JSON_UTILS_CONFIGURATION)
     static class JsonUtilsConfiguration implements InitializingBean {
 
         private final ObjectMapper objectMapper;

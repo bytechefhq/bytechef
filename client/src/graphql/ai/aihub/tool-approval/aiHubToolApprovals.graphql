@@ -1,0 +1,15 @@
+query aiHubToolApprovals($workspaceId: ID!, $chatId: ID!) {
+    aiHubToolApprovals(workspaceId: $workspaceId, chatId: $chatId) {
+        id
+        chatId
+        toolName
+        componentName
+        arguments
+        status
+        decidedByUserId
+        decidedAt
+        comment
+        expiresAt
+        executionError
+    }
+}

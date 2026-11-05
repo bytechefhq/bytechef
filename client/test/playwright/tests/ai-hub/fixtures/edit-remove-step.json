@@ -1,0 +1,32 @@
+{
+    "label": "Signup Alert",
+    "description": "Logs a signup and posts it to Slack",
+    "inputs": [],
+    "triggers": [
+        {
+            "label": "New Signup",
+            "name": "trigger_1",
+            "type": "webhook/v1/autoRespondWithHTTP200",
+            "parameters": {}
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Log Signup",
+            "name": "logger_1",
+            "type": "logger/v1/info",
+            "parameters": {
+                "text": "${trigger_1.body.email}"
+            }
+        },
+        {
+            "label": "Post Signup",
+            "name": "sendChannelMessage_1",
+            "type": "slack/v1/sendChannelMessage",
+            "parameters": {
+                "channel": "#signups",
+                "text": "New signup: ${trigger_1.body.email}"
+            }
+        }
+    ]
+}

@@ -30,13 +30,44 @@ function isCsrfProtectedUrl(url: string): boolean {
     return url.includes('/graphql') || url.includes('/internal/');
 }
 
+/*
+ * Some reads render their own error state inline and own the failure UX. The approval-form read,
+ * for instance, shows a "Form no longer available" panel (see ApprovalForm.tsx) whenever its fetch
+ * fails, and a workflow node's Test / Reset shows its failure in the Output tab (see
+ * testOutputInlineErrors.ts), so a global error toast on top of them is redundant and confusing.
+ * The AI Hub chat turn endpoint is another: its runtime provider shows RUN_ERROR inline and its own
+ * toasts, such as the "turn already running" notice on a 409 TURN_IN_FLIGHT (see
+ * AiHubRuntimeProvider.tsx). Only the hub's own path matches, so other agents' /ai/chat/{agentId}
+ * endpoints keep the global toast. Suppress the toast for those endpoints.
+ */
+const AI_HUB_CHAT_URL_PATTERN = /\/internal\/ai\/chat\/ai_hub(?:[?#]|$)/;
+
 function handlesErrorInline(url: string): boolean {
     return (
         url.includes('/approval-form/') ||
         isInlineTestOutputUrl(url) ||
+        AI_HUB_CHAT_URL_PATTERN.test(url) ||
         url.includes('/ai/chat/ai_hub/status') ||
         /\/ai\/chat\/ai_hub\/[^/]+\/presence/.test(url)
     );
+}
+
+async function isAiHubAuthorizationRefusal(url: string, response: Response): Promise<boolean> {
+    if (!AI_HUB_CHAT_URL_PATTERN.test(url)) {
+        return false;
+    }
+
+    try {
+        const body: unknown = await response.clone().json();
+
+        if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+            return false;
+        }
+
+        return Object.keys(body).length === 1 && typeof (body as {error?: unknown}).error === 'string';
+    } catch {
+        return false;
+    }
 }
 
 const AUTHENTICATION_REQUIRED_ERROR_CODE = 'AUTHENTICATION_REQUIRED';
@@ -49,6 +80,16 @@ interface GraphQlErrorI {
 
 function isAuthenticationError(error: GraphQlErrorI): boolean {
     return error.extensions?.errorCode === AUTHENTICATION_REQUIRED_ERROR_CODE;
+}
+
+const SILENT_GRAPHQL_ERROR_CODES = new Set(['TITLE_GENERATION_FAILED']);
+
+function isHandledInlineGraphQlError(error: GraphQlErrorI): boolean {
+    return isInlineTestOutputGraphQlError(error) || SILENT_GRAPHQL_ERROR_CODES.has(error.extensions?.errorCode ?? '');
+}
+
+function isAiHubToolApprovalConflictError(error: GraphQlErrorI): boolean {
+    return error.extensions?.errorCode === 'CONFLICT' && error.path?.[0] === 'resolveAiHubToolApproval';
 }
 
 function resolveUrl(input: RequestInfo | URL): string {
@@ -203,7 +244,11 @@ export default function useFetchInterceptor() {
                                 return;
                             }
 
-                            if (errors.length && errors.every(isInlineTestOutputGraphQlError)) {
+                            if (errors.length && errors.every(isHandledInlineGraphQlError)) {
+                                return;
+                            }
+
+                            if (errors.length && errors.every(isAiHubToolApprovalConflictError)) {
                                 return;
                             }
 
@@ -256,7 +301,7 @@ export default function useFetchInterceptor() {
 
             const url = resolveUrl(input);
 
-            if (!isCsrfProtectedUrl(url)) {
+            if (!isCsrfProtectedUrl(url) || (await isAiHubAuthorizationRefusal(url, response))) {
                 return response;
             }
 
@@ -272,7 +317,8 @@ export default function useFetchInterceptor() {
 
             if (
                 retriedResponse.status === 403 &&
-                !isAccessDeniedProblemDetail(await readProblemDetail(retriedResponse))
+                !isAccessDeniedProblemDetail(await readProblemDetail(retriedResponse)) &&
+                !(await isAiHubAuthorizationRefusal(url, retriedResponse))
             ) {
                 clearAuthentication();
                 clearCurrentWorkspaceId();

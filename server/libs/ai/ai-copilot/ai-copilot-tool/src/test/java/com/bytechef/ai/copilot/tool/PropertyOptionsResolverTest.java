@@ -102,7 +102,9 @@ class PropertyOptionsResolverTest {
 
         assertThat(envelope.get("error")).isEqualTo("connection_required");
         assertThat(envelope.get("componentName")).isEqualTo("slack");
-        assertThat(envelope.get("hint")).isNotNull();
+        assertThat(envelope.get("hint")).asString()
+            .contains("listConnectionsForComponent")
+            .contains("listConnections ");
     }
 
     @Test

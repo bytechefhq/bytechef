@@ -1089,7 +1089,7 @@ describe('ChatRuntimeProvider approval resolution', () => {
         let firstDecision: Promise<void> | undefined;
 
         act(() => {
-            firstDecision = approvalResolution!.resolveApproval('first', {approved: true});
+            firstDecision = approvalResolution!.resolveApproval!('first', {approved: true});
         });
 
         const [firstRequest] = getLastSseCall();
@@ -1097,7 +1097,7 @@ describe('ChatRuntimeProvider approval resolution', () => {
         let secondDecision: Promise<void> | undefined;
 
         act(() => {
-            secondDecision = approvalResolution!.resolveApproval('second', {approved: true});
+            secondDecision = approvalResolution!.resolveApproval!('second', {approved: true});
         });
 
         await expect(secondDecision).rejects.toThrow('Another decision is being submitted');
@@ -1120,7 +1120,7 @@ describe('ChatRuntimeProvider approval resolution', () => {
         let decision: Promise<void> | undefined;
 
         act(() => {
-            decision = approvalResolution!.resolveApproval('first', {approved: true});
+            decision = approvalResolution!.resolveApproval!('first', {approved: true});
         });
 
         const [request, sseOptions] = getLastSseCall();
@@ -1138,7 +1138,7 @@ describe('ChatRuntimeProvider approval resolution', () => {
         let decision: Promise<void> | undefined;
 
         act(() => {
-            decision = approvalResolution!.resolveApproval('first', {approved: true});
+            decision = approvalResolution!.resolveApproval!('first', {approved: true});
         });
 
         const [request, sseOptions] = getLastSseCall();
@@ -1157,7 +1157,7 @@ describe('ChatRuntimeProvider approval resolution', () => {
         let decision: Promise<void> | undefined;
 
         act(() => {
-            decision = approvalResolution!.resolveApproval('first', {approved: true});
+            decision = approvalResolution!.resolveApproval!('first', {approved: true});
         });
 
         expect(useChatsStore.getState().messages).toEqual([APPROVAL_CARD_MESSAGE]);
@@ -1184,7 +1184,7 @@ describe('ChatRuntimeProvider approval resolution', () => {
             let decision: Promise<void> | undefined;
 
             act(() => {
-                decision = approvalResolution!.resolveApproval('first', {approved: true});
+                decision = approvalResolution!.resolveApproval!('first', {approved: true});
             });
 
             const [request, sseOptions] = getLastSseCall();

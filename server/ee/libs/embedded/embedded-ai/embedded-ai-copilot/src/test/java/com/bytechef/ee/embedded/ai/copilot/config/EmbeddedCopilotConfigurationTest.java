@@ -54,7 +54,7 @@ class EmbeddedCopilotConfigurationTest {
         PROMPT_RESOURCE, PROMPT_RESOURCE, mock(WorkflowInstructionTools.class), mock(WorkflowValidatorTools.class));
     private final IntegrationTools integrationTools = new IntegrationTools(mock(IntegrationFacade.class));
     private final IntegrationWorkflowTools integrationWorkflowTools =
-        new IntegrationWorkflowTools(mock(IntegrationWorkflowFacade.class));
+        new IntegrationWorkflowTools(mock(IntegrationWorkflowFacade.class), mock(ObjectProvider.class));
 
     @Test
     void testWorkflowEditorEmbeddedAskAgentIsRegisteredUnderTheAskAgentId() throws AGUIException {
