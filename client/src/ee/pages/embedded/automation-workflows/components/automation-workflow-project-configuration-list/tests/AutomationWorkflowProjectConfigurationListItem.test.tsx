@@ -111,6 +111,7 @@ const renderItem = (
         configurations?: (typeof configuration)[];
         onUpdateVersion?: () => void;
         project?: typeof project;
+        showProjectName?: boolean;
     } = {}
 ) =>
     render(
@@ -122,6 +123,7 @@ const renderItem = (
                 onEdit={overrides.onEdit ?? vi.fn()}
                 onUpdateVersion={overrides.onUpdateVersion ?? vi.fn()}
                 project={overrides.project ?? project}
+                showProjectName={overrides.showProjectName}
             />
         </TooltipProvider>
     );
@@ -261,6 +263,20 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         expect(screen.getByText('STAGING')).toBeInTheDocument();
         expect(screen.queryByText('Staging')).not.toBeInTheDocument();
+    });
+
+    it('shows the project name when asked to', () => {
+        renderItem({showProjectName: true});
+
+        expect(screen.getByText('Mail Project')).toBeInTheDocument();
+        expect(document.querySelector('svg.lucide-folder')).toBeInTheDocument();
+    });
+
+    it('hides the project name by default', () => {
+        renderItem();
+
+        expect(screen.queryByText('Mail Project')).not.toBeInTheDocument();
+        expect(document.querySelector('svg.lucide-folder')).not.toBeInTheDocument();
     });
 
     it('does not show the connected user count', () => {
