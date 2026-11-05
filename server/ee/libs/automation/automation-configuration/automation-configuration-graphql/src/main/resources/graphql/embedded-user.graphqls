@@ -9,16 +9,26 @@ extend type Query {
 }
 
 extend type Mutation {
-    "Add a user as an embedded member with a built-in role."
-    addEmbeddedUser(userId: ID!, role: WorkspaceRole!): EmbeddedUser!
-    "Add an existing user, found by email, as an embedded member with a built-in role."
-    addEmbeddedUserByEmail(email: String!, role: WorkspaceRole!): EmbeddedUser!
-    "Update an embedded member's role."
-    updateEmbeddedUserRole(userId: ID!, role: WorkspaceRole!): EmbeddedUser!
+    """
+    Add a user as an embedded member. Supply exactly one of `role` or `customRoleId`; a custom role must grant at
+    least one embedded scope.
+    """
+    addEmbeddedUser(userId: ID!, role: WorkspaceRole, customRoleId: ID): EmbeddedUser!
+    """
+    Add an existing user, found by email, as an embedded member. Supply exactly one of `role` or `customRoleId`.
+    """
+    addEmbeddedUserByEmail(email: String!, role: WorkspaceRole, customRoleId: ID): EmbeddedUser!
+    "Update an embedded member's embedded-wide role. Supply exactly one of `role` or `customRoleId`."
+    updateEmbeddedUserRole(userId: ID!, role: WorkspaceRole, customRoleId: ID): EmbeddedUser!
     "Remove a user from the embedded members."
     removeEmbeddedUser(userId: ID!): Boolean!
-    "Give an embedded member a role in one environment."
-    setEmbeddedUserEnvironmentRole(userId: ID!, environment: EnvironmentEnum!, role: WorkspaceRole!): EmbeddedUser!
+    "Give an embedded member a role in one environment. Supply exactly one of `role` or `customRoleId`."
+    setEmbeddedUserEnvironmentRole(
+        userId: ID!
+        environment: EnvironmentEnum!
+        role: WorkspaceRole
+        customRoleId: ID
+    ): EmbeddedUser!
     "Remove an embedded member's role in one environment."
     removeEmbeddedUserEnvironmentRole(userId: ID!, environment: EnvironmentEnum!): Boolean!
 }

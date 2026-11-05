@@ -27,6 +27,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
     EnvironmentEnum,
+    PermissionScopeSide,
     WorkspaceRole,
     useAddWorkspaceUserMutation,
     useAssignWorkspaceUserCustomRoleMutation,
@@ -119,7 +120,7 @@ const WorkspaceUsers = () => {
             .map((user) => ({email: user!.email ?? '', id: String(user!.id)}));
     }, [tenantUsersData, workspaceUsers]);
 
-    const {data: customRolesData} = useCustomRolesQuery({workspaceId});
+    const {data: customRolesData} = useCustomRolesQuery({side: PermissionScopeSide.Automation, workspaceId});
 
     const customRoles = customRolesData?.customRoles ?? [];
 

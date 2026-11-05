@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.domain;
 
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
@@ -60,6 +61,9 @@ public class CustomRole {
     @MappedCollection(idColumn = "custom_role_id")
     private Set<CustomRoleScope> scopes = new HashSet<>();
 
+    @Column("side")
+    private int side;
+
     @Version
     private int version;
 
@@ -77,10 +81,20 @@ public class CustomRole {
      * in any workspace.
      */
     public CustomRole(String name, Set<String> scopeNames) {
+        this(name, PermissionScopeSide.AUTOMATION, scopeNames);
+    }
+
+    /**
+     * Creates a validated custom role for one side: an {@code AUTOMATION} role is assigned to workspace members, an
+     * {@code EMBEDDED} role to embedded members. The side is fixed for the role's lifetime.
+     */
+    public CustomRole(String name, PermissionScopeSide side, Set<String> scopeNames) {
         Assert.hasText(name, "'name' must not be blank");
+        Assert.notNull(side, "'side' must not be null");
         Assert.notEmpty(scopeNames, "'scopeNames' must not be empty");
 
         this.name = name;
+        this.side = side.ordinal();
         this.scopes = scopeNames.stream()
             .map(CustomRoleScope::new)
             .collect(Collectors.toCollection(HashSet::new));
@@ -140,6 +154,10 @@ public class CustomRole {
         return name;
     }
 
+    public PermissionScopeSide getSide() {
+        return PermissionScopeSide.values()[side];
+    }
+
     public Set<CustomRoleScope> getScopes() {
         return Collections.unmodifiableSet(scopes);
     }
@@ -189,6 +207,7 @@ public class CustomRole {
             "id=" + id +
             ", name='" + name + '\'' +
             ", description='" + description + '\'' +
+            ", side=" + getSide() +
             ", scopes=" + scopes +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +

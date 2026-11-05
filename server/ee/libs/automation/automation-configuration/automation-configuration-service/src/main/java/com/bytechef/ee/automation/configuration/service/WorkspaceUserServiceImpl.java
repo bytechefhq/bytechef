@@ -17,6 +17,7 @@ import com.bytechef.ee.automation.configuration.exception.WorkspaceErrorType;
 import com.bytechef.ee.automation.configuration.exception.WorkspaceUserErrorType;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.WorkspacePermissionScope;
 import com.bytechef.exception.ConfigurationException;
@@ -185,10 +186,18 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     }
 
     private CustomRole validateCustomRoleExists(long customRoleId) {
-        return customRoleRepository.findById(customRoleId)
+        CustomRole customRole = customRoleRepository.findById(customRoleId)
             .orElseThrow(() -> new ConfigurationException(
                 "Custom role " + customRoleId + " does not exist",
                 WorkspaceUserErrorType.CUSTOM_ROLE_NOT_FOUND));
+
+        if (customRole.getSide() != PermissionScopeSide.AUTOMATION) {
+            throw new ConfigurationException(
+                "Custom role " + customRoleId + " is an embedded role and cannot be assigned to a workspace member",
+                WorkspaceUserErrorType.CUSTOM_ROLE_SIDE_MISMATCH);
+        }
+
+        return customRole;
     }
 
     private void validateWorkspaceExists(long workspaceId) {

@@ -1,5 +1,5 @@
-mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole!) {
-    addEmbeddedUser(userId: $userId, role: $role) {
+mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole, $customRoleId: ID) {
+    addEmbeddedUser(userId: $userId, role: $role, customRoleId: $customRoleId) {
         id
         userId
         embeddedRole

@@ -1,5 +1,5 @@
-query PermissionScopeGroups {
-    permissionScopeGroups {
+query PermissionScopeGroups($side: PermissionScopeSide) {
+    permissionScopeGroups(side: $side) {
         name
         scopes
     }

@@ -63,6 +63,12 @@ public class CustomRoleAuditMapper implements AuditMapper {
             data.put("customRoleId", String.valueOf(customRoleId));
         }
 
+        Object side = auditInvocation.argument("side");
+
+        if (side != null) {
+            data.put("side", String.valueOf(side));
+        }
+
         Object name = auditInvocation.argument("name");
 
         if (name != null) {
