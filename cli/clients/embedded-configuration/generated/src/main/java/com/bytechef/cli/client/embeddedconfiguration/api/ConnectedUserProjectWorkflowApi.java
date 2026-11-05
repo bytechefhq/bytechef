@@ -21,12 +21,14 @@ import com.bytechef.cli.client.embeddedconfiguration.Pair;
 import com.bytechef.cli.client.embeddedconfiguration.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.CreateFrontendProjectWorkflowFromPromptRequestModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.CreateFrontendProjectWorkflowRequestModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.DisableFrontendProjectWorkflow409ResponseModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.EnableConnectedUserWorkflowResponseModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.EnableFrontendProjectWorkflow409ResponseModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.EnvironmentModel;
-import com.bytechef.cli.client.embeddedconfiguration.model.MissingConnectionErrorModel;
-import com.bytechef.cli.client.embeddedconfiguration.model.MissingInputErrorModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.ProvisionFrontendWorkflowReference409ResponseModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.ProvisionWorkflowReferenceRequestModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.PublishFrontendProjectWorkflowRequestModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.UpdateFrontendProjectWorkflowInputs409ResponseModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.UpdateFrontendWorkflowConfigurationConnectionRequestModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.UpdateWorkflowInputsRequestModel;
 
@@ -1667,10 +1669,11 @@ public class ConnectedUserProjectWorkflowApi {
    * Enable a workflow.
    * @param workflowUuid The workflow uuid. (required)
    * @param xEnvironment The environment. (optional)
+   * @return EnableConnectedUserWorkflowResponseModel
    * @throws ApiException if fails to make API call
    */
-  public void enableFrontendProjectWorkflow(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
-    enableFrontendProjectWorkflow(workflowUuid, xEnvironment, null);
+  public EnableConnectedUserWorkflowResponseModel enableFrontendProjectWorkflow(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return enableFrontendProjectWorkflow(workflowUuid, xEnvironment, null);
   }
 
   /**
@@ -1679,10 +1682,12 @@ public class ConnectedUserProjectWorkflowApi {
    * @param workflowUuid The workflow uuid. (required)
    * @param xEnvironment The environment. (optional)
    * @param headers Optional headers to include in the request
+   * @return EnableConnectedUserWorkflowResponseModel
    * @throws ApiException if fails to make API call
    */
-  public void enableFrontendProjectWorkflow(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
-    enableFrontendProjectWorkflowWithHttpInfo(workflowUuid, xEnvironment, headers);
+  public EnableConnectedUserWorkflowResponseModel enableFrontendProjectWorkflow(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    ApiResponse<EnableConnectedUserWorkflowResponseModel> localVarResponse = enableFrontendProjectWorkflowWithHttpInfo(workflowUuid, xEnvironment, headers);
+    return localVarResponse.getData();
   }
 
   /**
@@ -1690,10 +1695,10 @@ public class ConnectedUserProjectWorkflowApi {
    * Enable a workflow.
    * @param workflowUuid The workflow uuid. (required)
    * @param xEnvironment The environment. (optional)
-   * @return ApiResponse&lt;Void&gt;
+   * @return ApiResponse&lt;EnableConnectedUserWorkflowResponseModel&gt;
    * @throws ApiException if fails to make API call
    */
-  public ApiResponse<Void> enableFrontendProjectWorkflowWithHttpInfo(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+  public ApiResponse<EnableConnectedUserWorkflowResponseModel> enableFrontendProjectWorkflowWithHttpInfo(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
     return enableFrontendProjectWorkflowWithHttpInfo(workflowUuid, xEnvironment, null);
   }
 
@@ -1703,10 +1708,10 @@ public class ConnectedUserProjectWorkflowApi {
    * @param workflowUuid The workflow uuid. (required)
    * @param xEnvironment The environment. (optional)
    * @param headers Optional headers to include in the request
-   * @return ApiResponse&lt;Void&gt;
+   * @return ApiResponse&lt;EnableConnectedUserWorkflowResponseModel&gt;
    * @throws ApiException if fails to make API call
    */
-  public ApiResponse<Void> enableFrontendProjectWorkflowWithHttpInfo(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+  public ApiResponse<EnableConnectedUserWorkflowResponseModel> enableFrontendProjectWorkflowWithHttpInfo(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
     HttpRequest.Builder localVarRequestBuilder = enableFrontendProjectWorkflowRequestBuilder(workflowUuid, xEnvironment, headers);
     try {
       HttpResponse<InputStream> localVarResponse = memberVarHttpClient.send(
@@ -1721,13 +1726,24 @@ public class ConnectedUserProjectWorkflowApi {
           throw getApiException("enableFrontendProjectWorkflow", localVarResponse);
         }
         localVarResponseBody = ApiClient.getResponseBody(localVarResponse);
-        if (localVarResponseBody != null) {
-          localVarResponseBody.readAllBytes();
+        if (localVarResponseBody == null) {
+          return new ApiResponse<EnableConnectedUserWorkflowResponseModel>(
+              localVarResponse.statusCode(),
+              localVarResponse.headers().map(),
+              null
+          );
         }
-        return new ApiResponse<>(
+
+        
+        
+        String responseBody = new String(localVarResponseBody.readAllBytes());
+        EnableConnectedUserWorkflowResponseModel responseValue = responseBody.isBlank()? null: memberVarObjectMapper.readValue(responseBody, new TypeReference<EnableConnectedUserWorkflowResponseModel>() {});
+        
+
+        return new ApiResponse<EnableConnectedUserWorkflowResponseModel>(
             localVarResponse.statusCode(),
             localVarResponse.headers().map(),
-            null
+            responseValue
         );
       } finally {
         if (localVarResponseBody != null) {
@@ -1779,10 +1795,11 @@ public class ConnectedUserProjectWorkflowApi {
    * @param externalUserId The external user id. (required)
    * @param workflowUuid The workflow uuid. (required)
    * @param xEnvironment The environment. (optional)
+   * @return EnableConnectedUserWorkflowResponseModel
    * @throws ApiException if fails to make API call
    */
-  public void enableProjectWorkflow(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
-    enableProjectWorkflow(externalUserId, workflowUuid, xEnvironment, null);
+  public EnableConnectedUserWorkflowResponseModel enableProjectWorkflow(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return enableProjectWorkflow(externalUserId, workflowUuid, xEnvironment, null);
   }
 
   /**
@@ -1792,10 +1809,12 @@ public class ConnectedUserProjectWorkflowApi {
    * @param workflowUuid The workflow uuid. (required)
    * @param xEnvironment The environment. (optional)
    * @param headers Optional headers to include in the request
+   * @return EnableConnectedUserWorkflowResponseModel
    * @throws ApiException if fails to make API call
    */
-  public void enableProjectWorkflow(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
-    enableProjectWorkflowWithHttpInfo(externalUserId, workflowUuid, xEnvironment, headers);
+  public EnableConnectedUserWorkflowResponseModel enableProjectWorkflow(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    ApiResponse<EnableConnectedUserWorkflowResponseModel> localVarResponse = enableProjectWorkflowWithHttpInfo(externalUserId, workflowUuid, xEnvironment, headers);
+    return localVarResponse.getData();
   }
 
   /**
@@ -1804,10 +1823,10 @@ public class ConnectedUserProjectWorkflowApi {
    * @param externalUserId The external user id. (required)
    * @param workflowUuid The workflow uuid. (required)
    * @param xEnvironment The environment. (optional)
-   * @return ApiResponse&lt;Void&gt;
+   * @return ApiResponse&lt;EnableConnectedUserWorkflowResponseModel&gt;
    * @throws ApiException if fails to make API call
    */
-  public ApiResponse<Void> enableProjectWorkflowWithHttpInfo(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+  public ApiResponse<EnableConnectedUserWorkflowResponseModel> enableProjectWorkflowWithHttpInfo(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
     return enableProjectWorkflowWithHttpInfo(externalUserId, workflowUuid, xEnvironment, null);
   }
 
@@ -1818,10 +1837,10 @@ public class ConnectedUserProjectWorkflowApi {
    * @param workflowUuid The workflow uuid. (required)
    * @param xEnvironment The environment. (optional)
    * @param headers Optional headers to include in the request
-   * @return ApiResponse&lt;Void&gt;
+   * @return ApiResponse&lt;EnableConnectedUserWorkflowResponseModel&gt;
    * @throws ApiException if fails to make API call
    */
-  public ApiResponse<Void> enableProjectWorkflowWithHttpInfo(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+  public ApiResponse<EnableConnectedUserWorkflowResponseModel> enableProjectWorkflowWithHttpInfo(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
     HttpRequest.Builder localVarRequestBuilder = enableProjectWorkflowRequestBuilder(externalUserId, workflowUuid, xEnvironment, headers);
     try {
       HttpResponse<InputStream> localVarResponse = memberVarHttpClient.send(
@@ -1836,13 +1855,24 @@ public class ConnectedUserProjectWorkflowApi {
           throw getApiException("enableProjectWorkflow", localVarResponse);
         }
         localVarResponseBody = ApiClient.getResponseBody(localVarResponse);
-        if (localVarResponseBody != null) {
-          localVarResponseBody.readAllBytes();
+        if (localVarResponseBody == null) {
+          return new ApiResponse<EnableConnectedUserWorkflowResponseModel>(
+              localVarResponse.statusCode(),
+              localVarResponse.headers().map(),
+              null
+          );
         }
-        return new ApiResponse<>(
+
+        
+        
+        String responseBody = new String(localVarResponseBody.readAllBytes());
+        EnableConnectedUserWorkflowResponseModel responseValue = responseBody.isBlank()? null: memberVarObjectMapper.readValue(responseBody, new TypeReference<EnableConnectedUserWorkflowResponseModel>() {});
+        
+
+        return new ApiResponse<EnableConnectedUserWorkflowResponseModel>(
             localVarResponse.statusCode(),
             localVarResponse.headers().map(),
-            null
+            responseValue
         );
       } finally {
         if (localVarResponseBody != null) {
