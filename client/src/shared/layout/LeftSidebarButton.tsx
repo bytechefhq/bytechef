@@ -19,6 +19,7 @@ const LeftSidebarButton = ({
             <TooltipTrigger asChild>
                 <Button
                     aria-label={tooltip}
+                    className="hover:bg-surface-neutral-secondary-hover dark:hover:bg-surface-neutral-secondary-hover"
                     icon={<PanelLeftIcon />}
                     onClick={onLeftSidebarOpenClick}
                     size="icon"
