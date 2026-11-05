@@ -1400,11 +1400,6 @@ public class ApplicationProperties {
             private String apiKey;
 
             /**
-             * Brave Search API base URL
-             */
-            private String baseUrl;
-
-            /**
              * Whether Brave Search is enabled
              */
             private boolean enabled;
@@ -1415,14 +1410,6 @@ public class ApplicationProperties {
 
             public void setApiKey(String apiKey) {
                 this.apiKey = apiKey;
-            }
-
-            public String getBaseUrl() {
-                return baseUrl;
-            }
-
-            public void setBaseUrl(String baseUrl) {
-                this.baseUrl = baseUrl;
             }
 
             public boolean isEnabled() {
