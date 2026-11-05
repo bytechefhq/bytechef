@@ -68,6 +68,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
         when(
             toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
                 eq(PlatformType.AUTOMATION), eq(7L), eq(2L), eq(ToolExecutionSurface.MCP_AUTOMATION), isNull(), eq(5L),
+                isNull(),
                 isNull(), isNull(),
                 isNull(), isNull(), eq(0)))
                     .thenReturn(new PageImpl<>(List.of(toolInvocationLogDTO()), PageRequest.of(0, 50), 1));
@@ -113,14 +114,15 @@ class ToolInvocationLogGraphQlControllerIntTest {
             .isEqualTo(1);
 
         verify(toolInvocationLogFacade, never()).getToolInvocationLogs(
-            any(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
+            any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
     }
 
     @Test
     void testToolInvocationLogsUsesTheTenantWideFacadeQuery() {
         when(
             toolInvocationLogFacade.getToolInvocationLogs(
-                eq(PlatformType.EMBEDDED), isNull(), isNull(), isNull(), isNull(), eq(3L), isNull(), isNull(), isNull(),
+                eq(PlatformType.EMBEDDED), isNull(), isNull(), isNull(), isNull(), isNull(), eq(3L), isNull(), isNull(),
+                isNull(),
                 eq(0)))
                     .thenReturn(new PageImpl<>(List.of()));
 
@@ -138,7 +140,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
             .isEqualTo(0);
 
         verify(toolInvocationLogFacade, never()).getWorkspaceToolInvocationLogs(
-            any(), anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), any(), anyInt());
+            any(), anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
     }
 
     @Test
@@ -146,6 +148,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
         when(
             toolInvocationLogFacade.getToolInvocationLogs(
                 eq(PlatformType.AUTOMATION), eq(2L), eq(ToolExecutionSurface.MCP_AUTOMATION), isNull(), isNull(),
+                isNull(),
                 isNull(), isNull(), isNull(),
                 isNull(), eq(0)))
                     .thenReturn(new PageImpl<>(List.of(toolInvocationLogDTO()), PageRequest.of(0, 50), 1));
@@ -168,6 +171,49 @@ class ToolInvocationLogGraphQlControllerIntTest {
             .path("toolInvocationLogs.totalElements")
             .entity(Integer.class)
             .isEqualTo(1);
+    }
+
+    @Test
+    void testToolInvocationLogsPassesTheA2aServerToTheFacade() {
+        ToolInvocationLog toolInvocationLog = new ToolInvocationLog();
+
+        toolInvocationLog.setId(2L);
+        toolInvocationLog.setSurface(ToolExecutionSurface.A2A);
+        toolInvocationLog.setKind(ToolExecutionKind.WORKFLOW);
+        toolInvocationLog.setToolName("Summarize");
+        toolInvocationLog.setA2aServerId(4L);
+        toolInvocationLog.setOutcome(ToolExecutionOutcome.SUCCESS);
+        toolInvocationLog.setDurationMs(42);
+
+        when(
+            toolInvocationLogFacade.getToolInvocationLogs(
+                eq(PlatformType.AUTOMATION), isNull(), eq(ToolExecutionSurface.A2A), isNull(), isNull(), eq(4L),
+                isNull(), isNull(), isNull(), isNull(), eq(0)))
+                    .thenReturn(
+                        new PageImpl<>(
+                            List.of(new ToolInvocationLogDTO(toolInvocationLog, null)), PageRequest.of(0, 50), 1));
+
+        graphQlTester
+            .document("""
+                query {
+                    toolInvocationLogs(type: AUTOMATION, surface: "A2A", a2aServerId: 4) {
+                        content {
+                            surface
+                            a2aServerId
+                            mcpServerId
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("toolInvocationLogs.content[0].surface")
+            .entity(String.class)
+            .isEqualTo("A2A")
+            .path("toolInvocationLogs.content[0].a2aServerId")
+            .entity(Long.class)
+            .isEqualTo(4L)
+            .path("toolInvocationLogs.content[0].mcpServerId")
+            .valueIsNull();
     }
 
     @Test

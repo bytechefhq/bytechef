@@ -26,11 +26,13 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    implementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     runtimeOnly(project(":server:libs:automation:automation-ai:automation-ai-a2a:automation-ai-a2a-service"))
+    runtimeOnly(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-service"))
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.assertj:assertj-core")

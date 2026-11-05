@@ -25,12 +25,14 @@ public interface ToolInvocationLogFacade {
     Page<ToolInvocationLogDTO> getToolInvocationLogs(
         PlatformType type, @Nullable Long environmentId, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome,
-        @Nullable Long mcpServerId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
+        @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
+        @Nullable Long integrationInstanceId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber);
 
     Page<ToolInvocationLogDTO> getWorkspaceToolInvocationLogs(
         PlatformType type, long workspaceId, long environmentId, @Nullable ToolExecutionSurface surface,
-        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
+        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
+        @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber);
 }

@@ -71,6 +71,9 @@ public class ToolInvocationLog {
     @Column("mcp_server_id")
     private Long mcpServerId;
 
+    @Column("a2a_server_id")
+    private Long a2aServerId;
+
     @Column("job_id")
     private Long jobId;
 
@@ -150,6 +153,10 @@ public class ToolInvocationLog {
 
     public @Nullable Long getMcpServerId() {
         return mcpServerId;
+    }
+
+    public @Nullable Long getA2aServerId() {
+        return a2aServerId;
     }
 
     public @Nullable Long getJobId() {
@@ -234,6 +241,10 @@ public class ToolInvocationLog {
 
     public void setMcpServerId(Long mcpServerId) {
         this.mcpServerId = mcpServerId;
+    }
+
+    public void setA2aServerId(Long a2aServerId) {
+        this.a2aServerId = a2aServerId;
     }
 
     public void setJobId(Long jobId) {

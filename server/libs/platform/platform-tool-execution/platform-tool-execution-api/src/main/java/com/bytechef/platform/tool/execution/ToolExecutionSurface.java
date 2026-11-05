@@ -24,5 +24,6 @@ public enum ToolExecutionSurface {
     MCP_AUTOMATION,
     MCP_EMBEDDED,
     EMBEDDED_API_ACTION,
-    EMBEDDED_API_TOOL
+    EMBEDDED_API_TOOL,
+    A2A
 }
