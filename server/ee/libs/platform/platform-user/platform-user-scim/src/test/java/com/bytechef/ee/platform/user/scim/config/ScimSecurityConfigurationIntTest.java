@@ -10,7 +10,10 @@ package com.bytechef.ee.platform.user.scim.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,6 +36,8 @@ import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +45,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
@@ -54,7 +60,11 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -213,6 +223,48 @@ class ScimSecurityConfigurationIntTest {
             .andExpect(content().string("scim:Okta (5)@" + TENANT_ID));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "POST", "PUT", "PATCH", "DELETE"
+    })
+    void testScimWriteRequestWithTheScimApiKeyAndNoCsrfTokenReachesTheController(String method) throws Exception {
+        mockMvc.perform(
+            request(HttpMethod.valueOf(method), SCIM_USERS_PATH)
+                .header("Authorization", "Bearer " + SCIM_API_KEY)
+                .contentType(SCIM_JSON)
+                .content("{}"))
+            .andExpect(status().isOk())
+            .andExpect(content().string("scim:Okta (5)@" + TENANT_ID));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "POST", "PUT", "PATCH", "DELETE"
+    })
+    void testScimWriteRequestFromALoggedInUserWithoutBearerTokenIsRejected(String method) throws Exception {
+        mockMvc.perform(
+            request(HttpMethod.valueOf(method), SCIM_USERS_PATH)
+                .with(user("admin@localhost.com"))
+                .contentType(SCIM_JSON)
+                .content("{}"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.detail").value("Missing or invalid Authorization header"));
+    }
+
+    @Test
+    void testNonScimApiWriteRequestStillRequiresACsrfToken() throws Exception {
+        mockMvc.perform(
+            request(HttpMethod.POST, "/api/other")
+                .with(user("admin@localhost.com")))
+            .andExpect(status().isForbidden());
+
+        mockMvc.perform(
+            request(HttpMethod.POST, "/api/other")
+                .with(user("admin@localhost.com"))
+                .with(csrf()))
+            .andExpect(status().isOk());
+    }
+
     @Test
     void testNonScimApiRequestIsNotAuthenticatedByTheScimApiKey() throws Exception {
         mockMvc.perform(
@@ -231,6 +283,28 @@ class ScimSecurityConfigurationIntTest {
 
         @RestController
         static class ScimProbeController {
+
+            @DeleteMapping("/api/scim/v2/Users")
+            String deleteProbe() {
+                return probe();
+            }
+
+            @PatchMapping("/api/scim/v2/Users")
+            String patchProbe() {
+                return probe();
+            }
+
+            @PostMapping({
+                "/api/other", "/api/scim/v2/Users"
+            })
+            String postProbe() {
+                return probe();
+            }
+
+            @PutMapping("/api/scim/v2/Users")
+            String putProbe() {
+                return probe();
+            }
 
             @GetMapping({
                 "/api/other", "/api/scim/v2/Users"

@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.user.scim.config;
 import com.bytechef.ee.platform.user.scim.web.filter.ScimBearerTokenAuthenticationFilter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
@@ -21,10 +22,22 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  */
 class ScimHttpConfigurer extends AbstractHttpConfigurer<ScimHttpConfigurer, HttpSecurity> {
 
+    static final String SCIM_PATH_PATTERN = "/api/scim/v2/**";
+
     private final ScimBearerTokenAuthenticationFilter scimBearerTokenAuthenticationFilter;
 
     ScimHttpConfigurer(ScimBearerTokenAuthenticationFilter scimBearerTokenAuthenticationFilter) {
         this.scimBearerTokenAuthenticationFilter = scimBearerTokenAuthenticationFilter;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void init(HttpSecurity http) {
+        CsrfConfigurer<HttpSecurity> csrf = http.getConfigurer(CsrfConfigurer.class);
+
+        if (csrf != null) {
+            csrf.ignoringRequestMatchers(SCIM_PATH_PATTERN);
+        }
     }
 
     @Override
