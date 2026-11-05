@@ -23,6 +23,7 @@ import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -49,9 +50,13 @@ public class ToolCallbacksFactoryConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(ProjectDeploymentFacade.class)
-    DeploymentToolCallbacksFactory deploymentToolCallbacksFactory(ProjectDeploymentFacade projectDeploymentFacade) {
-        return new DeploymentToolCallbacksFactory(projectDeploymentFacade);
+    @ConditionalOnBean({
+        ProjectDeploymentFacade.class, ProjectWorkflowService.class
+    })
+    DeploymentToolCallbacksFactory deploymentToolCallbacksFactory(
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowService projectWorkflowService) {
+
+        return new DeploymentToolCallbacksFactory(projectDeploymentFacade, projectWorkflowService);
     }
 
     @Bean

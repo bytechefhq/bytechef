@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +29,14 @@ import org.springframework.ai.tool.ToolCallback;
 public class DeploymentToolCallbacksFactory {
 
     private final ProjectDeploymentFacade projectDeploymentFacade;
+    private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public DeploymentToolCallbacksFactory(ProjectDeploymentFacade projectDeploymentFacade) {
+    public DeploymentToolCallbacksFactory(
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowService projectWorkflowService) {
+
         this.projectDeploymentFacade = projectDeploymentFacade;
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     public List<ToolCallback> readToolCallbacks() {
@@ -48,7 +53,7 @@ public class DeploymentToolCallbacksFactory {
         toolCallbacks.add(new CreateProjectDeploymentToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new UpdateProjectDeploymentToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new DeleteProjectDeploymentToolCallback(projectDeploymentFacade));
-        toolCallbacks.add(new RollbackProjectDeploymentToolCallback(projectDeploymentFacade));
+        toolCallbacks.add(new RollbackProjectDeploymentToolCallback(projectDeploymentFacade, projectWorkflowService));
         toolCallbacks.add(new ToggleProjectDeploymentToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new PromoteWorkflowToolCallback(projectDeploymentFacade));
 
