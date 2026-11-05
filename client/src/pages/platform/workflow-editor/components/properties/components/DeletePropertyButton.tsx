@@ -14,8 +14,8 @@ const DeletePropertyButton = ({onClick, propertyName}: DeletePropertyButtonProps
                 aria-label={`Delete ${propertyName}`}
                 icon={<XIcon />}
                 onClick={() => onClick()}
-                size="iconXs"
-                variant="destructiveGhost"
+                size="iconXxs"
+                variant="destructiveOutline"
             />
         </TooltipTrigger>
 
