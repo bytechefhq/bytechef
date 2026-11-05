@@ -27,7 +27,7 @@ import {
     EllipsisVerticalIcon,
     PencilIcon,
     RefreshCcwIcon,
-    Settings2Icon,
+    SlidersHorizontalIcon,
     Trash2Icon,
     UsersIcon,
 } from 'lucide-react';
@@ -131,7 +131,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center gap-2">
-                            <Settings2Icon
+                            <SlidersHorizontalIcon
                                 aria-hidden="true"
                                 className="size-6 shrink-0 text-content-neutral-secondary"
                             />
