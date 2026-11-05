@@ -254,13 +254,13 @@ export default function useAiSkillDetail() {
             try {
                 await removeFileInSkill({id: selectedSkillId, path});
 
-                queryClient.removeQueries({queryKey: ['aiSkillFileContent', {id: selectedSkillId, path}]});
-
-                await queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths', {id: selectedSkillId}]});
-
                 if (selectedFilePath === path) {
                     setSelectedFilePath(null);
                 }
+
+                queryClient.removeQueries({queryKey: ['aiSkillFileContent', {id: selectedSkillId, path}]});
+
+                await queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths', {id: selectedSkillId}]});
 
                 toast.success('File removed');
             } catch (error) {
