@@ -20,6 +20,9 @@ bytechef:
     auto-memory:
       # Auto-memory storage provider (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
       provider: JDBC
+    brave:
+      base-url: https://api.search.brave.com/res/v1
+      enabled: false
     copilot:
       enabled: false
       # Default LLM provider of the Copilot when the user has not selected one; empty uses the catalog default
