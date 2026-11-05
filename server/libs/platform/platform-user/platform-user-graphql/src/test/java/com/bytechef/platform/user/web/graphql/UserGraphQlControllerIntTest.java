@@ -121,6 +121,35 @@ public class UserGraphQlControllerIntTest {
     }
 
     @Test
+    void testGetUserWithExternalId() {
+        Authority authority = createMockAuthority(1L, "ROLE_USER");
+        User mockUser = createMockUser(1L, "jane", "jane@example.com");
+
+        mockUser.setAuthorities(Set.of(authority));
+        mockUser.setExternalId("idp-jane-123");
+
+        when(userManagementFacade.fetchUser("jane"))
+            .thenReturn(Optional.of(new UserWithAuthorities(mockUser, List.of(authority))));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    user(login: "jane") {
+                        login
+                        externalId
+                    }
+                }
+                """)
+            .execute()
+            .path("user.login")
+            .entity(String.class)
+            .isEqualTo("jane")
+            .path("user.externalId")
+            .entity(String.class)
+            .isEqualTo("idp-jane-123");
+    }
+
+    @Test
     void testGetUserNotFound() {
         // Given
         when(userManagementFacade.fetchUser("unknown")).thenReturn(Optional.empty());
@@ -148,6 +177,7 @@ public class UserGraphQlControllerIntTest {
         User user2 = createMockUser(2L, "user2", "user2@example.com");
 
         user1.setAuthorities(Set.of(authority));
+        user1.setExternalId("idp-user1");
         user2.setAuthorities(Set.of(authority));
 
         Page<User> userPage = new PageImpl<>(List.of(user1, user2), PageRequest.of(0, 20), 2);
@@ -164,6 +194,7 @@ public class UserGraphQlControllerIntTest {
                             id
                             login
                             email
+                            externalId
                         }
                         totalElements
                         totalPages
@@ -179,9 +210,14 @@ public class UserGraphQlControllerIntTest {
             .path("users.content[0].login")
             .entity(String.class)
             .isEqualTo("user1")
+            .path("users.content[0].externalId")
+            .entity(String.class)
+            .isEqualTo("idp-user1")
             .path("users.content[1].login")
             .entity(String.class)
             .isEqualTo("user2")
+            .path("users.content[1].externalId")
+            .valueIsNull()
             .path("users.totalElements")
             .entity(Integer.class)
             .isEqualTo(2)
