@@ -34,7 +34,7 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, s
     const isObjectSchema = getSchemaType(schema) === 'object';
 
     let extraFields = Object.keys(schema).filter(
-        (key) => key !== 'type' && key !== 'items' && key !== 'properties' && key !== '$schema'
+        (key) => key !== 'type' && key !== 'items' && key !== 'properties' && key !== '$schema' && key !== 'title'
     );
 
     if (root) {
@@ -158,7 +158,9 @@ const SchemaArrayControls = ({onAdd, onChange, root, schema}: SchemaArrayControl
     const extraFields: string[] =
         (schema &&
             isObjectSchema &&
-            Object.keys(schema).filter((key) => key !== 'type' && key !== 'items' && key !== 'properties')) ||
+            Object.keys(schema).filter(
+                (key) => key !== 'type' && key !== 'items' && key !== 'properties' && key !== 'title'
+            )) ||
         [];
 
     return (
