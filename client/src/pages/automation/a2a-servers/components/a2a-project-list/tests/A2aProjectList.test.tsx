@@ -254,7 +254,10 @@ describe('A2aProjectList', () => {
     });
 
     it('lists every project of the server', () => {
-        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
+        const {container} = render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
+
+        expect(container.querySelectorAll('svg.lucide-folder')).toHaveLength(2);
+        expect(container.querySelector('svg.lucide-workflow')).not.toBeInTheDocument();
 
         expect(screen.getByText('Sales project')).toBeInTheDocument();
         expect(screen.getByText('Support project')).toBeInTheDocument();
@@ -333,13 +336,14 @@ describe('A2aProjectList', () => {
     it('lists the workflows of a project once it is expanded', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
+        const {container} = render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         expect(screen.queryByText('Lead intake')).not.toBeInTheDocument();
 
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
 
         expect(screen.getByText('Lead intake')).toBeInTheDocument();
+        expect(container.querySelectorAll('svg.lucide-workflow')).toHaveLength(2);
         expect(screen.getByText('Skill: Qualify lead')).toBeInTheDocument();
         expect(screen.getByText('Follow up')).toBeInTheDocument();
         expect(screen.queryByText('Triage')).not.toBeInTheDocument();

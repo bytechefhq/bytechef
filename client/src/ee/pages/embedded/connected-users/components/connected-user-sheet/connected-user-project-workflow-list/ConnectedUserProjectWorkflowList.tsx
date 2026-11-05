@@ -7,6 +7,7 @@ import ConnectedUserProjectWorkflowListItem, {
     ConnectedUserProjectWorkflowType,
     ConnectedUserWorkflowTemplateSourceI,
 } from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowListItem';
+import {FolderIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
 const OTHER_GROUP_KEY = 'other';
@@ -106,7 +107,12 @@ const ConnectedUserProjectWorkflowList = ({
                             <div className="flex items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover">
                                 <CollapsibleTrigger className="flex-1 py-3 text-left">
                                     <div className="flex flex-col items-start justify-center gap-y-2">
-                                        <h3 className="flex min-h-8 items-center text-base font-semibold">
+                                        <h3 className="flex min-h-8 items-center gap-2 text-base font-semibold">
+                                            <FolderIcon
+                                                aria-hidden="true"
+                                                className="size-6 shrink-0 text-content-neutral-secondary"
+                                            />
+
                                             {groupName}
                                         </h3>
 

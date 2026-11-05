@@ -15,7 +15,7 @@ import {
     useAutomationWorkflowProjectsQuery,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {SlidersHorizontalIcon} from 'lucide-react';
+import {FolderIcon, SlidersHorizontalIcon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
 import {flushSync} from 'react-dom';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -120,17 +120,26 @@ const AutomationWorkflowConfigurations = () => {
                     <div className="w-full divide-y divide-border/50 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                         {listedProjects.map((project) => (
                             <section aria-label={project.name} className="py-3" key={project.id}>
-                                <h2 className="mb-2 text-base font-semibold">{project.name}</h2>
+                                <h2 className="mb-2 flex items-center gap-2 text-base font-semibold">
+                                    <FolderIcon
+                                        aria-hidden="true"
+                                        className="size-6 shrink-0 text-content-neutral-secondary"
+                                    />
 
-                                <AutomationWorkflowProjectConfigurationList
-                                    environmentId={currentEnvironmentId}
-                                    onCreate={() => setConfigurationDialog({project})}
-                                    onEdit={(configuration) => setConfigurationDialog({configuration, project})}
-                                    onUpdateVersion={(configuration) =>
-                                        setConfigurationDialog({configuration, project, updateProjectVersion: true})
-                                    }
-                                    project={project}
-                                />
+                                    {project.name}
+                                </h2>
+
+                                <div className="pl-8">
+                                    <AutomationWorkflowProjectConfigurationList
+                                        environmentId={currentEnvironmentId}
+                                        onCreate={() => setConfigurationDialog({project})}
+                                        onEdit={(configuration) => setConfigurationDialog({configuration, project})}
+                                        onUpdateVersion={(configuration) =>
+                                            setConfigurationDialog({configuration, project, updateProjectVersion: true})
+                                        }
+                                        project={project}
+                                    />
+                                </div>
                             </section>
                         ))}
                     </div>

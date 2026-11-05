@@ -34,6 +34,7 @@ import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ChevronDownIcon,
+    ComponentIcon,
     EditIcon,
     EllipsisVerticalIcon,
     PlusIcon,
@@ -194,12 +195,21 @@ const IntegrationListItem = ({
                                 {integration?.integrationWorkflowIds &&
                                 integration?.integrationWorkflowIds.length > 0 ? (
                                     <Link
-                                        className="flex items-center gap-1"
+                                        className="flex items-center gap-2"
                                         onClick={(event) => event.stopPropagation()}
                                         to={`/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}?${searchParams}`}
                                     >
-                                        {integration?.icon && (
-                                            <InlineSVG className="size-5 flex-none" src={integration.icon} />
+                                        {integration?.icon ? (
+                                            <InlineSVG
+                                                aria-hidden="true"
+                                                className="size-6 shrink-0"
+                                                src={integration.icon}
+                                            />
+                                        ) : (
+                                            <ComponentIcon
+                                                aria-hidden="true"
+                                                className="size-6 shrink-0 text-content-neutral-secondary"
+                                            />
                                         )}
 
                                         <span className="text-base font-semibold text-content-neutral-primary">
@@ -207,9 +217,18 @@ const IntegrationListItem = ({
                                         </span>
                                     </Link>
                                 ) : (
-                                    <div className="flex items-center gap-1">
-                                        {integration?.icon && (
-                                            <InlineSVG className="size-5 flex-none" src={integration.icon} />
+                                    <div className="flex items-center gap-2">
+                                        {integration?.icon ? (
+                                            <InlineSVG
+                                                aria-hidden="true"
+                                                className="size-6 shrink-0"
+                                                src={integration.icon}
+                                            />
+                                        ) : (
+                                            <ComponentIcon
+                                                aria-hidden="true"
+                                                className="size-6 shrink-0 text-content-neutral-secondary"
+                                            />
                                         )}
 
                                         <span className="text-base font-semibold text-content-neutral-primary">

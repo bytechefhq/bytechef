@@ -80,6 +80,12 @@ it('summarizes workflows and deployments and hides the tabs while collapsed', ()
     expect(screen.queryByLabelText('Project Deployments')).not.toBeInTheDocument();
 });
 
+it('marks the project name with the folder icon', () => {
+    const {container} = renderProjectListItem();
+
+    expect(container.querySelector('svg.lucide-folder')).toBeInTheDocument();
+});
+
 it('shows deployments without a number when the server did not send a count', () => {
     renderProjectListItem(undefined, {developmentDeploymentCount: undefined});
 

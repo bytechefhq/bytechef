@@ -251,6 +251,10 @@ describe('ConnectedUserMcpServerListItem', () => {
         await expandCard();
         await expandGroups();
 
+        expect(
+            screen.getByRole('button', {name: 'Send Email'}).closest('li')?.querySelector('svg.lucide-workflow')
+        ).toBeInTheDocument();
+
         await userEvent.click(screen.getByRole('button', {name: 'Send Email'}));
 
         const state = useIntegrationInstanceConfigurationWorkflowSheetStore.getState();

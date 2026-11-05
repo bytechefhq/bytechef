@@ -18,7 +18,7 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/wor
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {CopyIcon, Share2Icon} from 'lucide-react';
+import {CopyIcon, Share2Icon, WorkflowIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -103,7 +103,9 @@ const ProjectWorkflowListItem = ({
                 to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
             >
                 <div className="flex w-80 min-w-0 shrink-0 flex-col gap-1 pr-1 text-sm font-semibold">
-                    <div className="flex min-w-0 items-center">
+                    <div className="flex min-w-0 items-center gap-2">
+                        <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
+
                         <Tooltip>
                             <TooltipTrigger className="line-clamp-1 min-w-0 truncate text-start">
                                 {workflow.label}

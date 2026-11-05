@@ -18,6 +18,7 @@ import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
 import {useQueryClient} from '@tanstack/react-query';
+import {WorkflowIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
 const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
@@ -74,13 +75,17 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
             key={workflow.id}
         >
             <div className="flex min-w-0 flex-1 items-center gap-2">
-                <button
-                    className="w-80 shrink-0 cursor-pointer truncate pr-1 text-left text-sm font-semibold"
-                    onClick={handleWorkflowClick}
-                    type="button"
-                >
-                    {workflow.label}
-                </button>
+                <div className="flex w-80 shrink-0 items-center gap-2 pr-1">
+                    <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
+
+                    <button
+                        className="min-w-0 cursor-pointer truncate text-left text-sm font-semibold"
+                        onClick={handleWorkflowClick}
+                        type="button"
+                    >
+                        {workflow.label}
+                    </button>
+                </div>
 
                 <WorkflowTriggerAndComponentsRow
                     className="hidden sm:flex"

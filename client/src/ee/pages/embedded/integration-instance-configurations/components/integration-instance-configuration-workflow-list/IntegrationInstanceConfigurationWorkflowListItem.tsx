@@ -12,6 +12,7 @@ import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.querie
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
+import {WorkflowIcon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -103,6 +104,8 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                         !integrationInstanceConfigurationWorkflow.enabled && 'text-muted-foreground'
                     )}
                 >
+                    <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
+
                     {workflow.label}
 
                     {isMcpWorkflow && <Badge label="MCP" styleType="secondary-outline" />}

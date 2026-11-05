@@ -52,6 +52,8 @@ describe('AutomationWorkflowProjectWorkflowListItem', () => {
     it('renders the label, the trigger badge, and the modified date', () => {
         renderRow();
 
+        expect(document.querySelector('svg.lucide-workflow')).toBeInTheDocument();
+
         expect(screen.getByText('Mailer')).toBeInTheDocument();
         expect(screen.getByText('Manual')).toBeInTheDocument();
         expect(screen.getByText(/Modified at/)).toBeInTheDocument();

@@ -15,7 +15,14 @@ import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/aut
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
+import {
+    ClipboardIcon,
+    FormIcon,
+    MessageCircleMoreIcon,
+    PlayIcon,
+    SquareArrowOutUpRightIcon,
+    WorkflowIcon,
+} from 'lucide-react';
 import {MouseEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -151,6 +158,8 @@ const ProjectDeploymentWorkflowListItem = ({
             <div className="flex min-w-0 flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
                 <div className="flex w-full max-w-80 min-w-0 shrink flex-col gap-1 sm:w-80 sm:shrink-0">
                     <div className="flex min-w-0 items-center gap-2">
+                        <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
+
                         <Tooltip>
                             <TooltipTrigger className="line-clamp-1 min-w-0 truncate text-start">
                                 <span

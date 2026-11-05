@@ -96,6 +96,12 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
     it("opens the workflow's executions for the connected user when the workflow is clicked", async () => {
         renderListItem(createConnectedUserProjectWorkflow(null), 'Automation Playground');
 
+        expect(
+            screen
+                .getByRole('button', {name: 'WhatsApp Agent - Human reply'})
+                .parentElement?.querySelector('svg.lucide-workflow')
+        ).toBeInTheDocument();
+
         await userEvent.click(screen.getByRole('button', {name: 'WhatsApp Agent - Human reply'}));
 
         const state = useAutomationWorkflowExecutionsSheetStore.getState();

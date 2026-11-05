@@ -156,6 +156,9 @@ describe('AutomationWorkflowConfigurations', () => {
         expect(mocks.projectsVariables).toEqual({environmentId: '2'});
         expect(screen.getByText('Projects: All Projects')).toBeInTheDocument();
         expect(screen.getByRole('region', {name: 'Live Project'})).toBeInTheDocument();
+        expect(
+            screen.getByRole('region', {name: 'Live Project'}).querySelector('svg.lucide-folder')
+        ).toBeInTheDocument();
         expect(screen.queryByRole('region', {name: 'Other Project'})).not.toBeInTheDocument();
         expect(screen.queryByRole('region', {name: 'Draft Project'})).not.toBeInTheDocument();
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();

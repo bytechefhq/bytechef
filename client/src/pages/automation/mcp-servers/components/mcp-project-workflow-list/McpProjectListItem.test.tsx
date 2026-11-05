@@ -70,6 +70,15 @@ describe('McpProjectListItem', () => {
         expect(screen.getByText('Workflow tools of 3')).toBeInTheDocument();
     });
 
+    it('marks the project row with the folder icon instead of the workflow icon', () => {
+        const {container} = renderListItem(
+            createMcpProject({id: '5', name: 'Sales project'} as McpProjectItemType['project'])
+        );
+
+        expect(container.querySelector('svg.lucide-folder')).toBeInTheDocument();
+        expect(container.querySelector('svg.lucide-workflow')).not.toBeInTheDocument();
+    });
+
     it('offers no project link when the project is unknown', () => {
         renderListItem(createMcpProject(null));
 

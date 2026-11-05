@@ -4,7 +4,7 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
-import {ChevronDownIcon, ChevronRightIcon, SquareArrowOutUpRightIcon, WorkflowIcon} from 'lucide-react';
+import {ChevronDownIcon, ChevronRightIcon, FolderIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
 import {useState} from 'react';
 
 import McpProjectWorkflowDialog from '../McpProjectWorkflowDialog';
@@ -62,7 +62,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                         </button>
                     </CollapsibleTrigger>
 
-                    <WorkflowIcon className="size-6 shrink-0 text-content-neutral-secondary" />
+                    <FolderIcon aria-hidden="true" className="size-6 shrink-0 text-content-neutral-secondary" />
 
                     <CollapsibleTrigger asChild>
                         <button className="flex min-w-0 cursor-pointer items-center text-left" type="button">

@@ -110,6 +110,13 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
         hoisted.integrationConfigurationsError = false;
     });
 
+    it("marks the integration with its component's icon", () => {
+        const {container} = renderItem();
+
+        expect(screen.getByTestId('integration-icon')).toBeInTheDocument();
+        expect(container.querySelector('svg.lucide-component')).not.toBeInTheDocument();
+    });
+
     it('sheet integration row offers Change configuration', async () => {
         await openMenu();
 
