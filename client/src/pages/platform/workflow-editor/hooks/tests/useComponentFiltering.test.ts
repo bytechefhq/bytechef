@@ -196,6 +196,55 @@ describe('useComponentFiltering', () => {
             expect(result.current.filteredComponents).toHaveLength(componentDefinitions.length - 1);
         });
 
+        it('does not count claudeCode when ff-3158 is off, matching the filtered view', () => {
+            const {result} = renderComponentFiltering([
+                makeComponentDefinition('claudeCode', ['AI']),
+                makeComponentDefinition('openAi', ['AI']),
+            ]);
+
+            act(() => {
+                result.current.toggleCategory('AI');
+            });
+
+            act(() => {
+                result.current.setActiveView('all');
+            });
+
+            expect(result.current.filterState.filteredCount).toBe(1);
+
+            act(() => {
+                result.current.setActiveView('filtered');
+            });
+
+            expect(getComponentNames(result.current.filteredComponents)).toEqual(['openAi']);
+            expect(result.current.filteredComponents).toHaveLength(result.current.filterState.filteredCount);
+        });
+
+        it('counts claudeCode when ff-3158 is on, matching the filtered view', () => {
+            hoisted.enabledFeatureFlags = ['ff-3158'];
+
+            const {result} = renderComponentFiltering([
+                makeComponentDefinition('claudeCode', ['AI']),
+                makeComponentDefinition('openAi', ['AI']),
+            ]);
+
+            act(() => {
+                result.current.toggleCategory('AI');
+            });
+
+            act(() => {
+                result.current.setActiveView('all');
+            });
+
+            expect(result.current.filterState.filteredCount).toBe(2);
+
+            act(() => {
+                result.current.setActiveView('filtered');
+            });
+
+            expect(getComponentNames(result.current.filteredComponents)).toEqual(['claudeCode', 'openAi']);
+        });
+
         it('restores the saved selection when switching back to filtered', () => {
             const {result} = renderComponentFiltering();
 

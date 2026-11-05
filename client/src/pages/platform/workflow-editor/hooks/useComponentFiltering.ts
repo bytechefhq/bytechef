@@ -54,21 +54,34 @@ export const useComponentFiltering = ({componentDefinitions}: {componentDefiniti
         return component.componentCategories?.map((category) => category.label?.toLowerCase() || '') || [];
     }, []);
 
+    const isComponentVisible = useCallback(
+        (component: ComponentDefinitionBasic) => ff_3158 || component.name !== 'claudeCode',
+        [ff_3158]
+    );
+
+    const getComponentsInCategories = useCallback(
+        (components: ComponentDefinitionBasic[], categories: string[]) =>
+            components.filter((component) => {
+                if (!isComponentVisible(component)) {
+                    return false;
+                }
+
+                const categoryLabels = getCategoryLabels(component);
+
+                return categories.some((category) => categoryLabels.includes((category || '').toLowerCase()));
+            }),
+        [getCategoryLabels, isComponentVisible]
+    );
+
     const calculateFilteredComponentsCount = useCallback(
         (components: ComponentDefinitionBasic[], categories: string[]) => {
             if (!components || categories.length === 0) {
                 return 0;
             }
 
-            const filteredComponents = components.filter((component) => {
-                const categoryLabels = getCategoryLabels(component);
-
-                return categories.some((category) => categoryLabels.includes(category.toLowerCase()));
-            });
-
-            return filteredComponents.length;
+            return getComponentsInCategories(components, categories).length;
         },
-        [getCategoryLabels]
+        [getComponentsInCategories]
     );
 
     const setActiveView = useCallback(
@@ -147,23 +160,17 @@ export const useComponentFiltering = ({componentDefinitions}: {componentDefiniti
         }
 
         if (filterState.activeView === 'all' || filterState.selectedCategories.length === 0) {
-            return componentDefinitions.filter((component) => {
-                return !(!ff_3158 && component.name === 'claudeCode');
-            });
+            return componentDefinitions.filter(isComponentVisible);
         }
 
-        return componentDefinitions.filter((component) => {
-            const categoryLabels = getCategoryLabels(component);
-
-            if (!ff_3158 && component.name === 'claudeCode') {
-                return false;
-            }
-
-            return filterState.selectedCategories.some((category: string) =>
-                categoryLabels.includes((category || '').toLowerCase())
-            );
-        });
-    }, [componentDefinitions, ff_3158, filterState.activeView, filterState.selectedCategories, getCategoryLabels]);
+        return getComponentsInCategories(componentDefinitions, filterState.selectedCategories);
+    }, [
+        componentDefinitions,
+        filterState.activeView,
+        filterState.selectedCategories,
+        getComponentsInCategories,
+        isComponentVisible,
+    ]);
 
     return {
         deselectAllCategories,
