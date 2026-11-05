@@ -461,9 +461,38 @@ class MicrosoftExcelUtilsTest {
         when(mockedParameters.getRequiredMap(ROW, Object.class))
             .thenReturn(Map.of(VALUES, valuesMap));
 
-        List<Object> result = MicrosoftExcelUtils.getRowValues(mockedParameters);
+        try (MockedStatic<MicrosoftExcelRowUtils> rowUtilsMockedStatic = mockStatic(MicrosoftExcelRowUtils.class)) {
+            rowUtilsMockedStatic
+                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(mockedParameters, mockedActionContext, 1))
+                .thenReturn(List.of("name", "age"));
 
-        assertEquals(List.of("A", "B"), result);
+            List<Object> result = MicrosoftExcelUtils.getRowValues(mockedParameters, mockedActionContext);
+
+            assertEquals(List.of("A", "B"), result);
+        }
+    }
+
+    @Test
+    void testGetRowValuesForMapPlacesEachValueUnderItsHeader() {
+        Map<String, String> valuesMap = new LinkedHashMap<>();
+
+        valuesMap.put("Status", "Novo");
+        valuesMap.put("Željeni_rok", "stale");
+        valuesMap.put("Datum", "2026-11-05");
+        valuesMap.put("Zeljeni_rok", "2026-12-01");
+
+        when(mockedParameters.getRequiredMap(ROW, Object.class))
+            .thenReturn(Map.of(VALUES, valuesMap));
+
+        try (MockedStatic<MicrosoftExcelRowUtils> rowUtilsMockedStatic = mockStatic(MicrosoftExcelRowUtils.class)) {
+            rowUtilsMockedStatic
+                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(mockedParameters, mockedActionContext, 1))
+                .thenReturn(List.of("Datum", "Zeljeni rok", "Opis", "Status"));
+
+            List<Object> result = MicrosoftExcelUtils.getRowValues(mockedParameters, mockedActionContext);
+
+            assertEquals(List.of("2026-11-05", "2026-12-01", "", "Novo"), result);
+        }
     }
 
     @Test
@@ -471,9 +500,30 @@ class MicrosoftExcelUtilsTest {
         when(mockedParameters.getRequiredMap(ROW, Object.class))
             .thenReturn(Map.of(VALUES, List.of("A", "B")));
 
-        List<Object> result = MicrosoftExcelUtils.getRowValues(mockedParameters);
+        List<Object> result = MicrosoftExcelUtils.getRowValues(mockedParameters, mockedActionContext);
 
         assertEquals(List.of("A", "B"), result);
+    }
+
+    @Test
+    void testGetUpdatedRowValuesForMapPlacesEachValueUnderItsHeader() {
+        Map<String, Object> valuesMap = new LinkedHashMap<>();
+
+        valuesMap.put("Status", "Gotovo");
+        valuesMap.put("Old_column", "stale");
+        valuesMap.put("Datum", null);
+
+        mockedParameters = MockParametersFactory.create(Map.of(ROW, Map.of(VALUES, valuesMap)));
+
+        try (MockedStatic<MicrosoftExcelRowUtils> rowUtilsMockedStatic = mockStatic(MicrosoftExcelRowUtils.class)) {
+            rowUtilsMockedStatic
+                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(mockedParameters, mockedActionContext, 1))
+                .thenReturn(List.of("Datum", "Status"));
+
+            List<Object> result = MicrosoftExcelUtils.getUpdatedRowValues(mockedParameters, mockedActionContext);
+
+            assertEquals(List.of("", "Gotovo"), result);
+        }
     }
 
     @Test

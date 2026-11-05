@@ -61,6 +61,6 @@ public class MicrosoftExcelAppendRowAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return updateRange(
             inputParameters, context, getLastUsedRowIndex(inputParameters, context) + 1,
-            getRowValues(inputParameters));
+            getRowValues(inputParameters, context));
     }
 }
