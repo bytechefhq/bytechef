@@ -19,6 +19,7 @@ import com.bytechef.cli.client.embeddedconfiguration.Configuration;
 import com.bytechef.cli.client.embeddedconfiguration.Pair;
 
 import com.bytechef.cli.client.embeddedconfiguration.model.AutomationWorkflowProjectModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.AutomationWorkflowProjectWorkflowTemplateModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.EnvironmentModel;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -280,6 +281,131 @@ public class AutomationWorkflowProjectApi {
   }
 
   /**
+   * Get an automation workflow template available to the connected user
+   * Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+   * @param workflowUuid The workflow template uuid. (required)
+   * @param xEnvironment The environment. (optional)
+   * @return AutomationWorkflowProjectWorkflowTemplateModel
+   * @throws ApiException if fails to make API call
+   */
+  public AutomationWorkflowProjectWorkflowTemplateModel getFrontendWorkflowTemplate(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return getFrontendWorkflowTemplate(workflowUuid, xEnvironment, null);
+  }
+
+  /**
+   * Get an automation workflow template available to the connected user
+   * Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+   * @param workflowUuid The workflow template uuid. (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return AutomationWorkflowProjectWorkflowTemplateModel
+   * @throws ApiException if fails to make API call
+   */
+  public AutomationWorkflowProjectWorkflowTemplateModel getFrontendWorkflowTemplate(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel> localVarResponse = getFrontendWorkflowTemplateWithHttpInfo(workflowUuid, xEnvironment, headers);
+    return localVarResponse.getData();
+  }
+
+  /**
+   * Get an automation workflow template available to the connected user
+   * Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+   * @param workflowUuid The workflow template uuid. (required)
+   * @param xEnvironment The environment. (optional)
+   * @return ApiResponse&lt;AutomationWorkflowProjectWorkflowTemplateModel&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel> getFrontendWorkflowTemplateWithHttpInfo(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return getFrontendWorkflowTemplateWithHttpInfo(workflowUuid, xEnvironment, null);
+  }
+
+  /**
+   * Get an automation workflow template available to the connected user
+   * Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+   * @param workflowUuid The workflow template uuid. (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return ApiResponse&lt;AutomationWorkflowProjectWorkflowTemplateModel&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel> getFrontendWorkflowTemplateWithHttpInfo(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    HttpRequest.Builder localVarRequestBuilder = getFrontendWorkflowTemplateRequestBuilder(workflowUuid, xEnvironment, headers);
+    try {
+      HttpResponse<InputStream> localVarResponse = memberVarHttpClient.send(
+          localVarRequestBuilder.build(),
+          HttpResponse.BodyHandlers.ofInputStream());
+      if (memberVarResponseInterceptor != null) {
+        memberVarResponseInterceptor.accept(localVarResponse);
+      }
+      InputStream localVarResponseBody = null;
+      try {
+        if (localVarResponse.statusCode()/ 100 != 2) {
+          throw getApiException("getFrontendWorkflowTemplate", localVarResponse);
+        }
+        localVarResponseBody = ApiClient.getResponseBody(localVarResponse);
+        if (localVarResponseBody == null) {
+          return new ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel>(
+              localVarResponse.statusCode(),
+              localVarResponse.headers().map(),
+              null
+          );
+        }
+
+        
+        
+        String responseBody = new String(localVarResponseBody.readAllBytes());
+        AutomationWorkflowProjectWorkflowTemplateModel responseValue = responseBody.isBlank()? null: memberVarObjectMapper.readValue(responseBody, new TypeReference<AutomationWorkflowProjectWorkflowTemplateModel>() {});
+        
+
+        return new ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel>(
+            localVarResponse.statusCode(),
+            localVarResponse.headers().map(),
+            responseValue
+        );
+      } finally {
+        if (localVarResponseBody != null) {
+          localVarResponseBody.close();
+        }
+      }
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ApiException(e);
+    }
+  }
+
+  private HttpRequest.Builder getFrontendWorkflowTemplateRequestBuilder(@jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    // verify the required parameter 'workflowUuid' is set
+    if (workflowUuid == null) {
+      throw new ApiException(400, "Missing the required parameter 'workflowUuid' when calling getFrontendWorkflowTemplate");
+    }
+
+    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();
+
+    String localVarPath = "/automation/workflow-templates/{workflowUuid}"
+        .replace("{workflowUuid}", ApiClient.urlEncode(workflowUuid.toString()));
+
+    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));
+
+    if (xEnvironment != null) {
+      localVarRequestBuilder.header("X-Environment", xEnvironment.toString());
+    }
+    localVarRequestBuilder.header("Accept", "application/json");
+
+    localVarRequestBuilder.method("GET", HttpRequest.BodyPublishers.noBody());
+    if (memberVarReadTimeout != null) {
+      localVarRequestBuilder.timeout(memberVarReadTimeout);
+    }
+    // Add custom headers if provided
+    localVarRequestBuilder = HttpRequestBuilderExtensions.withAdditionalHeaders(localVarRequestBuilder, headers);
+    if (memberVarInterceptor != null) {
+      memberVarInterceptor.accept(localVarRequestBuilder);
+    }
+    return localVarRequestBuilder;
+  }
+
+  /**
    * Get automation workflow projects available to a connected user identified by external user id
    * Get automation workflow projects available to a connected user identified by external user id.
    * @param externalUserId The external user id. (required)
@@ -384,6 +510,140 @@ public class AutomationWorkflowProjectApi {
 
     String localVarPath = "/{externalUserId}/automation/projects"
         .replace("{externalUserId}", ApiClient.urlEncode(externalUserId.toString()));
+
+    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));
+
+    if (xEnvironment != null) {
+      localVarRequestBuilder.header("X-Environment", xEnvironment.toString());
+    }
+    localVarRequestBuilder.header("Accept", "application/json");
+
+    localVarRequestBuilder.method("GET", HttpRequest.BodyPublishers.noBody());
+    if (memberVarReadTimeout != null) {
+      localVarRequestBuilder.timeout(memberVarReadTimeout);
+    }
+    // Add custom headers if provided
+    localVarRequestBuilder = HttpRequestBuilderExtensions.withAdditionalHeaders(localVarRequestBuilder, headers);
+    if (memberVarInterceptor != null) {
+      memberVarInterceptor.accept(localVarRequestBuilder);
+    }
+    return localVarRequestBuilder;
+  }
+
+  /**
+   * Get an automation workflow template available to a connected user identified by external user id
+   * Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+   * @param externalUserId The external user id. (required)
+   * @param workflowUuid The workflow template uuid. (required)
+   * @param xEnvironment The environment. (optional)
+   * @return AutomationWorkflowProjectWorkflowTemplateModel
+   * @throws ApiException if fails to make API call
+   */
+  public AutomationWorkflowProjectWorkflowTemplateModel getWorkflowTemplate(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return getWorkflowTemplate(externalUserId, workflowUuid, xEnvironment, null);
+  }
+
+  /**
+   * Get an automation workflow template available to a connected user identified by external user id
+   * Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+   * @param externalUserId The external user id. (required)
+   * @param workflowUuid The workflow template uuid. (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return AutomationWorkflowProjectWorkflowTemplateModel
+   * @throws ApiException if fails to make API call
+   */
+  public AutomationWorkflowProjectWorkflowTemplateModel getWorkflowTemplate(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel> localVarResponse = getWorkflowTemplateWithHttpInfo(externalUserId, workflowUuid, xEnvironment, headers);
+    return localVarResponse.getData();
+  }
+
+  /**
+   * Get an automation workflow template available to a connected user identified by external user id
+   * Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+   * @param externalUserId The external user id. (required)
+   * @param workflowUuid The workflow template uuid. (required)
+   * @param xEnvironment The environment. (optional)
+   * @return ApiResponse&lt;AutomationWorkflowProjectWorkflowTemplateModel&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel> getWorkflowTemplateWithHttpInfo(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return getWorkflowTemplateWithHttpInfo(externalUserId, workflowUuid, xEnvironment, null);
+  }
+
+  /**
+   * Get an automation workflow template available to a connected user identified by external user id
+   * Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+   * @param externalUserId The external user id. (required)
+   * @param workflowUuid The workflow template uuid. (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return ApiResponse&lt;AutomationWorkflowProjectWorkflowTemplateModel&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel> getWorkflowTemplateWithHttpInfo(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    HttpRequest.Builder localVarRequestBuilder = getWorkflowTemplateRequestBuilder(externalUserId, workflowUuid, xEnvironment, headers);
+    try {
+      HttpResponse<InputStream> localVarResponse = memberVarHttpClient.send(
+          localVarRequestBuilder.build(),
+          HttpResponse.BodyHandlers.ofInputStream());
+      if (memberVarResponseInterceptor != null) {
+        memberVarResponseInterceptor.accept(localVarResponse);
+      }
+      InputStream localVarResponseBody = null;
+      try {
+        if (localVarResponse.statusCode()/ 100 != 2) {
+          throw getApiException("getWorkflowTemplate", localVarResponse);
+        }
+        localVarResponseBody = ApiClient.getResponseBody(localVarResponse);
+        if (localVarResponseBody == null) {
+          return new ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel>(
+              localVarResponse.statusCode(),
+              localVarResponse.headers().map(),
+              null
+          );
+        }
+
+        
+        
+        String responseBody = new String(localVarResponseBody.readAllBytes());
+        AutomationWorkflowProjectWorkflowTemplateModel responseValue = responseBody.isBlank()? null: memberVarObjectMapper.readValue(responseBody, new TypeReference<AutomationWorkflowProjectWorkflowTemplateModel>() {});
+        
+
+        return new ApiResponse<AutomationWorkflowProjectWorkflowTemplateModel>(
+            localVarResponse.statusCode(),
+            localVarResponse.headers().map(),
+            responseValue
+        );
+      } finally {
+        if (localVarResponseBody != null) {
+          localVarResponseBody.close();
+        }
+      }
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ApiException(e);
+    }
+  }
+
+  private HttpRequest.Builder getWorkflowTemplateRequestBuilder(@jakarta.annotation.Nonnull String externalUserId, @jakarta.annotation.Nonnull String workflowUuid, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    // verify the required parameter 'externalUserId' is set
+    if (externalUserId == null) {
+      throw new ApiException(400, "Missing the required parameter 'externalUserId' when calling getWorkflowTemplate");
+    }
+    // verify the required parameter 'workflowUuid' is set
+    if (workflowUuid == null) {
+      throw new ApiException(400, "Missing the required parameter 'workflowUuid' when calling getWorkflowTemplate");
+    }
+
+    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();
+
+    String localVarPath = "/{externalUserId}/automation/workflow-templates/{workflowUuid}"
+        .replace("{externalUserId}", ApiClient.urlEncode(externalUserId.toString()))
+        .replace("{workflowUuid}", ApiClient.urlEncode(workflowUuid.toString()));
 
     localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));
 
