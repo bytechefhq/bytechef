@@ -33,6 +33,7 @@ import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.ClusterElementPropertyFacade;
 import com.bytechef.platform.configuration.facade.ClusterElementPropertyFacadeImpl;
+import com.bytechef.platform.configuration.security.McpComponentConnectionAccess;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -64,7 +65,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(classes = McpProjectIntTestConfiguration.class)
 @EnableMethodSecurity
 @Import({
-    ClusterElementPropertyFacadeImpl.class, PostgreSQLContainerConfiguration.class
+    ClusterElementPropertyFacadeImpl.class, McpComponentConnectionAccess.class, PostgreSQLContainerConfiguration.class
 })
 @McpProjectIntTestConfigurationSharedMocks
 class McpComponentConnectionSecurityIntTest {
@@ -106,8 +107,11 @@ class McpComponentConnectionSecurityIntTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    private long boundMcpComponentId;
     private long embeddedMcpComponentId;
+    private long foreignWorkspaceMcpComponentId;
     private long mcpComponentId;
+    private long otherEnvironmentMcpComponentId;
     private long mcpServerId;
 
     @BeforeEach
@@ -133,13 +137,14 @@ class McpComponentConnectionSecurityIntTest {
 
         mcpComponentId = mcpComponent.getId();
 
+        boundMcpComponentId = saveMcpComponent(2, mcpServerId, SAME_ENVIRONMENT_CONNECTION_ID);
+        otherEnvironmentMcpComponentId = saveMcpComponent(3, mcpServerId, OTHER_ENVIRONMENT_CONNECTION_ID);
+        foreignWorkspaceMcpComponentId = saveMcpComponent(4, mcpServerId, FOREIGN_WORKSPACE_CONNECTION_ID);
+
         McpServer embeddedMcpServer = mcpServerRepository.save(
             new McpServer("mcp-component-connection-embedded", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
 
-        McpComponent embeddedMcpComponent = mcpComponentRepository.save(
-            new McpComponent("slack", 1, embeddedMcpServer.getId(), null));
-
-        embeddedMcpComponentId = embeddedMcpComponent.getId();
+        embeddedMcpComponentId = saveMcpComponent(1, embeddedMcpServer.getId(), SAME_ENVIRONMENT_CONNECTION_ID);
 
         when(connectionService.getConnection(SAME_ENVIRONMENT_CONNECTION_ID))
             .thenReturn(createConnection(Environment.DEVELOPMENT));
@@ -255,90 +260,137 @@ class McpComponentConnectionSecurityIntTest {
 
     @Test
     void testIsMcpComponentConnectionRequiresTheWorkspaceAndEnvironmentOfTheMcpServer() {
-        assertThat(
-            mcpComponentConnectionSecurity.isMcpComponentConnection(mcpComponentId, SAME_ENVIRONMENT_CONNECTION_ID))
-                .isTrue();
-        assertThat(
-            mcpComponentConnectionSecurity.isMcpComponentConnection(mcpComponentId, OTHER_ENVIRONMENT_CONNECTION_ID))
-                .isFalse();
-        assertThat(
-            mcpComponentConnectionSecurity.isMcpComponentConnection(mcpComponentId, FOREIGN_WORKSPACE_CONNECTION_ID))
-                .isFalse();
-        assertThat(
-            mcpComponentConnectionSecurity.isMcpComponentConnection(
-                embeddedMcpComponentId, SAME_ENVIRONMENT_CONNECTION_ID))
-                    .isFalse();
-        assertThat(
-            mcpComponentConnectionSecurity.isMcpComponentConnection(Long.MAX_VALUE, SAME_ENVIRONMENT_CONNECTION_ID))
-                .isFalse();
+        assertThat(isMcpComponentConnection(boundMcpComponentId, 2, SAME_ENVIRONMENT_CONNECTION_ID)).isTrue();
+        assertThat(isMcpComponentConnection(otherEnvironmentMcpComponentId, 3, OTHER_ENVIRONMENT_CONNECTION_ID))
+            .isFalse();
+        assertThat(isMcpComponentConnection(foreignWorkspaceMcpComponentId, 4, FOREIGN_WORKSPACE_CONNECTION_ID))
+            .isFalse();
+        assertThat(isMcpComponentConnection(embeddedMcpComponentId, 1, SAME_ENVIRONMENT_CONNECTION_ID)).isFalse();
+        assertThat(isMcpComponentConnection(Long.MAX_VALUE, 2, SAME_ENVIRONMENT_CONNECTION_ID)).isFalse();
     }
 
     @Test
-    void testGetClusterElementOptionsAllowsAConnectionInTheMcpServerEnvironment() {
+    void testIsMcpComponentConnectionRequiresTheConnectionOfTheMcpComponent() {
+        assertThat(isMcpComponentConnection(mcpComponentId, 1, SAME_ENVIRONMENT_CONNECTION_ID)).isFalse();
+        assertThat(isMcpComponentConnection(otherEnvironmentMcpComponentId, 3, SAME_ENVIRONMENT_CONNECTION_ID))
+            .isFalse();
+    }
+
+    @Test
+    void testIsMcpComponentConnectionRequiresTheComponentOfTheMcpComponent() {
+        assertThat(
+            mcpComponentConnectionSecurity.isMcpComponentConnection(
+                boundMcpComponentId, "gmail", 2, SAME_ENVIRONMENT_CONNECTION_ID))
+                    .isFalse();
+        assertThat(isMcpComponentConnection(boundMcpComponentId, 3, SAME_ENVIRONMENT_CONNECTION_ID)).isFalse();
+    }
+
+    @Test
+    void testGetClusterElementOptionsAllowsTheConnectionOfTheMcpComponent() {
         authenticate(AuthorityConstants.USER);
 
-        getClusterElementOptions(mcpComponentId, SAME_ENVIRONMENT_CONNECTION_ID);
+        getClusterElementOptions(boundMcpComponentId, "slack", 2, SAME_ENVIRONMENT_CONNECTION_ID);
 
-        verifyClusterElementOptionsExecuted(SAME_ENVIRONMENT_CONNECTION_ID);
+        verifyClusterElementOptionsExecuted(2, SAME_ENVIRONMENT_CONNECTION_ID);
+    }
+
+    @Test
+    void testGetClusterElementOptionsRejectsAConnectionThatIsNotTheMcpComponentConnection() {
+        authenticate(AuthorityConstants.USER);
+
+        assertThatThrownBy(
+            () -> getClusterElementOptions(mcpComponentId, "slack", 1, SAME_ENVIRONMENT_CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> getClusterElementOptions(
+                otherEnvironmentMcpComponentId, "slack", 3, SAME_ENVIRONMENT_CONNECTION_ID))
+                    .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testGetClusterElementOptionsRejectsAComponentNameOfAnotherComponent() {
+        authenticate(AuthorityConstants.USER);
+
+        assertThatThrownBy(
+            () -> getClusterElementOptions(boundMcpComponentId, "gmail", 2, SAME_ENVIRONMENT_CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> getClusterElementOptions(boundMcpComponentId, "slack", 1, SAME_ENVIRONMENT_CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
     void testGetClusterElementOptionsRejectsAConnectionOfTheSameWorkspaceInAnotherEnvironment() {
         authenticate(AuthorityConstants.USER);
 
-        assertThatThrownBy(() -> getClusterElementOptions(mcpComponentId, OTHER_ENVIRONMENT_CONNECTION_ID))
-            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> getClusterElementOptions(
+                otherEnvironmentMcpComponentId, "slack", 3, OTHER_ENVIRONMENT_CONNECTION_ID))
+                    .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
     void testGetClusterElementOptionsRejectsAConnectionOfAnotherWorkspace() {
         authenticate(AuthorityConstants.USER);
 
-        assertThatThrownBy(() -> getClusterElementOptions(mcpComponentId, FOREIGN_WORKSPACE_CONNECTION_ID))
-            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> getClusterElementOptions(
+                foreignWorkspaceMcpComponentId, "slack", 4, FOREIGN_WORKSPACE_CONNECTION_ID))
+                    .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
     void testGetClusterElementOptionsRejectsAnEmbeddedMcpComponentForANonAdmin() {
         authenticate(AuthorityConstants.USER);
 
-        assertThatThrownBy(() -> getClusterElementOptions(embeddedMcpComponentId, SAME_ENVIRONMENT_CONNECTION_ID))
-            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> getClusterElementOptions(embeddedMcpComponentId, "slack", 1, SAME_ENVIRONMENT_CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
     void testGetClusterElementOptionsAllowsAMissingConnection() {
         authenticate(AuthorityConstants.USER);
 
-        getClusterElementOptions(mcpComponentId, null);
+        getClusterElementOptions(mcpComponentId, "slack", 1, null);
 
-        verifyClusterElementOptionsExecuted(null);
+        verifyClusterElementOptionsExecuted(1, null);
     }
 
     @Test
     void testGetClusterElementOptionsLetsATenantAdminUseAConnectionOfAnotherEnvironment() {
         authenticate(AuthorityConstants.ADMIN);
 
-        getClusterElementOptions(mcpComponentId, OTHER_ENVIRONMENT_CONNECTION_ID);
+        getClusterElementOptions(boundMcpComponentId, "slack", 2, OTHER_ENVIRONMENT_CONNECTION_ID);
 
-        verifyClusterElementOptionsExecuted(OTHER_ENVIRONMENT_CONNECTION_ID);
+        verifyClusterElementOptionsExecuted(2, OTHER_ENVIRONMENT_CONNECTION_ID);
     }
 
     @Test
-    void testGetClusterElementDynamicPropertiesAllowsAConnectionInTheMcpServerEnvironment() {
+    void testGetClusterElementDynamicPropertiesAllowsTheConnectionOfTheMcpComponent() {
         authenticate(AuthorityConstants.USER);
 
-        getClusterElementDynamicProperties(SAME_ENVIRONMENT_CONNECTION_ID);
+        getClusterElementDynamicProperties(boundMcpComponentId, 2, SAME_ENVIRONMENT_CONNECTION_ID);
 
         verify(clusterElementDefinitionFacade).executeDynamicProperties(
-            "component", 1, "clusterElement", "property", Map.of(), List.of(), SAME_ENVIRONMENT_CONNECTION_ID);
+            "slack", 2, "clusterElement", "property", Map.of(), List.of(), SAME_ENVIRONMENT_CONNECTION_ID);
     }
 
     @Test
     void testGetClusterElementDynamicPropertiesRejectsAConnectionOfTheSameWorkspaceInAnotherEnvironment() {
         authenticate(AuthorityConstants.USER);
 
-        assertThatThrownBy(() -> getClusterElementDynamicProperties(OTHER_ENVIRONMENT_CONNECTION_ID))
+        assertThatThrownBy(
+            () -> getClusterElementDynamicProperties(
+                otherEnvironmentMcpComponentId, 3, OTHER_ENVIRONMENT_CONNECTION_ID))
+                    .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testGetClusterElementDynamicPropertiesRejectsAConnectionThatIsNotTheMcpComponentConnection() {
+        authenticate(AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> getClusterElementDynamicProperties(mcpComponentId, 1, SAME_ENVIRONMENT_CONNECTION_ID))
             .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -367,19 +419,35 @@ class McpComponentConnectionSecurityIntTest {
         return connection;
     }
 
-    private void getClusterElementDynamicProperties(long connectionId) {
+    private void getClusterElementDynamicProperties(long curMcpComponentId, int componentVersion, long connectionId) {
         clusterElementPropertyFacade.getClusterElementDynamicProperties(
-            "component", 1, "clusterElement", "property", Map.of(), List.of(), mcpComponentId, connectionId);
+            "slack", componentVersion, "clusterElement", "property", Map.of(), List.of(), curMcpComponentId,
+            connectionId);
     }
 
-    private void getClusterElementOptions(long curMcpComponentId, Long connectionId) {
+    private void getClusterElementOptions(
+        long curMcpComponentId, String componentName, int componentVersion, Long connectionId) {
+
         clusterElementPropertyFacade.getClusterElementOptions(
-            "component", 1, "clusterElement", "property", Map.of(), List.of(), curMcpComponentId, connectionId);
+            componentName, componentVersion, "clusterElement", "property", Map.of(), List.of(), curMcpComponentId,
+            connectionId);
     }
 
-    private void verifyClusterElementOptionsExecuted(Long connectionId) {
+    private boolean isMcpComponentConnection(long curMcpComponentId, int componentVersion, long connectionId) {
+        return mcpComponentConnectionSecurity.isMcpComponentConnection(
+            curMcpComponentId, "slack", componentVersion, connectionId);
+    }
+
+    private long saveMcpComponent(int componentVersion, long curMcpServerId, long connectionId) {
+        McpComponent mcpComponent = mcpComponentRepository.save(
+            new McpComponent("slack", componentVersion, curMcpServerId, connectionId));
+
+        return mcpComponent.getId();
+    }
+
+    private void verifyClusterElementOptionsExecuted(int componentVersion, Long connectionId) {
         verify(clusterElementDefinitionFacade).executeOptions(
-            "component", 1, "clusterElement", "property", Map.of(), Map.of(), List.of(), null, connectionId,
-            Map.of(), Map.of());
+            "slack", componentVersion, "clusterElement", "property", Map.of(), Map.of(), List.of(), null,
+            connectionId, Map.of(), Map.of());
     }
 }
