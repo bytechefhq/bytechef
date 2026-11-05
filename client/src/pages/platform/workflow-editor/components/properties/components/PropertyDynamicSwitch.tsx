@@ -13,7 +13,7 @@ interface PropertyDynamicSwitchProps {
 const PropertyDynamicSwitch = ({dynamic, handleClick}: PropertyDynamicSwitchProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
-            <span className="mr-2 inline-flex [&_[data-testid=switch-wrapper]>div]:gap-0.5">
+            <span className="mr-2 inline-flex [&_[data-testid=switch-wrapper]>div]:gap-1">
                 <Switch
                     checked={dynamic}
                     label="Text"
