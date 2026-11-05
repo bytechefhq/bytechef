@@ -37,6 +37,23 @@ export async function createUserApiContext(email: string, password: string): Pro
     return apiContext;
 }
 
+export async function registerAccount(email: string, password: string): Promise<number> {
+    const apiContext = await createAnonymousApiContext();
+
+    try {
+        const xsrfToken = await getXsrfToken(apiContext);
+
+        const response = await apiContext.post('/api/register', {
+            data: {email, firstName: 'Playwright', langKey: 'en', lastName: 'Owner', login: email, password},
+            headers: {'X-XSRF-TOKEN': xsrfToken},
+        });
+
+        return response.status();
+    } finally {
+        await apiContext.dispose();
+    }
+}
+
 export async function createAdminApiContext(): Promise<APIRequestContext> {
     return createUserApiContext(TEST_USER.email, TEST_USER.password);
 }

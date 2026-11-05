@@ -277,6 +277,19 @@ interactivity callbacks and the approval short-token endpoint. They read the ser
 When `PLAYWRIGHT_BASE_URL` is set and `BYTECHEF_SERVER_URL` is not, the approval utilities stop with an error instead
 of falling back to `localhost:9555`, so a run against one client never sends its server calls to another server.
 
+## Invitation Specs
+
+`tests/account/invitation.spec.ts` invites users, reads the claim and password reset links from Mailpit and accepts
+them in a fresh browser. `tests/account/multiTenantInvitation.spec.ts` runs only against a multi-tenant server: it
+signs up two tenant owners through `/api/register` (sign-up enabled, no activation), reuses them on later runs, and
+checks that an invitation activates the invitee only in the inviting tenant.
+
+| Variable                                             | Default                         | Purpose                                                       |
+| ---------------------------------------------------- | ------------------------------- | ------------------------------------------------------------- |
+| `PLAYWRIGHT_MAILPIT_URL`                             | `http://localhost:8025`         | Mailpit, which receives the invitation and reset mails        |
+| `PLAYWRIGHT_USER_EMAIL` / `PLAYWRIGHT_USER_PASSWORD` | `admin@localhost.com` / `admin` | The inviting admin; on a multi-tenant server a tenant's admin |
+| `BYTECHEF_MULTI_TENANT`                              | -                               | `true` runs the cross-tenant cases                            |
+
 ## Notification Specs
 
 `tests/notifications/webhookNotifications.spec.ts` covers the Notifications settings page against a real EE server:
