@@ -15,8 +15,11 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
@@ -27,13 +30,16 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -153,11 +159,14 @@ class WorkspaceConnectionAuditIntTest {
         WorkspaceConnectionFacade workspaceConnectionFacade(
             ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
+            StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
             return new WorkspaceConnectionFacadeImpl(
                 mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), mock(ConnectionService.class),
-                mock(PermissionService.class), projectDeploymentWorkflowService,
-                mock(WorkflowTestConfigurationService.class),
-                mock(WorkspaceConnectionService.class));
+                mock(ResourceVisibilityResolver.class), beanFactory.getBeanProvider(MeterRegistry.class),
+                mock(PermissionService.class), projectDeploymentWorkflowService, mock(ProjectService.class),
+                mock(UserService.class), mock(WorkflowTestConfigurationService.class),
+                mock(WorkspaceConnectionService.class), mock(WorkspaceFacade.class));
         }
     }
 }

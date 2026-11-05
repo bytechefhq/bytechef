@@ -87,4 +87,9 @@ public class DisabledWorkflowJobPrincipalAccessor implements JobPrincipalAccesso
     public String getWorkflowUuid(String workflowId) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void validateConnectionsForJob(long jobPrincipalId, String workflowUuid) {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -115,7 +115,7 @@ class TriggerCompletionHandlerTest {
 
         verify(triggerExecution, never()).setStatus(any());
         verify(triggerExecutionService, never()).update(any());
-        verify(triggerStateService, never()).save(any(), any());
+        verify(triggerStateFacade, never()).save(any(), any());
     }
 
     @Test
