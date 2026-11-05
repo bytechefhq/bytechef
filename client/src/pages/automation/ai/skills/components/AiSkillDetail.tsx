@@ -159,7 +159,7 @@ const MarkdownViewer = ({content, editable, onContentChange}: MarkdownViewerProp
         <div className="overflow-y-auto px-6 pt-0 pb-6">
             {frontmatter && <FrontmatterTable frontmatter={frontmatter} />}
 
-            <div className="prose prose-sm max-w-none prose-code:before:content-none prose-code:after:content-none">
+            <div className="prose prose-sm max-w-none dark:prose-invert prose-code:before:content-none prose-code:after:content-none">
                 <EditorContent editor={editor} />
             </div>
         </div>
