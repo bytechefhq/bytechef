@@ -17,6 +17,7 @@ interface UseUsersTableI {
         activated?: boolean | null;
         authorities?: (string | null)[] | null;
         email?: string | null;
+        externalId?: string | null;
         firstName?: string | null;
         id?: string | null;
         lastName?: string | null;
