@@ -16,6 +16,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
@@ -150,6 +151,11 @@ public class AppIntTestConfiguration {
     @Bean
     PrincipalJobFacade principalJobFacade() {
         return Mockito.mock(PrincipalJobFacade.class);
+    }
+
+    @Bean
+    ProjectOwnershipService projectOwnershipService() {
+        return Mockito.mock(ProjectOwnershipService.class);
     }
 
     @Bean
