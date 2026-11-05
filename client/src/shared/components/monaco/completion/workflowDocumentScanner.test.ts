@@ -1,0 +1,337 @@
+import {describe, expect, it} from 'vitest';
+
+import {scanWorkflowDocument} from './workflowDocumentScanner';
+
+const JSON_DOC = `{
+  "label": "x",
+  "triggers": [{"name": "trigger_1", "type": "schedule/v1/interval"}],
+  "tasks": [
+    {"name": "httpClient_1", "type": "httpClient/v1/get", "parameters": {"uri": "https://a"}},
+    {
+      "name": "script_1",
+      "type": "script/v1/javascript",
+      "connections": [{"componentName": "googleMaps", "componentVersion": 1, "name": "gm"}],
+      "parameters": {
+        "input": {"order": "\${httpClient_1.body}", "flag": true},
+        "script": "function perform(input, connection, context) {\\n  input."
+      }
+    }
+  ]
+}`;
+
+describe('scanWorkflowDocument json', () => {
+    it('classifies the cursor inside the inline script with the task context', () => {
+        const offset = JSON_DOC.lastIndexOf('input.') + 6;
+        expect(scanWorkflowDocument(JSON_DOC, offset, 'json')).toMatchObject({
+            earlierNodeNames: ['trigger_1', 'httpClient_1'],
+            enclosingTaskConnections: [{componentName: 'googleMaps', componentVersion: 1, name: 'gm'}],
+            enclosingTaskIndex: 1,
+            enclosingTaskInputKeys: ['order', 'flag'],
+            enclosingTaskType: 'script/v1/javascript',
+            inString: true,
+            path: ['tasks', '1', 'parameters', 'script'],
+            stringValueBeforeCursor: 'function perform(input, connection, context) {\n  input.',
+        });
+    });
+
+    it('classifies a type value', () => {
+        const offset = JSON_DOC.indexOf('httpClient/v1/get') + 'httpClient/v1/get'.length;
+        expect(scanWorkflowDocument(JSON_DOC, offset, 'json')).toMatchObject({
+            inString: true,
+            path: ['tasks', '0', 'type'],
+            stringValueBeforeCursor: 'httpClient/v1/get',
+        });
+    });
+
+    it('classifies an expression string', () => {
+        const offset = JSON_DOC.indexOf('${httpClient_1.body}') + '${httpClient_1.'.length;
+        expect(scanWorkflowDocument(JSON_DOC, offset, 'json')).toMatchObject({
+            earlierNodeNames: ['trigger_1', 'httpClient_1'],
+            inString: true,
+            path: ['tasks', '1', 'parameters', 'input', 'order'],
+            stringValueBeforeCursor: '${httpClient_1.',
+        });
+    });
+
+    it('tolerates an unterminated string and a missing close brace', () => {
+        const source =
+            '{"tasks": [{"name": "a", "type": "script/v1/javascript", "parameters": {"script": "function perform(input, connection, context) { input.';
+        expect(scanWorkflowDocument(source, source.length, 'json')).toMatchObject({
+            enclosingTaskIndex: 0,
+            inString: true,
+            path: ['tasks', '0', 'parameters', 'script'],
+        });
+    });
+
+    it('reports not in a string between tokens', () => {
+        const offset = JSON_DOC.indexOf('"tasks"') - 1;
+        expect(scanWorkflowDocument(JSON_DOC, offset, 'json')).toMatchObject({inString: false});
+    });
+});
+
+const YAML_DOC = `label: x
+triggers:
+  - name: trigger_1
+    type: schedule/v1/interval
+tasks:
+  - name: httpClient_1
+    type: httpClient/v1/get
+  - name: script_1
+    type: script/v1/python
+    parameters:
+      input:
+        order: \${httpClient_1.body}
+      script: |
+        def perform(input, connection, context):
+            return input.
+`;
+
+describe('scanWorkflowDocument yaml', () => {
+    it('classifies the cursor inside a block scalar script', () => {
+        const offset = YAML_DOC.lastIndexOf('input.') + 6;
+        expect(scanWorkflowDocument(YAML_DOC, offset, 'yaml')).toMatchObject({
+            earlierNodeNames: ['trigger_1', 'httpClient_1'],
+            enclosingTaskIndex: 1,
+            enclosingTaskInputKeys: ['order'],
+            enclosingTaskType: 'script/v1/python',
+            inString: true,
+            path: ['tasks', '1', 'parameters', 'script'],
+            stringValueBeforeCursor: 'def perform(input, connection, context):\n    return input.',
+        });
+    });
+
+    it('classifies a plain scalar type value', () => {
+        const offset = YAML_DOC.indexOf('httpClient/v1/get') + 'httpClient/v1/get'.length;
+        expect(scanWorkflowDocument(YAML_DOC, offset, 'yaml')).toMatchObject({
+            inString: true,
+            path: ['tasks', '0', 'type'],
+            stringValueBeforeCursor: 'httpClient/v1/get',
+        });
+    });
+
+    it('classifies a plain scalar expression', () => {
+        const offset = YAML_DOC.indexOf('${httpClient_1.body}') + '${httpClient_1.'.length;
+        expect(scanWorkflowDocument(YAML_DOC, offset, 'yaml')).toMatchObject({
+            inString: true,
+            path: ['tasks', '1', 'parameters', 'input', 'order'],
+            stringValueBeforeCursor: '${httpClient_1.',
+        });
+    });
+});
+
+describe('scanWorkflowDocument edge cases', () => {
+    it('returns undefined inside comments and for an unknown format', () => {
+        const json = '{\n  // note\n  "a": 1\n}';
+        const yaml = 'a: 1 # note\nb: 2\n';
+
+        expect(scanWorkflowDocument(json, json.indexOf('note'), 'json')).toBeUndefined();
+        expect(scanWorkflowDocument(yaml, yaml.indexOf('note'), 'yaml')).toBeUndefined();
+        expect(scanWorkflowDocument(yaml, 1, 'toml' as 'json')).toBeUndefined();
+    });
+
+    it('accepts a trailing comma and reads connections declared as a map', () => {
+        const source =
+            '{"tasks": [{"name": "a", "connections": {"gm": {"componentName": "googleMaps"}}, "parameters": {"script": "x",}},]}';
+        const offset = source.indexOf('"x"') + 2;
+
+        expect(scanWorkflowDocument(source, offset, 'json')).toMatchObject({
+            enclosingTaskConnections: [{componentName: 'googleMaps', componentVersion: 1, name: 'gm'}],
+            enclosingTaskIndex: 0,
+            inString: true,
+            path: ['tasks', '0', 'parameters', 'script'],
+        });
+    });
+
+    it('classifies double-quoted yaml strings and the not-in-string case', () => {
+        const source = 'tasks:\n  - name: a\n    type: "script/v1/ja"\n';
+        const offset = source.indexOf('ja') + 2;
+
+        expect(scanWorkflowDocument(source, offset, 'yaml')).toMatchObject({
+            inString: true,
+            path: ['tasks', '0', 'type'],
+            stringValueBeforeCursor: 'script/v1/ja',
+        });
+        expect(scanWorkflowDocument(source, source.indexOf('tasks:'), 'yaml')).toMatchObject({inString: false});
+    });
+
+    it('classifies a freshly opened blank line inside a block scalar', () => {
+        const source = 'tasks:\n  - name: a\n    parameters:\n      script: |\n        x = 1\n        ';
+
+        expect(scanWorkflowDocument(source, source.length, 'yaml')).toMatchObject({
+            enclosingTaskIndex: 0,
+            inString: true,
+            stringValueBeforeCursor: 'x = 1\n',
+        });
+    });
+});
+
+describe('scanWorkflowDocument empty values', () => {
+    it('classifies an empty yaml value at the end of the document', () => {
+        const source = 'tasks:\n  - name: t\n    type: ';
+
+        expect(scanWorkflowDocument(source, source.length, 'yaml')).toMatchObject({
+            inString: true,
+            path: ['tasks', '0', 'type'],
+            stringValueBeforeCursor: '',
+        });
+    });
+
+    it('classifies an empty yaml value when more keys follow', () => {
+        const source = 'tasks:\n  - name: t\n    type: \n    label: x\n';
+        const offset = source.indexOf('type: ') + 'type: '.length;
+
+        expect(scanWorkflowDocument(source, offset, 'yaml')).toMatchObject({
+            enclosingTaskIndex: 0,
+            inString: true,
+            path: ['tasks', '0', 'type'],
+            stringValueBeforeCursor: '',
+        });
+    });
+
+    it('classifies an empty json string between the quotes', () => {
+        const source = '{"tasks": [{"name": "t", "type": ""}]}';
+        const offset = source.indexOf('""') + 1;
+
+        expect(scanWorkflowDocument(source, offset, 'json')).toMatchObject({
+            inString: true,
+            path: ['tasks', '0', 'type'],
+            stringValueBeforeCursor: '',
+        });
+    });
+});
+
+describe('scanWorkflowDocument key slots', () => {
+    it('reports a JSON key being typed under parameters with the other keys and the node type', () => {
+        const source = '{"tasks": [{"name": "h", "type": "httpClient/v1/get", "parameters": {"uri": "x", "he": ""}}]}';
+        const offset = source.indexOf('"he"') + 3;
+        const position = scanWorkflowDocument(source, offset, 'json');
+
+        expect(position?.keySlot).toEqual({
+            containerPath: ['tasks', '0', 'parameters'],
+            existingKeys: ['uri'],
+            prefix: 'he',
+        });
+        expect(position?.typeOf(['tasks', '0'])).toBe('httpClient/v1/get');
+    });
+
+    it('reports a JSON key in a nested object', () => {
+        const source = '{"tasks": [{"type": "httpClient/v1/get", "parameters": {"headers": {""}}}]}';
+        const offset = source.indexOf('{""}') + 2;
+
+        expect(scanWorkflowDocument(source, offset, 'json')?.keySlot).toEqual({
+            containerPath: ['tasks', '0', 'parameters', 'headers'],
+            existingKeys: [],
+            prefix: '',
+        });
+    });
+
+    it('reports no key slot inside a JSON value string', () => {
+        const source = '{"tasks": [{"parameters": {"uri": "ht"}}]}';
+
+        expect(scanWorkflowDocument(source, source.indexOf('ht') + 2, 'json')?.keySlot).toBeUndefined();
+    });
+
+    it('reports a YAML bare word under parameters as a key slot', () => {
+        const source = 'tasks:\n  - name: h\n    type: httpClient/v1/get\n    parameters:\n      uri: x\n      he';
+        const position = scanWorkflowDocument(source, source.length, 'yaml');
+
+        expect(position?.keySlot).toEqual({
+            containerPath: ['tasks', '0', 'parameters'],
+            existingKeys: ['uri'],
+            prefix: 'he',
+        });
+        expect(position?.typeOf(['tasks', '0'])).toBe('httpClient/v1/get');
+    });
+
+    it('reports a blank YAML line under an empty parameters key as a key slot', () => {
+        const source = 'triggers:\n  - name: t\n    type: slack/v1/newMessage\n    parameters:\n      ';
+
+        expect(scanWorkflowDocument(source, source.length, 'yaml')?.keySlot).toEqual({
+            containerPath: ['triggers', '0', 'parameters'],
+            existingKeys: [],
+            prefix: '',
+        });
+    });
+
+    it('reports no YAML key slot on a value position', () => {
+        const source = 'tasks:\n  - parameters:\n      uri: ht';
+
+        expect(scanWorkflowDocument(source, source.length, 'yaml')?.keySlot).toBeUndefined();
+    });
+
+    it('reports no YAML key slot inside a block scalar', () => {
+        const source = 'tasks:\n  - type: script/v1/javascript\n    parameters:\n      script: |\n        retu';
+
+        expect(scanWorkflowDocument(source, source.length, 'yaml')?.keySlot).toBeUndefined();
+    });
+});
+
+describe('scanWorkflowDocument parameter values', () => {
+    it('reads the literal values, keys and node name of a JSON task', () => {
+        const source =
+            '{"tasks": [{"name": "rows", "type": "a/v1/b", "parameters": {"id": "x", "count": 2, "on": true, "expr": "${t.a}", "nested": {"k": 1}, "": 1}}]}';
+        const position = scanWorkflowDocument(source, source.indexOf('"": 1') + 1, 'json');
+
+        expect(position?.literalValuesOf(['tasks', '0', 'parameters'])).toEqual({
+            count: 2,
+            id: 'x',
+            nested: {k: 1},
+            on: true,
+        });
+        expect(position?.keysOf(['tasks', '0', 'parameters'])).toEqual(['id', 'count', 'on', 'expr', 'nested']);
+        expect(position?.nameOf(['tasks', '0'])).toBe('rows');
+    });
+
+    it('coerces plain YAML scalars but keeps quoted ones as strings', () => {
+        const source =
+            'tasks:\n  - name: rows\n    type: a/v1/b\n    parameters:\n      count: 2\n      code: "2"\n      on: false\n      empty:\n      ';
+        const position = scanWorkflowDocument(source, source.length, 'yaml');
+
+        expect(position?.literalValuesOf(['tasks', '0', 'parameters'])).toEqual({code: '2', count: 2, on: false});
+        expect(position?.nameOf(['tasks', '0'])).toBe('rows');
+    });
+});
+
+describe('scanWorkflowDocument string positions', () => {
+    it('reports where a JSON string starts and its quote', () => {
+        const source = '{"tasks": [{"parameters": {"uri": "ht"}}]}';
+        const position = scanWorkflowDocument(source, source.indexOf('ht') + 2, 'json');
+
+        expect(position?.stringStart).toBe(source.indexOf('ht'));
+        expect(position?.stringQuote).toBe('"');
+    });
+
+    it('reports a YAML single quote and no quote for a plain value', () => {
+        const quoted = "tasks:\n  - parameters:\n      uri: 'ht";
+        const plain = 'tasks:\n  - parameters:\n      uri: ht';
+
+        expect(scanWorkflowDocument(quoted, quoted.length, 'yaml')?.stringQuote).toBe("'");
+        expect(scanWorkflowDocument(plain, plain.length, 'yaml')).toMatchObject({stringStart: plain.indexOf('ht')});
+        expect(scanWorkflowDocument(plain, plain.length, 'yaml')?.stringQuote).toBeUndefined();
+    });
+});
+
+describe('scanWorkflowDocument bare JSON values', () => {
+    it('reports the key and start of a value being typed without quotes', () => {
+        const source = '{"tasks": [{"parameters": {"count": tr}}]}';
+        const cursor = source.indexOf('tr') + 2;
+
+        expect(scanWorkflowDocument(source, cursor, 'json')?.bareValue).toEqual({
+            path: ['tasks', '0', 'parameters', 'count'],
+            start: source.indexOf('tr'),
+        });
+    });
+
+    it('reports an empty bare value right after the colon and nothing inside a string', () => {
+        const empty = '{"tasks": [{"parameters": {"count": }}]}';
+        const quoted = '{"tasks": [{"parameters": {"count": "x"}}]}';
+
+        expect(scanWorkflowDocument(empty, empty.indexOf(': }') + 2, 'json')?.bareValue?.path).toEqual([
+            'tasks',
+            '0',
+            'parameters',
+            'count',
+        ]);
+        expect(scanWorkflowDocument(quoted, quoted.indexOf('x'), 'json')?.bareValue).toBeUndefined();
+    });
+});
