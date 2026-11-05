@@ -81,10 +81,12 @@ const KnowledgeBase = lazy(() => import('@/pages/automation/knowledge-base/Knowl
 const KnowledgeBases = lazy(() => import('@/pages/automation/knowledge-bases/KnowledgeBases'));
 const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpServer'));
 const AppDetail = lazy(() => import('@/pages/automation/apps/App'));
+const AppInstanceDetail = lazy(() => import('@/pages/automation/apps/AppInstance'));
 const Apps = lazy(() => import('@/pages/automation/apps/Apps'));
 const A2aServers = lazy(() => import('@/pages/automation/a2a-servers/A2aServers'));
 const McpServers = lazy(() => import('@/pages/automation/mcp-servers/McpServers'));
 const Notifications = lazy(() => import('@/pages/settings/platform/notifications/Notifications'));
+const Portal = lazy(() => import('@/pages/automation/portal/Portal'));
 const Project = lazy(loadProject);
 const ProjectDeployments = lazy(() => import('@/pages/automation/project-deployments/ProjectDeployments'));
 const ProjectTemplate = lazy(() => import('@/pages/automation/template/project-template/ProjectTemplate'));
@@ -897,7 +899,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
-                                                <LazyLoadWrapper hasLeftSidebar>
+                                                <LazyLoadWrapper>
                                                     <Apps />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
@@ -909,13 +911,37 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
-                                                <LazyLoadWrapper hasLeftSidebar>
+                                                <LazyLoadWrapper>
                                                     <AppDetail />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
                                     path: 'apps/:id',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <AppInstanceDetail />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'apps/instances/:id',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <Portal />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'portal',
                                 },
                                 {
                                     children: [
