@@ -34,6 +34,8 @@ import com.bytechef.platform.user.service.AuthorityService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -81,15 +83,71 @@ class ScimGroupControllerTest {
         when(authorityService.getAuthorities()).thenReturn(
             List.of(createAuthority(1L, "ROLE_ADMIN"), createAuthority(2L, "ROLE_USER")));
 
+        mockMvc.perform(get(GROUPS_PATH).param("filter", "displayName eq \"role_user\""))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalResults").value(1))
+            .andExpect(jsonPath("$.startIndex").value(1))
+            .andExpect(jsonPath("$.Resources[0].id").value("2"))
+            .andExpect(jsonPath("$.Resources[0].displayName").value("ROLE_USER"));
+    }
+
+    @Test
+    void testListGroupsAppliesStartIndexAndCountWithRealTotal() throws Exception {
+        when(authorityService.getAuthorities()).thenReturn(
+            List.of(
+                createAuthority(3L, "ROLE_C"), createAuthority(1L, "ROLE_A"), createAuthority(2L, "ROLE_B")));
+
         mockMvc.perform(
             get(GROUPS_PATH)
-                .param("filter", "displayName eq \"role_user\"")
-                .param("startIndex", "5"))
+                .param("startIndex", "2")
+                .param("count", "1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalResults").value(3))
+            .andExpect(jsonPath("$.startIndex").value(2))
+            .andExpect(jsonPath("$.itemsPerPage").value(1))
+            .andExpect(jsonPath("$.Resources", hasSize(1)))
+            .andExpect(jsonPath("$.Resources[0].id").value("2"));
+    }
+
+    @Test
+    void testListGroupsWithCountZeroReturnsOnlyTotalResults() throws Exception {
+        when(authorityService.getAuthorities()).thenReturn(
+            List.of(createAuthority(1L, "ROLE_ADMIN"), createAuthority(2L, "ROLE_USER")));
+
+        mockMvc.perform(get(GROUPS_PATH).param("count", "0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalResults").value(2))
+            .andExpect(jsonPath("$.itemsPerPage").value(0))
+            .andExpect(jsonPath("$.Resources", hasSize(0)));
+    }
+
+    @Test
+    void testListGroupsWithStartIndexBeyondTotalReturnsNoResources() throws Exception {
+        when(authorityService.getAuthorities()).thenReturn(List.of(createAuthority(1L, "ROLE_ADMIN")));
+
+        mockMvc.perform(get(GROUPS_PATH).param("startIndex", "5"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.totalResults").value(1))
             .andExpect(jsonPath("$.startIndex").value(5))
-            .andExpect(jsonPath("$.Resources[0].id").value("2"))
-            .andExpect(jsonPath("$.Resources[0].displayName").value("ROLE_USER"));
+            .andExpect(jsonPath("$.Resources", hasSize(0)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "externalId eq \"abc\"",
+        "displayName co \"Eng\"",
+        "members.value eq \"1\"",
+        "displayName eq \"A\" or displayName eq \"B\""
+    })
+    void testListGroupsRejectsUnsupportedFilterWithInvalidFilterError(String filter) throws Exception {
+        mockMvc.perform(get(GROUPS_PATH).param("filter", filter))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(SCIM_JSON))
+            .andExpect(jsonPath("$.schemas[0]").value(ERROR_SCHEMA))
+            .andExpect(jsonPath("$.scimType").value("invalidFilter"))
+            .andExpect(jsonPath("$.status").value("400"));
+
+        verifyNoInteractions(authorityService);
     }
 
     @Test

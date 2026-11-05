@@ -21,6 +21,7 @@ import com.bytechef.ee.platform.user.scim.model.ScimName;
 import com.bytechef.ee.platform.user.scim.model.ScimPatchOperation;
 import com.bytechef.ee.platform.user.scim.model.ScimPatchRequest;
 import com.bytechef.ee.platform.user.scim.model.ScimUser;
+import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.service.UserService;
@@ -153,6 +154,35 @@ class ScimUserFacadeTest {
     }
 
     @Test
+    void testCreateUserWithActiveFalseDeactivatesTheCreatedUser() {
+        // UserService.create always activates the user it creates
+        User createdUser = createUser(true);
+
+        when(userService.create(any(AdminUserDTO.class))).thenReturn(createdUser);
+
+        User user = scimUserFacade.createUser(createScimUser(false));
+
+        assertThat(user).isSameAs(createdUser);
+        assertThat(user.isActivated()).isFalse();
+        assertThat(user.getActivationKey()).isNull();
+
+        verify(userService).save(createdUser);
+    }
+
+    @Test
+    void testCreateUserWithActiveTrueDoesNotSaveAgain() {
+        User createdUser = createUser(true);
+
+        when(userService.create(any(AdminUserDTO.class))).thenReturn(createdUser);
+
+        User user = scimUserFacade.createUser(createScimUser(true));
+
+        assertThat(user.isActivated()).isTrue();
+
+        verify(userService, never()).save(any(User.class));
+    }
+
+    @Test
     void testCreateUserUsesFirstEmailWhenNoneIsPrimary() {
         when(userService.create(any(AdminUserDTO.class))).thenReturn(createUser(true));
 
@@ -231,6 +261,59 @@ class ScimUserFacadeTest {
     }
 
     @Test
+    void testReplaceUserKeepsAttributesTheScimResourceDoesNotManage() {
+        User existingUser = createUser(true);
+
+        existingUser.setImageUrl("https://example.com/john.png");
+        existingUser.setLangKey("de");
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(existingUser));
+        when(userService.update(any(AdminUserDTO.class))).thenReturn(Optional.of(existingUser));
+
+        scimUserFacade.replaceUser(USER_ID, createScimUser(true));
+
+        AdminUserDTO adminUserDTO = captureUpdatedAdminUserDTO();
+
+        assertThat(adminUserDTO.getImageUrl()).isEqualTo("https://example.com/john.png");
+        assertThat(adminUserDTO.getLangKey()).isEqualTo("de");
+    }
+
+    @Test
+    void testReplaceUserDefaultsMissingLangKey() {
+        User existingUser = createUser(true);
+
+        existingUser.setLangKey(null);
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(existingUser));
+        when(userService.update(any(AdminUserDTO.class))).thenReturn(Optional.of(existingUser));
+
+        scimUserFacade.replaceUser(USER_ID, createScimUser(true));
+
+        AdminUserDTO adminUserDTO = captureUpdatedAdminUserDTO();
+
+        assertThat(adminUserDTO.getLangKey()).isEqualTo(UserConstants.DEFAULT_LANGUAGE);
+    }
+
+    @Test
+    void testDeactivateUserWithScimUserKeepsLangKeyAndImageUrl() {
+        User existingUser = createUser(true);
+
+        existingUser.setImageUrl("https://example.com/john.png");
+        existingUser.setLangKey("fr");
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(existingUser));
+        when(userService.update(any(AdminUserDTO.class))).thenReturn(Optional.of(existingUser));
+
+        scimUserFacade.deactivateUser(USER_ID, createScimUser(false));
+
+        AdminUserDTO adminUserDTO = captureUpdatedAdminUserDTO();
+
+        assertThat(adminUserDTO.getImageUrl()).isEqualTo("https://example.com/john.png");
+        assertThat(adminUserDTO.getLangKey()).isEqualTo("fr");
+        assertThat(adminUserDTO.isActivated()).isFalse();
+    }
+
+    @Test
     void testReplaceUserReturnsEmptyWhenUserDoesNotExist() {
         when(userService.fetchUser(USER_ID)).thenReturn(Optional.empty());
 
@@ -288,6 +371,20 @@ class ScimUserFacadeTest {
         assertThat(user.getFirstName()).isEqualTo("Jane");
         assertThat(user.getLastName()).isEqualTo("Smith");
         assertThat(user.isActivated()).isTrue();
+
+        verify(userService).save(user);
+    }
+
+    @Test
+    void testPatchUserStoresUserNameLowercased() {
+        User user = createUser(true);
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(user));
+
+        scimUserFacade.patchUser(
+            USER_ID, createPatchRequest(new ScimPatchOperation("replace", "userName", "Jane.Smith@Example.com")));
+
+        assertThat(user.getLogin()).isEqualTo("jane.smith@example.com");
 
         verify(userService).save(user);
     }
@@ -382,6 +479,14 @@ class ScimUserFacadeTest {
         assertThat(scimUserFacade.deleteUser(USER_ID)).isFalse();
 
         verify(userService, never()).delete(anyString());
+    }
+
+    private AdminUserDTO captureUpdatedAdminUserDTO() {
+        ArgumentCaptor<AdminUserDTO> adminUserDTOArgumentCaptor = ArgumentCaptor.forClass(AdminUserDTO.class);
+
+        verify(userService).update(adminUserDTOArgumentCaptor.capture());
+
+        return adminUserDTOArgumentCaptor.getValue();
     }
 
     private AdminUserDTO captureCreatedAdminUserDTO() {

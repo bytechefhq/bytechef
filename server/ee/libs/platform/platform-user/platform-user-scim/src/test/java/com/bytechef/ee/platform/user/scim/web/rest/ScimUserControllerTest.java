@@ -40,7 +40,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -86,11 +89,11 @@ class ScimUserControllerTest {
             .andExpect(jsonPath("$.Resources[1].id").value("2"))
             .andExpect(jsonPath("$.Resources[1].userName").value("jane.doe"));
 
-        verify(userService).getAllActiveUsers(PageRequest.of(0, 100));
+        verify(userService).getAllActiveUsers(new ScimOffsetPageRequest(0, 100));
     }
 
     @Test
-    void testListUsersTranslatesStartIndexAndCountToPageRequest() throws Exception {
+    void testListUsersTranslatesStartIndexAndCountToItemOffset() throws Exception {
         when(userService.getAllActiveUsers(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(
@@ -102,7 +105,7 @@ class ScimUserControllerTest {
             .andExpect(jsonPath("$.totalResults").value(0))
             .andExpect(jsonPath("$.Resources", hasSize(0)));
 
-        verify(userService).getAllActiveUsers(PageRequest.of(2, 10));
+        verify(userService).getAllActiveUsers(new ScimOffsetPageRequest(20, 10));
     }
 
     @Test
@@ -113,9 +116,81 @@ class ScimUserControllerTest {
             get(USERS_PATH)
                 .param("startIndex", "0")
                 .param("count", "5"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.startIndex").value(1));
+
+        verify(userService).getAllActiveUsers(new ScimOffsetPageRequest(0, 5));
+    }
+
+    @Test
+    void testListUsersUsesItemOffsetWhenStartIndexIsNotAlignedToCount() throws Exception {
+        when(userService.getAllActiveUsers(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+
+        mockMvc.perform(
+            get(USERS_PATH)
+                .param("startIndex", "50")
+                .param("count", "100"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.startIndex").value(50));
+
+        ArgumentCaptor<Pageable> pageableArgumentCaptor = ArgumentCaptor.forClass(Pageable.class);
+
+        verify(userService).getAllActiveUsers(pageableArgumentCaptor.capture());
+
+        Pageable pageable = pageableArgumentCaptor.getValue();
+
+        assertThat(pageable.getOffset()).isEqualTo(49L);
+        assertThat(pageable.getPageSize()).isEqualTo(100);
+    }
+
+    @Test
+    void testListUsersReportsTotalResultsAcrossAllPages() throws Exception {
+        User firstUser = createUser(1L, "john.doe", "john@example.com", true);
+        User secondUser = createUser(2L, "jane.doe", "jane@example.com", true);
+
+        when(userService.getAllActiveUsers(any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(firstUser, secondUser), new ScimOffsetPageRequest(0, 2), 5));
+
+        mockMvc.perform(get(USERS_PATH).param("count", "2"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalResults").value(5))
+            .andExpect(jsonPath("$.itemsPerPage").value(2))
+            .andExpect(jsonPath("$.Resources", hasSize(2)));
+    }
+
+    @Test
+    void testListUsersWithCountZeroReturnsOnlyTotalResults() throws Exception {
+        when(userService.countActiveUsers()).thenReturn(7L);
+
+        mockMvc.perform(get(USERS_PATH).param("count", "0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalResults").value(7))
+            .andExpect(jsonPath("$.itemsPerPage").value(0))
+            .andExpect(jsonPath("$.Resources", hasSize(0)));
+
+        verify(userService, never()).getAllActiveUsers(any(Pageable.class));
+    }
+
+    @Test
+    void testListUsersTreatsNegativeCountAsZero() throws Exception {
+        when(userService.countActiveUsers()).thenReturn(3L);
+
+        mockMvc.perform(get(USERS_PATH).param("count", "-5"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalResults").value(3))
+            .andExpect(jsonPath("$.Resources", hasSize(0)));
+
+        verify(userService, never()).getAllActiveUsers(any(Pageable.class));
+    }
+
+    @Test
+    void testListUsersCapsCountAtMaxResults() throws Exception {
+        when(userService.getAllActiveUsers(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+
+        mockMvc.perform(get(USERS_PATH).param("count", "1000"))
             .andExpect(status().isOk());
 
-        verify(userService).getAllActiveUsers(PageRequest.of(0, 5));
+        verify(userService).getAllActiveUsers(new ScimOffsetPageRequest(0, ScimPagination.MAX_RESULTS));
     }
 
     @Test
@@ -124,19 +199,93 @@ class ScimUserControllerTest {
 
         when(userService.fetchUserByLogin("john.doe")).thenReturn(Optional.of(user));
 
-        mockMvc.perform(
-            get(USERS_PATH)
-                .param("filter", "userName eq \"john.doe\"")
-                .param("startIndex", "3"))
+        mockMvc.perform(get(USERS_PATH).param("filter", "userName eq \"john.doe\""))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.schemas[0]").value(LIST_RESPONSE_SCHEMA))
             .andExpect(jsonPath("$.totalResults").value(1))
-            .andExpect(jsonPath("$.startIndex").value(3))
+            .andExpect(jsonPath("$.startIndex").value(1))
             .andExpect(jsonPath("$.Resources", hasSize(1)))
             .andExpect(jsonPath("$.Resources[0].id").value("42"))
             .andExpect(jsonPath("$.Resources[0].userName").value("john.doe"));
 
         verify(userService, never()).getAllActiveUsers(any(Pageable.class));
+    }
+
+    @Test
+    void testListUsersFilterByUserNameMatchesCaseInsensitively() throws Exception {
+        User user = createUser(USER_ID, "john.doe@x.com", "john.doe@x.com", true);
+
+        when(userService.fetchUserByLogin("john.doe@x.com")).thenReturn(Optional.of(user));
+
+        mockMvc.perform(get(USERS_PATH).param("filter", "userName eq \"John.Doe@X.com\""))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalResults").value(1))
+            .andExpect(jsonPath("$.Resources[0].id").value("42"))
+            .andExpect(jsonPath("$.Resources[0].userName").value("john.doe@x.com"));
+
+        verify(userService).fetchUserByLogin("john.doe@x.com");
+        verify(userService, never()).fetchUserByLogin("John.Doe@X.com");
+    }
+
+    @Test
+    void testListUsersFilterAppliesStartIndexToTheMatchedUser() throws Exception {
+        when(userService.fetchUserByLogin("john.doe"))
+            .thenReturn(Optional.of(createUser(USER_ID, "john.doe", "john@example.com", true)));
+
+        mockMvc.perform(
+            get(USERS_PATH)
+                .param("filter", "userName eq \"john.doe\"")
+                .param("startIndex", "3"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalResults").value(1))
+            .andExpect(jsonPath("$.startIndex").value(3))
+            .andExpect(jsonPath("$.itemsPerPage").value(0))
+            .andExpect(jsonPath("$.Resources", hasSize(0)));
+    }
+
+    @Test
+    void testListUsersFilterWithCountZeroReturnsOnlyTotalResults() throws Exception {
+        when(userService.fetchUserByLogin("john.doe"))
+            .thenReturn(Optional.of(createUser(USER_ID, "john.doe", "john@example.com", true)));
+
+        mockMvc.perform(
+            get(USERS_PATH)
+                .param("filter", "userName eq \"john.doe\"")
+                .param("count", "0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalResults").value(1))
+            .andExpect(jsonPath("$.Resources", hasSize(0)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "emails.value eq \"a@b.com\"",
+        "userName eq \"x\" and active eq true",
+        "userName co \"x\"",
+        "active eq true",
+        "displayName eq \"John Doe\""
+    })
+    void testListUsersRejectsUnsupportedFilterWithInvalidFilterError(String filter) throws Exception {
+        mockMvc.perform(get(USERS_PATH).param("filter", filter))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(SCIM_JSON))
+            .andExpect(jsonPath("$.schemas[0]").value(ERROR_SCHEMA))
+            .andExpect(jsonPath("$.scimType").value("invalidFilter"))
+            .andExpect(jsonPath("$.status").value("400"));
+
+        verify(userService, never()).getAllActiveUsers(any(Pageable.class));
+        verify(userService, never()).fetchUserByLogin(anyString());
+        verify(userService, never()).fetchUserByEmail(anyString());
+    }
+
+    @Test
+    void testListUsersTreatsBlankFilterAsNoFilter() throws Exception {
+        when(userService.getAllActiveUsers(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+
+        mockMvc.perform(get(USERS_PATH).param("filter", " "))
+            .andExpect(status().isOk());
+
+        verify(userService).getAllActiveUsers(new ScimOffsetPageRequest(0, 100));
     }
 
     @Test
@@ -289,6 +438,37 @@ class ScimUserControllerTest {
         assertThat(scimUser.name()).isEqualTo(new ScimName(null, "Doe", "John"));
         assertThat(scimUser.emails()).containsExactly(new ScimEmail("john@example.com", "work", true));
         assertThat(scimUser.active()).isTrue();
+    }
+
+    @Test
+    void testCreateUserReturnsUniquenessErrorWhenUserNameIsTaken() throws Exception {
+        when(scimUserFacade.createUser(any(ScimUser.class)))
+            .thenThrow(new DuplicateKeyException("duplicate key value violates unique constraint \"ux_user_login\""));
+
+        mockMvc.perform(
+            post(USERS_PATH)
+                .contentType(SCIM_JSON)
+                .content("{\"userName\": \"john.doe\", \"active\": true}"))
+            .andExpect(status().isConflict())
+            .andExpect(content().contentTypeCompatibleWith(SCIM_JSON))
+            .andExpect(jsonPath("$.schemas[0]").value(ERROR_SCHEMA))
+            .andExpect(jsonPath("$.scimType").value("uniqueness"))
+            .andExpect(jsonPath("$.status").value("409"));
+    }
+
+    @Test
+    void testReplaceUserReturnsUniquenessErrorWhenUserNameIsTaken() throws Exception {
+        when(userService.fetchUser(USER_ID))
+            .thenReturn(Optional.of(createUser(USER_ID, "john.doe", "john@example.com", true)));
+        when(scimUserFacade.replaceUser(eq(USER_ID), any(ScimUser.class)))
+            .thenThrow(new DuplicateKeyException("duplicate key"));
+
+        mockMvc.perform(
+            put(USERS_PATH + "/" + USER_ID)
+                .contentType(SCIM_JSON)
+                .content("{\"userName\": \"jane.doe\", \"active\": true}"))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.scimType").value("uniqueness"));
     }
 
     @Test
