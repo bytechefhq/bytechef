@@ -17,11 +17,17 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
+import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
@@ -54,10 +60,14 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
         }""";
 
     private final ProjectDeploymentFacade projectDeploymentFacade;
+    private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public RollbackProjectDeploymentToolCallback(ProjectDeploymentFacade projectDeploymentFacade) {
+    public RollbackProjectDeploymentToolCallback(
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowService projectWorkflowService) {
+
         this.projectDeploymentFacade = projectDeploymentFacade;
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
@@ -132,7 +142,9 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
                 .project(existing.project())
                 .projectId(existing.projectId())
                 .projectVersion(input.projectVersion())
-                .projectDeploymentWorkflows(existing.projectDeploymentWorkflows())
+                .projectDeploymentWorkflows(
+                    toTargetVersionWorkflows(
+                        existing.projectId(), input.projectVersion(), existing.projectDeploymentWorkflows()))
                 .tags(existing.tags())
                 .version(existing.version())
                 .build();
@@ -155,6 +167,40 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(RollbackProjectDeploymentToolCallback.class, TOOL_NAME, exception);
         }
+    }
+
+    private List<ProjectDeploymentWorkflowDTO> toTargetVersionWorkflows(
+        long projectId, int projectVersion, @Nullable List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows) {
+
+        List<ProjectDeploymentWorkflowDTO> targetVersionWorkflows = new ArrayList<>();
+
+        if (projectDeploymentWorkflows == null) {
+            return targetVersionWorkflows;
+        }
+
+        for (ProjectDeploymentWorkflowDTO projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            Optional<ProjectWorkflow> projectWorkflowOptional = projectWorkflowService.fetchProjectWorkflow(
+                projectId, projectVersion, projectDeploymentWorkflow.workflowUuid());
+
+            if (projectWorkflowOptional.isEmpty()) {
+                continue;
+            }
+
+            ProjectWorkflow projectWorkflow = projectWorkflowOptional.get();
+
+            targetVersionWorkflows.add(
+                new ProjectDeploymentWorkflowDTO(
+                    projectDeploymentWorkflow.connections(), projectDeploymentWorkflow.createdBy(),
+                    projectDeploymentWorkflow.createdDate(), projectDeploymentWorkflow.inputs(),
+                    projectDeploymentWorkflow.enabled(), projectDeploymentWorkflow.id(),
+                    projectDeploymentWorkflow.lastExecutionDate(), projectDeploymentWorkflow.lastExecutionStatus(),
+                    projectDeploymentWorkflow.lastModifiedBy(), projectDeploymentWorkflow.lastModifiedDate(),
+                    projectDeploymentWorkflow.projectDeploymentId(), projectDeploymentWorkflow.staticWebhookUrl(),
+                    projectDeploymentWorkflow.version(), projectWorkflow.getWorkflowId(),
+                    projectDeploymentWorkflow.workflowUuid()));
+        }
+
+        return targetVersionWorkflows;
     }
 
     private String toolError(String message) {

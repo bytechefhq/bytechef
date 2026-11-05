@@ -29,6 +29,7 @@ import com.bytechef.automation.ai.tool.knowledgebase.DeleteKnowledgeBaseDocument
 import com.bytechef.automation.ai.tool.knowledgebase.QueryKnowledgeBaseToolCallback;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -139,7 +140,9 @@ class ManagementToolIdParameterTypeTest {
             Arguments.of(
                 new DeleteProjectDeploymentToolCallback(projectDeploymentFacade), List.of("projectDeploymentId")),
             Arguments.of(
-                new RollbackProjectDeploymentToolCallback(projectDeploymentFacade), List.of("projectDeploymentId")),
+                new RollbackProjectDeploymentToolCallback(
+                    projectDeploymentFacade, mock(ProjectWorkflowService.class)),
+                List.of("projectDeploymentId")),
             Arguments.of(
                 new ToggleProjectDeploymentToolCallback(projectDeploymentFacade), List.of("projectDeploymentId")),
             Arguments.of(

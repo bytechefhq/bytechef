@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import org.springframework.ai.tool.ToolCallback;
 class DeploymentToolCallbacksFactoryTest {
 
     private final DeploymentToolCallbacksFactory factory = new DeploymentToolCallbacksFactory(
-        Mockito.mock(ProjectDeploymentFacade.class));
+        Mockito.mock(ProjectDeploymentFacade.class), Mockito.mock(ProjectWorkflowService.class));
 
     @Test
     void readListExcludesMutations() {
