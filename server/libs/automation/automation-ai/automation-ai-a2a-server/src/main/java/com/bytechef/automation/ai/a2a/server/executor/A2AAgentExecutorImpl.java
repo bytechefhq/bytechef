@@ -46,9 +46,15 @@ import com.bytechef.platform.ai.a2a.A2AInvalidParamsException;
 import com.bytechef.platform.ai.a2a.A2ATaskReference;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.SuspendUtils;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.tool.execution.ToolExecutionEvent;
+import com.bytechef.platform.tool.execution.ToolExecutionKind;
+import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -69,6 +75,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
@@ -104,6 +111,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
     private final Executor runCompletionExecutor;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
+    private final ToolExecutionRecorder toolExecutionRecorder;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -114,7 +122,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, @Nullable String publicUrl,
         Executor runCompletionExecutor, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        ToolExecutionRecorder toolExecutionRecorder, WorkflowService workflowService) {
 
         this.a2aProjectService = a2aProjectService;
         this.a2aProjectWorkflowService = a2aProjectWorkflowService;
@@ -129,6 +137,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         this.runCompletionExecutor = runCompletionExecutor;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
+        this.toolExecutionRecorder = toolExecutionRecorder;
         this.workflowService = workflowService;
     }
 
@@ -175,9 +184,30 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         Map<String, Object> metadata = Map.of(
             A2A_CONTEXT_ID_METADATA_KEY, request.contextId(), A2A_TASK_NONCE_METADATA_KEY, nonce.toString());
 
-        long jobId = principalJobFacade.createJob(
-            new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs, metadata),
-            projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
+        Environment environment = a2aServer.getEnvironment();
+
+        ToolExecutionEvent.Builder eventBuilder = ToolExecutionEvent
+            .builder(
+                PlatformType.AUTOMATION, ToolExecutionSurface.A2A, ToolExecutionKind.WORKFLOW,
+                getSkillName(exposedWorkflow))
+            .environment(environment.ordinal())
+            .a2aServerId(a2aServer.getId())
+            .workspaceId(a2aServer.getWorkspaceId());
+
+        long startNanos = System.nanoTime();
+        long jobId;
+
+        try {
+            jobId = principalJobFacade.createJob(
+                new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs, metadata),
+                projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
+        } catch (RuntimeException runtimeException) {
+            recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.ERROR, runtimeException);
+
+            throw runtimeException;
+        }
+
+        eventBuilder.jobId(jobId);
 
         A2aTaskId a2aTaskId = new A2aTaskId(jobId, nonce);
 
@@ -190,13 +220,15 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         } catch (RuntimeException runtimeException) {
             log.error("Failed to await A2A workflow run {}", jobId, runtimeException);
 
+            recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.ERROR, runtimeException);
+
             return A2AAgentRun.started(
                 taskReference, CompletableFuture.completedFuture(inProgressResult(taskReference)));
         }
 
         CompletableFuture<A2AAgentResult> result = jobFuture.handleAsync(
             (job, throwable) -> TenantContext.callWithTenantId(
-                tenantId, () -> toRunResult(jobId, job, throwable, taskReference)),
+                tenantId, () -> toRecordedRunResult(jobId, job, throwable, taskReference, eventBuilder, startNanos)),
             runCompletionExecutor);
 
         return A2AAgentRun.started(taskReference, result);
@@ -237,14 +269,21 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         };
     }
 
-    private A2AAgentResult toRunResult(
-        long jobId, @Nullable Job job, @Nullable Throwable throwable, A2ATaskReference taskReference) {
+    private A2AAgentResult toRecordedRunResult(
+        long jobId, @Nullable Job job, @Nullable Throwable throwable, A2ATaskReference taskReference,
+        ToolExecutionEvent.Builder eventBuilder, long startNanos) {
 
         if (throwable == null && job != null) {
             try {
-                return toAgentResult(job, taskReference);
+                A2AAgentResult agentResult = toAgentResult(job, taskReference, eventBuilder);
+
+                recordSkillCall(eventBuilder, startNanos, getOutcome(agentResult), null);
+
+                return agentResult;
             } catch (RuntimeException runtimeException) {
                 log.error("Failed to read the result of A2A workflow run {}", jobId, runtimeException);
+
+                recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.ERROR, runtimeException);
 
                 return inProgressResult(taskReference);
             }
@@ -253,11 +292,41 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         Throwable cause = throwable instanceof CompletionException completionException &&
             completionException.getCause() != null ? completionException.getCause() : throwable;
 
-        if (!(cause instanceof TimeoutException)) {
+        if (cause instanceof TimeoutException) {
+            recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.TIMEOUT, cause);
+        } else {
             log.error("Failed to await A2A workflow run {}", jobId, cause);
+
+            recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.ERROR, cause);
         }
 
         return inProgressResult(taskReference);
+    }
+
+    private void recordSkillCall(
+        ToolExecutionEvent.Builder eventBuilder, long startNanos, ToolExecutionOutcome outcome,
+        @Nullable Throwable throwable) {
+
+        if (throwable != null) {
+            Class<? extends Throwable> throwableClass = throwable.getClass();
+
+            eventBuilder.errorType(throwableClass.getSimpleName());
+            eventBuilder.errorMessage(throwable.getMessage());
+        }
+
+        eventBuilder.outcome(outcome);
+        eventBuilder.durationMs(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos));
+
+        toolExecutionRecorder.record(eventBuilder.build());
+    }
+
+    private static ToolExecutionOutcome getOutcome(A2AAgentResult agentResult) {
+        return switch (agentResult) {
+            case A2AAgentResult.Completed _ -> ToolExecutionOutcome.SUCCESS;
+            case A2AAgentResult.Failed _ -> ToolExecutionOutcome.ERROR;
+            case A2AAgentResult.InputRequired _ -> ToolExecutionOutcome.APPROVAL_REQUIRED;
+            case A2AAgentResult.Working _ -> ToolExecutionOutcome.SUSPENDED;
+        };
     }
 
     private static A2AAgentResult inProgressResult(A2ATaskReference taskReference) {
@@ -265,6 +334,12 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
     }
 
     private A2AAgentResult toAgentResult(Job job, A2ATaskReference taskReference) {
+        return toAgentResult(job, taskReference, null);
+    }
+
+    private A2AAgentResult toAgentResult(
+        Job job, A2ATaskReference taskReference, ToolExecutionEvent.@Nullable Builder eventBuilder) {
+
         if (isPausedOnApproval(job)) {
             return A2AAgentResult.ofInputRequired(describePendingApproval(job), taskReference);
         }
@@ -278,6 +353,11 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
             JobExecutionErrors.checkCompleted(job);
         } catch (ExecutionException executionException) {
             log.warn("A2A workflow run {} did not complete", job.getId(), executionException);
+
+            if (eventBuilder != null) {
+                eventBuilder.errorType(ExecutionException.class.getSimpleName());
+                eventBuilder.errorMessage(executionException.getMessage());
+            }
 
             return A2AAgentResult.ofFailed("The workflow run " + job.getId() + " did not complete", taskReference);
         }
@@ -462,16 +542,29 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
             });
     }
 
+    private static String getSkillName(ExposedWorkflow exposedWorkflow) {
+        A2aProjectWorkflow a2aProjectWorkflow = exposedWorkflow.a2aProjectWorkflow();
+
+        String skillName = a2aProjectWorkflow.getSkillName();
+
+        if (skillName != null) {
+            return skillName;
+        }
+
+        Workflow workflow = exposedWorkflow.workflow();
+
+        return Objects.toString(workflow.getLabel(), "");
+    }
+
     private static A2ASkill toSkill(ExposedWorkflow exposedWorkflow) {
         A2aProjectWorkflow a2aProjectWorkflow = exposedWorkflow.a2aProjectWorkflow();
 
         Workflow workflow = exposedWorkflow.workflow();
 
-        String skillName = a2aProjectWorkflow.getSkillName();
         String skillDescription = a2aProjectWorkflow.getSkillDescription();
 
         return new A2ASkill(
-            getSkillId(exposedWorkflow), skillName == null ? Objects.toString(workflow.getLabel(), "") : skillName,
+            getSkillId(exposedWorkflow), getSkillName(exposedWorkflow),
             skillDescription == null ? workflow.getDescription() : skillDescription, List.of());
     }
 

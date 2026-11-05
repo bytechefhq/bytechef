@@ -60,12 +60,14 @@ public class ToolInvocationLogFacadeImpl implements ToolInvocationLogFacade {
     public Page<ToolInvocationLogDTO> getToolInvocationLogs(
         PlatformType type, @Nullable Long environmentId, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome,
-        @Nullable Long mcpServerId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
+        @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
+        @Nullable Long integrationInstanceId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
 
         return toToolInvocationLogDTOPage(
             toolInvocationLogService.getToolInvocationLogs(
                 type, environmentId == null ? null : Math.toIntExact(environmentId), surface, outcome, mcpServerId,
+                a2aServerId,
                 connectedUserId, integrationInstanceId, startDate, endDate, pageNumber));
     }
 
@@ -73,13 +75,15 @@ public class ToolInvocationLogFacadeImpl implements ToolInvocationLogFacade {
     @PreAuthorize(IS_PLATFORM_USER + " and hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     public Page<ToolInvocationLogDTO> getWorkspaceToolInvocationLogs(
         PlatformType type, long workspaceId, long environmentId, @Nullable ToolExecutionSurface surface,
-        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
+        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
+        @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
         return toToolInvocationLogDTOPage(
             toolInvocationLogService.getWorkspaceToolInvocationLogs(
-                type, workspaceId, Math.toIntExact(environmentId), surface, outcome, mcpServerId, connectedUserId,
+                type, workspaceId, Math.toIntExact(environmentId), surface, outcome, mcpServerId, a2aServerId,
+                connectedUserId,
                 integrationInstanceId, startDate, endDate, pageNumber));
     }
 

@@ -56,11 +56,13 @@ public class ToolInvocationLogServiceImpl implements ToolInvocationLogService {
     public Page<ToolInvocationLog> getToolInvocationLogs(
         PlatformType type, @Nullable Integer environment, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome,
-        @Nullable Long mcpServerId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
+        @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
+        @Nullable Long integrationInstanceId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
 
         return findPage(
-            type, null, environment, surface, outcome, mcpServerId, connectedUserId, integrationInstanceId, startDate,
+            type, null, environment, surface, outcome, mcpServerId, a2aServerId, connectedUserId, integrationInstanceId,
+            startDate,
             endDate, pageNumber);
     }
 
@@ -68,19 +70,22 @@ public class ToolInvocationLogServiceImpl implements ToolInvocationLogService {
     @Transactional(readOnly = true)
     public Page<ToolInvocationLog> getWorkspaceToolInvocationLogs(
         PlatformType type, long workspaceId, int environment, @Nullable ToolExecutionSurface surface,
-        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
+        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
+        @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
         return findPage(
-            type, workspaceId, environment, surface, outcome, mcpServerId, connectedUserId, integrationInstanceId,
+            type, workspaceId, environment, surface, outcome, mcpServerId, a2aServerId, connectedUserId,
+            integrationInstanceId,
             startDate, endDate, pageNumber);
     }
 
     private Page<ToolInvocationLog> findPage(
         PlatformType type, @Nullable Long workspaceId, @Nullable Integer environment,
         @Nullable ToolExecutionSurface surface,
-        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
+        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
+        @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
@@ -90,11 +95,13 @@ public class ToolInvocationLogServiceImpl implements ToolInvocationLogService {
         PageRequest pageRequest = PageRequest.of(pageNumber, DEFAULT_PAGE_SIZE);
 
         List<ToolInvocationLog> content = toolInvocationLogRepository.findFiltered(
-            type.ordinal(), workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId,
+            type.ordinal(), workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, a2aServerId,
+            connectedUserId,
             integrationInstanceId, startDate, endDate, pageRequest.getPageSize(), pageRequest.getOffset());
 
         long total = toolInvocationLogRepository.countFiltered(
-            type.ordinal(), workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId,
+            type.ordinal(), workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, a2aServerId,
+            connectedUserId,
             integrationInstanceId, startDate, endDate);
 
         return new PageImpl<>(content, pageRequest, total);

@@ -31,6 +31,7 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
             AND (:surface IS NULL OR surface = :surface)
             AND (:outcome IS NULL OR outcome = :outcome)
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
+            AND (:a2aServerId IS NULL OR a2a_server_id = :a2aServerId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
             AND (:integrationInstanceId IS NULL OR integration_instance_id = :integrationInstanceId)
             AND (CAST(:startDate AS TIMESTAMP) IS NULL OR created_date >= CAST(:startDate AS TIMESTAMP))
@@ -42,7 +43,8 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
         @Param("type") int type, @Param("workspaceId") @Nullable Long workspaceId,
         @Param("environment") @Nullable Integer environment,
         @Param("surface") @Nullable Integer surface, @Param("outcome") @Nullable Integer outcome,
-        @Param("mcpServerId") @Nullable Long mcpServerId, @Param("connectedUserId") @Nullable Long connectedUserId,
+        @Param("mcpServerId") @Nullable Long mcpServerId, @Param("a2aServerId") @Nullable Long a2aServerId,
+        @Param("connectedUserId") @Nullable Long connectedUserId,
         @Param("integrationInstanceId") @Nullable Long integrationInstanceId,
         @Param("startDate") @Nullable Instant startDate, @Param("endDate") @Nullable Instant endDate,
         @Param("limit") int limit, @Param("offset") long offset);
@@ -55,6 +57,7 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
             AND (:surface IS NULL OR surface = :surface)
             AND (:outcome IS NULL OR outcome = :outcome)
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
+            AND (:a2aServerId IS NULL OR a2a_server_id = :a2aServerId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
             AND (:integrationInstanceId IS NULL OR integration_instance_id = :integrationInstanceId)
             AND (CAST(:startDate AS TIMESTAMP) IS NULL OR created_date >= CAST(:startDate AS TIMESTAMP))
@@ -64,7 +67,8 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
         @Param("type") int type, @Param("workspaceId") @Nullable Long workspaceId,
         @Param("environment") @Nullable Integer environment,
         @Param("surface") @Nullable Integer surface, @Param("outcome") @Nullable Integer outcome,
-        @Param("mcpServerId") @Nullable Long mcpServerId, @Param("connectedUserId") @Nullable Long connectedUserId,
+        @Param("mcpServerId") @Nullable Long mcpServerId, @Param("a2aServerId") @Nullable Long a2aServerId,
+        @Param("connectedUserId") @Nullable Long connectedUserId,
         @Param("integrationInstanceId") @Nullable Long integrationInstanceId,
         @Param("startDate") @Nullable Instant startDate, @Param("endDate") @Nullable Instant endDate);
 

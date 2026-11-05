@@ -27,8 +27,8 @@ public record ToolExecutionEvent(
     @Nullable String componentName, @Nullable Integer componentVersion, @Nullable String operationName,
     @Nullable Long connectionId, @Nullable Integer environment, @Nullable Long workspaceId,
     @Nullable String externalUserId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
-    @Nullable Long mcpServerId, @Nullable Long jobId, ToolExecutionOutcome outcome, @Nullable String errorType,
-    @Nullable String errorMessage, long durationMs) {
+    @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long jobId, ToolExecutionOutcome outcome,
+    @Nullable String errorType, @Nullable String errorMessage, long durationMs) {
 
     public static final int ERROR_MESSAGE_MAX_LENGTH = 512;
 
@@ -55,6 +55,7 @@ public record ToolExecutionEvent(
         private @Nullable Long connectedUserId;
         private @Nullable Long integrationInstanceId;
         private @Nullable Long mcpServerId;
+        private @Nullable Long a2aServerId;
         private @Nullable Long jobId;
         private ToolExecutionOutcome outcome = ToolExecutionOutcome.SUCCESS;
         private @Nullable String errorType;
@@ -128,6 +129,12 @@ public record ToolExecutionEvent(
             return this;
         }
 
+        public Builder a2aServerId(@Nullable Long a2aServerId) {
+            this.a2aServerId = a2aServerId;
+
+            return this;
+        }
+
         public Builder jobId(@Nullable Long jobId) {
             this.jobId = jobId;
 
@@ -165,8 +172,8 @@ public record ToolExecutionEvent(
         public ToolExecutionEvent build() {
             return new ToolExecutionEvent(
                 type, surface, kind, toolName, componentName, componentVersion, operationName, connectionId,
-                environment, workspaceId, externalUserId, connectedUserId, integrationInstanceId, mcpServerId, jobId,
-                outcome, errorType, errorMessage, durationMs);
+                environment, workspaceId, externalUserId, connectedUserId, integrationInstanceId, mcpServerId,
+                a2aServerId, jobId, outcome, errorType, errorMessage, durationMs);
         }
     }
 }

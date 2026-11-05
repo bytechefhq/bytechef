@@ -82,6 +82,7 @@ class ToolInvocationLogEventListenerIntTest {
             .connectedUserId(8L)
             .integrationInstanceId(9L)
             .mcpServerId(3L)
+            .a2aServerId(4L)
             .jobId(11L)
             .outcome(ToolExecutionOutcome.ERROR)
             .errorType("IllegalStateException")
@@ -112,6 +113,7 @@ class ToolInvocationLogEventListenerIntTest {
         assertThat(toolInvocationLog.getConnectedUserId()).isEqualTo(8L);
         assertThat(toolInvocationLog.getIntegrationInstanceId()).isEqualTo(9L);
         assertThat(toolInvocationLog.getMcpServerId()).isEqualTo(3L);
+        assertThat(toolInvocationLog.getA2aServerId()).isEqualTo(4L);
         assertThat(toolInvocationLog.getJobId()).isEqualTo(11L);
         assertThat(toolInvocationLog.getOutcome()).isEqualTo(ToolExecutionOutcome.ERROR);
         assertThat(toolInvocationLog.getErrorType()).isEqualTo("IllegalStateException");

@@ -66,6 +66,7 @@ public class ToolInvocationLogEventListener {
         toolInvocationLog.setConnectedUserId(event.connectedUserId());
         toolInvocationLog.setIntegrationInstanceId(event.integrationInstanceId());
         toolInvocationLog.setMcpServerId(event.mcpServerId());
+        toolInvocationLog.setA2aServerId(event.a2aServerId());
         toolInvocationLog.setJobId(event.jobId());
         toolInvocationLog.setOutcome(event.outcome());
         toolInvocationLog.setErrorType(event.errorType());

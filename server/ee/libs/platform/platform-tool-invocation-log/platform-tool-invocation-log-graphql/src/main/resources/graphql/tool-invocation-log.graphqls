@@ -5,6 +5,7 @@ extend type Query {
         surface: String
         outcome: String
         mcpServerId: Long
+        a2aServerId: Long
         connectedUserId: Long
         integrationInstanceId: Long
         fromDate: Long
@@ -18,6 +19,7 @@ extend type Query {
         surface: String
         outcome: String
         mcpServerId: Long
+        a2aServerId: Long
         connectedUserId: Long
         integrationInstanceId: Long
         fromDate: Long
@@ -41,6 +43,7 @@ type ToolInvocationLogType {
     connectedUserId: Long
     integrationInstanceId: Long
     mcpServerId: Long
+    a2aServerId: Long
     jobId: Long
     workflowName: String
     outcome: String!
