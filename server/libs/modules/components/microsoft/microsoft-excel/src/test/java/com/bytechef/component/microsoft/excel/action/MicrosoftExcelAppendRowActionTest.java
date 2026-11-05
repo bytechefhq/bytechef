@@ -40,7 +40,8 @@ class MicrosoftExcelAppendRowActionTest extends AbstractMicrosoftExcelActionTest
         Map<String, Object> map = Map.of("key", "value");
 
         microsoftExcelUtilsMockedStatic
-            .when(() -> MicrosoftExcelUtils.getRowValues(parametersArgumentCaptor.capture()))
+            .when(() -> MicrosoftExcelUtils.getRowValues(
+                parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
             .thenReturn(row);
         microsoftExcelUtilsMockedStatic
             .when(() -> MicrosoftExcelUtils.getLastUsedRowIndex(
@@ -57,7 +58,9 @@ class MicrosoftExcelAppendRowActionTest extends AbstractMicrosoftExcelActionTest
         assertEquals(map, result);
         assertEquals(List.of(mockedParameters, mockedParameters, mockedParameters),
             parametersArgumentCaptor.getAllValues());
-        assertEquals(List.of(mockedActionContext, mockedActionContext), actionContextArgumentCaptor.getAllValues());
+        assertEquals(
+            List.of(mockedActionContext, mockedActionContext, mockedActionContext),
+            actionContextArgumentCaptor.getAllValues());
         assertEquals(3, integerArgumentCaptor.getValue());
         assertEquals(row, listArgumentCaptor.getValue());
     }

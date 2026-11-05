@@ -266,13 +266,13 @@ public class MicrosoftExcelUtils {
         return valuesMap;
     }
 
-    public static List<Object> getRowValues(Parameters inputParameters) {
+    public static List<Object> getRowValues(Parameters inputParameters, Context context) {
         List<Object> row = new ArrayList<>();
 
         Map<String, Object> rowMap = inputParameters.getRequiredMap(ROW, Object.class);
 
         if (rowMap.get(VALUES) instanceof Map<?, ?> map) {
-            row.addAll(map.values());
+            row.addAll(getValuesInHeaderOrder(map, inputParameters, context));
         } else if (rowMap.get(VALUES) instanceof List<?> list) {
             row.addAll(list);
         }
@@ -287,10 +287,7 @@ public class MicrosoftExcelUtils {
             Object values = rowMap.get(VALUES);
 
             if (values instanceof Map<?, ?> map) {
-                row = map.values()
-                    .stream()
-                    .map(value -> Objects.requireNonNullElse(value, ""))
-                    .toList();
+                row = getValuesInHeaderOrder(map, inputParameters, context);
             } else if (values instanceof List<?> list) {
                 if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
 
@@ -414,6 +411,24 @@ public class MicrosoftExcelUtils {
         }
 
         return properties;
+    }
+
+    private static List<Object> getValuesInHeaderOrder(
+        Map<?, ?> valuesMap, Parameters inputParameters, Context context) {
+
+        List<Object> headerRow = MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters, context, 1);
+
+        List<Object> row = new ArrayList<>();
+
+        for (Object header : headerRow) {
+            String label = header.toString();
+
+            Object value = valuesMap.get(label.replaceAll(" ", "_"));
+
+            row.add(Objects.requireNonNullElse(value, ""));
+        }
+
+        return row;
     }
 
     private static List<Option<String>> getColumnOptions(Parameters inputParameters, ActionContext actionContext) {
