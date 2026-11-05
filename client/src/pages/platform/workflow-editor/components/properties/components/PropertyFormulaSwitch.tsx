@@ -17,7 +17,7 @@ const PropertyFormulaSwitch = ({disabled = false, formulaMode, handleClick}: Pro
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <span className="inline-flex [&_[data-testid=switch-wrapper]>div]:gap-0.5">
+                <span className="inline-flex [&_[data-testid=switch-wrapper]>div]:gap-1">
                     <Switch
                         checked={formulaMode}
                         disabled={disabled}
