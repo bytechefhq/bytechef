@@ -44,6 +44,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -176,6 +177,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public long countUsers() {
+        return userRepository.count();
+    }
+
+    @Override
     @Transactional
     public void changePassword(String currentClearTextPassword, String newPassword) {
         SecurityUtils.fetchCurrentUserLogin()
@@ -219,6 +226,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(email.toLowerCase());
         }
 
+        user.setExternalId(userDTO.getExternalId());
         user.setImageUrl(userDTO.getImageUrl());
 
         if (userDTO.getLangKey() == null) {
@@ -476,7 +484,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.findByLogin(login.toLowerCase())
             .ifPresent(existingUser -> {
-                boolean removed = removeNonActivatedUser(existingUser);
+                boolean removed = removePendingRegistration(existingUser);
 
                 if (!removed) {
                     throw new LoginAlreadyUsedException();
@@ -487,7 +495,8 @@ public class UserServiceImpl implements UserService {
 
         userRepository.findByEmailIgnoreCase(email)
             .ifPresent(existingUser -> {
-                boolean removed = removeNonActivatedUser(existingUser);
+                boolean removed = removePendingRegistration(existingUser);
+
                 if (!removed) {
                     throw new EmailAlreadyUsedException();
                 }
@@ -556,6 +565,7 @@ public class UserServiceImpl implements UserService {
                     user.setEmail(email.toLowerCase());
                 }
 
+                user.setExternalId(userDTO.getExternalId());
                 user.setImageUrl(userDTO.getImageUrl());
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
@@ -637,8 +647,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<User> getUsersByExternalId(String externalId) {
+        return userRepository.findAllByExternalIdOrderById(externalId);
+    }
+
+    @Override
     public void save(User user) {
-        userRepository.save(user);
+        Long id = user.getId();
+
+        if (id != null) {
+            userRepository.findById(id)
+                .ifPresent(this::clearUserCaches);
+        }
+
+        User savedUser = userRepository.save(user);
+
+        clearUserCaches(savedUser);
     }
 
     @Override
@@ -700,8 +725,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private boolean removeNonActivatedUser(User existingUser) {
-        if (existingUser.isActivated()) {
+    private boolean removePendingRegistration(User existingUser) {
+        if (existingUser.isActivated() || existingUser.getActivationKey() == null || existingUser.isInvited()) {
             return false;
         }
 

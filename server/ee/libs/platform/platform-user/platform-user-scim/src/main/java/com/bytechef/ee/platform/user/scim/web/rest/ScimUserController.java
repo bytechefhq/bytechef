@@ -80,31 +80,33 @@ class ScimUserController {
                 return ScimErrors.invalidFilter(filter);
             }
 
-            Optional<User> user;
+            List<User> users;
 
             if (USER_NAME.equalsIgnoreCase(scimFilter.attributeName())) {
                 String value = scimFilter.value();
 
-                user = userService.fetchUserByLogin(value.toLowerCase(Locale.ROOT));
+                Optional<User> user = userService.fetchUserByLogin(value.toLowerCase(Locale.ROOT));
+
+                users = user.stream()
+                    .toList();
             } else if (EXTERNAL_ID.equalsIgnoreCase(scimFilter.attributeName())) {
-                user = userService.fetchUserByEmail(scimFilter.value());
+                users = userService.getUsersByExternalId(scimFilter.value());
             } else {
                 return ScimErrors.invalidFilter(filter);
             }
 
-            List<ScimUser> scimUsers = user.map(this::toScimUser)
-                .stream()
+            List<ScimUser> scimUsers = users.stream()
+                .map(this::toScimUser)
                 .toList();
 
             return ResponseEntity.ok(ScimListResponse.slice(scimUsers, normalizedStartIndex, normalizedCount));
         }
 
         if (normalizedCount == 0) {
-            return ResponseEntity.ok(
-                ScimListResponse.of(List.of(), userService.countActiveUsers(), normalizedStartIndex));
+            return ResponseEntity.ok(ScimListResponse.of(List.of(), userService.countUsers(), normalizedStartIndex));
         }
 
-        Page<User> userPage = userService.getAllActiveUsers(
+        Page<User> userPage = userService.getAllManagedUsers(
             ScimOffsetPageRequest.of(normalizedStartIndex, normalizedCount));
 
         List<ScimUser> scimUsers = userPage.getContent()
@@ -220,7 +222,7 @@ class ScimUserController {
             "/api/scim/v2/Users/" + user.getId());
 
         return new ScimUser(
-            List.of(ScimUser.SCHEMA), String.valueOf(user.getId()), user.getEmail(), user.getLogin(), scimName,
+            List.of(ScimUser.SCHEMA), String.valueOf(user.getId()), user.getExternalId(), user.getLogin(), scimName,
             scimName.formatted(), emails, user.isActivated(), List.of(), meta);
     }
 }

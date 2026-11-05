@@ -79,6 +79,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class ScimAuditIntTest {
 
     private static final String DEFAULT_SCHEMA = "public";
+    private static final String EXTERNAL_ID = "00u-external";
     private static final long IDENTITY_PROVIDER_ID = 5L;
     private static final MediaType SCIM_JSON = MediaType.parseMediaType("application/scim+json");
     private static final String SCIM_API_KEY = "scim-api-key-value";
@@ -287,6 +288,128 @@ public class ScimAuditIntTest {
     }
 
     @Test
+    public void testListUsersIncludesDeactivatedUsersInTheResourcesAndTheTotal() throws Exception {
+        createUser("anna", "anna@example.com", true);
+        createUser("bert", "bert@example.com", false);
+        createUser("carl", "carl@example.com", true);
+
+        mockMvc
+            .perform(scimRequest(MockMvcRequestBuilders.get("/api/scim/v2/Users")))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.totalResults")
+                .value(3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources.length()")
+                .value(3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources[1].userName")
+                .value("bert"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources[1].active")
+                .value(false));
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.get("/api/scim/v2/Users"))
+                    .param("startIndex", "2")
+                    .param("count", "1"))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.totalResults")
+                .value(3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.startIndex")
+                .value(2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources[0].userName")
+                .value("bert"));
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.get("/api/scim/v2/Users"))
+                    .param("count", "0"))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.totalResults")
+                .value(3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources.length()")
+                .value(0));
+
+        assertNoAuditEvents();
+    }
+
+    @Test
+    public void testCreateUserPersistsTheExternalIdAndFiltersByIt() throws Exception {
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Users"))
+                    .content(userJson("jane", "jane@example.com", "Jane", "Doe", true)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isCreated())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.externalId")
+                .value(EXTERNAL_ID));
+
+        Long userId = findUserId("jane");
+
+        assertThat(findUserColumn(userId, "external_id")).isEqualTo(EXTERNAL_ID);
+
+        mockMvc
+            .perform(scimRequest(MockMvcRequestBuilders.get("/api/scim/v2/Users/" + userId)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.externalId")
+                .value(EXTERNAL_ID))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.emails[0].value")
+                .value("jane@example.com"));
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.get("/api/scim/v2/Users"))
+                    .param("filter", "externalId eq \"" + EXTERNAL_ID + "\""))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.totalResults")
+                .value(1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources[0].id")
+                .value(String.valueOf(userId)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.Resources[0].externalId")
+                .value(EXTERNAL_ID));
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.get("/api/scim/v2/Users"))
+                    .param("filter", "externalId eq \"jane@example.com\""))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.totalResults")
+                .value(0));
+    }
+
+    @Test
+    public void testReplaceAndPatchUserReplaceTheExternalId() throws Exception {
+        long userId = createUser("jane", "jane@example.com", true);
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.put("/api/scim/v2/Users/" + userId))
+                    .content(userJson("jane", "jane@example.com", "Jane", "Doe", true, "00u-replaced")))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.externalId")
+                .value("00u-replaced"));
+
+        assertThat(findUserColumn(userId, "external_id")).isEqualTo("00u-replaced");
+
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.patch("/api/scim/v2/Users/" + userId))
+                    .content(patchJson("\"path\": \"externalId\", \"value\": \"00u-patched\"")))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.externalId")
+                .value("00u-patched"));
+
+        assertThat(findUserColumn(userId, "external_id")).isEqualTo("00u-patched");
+        assertThat(findUserColumn(userId, "email")).isEqualTo("jane@example.com");
+    }
+
+    @Test
     public void testReplaceUserRecordsTheChangedFields() throws Exception {
         long groupId = createGroup("ROLE_ENGINEERING");
         long userId = createUser("jane", "jane@example.com", true);
@@ -369,8 +492,8 @@ public class ScimAuditIntTest {
             .containsEntry("userId", String.valueOf(userId))
             .containsEntry("login", "jane")
             .containsEntry("active", "true")
-            .containsEntry("changedFields", "lastName")
-            .doesNotContainKey("externalId");
+            .containsEntry("externalId", EXTERNAL_ID)
+            .containsEntry("changedFields", "lastName");
     }
 
     @Test
@@ -604,6 +727,7 @@ public class ScimAuditIntTest {
         AdminUserDTO adminUserDTO = new AdminUserDTO();
 
         adminUserDTO.setEmail(email);
+        adminUserDTO.setExternalId(EXTERNAL_ID);
         adminUserDTO.setFirstName("Jane");
         adminUserDTO.setLastName("Doe");
         adminUserDTO.setLogin(login);
@@ -683,16 +807,22 @@ public class ScimAuditIntTest {
     private static String userJson(
         String userName, String email, String givenName, String familyName, boolean active) {
 
+        return userJson(userName, email, givenName, familyName, active, EXTERNAL_ID);
+    }
+
+    private static String userJson(
+        String userName, String email, String givenName, String familyName, boolean active, String externalId) {
+
         return """
             { \
               "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"], \
-              "externalId": "00u-external", \
+              "externalId": "%s", \
               "userName": "%s", \
               "name": {"givenName": "%s", "familyName": "%s"}, \
               "emails": [{"value": "%s", "type": "work", "primary": true}], \
               "active": %s \
             } \
-            """.formatted(userName, givenName, familyName, email, active);
+            """.formatted(externalId, userName, givenName, familyName, email, active);
     }
 
     private record AuditEventRow(String eventType, String principal, Map<String, String> data) {
