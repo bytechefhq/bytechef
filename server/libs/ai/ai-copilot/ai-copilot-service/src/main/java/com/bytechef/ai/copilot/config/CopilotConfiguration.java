@@ -58,6 +58,7 @@ import com.bytechef.automation.ai.tool.SkillsTools;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.platform.ai.tool.BraveWebSearchTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.FirecrawlTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -175,6 +176,7 @@ public class CopilotConfiguration {
     CodeEditorSpringAIAgent codeEditorAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools,
+        Optional<BraveWebSearchTools> braveWebSearchTools,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
         String name = Source.CODE_EDITOR.name() + "_" + Mode.ASK.name();
@@ -183,6 +185,7 @@ public class CopilotConfiguration {
             List.of(readProjectWorkflowTools, componentTools, workflowValidatorTools, workflowInstructionTools));
 
         firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
 
         return CodeEditorSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -225,6 +228,7 @@ public class CopilotConfiguration {
     ClusterElementSpringAIAgent clusterElementAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools, TaskTools taskTools, Optional<FirecrawlTools> firecrawlTools,
+        Optional<BraveWebSearchTools> braveWebSearchTools,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
 
@@ -236,6 +240,7 @@ public class CopilotConfiguration {
                 workflowInstructionTools));
 
         firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
 
         return ClusterElementSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -334,7 +339,8 @@ public class CopilotConfiguration {
     WorkflowEditorSpringAIAgent workflowEditorAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        Optional<FirecrawlTools> firecrawlTools, WorkflowService workflowService,
+        Optional<FirecrawlTools> firecrawlTools,
+        Optional<BraveWebSearchTools> braveWebSearchTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, Advisor questionAnswerAdvisor,
         PermissionService permissionService, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -348,6 +354,7 @@ public class CopilotConfiguration {
                 workflowInstructionTools));
 
         firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
 
         tools.addAll(interactivePickerToolCallbacks());
 
@@ -430,7 +437,8 @@ public class CopilotConfiguration {
     SkillsSpringAIAgent skillsAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools,
-        Optional<FirecrawlTools> firecrawlTools, SecurityContextRehydrator securityContextRehydrator,
+        Optional<FirecrawlTools> firecrawlTools,
+        Optional<BraveWebSearchTools> braveWebSearchTools, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -442,6 +450,7 @@ public class CopilotConfiguration {
                 workflowInstructionTools));
 
         firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
 
         return SkillsSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -512,19 +521,20 @@ public class CopilotConfiguration {
     @Bean
     ChatClient codeEditorAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
-        ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools) {
+        ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools,
+        Optional<BraveWebSearchTools> braveWebSearchTools) {
 
         ChatClient.Builder builder = ChatClient.builder(chatModel)
             .defaultSystem(getSystemPrompt(promptCodeEditorAskResource));
 
-        if (firecrawlTools.isPresent()) {
-            builder.defaultTools(
-                readProjectWorkflowTools, componentTools, workflowValidatorTools, workflowInstructionTools,
-                firecrawlTools.get());
-        } else {
-            builder.defaultTools(
-                readProjectWorkflowTools, componentTools, workflowValidatorTools, workflowInstructionTools);
-        }
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                readProjectWorkflowTools, componentTools, workflowValidatorTools, workflowInstructionTools));
+
+        firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
+
+        builder.defaultTools(tools.toArray());
 
         return builder.build();
     }
@@ -553,21 +563,22 @@ public class CopilotConfiguration {
     ChatClient workflowEditorAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        Optional<FirecrawlTools> firecrawlTools, Advisor questionAnswerAdvisor) {
+        Optional<FirecrawlTools> firecrawlTools,
+        Optional<BraveWebSearchTools> braveWebSearchTools, Advisor questionAnswerAdvisor) {
 
         ChatClient.Builder builder = ChatClient.builder(chatModel)
             .defaultSystem(getSystemPrompt(promptWorkflowEditorAskResource))
             .defaultAdvisors(questionAnswerAdvisor);
 
-        if (firecrawlTools.isPresent()) {
-            builder.defaultTools(
+        List<Object> tools = new ArrayList<>(
+            List.of(
                 readProjectTools, readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
-                workflowInstructionTools, firecrawlTools.get());
-        } else {
-            builder.defaultTools(
-                readProjectTools, readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
-                workflowInstructionTools);
-        }
+                workflowInstructionTools));
+
+        firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
+
+        builder.defaultTools(tools.toArray());
 
         return builder.build();
     }
@@ -618,19 +629,20 @@ public class CopilotConfiguration {
     @Bean
     ChatClient clusterElementAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
-        ComponentTools componentTools, TaskTools taskTools, Optional<FirecrawlTools> firecrawlTools) {
+        ComponentTools componentTools, TaskTools taskTools, Optional<FirecrawlTools> firecrawlTools,
+        Optional<BraveWebSearchTools> braveWebSearchTools) {
 
         ChatClient.Builder builder = ChatClient.builder(chatModel)
             .defaultSystem(getSystemPrompt(promptClusterElementAskResource));
 
-        if (firecrawlTools.isPresent()) {
-            builder.defaultTools(
-                readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools, workflowInstructionTools,
-                firecrawlTools.get());
-        } else {
-            builder.defaultTools(
-                readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools, workflowInstructionTools);
-        }
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools, workflowInstructionTools));
+
+        firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
+
+        builder.defaultTools(tools.toArray());
 
         return builder.build();
     }
@@ -659,20 +671,21 @@ public class CopilotConfiguration {
     ChatClient skillsAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools,
-        Optional<FirecrawlTools> firecrawlTools) {
+        Optional<FirecrawlTools> firecrawlTools,
+        Optional<BraveWebSearchTools> braveWebSearchTools) {
 
         ChatClient.Builder builder = ChatClient.builder(chatModel)
             .defaultSystem(getSystemPrompt(promptSkillsAskResource));
 
-        if (firecrawlTools.isPresent()) {
-            builder.defaultTools(
+        List<Object> tools = new ArrayList<>(
+            List.of(
                 readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
-                workflowInstructionTools, firecrawlTools.get());
-        } else {
-            builder.defaultTools(
-                readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
-                workflowInstructionTools);
-        }
+                workflowInstructionTools));
+
+        firecrawlTools.ifPresent(tools::add);
+        braveWebSearchTools.ifPresent(tools::add);
+
+        builder.defaultTools(tools.toArray());
 
         return builder.build();
     }
