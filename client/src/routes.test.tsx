@@ -3,12 +3,15 @@ import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT, PRODUCTION_ENVIRONMENT} from '@/sh
 import EEVersion from '@/shared/edition/EEVersion';
 import EmbeddedEnvironmentAccessGuard from '@/shared/layout/EmbeddedEnvironmentAccessGuard';
 import Settings, {SettingsNavItemI} from '@/shared/layout/Settings';
+import SettingsLayout from '@/shared/layout/SettingsLayout';
+import {getSettingsNavItems} from '@/shared/layout/settingsNavItems';
+import {resolvePlatformMode} from '@/shared/navigation/platformMode';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render} from '@/shared/util/test-utils';
 import {QueryClient} from '@tanstack/react-query';
 import {ReactElement, ReactNode} from 'react';
-import {MemoryRouter, Route, RouteObject, Routes, useLocation} from 'react-router-dom';
+import {MemoryRouter, Route, RouteObject, Routes, matchRoutes, useLocation} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
@@ -61,7 +64,7 @@ vi.mock('@/shared/stores/useFeatureFlagsStore', async (importOriginal) => ({
 
 type PrivateRouteElementType = ReactElement<{hasAnyAuthorities?: string[]}>;
 
-type SettingsElementType = ReactElement<{sidebarNavItems: SettingsNavItemI[]}>;
+type SettingsElementType = ReactElement<{sidebarNavItems?: SettingsNavItemI[]}>;
 
 interface SettingsNavEntryI {
     href: string;
@@ -70,27 +73,36 @@ interface SettingsNavEntryI {
 
 interface SettingsRouteI {
     element: SettingsElementType;
+    fullPath: string;
     navEntries: SettingsNavEntryI[];
     path: string;
 }
 
-const findSettingsRoutes = (routes: RouteObject[]): RouteObject[] =>
-    routes.flatMap((route) => [
-        ...((route.element as ReactElement | undefined)?.type === Settings ? [route] : []),
-        ...(route.children ? findSettingsRoutes(route.children) : []),
-    ]);
+interface SettingsRouteMatchI {
+    fullPath: string;
+    route: RouteObject;
+}
 
-const findNavItemRoute = (settingsRoute: RouteObject, href: string) => {
-    const settingsPathSegment = `/${settingsRoute.path}`;
+const joinRoutePath = (parentPath: string, path: string | undefined) =>
+    path ? (path.startsWith('/') ? path : `${parentPath}/${path}`).replace(/\/+/g, '/') : parentPath;
 
-    const relativePath = href.startsWith('/')
-        ? href.slice(href.indexOf(settingsPathSegment) + settingsPathSegment.length).replace(/^\//, '')
-        : href;
+const isSettingsElement = (element: ReactElement | undefined) =>
+    element?.type === Settings || element?.type === SettingsLayout;
 
-    return settingsRoute.children?.find((childRoute) =>
-        relativePath === '' ? childRoute.index : childRoute.path === relativePath
-    );
-};
+const findSettingsRoutes = (routes: RouteObject[], parentPath = ''): SettingsRouteMatchI[] =>
+    routes.flatMap((route) => {
+        const fullPath = joinRoutePath(parentPath, route.path);
+
+        return [
+            ...(isSettingsElement(route.element as ReactElement | undefined) ? [{fullPath, route}] : []),
+            ...(route.children ? findSettingsRoutes(route.children, fullPath) : []),
+        ];
+    });
+
+const getSidebarNavItems = (element: SettingsElementType, fullPath: string) =>
+    element.type === Settings
+        ? element.props.sidebarNavItems!
+        : getSettingsNavItems(resolvePlatformMode(fullPath, undefined));
 
 const isTenantAdminOnly = (route: RouteObject) => {
     const guardedRoutes = route.element ? [route] : (route.children ?? []).filter((childRoute) => childRoute.element);
@@ -106,23 +118,23 @@ const isTenantAdminOnly = (route: RouteObject) => {
 };
 
 const getSettingsRoutes = (): SettingsRouteI[] => {
-    const router = getRouter(new QueryClient());
+    const routes = getRouter(new QueryClient()).routes as RouteObject[];
 
-    return findSettingsRoutes(router.routes as RouteObject[]).map((settingsRoute) => {
-        const element = settingsRoute.element as SettingsElementType;
+    return findSettingsRoutes(routes).map(({fullPath, route}) => {
+        const element = route.element as SettingsElementType;
 
-        const navEntries = element.props.sidebarNavItems
+        const navEntries = getSidebarNavItems(element, fullPath)
             .flatMap((navItem) => navItem.items ?? [navItem])
             .filter((navItem) => navItem.href !== undefined)
             .map((navItem) => {
-                const navItemRoute = findNavItemRoute(settingsRoute, navItem.href!);
+                const navItemRoute = matchRoutes(routes, navItem.href!)?.at(-1)?.route;
 
                 expect(navItemRoute, `route for settings entry ${navItem.href}`).toBeDefined();
 
                 return {href: navItem.href!, tenantAdminOnly: isTenantAdminOnly(navItemRoute!)};
             });
 
-        return {element, navEntries, path: settingsRoute.path!};
+        return {element, fullPath, navEntries, path: route.path!};
     });
 };
 
@@ -131,10 +143,9 @@ const findSettingsIndexElements = (routes: RouteObject[], parentPath = ''): Reco
         routes.flatMap((route) => {
             const routePath = route.path ? `${parentPath}/${route.path}`.replace(/\/+/g, '/') : parentPath;
 
-            const indexRoute =
-                (route.element as ReactElement | undefined)?.type === Settings
-                    ? route.children?.find((childRoute) => childRoute.index)
-                    : undefined;
+            const indexRoute = isSettingsElement(route.element as ReactElement | undefined)
+                ? route.children?.find((childRoute) => childRoute.index)
+                : undefined;
 
             return [
                 ...(indexRoute ? [[routePath, indexRoute.element as ReactElement]] : []),
@@ -167,8 +178,8 @@ const resolveSettingsIndexRedirect = (settingsPath: string) => {
     return pathname;
 };
 
-const renderNavHrefs = (element: SettingsElementType) => {
-    const {container, unmount} = render(<MemoryRouter>{element}</MemoryRouter>);
+const renderNavHrefs = (element: SettingsElementType, fullPath: string) => {
+    const {container, unmount} = render(<MemoryRouter initialEntries={[fullPath]}>{element}</MemoryRouter>);
 
     const navHrefs = Array.from(container.querySelectorAll('[data-nav-href]')).map((navElement) =>
         navElement.getAttribute('data-nav-href')
@@ -313,7 +324,7 @@ describe('settings route authorities', () => {
     it('lets only a tenant admin open the API Connectors settings pages', () => {
         const authorities = getChildRouteAuthorities('api-connectors');
 
-        expect(authorities.length).toBe(8);
+        expect(authorities.length).toBe(4);
         authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
     });
 
@@ -412,8 +423,8 @@ describe('settings navigation visibility', () => {
     });
 
     it('hides from a non-admin every settings entry whose route only a tenant admin may open', () => {
-        getSettingsRoutes().forEach(({element, navEntries}) => {
-            const navHrefs = renderNavHrefs(element);
+        getSettingsRoutes().forEach(({element, fullPath, navEntries}) => {
+            const navHrefs = renderNavHrefs(element, fullPath);
 
             navEntries.forEach(({href, tenantAdminOnly}) => {
                 if (tenantAdminOnly) {
@@ -428,8 +439,8 @@ describe('settings navigation visibility', () => {
     it('shows a tenant admin every settings entry', () => {
         hoisted.isTenantAdmin = true;
 
-        getSettingsRoutes().forEach(({element, navEntries}) => {
-            const navHrefs = renderNavHrefs(element);
+        getSettingsRoutes().forEach(({element, fullPath, navEntries}) => {
+            const navHrefs = renderNavHrefs(element, fullPath);
 
             navEntries.forEach(({href}) => expect(navHrefs, `entry ${href}`).toContain(href));
         });
@@ -458,6 +469,6 @@ describe('settings navigation visibility', () => {
 
         hoisted.embeddedScopes = [];
 
-        expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/mcp-server');
+        expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/settings/mcp-server');
     });
 });
