@@ -117,10 +117,14 @@ const AutomationWorkflowConfigurations = () => {
         >
             <PageLoader errors={[projectsError]} loading={projectsIsLoading}>
                 {listedProjects.length > 0 ? (
-                    <div className="w-full divide-y divide-border/50 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
+                    <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                         {listedProjects.map((project) => (
-                            <section aria-label={project.name} className="py-3" key={project.id}>
-                                <h2 className="mb-2 flex items-center gap-2 text-base font-semibold">
+                            <section
+                                aria-label={project.name}
+                                className="mb-2 rounded border border-border/50"
+                                key={project.id}
+                            >
+                                <h2 className="flex items-center gap-2 p-3 text-base font-semibold">
                                     <FolderIcon
                                         aria-hidden="true"
                                         className="size-6 shrink-0 text-content-neutral-secondary"
@@ -129,7 +133,7 @@ const AutomationWorkflowConfigurations = () => {
                                     {project.name}
                                 </h2>
 
-                                <div className="pl-8">
+                                <div className="mx-3 mt-1 mb-3">
                                     <AutomationWorkflowProjectConfigurationList
                                         environmentId={currentEnvironmentId}
                                         onCreate={() => setConfigurationDialog({project})}
