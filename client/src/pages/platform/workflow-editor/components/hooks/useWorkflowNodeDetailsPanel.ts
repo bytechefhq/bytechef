@@ -94,10 +94,10 @@ import resolveFallbackTab from './resolveFallbackTab';
 import resolveMissingDefinitionMessage from './resolveMissingDefinitionMessage';
 import {resolveMissingRequiredPropertiesRefetch} from './resolveMissingRequiredPropertiesRefetch';
 import resolveNodeConnectionFields from './resolveNodeConnectionFields';
-import resolveNodeOpenTab from './resolveNodeOpenTab';
 import resolveShowOutputTab from './resolveShowOutputTab';
 import resolveSyncedOperationName from './resolveSyncedOperationName';
 import useDisplayConditionsRefreshAfterOperationChange from './useDisplayConditionsRefreshAfterOperationChange';
+import useNodeOpenTab from './useNodeOpenTab';
 import useNodeOperationProperties from './useNodeOperationProperties';
 import useRefreshAfterLookupFailure from './useRefreshAfterLookupFailure';
 
@@ -145,7 +145,6 @@ export default function useWorkflowNodeDetailsPanel({
 
     const errorsLoadingArmedRef = useRef(false);
     const lastErrorsDataUpdatedAtRef = useRef(0);
-    const nodeOpenTabResolvedNodeNameRef = useRef<string | undefined>(undefined);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -1263,43 +1262,14 @@ export default function useWorkflowNodeDetailsPanel({
         currentWorkflowNodeConnections.length,
     ]);
 
-    useEffect(() => {
-        const workflowNodeName = currentNode?.workflowNodeName;
-
-        if (!workflowNodeName) {
-            nodeOpenTabResolvedNodeNameRef.current = undefined;
-
-            return;
-        }
-
-        if (nodeOpenTabResolvedNodeNameRef.current === workflowNodeName) {
-            return;
-        }
-
-        const nodeOpenTabResolution = resolveNodeOpenTab({
-            componentDefinition: currentComponentDefinition,
-            connectionsFetched: workflowTestConfigurationConnectionsFetched,
-            nodeComponentName: currentNode?.componentName,
-            testConfigurationConnectionsCount: workflowTestConfigurationConnections?.length ?? 0,
-        });
-
-        if (nodeOpenTabResolution === 'WAIT') {
-            return;
-        }
-
-        nodeOpenTabResolvedNodeNameRef.current = workflowNodeName;
-
-        if (nodeOpenTabResolution === 'CONNECTION') {
-            setActiveTab('connection');
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        currentComponentDefinition,
-        currentNode?.componentName,
-        currentNode?.workflowNodeName,
-        workflowTestConfigurationConnections,
-        workflowTestConfigurationConnectionsFetched,
-    ]);
+    useNodeOpenTab({
+        componentDefinition: currentComponentDefinition,
+        connectionsFetched: workflowTestConfigurationConnectionsFetched,
+        nodeComponentName: currentNode?.componentName,
+        onConnectionTabRequired: () => setActiveTab('connection'),
+        testConfigurationConnectionsCount: workflowTestConfigurationConnections?.length ?? 0,
+        workflowNodeName: currentNode?.workflowNodeName,
+    });
 
     // Update currentNode with connection data, operationName and type
     useEffect(() => {
