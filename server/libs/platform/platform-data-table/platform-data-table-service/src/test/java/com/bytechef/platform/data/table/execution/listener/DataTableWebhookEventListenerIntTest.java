@@ -398,9 +398,7 @@ class DataTableWebhookEventListenerIntTest {
     }
 
     private long register(String baseName, String workflowExecutionId, DataTableWebhookType type, long environmentId) {
-        return dataTableWebhookService.addWebhook(
-            baseName, workflowExecutionId, "http://localhost:9555/webhooks/" + workflowExecutionId, type,
-            environmentId);
+        return dataTableWebhookService.addWebhook(baseName, workflowExecutionId, type, environmentId);
     }
 
     private static Map<String, Object> row(String name) {
