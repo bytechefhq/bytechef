@@ -13,9 +13,11 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
@@ -34,6 +36,7 @@ import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
@@ -70,13 +73,13 @@ import tools.jackson.databind.ObjectMapper;
 /**
  * The API collection, connection, connection-definition, context-factory, temp-file-storage, workspace-connection,
  * component-definition, resource-grant, user, workspace-user, project, project-deployment, project-workflow and
- * workflow services, and the job, job-completion, principal-job, task-execution and task-file-storage collaborators,
- * are stubbed: {@code AppConnectionServiceImpl}, {@code AppFacadeImpl}, {@code AppSharingFacadeImpl},
- * {@code AppExecutionFacadeImpl}, {@code AppProxyExecutor}, {@code AppCallableWorkflowResolver},
- * {@code AppApiCollectionResolver} and {@code AppWorkflowExecutionFacadeImpl} need them and their real implementations
- * live in modules this one does not depend on. The app lane is a real executor carrying the same tenant and
- * context-propagation decoration as production (so the request's security context reaches the lane), so a test can
- * prove the tenant reaches it.
+ * workflow services, the workspace facade, and the job, job-completion, principal-job, task-execution and
+ * task-file-storage collaborators, are stubbed: {@code AppConnectionServiceImpl}, {@code AppFacadeImpl},
+ * {@code AppSharingFacadeImpl}, {@code AppPortalFacadeImpl}, {@code AppExecutionFacadeImpl}, {@code AppProxyExecutor},
+ * {@code AppCallableWorkflowResolver}, {@code AppApiCollectionResolver} and {@code AppWorkflowExecutionFacadeImpl} need
+ * them and their real implementations live in modules this one does not depend on. The app lane is a real executor
+ * carrying the same tenant and context-propagation decoration as production (so the request's security context reaches
+ * the lane), so a test can prove the tenant reaches it.
  *
  * Repositories are not enabled here: the production {@code AppJdbcRepositoryConfiguration} auto-configuration is gated
  * on an {@code AbstractJdbcConfiguration} bean, which the nested class supplies.
@@ -143,6 +146,11 @@ public class AppIntTestConfiguration {
     }
 
     @Bean
+    CategoryService categoryService() {
+        return Mockito.mock(CategoryService.class);
+    }
+
+    @Bean
     ClusterElementDefinitionFacade clusterElementDefinitionFacade() {
         return Mockito.mock(ClusterElementDefinitionFacade.class);
     }
@@ -183,6 +191,11 @@ public class AppIntTestConfiguration {
     @Bean
     PrincipalJobFacade principalJobFacade() {
         return Mockito.mock(PrincipalJobFacade.class);
+    }
+
+    @Bean
+    ProjectOwnershipService projectOwnershipService() {
+        return Mockito.mock(ProjectOwnershipService.class);
     }
 
     @Bean
@@ -285,6 +298,11 @@ public class AppIntTestConfiguration {
     @Bean
     WorkspaceUserService workspaceUserService() {
         return Mockito.mock(WorkspaceUserService.class);
+    }
+
+    @Bean
+    WorkspaceFacade workspaceFacade() {
+        return Mockito.mock(WorkspaceFacade.class);
     }
 
     @Bean
