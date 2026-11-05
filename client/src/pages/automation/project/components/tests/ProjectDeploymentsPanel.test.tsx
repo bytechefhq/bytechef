@@ -47,18 +47,12 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-li
         expandAll,
         newlyCreatedDeploymentId,
         projectDeployments,
-        showEnvironment,
     }: {
         expandAll?: boolean;
         newlyCreatedDeploymentId?: number;
         projectDeployments: ProjectDeployment[];
-        showEnvironment?: boolean;
     }) => (
-        <ul
-            data-expand-all={String(!!expandAll)}
-            data-show-environment={String(!!showEnvironment)}
-            data-testid="project-deployment-list"
-        >
+        <ul data-expand-all={String(!!expandAll)} data-testid="project-deployment-list">
             {projectDeployments.map((projectDeployment) => (
                 <li key={projectDeployment.id}>
                     {projectDeployment.id === newlyCreatedDeploymentId
@@ -202,12 +196,6 @@ describe('ProjectDeploymentsPanel', () => {
         );
 
         expect(screen.getByTestId('project-deployment-list')).toHaveAttribute('data-expand-all', 'true');
-    });
-
-    it('hides the environment badge unless asked to show it', () => {
-        renderProjectDeploymentsPanel();
-
-        expect(screen.getByTestId('project-deployment-list')).toHaveAttribute('data-show-environment', 'false');
     });
 
     it('expands the given deployment', () => {

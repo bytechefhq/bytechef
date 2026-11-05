@@ -25,7 +25,6 @@ interface ProjectDeploymentsPanelProps {
     expandedProjectDeploymentId?: number;
     onProjectDeploymentSaved: (projectDeploymentId: number) => void;
     project: Project;
-    showEnvironment?: boolean;
 }
 
 const ProjectDeploymentsPanel = ({
@@ -34,7 +33,6 @@ const ProjectDeploymentsPanel = ({
     expandedProjectDeploymentId,
     onProjectDeploymentSaved,
     project,
-    showEnvironment = false,
 }: ProjectDeploymentsPanelProps) => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -173,7 +171,6 @@ const ProjectDeploymentsPanel = ({
                         newlyCreatedDeploymentId={expandedProjectDeploymentId}
                         project={project}
                         projectDeployments={environmentProjectDeployments}
-                        showEnvironment={showEnvironment}
                         showTags={false}
                         tags={tags ?? []}
                         taskDispatcherDefinitions={taskDispatcherDefinitions}

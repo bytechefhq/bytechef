@@ -8,7 +8,6 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemDropdownMenu';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
-import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
@@ -30,7 +29,6 @@ interface ProjectDeploymentListItemProps {
     hideOpenInProject?: boolean;
     projectDeployment: ProjectDeployment;
     remainingTags?: Tag[];
-    showEnvironment?: boolean;
     showTags?: boolean;
 }
 
@@ -38,7 +36,6 @@ const ProjectDeploymentListItem = ({
     hideOpenInProject,
     projectDeployment,
     remainingTags,
-    showEnvironment,
     showTags = true,
 }: ProjectDeploymentListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
@@ -129,12 +126,6 @@ const ProjectDeploymentListItem = ({
 
     const showOpenProject = !hideOpenInProject && projectDeployment.projectId != null;
 
-    const environmentConfig =
-        showEnvironment && projectDeployment.environmentId != null
-            ? ENVIRONMENT_CONFIGS[projectDeployment.environmentId]
-            : undefined;
-    const EnvironmentIcon = environmentConfig?.icon;
-
     const handleOpenProjectClick = () => {
         if (projectDeployment.projectId != null) {
             openProject(projectDeployment.projectId);
@@ -155,15 +146,6 @@ const ProjectDeploymentListItem = ({
                                     aria-hidden="true"
                                     className="size-6 shrink-0 text-content-neutral-secondary"
                                 />
-
-                                {environmentConfig && EnvironmentIcon && (
-                                    <Badge
-                                        icon={<EnvironmentIcon className="size-3" />}
-                                        label={environmentConfig.shortLabel}
-                                        styleType={environmentConfig.styleType}
-                                        weight="semibold"
-                                    />
-                                )}
 
                                 {projectDeployment.description ? (
                                     <Tooltip>
