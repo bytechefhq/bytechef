@@ -171,4 +171,28 @@ describe('ProjectTabButtons Export Functionality', () => {
         expect(screen.queryByText('Pull Project from Git')).not.toBeInTheDocument();
         expect(screen.queryByText('Git Configuration')).not.toBeInTheDocument();
     });
+
+    it('should keep only the project actions that support code workflows', () => {
+        renderProjectTabButtons({...mockProps, codeWorkflow: true} as typeof mockProps);
+
+        for (const label of [
+            'Edit Project Button',
+            'Share ProjectButton',
+            'Export Project',
+            'Project History',
+            'Delete Project',
+        ]) {
+            expect(screen.getByLabelText(label)).toBeInTheDocument();
+        }
+
+        for (const label of [
+            'Duplicate Project Button',
+            'New Workflow',
+            'New Workflow from Template',
+            'Import Workflow',
+            'Import n8n Workflow',
+        ]) {
+            expect(screen.queryByLabelText(label)).not.toBeInTheDocument();
+        }
+    });
 });

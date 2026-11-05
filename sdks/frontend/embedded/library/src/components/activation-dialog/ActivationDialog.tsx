@@ -10,6 +10,7 @@ import {
     initialActivationState,
     toInputValueText,
 } from './activationReducer';
+import ComponentInputField from './ComponentInputField';
 import ConnectDialogOpener from './ConnectDialogOpener';
 import styles from './ActivationDialog.module.css';
 import {
@@ -281,6 +282,12 @@ const ActivationBody = ({
         [components, state.requiredComponents]
     );
 
+    const componentTitle = useCallback(
+        (componentName: string) =>
+            components.find((component) => component.name === componentName)?.title || componentName,
+        [components]
+    );
+
     const loadConnections = useCallback(
         async (componentName: string): Promise<boolean> => {
             try {
@@ -549,36 +556,53 @@ const ActivationBody = ({
                     <div className={styles.steps}>
                         <p className={styles.stepHint}>This automation needs a few details before it can run.</p>
 
-                        {inputs.map((input) => (
-                            <div className={styles.field} key={input.name}>
-                                <label className={styles.label} htmlFor={`activation-input-${input.name}`}>
-                                    {input.label || input.name}
+                        {inputs.map((input) =>
+                            input.componentReference && !input.provided ? (
+                                <ComponentInputField
+                                    componentReference={input.componentReference}
+                                    componentTitle={componentTitle(input.componentReference.componentName)}
+                                    connectionId={state.selections[input.componentReference.componentName]}
+                                    fetch={fetch}
+                                    key={input.name}
+                                    label={input.label || input.name}
+                                    name={input.name}
+                                    onChange={(value) => dispatch({name: input.name, type: 'SET_INPUT_VALUE', value})}
+                                    required={input.required}
+                                    value={toInputValueText(state.inputValues[input.name])}
+                                />
+                            ) : (
+                                <div className={styles.field} key={input.name}>
+                                    <label className={styles.label} htmlFor={`activation-input-${input.name}`}>
+                                        {input.label || input.name}
 
-                                    {input.required && !input.provided && <span className={styles.required}>*</span>}
-                                </label>
+                                        {input.required && !input.provided && (
+                                            <span className={styles.required}>*</span>
+                                        )}
+                                    </label>
 
-                                {input.provided ? (
-                                    <span className={styles.notice} id={`activation-input-${input.name}`}>
-                                        {PROVIDED_BY_ADMINISTRATOR_LABEL}
-                                    </span>
-                                ) : (
-                                    <input
-                                        className={styles.input}
-                                        id={`activation-input-${input.name}`}
-                                        onChange={(event) =>
-                                            dispatch({
-                                                name: input.name,
-                                                type: 'SET_INPUT_VALUE',
-                                                value: event.target.value,
-                                            })
-                                        }
-                                        required={input.required}
-                                        type={INPUT_TYPE_ATTRIBUTES[input.type ?? ''] ?? 'text'}
-                                        value={toInputValueText(state.inputValues[input.name])}
-                                    />
-                                )}
-                            </div>
-                        ))}
+                                    {input.provided ? (
+                                        <span className={styles.notice} id={`activation-input-${input.name}`}>
+                                            {PROVIDED_BY_ADMINISTRATOR_LABEL}
+                                        </span>
+                                    ) : (
+                                        <input
+                                            className={styles.input}
+                                            id={`activation-input-${input.name}`}
+                                            onChange={(event) =>
+                                                dispatch({
+                                                    name: input.name,
+                                                    type: 'SET_INPUT_VALUE',
+                                                    value: event.target.value,
+                                                })
+                                            }
+                                            required={input.required}
+                                            type={INPUT_TYPE_ATTRIBUTES[input.type ?? ''] ?? 'text'}
+                                            value={toInputValueText(state.inputValues[input.name])}
+                                        />
+                                    )}
+                                </div>
+                            )
+                        )}
                     </div>
                 )}
 

@@ -171,6 +171,17 @@ function perform(input, connection, context) {
 }
 ```
 
+In Python, read a parameter by subscript:
+
+```python
+def perform(input, connection, context):
+    token = connection["googleMaps"]["api_token"]
+
+    return None
+```
+
 Declare `connection` as a plain, required parameter. ByteChef counts the required parameters of `perform` to decide whether to pass it, so a JavaScript default value on `connection` makes the script receive `perform(input, context)` instead. Scripts that declare `perform(input, context)`, with or without further optional parameters, keep working unchanged.
+
+The same `perform(input, connection, context)` receives the connections under the Process, Docker, Kubernetes and AWS Batch runners, read from the task's `connections.json` file.
 
 Datastream item processors and AI skill scripts receive an empty `connection`. A Script tool's return value is sent to the AI model, so don't return connection parameters from a tool.

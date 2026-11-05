@@ -340,15 +340,32 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public Object executePerformForPolyglot(
         @ComponentNameParam String componentName, int componentVersion, String actionName,
         Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection,
+        Map<String, ? extends ComponentConnection> componentConnections, Map<String, ?> extensions,
         @Nullable Long environmentId, ActionContext context) {
 
-        PerformFunction performFunction =
-            (PerformFunction) componentDefinitionRegistry
-                .getActionDefinition(componentName, componentVersion, actionName)
-                .getPerform()
-                .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
+        BasePerformFunction basePerformFunction = componentDefinitionRegistry
+            .getActionDefinition(componentName, componentVersion, actionName)
+            .getPerform()
+            .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
 
-        return executeSingleConnectionPerform(performFunction, inputParameters, componentConnection, context);
+        if (basePerformFunction instanceof PerformFunction performFunction) {
+            return executeSingleConnectionPerform(performFunction, inputParameters, componentConnection, context);
+        }
+
+        if (basePerformFunction instanceof MultipleConnectionsPerformFunction performFunction) {
+            Map<String, ComponentConnection> connections = new HashMap<>(componentConnections);
+
+            if (componentConnection != null) {
+                connections.putIfAbsent(componentName, componentConnection);
+            }
+
+            return executeMultipleConnectionsPerform(
+                performFunction, inputParameters, connections, extensions, context);
+        }
+
+        throw new IllegalArgumentException(
+            ("Action %s of component %s cannot be invoked from code: its perform streams its result to a sink that "
+                + "only a workflow node provides").formatted(actionName, componentName));
     }
 
     @Override

@@ -1,4 +1,4 @@
-import {ConnectedUserProjectWorkflow} from '@/ee/shared/middleware/embedded/public';
+import {ConnectedUserProjectWorkflow} from '@bytechef/embedded-api';
 
 interface RemoveAutomationHandlersI {
     onDeleteAutomation: (workflowUuid: string) => Promise<unknown>;

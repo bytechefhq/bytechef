@@ -5,6 +5,7 @@
  */
 package com.bytechef.ee.automation.configuration.public_.web.rest;
 
+import com.bytechef.ee.automation.configuration.public_.web.rest.model.EnvironmentModel;
 import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,7 +48,9 @@ public interface ProjectCodeWorkflowApi {
      * POST /projects/deploy : Deploy a new code based project
      * Deploy a new code based project.
      *
-     * @param workspaceId The id of a workspace this project will belong. (optional)
+     * @param workspaceId The id of a workspace this project will belong. (required)
+     * @param xEnvironment The environment. (optional)
+     * @param enable Whether to make the published project live in the environment: create and enable its deployment when it has none there, otherwise move the existing one to the published version and enable it. (optional, default to false)
      * @param projectFile The file of a code-native project. (optional)
      * @return Successful operation. (status code 204)
      */
@@ -66,7 +69,9 @@ public interface ProjectCodeWorkflowApi {
         consumes = { "multipart/form-data" }
     )
     default ResponseEntity<Void> deployProject(
-        @Parameter(name = "workspaceId", description = "The id of a workspace this project will belong.") @Valid @RequestParam(value = "workspaceId", required = false) Long workspaceId,
+        @Parameter(name = "workspaceId", description = "The id of a workspace this project will belong.", required = true) @Valid @RequestParam(value = "workspaceId", required = true) Long workspaceId,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
+        @Parameter(name = "enable", description = "Whether to make the published project live in the environment: create and enable its deployment when it has none there, otherwise move the existing one to the published version and enable it.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "enable", required = false, defaultValue = "false") Boolean enable,
         @Parameter(name = "projectFile", description = "The file of a code-native project.") @RequestPart(value = "projectFile", required = false) MultipartFile projectFile
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

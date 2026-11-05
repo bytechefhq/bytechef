@@ -13,6 +13,8 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.Emb
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectComponentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowTemplateModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +37,14 @@ public interface AutomationWorkflowProjectMapper
     extends Converter<AutomationWorkflowProjectDTO, AutomationWorkflowProjectModel> {
 
     @Override
+    @Mapping(target = "kind", source = "codeWorkflowProject")
     AutomationWorkflowProjectModel convert(AutomationWorkflowProjectDTO automationWorkflowProjectDTO);
 
     AutomationWorkflowProjectComponentModel toComponentModel(ConnectedUserWorkflowTemplateDTO.Component component);
+
+    @Mapping(target = "group", ignore = true)
+    ComponentInputReferenceModel toComponentInputReferenceModel(
+        WorkflowInput.ComponentInputReference componentInputReference);
 
     @Mapping(target = "components", expression = "java(toComponentModels(workflowTemplateDTO))")
     @Mapping(target = "id", source = "workflowUuid")
@@ -60,5 +67,11 @@ public interface AutomationWorkflowProjectMapper
             .stream()
             .map(this::toComponentModel)
             .toList();
+    }
+
+    default AutomationWorkflowProjectModel.KindEnum mapKind(boolean codeWorkflowProject) {
+        return codeWorkflowProject
+            ? AutomationWorkflowProjectModel.KindEnum.REFERENCE
+            : AutomationWorkflowProjectModel.KindEnum.COPY;
     }
 }

@@ -1,0 +1,54 @@
+---
+title: Sample Repositories
+description: Every public ByteChef sample repository - code workflows, custom components, the embedded sample app and the ComponentKit integrations - with what each one shows.
+---
+
+ByteChef keeps a working sample for each way you extend or embed the platform. Every repository builds or checks
+locally, and its README walks through deploying it. Each table links the page that explains the feature.
+
+## Code workflows
+
+A whole project or integration defined in code - see [Code Workflows](/platform/automation/build/workflows/code-workflows).
+Each sample has a local check that evaluates the file the way the server does and runs its tasks once.
+
+| | Java | JavaScript | Python |
+|---|---|---|---|
+| **Automation project** | [bytechef-automation-sample-code-workflow-java](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-java) | [bytechef-automation-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-javascript) | [bytechef-automation-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-python) |
+| **Embedded catalog code project** | [bytechef-embedded-automation-sample-code-workflow-java](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-java) | [bytechef-embedded-automation-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-javascript) | [bytechef-embedded-automation-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-python) |
+| **Embedded code integration** | [bytechef-embedded-integration-sample-code-workflow-java](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-java) | [bytechef-embedded-integration-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript) | [bytechef-embedded-integration-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-python) |
+
+Each sample includes a workflow started by the Gmail **New Email** trigger, one that calls the Gmail **Search Email**
+action, and `notifySlackOnNewEmail`, which posts each new email to Slack through a declared `slack` connection and
+picks its channel from Slack's own `channel` input.
+
+- **Automation project** - a project deployed to Automation → Projects; it also has a workflow that takes a `name` input
+  and returns a greeting. See [Code Workflows](/platform/automation/build/workflows/code-workflows).
+- **Embedded catalog code project** - a catalog project run by reference for your connected users; its
+  `greetOnRequest` workflow has a Request trigger. See
+  [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows).
+- **Embedded code integration** - an integration built on the Gmail component, so its Gmail calls need no declared
+  connection. See [Code Integrations](/platform/embedded/build/code-integrations).
+
+## Custom components
+
+Your own component, uploaded and used like a built-in one - see
+[Custom Components](/platform/settings/components/custom-components).
+
+| Language | Repository |
+|---|---|
+| Java | [bytechef-sample-custom-component-java](https://github.com/bytechefhq/bytechef-sample-custom-component-java) |
+| JavaScript | [bytechef-sample-custom-component-javascript](https://github.com/bytechefhq/bytechef-sample-custom-component-javascript) |
+
+## Embedded
+
+| Repository | Shows |
+|---|---|
+| [bytechef-embedded-sample-app](https://github.com/bytechefhq/bytechef-embedded-sample-app) | A reference SaaS app that embeds ByteChef end to end: the integration marketplace, connections, the Automation Hub, workflow templates and the custom workflow builder. See [Sample App](/platform/embedded/get-started/quick-start/sample-app). |
+| [bytechef-embedded-componentkit-vercel-ai-sdk](https://github.com/bytechefhq/bytechef-embedded-componentkit-vercel-ai-sdk) | The ComponentKit `/tools` endpoints consumed from a TypeScript app through the Vercel AI SDK. See [Component Kit](/platform/embedded/build/component-kit). |
+| [bytechef-embedded-componentkit-spring-ai](https://github.com/bytechefhq/bytechef-embedded-componentkit-spring-ai) | The same endpoints consumed from a Java app through Spring AI. See [Component Kit](/platform/embedded/build/component-kit). |
+
+## Templates
+
+Pre-built workflows and projects live in [bytechef-workflows](https://github.com/bytechefhq/bytechef-workflows) -
+every workflow and project there is published as a template you can preview and import. See
+[Templates](/platform/automation/build/workflows/templates).

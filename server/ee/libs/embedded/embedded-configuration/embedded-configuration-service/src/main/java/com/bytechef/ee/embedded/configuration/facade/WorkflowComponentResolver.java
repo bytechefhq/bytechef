@@ -13,7 +13,9 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateD
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
@@ -34,16 +37,19 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class WorkflowComponentResolver {
 
+    private static final String CODE_WORKFLOW_COMPONENT_NAME = "codeWorkflow";
     private static final String MANUAL_COMPONENT_NAME = "manual";
 
+    private final ComponentConnectionFacade componentConnectionFacade;
     private final ComponentDefinitionService componentDefinitionService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
     @SuppressFBWarnings("EI")
     public WorkflowComponentResolver(
-        ComponentDefinitionService componentDefinitionService,
+        ComponentConnectionFacade componentConnectionFacade, ComponentDefinitionService componentDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
 
+        this.componentConnectionFacade = componentConnectionFacade;
         this.componentDefinitionService = componentDefinitionService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
     }
@@ -69,7 +75,18 @@ public class WorkflowComponentResolver {
         for (WorkflowTask workflowTask : workflow.getTasks(true)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-            workflowNodeTypesByName.putIfAbsent(workflowNodeType.name(), workflowNodeType);
+            if (!Objects.equals(workflowNodeType.name(), CODE_WORKFLOW_COMPONENT_NAME)) {
+                workflowNodeTypesByName.putIfAbsent(workflowNodeType.name(), workflowNodeType);
+            }
+
+            for (ComponentConnection componentConnection : componentConnectionFacade.getComponentConnections(
+                workflowTask)) {
+
+                workflowNodeTypesByName.putIfAbsent(
+                    componentConnection.componentName(),
+                    new WorkflowNodeType(
+                        componentConnection.componentName(), componentConnection.componentVersion(), null));
+            }
         }
 
         return resolveComponents(workflowNodeTypesByName);

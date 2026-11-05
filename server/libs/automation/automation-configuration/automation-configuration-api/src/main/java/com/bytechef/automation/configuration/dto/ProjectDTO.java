@@ -30,36 +30,50 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectDTO(
-    Category category, String createdBy, Instant createdDate, String description,
-    Integer developmentDeploymentCount, Long id, String name, String lastModifiedBy, Instant lastModifiedDate,
-    Instant lastPublishedDate, Status lastStatus,
-    int lastProjectVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds, List<Tag> tags,
-    String uuid, int version, Long workspaceId) {
+    Category category, boolean codeWorkflow, String codeWorkflowLanguage, String createdBy, Instant createdDate,
+    String description, Integer developmentDeploymentCount, Long id, String name, String lastModifiedBy,
+    Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus, int lastProjectVersion,
+    List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds, List<Tag> tags, String uuid, int version,
+    Long workspaceId) {
 
     public ProjectDTO(Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags) {
-        this(category, project, projectWorkflowIds, tags, null);
+        this(category, project, projectWorkflowIds, tags, null, false, null);
     }
 
     public ProjectDTO(
         Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags,
         Integer developmentDeploymentCount) {
 
+        this(category, project, projectWorkflowIds, tags, developmentDeploymentCount, false, null);
+    }
+
+    public ProjectDTO(
+        Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags, boolean codeWorkflow,
+        String codeWorkflowLanguage) {
+
+        this(category, project, projectWorkflowIds, tags, null, codeWorkflow, codeWorkflowLanguage);
+    }
+
+    public ProjectDTO(
+        Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags,
+        Integer developmentDeploymentCount, boolean codeWorkflow, String codeWorkflowLanguage) {
+
         this(
-            category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(),
-            developmentDeploymentCount, project.getId(),
-            project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
-            project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
-            project.getProjectVersions(), projectWorkflowIds, tags, project.getUuid(), project.getVersion(),
-            project.getWorkspaceId());
+            category, codeWorkflow, codeWorkflowLanguage, project.getCreatedBy(), project.getCreatedDate(),
+            project.getDescription(), developmentDeploymentCount, project.getId(), project.getName(),
+            project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastPublishedDate(),
+            project.getLastStatus(), project.getLastProjectVersion(), project.getProjectVersions(),
+            projectWorkflowIds, tags, project.getUuid(), project.getVersion(), project.getWorkspaceId());
     }
 
     public ProjectDTO(Project project) {
         this(
-            project.getCategoryId() == null ? null : new Category(project.getCategoryId()), project.getCreatedBy(),
-            project.getCreatedDate(), project.getDescription(), null, project.getId(), project.getName(),
-            project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastPublishedDate(),
-            project.getLastStatus(), project.getLastProjectVersion(), project.getProjectVersions(), List.of(),
-            List.of(), project.getUuid(), project.getVersion(), project.getWorkspaceId());
+            project.getCategoryId() == null ? null : new Category(project.getCategoryId()), false, null,
+            project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), null, project.getId(),
+            project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
+            project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
+            project.getProjectVersions(), List.of(), List.of(), project.getUuid(), project.getVersion(),
+            project.getWorkspaceId());
     }
 
     public static Builder builder() {
@@ -84,6 +98,8 @@ public record ProjectDTO(
     @SuppressFBWarnings("EI")
     public static final class Builder {
         private Category category;
+        private boolean codeWorkflow;
+        private String codeWorkflowLanguage;
         private String createdBy;
         private Instant createdDate;
         private String description;
@@ -106,6 +122,18 @@ public record ProjectDTO(
 
         public Builder category(Category category) {
             this.category = category;
+
+            return this;
+        }
+
+        public Builder codeWorkflow(boolean codeWorkflow) {
+            this.codeWorkflow = codeWorkflow;
+
+            return this;
+        }
+
+        public Builder codeWorkflowLanguage(String codeWorkflowLanguage) {
+            this.codeWorkflowLanguage = codeWorkflowLanguage;
 
             return this;
         }
@@ -208,9 +236,9 @@ public record ProjectDTO(
 
         public ProjectDTO build() {
             return new ProjectDTO(
-                category, createdBy, createdDate, description, null, id, name, lastModifiedBy, lastModifiedDate,
-                lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, projectWorkflowIds, tags, uuid,
-                version, workspaceId);
+                category, codeWorkflow, codeWorkflowLanguage, createdBy, createdDate, description, null, id, name,
+                lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastProjectVersion, projectVersions,
+                projectWorkflowIds, tags, uuid, version, workspaceId);
         }
     }
 }

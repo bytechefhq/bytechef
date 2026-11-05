@@ -1,0 +1,366 @@
+---
+title: Code Integrations
+description: Build an embedded integration's workflows in JavaScript, Python or Java - create and edit it in ByteChef or deploy it from CI, then publish it to your connected users.
+comingSoon: true
+ee: true
+---
+
+A **code integration** is an embedded [integration](/platform/embedded/build/integrations) whose workflows are written
+in code instead of on the canvas. Your connected users meet it exactly like any other integration - in the
+[Integration Marketplace](/platform/embedded/build/integration-marketplace), the connect dialog and their instances -
+and its workflows run on the same engine. Only the authoring and the lifecycle differ.
+
+It uses the [code workflow contract](/platform/automation/build/workflows/code-workflows): the same workflows, inputs,
+outputs, triggers, tasks, task context and type definitions. The one difference is how it is identified: a code
+integration is keyed by the **component it integrates**, so it declares `componentName` and `componentVersion` where a
+project declares `name`.
+
+<Callout title="Enterprise Edition only">
+    Code integrations require an Enterprise Edition deployment (`bytechef.edition=ee`).
+</Callout>
+
+## The definition
+
+| Member | Type | Required | |
+|---|---|---|---|
+| `componentName` | string | Yes | The component this integration is for. It must exist on the server. |
+| `componentVersion` | integer | Yes | That component's version. |
+| `version` | string | No | Defaults to `0.0.1`. |
+| `description` | string | No | |
+| `workflows` | list of workflows | No | [Workflows](/platform/automation/build/workflows/code-workflows#workflow) as in a code project. |
+
+```javascript tab="JavaScript"
+({
+    componentName: "googleMail",
+    componentVersion: 1,
+    version: "0.0.1",
+    description: "A sample code integration built on the Gmail component.",
+    workflows: [
+        {
+            name: "summarizeNewEmail",
+            label: "Summarize New Email",
+            description: "Runs for every new email in the connected user's inbox and logs who sent it.",
+            triggers: [{name: "newEmail", type: "googleMail/v1/newEmailPolling", parameters: {format: "SIMPLE"}}],
+            outputs: [{name: "summary", task: "summarize"}],
+            tasks: [
+                {
+                    name: "summarize",
+                    label: "Summarize",
+                    description: "Builds a one-line summary of the new email.",
+                    perform: function (context) {
+                        const email = context.input("newEmail");
+
+                        const summary = "New email from " + email.from + ": " + email.subject;
+
+                        context.log("info", summary);
+
+                        return summary;
+                    }
+                }
+            ]
+        },
+        {
+            name: "fetchRecentEmails",
+            label: "Fetch Recent Emails",
+            description: "Returns the connected user's most recent emails, optionally only those from one sender.",
+            triggers: [{name: "request", type: "request/v1/awaitWorkflowAndRespond"}],
+            outputs: [{name: "emails", task: "fetchEmails"}],
+            tasks: [
+                {
+                    name: "fetchEmails",
+                    label: "Fetch Emails",
+                    description: "Searches the inbox with the Gmail Search Email action.",
+                    perform: function (context) {
+                        const request = context.input()["request"] || {};
+                        const body = request.body || {};
+
+                        const result = context.component.googleMail.searchEmail(
+                            {from: body.from, maxResults: body.maxResults || 10});
+
+                        context.log("info", "Found " + (result.messages || []).length + " emails");
+
+                        return result.messages || [];
+                    }
+                }
+            ]
+        },
+        {
+            name: "notifySlackOnNewEmail",
+            label: "Notify Slack on New Email",
+            description: "Posts every new email in the connected user's inbox to a Slack channel.",
+            inputs: [
+                {
+                    name: "channel", label: "Slack Channel", type: "STRING", required: true,
+                    componentName: "slack", componentVersion: 1, groupName: "channel"
+                }
+            ],
+            triggers: [{name: "newEmail", type: "googleMail/v1/newEmailPolling", parameters: {format: "SIMPLE"}}],
+            outputs: [{name: "message", task: "postToSlack"}],
+            tasks: [
+                {
+                    name: "postToSlack",
+                    label: "Post to Slack",
+                    description: "Posts the sender and subject with the Slack Send Channel Message action.",
+                    connections: [{componentName: "slack", name: "slack"}],
+                    perform: function (context) {
+                        const email = context.input("newEmail");
+
+                        const text = "New email from " + email.from + ": " + email.subject;
+
+                        const message = context.component.slack.sendChannelMessage(
+                            {channel: context.input("channel"), text: text}, "slack");
+
+                        context.log("info", "Posted to Slack: " + text);
+
+                        return message;
+                    }
+                }
+            ]
+        }
+    ]
+})
+```
+
+```python tab="Python"
+from typing import TYPE_CHECKING, Any, List
+
+if TYPE_CHECKING:
+    from bytechef_workflow_api import IntegrationDefinition, TaskContext
+
+
+def summarize(context: "TaskContext") -> str:
+    email = context.input("newEmail")
+
+    summary = f"New email from {email['from']}: {email['subject']}"
+
+    context.log("info", summary)
+
+    return summary
+
+
+def fetch_emails(context: "TaskContext") -> List[Any]:
+    request = context.input().get("request") or {}
+    body = request.get("body") or {}
+
+    result = context.component.googleMail.searchEmail(
+        {"from": body.get("from"), "maxResults": body.get("maxResults") or 10}
+    )
+
+    messages: List[Any] = result.get("messages") or []
+
+    context.log("info", f"Found {len(messages)} emails")
+
+    return messages
+
+
+def post_to_slack(context: "TaskContext") -> Any:
+    email = context.input("newEmail")
+
+    text = f"New email from {email['from']}: {email['subject']}"
+
+    message = context.component.slack.sendChannelMessage({"channel": context.input("channel"), "text": text}, "slack")
+
+    context.log("info", f"Posted to Slack: {text}")
+
+    return message
+
+
+integration: "IntegrationDefinition" = {
+    "componentName": "googleMail",
+    "componentVersion": 1,
+    "version": "0.0.1",
+    "description": "A sample code integration built on the Gmail component.",
+    "workflows": [
+        {
+            "name": "summarizeNewEmail",
+            "label": "Summarize New Email",
+            "description": "Runs for every new email in the connected user's inbox and logs who sent it.",
+            "triggers": [
+                {"name": "newEmail", "type": "googleMail/v1/newEmailPolling", "parameters": {"format": "SIMPLE"}}
+            ],
+            "outputs": [{"name": "summary", "task": "summarize"}],
+            "tasks": [
+                {
+                    "name": "summarize",
+                    "label": "Summarize",
+                    "description": "Builds a one-line summary of the new email.",
+                    "perform": summarize,
+                }
+            ],
+        },
+        {
+            "name": "fetchRecentEmails",
+            "label": "Fetch Recent Emails",
+            "description": "Returns the connected user's most recent emails, optionally only those from one sender.",
+            "triggers": [{"name": "request", "type": "request/v1/awaitWorkflowAndRespond"}],
+            "outputs": [{"name": "emails", "task": "fetchEmails"}],
+            "tasks": [
+                {
+                    "name": "fetchEmails",
+                    "label": "Fetch Emails",
+                    "description": "Searches the inbox with the Gmail Search Email action.",
+                    "perform": fetch_emails,
+                }
+            ],
+        },
+        {
+            "name": "notifySlackOnNewEmail",
+            "label": "Notify Slack on New Email",
+            "description": "Posts every new email in the connected user's inbox to a Slack channel.",
+            "inputs": [
+                {
+                    "name": "channel",
+                    "label": "Slack Channel",
+                    "type": "STRING",
+                    "required": True,
+                    "componentName": "slack",
+                    "componentVersion": 1,
+                    "groupName": "channel",
+                }
+            ],
+            "triggers": [
+                {"name": "newEmail", "type": "googleMail/v1/newEmailPolling", "parameters": {"format": "SIMPLE"}}
+            ],
+            "outputs": [{"name": "message", "task": "postToSlack"}],
+            "tasks": [
+                {
+                    "name": "postToSlack",
+                    "label": "Post to Slack",
+                    "description": "Posts the sender and subject with the Slack Send Channel Message action.",
+                    "connections": [{"componentName": "slack", "name": "slack"}],
+                    "perform": post_to_slack,
+                }
+            ],
+        },
+    ],
+}
+
+integration
+```
+
+A Java code integration is a jar with an `IntegrationHandler` implementation from
+`sdks/backend/java/embedded/integration-api`, registered through `ServiceLoader` like a
+[Java code project](/platform/automation/build/workflows/code-workflows#the-java-contract).
+
+To type-check a JavaScript or Python integration, use `ByteChef.IntegrationDefinition` from
+`@bytechef/workflow-api` or `IntegrationDefinition` from `bytechef-workflow-api`; see
+[Typed authoring](/platform/automation/build/workflows/code-workflows#typed-authoring).
+
+## Sample integrations
+
+| Language | Sample |
+|---|---|
+| Java | [bytechef-embedded-integration-sample-code-workflow-java](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-java) |
+| JavaScript | [bytechef-embedded-integration-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript) |
+| Python | [bytechef-embedded-integration-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-python) |
+
+Each sample is the Gmail integration above, with a local check that evaluates the file the way the server does and runs
+each task once against a stub that returns a sample email.
+
+## Connections
+
+A Gmail trigger in a Gmail integration runs on the connection the connected user created when they connected the
+integration. A task calls component actions with `context.component.<componentName>.<actionName>(input,
+connectionName)`, and what it declares depends on the component:
+
+- **The integration's own component** - `googleMail` above - needs no declaration and no connection name:
+  `context.component.googleMail.searchEmail({maxResults: 10})` runs on the connected user's integration connection. When
+  the integration is saved or deployed, ByteChef adds that connection to every code task under the component's name,
+  pinned to the integration's component version, unless the task already declares one on that component.
+- **Any other component** - `slack` in `notifySlackOnNewEmail` - is declared on the task and its name passed to the
+  call. An administrator picks that connection when enabling the workflow in the integration's instance configuration,
+  and every connected user's run uses it. A deploy with `enable=true` leaves such a workflow disabled until an
+  administrator has picked the connection.
+
+See [Declaring connections](/platform/automation/build/workflows/code-workflows#declaring-connections) for the syntax in
+each language.
+
+## Inputs with component options
+
+An input can take its options from an input a component declares, so the connected user picks a value from a list
+instead of typing it. `notifySlackOnNewEmail`'s `channel` input points at Slack's `channel` input with
+`componentName`, `componentVersion` and `groupName`, so the connect dialog lists the channels of the Slack workspace:
+
+```javascript
+inputs: [
+    {
+        name: "channel", label: "Slack Channel", type: "STRING", required: true,
+        componentName: "slack", componentVersion: 1, groupName: "channel"
+    }
+]
+```
+
+The options load through the same connection a task uses for that component: the connected user's integration
+connection for the integration's own component, and the connection an administrator picked in the instance
+configuration for any other. Until that connection is picked, the list is empty. See
+[Inputs, outputs and triggers](/platform/automation/build/workflows/code-workflows#inputs-outputs-and-triggers) for the
+syntax in each language.
+
+## Creating a code integration
+
+On Embedded → **Integrations**, the arrow next to **New Integration** opens a menu with **New Code Integration** and
+**Import Code Integration**.
+
+- **New Code Integration** asks for the component, a language (JavaScript or Python), a name, a description, a
+  category, tags and an optional [permission expression](/platform/embedded/build/permission-expressions). ByteChef
+  creates the integration as an unpublished draft from a starter source and opens it in the code editor.
+- **Import Code Integration** uploads a `.js`, `.py` or `.jar` file and publishes it.
+
+## Editing in ByteChef
+
+A JavaScript or Python code integration opens in a **source editor** instead of the canvas.
+
+- **Save** checks the source before storing it: source that fails to load is rejected with the loader's error and the
+  draft stays as it was. The `componentName` declared in the source must stay the integration's component - renaming
+  through the source is not supported.
+- Saves change the **draft** only. Connected users keep running the last published version until you publish the
+  integration, exactly like a visual integration.
+- A workflow keeps its identity across saves, uploads and publishes as long as its name doesn't change, so instance
+  configurations and connected users' instances keep pointing at the right workflow.
+
+Java code integrations are uploaded only; the editor does not open them.
+
+## Deploying through the API
+
+```
+POST /api/embedded/v1/integration-code-workflows/deploy
+```
+
+A `multipart/form-data` request with one file part, `integrationFile`: the `.js`, `.py` or `.jar` file. The file
+name's extension picks the language. An optional `enable` query parameter (`false` by default) makes the published
+integration live in the request's environment: ByteChef creates and enables its instance configuration when it has
+none there, otherwise it moves the existing one to the published version and enables it.
+
+Authenticate with an **Embedded API key** (Embedded → Settings → **API Keys**) that belongs to an administrator -
+deploying requires the admin role, and an organization admin key is rejected with `401`. The key is looked up in the
+environment named by the `X-Environment` header (`DEVELOPMENT`, `STAGING` or `PRODUCTION`; `PRODUCTION` when absent),
+and the request runs as the key's own ByteChef user, not as a connected user. A successful deploy returns
+`204 No Content`.
+
+```bash
+curl -X POST "$BYTECHEF_URL/api/embedded/v1/integration-code-workflows/deploy?enable=true" \
+  -H "Authorization: Bearer $BYTECHEF_EMBEDDED_API_KEY" \
+  -H "X-Environment: DEVELOPMENT" \
+  -F "integrationFile=@src/sample_code_integration.py"
+```
+
+What the endpoint does:
+
+- **It saves *and* publishes.** The upload is saved as the integration's draft and published in the same call. An
+  upload replaces any unpublished editor changes.
+- **It upserts by component.** The first deploy for a component creates the integration; every deploy after that
+  publishes a new version of it. If more than one code integration is built on the same component (possible when they
+  were created in ByteChef), an upload can't tell which one to update and is refused - edit the one you mean in the
+  source editor instead.
+
+Java uploads follow the
+[`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`](/platform/automation/build/workflows/code-workflows#restricting-java-code-workflows)
+switch.
+
+## See also
+
+- [Code Workflows](/platform/automation/build/workflows/code-workflows) - the full contract: task context, inputs,
+  outputs, triggers, concurrency, connections and typed authoring.
+- [Integrations](/platform/embedded/build/integrations) - how an integration reaches your connected users.
+- [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows) - catalog code projects,
+  run by reference.

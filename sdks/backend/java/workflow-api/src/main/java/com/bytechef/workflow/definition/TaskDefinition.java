@@ -17,25 +17,33 @@
 package com.bytechef.workflow.definition;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskDefinition {
+public interface TaskDefinition extends WorkflowTaskDefinition {
 
-    Optional<String> getDescription();
+    default Optional<List<? extends ConnectionRequirement>> getConnections() {
+        return Optional.empty();
+    }
 
-    Optional<String> getLabel();
-
-    String getName();
-
-    Optional<List<? extends Parameter>> getParameters();
+    Optional<Map<String, ?>> getParameters();
 
     PerformFunction getPerform();
 
     interface PerformFunction {
 
         Object apply();
+
+        default Object apply(TaskContext context) throws Exception {
+            return apply();
+        }
+    }
+
+    interface ContextPerformFunction {
+
+        Object apply(TaskContext context) throws Exception;
     }
 }

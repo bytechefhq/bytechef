@@ -176,11 +176,9 @@ class AiAgentUtilsSkillsToolTest {
 
         when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(1L));
         when(aiSkillFacade.getAiSkillDownload(1L)).thenReturn(zipBytes);
-        when(
-            polyglotEngine.execute(
-                eq(ScriptSandboxMode.STRICT), isNull(), eq("js"), any(Parameters.class), eq(Map.of()), eq(false),
-                eq(context)))
-                    .thenReturn(Map.of());
+        when(polyglotEngine.execute(
+            eq(ScriptSandboxMode.STRICT), isNull(), eq("js"), any(Parameters.class), eq(Map.of()), eq(false),
+            eq(context))).thenReturn(Map.of());
 
         ToolCallback scriptToolCallback = Arrays.stream(invokeApply().getToolCallbacks())
             .filter(toolCallback -> "release_notes_group_commits".equals(toolCallback.getToolDefinition()

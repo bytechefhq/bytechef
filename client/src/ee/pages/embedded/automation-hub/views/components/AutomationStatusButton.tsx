@@ -3,7 +3,7 @@ import {
     describeAttentionReason,
     isInvalidWorkflowAttentionReason,
 } from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
-import {ConnectedUserProjectWorkflow} from '@/ee/shared/middleware/embedded/public';
+import {ConnectedUserProjectWorkflow} from '@bytechef/embedded-api';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 

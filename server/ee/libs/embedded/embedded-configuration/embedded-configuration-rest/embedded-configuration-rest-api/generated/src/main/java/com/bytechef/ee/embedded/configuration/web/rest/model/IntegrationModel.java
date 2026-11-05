@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T07:55:59.220524+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T23:11:44.401718+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationModel {
 
   private String componentName;
@@ -66,6 +66,10 @@ public class IntegrationModel {
   private @Nullable String permissionExpression;
 
   private @Nullable CategoryModel category;
+
+  private @Nullable Boolean codeWorkflow;
+
+  private @Nullable String codeWorkflowLanguage;
 
   private @Nullable Integer developmentConfigurationCount;
 
@@ -402,6 +406,48 @@ public class IntegrationModel {
     this.category = category;
   }
 
+  public IntegrationModel codeWorkflow(@Nullable Boolean codeWorkflow) {
+    this.codeWorkflow = codeWorkflow;
+    return this;
+  }
+
+  /**
+   * Whether the integration is backed by a code workflow.
+   * @return codeWorkflow
+   */
+  
+  @Schema(name = "codeWorkflow", accessMode = Schema.AccessMode.READ_ONLY, description = "Whether the integration is backed by a code workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("codeWorkflow")
+  public @Nullable Boolean getCodeWorkflow() {
+    return codeWorkflow;
+  }
+
+  @JsonProperty("codeWorkflow")
+  public void setCodeWorkflow(@Nullable Boolean codeWorkflow) {
+    this.codeWorkflow = codeWorkflow;
+  }
+
+  public IntegrationModel codeWorkflowLanguage(@Nullable String codeWorkflowLanguage) {
+    this.codeWorkflowLanguage = codeWorkflowLanguage;
+    return this;
+  }
+
+  /**
+   * The programming language of the code workflow, if the integration is code-backed.
+   * @return codeWorkflowLanguage
+   */
+  
+  @Schema(name = "codeWorkflowLanguage", accessMode = Schema.AccessMode.READ_ONLY, description = "The programming language of the code workflow, if the integration is code-backed.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("codeWorkflowLanguage")
+  public @Nullable String getCodeWorkflowLanguage() {
+    return codeWorkflowLanguage;
+  }
+
+  @JsonProperty("codeWorkflowLanguage")
+  public void setCodeWorkflowLanguage(@Nullable String codeWorkflowLanguage) {
+    this.codeWorkflowLanguage = codeWorkflowLanguage;
+  }
+
   public IntegrationModel developmentConfigurationCount(@Nullable Integer developmentConfigurationCount) {
     this.developmentConfigurationCount = developmentConfigurationCount;
     return this;
@@ -526,6 +572,8 @@ public class IntegrationModel {
         Objects.equals(this.name, integration.name) &&
         Objects.equals(this.permissionExpression, integration.permissionExpression) &&
         Objects.equals(this.category, integration.category) &&
+        Objects.equals(this.codeWorkflow, integration.codeWorkflow) &&
+        Objects.equals(this.codeWorkflowLanguage, integration.codeWorkflowLanguage) &&
         Objects.equals(this.developmentConfigurationCount, integration.developmentConfigurationCount) &&
         Objects.equals(this.integrationWorkflowIds, integration.integrationWorkflowIds) &&
         Objects.equals(this.tags, integration.tags) &&
@@ -534,7 +582,7 @@ public class IntegrationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name, permissionExpression, category, developmentConfigurationCount, integrationWorkflowIds, tags, version);
+    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name, permissionExpression, category, codeWorkflow, codeWorkflowLanguage, developmentConfigurationCount, integrationWorkflowIds, tags, version);
   }
 
   @Override
@@ -556,6 +604,8 @@ public class IntegrationModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    permissionExpression: ").append(toIndentedString(permissionExpression)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
+    sb.append("    codeWorkflow: ").append(toIndentedString(codeWorkflow)).append("\n");
+    sb.append("    codeWorkflowLanguage: ").append(toIndentedString(codeWorkflowLanguage)).append("\n");
     sb.append("    developmentConfigurationCount: ").append(toIndentedString(developmentConfigurationCount)).append("\n");
     sb.append("    integrationWorkflowIds: ").append(toIndentedString(integrationWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");

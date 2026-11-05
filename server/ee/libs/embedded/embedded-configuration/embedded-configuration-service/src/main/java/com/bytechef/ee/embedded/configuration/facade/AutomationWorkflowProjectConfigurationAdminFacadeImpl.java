@@ -1200,7 +1200,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
 
-        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
+        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids, environment)
             .stream()
             .filter(reference -> connectedUserIds.contains(reference.connectedUserId()) &&
                 Objects.equals(reference.environment(), environment.name()))

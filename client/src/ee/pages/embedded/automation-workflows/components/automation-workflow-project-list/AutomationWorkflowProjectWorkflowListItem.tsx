@@ -16,6 +16,7 @@ type AutomationWorkflowProjectWorkflowTemplateType =
     AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number]['workflowTemplates'][number];
 
 interface AutomationWorkflowProjectWorkflowListItemProps {
+    codeWorkflowProject?: boolean;
     onDeleteWorkflow: (workflowUuid: string) => void;
     onEditWorkflow: (workflow: AutomationWorkflowProjectWorkflowTemplateType) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
@@ -23,6 +24,7 @@ interface AutomationWorkflowProjectWorkflowListItemProps {
 }
 
 const AutomationWorkflowProjectWorkflowListItem = ({
+    codeWorkflowProject = false,
     onDeleteWorkflow,
     onEditWorkflow,
     onSelectWorkflow,
@@ -100,42 +102,46 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                     </Tooltip>
                 )}
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label="Workflow Actions"
-                            icon={<EllipsisVerticalIcon />}
-                            onClick={(event) => event.stopPropagation()}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </DropdownMenuTrigger>
+                {codeWorkflowProject ? (
+                    <div aria-hidden className="size-9 shrink-0" />
+                ) : (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Workflow Actions"
+                                icon={<EllipsisVerticalIcon />}
+                                onClick={(event) => event.stopPropagation()}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            aria-label="Edit Workflow"
-                            icon={<PencilIcon />}
-                            label="Edit"
-                            onClick={(event) => {
-                                event.stopPropagation();
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                aria-label="Edit Workflow"
+                                icon={<PencilIcon />}
+                                label="Edit"
+                                onClick={(event) => {
+                                    event.stopPropagation();
 
-                                onEditWorkflow(workflow);
-                            }}
-                        />
+                                    onEditWorkflow(workflow);
+                                }}
+                            />
 
-                        <DropdownMenuItem
-                            aria-label="Delete Workflow"
-                            icon={<Trash2Icon />}
-                            label="Delete"
-                            onClick={(event) => {
-                                event.stopPropagation();
+                            <DropdownMenuItem
+                                aria-label="Delete Workflow"
+                                icon={<Trash2Icon />}
+                                label="Delete"
+                                onClick={(event) => {
+                                    event.stopPropagation();
 
-                                onDeleteWorkflow(workflow.workflowUuid);
-                            }}
-                            variant="destructive"
-                        />
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                    onDeleteWorkflow(workflow.workflowUuid);
+                                }}
+                                variant="destructive"
+                            />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
         </li>
     );
