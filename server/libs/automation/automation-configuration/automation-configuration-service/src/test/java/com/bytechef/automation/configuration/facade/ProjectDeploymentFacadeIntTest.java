@@ -54,9 +54,12 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentReposit
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
+import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -75,6 +78,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -173,6 +177,12 @@ public class ProjectDeploymentFacadeIntTest {
     @Autowired
     private ConnectionService connectionService;
 
+    @Autowired
+    private WorkspaceConnectionRepository workspaceConnectionRepository;
+
+    @Autowired
+    private WorkspaceConnectionService workspaceConnectionService;
+
     private void renameProjectDeployment(long projectDeploymentId, String name) {
         ProjectDeployment projectDeployment = projectDeploymentRepository.findById(projectDeploymentId)
             .orElseThrow();
@@ -184,6 +194,9 @@ public class ProjectDeploymentFacadeIntTest {
 
     @AfterEach
     public void afterEach() {
+        SecurityContextHolder.clearContext();
+
+        workspaceConnectionRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
         projectWorkflowRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
@@ -781,6 +794,9 @@ public class ProjectDeploymentFacadeIntTest {
 
         when(connectionService.getConnection(anyLong())).thenReturn(connection);
 
+        workspaceConnectionService.create(oldConnectionId, workspace.getId());
+        workspaceConnectionService.create(newConnectionId, workspace.getId());
+
         long projectDeploymentId = createCronInputProjectDeployment(
             "0/5 15 * * ?",
             List.of(new ProjectDeploymentWorkflowConnection(oldConnectionId, "connection", "trigger_1")));
@@ -814,6 +830,409 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     @Disabled
+    @Test
+    public void testCreateProjectDeploymentRejectsAConnectionOfAnotherWorkspace() {
+        stubScheduleConnection(1101L, Environment.DEVELOPMENT, foreignWorkspaceId());
+
+        assertThatThrownBy(() -> createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1101L)))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    public void testCreateProjectDeploymentRejectsAConnectionFromAnotherEnvironment() {
+        stubScheduleConnection(1102L, Environment.PRODUCTION, workspace.getId());
+
+        assertThatThrownBy(() -> createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1102L)))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    public void testCreateProjectDeploymentLetsATenantAdminUseAConnectionOfAnotherWorkspace() {
+        stubScheduleConnection(1103L, Environment.DEVELOPMENT, foreignWorkspaceId());
+
+        authenticate(AuthorityConstants.ADMIN);
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1103L));
+
+        assertThat(getStoredConnectionIds(projectDeploymentId)).containsExactly(1103L);
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowAcceptsAConnectionOfTheProjectWorkspaceAndEnvironment() {
+        stubScheduleConnection(1104L, Environment.DEVELOPMENT, workspace.getId());
+        stubScheduleConnection(1105L, Environment.DEVELOPMENT, workspace.getId());
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1104L));
+
+        updateProjectDeploymentWorkflowConnection(projectDeploymentId, 1105L);
+
+        assertThat(getStoredConnectionIds(projectDeploymentId)).containsExactly(1105L);
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowRejectsAConnectionOfAnotherWorkspace() {
+        stubScheduleConnection(1106L, Environment.DEVELOPMENT, workspace.getId());
+        stubScheduleConnection(1107L, Environment.DEVELOPMENT, foreignWorkspaceId());
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1106L));
+
+        assertThatThrownBy(() -> updateProjectDeploymentWorkflowConnection(projectDeploymentId, 1107L))
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(getStoredConnectionIds(projectDeploymentId)).containsExactly(1106L);
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowRejectsAConnectionFromAnotherEnvironment() {
+        stubScheduleConnection(1108L, Environment.DEVELOPMENT, workspace.getId());
+        stubScheduleConnection(1109L, Environment.PRODUCTION, workspace.getId());
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1108L));
+
+        assertThatThrownBy(() -> updateProjectDeploymentWorkflowConnection(projectDeploymentId, 1109L))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowKeepsAnUnchangedConnectionATenantAdminBound() {
+        stubScheduleConnection(1110L, Environment.DEVELOPMENT, foreignWorkspaceId());
+
+        authenticate(AuthorityConstants.ADMIN);
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1110L));
+
+        SecurityContextHolder.clearContext();
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentWorkflow.setInputs(Map.of("cronExpression", "0/10 15 * * ?"));
+
+        projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+
+        assertThat(getStoredConnectionIds(projectDeploymentId)).containsExactly(1110L);
+    }
+
+    @Test
+    public void testCreateProjectDeploymentRejectsAWorkflowOfAnotherProject() {
+        long foreignWorkspaceId = foreignWorkspaceId();
+
+        stubScheduleConnection(1111L, Environment.DEVELOPMENT, foreignWorkspaceId);
+
+        ProjectWorkflow projectWorkflow = publishCronInputProjectWorkflow(workspace.getId());
+        ProjectWorkflow foreignProjectWorkflow = publishCronInputProjectWorkflow(foreignWorkspaceId);
+
+        assertThatThrownBy(() -> createCronInputProjectDeployment(
+            projectWorkflow.getProjectId(), foreignProjectWorkflow, "0/5 15 * * ?", scheduleConnections(1111L)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("does not belong to project");
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowRejectsAWorkflowOfAnotherProject() {
+        long foreignWorkspaceId = foreignWorkspaceId();
+
+        stubScheduleConnection(1112L, Environment.DEVELOPMENT, workspace.getId());
+        stubScheduleConnection(1113L, Environment.DEVELOPMENT, foreignWorkspaceId);
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1112L));
+
+        ProjectWorkflow foreignProjectWorkflow = publishCronInputProjectWorkflow(foreignWorkspaceId);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        String workflowId = projectDeploymentWorkflow.getWorkflowId();
+
+        projectDeploymentWorkflow.setConnections(scheduleConnections(1113L));
+        projectDeploymentWorkflow.setWorkflowId(foreignProjectWorkflow.getWorkflowId());
+
+        assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        ProjectDeploymentWorkflow storedProjectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        assertThat(storedProjectDeploymentWorkflow.getWorkflowId()).isEqualTo(workflowId);
+        assertThat(getStoredConnectionIds(projectDeploymentId)).containsExactly(1112L);
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowRejectsARowOfAnotherProjectDeployment() {
+        stubScheduleConnection(1114L, Environment.DEVELOPMENT, workspace.getId());
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1114L));
+        long otherProjectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", List.of());
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentWorkflow.setProjectDeploymentId(otherProjectDeploymentId);
+
+        assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentRejectsADeploymentOfAnotherProject() {
+        stubScheduleConnection(1115L, Environment.DEVELOPMENT, workspace.getId());
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1115L));
+
+        ProjectWorkflow otherProjectWorkflow = publishCronInputProjectWorkflow(workspace.getId());
+
+        ProjectDeploymentDTO currentProjectDeployment = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        ProjectDeploymentDTO updateDTO = ProjectDeploymentDTO.builder()
+            .id(projectDeploymentId)
+            .projectId(otherProjectWorkflow.getProjectId())
+            .name(currentProjectDeployment.name())
+            .environment(Environment.DEVELOPMENT)
+            .projectVersion(1)
+            .projectDeploymentWorkflows(currentProjectDeployment.projectDeploymentWorkflows())
+            .version(currentProjectDeployment.version())
+            .build();
+
+        assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeployment(updateDTO))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowRejectsMovingAnAdminBoundConnectionToAnotherSlot() {
+        stubScheduleConnection(1116L, Environment.DEVELOPMENT, foreignWorkspaceId());
+
+        authenticate(AuthorityConstants.ADMIN);
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1116L));
+
+        SecurityContextHolder.clearContext();
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentWorkflow.setConnections(
+            List.of(
+                new ProjectDeploymentWorkflowConnection(1116L, "connection", "trigger_1"),
+                new ProjectDeploymentWorkflowConnection(1116L, "otherConnection", "trigger_1")));
+
+        assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow))
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(getStoredConnectionIds(projectDeploymentId)).containsExactly(1116L);
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentRejectsTheDraftProjectVersion() {
+        stubScheduleConnection(1117L, Environment.DEVELOPMENT, workspace.getId());
+
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?", scheduleConnections(1117L));
+
+        ProjectDeploymentDTO existingProjectDeployment = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        ProjectDeploymentDTO updateDTO = toToolProjectDeploymentDTO(
+            existingProjectDeployment, existingProjectDeployment.name(), 2,
+            existingProjectDeployment.projectDeploymentWorkflows());
+
+        assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeployment(updateDTO))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("cannot be in DRAFT");
+
+        assertThat(projectDeploymentFacade.getProjectDeployment(projectDeploymentId)
+            .projectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    public void testRollbackToolPayloadKeepsTheDeploymentWorkflowsOnTheTargetVersion() {
+        stubScheduleConnection(1118L, Environment.DEVELOPMENT, workspace.getId());
+
+        ProjectWorkflow v1ProjectWorkflow = publishCronInputProjectWorkflow(workspace.getId());
+        long projectId = v1ProjectWorkflow.getProjectId();
+
+        projectFacade.publishProject(projectId, "Published v2 for test", false);
+
+        ProjectWorkflow v2ProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectId, 2)
+            .getFirst();
+
+        long projectDeploymentId = createCronInputProjectDeployment(
+            projectId, 2, v2ProjectWorkflow, "0/5 15 * * ?", scheduleConnections(1118L));
+
+        ProjectDeploymentDTO existingProjectDeployment = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        projectDeploymentFacade.updateProjectDeployment(
+            toToolProjectDeploymentDTO(
+                existingProjectDeployment, existingProjectDeployment.name(), 1,
+                toTargetVersionWorkflows(projectId, 1, existingProjectDeployment.projectDeploymentWorkflows())));
+
+        assertThat(projectDeploymentFacade.getProjectDeployment(projectDeploymentId)
+            .projectVersion()).isEqualTo(1);
+        assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+            .singleElement()
+            .satisfies(projectDeploymentWorkflow -> {
+                assertThat(projectDeploymentWorkflow.getWorkflowId()).isEqualTo(v1ProjectWorkflow.getWorkflowId());
+                assertThat(projectDeploymentWorkflow.isEnabled()).isTrue();
+                assertThat(projectDeploymentWorkflow.getConnections())
+                    .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                    .containsExactly(1118L);
+                assertThat(projectDeploymentWorkflow.getInputs())
+                    .isEqualTo(Map.of("cronExpression", "0/5 15 * * ?"));
+            });
+    }
+
+    @Test
+    public void testUpdateToolPayloadKeepsTheDeploymentWorkflows() {
+        stubScheduleConnection(1119L, Environment.DEVELOPMENT, workspace.getId());
+
+        ProjectWorkflow v1ProjectWorkflow = publishCronInputProjectWorkflow(workspace.getId());
+        long projectId = v1ProjectWorkflow.getProjectId();
+
+        projectFacade.publishProject(projectId, "Published v2 for test", false);
+
+        ProjectWorkflow v2ProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectId, 2)
+            .getFirst();
+
+        long projectDeploymentId = createCronInputProjectDeployment(
+            projectId, 2, v2ProjectWorkflow, "0/5 15 * * ?", scheduleConnections(1119L));
+
+        ProjectDeploymentDTO existingProjectDeployment = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        projectDeploymentFacade.updateProjectDeployment(
+            toToolProjectDeploymentDTO(
+                existingProjectDeployment, "Renamed Deployment", 2,
+                existingProjectDeployment.projectDeploymentWorkflows()));
+
+        ProjectDeploymentDTO updatedProjectDeployment = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        assertThat(updatedProjectDeployment.name()).isEqualTo("Renamed Deployment");
+        assertThat(updatedProjectDeployment.projectVersion()).isEqualTo(2);
+        assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+            .singleElement()
+            .satisfies(projectDeploymentWorkflow -> {
+                assertThat(projectDeploymentWorkflow.getWorkflowId()).isEqualTo(v2ProjectWorkflow.getWorkflowId());
+                assertThat(projectDeploymentWorkflow.isEnabled()).isTrue();
+                assertThat(projectDeploymentWorkflow.getConnections())
+                    .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                    .containsExactly(1119L);
+            });
+    }
+
+    private static ProjectDeploymentDTO toToolProjectDeploymentDTO(
+        ProjectDeploymentDTO existing, String name, int projectVersion,
+        List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows) {
+
+        return ProjectDeploymentDTO.builder()
+            .createdBy(existing.createdBy())
+            .createdDate(existing.createdDate())
+            .description(existing.description())
+            .enabled(existing.enabled())
+            .environment(existing.environment())
+            .id(existing.id())
+            .name(name)
+            .lastModifiedBy(existing.lastModifiedBy())
+            .lastModifiedDate(existing.lastModifiedDate())
+            .project(existing.project())
+            .projectId(existing.projectId())
+            .projectVersion(projectVersion)
+            .projectDeploymentWorkflows(projectDeploymentWorkflows)
+            .tags(existing.tags())
+            .version(existing.version())
+            .build();
+    }
+
+    private List<ProjectDeploymentWorkflowDTO> toTargetVersionWorkflows(
+        long projectId, int projectVersion, List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows) {
+
+        List<ProjectWorkflow> targetProjectWorkflows = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectId, projectVersion);
+
+        List<ProjectDeploymentWorkflowDTO> targetVersionWorkflows = new ArrayList<>();
+
+        for (ProjectDeploymentWorkflowDTO projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            for (ProjectWorkflow projectWorkflow : targetProjectWorkflows) {
+                if (Objects.equals(projectWorkflow.getUuidAsString(), projectDeploymentWorkflow.workflowUuid())) {
+                    targetVersionWorkflows.add(
+                        new ProjectDeploymentWorkflowDTO(
+                            projectDeploymentWorkflow.connections(), null, null, projectDeploymentWorkflow.inputs(),
+                            projectDeploymentWorkflow.enabled(), projectDeploymentWorkflow.id(), null, null, null,
+                            null, projectDeploymentWorkflow.projectDeploymentId(), null,
+                            projectDeploymentWorkflow.version(), projectWorkflow.getWorkflowId(),
+                            projectDeploymentWorkflow.workflowUuid()));
+                }
+            }
+        }
+
+        return targetVersionWorkflows;
+    }
+
+    private static void authenticate(String authority) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                UsernamePasswordAuthenticationToken.authenticated(
+                    "user@localhost.com", null, List.of(new SimpleGrantedAuthority(authority))));
+    }
+
+    private long foreignWorkspaceId() {
+        Workspace foreignWorkspace = workspaceRepository.save(new Workspace("foreign"));
+
+        return foreignWorkspace.getId();
+    }
+
+    private List<Long> getStoredConnectionIds(long projectDeploymentId) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        return projectDeploymentWorkflow.getConnections()
+            .stream()
+            .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .toList();
+    }
+
+    private static List<ProjectDeploymentWorkflowConnection> scheduleConnections(long connectionId) {
+        return List.of(new ProjectDeploymentWorkflowConnection(connectionId, "connection", "trigger_1"));
+    }
+
+    private void stubScheduleConnection(long connectionId, Environment environment, long workspaceId) {
+        ComponentConnection componentConnection = new ComponentConnection(
+            "schedule", 1, "trigger_1", "connection", false);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTrigger.class)))
+            .thenReturn(List.of(componentConnection));
+        when(componentConnectionFacade.getComponentConnection(anyString(), anyString(), anyString()))
+            .thenReturn(componentConnection);
+
+        Connection connection = new Connection();
+
+        connection.setComponentName("schedule");
+        connection.setEnvironmentId(environment.ordinal());
+        connection.setId(connectionId);
+
+        when(connectionService.getConnection(connectionId)).thenReturn(connection);
+
+        workspaceConnectionService.create(connectionId, workspaceId);
+    }
+
+    private void updateProjectDeploymentWorkflowConnection(long projectDeploymentId, long connectionId) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentWorkflow.setConnections(scheduleConnections(connectionId));
+
+        projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+    }
+
     @Test
     public void testUpdateProjectDeploymentTags() {
         // TODO
@@ -1092,7 +1511,40 @@ public class ProjectDeploymentFacadeIntTest {
     private long createCronInputProjectDeployment(
         String cronExpression, List<ProjectDeploymentWorkflowConnection> connections) {
 
-        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectWorkflow publishedProjectWorkflow = publishCronInputProjectWorkflow(workspace.getId());
+
+        return createCronInputProjectDeployment(
+            publishedProjectWorkflow.getProjectId(), publishedProjectWorkflow, cronExpression, connections);
+    }
+
+    private long createCronInputProjectDeployment(
+        long projectId, ProjectWorkflow projectWorkflow, String cronExpression,
+        List<ProjectDeploymentWorkflowConnection> connections) {
+
+        return createCronInputProjectDeployment(projectId, 1, projectWorkflow, cronExpression, connections);
+    }
+
+    private long createCronInputProjectDeployment(
+        long projectId, int projectVersion, ProjectWorkflow projectWorkflow, String cronExpression,
+        List<ProjectDeploymentWorkflowConnection> connections) {
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
+            connections, null, null, Map.of("cronExpression", cronExpression), true, null, null, null, null, null,
+            null, null, 0, projectWorkflow.getWorkflowId(), projectWorkflow.getUuidAsString());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .projectId(projectId)
+            .name("Cron Input Deployment")
+            .environment(Environment.DEVELOPMENT)
+            .projectVersion(projectVersion)
+            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+            .build();
+
+        return projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO);
+    }
+
+    private ProjectWorkflow publishCronInputProjectWorkflow(long workspaceId) {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspaceId);
 
         projectDeploymentFacadeHelper.addTestWorkflow(
             projectDTO,
@@ -1118,23 +1570,8 @@ public class ProjectDeploymentFacadeIntTest {
 
         projectFacade.publishProject(projectDTO.id(), "Published for test", false);
 
-        ProjectWorkflow publishedProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
-            projectDTO.id(), 1)
+        return projectWorkflowRepository.findAllByProjectIdAndProjectVersion(projectDTO.id(), 1)
             .getFirst();
-
-        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            connections, null, null, Map.of("cronExpression", cronExpression), true, null, null, null, null, null,
-            null, null, 0, publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
-
-        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
-            .projectId(projectDTO.id())
-            .name("Cron Input Deployment")
-            .environment(Environment.DEVELOPMENT)
-            .projectVersion(1)
-            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
-            .build();
-
-        return projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO);
     }
 
     @Nested

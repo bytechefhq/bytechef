@@ -51,12 +51,16 @@ import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.security.WorkflowConnectionAccessResolver;
+import com.bytechef.platform.configuration.security.WorkflowConnectionAccessResolver.ConnectionAccess;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -69,15 +73,19 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -111,6 +119,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
     private final String webhookUrl;
+    private final ObjectProvider<WorkflowConnectionAccessResolver> workflowConnectionAccessResolvers;
     private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
 
@@ -125,7 +134,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
         ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
-        List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners) {
+        List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners,
+        ObjectProvider<WorkflowConnectionAccessResolver> workflowConnectionAccessResolvers) {
 
         this.connectionService = connectionService;
         this.evaluator = evaluator;
@@ -147,6 +157,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.webhookUrl = applicationProperties.getWebhookUrl();
         this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
+        this.workflowConnectionAccessResolvers = workflowConnectionAccessResolvers;
     }
 
     @Override
@@ -157,11 +168,21 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     })
     @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
-        return createProjectDeployment(
-            projectDeploymentDTO.toProjectDeployment(), CollectionUtils.map(
-                projectDeploymentDTO.projectDeploymentWorkflows(),
-                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
-            projectDeploymentDTO.tags());
+        ProjectDeployment projectDeployment = projectDeploymentDTO.toProjectDeployment();
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = CollectionUtils.map(
+            projectDeploymentDTO.projectDeploymentWorkflows(),
+            ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow);
+
+        long projectId = Validate.notNull(projectDeployment.getProjectId(), "projectId");
+
+        validateWorkflowIds(
+            projectDeploymentWorkflows,
+            projectWorkflowService.getProjectWorkflowIds(projectId, projectDeployment.getProjectVersion()),
+            projectId);
+
+        checkConnectionAccess(projectId, projectDeploymentWorkflows, projectDeployment.getEnvironmentId(), List.of());
+
+        return createProjectDeployment(projectDeployment, projectDeploymentWorkflows, projectDeploymentDTO.tags());
     }
 
     @Override
@@ -453,12 +474,38 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     })
     @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
     public void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
-        updateProjectDeployment(
-            projectDeploymentDTO.toProjectDeployment(),
-            CollectionUtils.map(
-                projectDeploymentDTO.projectDeploymentWorkflows(),
-                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
-            projectDeploymentDTO.tags());
+        ProjectDeployment projectDeployment = projectDeploymentDTO.toProjectDeployment();
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = CollectionUtils.map(
+            projectDeploymentDTO.projectDeploymentWorkflows(),
+            ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow);
+
+        ProjectDeployment storedProjectDeployment = projectDeploymentService.getProjectDeployment(
+            Validate.notNull(projectDeployment.getId(), "id"));
+
+        long projectId = Validate.notNull(storedProjectDeployment.getProjectId(), "projectId");
+
+        if (!Objects.equals(projectDeployment.getProjectId(), projectId)) {
+            throw new AccessDeniedException(
+                "Project deployment %d does not belong to project %d".formatted(
+                    storedProjectDeployment.getId(), projectDeployment.getProjectId()));
+        }
+
+        Project project = projectService.getProject(projectId);
+
+        if (project.getLastProjectVersion() == projectDeployment.getProjectVersion()) {
+            throw new ConfigurationException(
+                "Project version v=%s cannot be in DRAFT".formatted(projectDeployment.getProjectVersion()),
+                ProjectDeploymentErrorType.INVALID_PROJECT_VERSION);
+        }
+
+        validateWorkflowIds(
+            projectDeploymentWorkflows, projectWorkflowService.getProjectWorkflowIds(projectId), projectId);
+
+        checkConnectionAccess(
+            projectId, projectDeploymentWorkflows, storedProjectDeployment.getEnvironmentId(),
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(storedProjectDeployment.getId()));
+
+        updateProjectDeployment(projectDeployment, projectDeploymentWorkflows, projectDeploymentDTO.tags());
     }
 
     @Override
@@ -550,14 +597,33 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     public void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
-        validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
-
         ProjectDeploymentWorkflow oldProjectDeploymentWorkflow =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
                 Validate.notNull(projectDeploymentWorkflow.getId(), "id"));
 
+        if (!Objects.equals(
+            projectDeploymentWorkflow.getProjectDeploymentId(),
+            oldProjectDeploymentWorkflow.getProjectDeploymentId())) {
+
+            throw new AccessDeniedException(
+                "Project deployment workflow %d does not belong to project deployment %d".formatted(
+                    oldProjectDeploymentWorkflow.getId(), projectDeploymentWorkflow.getProjectDeploymentId()));
+        }
+
+        if (!Objects.equals(projectDeploymentWorkflow.getWorkflowId(), oldProjectDeploymentWorkflow.getWorkflowId())) {
+            throw new IllegalArgumentException(
+                "Project deployment workflow %d cannot be moved to workflow %s".formatted(
+                    oldProjectDeploymentWorkflow.getId(), projectDeploymentWorkflow.getWorkflowId()));
+        }
+
+        validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
             oldProjectDeploymentWorkflow.getProjectDeploymentId());
+
+        checkConnectionAccess(
+            Validate.notNull(projectDeployment.getProjectId(), "projectId"), List.of(projectDeploymentWorkflow),
+            projectDeployment.getEnvironmentId(), List.of(oldProjectDeploymentWorkflow));
 
         ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowService.update(
             projectDeploymentWorkflow);
@@ -711,6 +777,80 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
 
                 projectDeploymentWorkflowService.delete(oldProjectDeploymentWorkflow.getId());
+            }
+        }
+    }
+
+    private void checkConnectionAccess(
+        long projectId, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows, long environmentId,
+        List<ProjectDeploymentWorkflow> storedProjectDeploymentWorkflows) {
+
+        if (SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)) {
+            return;
+        }
+
+        Map<String, String> workflowUuids = projectWorkflowService.getProjectWorkflows(projectId)
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getWorkflowId, ProjectWorkflow::getUuidAsString, (a, b) -> a));
+
+        Set<ConnectionSlot> storedConnectionSlots = new HashSet<>();
+
+        for (ProjectDeploymentWorkflow storedProjectDeploymentWorkflow : storedProjectDeploymentWorkflows) {
+            String workflowUuid = workflowUuids.get(storedProjectDeploymentWorkflow.getWorkflowId());
+
+            List<ProjectDeploymentWorkflowConnection> storedConnections =
+                storedProjectDeploymentWorkflow.getConnections();
+
+            for (ProjectDeploymentWorkflowConnection storedConnection : storedConnections) {
+                storedConnectionSlots.add(ConnectionSlot.of(workflowUuid, storedConnection));
+            }
+        }
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            String workflowUuid = workflowUuids.get(projectDeploymentWorkflow.getWorkflowId());
+
+            List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections =
+                projectDeploymentWorkflow.getConnections();
+
+            for (ProjectDeploymentWorkflowConnection projectDeploymentWorkflowConnection : projectDeploymentWorkflowConnections) {
+
+                Long connectionId = projectDeploymentWorkflowConnection.getConnectionId();
+
+                boolean storedConnectionSlot = workflowUuid != null && storedConnectionSlots.contains(
+                    ConnectionSlot.of(workflowUuid, projectDeploymentWorkflowConnection));
+
+                if (connectionId == null || storedConnectionSlot) {
+                    continue;
+                }
+
+                checkConnectionAccess(projectDeploymentWorkflow.getWorkflowId(), connectionId, environmentId);
+            }
+        }
+    }
+
+    private void checkConnectionAccess(String workflowId, long connectionId, long environmentId) {
+        ConnectionAccess connectionAccess = workflowConnectionAccessResolvers.orderedStream()
+            .map(resolver -> resolver.resolveConnectionAccess(workflowId, connectionId, environmentId))
+            .filter(curConnectionAccess -> curConnectionAccess != ConnectionAccess.ABSTAIN)
+            .findFirst()
+            .orElse(ConnectionAccess.DENIED);
+
+        if (connectionAccess != ConnectionAccess.GRANTED) {
+            throw new AccessDeniedException(
+                "Connection %d cannot be used by workflow %s in environment %d".formatted(
+                    connectionId, workflowId, environmentId));
+        }
+    }
+
+    private static void validateWorkflowIds(
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows, List<String> projectWorkflowIds, long projectId) {
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            String workflowId = projectDeploymentWorkflow.getWorkflowId();
+
+            if (!projectWorkflowIds.contains(workflowId)) {
+                throw new IllegalArgumentException(
+                    "Workflow %s does not belong to project %d".formatted(workflowId, projectId));
             }
         }
     }
@@ -1062,6 +1202,19 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                     Assert.hasText(string, "Missing required param: " + input.name());
                 }
             }
+        }
+    }
+
+    private record ConnectionSlot(String workflowUuid, Long connectionId, String workflowNodeName,
+        String workflowConnectionKey) {
+
+        private static ConnectionSlot of(
+            String workflowUuid, ProjectDeploymentWorkflowConnection projectDeploymentWorkflowConnection) {
+
+            return new ConnectionSlot(
+                workflowUuid, projectDeploymentWorkflowConnection.getConnectionId(),
+                projectDeploymentWorkflowConnection.getWorkflowNodeName(),
+                projectDeploymentWorkflowConnection.getWorkflowConnectionKey());
         }
     }
 }
