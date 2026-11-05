@@ -1,5 +1,5 @@
-import WorkspaceApiKeys from '@/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import WorkspaceApiKeys from '@/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys';
 import {act, render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';

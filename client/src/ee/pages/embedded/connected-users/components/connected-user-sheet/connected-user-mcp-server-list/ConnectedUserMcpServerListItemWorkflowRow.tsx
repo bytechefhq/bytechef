@@ -11,10 +11,10 @@ import {
 } from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
-import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ConnectedUserMcpServerWorkflow} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';

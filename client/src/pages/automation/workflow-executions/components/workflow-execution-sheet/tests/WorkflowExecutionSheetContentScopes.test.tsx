@@ -67,12 +67,12 @@ const renderContent = (embedded?: boolean) =>
             isTriggerExecution={false}
             jobFailedWithNoExecutions={false}
             jobFailureError={{message: '', stackTrace: []} as never}
+            lazy={{workflowExecutionId: 1}}
             selectedItem={{id: '11'} as never}
             setActiveTab={vi.fn()}
             setDialogOpen={vi.fn()}
             subflowStack={[]}
             taskExecutionAttempts={[]}
-            lazy={{workflowExecutionId: 1}}
         />
     );
 

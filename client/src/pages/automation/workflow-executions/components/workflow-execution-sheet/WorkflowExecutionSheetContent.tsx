@@ -2,8 +2,8 @@ import Button from '@/components/Button/Button';
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import SubflowExecutionBreadcrumb, {
     BreadcrumbEntryI,
 } from '@/shared/components/workflow-executions/SubflowExecutionBreadcrumb';

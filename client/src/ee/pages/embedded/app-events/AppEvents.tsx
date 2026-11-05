@@ -6,8 +6,8 @@ import AppEventList from '@/ee/pages/embedded/app-events/components/AppEventList
 import AppEventsFilterTitle from '@/ee/pages/embedded/app-events/components/AppEventsFilterTitle';
 import {EMBEDDED_APP_EVENTS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {useGetAppEventsQuery} from '@/ee/shared/queries/embedded/appEvents.queries';
-import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';

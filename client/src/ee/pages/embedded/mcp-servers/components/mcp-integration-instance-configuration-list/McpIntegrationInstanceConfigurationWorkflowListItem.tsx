@@ -8,11 +8,11 @@ import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMen
 import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
 import WorkflowToolRowLabel from '@/shared/components/mcp-server/WorkflowToolRowLabel';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
 import {useMemo} from 'react';
-import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 
 import McpIntegrationInstanceConfigurationWorkflowPropertiesPopover from './McpIntegrationInstanceConfigurationWorkflowPropertiesPopover';
 import {McpIntegrationInstanceConfigurationWorkflowItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';

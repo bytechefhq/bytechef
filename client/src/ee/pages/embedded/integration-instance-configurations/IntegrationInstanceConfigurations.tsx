@@ -12,8 +12,8 @@ import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queri
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';

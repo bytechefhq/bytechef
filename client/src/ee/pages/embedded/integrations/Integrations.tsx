@@ -12,8 +12,8 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {useGetIntegrationCategoriesQuery} from '@/ee/shared/queries/embedded/integrationCategories.queries';
 import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
-import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';

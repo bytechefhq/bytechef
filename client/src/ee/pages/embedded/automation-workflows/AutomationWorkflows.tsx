@@ -3,8 +3,8 @@ import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
-import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {

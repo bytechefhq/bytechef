@@ -7,8 +7,8 @@ import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
-import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';

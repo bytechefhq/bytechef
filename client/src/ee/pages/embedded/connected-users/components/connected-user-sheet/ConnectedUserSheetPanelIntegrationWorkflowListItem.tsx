@@ -14,10 +14,10 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {IntegrationInstanceKeys} from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
-import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
