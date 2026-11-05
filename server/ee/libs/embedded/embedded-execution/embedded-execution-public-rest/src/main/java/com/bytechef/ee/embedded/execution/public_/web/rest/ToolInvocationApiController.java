@@ -15,7 +15,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationM
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationOutcomeModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationPageModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationSurfaceModel;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;

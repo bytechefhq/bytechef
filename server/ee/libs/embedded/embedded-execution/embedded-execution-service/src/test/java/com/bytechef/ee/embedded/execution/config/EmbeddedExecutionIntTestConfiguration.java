@@ -19,8 +19,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogEventListener;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogServiceImpl;
+import com.bytechef.ee.platform.tool.invocation.log.listener.ToolInvocationLogEventListener;
+import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogServiceImpl;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;

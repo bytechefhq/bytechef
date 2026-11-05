@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.bytechef.ee.embedded.execution.facade.ToolInvocationFacade;
 import com.bytechef.ee.embedded.execution.public_.web.rest.config.EmbeddedExecutionPublicRestTestConfiguration;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;

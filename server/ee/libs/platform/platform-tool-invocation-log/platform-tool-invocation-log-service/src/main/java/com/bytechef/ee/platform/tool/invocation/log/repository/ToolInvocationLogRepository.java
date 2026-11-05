@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.tool.invocation.log.repository;
 
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
 import java.time.Instant;
 import java.util.List;
 import org.jspecify.annotations.Nullable;

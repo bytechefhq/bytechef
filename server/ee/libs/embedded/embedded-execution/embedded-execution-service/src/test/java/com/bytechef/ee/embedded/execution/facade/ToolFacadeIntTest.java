@@ -28,8 +28,8 @@ import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestConfigu
 import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestSupport;
 import com.bytechef.ee.embedded.execution.constant.EmbeddedToolConstants;
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogService;
 import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;

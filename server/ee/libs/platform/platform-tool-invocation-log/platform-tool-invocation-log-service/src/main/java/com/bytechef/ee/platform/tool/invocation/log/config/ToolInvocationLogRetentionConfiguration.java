@@ -8,8 +8,8 @@
 package com.bytechef.ee.platform.tool.invocation.log.config;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogRetentionJob;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
+import com.bytechef.ee.platform.tool.invocation.log.job.ToolInvocationLogRetentionJob;
+import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.service.TenantService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

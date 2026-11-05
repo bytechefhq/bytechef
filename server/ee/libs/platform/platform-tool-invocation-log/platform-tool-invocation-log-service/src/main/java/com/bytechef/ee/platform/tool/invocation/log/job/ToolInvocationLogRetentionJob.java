@@ -5,9 +5,10 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.tool.invocation.log;
+package com.bytechef.ee.platform.tool.invocation.log.job;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

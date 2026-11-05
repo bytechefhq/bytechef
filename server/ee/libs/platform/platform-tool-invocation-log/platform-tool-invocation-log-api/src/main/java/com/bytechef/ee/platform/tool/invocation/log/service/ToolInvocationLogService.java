@@ -5,8 +5,9 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.tool.invocation.log;
+package com.bytechef.ee.platform.tool.invocation.log.service;
 
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;

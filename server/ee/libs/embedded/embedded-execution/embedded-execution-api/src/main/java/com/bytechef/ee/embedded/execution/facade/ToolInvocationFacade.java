@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.embedded.execution.facade;
 
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;

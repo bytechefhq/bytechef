@@ -9,8 +9,8 @@ package com.bytechef.ee.embedded.execution.facade;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
