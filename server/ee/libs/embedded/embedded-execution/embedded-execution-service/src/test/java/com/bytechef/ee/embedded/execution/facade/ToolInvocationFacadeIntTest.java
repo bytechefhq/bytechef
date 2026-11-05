@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestConfiguration;
 import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestSupport;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;

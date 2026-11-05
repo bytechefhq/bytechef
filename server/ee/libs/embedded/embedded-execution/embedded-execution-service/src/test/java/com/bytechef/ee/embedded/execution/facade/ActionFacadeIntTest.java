@@ -21,8 +21,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestConfiguration;
 import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestSupport;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;

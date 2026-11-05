@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.tool.invocation.log.facade;
 
-import com.bytechef.ee.platform.tool.invocation.log.facade.dto.ToolInvocationLogDTO;
+import com.bytechef.ee.platform.tool.invocation.log.dto.ToolInvocationLogDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;

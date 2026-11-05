@@ -5,9 +5,9 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.tool.invocation.log.facade.dto;
+package com.bytechef.ee.platform.tool.invocation.log.dto;
 
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 

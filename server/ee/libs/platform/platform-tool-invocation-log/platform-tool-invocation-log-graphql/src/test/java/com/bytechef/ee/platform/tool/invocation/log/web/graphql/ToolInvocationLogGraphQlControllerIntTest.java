@@ -17,9 +17,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
+import com.bytechef.ee.platform.tool.invocation.log.dto.ToolInvocationLogDTO;
 import com.bytechef.ee.platform.tool.invocation.log.facade.ToolInvocationLogFacade;
-import com.bytechef.ee.platform.tool.invocation.log.facade.dto.ToolInvocationLogDTO;
 import com.bytechef.ee.platform.tool.invocation.log.web.graphql.config.ToolInvocationLogGraphQlTestConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;

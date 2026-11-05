@@ -10,7 +10,7 @@ package com.bytechef.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogRetentionJob;
+import com.bytechef.ee.platform.tool.invocation.log.job.ToolInvocationLogRetentionJob;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
