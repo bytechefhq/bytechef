@@ -1286,6 +1286,7 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
+    "taskTool": [ "MODEL", "SUBAGENT" ],
     "shellTools": [ ],
     "askUserQuestionTool": [ ],
     "removeFileFromAiSkill": [ ],
@@ -1302,8 +1303,7 @@
     "approvalGate": [ "TOOLS", "APPROVAL_CHANNELS" ],
     "todoWriteTool": [ ],
     "globTool": [ ],
-    "smartWebFetchTool": [ "MODEL" ],
-    "taskTool": [ "MODEL", "SUBAGENT" ]
+    "smartWebFetchTool": [ "MODEL" ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",
@@ -1743,42 +1743,6 @@
       "type": "INTEGER"
     } ],
     "title": "Smart Web Fetch Tool",
-    "type": {
-      "name": "TOOLS",
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "required": false
-    },
-    "workflowNodeDescription": null
-  }, {
-    "name": "braveWebSearchTool",
-    "description": "Web search with domain filtering using the Brave Search API.",
-    "element": { },
-    "help": null,
-    "outputDefinition": null,
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": true,
-      "controlType": "INTEGER",
-      "defaultValue": null,
-      "description": "Number of search results returned per query. Leave empty for the default of 10.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": true,
-      "hidden": false,
-      "label": "Result Count",
-      "maxValue": 20,
-      "metadata": { },
-      "minValue": 1,
-      "name": "resultCount",
-      "options": [ ],
-      "optionsDataSource": null,
-      "placeholder": null,
-      "required": false,
-      "type": "INTEGER"
-    } ],
-    "title": "Brave Web Search Tool",
     "type": {
       "name": "TOOLS",
       "key": "tools",
@@ -3176,6 +3140,42 @@
       "type": "ARRAY"
     } ],
     "title": "Update AI Skill",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "braveWebSearchTool",
+    "description": "Web search with domain filtering using the Brave Search API.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": true,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "Number of search results returned per query. Leave empty for the default of 10.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Result Count",
+      "maxValue": 20,
+      "metadata": { },
+      "minValue": 1,
+      "name": "resultCount",
+      "options": [ ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    } ],
+    "title": "Brave Web Search Tool",
     "type": {
       "name": "TOOLS",
       "key": "tools",
