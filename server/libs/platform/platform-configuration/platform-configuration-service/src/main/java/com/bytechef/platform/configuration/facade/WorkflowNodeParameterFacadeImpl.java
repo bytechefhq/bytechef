@@ -51,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -1458,24 +1457,24 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressWarnings("unchecked")
     private static void removeEmptyCollectionsFromList(List<Object> list) {
-        Iterator<Object> iterator = list.iterator();
+        boolean allElementsEmpty = true;
 
-        while (iterator.hasNext()) {
-            Object element = iterator.next();
-
+        for (Object element : list) {
             if (element instanceof Map<?, ?> nestedMap) {
                 removeEmptyCollections((Map<String, ?>) nestedMap);
 
-                if (nestedMap.isEmpty()) {
-                    iterator.remove();
-                }
+                allElementsEmpty = allElementsEmpty && nestedMap.isEmpty();
             } else if (element instanceof List<?> nestedList) {
                 removeEmptyCollectionsFromList((List<Object>) nestedList);
 
-                if (nestedList.isEmpty()) {
-                    iterator.remove();
-                }
+                allElementsEmpty = allElementsEmpty && nestedList.isEmpty();
+            } else {
+                allElementsEmpty = false;
             }
+        }
+
+        if (allElementsEmpty) {
+            list.clear();
         }
     }
 
