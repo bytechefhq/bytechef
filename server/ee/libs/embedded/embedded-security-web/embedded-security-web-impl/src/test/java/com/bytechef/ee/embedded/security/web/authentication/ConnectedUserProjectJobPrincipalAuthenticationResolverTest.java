@@ -13,10 +13,10 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;

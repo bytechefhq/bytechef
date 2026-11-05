@@ -97,10 +97,11 @@ class ConnectedUserProjectFacadeConnectionOwnershipTest {
     @BeforeEach
     void setUp() {
         connectedUserProjectFacade = new ConnectedUserProjectFacadeImpl(
-            null, null, connectedUserConnectionMembership, null, null, connectedUserProjectWorkflowManager, null,
-            connectedUserProjectWorkflowService, null, null, null, connectionService, null, null, null, null, null,
-            null, projectDeploymentFacade, null, null, projectFacade, null, null, projectWorkflowService, null, null,
-            null, workflowTestConfigurationFacade, workflowTestConfigurationService);
+            null, null, null, null, connectedUserConnectionMembership, null, null,
+            connectedUserProjectWorkflowManager, null, connectedUserProjectWorkflowService, null, null, null, null,
+            null, connectionService, null, null, null, null, null, null, projectDeploymentFacade, null, null,
+            projectFacade, null, null, projectWorkflowService, null, null, null, workflowTestConfigurationFacade,
+            workflowTestConfigurationService);
     }
 
     @Test

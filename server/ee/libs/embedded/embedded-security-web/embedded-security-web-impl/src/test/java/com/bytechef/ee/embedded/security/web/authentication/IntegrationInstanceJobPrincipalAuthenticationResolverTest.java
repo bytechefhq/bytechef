@@ -17,11 +17,12 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
@@ -139,7 +141,9 @@ class IntegrationInstanceJobPrincipalAuthenticationResolverTest {
         PreAuthorizeAuthorizationManager preAuthorizeAuthorizationManager = new PreAuthorizeAuthorizationManager();
 
         preAuthorizeAuthorizationManager.setExpressionHandler(
-            new AutomationMethodSecurityExpressionHandler(mock(PermissionService.class)));
+            new AutomationMethodSecurityExpressionHandler(
+                mock(PermissionService.class),
+                new StaticListableBeanFactory().getBeanProvider(MethodSecurityExpressionContributor.class)));
 
         ProxyFactory proxyFactory = new ProxyFactory(new GatedOperations());
 
@@ -153,7 +157,7 @@ class IntegrationInstanceJobPrincipalAuthenticationResolverTest {
     static class GatedOperations {
 
         @PreAuthorize("isTenantAdmin() or " +
-            "T(com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications).isConnectedUser()")
+            "T(com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications).isConnectedUser()")
         public String connectedUserOperation() {
             return "granted";
         }
