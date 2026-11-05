@@ -47,7 +47,12 @@ const workflow = {
     workflowUuid: 'workflow-uuid',
 } as unknown as Workflow;
 
-const renderListItem = (projectName?: string, projectId?: number) =>
+interface RenderListItemOverridesI {
+    projectDeploymentWorkflow?: ProjectDeploymentWorkflow;
+    workflow?: Workflow;
+}
+
+const renderListItem = (projectName?: string, projectId?: number, overrides: RenderListItemOverridesI = {}) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
             <MemoryRouter>
@@ -57,12 +62,13 @@ const renderListItem = (projectName?: string, projectId?: number) =>
                         projectDeploymentEnabled
                         projectDeploymentId={3}
                         projectDeploymentWorkflow={
-                            {enabled: true, workflowId: 'workflow1'} as ProjectDeploymentWorkflow
+                            overrides.projectDeploymentWorkflow ??
+                            ({enabled: true, workflowId: 'workflow1'} as ProjectDeploymentWorkflow)
                         }
                         projectId={projectId}
                         projectName={projectName}
                         projectVersion={2}
-                        workflow={workflow}
+                        workflow={overrides.workflow ?? workflow}
                         workflowComponentDefinitions={{}}
                         workflowTaskDispatcherDefinitions={{}}
                     />
@@ -187,5 +193,65 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         await user.click(screen.getByRole('switch'));
 
         expect(useProjectDeploymentWorkflowSheetStore.getState().projectDeploymentWorkflowSheetOpen).toBe(false);
+    });
+
+    describe('trigger page links', () => {
+        const staticWebhookUrl = 'http://localhost:9555/webhooks/workflow-execution-id';
+
+        const formWorkflow = {
+            ...workflow,
+            triggers: [{name: 'trigger_1', type: 'form/v1/newFormRequest'}],
+        } as unknown as Workflow;
+
+        const chatWorkflow = {
+            ...workflow,
+            triggers: [{name: 'trigger_1', parameters: {mode: 1}, type: 'chat/v1/newChatRequest'}],
+        } as unknown as Workflow;
+
+        it('renders the form button as a link to the form page so it can open in a new tab', () => {
+            renderListItem(undefined, undefined, {
+                projectDeploymentWorkflow: {
+                    enabled: true,
+                    staticWebhookUrl,
+                    workflowId: 'workflow1',
+                } as ProjectDeploymentWorkflow,
+                workflow: formWorkflow,
+            });
+
+            expect(screen.getByRole('link', {name: 'Open form'})).toHaveAttribute(
+                'href',
+                '/form/1/workflow-execution-id'
+            );
+        });
+
+        it('renders the hosted chat button as a link to the chat page so it can open in a new tab', () => {
+            renderListItem(undefined, undefined, {
+                projectDeploymentWorkflow: {
+                    enabled: true,
+                    staticWebhookUrl,
+                    workflowId: 'workflow1',
+                } as ProjectDeploymentWorkflow,
+                workflow: chatWorkflow,
+            });
+
+            expect(screen.getByRole('link', {name: 'Open hosted chat'})).toHaveAttribute(
+                'href',
+                '/automation/chats/workflow-execution-id'
+            );
+        });
+
+        it('renders disabled buttons instead of links while the workflow is disabled', () => {
+            renderListItem(undefined, undefined, {
+                projectDeploymentWorkflow: {
+                    enabled: false,
+                    staticWebhookUrl,
+                    workflowId: 'workflow1',
+                } as ProjectDeploymentWorkflow,
+                workflow: formWorkflow,
+            });
+
+            expect(screen.queryByRole('link', {name: 'Open form'})).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Open form'})).toBeDisabled();
+        });
     });
 });
