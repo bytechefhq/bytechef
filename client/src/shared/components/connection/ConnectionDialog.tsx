@@ -874,7 +874,7 @@ const ConnectionDialog = ({
                                 )
                             }
                         >
-                            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:space-x-2">
+                            <div className="flex flex-wrap items-center justify-end gap-2">
                                 <Select
                                     defaultValue={String(connectionDefinition?.version ?? 1)}
                                     onValueChange={(value) => setConnectionVersion(Number(value))}

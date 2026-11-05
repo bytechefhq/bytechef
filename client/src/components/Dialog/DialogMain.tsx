@@ -153,7 +153,7 @@ DialogBody.displayName = 'DialogBody';
 const DialogFooter = ({children, className, startContent, ...props}: DialogFooterProps) => (
     <div
         className={twMerge(
-            'flex items-center justify-between gap-2 border-t border-stroke-neutral-primary px-4 py-2.5',
+            'flex flex-wrap items-center justify-between gap-2 border-t border-stroke-neutral-primary px-4 py-2.5',
             className
         )}
         data-slot="dialog-footer"
@@ -161,7 +161,7 @@ const DialogFooter = ({children, className, startContent, ...props}: DialogFoote
     >
         <div className="flex items-center gap-1.5">{startContent}</div>
 
-        <div className="flex items-center gap-2">{children}</div>
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">{children}</div>
     </div>
 );
 
