@@ -1,0 +1,34 @@
+extend type Query {
+    aiEvalDatasets(workspaceId: ID!): [AiEvalDatasetView!]!
+    aiEvalDatasetVersions(datasetId: ID!): [AiEvalDatasetVersionView!]!
+    aiEvalDatasetItems(versionId: ID!): [AiEvalDatasetItemView!]!
+}
+
+type AiEvalDatasetView {
+    archivedDate: Long
+    createdDate: Long
+    description: String
+    id: ID!
+    name: String!
+    tags: String
+    workspaceId: ID!
+}
+
+type AiEvalDatasetVersionView {
+    createdDate: Long
+    datasetId: ID!
+    frozen: Boolean!
+    id: ID!
+    itemCount: Int!
+    label: String
+}
+
+type AiEvalDatasetItemView {
+    createdDate: Long
+    datasetVersionId: ID!
+    expectedOutput: String
+    id: ID!
+    input: String!
+    metadata: String
+    sourceTraceId: ID
+}
