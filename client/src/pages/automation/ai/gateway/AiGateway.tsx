@@ -3,17 +3,34 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useSearchParams} from 'react-router-dom';
 
+import AiObservabilityAlerts from './components/alerts/AiObservabilityAlerts';
 import AiGatewayBudget from './components/budget/AiGatewayBudget';
+import AiObservabilityExports from './components/exports/AiObservabilityExports';
 import AiGatewayModels from './components/models/AiGatewayModels';
 import AiGatewayDashboard from './components/monitoring/AiGatewayDashboard';
 import AiGatewayProjects from './components/projects/AiGatewayProjects';
 import AiGatewayProviders from './components/providers/AiGatewayProviders';
 import AiGatewayRateLimits from './components/rate-limits/AiGatewayRateLimits';
 import AiGatewayRoutingPolicies from './components/routing/AiGatewayRoutingPolicies';
+import AiObservabilitySessionDetail from './components/sessions/AiObservabilitySessionDetail';
+import AiObservabilitySessions from './components/sessions/AiObservabilitySessions';
 import AiGatewaySettings from './components/settings/AiGatewaySettings';
+import AiObservabilityTraceDetail from './components/traces/AiObservabilityTraceDetail';
+import AiObservabilityTraces from './components/traces/AiObservabilityTraces';
 
 type AiGatewayPageType =
-    'budget' | 'models' | 'monitoring' | 'projects' | 'providers' | 'rateLimits' | 'routing' | 'settings';
+    | 'alerts'
+    | 'budget'
+    | 'exports'
+    | 'models'
+    | 'monitoring'
+    | 'projects'
+    | 'providers'
+    | 'rateLimits'
+    | 'routing'
+    | 'sessions'
+    | 'settings'
+    | 'traces';
 
 const GATEWAY_SECTIONS: {id: AiGatewayPageType; label: string}[] = [
     {id: 'providers', label: 'Providers'},
@@ -24,6 +41,10 @@ const GATEWAY_SECTIONS: {id: AiGatewayPageType; label: string}[] = [
     {id: 'budget', label: 'Budget'},
     {id: 'rateLimits', label: 'Rate Limits'},
     {id: 'monitoring', label: 'Monitoring'},
+    {id: 'traces', label: 'Traces'},
+    {id: 'sessions', label: 'Sessions'},
+    {id: 'alerts', label: 'Alerts'},
+    {id: 'exports', label: 'Exports'},
 ];
 
 const VALID_PAGES: ReadonlySet<AiGatewayPageType> = new Set(GATEWAY_SECTIONS.map((section) => section.id));
@@ -32,10 +53,30 @@ const isValidPage = (value: string | null): value is AiGatewayPageType =>
     value !== null && VALID_PAGES.has(value as AiGatewayPageType);
 
 const AiGateway = () => {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const sectionParam = searchParams.get('section');
     const activePage: AiGatewayPageType = isValidPage(sectionParam) ? sectionParam : 'providers';
+
+    const selectedSessionId = searchParams.get('sessionId') || undefined;
+    const selectedTraceId = searchParams.get('traceId') || undefined;
+
+    const updateQueryParam = (key: string, value: string | undefined) => {
+        setSearchParams(
+            (current) => {
+                const next = new URLSearchParams(current);
+
+                if (value === undefined) {
+                    next.delete(key);
+                } else {
+                    next.set(key, value);
+                }
+
+                return next;
+            },
+            {replace: true}
+        );
+    };
 
     const activePageLabel = GATEWAY_SECTIONS.find((section) => section.id === activePage)?.label || 'AI Gateway';
 
@@ -71,6 +112,32 @@ const AiGateway = () => {
             {activePage === 'rateLimits' && <AiGatewayRateLimits />}
 
             {activePage === 'monitoring' && <AiGatewayDashboard />}
+
+            {activePage === 'traces' &&
+                (selectedTraceId ? (
+                    <AiObservabilityTraceDetail
+                        onBack={() => updateQueryParam('traceId', undefined)}
+                        traceId={selectedTraceId}
+                    />
+                ) : (
+                    <AiObservabilityTraces onSelectTrace={(traceId) => updateQueryParam('traceId', traceId)} />
+                ))}
+
+            {activePage === 'sessions' &&
+                (selectedSessionId ? (
+                    <AiObservabilitySessionDetail
+                        onBack={() => updateQueryParam('sessionId', undefined)}
+                        sessionId={selectedSessionId}
+                    />
+                ) : (
+                    <AiObservabilitySessions
+                        onSelectSession={(sessionId) => updateQueryParam('sessionId', sessionId)}
+                    />
+                ))}
+
+            {activePage === 'alerts' && <AiObservabilityAlerts />}
+
+            {activePage === 'exports' && <AiObservabilityExports />}
         </LayoutContainer>
     );
 };
