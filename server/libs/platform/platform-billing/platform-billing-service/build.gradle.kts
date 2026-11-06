@@ -1,4 +1,5 @@
 dependencies {
+    implementation("com.github.kagkarlsson:db-scheduler:16.12.0")
     implementation("com.stripe:stripe-java:32.1.0")
     implementation("tools.jackson.core:jackson-databind")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
@@ -10,6 +11,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-billing:platform-billing-api"))
+    implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-db"))
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
