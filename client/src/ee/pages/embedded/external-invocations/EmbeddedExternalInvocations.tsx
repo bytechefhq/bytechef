@@ -1,11 +1,17 @@
 import EmbeddedExternalInvocationsEmptyState from '@/ee/pages/embedded/external-invocations/components/EmbeddedExternalInvocationsEmptyState';
+import WorkflowExecutionSheet from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
+import useWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {ExternalInvocations} from '@/pages/automation/external-invocations/ExternalInvocations';
 import {PlatformType, useEmbeddedMcpServersQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 
 export const EmbeddedExternalInvocations = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const setWorkflowExecutionId = useWorkflowExecutionSheetStore((state) => state.setWorkflowExecutionId);
+    const setWorkflowExecutionSheetOpen = useWorkflowExecutionSheetStore(
+        (state) => state.setWorkflowExecutionSheetOpen
+    );
 
     const {data} = useEmbeddedMcpServersQuery();
 
@@ -25,13 +31,23 @@ export const EmbeddedExternalInvocations = () => {
         [currentEnvironmentId, data]
     );
 
+    const handleViewJob = useCallback(
+        (jobId: number) => {
+            setWorkflowExecutionId(jobId);
+            setWorkflowExecutionSheetOpen(true);
+        },
+        [setWorkflowExecutionId, setWorkflowExecutionSheetOpen]
+    );
+
     return (
         <ExternalInvocations
             environmentId={currentEnvironmentId}
             firstRunEmptyState={<EmbeddedExternalInvocationsEmptyState hasMcpServer={hasMcpServer} />}
             key={currentEnvironmentId}
             mcpServerOptions={mcpServerOptions}
+            onViewJob={handleViewJob}
             type={PlatformType.Embedded}
+            workflowExecutionSheet={<WorkflowExecutionSheet />}
         />
     );
 };

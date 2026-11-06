@@ -1,4 +1,5 @@
 import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
+import {render as renderWithProviders} from '@/shared/util/test-utils';
 import {render, screen} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 
@@ -205,5 +206,17 @@ describe('ExternalInvocationsTable', () => {
         expect(screen.getAllByRole('row')).toHaveLength(3);
         expect(screen.getByText('first_tool')).toBeInTheDocument();
         expect(screen.getByText('second_tool')).toBeInTheDocument();
+    });
+    it('adds an Actions column only when the page can open a workflow run', () => {
+        const {unmount} = render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);
+
+        expect(screen.queryByText('Actions')).not.toBeInTheDocument();
+
+        unmount();
+
+        renderWithProviders(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} onViewJob={() => {}} />);
+
+        expect(screen.getAllByRole('columnheader').at(-1)).toHaveTextContent('Actions');
+        expect(screen.getByRole('button', {name: 'External invocation actions'})).toBeInTheDocument();
     });
 });

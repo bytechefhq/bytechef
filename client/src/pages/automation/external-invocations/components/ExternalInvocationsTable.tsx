@@ -6,14 +6,21 @@ import {
     EXECUTIONS_TABLE_HEADER_CLASS_NAME,
     EXECUTIONS_TABLE_HEAD_CLASS_NAME,
     EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME,
+    PINNED_CELL_CLASS_NAME,
+    PINNED_HEAD_CLASS_NAME,
+    PINNED_STRIPED_CELL_CLASS_NAME,
 } from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
 import {ExternalInvocationLogsQuery} from '@/shared/middleware/graphql';
+import {twMerge} from 'tailwind-merge';
+
+import ExternalInvocationsDropdownMenu from './ExternalInvocationsDropdownMenu';
 
 type ExternalInvocationLogItemType = ExternalInvocationLogsQuery['externalInvocationLogs']['content'][number];
 
 interface ExternalInvocationsTableProps {
     a2aServerNames?: Record<string, string>;
     mcpServerNames?: Record<string, string>;
+    onViewJob?: (jobId: number) => void;
     showSurface?: boolean;
     externalInvocationLogs: Array<ExternalInvocationLogItemType>;
 }
@@ -74,6 +81,7 @@ const ExternalInvocationsTable = ({
     a2aServerNames,
     externalInvocationLogs,
     mcpServerNames,
+    onViewJob,
     showSurface = true,
 }: ExternalInvocationsTableProps) => (
     <Table>
@@ -92,13 +100,19 @@ const ExternalInvocationsTable = ({
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Duration</TableHead>
 
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Date</TableHead>
+
+                {onViewJob && (
+                    <TableHead className={twMerge(EXECUTIONS_TABLE_HEAD_CLASS_NAME, PINNED_HEAD_CLASS_NAME)}>
+                        Actions
+                    </TableHead>
+                )}
             </TableRow>
         </TableHeader>
 
         <TableBody>
             {externalInvocationLogs.map((externalInvocationLog) => (
                 <TableRow
-                    className={`border-0 ${EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME}`}
+                    className={twMerge('group border-0', EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME)}
                     key={externalInvocationLog.id}
                 >
                     <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
@@ -135,6 +149,22 @@ const ExternalInvocationsTable = ({
                     <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
                         {formatCreatedDate(externalInvocationLog.createdDate)}
                     </TableCell>
+
+                    {onViewJob && (
+                        <TableCell
+                            className={twMerge(
+                                EXECUTIONS_TABLE_CELL_CLASS_NAME,
+                                PINNED_CELL_CLASS_NAME,
+                                PINNED_STRIPED_CELL_CLASS_NAME
+                            )}
+                        >
+                            <ExternalInvocationsDropdownMenu
+                                jobId={externalInvocationLog.jobId}
+                                onViewJob={onViewJob}
+                                outcome={externalInvocationLog.outcome}
+                            />
+                        </TableCell>
+                    )}
                 </TableRow>
             ))}
         </TableBody>
