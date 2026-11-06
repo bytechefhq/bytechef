@@ -1479,7 +1479,7 @@ public class ApplicationProperties {
             /**
              * Maximum total size in bytes of all knowledge base documents in a tenant. 0 means unlimited. Default 1 GB.
              */
-            private long maxSizeBytes = 1_073_741_824L;
+            private long maxSizeBytes;
 
             /**
              * OCR configuration

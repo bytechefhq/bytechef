@@ -34,6 +34,7 @@ bytechef:
       enabled: false
     knowledge-base:
       enabled: false
+      maxSizeBytes: 1073741824
       ocr:
         # OCR provider used when extracting text from knowledge base documents (AZURE | MISTRAL | NONE)
         provider: NONE
