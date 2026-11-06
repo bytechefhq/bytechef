@@ -1662,10 +1662,13 @@ export const getElkLayoutElements = async ({
                         // that reads 106px in TB collapses to 84px in LR.
                         const renderedSize = getRenderedNodeSize(candidateNode, direction);
                         const renderedCross = crossAxis === 'x' ? renderedSize.width : renderedSize.height;
+                        const overhangBeyondAnchor = Math.max(0, renderedCross / 2 - NODE_ANCHOR_SIZE / 2);
 
                         farthestContentCross = pickFarther(
                             farthestContentCross,
-                            candidateNode.position[crossAxis] + renderedCross / 2
+                            candidateNode.position[crossAxis] +
+                                renderedCross / 2 -
+                                ringContentSign * overhangBeyondAnchor
                         );
                     }
                 });

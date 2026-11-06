@@ -3011,6 +3011,68 @@ describe('getElkLayoutElements with cluster roots', () => {
         expect(topBarY - (positionOf(result.nodes, 'condition_1').y + 72)).toBe(TOP_BOX_GAP);
         expect(positionOf(result.nodes, 'aiAgent_1').y - (topBarY + 2)).toBe(BAR_TO_CHILD_GAP);
     });
+
+    it('keeps the loop rail clear of an expanded cluster box in a nested condition branch', async () => {
+        const frameWidth = 272;
+
+        const nodes: Node[] = [
+            loopNode('loop_1'),
+            ...loopAuxNodes('loop_1'),
+            conditionNode('condition_1', undefined),
+            ...conditionGhostNodes('condition_1'),
+            clusterRootNode('knowledgeBase_1', false, {
+                clusterFrame: {height: 250, width: frameWidth},
+                conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_1', index: 0},
+            }),
+            conditionPlaceholderNode('condition_1', 'right'),
+        ];
+
+        (nodes[4].data as Record<string, unknown>).loopData = {index: 0, loopId: 'loop_1'};
+
+        const edges: Edge[] = [
+            ...loopStructureEdges('loop_1'),
+            edge('loop_1-loop-top-ghost', 'condition_1'),
+            edge('condition_1', 'condition_1-condition-top-ghost'),
+            edge('condition_1-condition-top-ghost', 'knowledgeBase_1'),
+            edge('knowledgeBase_1', 'condition_1-condition-bottom-ghost'),
+            edge('condition_1-condition-top-ghost', 'condition_1-condition-right-placeholder-0'),
+            edge('condition_1-condition-right-placeholder-0', 'condition_1-condition-bottom-ghost'),
+            edge('condition_1-condition-bottom-ghost', 'loop_1-loop-bottom-ghost'),
+        ];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const railX = positionOf(result.nodes, 'loop_1-taskDispatcher-left-ghost').x;
+        const frameLeft = positionOf(result.nodes, 'knowledgeBase_1').x;
+
+        expect(frameLeft).toBeGreaterThan(railX);
+    });
+
+    it('keeps the loop rail clear of an expanded cluster box in the loop body', async () => {
+        const frameWidth = 272;
+
+        const nodes: Node[] = [
+            loopNode('loop_1'),
+            ...loopAuxNodes('loop_1'),
+            clusterRootNode('knowledgeBase_1', false, {
+                clusterFrame: {height: 250, width: frameWidth},
+                loopData: {index: 0, loopId: 'loop_1'},
+            }),
+        ];
+
+        const edges: Edge[] = [
+            ...loopStructureEdges('loop_1'),
+            edge('loop_1-loop-top-ghost', 'knowledgeBase_1'),
+            edge('knowledgeBase_1', 'loop_1-loop-bottom-ghost'),
+        ];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const railX = positionOf(result.nodes, 'loop_1-taskDispatcher-left-ghost').x;
+        const frameLeft = positionOf(result.nodes, 'knowledgeBase_1').x;
+
+        expect(frameLeft).toBeGreaterThan(railX);
+    });
 });
 
 describe('getElkLayoutElements ring hug in LR', () => {
