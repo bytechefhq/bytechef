@@ -68,6 +68,7 @@ const config: CodegenConfig = {
         '../server/libs/platform/platform-configuration/platform-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-data-table/**/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-knowledge-base/automation-knowledge-base-graphql/src/main/resources/graphql/**/*.graphqls',
+        '../server/libs/automation/automation-asset-file/automation-asset-file-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/platform/platform-mcp/platform-mcp-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-ai/automation-ai-a2a/automation-ai-a2a-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-ai/automation-ai-mcp/automation-ai-mcp-graphql/src/main/resources/graphql/*.graphqls',
