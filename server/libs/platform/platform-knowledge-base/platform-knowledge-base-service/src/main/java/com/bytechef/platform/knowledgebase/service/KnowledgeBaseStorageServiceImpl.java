@@ -49,10 +49,11 @@ public class KnowledgeBaseStorageServiceImpl implements KnowledgeBaseStorageServ
         long limit = getLimit();
         long used = currentUsageBytes();
 
-        boolean unlimited = limit <= 0;
-        double percentage = unlimited ? 0.0 : used * 100.0 / limit;
+        if (limit <= 0) {
+            return new KnowledgeBaseStorageUsage(currentUsageBytes(), limit, 0.0, true);
+        }
 
-        return new KnowledgeBaseStorageUsage(used, limit, percentage, unlimited);
+        return new KnowledgeBaseStorageUsage(used, limit, used * 100.0 / limit, false);
     }
 
     @Override
