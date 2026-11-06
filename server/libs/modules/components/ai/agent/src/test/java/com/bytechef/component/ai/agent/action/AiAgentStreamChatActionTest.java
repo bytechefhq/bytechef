@@ -720,7 +720,7 @@ class AiAgentStreamChatActionTest {
                         prompts,
                         callNumber -> callNumber == 1 ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID) : finalAnswer()),
                     chatMemoryResult),
-                new AgentToolCallingManagers(createToolCallingManager()), null);
+                new AgentToolCallingManagers(createToolCallingManager()), null, null);
 
             SseEmitterHandler performHandler = getPerformFunction(streamChatActionDefinition).apply(
                 createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
@@ -788,7 +788,7 @@ class AiAgentStreamChatActionTest {
                             ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID)
                             : callNumber == 2 ? suspendingToolCallResponse(SECOND_TOOL_CALL_ID) : finalAnswer()),
                     chatMemoryResult),
-                new AgentToolCallingManagers(createToolCallingManager()), null);
+                new AgentToolCallingManagers(createToolCallingManager()), null, null);
 
             SseEmitterHandler performHandler = getPerformFunction(streamChatActionDefinition).apply(
                 createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
@@ -855,7 +855,7 @@ class AiAgentStreamChatActionTest {
             return AiAgentStreamChatAction.of(
                 mock(AiAgentToolFacade.class),
                 createClusterElementDefinitionService(createChatModel(prompts, responseFunction), null),
-                new AgentToolCallingManagers(createToolCallingManager()), null);
+                new AgentToolCallingManagers(createToolCallingManager()), null, null);
         }
 
         private static MultipleConnectionsStreamPerformFunction getPerformFunction(ActionDefinition actionDefinition) {

@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
+import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiAgentComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -46,11 +47,12 @@ public class AiAgentComponentHandler implements ComponentHandler {
     public AiAgentComponentHandler(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         AgentToolCallingManagers agentToolCallingManagers,
-        ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
+        ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
 
         final ActionDefinition aiAgentChatActionDefinition = AiAgentChatAction.of(
             aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
-            aiGuardrailsAdvisorProviderObjectProvider);
+            aiGuardrailsAdvisorProviderObjectProvider, workspaceSystemPromptAdvisorProviderObjectProvider);
 
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
             component(AI_AGENT)
@@ -62,7 +64,7 @@ public class AiAgentComponentHandler implements ComponentHandler {
                     aiAgentChatActionDefinition,
                     AiAgentStreamChatAction.of(
                         aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
-                        aiGuardrailsAdvisorProviderObjectProvider))
+                        aiGuardrailsAdvisorProviderObjectProvider, workspaceSystemPromptAdvisorProviderObjectProvider))
                 .clusterElements(AiAgentChatTool.of(aiAgentChatActionDefinition)));
     }
 

@@ -31,6 +31,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
+import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -57,21 +58,23 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
     public static ChatActionDefinitionWrapper of(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         AgentToolCallingManagers agentToolCallingManagers,
-        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
 
         return new AiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
-            aiGuardrailsAdvisorProviderObjectProvider).build();
+            aiGuardrailsAdvisorProviderObjectProvider, workspaceSystemPromptAdvisorProviderObjectProvider).build();
     }
 
     private AiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         AgentToolCallingManagers agentToolCallingManagers,
-        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
 
         super(
             aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
-            aiGuardrailsAdvisorProviderObjectProvider);
+            aiGuardrailsAdvisorProviderObjectProvider, workspaceSystemPromptAdvisorProviderObjectProvider);
     }
 
     private ChatActionDefinitionWrapper build() {

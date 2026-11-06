@@ -67,6 +67,7 @@ import com.bytechef.platform.ai.tool.GateDecision;
 import com.bytechef.platform.ai.tool.GatedToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
+import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -139,6 +140,7 @@ public abstract class AbstractAiAgentChatAction {
     private final ClusterElementToolCallbacks clusterElementToolCallbacks;
     private final AgentToolCallingManagers agentToolCallingManagers;
     private final @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider;
+    private final @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider;
 
     protected AbstractAiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
@@ -152,11 +154,23 @@ public abstract class AbstractAiAgentChatAction {
         AgentToolCallingManagers agentToolCallingManagers,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
+        this(
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
+            aiGuardrailsAdvisorProviderObjectProvider, null);
+    }
+
+    protected AbstractAiAgentChatAction(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        AgentToolCallingManagers agentToolCallingManagers,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
+
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.clusterElementToolCallbacks =
             new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService);
         this.agentToolCallingManagers = agentToolCallingManagers;
         this.aiGuardrailsAdvisorProviderObjectProvider = aiGuardrailsAdvisorProviderObjectProvider;
+        this.workspaceSystemPromptAdvisorProviderObjectProvider = workspaceSystemPromptAdvisorProviderObjectProvider;
     }
 
     protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
@@ -271,6 +285,17 @@ public abstract class AbstractAiAgentChatAction {
                         .orElse(null);
                 }
             }
+        }
+
+        if (workspaceSystemPromptAdvisorProviderObjectProvider != null
+            && context instanceof ActionContextAware actionContextAware) {
+
+            workspaceSystemPromptAdvisorProviderObjectProvider.ifAvailable(
+                provider -> provider
+                    .getAdvisor(
+                        actionContextAware.getPlatformType(), actionContextAware.getJobPrincipalId(),
+                        GuardrailSurface.AI_AGENT)
+                    .ifPresent(workspaceAdvisors::add));
         }
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = (resumedTurn

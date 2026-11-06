@@ -70,6 +70,7 @@ import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.tool.ToolSuspension;
+import com.bytechef.platform.ai.workspaceprompt.WorkspaceSystemPromptAdvisorProvider;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.SuspendUtils;
@@ -736,11 +737,12 @@ class AiAgentChatActionIntTest {
         AiAgentComponentHandler aiAgentComponentHandler(
             AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
             ToolCallingManager toolCallingManager,
-            ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
+            ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+            ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
 
             return new AiAgentComponentHandler(
                 aiAgentToolFacade, clusterElementDefinitionService, new AgentToolCallingManagers(toolCallingManager),
-                aiGuardrailsAdvisorProviderObjectProvider);
+                aiGuardrailsAdvisorProviderObjectProvider, workspaceSystemPromptAdvisorProviderObjectProvider);
         }
 
         @Bean

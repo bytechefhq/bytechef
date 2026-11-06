@@ -353,7 +353,7 @@ class AiAgentChatActionTest {
             AiAgentChatAction.of(
                 mock(AiAgentToolFacade.class), clusterElementDefinitionService,
                 new AgentToolCallingManagers(createToolCallingManager()),
-                null));
+                null, null));
 
         Throwable throwable = catchThrowable(() -> performFunction.apply(
             createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
@@ -385,7 +385,7 @@ class AiAgentChatActionTest {
             AiAgentChatAction.of(
                 mock(AiAgentToolFacade.class), clusterElementDefinitionService,
                 new AgentToolCallingManagers(createToolCallingManager()),
-                null));
+                null, null));
 
         Throwable throwable = catchThrowable(() -> performFunction.apply(
             createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false, false, true),
@@ -417,7 +417,7 @@ class AiAgentChatActionTest {
             AiAgentChatAction.of(
                 mock(AiAgentToolFacade.class), clusterElementDefinitionService,
                 new AgentToolCallingManagers(createToolCallingManager()),
-                null));
+                null, null));
 
         Throwable throwable = catchThrowable(() -> performFunction.apply(
             createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false),
@@ -578,7 +578,7 @@ class AiAgentChatActionTest {
 
         AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = AiAgentChatAction.of(
             mock(AiAgentToolFacade.class), clusterElementDefinitionService,
-            new AgentToolCallingManagers(createToolCallingManager()), null);
+            new AgentToolCallingManagers(createToolCallingManager()), null, null);
 
         AtomicReference<ActionContext.Suspend> firstTurnSuspend = new AtomicReference<>();
 
@@ -1070,7 +1070,7 @@ class AiAgentChatActionTest {
         return AiAgentChatAction.of(
             mock(AiAgentToolFacade.class),
             createClusterElementDefinitionService(createChatModel(prompts, responseFunction), chatMemoryResult),
-            new AgentToolCallingManagers(createToolCallingManager()), null);
+            new AgentToolCallingManagers(createToolCallingManager()), null, null);
     }
 
     private static ActionContextAware createRecordingActionContext(
@@ -1123,7 +1123,7 @@ class AiAgentChatActionTest {
         return AiAgentChatAction.of(
             mock(AiAgentToolFacade.class), clusterElementDefinitionService,
             new AgentToolCallingManagers(createToolCallingManager()),
-            null);
+            null, null);
     }
 
     private static MultipleConnectionsPerformFunction getPerformFunction(
