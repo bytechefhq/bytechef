@@ -1,0 +1,96 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.component.assetfile;
+
+import static com.bytechef.component.assetfile.constant.AssetFileConstants.ASSET_FILE;
+import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
+
+import com.bytechef.automation.assetfile.service.AssetFileSystemFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.assetfile.action.AssetFileDeleteAction;
+import com.bytechef.component.assetfile.action.AssetFileDownloadAction;
+import com.bytechef.component.assetfile.action.AssetFileFindAction;
+import com.bytechef.component.assetfile.action.AssetFileGetAction;
+import com.bytechef.component.assetfile.action.AssetFileRenameAction;
+import com.bytechef.component.assetfile.action.AssetFileUpdateContentAction;
+import com.bytechef.component.assetfile.action.AssetFileUploadAction;
+import com.bytechef.component.assetfile.util.AssetFileContextResolver;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author Ivica Cardic
+ */
+@Component(ASSET_FILE + "_v1_ComponentHandler")
+public class AssetFileComponentHandler implements ComponentHandler {
+
+    private final ComponentDefinition componentDefinition;
+
+    public AssetFileComponentHandler(
+        AssetFileSystemFacade assetFileSystemFacade, ProjectService projectService,
+        ProjectWorkflowService projectWorkflowService) {
+
+        this.componentDefinition = new AssetFileComponentDefinitionImpl(
+            assetFileSystemFacade, new AssetFileContextResolver(projectService, projectWorkflowService));
+    }
+
+    @Override
+    public ComponentDefinition getDefinition() {
+        return componentDefinition;
+    }
+
+    private static class AssetFileComponentDefinitionImpl extends AbstractComponentDefinitionWrapper {
+
+        public AssetFileComponentDefinitionImpl(
+            AssetFileSystemFacade assetFileSystemFacade, AssetFileContextResolver contextResolver) {
+
+            super(buildDefinition(assetFileSystemFacade, contextResolver));
+        }
+
+        private static ComponentDefinition buildDefinition(
+            AssetFileSystemFacade assetFileSystemFacade, AssetFileContextResolver contextResolver) {
+
+            ActionDefinition uploadAction = AssetFileUploadAction.of(assetFileSystemFacade, contextResolver);
+            ActionDefinition downloadAction = AssetFileDownloadAction.of(assetFileSystemFacade, contextResolver);
+            ActionDefinition getAction = AssetFileGetAction.of(assetFileSystemFacade, contextResolver);
+            ActionDefinition findAction = AssetFileFindAction.of(assetFileSystemFacade, contextResolver);
+            ActionDefinition updateContentAction =
+                AssetFileUpdateContentAction.of(assetFileSystemFacade, contextResolver);
+            ActionDefinition renameAction = AssetFileRenameAction.of(assetFileSystemFacade, contextResolver);
+            ActionDefinition deleteAction = AssetFileDeleteAction.of(assetFileSystemFacade, contextResolver);
+
+            return component(ASSET_FILE)
+                .title("Asset File")
+                .description("Work with ByteChef workspace asset files: upload, download, list, rename and delete " +
+                    "binary files stored in the workspace asset file infrastructure.")
+                .icon("path:assets/asset-file.svg")
+                .categories(ComponentCategory.HELPERS)
+                .actions(
+                    uploadAction, downloadAction, getAction, findAction, updateContentAction, renameAction,
+                    deleteAction)
+                .clusterElements(
+                    tool(uploadAction), tool(downloadAction), tool(getAction), tool(findAction),
+                    tool(updateContentAction), tool(renameAction), tool(deleteAction));
+        }
+    }
+}
