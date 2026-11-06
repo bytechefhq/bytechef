@@ -58,7 +58,6 @@ const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
     return (
         <Tooltip>
             <ProjectDeploymentDialog
-                environmentEditable={true}
                 onSuccess={onDeploymentSaved}
                 projectDeployment={{
                     name: project.name,

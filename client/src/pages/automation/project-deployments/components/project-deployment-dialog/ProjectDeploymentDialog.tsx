@@ -154,7 +154,6 @@ ProjectDeploymentDialogFooter.displayName = 'ProjectDeploymentDialogFooter';
 
 interface ProjectDeploymentDialogProps {
     changeProjectVersion?: boolean;
-    environmentEditable?: boolean;
     filterWorkflowUuids?: string[];
     onClose?: () => void;
     onOpenChange?: (isOpen: boolean) => void;
@@ -169,7 +168,6 @@ interface ProjectDeploymentDialogProps {
 
 const ProjectDeploymentDialog = ({
     changeProjectVersion = false,
-    environmentEditable = false,
     filterWorkflowUuids,
     onClose,
     onOpenChange,
@@ -225,6 +223,11 @@ const ProjectDeploymentDialog = ({
     const watchedEnvironmentId = watch('environmentId');
 
     const deploymentEnvironmentId = watchedEnvironmentId ?? currentEnvironmentId;
+
+    const environmentProjectDeployments = useMemo(
+        () => projectDeployments?.filter((deployment) => deployment.environmentId === currentEnvironmentId),
+        [currentEnvironmentId, projectDeployments]
+    );
 
     const {data: connections} = useGetWorkspaceConnectionsQuery(
         {
@@ -387,12 +390,11 @@ const ProjectDeploymentDialog = ({
                 basicStepTab={basicStepTab}
                 changeProjectVersion={effectiveChangeProjectVersion}
                 control={control}
-                environmentEditable={environmentEditable}
                 getValues={getValues}
                 handleTabChange={handleBasicStepTabChange}
                 onDeploymentSelect={handleExistingDeploymentSelect}
                 projectDeployment={effectiveProjectDeployment}
-                projectDeployments={projectDeployments}
+                projectDeployments={environmentProjectDeployments}
                 projectDeploymentsLoading={projectDeploymentsLoading}
                 setValue={setValue}
                 showTabs={showTabs}
@@ -413,7 +415,7 @@ const ProjectDeploymentDialog = ({
     const isBasicStepBlocked =
         basicStepTab === 'change-version' &&
         !projectDeploymentsLoading &&
-        (projectDeployments?.length ?? 0) === 0 &&
+        (environmentProjectDeployments?.length ?? 0) === 0 &&
         !!showTabs;
 
     const steps = useMemo<DialogStepI[]>(
@@ -596,14 +598,14 @@ const ProjectDeploymentDialog = ({
             return;
         }
 
-        if (projectDeploymentsLoading || projectDeployments === undefined) {
+        if (projectDeploymentsLoading || environmentProjectDeployments === undefined) {
             return;
         }
 
-        setBasicStepTab(projectDeployments.length > 0 ? 'change-version' : 'new-deployment');
+        setBasicStepTab(environmentProjectDeployments.length > 0 ? 'change-version' : 'new-deployment');
 
         setTabInitialized(true);
-    }, [isOpen, projectDeploymentsLoading, projectDeployments, changeProjectVersion, tabInitialized]);
+    }, [isOpen, projectDeploymentsLoading, environmentProjectDeployments, changeProjectVersion, tabInitialized]);
 
     const isWizard = !effectiveProjectDeployment?.id || effectiveChangeProjectVersion;
 

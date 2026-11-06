@@ -1,5 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {PRODUCTION_ENVIRONMENT, STAGING_ENVIRONMENT} from '@/shared/constants';
 import {ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {UseFormSetValue} from 'react-hook-form';
@@ -77,7 +79,7 @@ vi.mock('./ProjectDeploymentDialogWorkflowsStep', () => ({
 const projectDeployments: ProjectDeployment[] = [
     {
         enabled: true,
-        environmentId: 1,
+        environmentId: STAGING_ENVIRONMENT,
         id: 11,
         name: 'Production',
         projectDeploymentWorkflows: [],
@@ -86,7 +88,7 @@ const projectDeployments: ProjectDeployment[] = [
     },
     {
         enabled: true,
-        environmentId: 1,
+        environmentId: STAGING_ENVIRONMENT,
         id: 12,
         name: 'Staging',
         projectDeploymentWorkflows: [],
@@ -97,6 +99,8 @@ const projectDeployments: ProjectDeployment[] = [
 
 beforeEach(() => {
     vi.clearAllMocks();
+
+    environmentStore.setState({currentEnvironmentId: STAGING_ENVIRONMENT});
 });
 
 describe('ProjectDeploymentDialog', () => {
@@ -128,5 +132,35 @@ describe('ProjectDeploymentDialog', () => {
         expect(submittedDeployment.projectDeploymentWorkflows).toEqual([
             expect.objectContaining({enabled: true, workflowId: 'workflow-v1'}),
         ]);
+    });
+
+    it('offers only deployments from the current environment', async () => {
+        render(
+            <MemoryRouter>
+                <TooltipProvider>
+                    <ProjectDeploymentDialog
+                        projectDeployment={{name: 'Webhooks', projectId: 5}}
+                        projectDeployments={[
+                            ...projectDeployments,
+                            {
+                                enabled: true,
+                                environmentId: PRODUCTION_ENVIRONMENT,
+                                id: 13,
+                                name: 'Live',
+                                projectDeploymentWorkflows: [],
+                                projectId: 5,
+                                projectVersion: 1,
+                            },
+                        ]}
+                        projectDeploymentsLoading={false}
+                        showTabs
+                    />
+                </TooltipProvider>
+            </MemoryRouter>
+        );
+
+        expect(await screen.findByRole('button', {name: 'Select Production'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Select Staging'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Select Live'})).not.toBeInTheDocument();
     });
 });

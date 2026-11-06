@@ -369,7 +369,6 @@ const ProjectListItem = ({
 
                                         <ButtonGroup>
                                             <ProjectDeploymentDialog
-                                                environmentEditable={true}
                                                 onOpenChange={setIsProjectDeploymentDialogOpen}
                                                 onSuccess={openSavedProjectDeployment}
                                                 projectDeployment={{
