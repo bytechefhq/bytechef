@@ -146,18 +146,14 @@ describe('ProjectDeploymentListItem', () => {
         invalidateQueriesSpy.mockRestore();
     });
 
-    it('opens the project from the icon beside the name and from the menu', async () => {
+    it('opens the project from the menu', async () => {
         const user = userEvent.setup();
 
         render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
 
-        await user.click(screen.getByRole('button', {name: 'Open project'}));
-
-        expect(hoisted.openProjectMock).toHaveBeenLastCalledWith(7);
-
         await user.click(screen.getByText('Open Project'));
 
-        expect(hoisted.openProjectMock).toHaveBeenCalledTimes(2);
+        expect(hoisted.openProjectMock).toHaveBeenCalledTimes(1);
         expect(hoisted.openProjectMock).toHaveBeenLastCalledWith(7);
     });
 

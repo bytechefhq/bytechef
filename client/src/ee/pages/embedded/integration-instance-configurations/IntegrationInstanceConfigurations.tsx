@@ -12,6 +12,7 @@ import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queri
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import ListGroupHeader from '@/shared/components/ListGroupHeader';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -21,6 +22,7 @@ import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/ta
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Settings2Icon, TagIcon} from 'lucide-react';
+import InlineSVG from 'react-inlinesvg';
 import {useSearchParams} from 'react-router-dom';
 
 export enum Type {
@@ -240,30 +242,46 @@ const IntegrationInstanceConfigurations = () => {
                 {componentDefinitions &&
                 integrationInstanceConfigurations &&
                 integrationInstanceConfigurations?.length > 0 ? (
-                    <div className="w-full divide-y divide-border/50 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
+                    <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                         <WorkflowReadOnlyProvider
                             value={{
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
                             }}
                         >
-                            {Array.from(integrationInstanceConfigurationMap.keys())?.map(
-                                (integrationId) =>
-                                    integrations &&
+                            {Array.from(integrationInstanceConfigurationMap.keys())?.map((integrationId) => {
+                                const integration = integrations?.find(
+                                    (currentIntegration) => currentIntegration.id === integrationId
+                                );
+
+                                return (
+                                    integration &&
                                     tags && (
-                                        <IntegrationInstanceConfigurationList
-                                            componentDefinitions={actionTriggerComponentDefinitions}
-                                            integration={integrations.find(
-                                                (currentIntegration) => currentIntegration.id === integrationId
-                                            )!}
-                                            integrationInstanceConfigurations={integrationInstanceConfigurationMap.get(
-                                                integrationId
-                                            )!}
-                                            key={integrationId}
-                                            tags={tags}
-                                            taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                        />
+                                        <section key={integrationId}>
+                                            <ListGroupHeader
+                                                icon={
+                                                    integration.icon ? (
+                                                        <InlineSVG className="size-6 shrink-0" src={integration.icon} />
+                                                    ) : (
+                                                        <Settings2Icon aria-hidden="true" className="size-6 shrink-0" />
+                                                    )
+                                                }
+                                                name={integration.name}
+                                            />
+
+                                            <IntegrationInstanceConfigurationList
+                                                componentDefinitions={actionTriggerComponentDefinitions}
+                                                integration={integration}
+                                                integrationInstanceConfigurations={integrationInstanceConfigurationMap.get(
+                                                    integrationId
+                                                )!}
+                                                showIntegrationIcon={false}
+                                                tags={tags}
+                                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                            />
+                                        </section>
                                     )
-                            )}
+                                );
+                            })}
 
                             <IntegrationInstanceConfigurationWorkflowExecutionsSheet />
                         </WorkflowReadOnlyProvider>

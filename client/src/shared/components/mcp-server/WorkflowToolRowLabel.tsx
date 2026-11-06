@@ -62,8 +62,8 @@ const WorkflowToolRowLabel = ({
                         <TooltipTrigger asChild>
                             <Button
                                 aria-label="Open in project"
-                                className="size-6 shrink-0"
-                                icon={<SquareArrowOutUpRightIcon className="size-3.5" />}
+                                className="size-5 shrink-0 [&_svg]:size-3"
+                                icon={<SquareArrowOutUpRightIcon className="size-3" />}
                                 onClick={onOpenInProjectClick}
                                 size="icon"
                                 variant="ghost"

@@ -160,10 +160,10 @@ describe('AutomationWorkflowConfigurations', () => {
         expect(mocks.projectsVariables).toEqual({environmentId: '2'});
         expect(screen.getByText('Projects: All Projects')).toBeInTheDocument();
         expect(listedProjectIds()).toEqual(['live']);
-        expect(screen.queryByRole('heading', {name: 'Live Project'})).not.toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'Live Project'})).toBeInTheDocument();
         expect(
-            within(screen.getByText('PRODUCTION').closest('[data-state]') as HTMLElement).getByText('Live Project')
-        ).toBeInTheDocument();
+            within(screen.getByText('PRODUCTION').closest('[data-state]') as HTMLElement).queryByText('Live Project')
+        ).not.toBeInTheDocument();
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'New Project Configuration'})).toBeInTheDocument();
         expect(mocks.configurationsVariables).toContainEqual({environmentId: '2', projectId: 'live'});

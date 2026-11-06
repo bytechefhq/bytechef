@@ -5,8 +5,10 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
+import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import ListGroupHeader from '@/shared/components/ListGroupHeader';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -18,7 +20,7 @@ import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automatio
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {RefreshCwIcon, TagIcon} from 'lucide-react';
+import {FolderIcon, RefreshCwIcon, SquareArrowOutUpRightIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -62,6 +64,8 @@ const ProjectDeployments = () => {
 
     const location = useLocation();
     const [searchParams] = useSearchParams();
+
+    const {openProject} = useOpenInProject();
 
     const projectId = searchParams.get('projectId');
     const tagId = searchParams.get('tagId');
@@ -224,29 +228,52 @@ const ProjectDeployments = () => {
                 loading={projectsIsLoading || projectDeploymentsIsLoading || tagsIsLoading}
             >
                 {projectDeployments && projectDeployments?.length > 0 ? (
-                    <div className="w-full divide-y divide-border/50 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
+                    <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                         <WorkflowReadOnlyProvider
                             value={{
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
                             }}
                         >
-                            {Array.from(projectDeploymentMap.keys())?.map(
-                                (projectId) =>
-                                    projects &&
+                            {Array.from(projectDeploymentMap.keys())?.map((projectId) => {
+                                const project = projects?.find((currentProject) => currentProject.id === projectId);
+
+                                return (
+                                    project &&
                                     tags && (
-                                        <ProjectDeploymentList
-                                            componentDefinitions={componentDefinitions}
-                                            key={projectId}
-                                            newlyCreatedDeploymentId={expandedProjectDeploymentId}
-                                            project={projects.find(
-                                                (currentProject) => currentProject.id === projectId
-                                            )!}
-                                            projectDeployments={projectDeploymentMap.get(projectId)!}
-                                            tags={tags}
-                                            taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                        />
+                                        <section key={projectId}>
+                                            <ListGroupHeader
+                                                action={
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                aria-label="Open project"
+                                                                className="size-5 [&_svg]:size-3"
+                                                                icon={<SquareArrowOutUpRightIcon className="size-3" />}
+                                                                onClick={() => openProject(projectId)}
+                                                                size="icon"
+                                                                variant="ghost"
+                                                            />
+                                                        </TooltipTrigger>
+
+                                                        <TooltipContent>Open project</TooltipContent>
+                                                    </Tooltip>
+                                                }
+                                                icon={<FolderIcon aria-hidden="true" className="size-6 shrink-0" />}
+                                                name={project.name}
+                                            />
+
+                                            <ProjectDeploymentList
+                                                componentDefinitions={componentDefinitions}
+                                                newlyCreatedDeploymentId={expandedProjectDeploymentId}
+                                                project={project}
+                                                projectDeployments={projectDeploymentMap.get(projectId)!}
+                                                tags={tags}
+                                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                            />
+                                        </section>
                                     )
-                            )}
+                                );
+                            })}
 
                             {projectDeploymentsIsLoading &&
                                 projectDeployments &&

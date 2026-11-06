@@ -77,8 +77,8 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                             <TooltipTrigger asChild>
                                 <Button
                                     aria-label="Open project"
-                                    className="relative z-10 size-6 shrink-0"
-                                    icon={<SquareArrowOutUpRightIcon className="size-4" />}
+                                    className="relative z-10 size-5 shrink-0 [&_svg]:size-3"
+                                    icon={<SquareArrowOutUpRightIcon className="size-3" />}
                                     onClick={handleOpenProjectClick}
                                     size="icon"
                                     variant="ghost"

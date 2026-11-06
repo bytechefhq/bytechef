@@ -1,6 +1,5 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
@@ -19,7 +18,7 @@ import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeplo
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, Layers3Icon, SquareArrowOutUpRightIcon} from 'lucide-react';
+import {ChevronDownIcon, Layers3Icon} from 'lucide-react';
 import {useCallback, useRef, useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -157,23 +156,6 @@ const ProjectDeploymentListItem = ({
                                     </Tooltip>
                                 ) : (
                                     <span className="text-base font-semibold">{projectDeployment.name}</span>
-                                )}
-
-                                {showOpenProject && (
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                aria-label="Open project"
-                                                className="size-6"
-                                                icon={<SquareArrowOutUpRightIcon className="size-4" />}
-                                                onClick={handleOpenProjectClick}
-                                                size="icon"
-                                                variant="ghost"
-                                            />
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>Open project</TooltipContent>
-                                    </Tooltip>
                                 )}
                             </div>
                         </div>
