@@ -9,6 +9,7 @@ import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOp
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ListGroupHeader from '@/shared/components/ListGroupHeader';
+import OpenInButton from '@/shared/components/OpenInButton';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -20,7 +21,7 @@ import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automatio
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {FolderIcon, RefreshCwIcon, SquareArrowOutUpRightIcon, TagIcon} from 'lucide-react';
+import {FolderIcon, RefreshCwIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -243,20 +244,10 @@ const ProjectDeployments = () => {
                                         <section key={projectId}>
                                             <ListGroupHeader
                                                 action={
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button
-                                                                aria-label="Open project"
-                                                                className="-ml-1.5 size-5 [&_svg]:size-3"
-                                                                icon={<SquareArrowOutUpRightIcon className="size-3" />}
-                                                                onClick={() => openProject(projectId)}
-                                                                size="icon"
-                                                                variant="ghost"
-                                                            />
-                                                        </TooltipTrigger>
-
-                                                        <TooltipContent>Open project</TooltipContent>
-                                                    </Tooltip>
+                                                    <OpenInButton
+                                                        label="Open project"
+                                                        onClick={() => openProject(projectId)}
+                                                    />
                                                 }
                                                 icon={<FolderIcon aria-hidden="true" className="size-6 shrink-0" />}
                                                 name={project.name}

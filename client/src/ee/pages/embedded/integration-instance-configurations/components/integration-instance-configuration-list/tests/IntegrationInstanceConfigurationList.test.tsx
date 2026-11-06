@@ -19,8 +19,14 @@ vi.mock(
 vi.mock(
     '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowList',
     () => ({
-        default: ({integrationInstanceConfigurationId}: {integrationInstanceConfigurationId: number}) => (
-            <div>{`Workflows of ${integrationInstanceConfigurationId}`}</div>
+        default: ({
+            integrationInstanceConfigurationId,
+            showOpenInIntegration,
+        }: {
+            integrationInstanceConfigurationId: number;
+            showOpenInIntegration?: boolean;
+        }) => (
+            <div>{`Workflows of ${integrationInstanceConfigurationId}${showOpenInIntegration ? ' with open links' : ''}`}</div>
         ),
     })
 );
@@ -32,12 +38,13 @@ const integrationInstanceConfigurations = [
     {environmentId: 0, id: 12, integrationId: 1, integrationVersion: 1, name: 'Second'},
 ] as IntegrationInstanceConfiguration[];
 
-const renderList = (expandAll?: boolean) =>
+const renderList = (expandAll?: boolean, showOpenInIntegration?: boolean) =>
     render(
         <IntegrationInstanceConfigurationList
             expandAll={expandAll}
             integration={integration}
             integrationInstanceConfigurations={integrationInstanceConfigurations}
+            showOpenInIntegration={showOpenInIntegration}
             tags={[]}
         />
     );
@@ -55,5 +62,11 @@ describe('IntegrationInstanceConfigurationList', () => {
 
         expect(screen.getByText('Workflows of 11')).toBeInTheDocument();
         expect(screen.getByText('Workflows of 12')).toBeInTheDocument();
+    });
+
+    it('passes the open-in-integration links down to the workflows', () => {
+        renderList(true, true);
+
+        expect(screen.getByText('Workflows of 11 with open links')).toBeInTheDocument();
     });
 });

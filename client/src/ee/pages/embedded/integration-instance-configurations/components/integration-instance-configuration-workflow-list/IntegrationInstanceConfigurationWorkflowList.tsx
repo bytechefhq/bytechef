@@ -13,6 +13,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
     integrationInstanceConfigurationWorkflows,
     integrationVersion,
     mcpWorkflowIds,
+    showOpenInIntegration = false,
     taskDispatcherDefinitions,
 }: {
     componentDefinitions?: ComponentDefinitionBasic[];
@@ -23,6 +24,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
     integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflow>;
     integrationVersion: number;
     mcpWorkflowIds?: Set<string>;
+    showOpenInIntegration?: boolean;
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
     const {data: workflows, isLoading: isIntegrationWorkflowsLoading} = useGetIntegrationVersionWorkflowsQuery(
@@ -70,7 +72,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
             ))}
         </div>
     ) : (
-        <div className="pt-3">
+        <div className="pt-3 pb-2">
             <h3 className="flex justify-start px-3 text-sm font-semibold text-content-neutral-tertiary uppercase">
                 Workflows
             </h3>
@@ -116,12 +118,14 @@ const IntegrationInstanceConfigurationWorkflowList = ({
                             <IntegrationInstanceConfigurationWorkflowListItem
                                 componentName={componentName}
                                 filteredComponentNames={filteredComponentNames}
+                                integrationId={integrationId}
                                 integrationInstanceConfigurationId={integrationInstanceConfigurationId}
                                 integrationInstanceConfigurationName={integrationInstanceConfigurationName}
                                 integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                                 integrationVersion={integrationVersion}
                                 isMcpWorkflow={mcpWorkflowIds?.has(workflow.id!) ?? false}
                                 key={workflow.id}
+                                showOpenInIntegration={showOpenInIntegration}
                                 workflow={workflow}
                                 workflowComponentDefinitions={workflowComponentDefinitions}
                                 workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}

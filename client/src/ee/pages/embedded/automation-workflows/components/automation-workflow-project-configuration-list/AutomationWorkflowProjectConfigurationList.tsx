@@ -23,6 +23,7 @@ interface AutomationWorkflowProjectConfigurationListProps {
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     project: AutomationWorkflowProjectType;
+    showOpenInProject?: boolean;
     showProjectName?: boolean;
 }
 
@@ -32,6 +33,7 @@ const AutomationWorkflowProjectConfigurationList = ({
     onEdit,
     onUpdateVersion,
     project,
+    showOpenInProject = false,
     showProjectName = false,
 }: AutomationWorkflowProjectConfigurationListProps) => {
     const queryClient = useQueryClient();
@@ -98,6 +100,7 @@ const AutomationWorkflowProjectConfigurationList = ({
                     onEdit={onEdit}
                     onUpdateVersion={onUpdateVersion}
                     project={project}
+                    showOpenInProject={showOpenInProject}
                     showProjectName={showProjectName}
                 />
             ))}

@@ -248,10 +248,16 @@ describe('AutomationWorkflowProjectConfigurationWorkflowListItem', () => {
         expect(screen.getByRole('button', {name: 'wf-1'})).toBeInTheDocument();
     });
 
+    it('does not offer opening the workflow in its project by default', () => {
+        renderItem();
+
+        expect(screen.queryByRole('button', {name: 'Open in project'})).not.toBeInTheDocument();
+    });
+
     it('mutes the label of a disabled workflow', () => {
         renderItem({workflow: {enabled: false}});
 
-        expect(screen.getByText('Mailer').parentElement).toHaveClass('text-muted-foreground');
+        expect(screen.getByRole('button', {name: 'Mailer'}).parentElement).toHaveClass('text-muted-foreground');
     });
 
     it('shows when the workflow last executed', () => {

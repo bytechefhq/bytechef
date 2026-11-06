@@ -8,6 +8,7 @@ import {
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
+import OpenAutomationWorkflowButton from '@/ee/pages/embedded/shared/OpenAutomationWorkflowButton';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {
@@ -29,6 +30,7 @@ type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automation
 interface AutomationWorkflowProjectConfigurationWorkflowListItemProps {
     configuration: AutomationWorkflowProjectConfigurationType;
     project: AutomationWorkflowProjectType;
+    showOpenInProject?: boolean;
     workflow: AutomationWorkflowProjectConfigurationType['workflows'][number];
     workflowTemplate?: AutomationWorkflowProjectType['workflowTemplates'][number];
 }
@@ -36,6 +38,7 @@ interface AutomationWorkflowProjectConfigurationWorkflowListItemProps {
 const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
     configuration,
     project,
+    showOpenInProject = false,
     workflow,
     workflowTemplate,
 }: AutomationWorkflowProjectConfigurationWorkflowListItemProps) => {
@@ -96,21 +99,26 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
 
     return (
         <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
-            <button
-                aria-label={workflowLabel}
-                className="flex flex-1 cursor-pointer items-center text-left"
-                onClick={handleOpenExecutions}
-                type="button"
-            >
+            <div className="flex flex-1 cursor-pointer items-center" onClick={handleOpenExecutions}>
                 <div
                     className={twMerge(
                         'flex w-80 items-center gap-2 text-sm font-semibold',
                         !workflow.enabled && 'text-muted-foreground'
                     )}
                 >
-                    <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
+                    <button
+                        aria-label={workflowLabel}
+                        className="flex min-w-0 cursor-pointer items-center gap-2 text-left"
+                        type="button"
+                    >
+                        <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
 
-                    <span className="line-clamp-1">{workflowLabel}</span>
+                        <span className="line-clamp-1">{workflowLabel}</span>
+                    </button>
+
+                    {showOpenInProject && (
+                        <OpenAutomationWorkflowButton label="Open in project" workflowUuid={workflow.workflowUuid} />
+                    )}
                 </div>
 
                 {workflowTemplate && (
@@ -124,7 +132,7 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                         />
                     </div>
                 )}
-            </button>
+            </div>
 
             <div className="flex items-center gap-x-4">
                 {lastExecutionDate ? (

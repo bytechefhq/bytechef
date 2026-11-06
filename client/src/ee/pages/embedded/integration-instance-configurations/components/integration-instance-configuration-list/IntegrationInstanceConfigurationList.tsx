@@ -13,6 +13,7 @@ const IntegrationInstanceConfigurationList = ({
     integration,
     integrationInstanceConfigurations,
     showIntegrationIcon = true,
+    showOpenInIntegration = false,
     showTags = true,
     tags,
     taskDispatcherDefinitions,
@@ -22,6 +23,7 @@ const IntegrationInstanceConfigurationList = ({
     integration: Integration;
     integrationInstanceConfigurations: IntegrationInstanceConfiguration[];
     showIntegrationIcon?: boolean;
+    showOpenInIntegration?: boolean;
     showTags?: boolean;
     tags: Tag[];
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
@@ -99,6 +101,7 @@ const IntegrationInstanceConfigurationList = ({
                                             mcpWorkflowIdsByConfigurationId.get(integrationInstanceConfiguration.id!) ||
                                             new Set()
                                         }
+                                        showOpenInIntegration={showOpenInIntegration}
                                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                                     />
                                 </CollapsibleContent>
