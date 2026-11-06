@@ -57,7 +57,8 @@ final class ScimUserPatchOperations {
             String operation = scimPatchOperation.operation();
 
             switch (operation.toLowerCase(Locale.ROOT)) {
-                case ADD, REPLACE -> parseAddOrReplace(scimPatchOperation, attributeChanges);
+                case ADD -> parseAddOrReplace(scimPatchOperation, false, attributeChanges);
+                case REPLACE -> parseAddOrReplace(scimPatchOperation, true, attributeChanges);
                 case REMOVE -> parseRemove(scimPatchOperation, attributeChanges);
                 default -> throw ScimBadRequestException.invalidSyntax("Unsupported PATCH operation: " + operation);
             }
@@ -67,13 +68,13 @@ final class ScimUserPatchOperations {
     }
 
     private static void parseAddOrReplace(
-        ScimPatchOperation scimPatchOperation, List<AttributeChange> attributeChanges) {
+        ScimPatchOperation scimPatchOperation, boolean replace, List<AttributeChange> attributeChanges) {
 
         String path = scimPatchOperation.path();
         Object value = scimPatchOperation.value();
 
         if (path != null && !path.isBlank()) {
-            addValue(path, value, attributeChanges);
+            addValue(path, value, replace, attributeChanges);
 
             return;
         }
@@ -84,11 +85,13 @@ final class ScimUserPatchOperations {
         }
 
         for (Map.Entry<?, ?> entry : valueMap.entrySet()) {
-            addValue(String.valueOf(entry.getKey()), entry.getValue(), attributeChanges);
+            addValue(String.valueOf(entry.getKey()), entry.getValue(), replace, attributeChanges);
         }
     }
 
-    private static void addValue(String path, @Nullable Object value, List<AttributeChange> attributeChanges) {
+    private static void addValue(
+        String path, @Nullable Object value, boolean replace, List<AttributeChange> attributeChanges) {
+
         switch (normalizePath(path)) {
             case "active" -> attributeChanges.add(new AttributeChange(Attribute.ACTIVE, toActive(value)));
             case "externalid" -> attributeChanges.add(
@@ -107,17 +110,21 @@ final class ScimUserPatchOperations {
                     Attribute.FAMILY_NAME,
                     ScimValues.checkMaxLength(
                         FAMILY_NAME, toSingleValue(FAMILY_NAME, value), ScimValues.NAME_MAX_LENGTH)));
-            case "name" -> addNameValue(value, attributeChanges);
+            case "name" -> addNameValue(value, replace, attributeChanges);
             default -> {
             }
         }
     }
 
-    private static void addNameValue(@Nullable Object value, List<AttributeChange> attributeChanges) {
-        if (value == null) {
+    private static void addNameValue(
+        @Nullable Object value, boolean replace, List<AttributeChange> attributeChanges) {
+
+        if (value == null || replace) {
             attributeChanges.add(new AttributeChange(Attribute.GIVEN_NAME, null));
             attributeChanges.add(new AttributeChange(Attribute.FAMILY_NAME, null));
+        }
 
+        if (value == null) {
             return;
         }
 
@@ -126,7 +133,7 @@ final class ScimUserPatchOperations {
         }
 
         for (Map.Entry<?, ?> entry : nameMap.entrySet()) {
-            addValue(NAME + "." + entry.getKey(), entry.getValue(), attributeChanges);
+            addValue(NAME + "." + entry.getKey(), entry.getValue(), false, attributeChanges);
         }
     }
 
@@ -144,7 +151,7 @@ final class ScimUserPatchOperations {
             case "externalid" -> attributeChanges.add(new AttributeChange(Attribute.EXTERNAL_ID, null));
             case "name.givenname" -> attributeChanges.add(new AttributeChange(Attribute.GIVEN_NAME, null));
             case "name.familyname" -> attributeChanges.add(new AttributeChange(Attribute.FAMILY_NAME, null));
-            case "name" -> addNameValue(null, attributeChanges);
+            case "name" -> addNameValue(null, false, attributeChanges);
             default -> {
             }
         }
