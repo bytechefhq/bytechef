@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.gateway.reliability;
 
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModelDeployment;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderScopeViolationException;
 import com.bytechef.ee.platform.ai.gateway.util.AiGatewayThrowables;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.ArrayList;
@@ -176,7 +177,8 @@ public class AiGatewayRetryHandlerImpl implements AiGatewayRetryHandler {
             exception instanceof ClassCastException ||
             exception instanceof UnsupportedOperationException ||
             exception instanceof IndexOutOfBoundsException ||
-            exception instanceof NonTransientAiException;
+            exception instanceof NonTransientAiException ||
+            exception instanceof AiGatewayProviderScopeViolationException;
     }
 
     private <T> Flux<T> tryDeploymentStream(

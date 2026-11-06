@@ -25,4 +25,7 @@ public interface AiGatewaySpendSummaryRepository extends ListCrudRepository<AiGa
         long workspaceId, Instant start, Instant end);
 
     List<AiGatewaySpendSummary> findAllByWorkspaceIdIsNullAndPeriodStartBetween(Instant start, Instant end);
+
+    List<AiGatewaySpendSummary> findAllByConnectedUserIdAndPeriodStartBetween(
+        long connectedUserId, Instant start, Instant end);
 }

@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.ai.gateway.cache;
 
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -23,7 +24,7 @@ public interface AiGatewayResponseCache {
 
     AiGatewayChatCompletionResponse put(String cacheKey, AiGatewayChatCompletionResponse response);
 
-    String computeCacheKey(AiGatewayChatCompletionRequest request);
+    String computeCacheKey(AiGatewayChatCompletionRequest request, @Nullable Long connectedUserId);
 
     boolean shouldCache(AiGatewayChatCompletionRequest request);
 }

@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     api(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-api"))
     api(project(":server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-api"))
@@ -33,6 +34,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))

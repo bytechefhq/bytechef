@@ -518,7 +518,7 @@ class AiGatewayFacadeTest {
 
         when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(true);
-        when(aiGatewayResponseCache.computeCacheKey(any())).thenReturn("test-cache-key");
+        when(aiGatewayResponseCache.computeCacheKey(any(), any())).thenReturn("test-cache-key");
 
         AiGatewayChatCompletionResponse cachedResponse = new AiGatewayChatCompletionResponse(
             "cached-id", "chat.completion", 1000L, "openai/gpt-4",
@@ -544,7 +544,7 @@ class AiGatewayFacadeTest {
 
         when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(true);
-        when(aiGatewayResponseCache.computeCacheKey(any())).thenReturn("test-cache-key");
+        when(aiGatewayResponseCache.computeCacheKey(any(), any())).thenReturn("test-cache-key");
         when(aiGatewayResponseCache.get("test-cache-key")).thenReturn(null);
 
         AiGatewayProvider provider = createProvider();
@@ -583,7 +583,7 @@ class AiGatewayFacadeTest {
         when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
         when(aiGatewayResponseCache.shouldCache(any())).thenReturn(true);
         org.mockito.Mockito.lenient()
-            .when(aiGatewayResponseCache.computeCacheKey(any()))
+            .when(aiGatewayResponseCache.computeCacheKey(any(), any()))
             .thenReturn("pii-bearing-request-key");
 
         AiGatewayProvider provider = createProvider();

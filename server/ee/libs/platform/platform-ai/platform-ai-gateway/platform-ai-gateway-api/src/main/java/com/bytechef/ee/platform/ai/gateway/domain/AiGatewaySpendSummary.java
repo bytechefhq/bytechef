@@ -30,6 +30,9 @@ public final class AiGatewaySpendSummary {
     @Column("api_key_id")
     private Long apiKeyId;
 
+    @Column("connected_user_id")
+    private @Nullable Long connectedUserId;
+
     @Column("created_date")
     @CreatedDate
     private Instant createdDate;
@@ -108,6 +111,10 @@ public final class AiGatewaySpendSummary {
         return apiKeyId;
     }
 
+    public @Nullable Long getConnectedUserId() {
+        return connectedUserId;
+    }
+
     public Instant getCreatedDate() {
         return createdDate;
     }
@@ -172,6 +179,10 @@ public final class AiGatewaySpendSummary {
         this.apiKeyId = apiKeyId;
     }
 
+    public void setConnectedUserId(@Nullable Long connectedUserId) {
+        this.connectedUserId = connectedUserId;
+    }
+
     public void setCurrency(String currency) {
         Validate.notBlank(currency, "currency must not be blank");
         Validate.isTrue(currency.length() == 3, "currency must be a 3-letter ISO 4217 code");
@@ -233,6 +244,7 @@ public final class AiGatewaySpendSummary {
             ", totalCost=" + totalCost +
             ", createdDate=" + createdDate +
             ", workspaceId=" + workspaceId +
+            ", connectedUserId=" + connectedUserId +
             '}';
     }
 }

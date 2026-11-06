@@ -16,5 +16,8 @@ import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
  * @author Ivica Cardic
  */
 public interface AiGatewayProviderResolver {
+
+    AiGatewayProvider resolve(long connectedUserId, AiGatewayProviderType type);
+
     AiGatewayProvider resolveTenantProvider(AiGatewayProviderType type);
 }

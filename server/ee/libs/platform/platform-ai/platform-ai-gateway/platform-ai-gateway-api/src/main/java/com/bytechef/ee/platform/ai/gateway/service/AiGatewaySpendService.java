@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.gateway.service;
 
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewaySpendSummary;
+import com.bytechef.ee.platform.ai.llm.usage.Money;
 import java.time.Instant;
 import java.util.List;
 
@@ -25,4 +26,6 @@ public interface AiGatewaySpendService {
     List<AiGatewaySpendSummary> getSpendSummariesByWorkspaceId(long workspaceId, Instant start, Instant end);
 
     List<AiGatewaySpendSummary> getSpendSummariesWithoutWorkspace(Instant start, Instant end);
+
+    Money getTotalCostByConnectedUserId(long connectedUserId, Instant start, Instant end);
 }

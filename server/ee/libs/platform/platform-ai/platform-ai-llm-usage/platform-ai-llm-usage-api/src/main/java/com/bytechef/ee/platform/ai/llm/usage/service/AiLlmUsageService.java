@@ -22,6 +22,8 @@ public interface AiLlmUsageService {
 
     void create(AiLlmUsage usage, Long workspaceId);
 
+    void createForConnectedUser(AiLlmUsage usage, long connectedUserId);
+
     void deleteOlderThan(Instant date);
 
     void deleteOlderThanByWorkspace(Instant date, Long workspaceId);
@@ -37,4 +39,6 @@ public interface AiLlmUsageService {
     List<AiLlmUsage> getRequestLogs(Instant start, Instant end);
 
     List<AiLlmUsage> getRequestLogsByWorkspace(Long workspaceId, Instant start, Instant end);
+
+    List<AiLlmUsage> getConnectedUserRequestLogsWithoutWorkspace(Instant start, Instant end);
 }

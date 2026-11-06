@@ -738,7 +738,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private AiGatewayChatCompletionResponse chatCompletionDirect(
         AiGatewayChatCompletionRequest request) {
         if (isCacheable(request)) {
-            String cacheKey = aiGatewayResponseCache.computeCacheKey(request);
+            String cacheKey = aiGatewayResponseCache.computeCacheKey(request, null);
             AiGatewayChatCompletionResponse cached = aiGatewayResponseCache.get(cacheKey);
 
             if (cached != null) {
@@ -788,7 +788,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
             AiGatewayChatCompletionResponse response = toResponse(chatResponse, request.model());
 
             if (isCacheable(request)) {
-                String cacheKey = aiGatewayResponseCache.computeCacheKey(request);
+                String cacheKey = aiGatewayResponseCache.computeCacheKey(request, null);
 
                 try {
                     aiGatewayResponseCache.put(cacheKey, response);
@@ -822,7 +822,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private AiGatewayChatCompletionResponse chatCompletionWithRouting(
         AiGatewayChatCompletionRequest request) {
         if (isCacheable(request)) {
-            String cacheKey = aiGatewayResponseCache.computeCacheKey(request);
+            String cacheKey = aiGatewayResponseCache.computeCacheKey(request, null);
             AiGatewayChatCompletionResponse cached = aiGatewayResponseCache.get(cacheKey);
 
             if (cached != null) {
@@ -921,7 +921,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 });
 
             if (isCacheable(request)) {
-                String cacheKey = aiGatewayResponseCache.computeCacheKey(request);
+                String cacheKey = aiGatewayResponseCache.computeCacheKey(request, null);
 
                 try {
                     aiGatewayResponseCache.put(cacheKey, response);

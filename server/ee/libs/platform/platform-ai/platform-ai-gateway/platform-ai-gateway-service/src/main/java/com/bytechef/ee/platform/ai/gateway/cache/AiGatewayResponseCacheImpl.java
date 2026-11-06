@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -53,11 +54,12 @@ public class AiGatewayResponseCacheImpl implements AiGatewayResponseCache {
     @CachePut(cacheNames = AI_GATEWAY_RESPONSE_CACHE, key = "#cacheKey")
     public AiGatewayChatCompletionResponse put(
         String cacheKey, AiGatewayChatCompletionResponse response) {
+
         return response;
     }
 
     @Override
-    public String computeCacheKey(AiGatewayChatCompletionRequest request) {
+    public String computeCacheKey(AiGatewayChatCompletionRequest request, @Nullable Long connectedUserId) {
         String messagesJson;
 
         try {
@@ -88,7 +90,7 @@ public class AiGatewayResponseCacheImpl implements AiGatewayResponseCache {
 
         String raw = request.model() + "|" + messagesJson + "|" +
             request.temperature() + "|" + request.maxTokens() + "|" + request.topP() + "|" +
-            toolsJson + "|" + toolChoiceJson;
+            toolsJson + "|" + toolChoiceJson + "|" + connectedUserId;
 
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

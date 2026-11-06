@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.ai.gateway.repository;
 
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 
 /**
@@ -19,6 +20,10 @@ import org.springframework.data.repository.ListCrudRepository;
 public interface AiGatewayProviderRepository extends ListCrudRepository<AiGatewayProvider, Long> {
 
     List<AiGatewayProvider> findAllByEnabled(boolean enabled);
+
+    List<AiGatewayProvider> findAllByConnectedUserId(long connectedUserId);
+
+    Optional<AiGatewayProvider> findByConnectedUserIdAndType(long connectedUserId, int type);
 
     List<AiGatewayProvider> findAllByWorkspaceId(long workspaceId);
 }

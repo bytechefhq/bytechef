@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.gateway.service;
 
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
 import com.bytechef.ee.platform.ai.gateway.domain.ApiKey;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayEmbeddingModelFactory;
@@ -18,6 +19,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -46,6 +48,7 @@ class AiGatewayProviderServiceImpl implements AiGatewayProviderService {
         AiGatewayEmbeddingModelFactory aiGatewayEmbeddingModelFactory,
         AiModelService aiModelService,
         AiGatewayProviderRepository aiGatewayProviderRepository) {
+
         this.aiGatewayChatModelFactory = aiGatewayChatModelFactory;
         this.aiGatewayEmbeddingModelFactory = aiGatewayEmbeddingModelFactory;
         this.aiModelService = aiModelService;
@@ -56,6 +59,34 @@ class AiGatewayProviderServiceImpl implements AiGatewayProviderService {
     public AiGatewayProvider create(AiGatewayProvider provider) {
         Validate.notNull(provider, "'provider' must not be null");
         Validate.isTrue(provider.getId() == null, "'id' must be null");
+
+        return aiGatewayProviderRepository.save(provider);
+    }
+
+    @Override
+    public AiGatewayProvider createConnectedUserProvider(AiGatewayProvider provider, long connectedUserId) {
+        Validate.notNull(provider, "'provider' must not be null");
+        Validate.isTrue(provider.getId() == null, "'id' must be null");
+
+        if (provider.getWorkspaceId() != null) {
+            throw new IllegalArgumentException("A connected user's provider cannot belong to a workspace");
+        }
+
+        AiGatewayProviderType type = provider.getType();
+
+        Optional<AiGatewayProvider> existingProvider =
+            aiGatewayProviderRepository.findByConnectedUserIdAndType(connectedUserId, type.ordinal());
+
+        if (existingProvider.isPresent()) {
+            throw new IllegalArgumentException(
+                "Connected user " + connectedUserId + " already has a provider of type " + type + " (" +
+                    existingProvider.get()
+                        .getId()
+                    +
+                    "); delete it first");
+        }
+
+        provider.setConnectedUserId(connectedUserId);
 
         return aiGatewayProviderRepository.save(provider);
     }
@@ -72,6 +103,26 @@ class AiGatewayProviderServiceImpl implements AiGatewayProviderService {
         }
 
         aiGatewayProviderRepository.deleteById(id);
+    }
+
+    @Override
+    public void disableByConnectedUserId(long connectedUserId) {
+        for (AiGatewayProvider provider : aiGatewayProviderRepository.findAllByConnectedUserId(connectedUserId)) {
+            provider.setEnabled(false);
+
+            aiGatewayProviderRepository.save(provider);
+
+            aiGatewayChatModelFactory.evict(provider.getId());
+            aiGatewayEmbeddingModelFactory.evict(provider.getId());
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AiGatewayProvider> fetchProviderByConnectedUserIdAndType(
+        long connectedUserId, AiGatewayProviderType type) {
+
+        return aiGatewayProviderRepository.findByConnectedUserIdAndType(connectedUserId, type.ordinal());
     }
 
     @Override
@@ -97,6 +148,12 @@ class AiGatewayProviderServiceImpl implements AiGatewayProviderService {
     @Transactional(readOnly = true)
     public List<AiGatewayProvider> getEnabledProviders() {
         return aiGatewayProviderRepository.findAllByEnabled(true);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AiGatewayProvider> getProvidersByConnectedUserId(long connectedUserId) {
+        return aiGatewayProviderRepository.findAllByConnectedUserId(connectedUserId);
     }
 
     @Override

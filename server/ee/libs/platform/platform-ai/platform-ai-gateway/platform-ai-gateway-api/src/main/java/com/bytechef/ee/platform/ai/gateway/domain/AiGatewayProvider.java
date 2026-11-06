@@ -38,6 +38,9 @@ public final class AiGatewayProvider {
     @Column
     private String config;
 
+    @Column("connected_user_id")
+    private @Nullable Long connectedUserId;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -123,6 +126,10 @@ public final class AiGatewayProvider {
         return config;
     }
 
+    public @Nullable Long getConnectedUserId() {
+        return connectedUserId;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -201,6 +208,10 @@ public final class AiGatewayProvider {
         this.config = config;
     }
 
+    public void setConnectedUserId(@Nullable Long connectedUserId) {
+        this.connectedUserId = connectedUserId;
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
@@ -228,6 +239,7 @@ public final class AiGatewayProvider {
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
             ", workspaceId=" + workspaceId +
+            ", connectedUserId=" + connectedUserId +
             '}';
     }
 }

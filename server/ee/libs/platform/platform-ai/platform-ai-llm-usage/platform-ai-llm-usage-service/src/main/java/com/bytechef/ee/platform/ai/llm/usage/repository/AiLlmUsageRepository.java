@@ -26,6 +26,8 @@ public interface AiLlmUsageRepository extends ListCrudRepository<AiLlmUsage, Lon
 
     List<AiLlmUsage> findAllByWorkspaceIdAndCreatedDateBetween(Long workspaceId, Instant start, Instant end);
 
+    List<AiLlmUsage> findAllByWorkspaceIdIsNullAndUserIdIsNotNullAndCreatedDateBetween(Instant start, Instant end);
+
     List<AiLlmUsage> findAllByStatusAndCreatedDateAfter(Integer status, Instant after);
 
     void deleteAllByCreatedDateBefore(Instant date);

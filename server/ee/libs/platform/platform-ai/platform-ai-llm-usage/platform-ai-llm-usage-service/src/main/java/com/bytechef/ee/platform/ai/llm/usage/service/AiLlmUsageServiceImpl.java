@@ -57,6 +57,14 @@ class AiLlmUsageServiceImpl implements AiLlmUsageService, LlmUsageRecorder {
     }
 
     @Override
+    public void createForConnectedUser(AiLlmUsage usage, long connectedUserId) {
+        usage.setWorkspaceId(null);
+        usage.setUserId(connectedUserId);
+
+        repository.save(usage);
+    }
+
+    @Override
     public void deleteOlderThan(Instant date) {
         repository.deleteAllByCreatedDateBefore(date);
     }
@@ -110,6 +118,12 @@ class AiLlmUsageServiceImpl implements AiLlmUsageService, LlmUsageRecorder {
     @Transactional(readOnly = true)
     public List<AiLlmUsage> getRequestLogsByWorkspace(Long workspaceId, Instant start, Instant end) {
         return repository.findAllByWorkspaceIdAndCreatedDateBetween(workspaceId, start, end);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AiLlmUsage> getConnectedUserRequestLogsWithoutWorkspace(Instant start, Instant end) {
+        return repository.findAllByWorkspaceIdIsNullAndUserIdIsNotNullAndCreatedDateBetween(start, end);
     }
 
     @Override

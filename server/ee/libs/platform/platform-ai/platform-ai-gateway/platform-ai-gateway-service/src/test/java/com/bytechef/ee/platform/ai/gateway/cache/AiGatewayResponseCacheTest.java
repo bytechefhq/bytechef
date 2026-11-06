@@ -104,8 +104,8 @@ class AiGatewayResponseCacheTest {
         AiGatewayChatCompletionRequest requestWithToolB = new AiGatewayChatCompletionRequest(
             "gpt-4", messages, 0.0, 100, 1.0, false, null, true, null, List.of(toolB));
 
-        String keyA = aiGatewayResponseCache.computeCacheKey(requestWithToolA);
-        String keyB = aiGatewayResponseCache.computeCacheKey(requestWithToolB);
+        String keyA = aiGatewayResponseCache.computeCacheKey(requestWithToolA, null);
+        String keyB = aiGatewayResponseCache.computeCacheKey(requestWithToolB, null);
 
         assertNotEquals(keyA, keyB);
     }
@@ -120,8 +120,8 @@ class AiGatewayResponseCacheTest {
         AiGatewayChatCompletionRequest requestWithNoneChoice = new AiGatewayChatCompletionRequest(
             "gpt-4", messages, 0.0, 100, 1.0, false, null, true, AiGatewayToolChoice.ofString("none"), null);
 
-        String keyAuto = aiGatewayResponseCache.computeCacheKey(requestWithAutoChoice);
-        String keyNone = aiGatewayResponseCache.computeCacheKey(requestWithNoneChoice);
+        String keyAuto = aiGatewayResponseCache.computeCacheKey(requestWithAutoChoice, null);
+        String keyNone = aiGatewayResponseCache.computeCacheKey(requestWithNoneChoice, null);
 
         assertNotEquals(keyAuto, keyNone);
     }
@@ -133,9 +133,35 @@ class AiGatewayResponseCacheTest {
             List.of(new AiGatewayChatMessage("user", "Hello")),
             0.0, 100, 1.0, false, null, true);
 
-        String firstKey = aiGatewayResponseCache.computeCacheKey(request);
-        String secondKey = aiGatewayResponseCache.computeCacheKey(request);
+        String firstKey = aiGatewayResponseCache.computeCacheKey(request, null);
+        String secondKey = aiGatewayResponseCache.computeCacheKey(request, null);
 
         assertEquals(firstKey, secondKey);
+    }
+
+    @Test
+    void testComputeCacheKeyDifferentForDifferentConnectedUsersWithTheIdenticalRequest() {
+        AiGatewayChatCompletionRequest request = new AiGatewayChatCompletionRequest(
+            "gpt-4",
+            List.of(new AiGatewayChatMessage("user", "Hello")),
+            0.0, 100, 1.0, false, null, true);
+
+        String keyForConnectedUserA = aiGatewayResponseCache.computeCacheKey(request, 5L);
+        String keyForConnectedUserB = aiGatewayResponseCache.computeCacheKey(request, 6L);
+
+        assertNotEquals(keyForConnectedUserA, keyForConnectedUserB);
+    }
+
+    @Test
+    void testComputeCacheKeyDifferentForConnectedUserVersusAutomation() {
+        AiGatewayChatCompletionRequest request = new AiGatewayChatCompletionRequest(
+            "gpt-4",
+            List.of(new AiGatewayChatMessage("user", "Hello")),
+            0.0, 100, 1.0, false, null, true);
+
+        String keyForConnectedUser = aiGatewayResponseCache.computeCacheKey(request, 5L);
+        String keyForAutomation = aiGatewayResponseCache.computeCacheKey(request, null);
+
+        assertNotEquals(keyForConnectedUser, keyForAutomation);
     }
 }

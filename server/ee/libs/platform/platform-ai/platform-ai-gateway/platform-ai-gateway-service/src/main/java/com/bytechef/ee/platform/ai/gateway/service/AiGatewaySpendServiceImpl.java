@@ -9,9 +9,12 @@ package com.bytechef.ee.platform.ai.gateway.service;
 
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewaySpendSummary;
 import com.bytechef.ee.platform.ai.gateway.repository.AiGatewaySpendSummaryRepository;
+import com.bytechef.ee.platform.ai.llm.usage.Money;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,5 +57,16 @@ class AiGatewaySpendServiceImpl implements AiGatewaySpendService {
     @Transactional(readOnly = true)
     public List<AiGatewaySpendSummary> getSpendSummariesWithoutWorkspace(Instant start, Instant end) {
         return aiGatewaySpendSummaryRepository.findAllByWorkspaceIdIsNullAndPeriodStartBetween(start, end);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Money getTotalCostByConnectedUserId(long connectedUserId, Instant start, Instant end) {
+        return aiGatewaySpendSummaryRepository
+            .findAllByConnectedUserIdAndPeriodStartBetween(connectedUserId, start, end)
+            .stream()
+            .map(AiGatewaySpendSummary::getTotalCostAsMoney)
+            .filter(Objects::nonNull)
+            .reduce(Money.usd(BigDecimal.ZERO), Money::add);
     }
 }

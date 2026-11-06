@@ -8,6 +8,8 @@
 package com.bytechef.ee.platform.ai.gateway.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,6 +34,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class AiGatewayRoutingPolicyServiceTest {
 
     @Mock
+    private AiGatewayConnectedUserSettingsService aiGatewayConnectedUserSettingsService;
+
+    @Mock
     private AiGatewayModelDeploymentService aiGatewayModelDeploymentService;
 
     @Mock
@@ -42,7 +47,7 @@ class AiGatewayRoutingPolicyServiceTest {
     @BeforeEach
     void setUp() {
         aiGatewayRoutingPolicyService = new AiGatewayRoutingPolicyServiceImpl(
-            aiGatewayModelDeploymentService, aiGatewayRoutingPolicyRepository);
+            aiGatewayConnectedUserSettingsService, aiGatewayModelDeploymentService, aiGatewayRoutingPolicyRepository);
     }
 
     @Test
@@ -67,7 +72,20 @@ class AiGatewayRoutingPolicyServiceTest {
     }
 
     @Test
-    void testDeleteRemovesThePolicyAndItsDeployments() {
+    void testDeleteRefusesAPolicyAssignedToConnectedUsers() {
+        when(aiGatewayConnectedUserSettingsService.countByRoutingPolicyId(10L)).thenReturn(3L);
+
+        assertThatThrownBy(() -> aiGatewayRoutingPolicyService.delete(10L))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Routing policy 10 is assigned to 3 connected users; reassign them first");
+
+        verify(aiGatewayModelDeploymentService, never()).deleteByRoutingPolicyId(10L);
+        verify(aiGatewayRoutingPolicyRepository, never()).deleteById(10L);
+    }
+
+    @Test
+    void testDeleteRemovesAnUnassignedPolicyAndItsDeployments() {
+        when(aiGatewayConnectedUserSettingsService.countByRoutingPolicyId(10L)).thenReturn(0L);
 
         aiGatewayRoutingPolicyService.delete(10L);
 
@@ -76,9 +94,21 @@ class AiGatewayRoutingPolicyServiceTest {
     }
 
     @Test
-    void testUpdateWorkspaceIdAssignsThePolicyToAWorkspace() {
+    void testUpdateWorkspaceIdRefusesAssigningAPolicyAssignedToConnectedUsersToAWorkspace() {
+        when(aiGatewayConnectedUserSettingsService.countByRoutingPolicyId(10L)).thenReturn(3L);
+
+        assertThatThrownBy(() -> aiGatewayRoutingPolicyService.updateWorkspaceId(10L, 1L))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Routing policy 10 is assigned to 3 connected users; reassign them first");
+
+        verify(aiGatewayRoutingPolicyRepository, never()).save(any());
+    }
+
+    @Test
+    void testUpdateWorkspaceIdAllowsAssigningAnUnassignedPolicyToAWorkspace() {
         AiGatewayRoutingPolicy policy = new AiGatewayRoutingPolicy("default", AiGatewayRoutingStrategyType.SIMPLE);
 
+        when(aiGatewayConnectedUserSettingsService.countByRoutingPolicyId(10L)).thenReturn(0L);
         when(aiGatewayRoutingPolicyRepository.findById(10L)).thenReturn(Optional.of(policy));
 
         aiGatewayRoutingPolicyService.updateWorkspaceId(10L, 1L);
@@ -89,7 +119,7 @@ class AiGatewayRoutingPolicyServiceTest {
     }
 
     @Test
-    void testUpdateWorkspaceIdUnscopesThePolicy() {
+    void testUpdateWorkspaceIdAllowsUnscopingAnAssignedPolicy() {
         AiGatewayRoutingPolicy policy = new AiGatewayRoutingPolicy("default", AiGatewayRoutingStrategyType.SIMPLE);
 
         when(aiGatewayRoutingPolicyRepository.findById(10L)).thenReturn(Optional.of(policy));
@@ -98,6 +128,7 @@ class AiGatewayRoutingPolicyServiceTest {
 
         assertThat(policy.getWorkspaceId()).isNull();
 
+        verify(aiGatewayConnectedUserSettingsService, never()).countByRoutingPolicyId(10L);
         verify(aiGatewayRoutingPolicyRepository).save(policy);
     }
 }
