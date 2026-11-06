@@ -1,10 +1,10 @@
-import EmbeddedToolInvocationsEmptyState from '@/ee/pages/embedded/tool-invocations/components/EmbeddedToolInvocationsEmptyState';
-import {ToolInvocations} from '@/pages/automation/tool-invocations/ToolInvocations';
+import EmbeddedExternalInvocationsEmptyState from '@/ee/pages/embedded/external-invocations/components/EmbeddedExternalInvocationsEmptyState';
+import {ExternalInvocations} from '@/pages/automation/external-invocations/ExternalInvocations';
 import {PlatformType, useEmbeddedMcpServersQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
 
-export const EmbeddedToolInvocations = () => {
+export const EmbeddedExternalInvocations = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {data} = useEmbeddedMcpServersQuery();
@@ -26,9 +26,9 @@ export const EmbeddedToolInvocations = () => {
     );
 
     return (
-        <ToolInvocations
+        <ExternalInvocations
             environmentId={currentEnvironmentId}
-            firstRunEmptyState={<EmbeddedToolInvocationsEmptyState hasMcpServer={hasMcpServer} />}
+            firstRunEmptyState={<EmbeddedExternalInvocationsEmptyState hasMcpServer={hasMcpServer} />}
             key={currentEnvironmentId}
             mcpServerOptions={mcpServerOptions}
             type={PlatformType.Embedded}

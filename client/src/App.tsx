@@ -100,9 +100,9 @@ const automationNavigation: NavigationType[] = [
     },
     {
         group: executionsNavigationGroup,
-        href: '/automation/executions/tool-invocations',
+        href: '/automation/executions/external-invocations',
         icon: HammerIcon,
-        name: 'Tool Invocations',
+        name: 'External Invocations',
     },
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
@@ -154,9 +154,9 @@ const embeddedNavigation: NavigationType[] = [
     },
     {
         group: executionsNavigationGroup,
-        href: '/embedded/executions/tool-invocations',
+        href: '/embedded/executions/external-invocations',
         icon: HammerIcon,
-        name: 'Tool Invocations',
+        name: 'External Invocations',
     },
     {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
 ];
@@ -231,7 +231,7 @@ function App() {
             return ai.knowledgeBase.enabled;
         }
 
-        if (navItem.href === '/automation/executions/tool-invocations') {
+        if (navItem.href === '/automation/executions/external-invocations') {
             return edition === EditionType.EE;
         }
 

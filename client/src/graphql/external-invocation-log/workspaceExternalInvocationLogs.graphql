@@ -1,4 +1,4 @@
-query WorkspaceToolInvocationLogs(
+query WorkspaceExternalInvocationLogs(
     $type: PlatformType!
     $workspaceId: ID!
     $environmentId: ID!
@@ -12,7 +12,7 @@ query WorkspaceToolInvocationLogs(
     $toDate: Long
     $page: Int
 ) {
-    workspaceToolInvocationLogs(
+    workspaceExternalInvocationLogs(
         type: $type
         workspaceId: $workspaceId
         environmentId: $environmentId

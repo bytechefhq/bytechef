@@ -1,13 +1,13 @@
+import {ExternalInvocations} from '@/pages/automation/external-invocations/ExternalInvocations';
+import AutomationExternalInvocationsEmptyState from '@/pages/automation/external-invocations/components/AutomationExternalInvocationsEmptyState';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {ToolInvocations} from '@/pages/automation/tool-invocations/ToolInvocations';
-import AutomationToolInvocationsEmptyState from '@/pages/automation/tool-invocations/components/AutomationToolInvocationsEmptyState';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {PlatformType, useA2aServersQuery, useWorkspaceMcpServersQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
 
-export const AutomationToolInvocations = () => {
+export const AutomationExternalInvocations = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -56,9 +56,9 @@ export const AutomationToolInvocations = () => {
     );
 
     return (
-        <ToolInvocations
+        <ExternalInvocations
             a2aServerOptions={a2aServerOptions}
-            firstRunEmptyState={<AutomationToolInvocationsEmptyState hasMcpServer={hasMcpServer} />}
+            firstRunEmptyState={<AutomationExternalInvocationsEmptyState hasMcpServer={hasMcpServer} />}
             key={`${currentWorkspaceId}-${currentEnvironmentId}`}
             mcpServerOptions={mcpServerOptions}
             type={PlatformType.Automation}

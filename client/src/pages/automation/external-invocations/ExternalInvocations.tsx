@@ -6,11 +6,11 @@ import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ToolInvocationsTable from '@/pages/automation/tool-invocations/components/ToolInvocationsTable';
+import ExternalInvocationsTable from '@/pages/automation/external-invocations/components/ExternalInvocationsTable';
 import {
-    ToolInvocationsWorkspaceScopeI,
-    useToolInvocations,
-} from '@/pages/automation/tool-invocations/hooks/useToolInvocations';
+    ExternalInvocationsWorkspaceScopeI,
+    useExternalInvocations,
+} from '@/pages/automation/external-invocations/hooks/useExternalInvocations';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -45,25 +45,30 @@ const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
     ],
 };
 
-interface ToolInvocationsProps {
+interface ExternalInvocationsProps {
     a2aServerOptions?: Array<ComboBoxItemType>;
     environmentId?: number;
     /* Shown instead of the filters and the table when nothing has been recorded yet and no filter is set. */
     firstRunEmptyState: ReactNode;
     mcpServerOptions?: Array<ComboBoxItemType>;
     type: PlatformType;
-    workspaceScope?: ToolInvocationsWorkspaceScopeI;
+    workspaceScope?: ExternalInvocationsWorkspaceScopeI;
 }
 
-export const ToolInvocations = ({
+export const ExternalInvocations = ({
     a2aServerOptions,
     environmentId,
     firstRunEmptyState,
     mcpServerOptions,
     type,
     workspaceScope,
-}: ToolInvocationsProps) => {
+}: ExternalInvocationsProps) => {
     const {
+        externalInvocationLogPage,
+        externalInvocationLogs,
+        externalInvocationLogsError,
+        externalInvocationLogsIsFetching,
+        externalInvocationLogsIsLoading,
         filterA2aServerId,
         filterEndDate,
         filterMcpServerId,
@@ -78,15 +83,10 @@ export const ToolInvocations = ({
         handlePaginationClick,
         handleStartDateChange,
         handleSurfaceChange,
-        refetchToolInvocations,
-        toolInvocationLogPage,
-        toolInvocationLogs,
-        toolInvocationLogsError,
-        toolInvocationLogsIsFetching,
-        toolInvocationLogsIsLoading,
-    } = useToolInvocations({environmentId, type, workspaceScope});
+        refetchExternalInvocations,
+    } = useExternalInvocations({environmentId, type, workspaceScope});
 
-    const initialLoadComplete = useInitialLoadComplete(toolInvocationLogsIsLoading);
+    const initialLoadComplete = useInitialLoadComplete(externalInvocationLogsIsLoading);
 
     const a2aServerNames = useMemo(
         () =>
@@ -113,24 +113,24 @@ export const ToolInvocations = ({
         !!filterSurface;
 
     const isFirstRun =
-        !toolInvocationLogsIsLoading &&
-        !toolInvocationLogsError &&
+        !externalInvocationLogsIsLoading &&
+        !externalInvocationLogsError &&
         !hasActiveFilters &&
         filterPageNumber === 0 &&
-        toolInvocationLogs.length === 0;
+        externalInvocationLogs.length === 0;
 
     return (
         <LayoutContainer
             footer={
-                toolInvocationLogPage?.content &&
-                toolInvocationLogPage.content.length > 0 && (
+                externalInvocationLogPage?.content &&
+                externalInvocationLogPage.content.length > 0 && (
                     <Footer centerTitle className="border-t border-stroke-neutral-primary 3xl:w-full" position="main">
                         <TablePagination
                             onClick={handlePaginationClick}
                             pageNumber={filterPageNumber}
-                            pageSize={toolInvocationLogPage.size}
-                            totalElements={toolInvocationLogPage.totalElements}
-                            totalPages={toolInvocationLogPage.totalPages}
+                            pageSize={externalInvocationLogPage.size}
+                            totalElements={externalInvocationLogPage.totalElements}
+                            totalPages={externalInvocationLogPage.totalPages}
                         />
                     </Footer>
                 )
@@ -144,14 +144,14 @@ export const ToolInvocations = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        aria-label="Refresh tool invocations"
-                                        disabled={toolInvocationLogsIsFetching}
+                                        aria-label="Refresh external invocations"
+                                        disabled={externalInvocationLogsIsFetching}
                                         icon={
                                             <RefreshCwIcon
-                                                className={twMerge(toolInvocationLogsIsFetching && 'animate-spin')}
+                                                className={twMerge(externalInvocationLogsIsFetching && 'animate-spin')}
                                             />
                                         }
-                                        onClick={() => refetchToolInvocations()}
+                                        onClick={() => refetchExternalInvocations()}
                                         size="icon"
                                         variant="ghost"
                                     />
@@ -161,7 +161,7 @@ export const ToolInvocations = ({
                             </Tooltip>
                         </div>
                     }
-                    title="Tool Invocations"
+                    title="External Invocations"
                 />
             }
             leftSidebarBody={
@@ -223,18 +223,18 @@ export const ToolInvocations = ({
                     </div>
                 </div>
             }
-            leftSidebarHeader={<Header position="sidebar" title="Tool Invocations" />}
+            leftSidebarHeader={<Header position="sidebar" title="External Invocations" />}
             leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
-            <PageLoader errors={[toolInvocationLogsError]} loading={toolInvocationLogsIsLoading}>
-                {toolInvocationLogs.length > 0 ? (
+            <PageLoader errors={[externalInvocationLogsError]} loading={externalInvocationLogsIsLoading}>
+                {externalInvocationLogs.length > 0 ? (
                     <div className="w-full self-start p-4 pt-0">
-                        <ToolInvocationsTable
+                        <ExternalInvocationsTable
                             a2aServerNames={a2aServerNames}
+                            externalInvocationLogs={externalInvocationLogs}
                             mcpServerNames={mcpServerNames}
                             showSurface={showSurface}
-                            toolInvocationLogs={toolInvocationLogs}
                         />
                     </div>
                 ) : isFirstRun ? (
@@ -242,8 +242,8 @@ export const ToolInvocations = ({
                 ) : (
                     <EmptyList
                         icon={<HammerIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="No tool invocations match the current filter."
-                        title="No Matching Tool Invocations"
+                        message="No external invocations match the current filter."
+                        title="No Matching External Invocations"
                     />
                 )}
             </PageLoader>

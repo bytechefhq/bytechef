@@ -51,7 +51,7 @@ const navigation = [
     {href: '/automation/ai-hub', icon: MessagesSquareIcon, name: 'AI Hub'},
     {href: '/automation/projects', icon: FolderIcon, name: 'Projects'},
     {href: '/automation/executions', icon: ActivityIcon, name: 'Workflow Executions'},
-    {href: '/automation/executions/tool-invocations', icon: WrenchIcon, name: 'Tool Invocations'},
+    {href: '/automation/executions/external-invocations', icon: WrenchIcon, name: 'External Invocations'},
 ];
 
 const serversGroup = {icon: ServerCogIcon, name: 'Servers'};
@@ -116,9 +116,9 @@ describe('AppSidebar', () => {
         const isActiveLink = (name: string) => screen.getByRole('link', {name}).getAttribute('data-active') === 'true';
 
         it('marks only the nested entry active on its own page', () => {
-            renderSidebar(true, '/automation/executions/tool-invocations');
+            renderSidebar(true, '/automation/executions/external-invocations');
 
-            expect(isActiveLink('Tool Invocations')).toBe(true);
+            expect(isActiveLink('External Invocations')).toBe(true);
             expect(isActiveLink('Workflow Executions')).toBe(false);
         });
 
@@ -126,7 +126,7 @@ describe('AppSidebar', () => {
             renderSidebar(true, '/automation/executions');
 
             expect(isActiveLink('Workflow Executions')).toBe(true);
-            expect(isActiveLink('Tool Invocations')).toBe(false);
+            expect(isActiveLink('External Invocations')).toBe(false);
         });
 
         it('marks the parent entry active on a deep route that is not a nav entry', () => {

@@ -19,10 +19,10 @@ vi.mock('@/ee/pages/embedded/connected-users/components/connected-user-sheet/Con
 }));
 
 vi.mock(
-    '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelToolInvocationList',
+    '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelExternalInvocationList',
     () => ({
         default: ({connectedUserId}: {connectedUserId: number}) => (
-            <div>{`tool invocation list ${connectedUserId}`}</div>
+            <div>{`external invocation list ${connectedUserId}`}</div>
         ),
     })
 );
@@ -43,14 +43,14 @@ vi.mock(
 );
 
 describe('ConnectedUserSheetPanel', () => {
-    it("shows the connected user's tool invocations on the Tool Invocations tab", async () => {
+    it("shows the connected user's external invocations on the External Invocations tab", async () => {
         render(<ConnectedUserSheetPanel connectedUser={{externalId: 'external-user-1', id: 7} as ConnectedUser} />);
 
-        expect(screen.queryByText('tool invocation list 7')).not.toBeInTheDocument();
+        expect(screen.queryByText('external invocation list 7')).not.toBeInTheDocument();
 
-        await userEvent.click(screen.getByRole('tab', {name: 'Tool Invocations'}));
+        await userEvent.click(screen.getByRole('tab', {name: 'External Invocations'}));
 
-        expect(screen.getByText('tool invocation list 7')).toBeInTheDocument();
+        expect(screen.getByText('external invocation list 7')).toBeInTheDocument();
     });
 
     it("passes the connected user's name and email to the Workflows tab", async () => {

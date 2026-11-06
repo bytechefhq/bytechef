@@ -1,4 +1,4 @@
-import {useToolInvocations} from '@/pages/automation/tool-invocations/hooks/useToolInvocations';
+import {useExternalInvocations} from '@/pages/automation/external-invocations/hooks/useExternalInvocations';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {act} from '@testing-library/react';
@@ -6,30 +6,30 @@ import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {EmbeddedToolInvocations} from './EmbeddedToolInvocations';
+import {EmbeddedExternalInvocations} from './EmbeddedExternalInvocations';
 
 const hoisted = vi.hoisted(() => ({
     useEmbeddedMcpServersQueryMock: vi.fn(),
-    useToolInvocationLogsQueryMock: vi.fn(),
-    useWorkspaceToolInvocationLogsQueryMock: vi.fn(),
+    useExternalInvocationLogsQueryMock: vi.fn(),
+    useWorkspaceExternalInvocationLogsQueryMock: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     PlatformType: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
     useEmbeddedMcpServersQuery: hoisted.useEmbeddedMcpServersQueryMock,
     useEnvironmentsQuery: () => ({data: undefined}),
-    useToolInvocationLogsQuery: hoisted.useToolInvocationLogsQueryMock,
-    useWorkspaceToolInvocationLogsQuery: hoisted.useWorkspaceToolInvocationLogsQueryMock,
+    useExternalInvocationLogsQuery: hoisted.useExternalInvocationLogsQueryMock,
+    useWorkspaceExternalInvocationLogsQuery: hoisted.useWorkspaceExternalInvocationLogsQueryMock,
 }));
 
-vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
-    ToolInvocations: ({
+vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
+    ExternalInvocations: ({
         environmentId,
         firstRunEmptyState,
         type,
         workspaceScope,
-    }: {firstRunEmptyState: ReactNode} & Parameters<typeof useToolInvocations>[0]) => {
-        const {filterOutcome, filterPageNumber, handleOutcomeChange, handlePaginationClick} = useToolInvocations({
+    }: {firstRunEmptyState: ReactNode} & Parameters<typeof useExternalInvocations>[0]) => {
+        const {filterOutcome, filterPageNumber, handleOutcomeChange, handlePaginationClick} = useExternalInvocations({
             environmentId,
             type,
             workspaceScope,
@@ -62,18 +62,18 @@ const emptyQueryResult = () => ({
 const renderPage = () =>
     render(
         <MemoryRouter>
-            <EmbeddedToolInvocations />
+            <EmbeddedExternalInvocations />
         </MemoryRouter>
     );
 
-describe('EmbeddedToolInvocations', () => {
+describe('EmbeddedExternalInvocations', () => {
     beforeEach(() => {
         hoisted.useEmbeddedMcpServersQueryMock.mockReset();
         hoisted.useEmbeddedMcpServersQueryMock.mockReturnValue({data: undefined});
-        hoisted.useToolInvocationLogsQueryMock.mockReset();
-        hoisted.useToolInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
-        hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReset();
-        hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
+        hoisted.useExternalInvocationLogsQueryMock.mockReset();
+        hoisted.useExternalInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
+        hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReset();
+        hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
 
         environmentStore.setState({currentEnvironmentId: 2});
     });
@@ -82,7 +82,7 @@ describe('EmbeddedToolInvocations', () => {
         renderPage();
 
         expect(screen.getByTestId('workspace-scope')).toHaveTextContent('none');
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({environmentId: '2', page: 0, type: 'EMBEDDED'}),
             {enabled: true}
         );
@@ -95,7 +95,7 @@ describe('EmbeddedToolInvocations', () => {
         await userEvent.click(screen.getByRole('button', {name: 'next pages'}));
 
         expect(screen.getByTestId('filters')).toHaveTextContent('outcome=ERROR;page=3');
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({environmentId: '2', outcome: 'ERROR', page: 3, type: 'EMBEDDED'}),
             {enabled: true}
         );
@@ -105,7 +105,7 @@ describe('EmbeddedToolInvocations', () => {
         });
 
         expect(screen.getByTestId('filters')).toHaveTextContent('outcome=;page=0');
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({environmentId: '1', outcome: undefined, page: 0, type: 'EMBEDDED'}),
             {enabled: true}
         );

@@ -1,17 +1,21 @@
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {ToolInvocationsWorkspaceScopeI, UseToolInvocationsOptionsI, useToolInvocations} from './useToolInvocations';
+import {
+    ExternalInvocationsWorkspaceScopeI,
+    UseExternalInvocationsOptionsI,
+    useExternalInvocations,
+} from './useExternalInvocations';
 
 const hoisted = vi.hoisted(() => ({
-    useToolInvocationLogsQueryMock: vi.fn(),
-    useWorkspaceToolInvocationLogsQueryMock: vi.fn(),
+    useExternalInvocationLogsQueryMock: vi.fn(),
+    useWorkspaceExternalInvocationLogsQueryMock: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     PlatformType: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
-    useToolInvocationLogsQuery: hoisted.useToolInvocationLogsQueryMock,
-    useWorkspaceToolInvocationLogsQuery: hoisted.useWorkspaceToolInvocationLogsQueryMock,
+    useExternalInvocationLogsQuery: hoisted.useExternalInvocationLogsQueryMock,
+    useWorkspaceExternalInvocationLogsQuery: hoisted.useWorkspaceExternalInvocationLogsQueryMock,
 }));
 
 const emptyQueryResult = () => ({
@@ -22,39 +26,43 @@ const emptyQueryResult = () => ({
     refetch: vi.fn(),
 });
 
-const renderUseToolInvocations = (workspaceScope?: ToolInvocationsWorkspaceScopeI) =>
-    renderHook(() => useToolInvocations({type: 'AUTOMATION' as UseToolInvocationsOptionsI['type'], workspaceScope}));
+const renderUseExternalInvocations = (workspaceScope?: ExternalInvocationsWorkspaceScopeI) =>
+    renderHook(() =>
+        useExternalInvocations({type: 'AUTOMATION' as UseExternalInvocationsOptionsI['type'], workspaceScope})
+    );
 
-const renderUseEmbeddedToolInvocations = (environmentId?: number) =>
-    renderHook(() => useToolInvocations({environmentId, type: 'EMBEDDED' as UseToolInvocationsOptionsI['type']}));
+const renderUseEmbeddedExternalInvocations = (environmentId?: number) =>
+    renderHook(() =>
+        useExternalInvocations({environmentId, type: 'EMBEDDED' as UseExternalInvocationsOptionsI['type']})
+    );
 
-describe('useToolInvocations', () => {
+describe('useExternalInvocations', () => {
     beforeEach(() => {
-        hoisted.useToolInvocationLogsQueryMock.mockReset();
-        hoisted.useToolInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
-        hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReset();
-        hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
+        hoisted.useExternalInvocationLogsQueryMock.mockReset();
+        hoisted.useExternalInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
+        hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReset();
+        hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
     });
 
     it('queries the tenant-wide log and leaves the workspace query off without a workspace scope', () => {
-        renderUseToolInvocations();
+        renderUseExternalInvocations();
 
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenCalledWith(
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenCalledWith(
             expect.objectContaining({page: 0, type: 'AUTOMATION'}),
             {
                 enabled: true,
             }
         );
-        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {
             enabled: false,
         });
     });
 
     it('queries the workspace log with the workspace and environment of the scope', () => {
-        hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReturnValue({
+        hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReturnValue({
             ...emptyQueryResult(),
             data: {
-                workspaceToolInvocationLogs: {
+                workspaceExternalInvocationLogs: {
                     content: [{id: '1', toolName: 'CRM__SEARCH_RECORDS'}],
                     number: 0,
                     size: 50,
@@ -64,19 +72,19 @@ describe('useToolInvocations', () => {
             },
         });
 
-        const {result} = renderUseToolInvocations({environmentId: 2, workspaceId: 1049});
+        const {result} = renderUseExternalInvocations({environmentId: 2, workspaceId: 1049});
 
-        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenCalledWith(
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenCalledWith(
             expect.objectContaining({environmentId: '2', page: 0, type: 'AUTOMATION', workspaceId: '1049'}),
             {enabled: true}
         );
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
-        expect(result.current.toolInvocationLogs).toEqual([{id: '1', toolName: 'CRM__SEARCH_RECORDS'}]);
-        expect(result.current.toolInvocationLogPage?.totalElements).toBe(1);
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
+        expect(result.current.externalInvocationLogs).toEqual([{id: '1', toolName: 'CRM__SEARCH_RECORDS'}]);
+        expect(result.current.externalInvocationLogPage?.totalElements).toBe(1);
     });
 
     it('passes the filters to the workspace query and resets the page when one changes', () => {
-        const {result} = renderUseToolInvocations({environmentId: 2, workspaceId: 1049});
+        const {result} = renderUseExternalInvocations({environmentId: 2, workspaceId: 1049});
 
         act(() => {
             result.current.handlePaginationClick(3);
@@ -87,14 +95,14 @@ describe('useToolInvocations', () => {
         });
 
         expect(result.current.filterPageNumber).toBe(0);
-        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({environmentId: '2', mcpServerId: 9, page: 0, workspaceId: '1049'}),
             {enabled: true}
         );
     });
 
     it('passes the A2A server filter to the workspace query and resets the page', () => {
-        const {result} = renderUseToolInvocations({environmentId: 2, workspaceId: 1049});
+        const {result} = renderUseExternalInvocations({environmentId: 2, workspaceId: 1049});
 
         act(() => {
             result.current.handlePaginationClick(3);
@@ -106,7 +114,7 @@ describe('useToolInvocations', () => {
 
         expect(result.current.filterA2aServerId).toBe('4');
         expect(result.current.filterPageNumber).toBe(0);
-        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({a2aServerId: 4, environmentId: '2', page: 0, workspaceId: '1049'}),
             {enabled: true}
         );
@@ -116,27 +124,27 @@ describe('useToolInvocations', () => {
         });
 
         expect(result.current.filterA2aServerId).toBeUndefined();
-        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({a2aServerId: undefined}),
             {enabled: true}
         );
     });
 
     it('waits for the workspace instead of falling back to the tenant-wide log', () => {
-        renderUseToolInvocations({environmentId: 2, workspaceId: undefined});
+        renderUseExternalInvocations({environmentId: 2, workspaceId: undefined});
 
-        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {
             enabled: false,
         });
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
     });
 
     it('reads the tenant-wide page and its fetch state when there is no workspace scope', () => {
         const refetch = vi.fn();
 
-        hoisted.useToolInvocationLogsQueryMock.mockReturnValue({
+        hoisted.useExternalInvocationLogsQueryMock.mockReturnValue({
             data: {
-                toolInvocationLogs: {
+                externalInvocationLogs: {
                     content: [{id: '5', toolName: 'slack_sendMessage'}],
                     number: 0,
                     size: 50,
@@ -150,14 +158,14 @@ describe('useToolInvocations', () => {
             refetch,
         });
 
-        const {result} = renderUseToolInvocations();
+        const {result} = renderUseExternalInvocations();
 
-        expect(result.current.toolInvocationLogs).toEqual([{id: '5', toolName: 'slack_sendMessage'}]);
-        expect(result.current.toolInvocationLogPage?.totalElements).toBe(1);
-        expect(result.current.toolInvocationLogsIsFetching).toBe(true);
-        expect(result.current.toolInvocationLogsIsLoading).toBe(false);
+        expect(result.current.externalInvocationLogs).toEqual([{id: '5', toolName: 'slack_sendMessage'}]);
+        expect(result.current.externalInvocationLogPage?.totalElements).toBe(1);
+        expect(result.current.externalInvocationLogsIsFetching).toBe(true);
+        expect(result.current.externalInvocationLogsIsLoading).toBe(false);
 
-        result.current.refetchToolInvocations();
+        result.current.refetchExternalInvocations();
 
         expect(refetch).toHaveBeenCalledTimes(1);
     });
@@ -165,25 +173,25 @@ describe('useToolInvocations', () => {
     it('reports the loading state and the error of the workspace query', () => {
         const error = new Error('Access denied');
 
-        hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReturnValue({
+        hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReturnValue({
             ...emptyQueryResult(),
             error,
             isLoading: true,
         });
 
-        const {result} = renderUseToolInvocations({environmentId: 2, workspaceId: 1049});
+        const {result} = renderUseExternalInvocations({environmentId: 2, workspaceId: 1049});
 
-        expect(result.current.toolInvocationLogsError).toBe(error);
-        expect(result.current.toolInvocationLogsIsLoading).toBe(true);
-        expect(result.current.toolInvocationLogs).toEqual([]);
-        expect(result.current.toolInvocationLogPage).toBeUndefined();
+        expect(result.current.externalInvocationLogsError).toBe(error);
+        expect(result.current.externalInvocationLogsIsLoading).toBe(true);
+        expect(result.current.externalInvocationLogs).toEqual([]);
+        expect(result.current.externalInvocationLogPage).toBeUndefined();
     });
 
     it('passes the surface, outcome and date filters as query variables and clears them again', () => {
         const startDate = new Date(Date.UTC(2026, 9, 1));
         const endDate = new Date(2026, 9, 31);
 
-        const {result} = renderUseToolInvocations();
+        const {result} = renderUseExternalInvocations();
 
         act(() => {
             result.current.handlePaginationClick(2);
@@ -201,7 +209,7 @@ describe('useToolInvocations', () => {
         expect(result.current.filterStartDate).toBe(startDate);
         expect(result.current.filterEndDate).toBe(endDate);
         expect(result.current.filterPageNumber).toBe(0);
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             {
                 a2aServerId: undefined,
                 environmentId: undefined,
@@ -224,7 +232,7 @@ describe('useToolInvocations', () => {
             result.current.handleEndDateChange(undefined);
         });
 
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             {
                 a2aServerId: undefined,
                 environmentId: undefined,
@@ -241,35 +249,35 @@ describe('useToolInvocations', () => {
     });
 
     it('keeps the requested page until a filter changes', () => {
-        const {result} = renderUseToolInvocations({environmentId: 2, workspaceId: 1049});
+        const {result} = renderUseExternalInvocations({environmentId: 2, workspaceId: 1049});
 
         act(() => {
             result.current.handlePaginationClick(4);
         });
 
         expect(result.current.filterPageNumber).toBe(4);
-        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({page: 4, type: 'AUTOMATION'}),
             {enabled: true}
         );
     });
 
     it('queries the tenant-wide embedded log of the given environment', () => {
-        renderUseEmbeddedToolInvocations(2);
+        renderUseEmbeddedExternalInvocations(2);
 
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({environmentId: '2', page: 0, type: 'EMBEDDED'}),
             {enabled: true}
         );
-        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(expect.anything(), {
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(expect.anything(), {
             enabled: false,
         });
     });
 
     it('sends environment 0 as a filter instead of dropping it', () => {
-        renderUseEmbeddedToolInvocations(0);
+        renderUseEmbeddedExternalInvocations(0);
 
-        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({environmentId: '0', type: 'EMBEDDED'}),
             {enabled: true}
         );
