@@ -247,7 +247,7 @@ const ProjectDeployments = () => {
                                                         <TooltipTrigger asChild>
                                                             <Button
                                                                 aria-label="Open project"
-                                                                className="size-5 [&_svg]:size-3"
+                                                                className="-ml-1.5 size-5 [&_svg]:size-3"
                                                                 icon={<SquareArrowOutUpRightIcon className="size-3" />}
                                                                 onClick={() => openProject(projectId)}
                                                                 size="icon"
