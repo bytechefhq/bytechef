@@ -177,13 +177,13 @@ describe('ProjectDeploymentListItem', () => {
     it('shows the tags by default', () => {
         render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
 
-        expect(screen.getByText('Tags:')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Add tag'})).toBeInTheDocument();
     });
 
     it('hides the tags when showTags is false', () => {
         render(<ProjectDeploymentListItem projectDeployment={projectDeployment} showTags={false} />);
 
-        expect(screen.queryByText('Tags:')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Add tag'})).not.toBeInTheDocument();
     });
 
     it('captures the deployment enabled event when the deployment is turned on', async () => {

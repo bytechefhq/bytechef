@@ -72,7 +72,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
 
     return (
         <div className="mr-4 flex h-7 items-center justify-center gap-2">
-            <span className="text-xs text-content-neutral-secondary">Tags:</span>
+            {tags.length > 0 && <span className="text-xs text-content-neutral-secondary">Tags:</span>}
 
             {tags.slice(0, 3).map((tag) => (
                 <Tag key={tag.id ?? tag.name} onDeleteTag={handleDeleteTag} tag={tag} />
@@ -157,22 +157,18 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                     </Tooltip>
                 </>
             ) : (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            icon={<PlusIcon />}
-                            onClick={(event) => {
-                                event.preventDefault();
+                <Button
+                    className="rounded-full border border-dashed border-border pl-1.5 text-content-neutral-secondary hover:border-solid hover:text-content-neutral-primary [&_svg]:size-3"
+                    icon={<PlusIcon />}
+                    label="Add tag"
+                    onClick={(event) => {
+                        event.preventDefault();
 
-                                setIsNewTagWindowVisible(true);
-                            }}
-                            size="iconXs"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>Add new tag</TooltipContent>
-                </Tooltip>
+                        setIsNewTagWindowVisible(true);
+                    }}
+                    size="xs"
+                    variant="ghost"
+                />
             )}
         </div>
     );
