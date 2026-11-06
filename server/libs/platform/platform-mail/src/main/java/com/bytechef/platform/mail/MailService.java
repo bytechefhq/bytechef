@@ -162,6 +162,16 @@ public class MailService {
         }
     }
 
+    public void sendEmailOrThrow(
+        String recipient, String subject, String content, boolean isMultipart, boolean isHtml) {
+
+        try {
+            deliverEmail(recipient, subject, content, isMultipart, isHtml);
+        } catch (MessagingException messagingException) {
+            throw new MailPreparationException(messagingException);
+        }
+    }
+
     private void sendEmailSync(String recipient, String subject, String content, boolean isMultipart, boolean isHtml) {
         log.debug(
             "Send email[multipart '{}' and html '{}'] to '{}' with subject '{}'",

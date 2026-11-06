@@ -399,6 +399,17 @@ class MailServiceIntTest {
     }
 
     @Test
+    void testSendEmailOrThrowWithException() {
+        doThrow(new MailSendException("SMTP unavailable")).when(javaMailSender)
+            .send(any(MimeMessage.class));
+
+        assertThatThrownBy(
+            () -> mailService.sendEmailOrThrow("john.doe@example.com", "testSubject", "testContent", false, false))
+                .isInstanceOf(MailSendException.class)
+                .hasMessage("SMTP unavailable");
+    }
+
+    @Test
     @SuppressFBWarnings("OS")
     void testSendLocalizedEmailForAllSupportedLanguages() throws Exception {
         User user = new User();
