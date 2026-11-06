@@ -605,6 +605,7 @@ include("server:ee:libs:automation:automation-configuration:automation-configura
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-service")
+include("server:ee:libs:automation:automation-data-table:automation-data-table-public-rest")
 include("server:ee:libs:automation:automation-data-table:automation-data-table-remote-client")
 include("server:ee:libs:automation:automation-task:automation-task-remote-client")
 include("server:ee:libs:automation:automation-task:automation-task-remote-rest")
