@@ -27,7 +27,7 @@ const LeftSidebarButton = ({
                 />
             </TooltipTrigger>
 
-            <TooltipContent>{tooltip}</TooltipContent>
+            <TooltipContent align="end">{tooltip}</TooltipContent>
         </Tooltip>
     );
 };
