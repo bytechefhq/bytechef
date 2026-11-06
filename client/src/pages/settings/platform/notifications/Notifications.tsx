@@ -8,7 +8,7 @@ import SigningSecretDialog from '@/pages/settings/platform/notifications/compone
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {Link2Icon, PlusIcon} from 'lucide-react';
+import {Link2Icon} from 'lucide-react';
 import {UseFormReturn} from 'react-hook-form';
 
 import useNotifications, {NotificationFormValuesType} from './hooks/useNotifications';
@@ -49,11 +49,7 @@ const Notifications = () => {
                             : 'Send an email or Slack message when a workflow run reaches a given status.'
                     }
                     position="main"
-                    right={
-                        hasNotifications && (
-                            <Button icon={<PlusIcon />} label="New Notification" onClick={() => openEditDialog()} />
-                        )
-                    }
+                    right={hasNotifications && <Button label="New Notification" onClick={() => openEditDialog()} />}
                     title="Notifications"
                 />
             }
@@ -64,9 +60,7 @@ const Notifications = () => {
                     <NotificationsTable columns={columns} notifications={notificationsData!} />
                 ) : (
                     <EmptyList
-                        button={
-                            <Button icon={<PlusIcon />} label="New Notification" onClick={() => openEditDialog()} />
-                        }
+                        button={<Button label="New Notification" onClick={() => openEditDialog()} />}
                         icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
                         message="You do not have any Notifications created yet."
                         title="No Notifications"
