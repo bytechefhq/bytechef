@@ -215,6 +215,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-oauth2-authorization-server"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-impl"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-db"))
+    implementation("no.bekk.db-scheduler-ui:db-scheduler-ui-spring-boot-4-starter:5.0.0")
     implementation(project(":server:libs:platform:platform-security:platform-security-graphql"))
     implementation(project(":server:libs:platform:platform-security:platform-security-service"))
     implementation(project(":server:libs:platform:platform-swagger"))

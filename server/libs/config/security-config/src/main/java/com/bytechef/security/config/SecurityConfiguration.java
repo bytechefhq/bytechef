@@ -41,6 +41,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -122,6 +123,32 @@ public class SecurityConfiguration {
         this.saml2LoginCustomizers = saml2LoginCustomizersProvider.getIfAvailable(List::of);
         this.security = applicationProperties.getSecurity();
         this.twoFactorVerificationFilterProvider = twoFactorVerificationFilterProvider;
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "db-scheduler-ui.enabled", havingValue = "true")
+    @Order(0)
+    public SecurityFilterChain dbSchedulerUiFilterChain(
+        HttpSecurity http, PathPatternRequestMatcher.Builder mvc) throws Exception {
+
+        http
+            .securityMatcher("/db-scheduler/**", "/db-scheduler-api/**")
+            .cors(withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers(mvc.matcher("/db-scheduler/**"), mvc.matcher("/db-scheduler-api/**"))
+                .hasAuthority(AuthorityConstants.SYSTEM_ADMIN))
+            .httpBasic(withDefaults())
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(new UnauthorizedBasicAuthenticationEntryPoint()));
+
+        AuthenticationProvider authenticationProvider = getSystemAuthenticationProvider(security.getSystem());
+
+        if (authenticationProvider != null) {
+            http.authenticationProvider(authenticationProvider);
+        }
+
+        return http.build();
     }
 
     /**
