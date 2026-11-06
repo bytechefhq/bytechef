@@ -399,9 +399,8 @@ const ConnectionTabConnectionSelect = ({
                 </Select>
 
                 {currentConnection?.credentialStatus === 'INVALID' && (
-                    <p className="text-sm text-content-destructive-primary">
-                        The credentials of this connection could not be refreshed. Create a new connection or choose
-                        another one.
+                    <p className="mt-2 text-sm text-content-destructive-primary">
+                        Credentials could not be refreshed. Reconnect or choose another connection.
                     </p>
                 )}
             </div>

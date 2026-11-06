@@ -667,7 +667,7 @@ describe('ConnectionTabConnectionSelect', () => {
         );
 
         expect(screen.getByText('Invalid')).toBeInTheDocument();
-        expect(screen.getByText(/credentials of this connection could not be refreshed/)).toBeInTheDocument();
+        expect(screen.getByText(/Credentials could not be refreshed/)).toBeInTheDocument();
     });
 
     it('should not mark a selected connection with valid credentials as invalid', () => {
@@ -687,7 +687,7 @@ describe('ConnectionTabConnectionSelect', () => {
         );
 
         expect(screen.queryByText('Invalid')).not.toBeInTheDocument();
-        expect(screen.queryByText(/credentials of this connection could not be refreshed/)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Credentials could not be refreshed/)).not.toBeInTheDocument();
     });
 
     it('should display connection parameters when connection is selected', () => {
