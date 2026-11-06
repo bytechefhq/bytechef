@@ -2442,6 +2442,20 @@ export type UsersQueryVariables = Exact<{
 
 export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
 
+export type WorkspaceSystemPromptQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceSystemPromptQuery = { workspaceSystemPrompt: { prompt: string, workspaceId: string } | null };
+
+export type UpdateWorkspaceSystemPromptMutationVariables = Exact<{
+  input: Types.WorkspaceSystemPromptInput;
+}>;
+
+
+export type UpdateWorkspaceSystemPromptMutation = { updateWorkspaceSystemPrompt: { prompt: string, workspaceId: string } | null };
+
 export type ToolInvocationLogsQueryVariables = Exact<{
   type: Types.PlatformType;
   environmentId?: string | number | null | undefined;
@@ -11647,6 +11661,53 @@ export const useUsersQuery = <
       {
     queryKey: variables === undefined ? ['users'] : ['users', variables],
     queryFn: fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceSystemPromptDocument = new TypedDocumentString(`
+    query workspaceSystemPrompt($workspaceId: ID!) {
+  workspaceSystemPrompt(workspaceId: $workspaceId) {
+    prompt
+    workspaceId
+  }
+}
+    `);
+
+export const useWorkspaceSystemPromptQuery = <
+      TData = WorkspaceSystemPromptQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceSystemPromptQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceSystemPromptQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceSystemPromptQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceSystemPromptQuery, TError, TData>(
+      {
+    queryKey: ['workspaceSystemPrompt', variables],
+    queryFn: fetcher<WorkspaceSystemPromptQuery, WorkspaceSystemPromptQueryVariables>(WorkspaceSystemPromptDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceSystemPromptDocument = new TypedDocumentString(`
+    mutation updateWorkspaceSystemPrompt($input: WorkspaceSystemPromptInput!) {
+  updateWorkspaceSystemPrompt(input: $input) {
+    prompt
+    workspaceId
+  }
+}
+    `);
+
+export const useUpdateWorkspaceSystemPromptMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceSystemPromptMutation, TError, UpdateWorkspaceSystemPromptMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceSystemPromptMutation, TError, UpdateWorkspaceSystemPromptMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWorkspaceSystemPrompt'],
+    mutationFn: (variables?: UpdateWorkspaceSystemPromptMutationVariables) => fetcher<UpdateWorkspaceSystemPromptMutation, UpdateWorkspaceSystemPromptMutationVariables>(UpdateWorkspaceSystemPromptDocument, variables)(),
     ...options
   }
     )};

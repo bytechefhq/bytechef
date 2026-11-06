@@ -2101,6 +2101,7 @@ export type Mutation = {
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
   updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
+  updateWorkspaceSystemPrompt?: Maybe<WorkspaceSystemPrompt>;
   upgradeAutomationWorkflowProjectConfigurationConnectedUsers: ConfigurationMoveResult;
 };
 
@@ -3115,6 +3116,11 @@ export type MutationUpdateWorkspaceMcpToolEnabledArgs = {
 };
 
 
+export type MutationUpdateWorkspaceSystemPromptArgs = {
+  input: WorkspaceSystemPromptInput;
+};
+
+
 export type MutationUpgradeAutomationWorkflowProjectConfigurationConnectedUsersArgs = {
   connectedUserIds: Array<Scalars['ID']['input']>;
   targetId: Scalars['ID']['input'];
@@ -3656,6 +3662,7 @@ export type Query = {
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
+  workspaceSystemPrompt?: Maybe<WorkspaceSystemPrompt>;
   workspaceToolInvocationLogs: ToolInvocationLogPageType;
 };
 
@@ -4583,6 +4590,11 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
 };
 
 
+export type QueryWorkspaceSystemPromptArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkspaceToolInvocationLogsArgs = {
   connectedUserId?: InputMaybe<Scalars['Long']['input']>;
   environmentId: Scalars['ID']['input'];
@@ -5101,4 +5113,15 @@ export type WorkflowValidationResult = {
   errors: Array<Scalars['String']['output']>;
   nodeIssues: Array<NodeValidationIssue>;
   warnings: Array<Scalars['String']['output']>;
+};
+
+export type WorkspaceSystemPrompt = {
+  __typename?: 'WorkspaceSystemPrompt';
+  prompt: Scalars['String']['output'];
+  workspaceId: Scalars['ID']['output'];
+};
+
+export type WorkspaceSystemPromptInput = {
+  prompt?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['ID']['input'];
 };
