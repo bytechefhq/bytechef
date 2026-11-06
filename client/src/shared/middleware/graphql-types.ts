@@ -2235,6 +2235,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
+  assignNotificationToWorkspace: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
   createA2aProject?: Maybe<A2aProject>;
@@ -2385,6 +2386,7 @@ export type Mutation = {
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
   testWorkspaceAiGatewayProviderConnection?: Maybe<ProviderConnectionResult>;
+  unassignNotificationFromWorkspace: Scalars['Boolean']['output'];
   unpinAiModel?: Maybe<AiModel>;
   unpinWorkspaceAiModel?: Maybe<AiModel>;
   updateA2aProject?: Maybe<A2aProject>;
@@ -2465,6 +2467,12 @@ export type Mutation = {
 
 export type MutationAddDataTableColumnArgs = {
   input: AddColumnInput;
+};
+
+
+export type MutationAssignNotificationToWorkspaceArgs = {
+  notificationId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3247,6 +3255,11 @@ export type MutationTestWorkflowNodeScriptArgs = {
 export type MutationTestWorkspaceAiGatewayProviderConnectionArgs = {
   providerId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationUnassignNotificationFromWorkspaceArgs = {
+  notificationId: Scalars['ID']['input'];
 };
 
 
@@ -4216,6 +4229,7 @@ export type Query = {
   workspaceChatWorkflows: Array<ChatWorkflow>;
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
+  workspaceNotifications: Array<WorkspaceScopedNotification>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
   workspaceToolInvocationLogs: ToolInvocationLogPageType;
 };
@@ -5220,6 +5234,11 @@ export type QueryWorkspaceMcpServersArgs = {
 };
 
 
+export type QueryWorkspaceNotificationsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkspaceProjectDeploymentsArgs = {
   environmentId: Scalars['ID']['input'];
   projectId?: InputMaybe<Scalars['ID']['input']>;
@@ -5807,4 +5826,11 @@ export type WorkflowValidationResult = {
   errors: Array<Scalars['String']['output']>;
   nodeIssues: Array<NodeValidationIssue>;
   warnings: Array<Scalars['String']['output']>;
+};
+
+export type WorkspaceScopedNotification = {
+  __typename?: 'WorkspaceScopedNotification';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: Scalars['String']['output'];
 };
