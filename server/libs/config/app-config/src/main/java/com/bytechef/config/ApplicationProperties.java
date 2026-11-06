@@ -146,6 +146,8 @@ public class ApplicationProperties {
      */
     private Kafka kafka = new Kafka();
 
+    private Licence licence = new Licence();
+
     /**
      * Email configuration
      */
@@ -331,6 +333,10 @@ public class ApplicationProperties {
         return kafka;
     }
 
+    public Licence getLicence() {
+        return licence;
+    }
+
     public Mail getMail() {
         return mail;
     }
@@ -497,6 +503,10 @@ public class ApplicationProperties {
 
     public void setKafka(Kafka kafka) {
         this.kafka = kafka;
+    }
+
+    public void setLicence(Licence licence) {
+        this.licence = licence;
     }
 
     public void setMail(Mail mail) {
@@ -4200,6 +4210,77 @@ public class ApplicationProperties {
 
             public void setGroupId(String groupId) {
                 this.groupId = groupId;
+            }
+        }
+    }
+
+    public static class Licence {
+
+        private String accountId;
+        private CheckIn checkIn = new CheckIn();
+        private int gracePeriodDays = 14;
+        private String path;
+        private String publicKey;
+
+        public String getAccountId() {
+            return accountId;
+        }
+
+        public void setAccountId(String accountId) {
+            this.accountId = accountId;
+        }
+
+        public CheckIn getCheckIn() {
+            return checkIn;
+        }
+
+        public void setCheckIn(CheckIn checkIn) {
+            this.checkIn = checkIn;
+        }
+
+        public int getGracePeriodDays() {
+            return gracePeriodDays;
+        }
+
+        public void setGracePeriodDays(int gracePeriodDays) {
+            this.gracePeriodDays = gracePeriodDays;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        public String getPublicKey() {
+            return publicKey;
+        }
+
+        public void setPublicKey(String publicKey) {
+            this.publicKey = publicKey;
+        }
+
+        public static class CheckIn {
+
+            private boolean enabled;
+            private Duration interval = Duration.ofHours(24);
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public Duration getInterval() {
+                return interval;
+            }
+
+            public void setInterval(Duration interval) {
+                this.interval = interval;
             }
         }
     }

@@ -155,6 +155,9 @@ include("server:libs:core:rest:rest-impl")
 include("server:libs:core:tenant:tenant-api")
 include("server:libs:core:tenant:tenant-single-service")
 
+include("server:libs:licence:licence-api")
+include("server:libs:licence:licence-service")
+
 include("server:libs:platform:platform-ai:platform-ai-a2a-api")
 include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-api")
 include("server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-api")
