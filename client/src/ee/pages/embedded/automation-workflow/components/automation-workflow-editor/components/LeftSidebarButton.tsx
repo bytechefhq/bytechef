@@ -9,7 +9,7 @@ const LeftSidebarButton = ({onLeftSidebarOpenClick}: {onLeftSidebarOpenClick: ()
                 <Button icon={<PanelLeftIcon />} onClick={onLeftSidebarOpenClick} size="icon" variant="ghost" />
             </TooltipTrigger>
 
-            <TooltipContent>See workflows</TooltipContent>
+            <TooltipContent align="end">See workflows</TooltipContent>
         </Tooltip>
     );
 };
