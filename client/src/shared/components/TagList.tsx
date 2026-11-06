@@ -22,13 +22,14 @@ interface TagProps {
 }
 
 const Tag = ({onDeleteTag, tag}: TagProps) => (
-    <div className="group flex max-h-8 items-center justify-between rounded-full border border-border/50 pr-1 pl-2 text-xs text-content-neutral-primary">
-        <span className="py-1">{tag.name}</span>
+    <div className="group relative flex max-h-8 items-center rounded-full border border-border/50 px-2 text-xs text-content-neutral-primary">
+        <span className="py-0.5">{tag.name}</span>
 
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className="ml-1.5 rounded-full opacity-100"
+                    aria-label="Remove tag"
+                    className="pointer-events-none absolute top-1/2 right-0.5 size-4 -translate-y-1/2 rounded-full bg-surface-neutral-secondary p-0.5 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-surface-neutral-secondary-hover focus-visible:pointer-events-auto focus-visible:opacity-100 [&_svg]:size-2.5"
                     icon={<XIcon />}
                     onClick={() => onDeleteTag(tag)}
                     size="iconXxs"
