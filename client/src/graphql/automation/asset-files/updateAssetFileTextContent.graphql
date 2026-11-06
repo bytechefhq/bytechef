@@ -1,0 +1,7 @@
+mutation UpdateAssetFileTextContent($id: ID!, $content: String!) {
+    updateAssetFileTextContent(id: $id, content: $content) {
+        id
+        lastModifiedDate
+        sizeBytes
+    }
+}

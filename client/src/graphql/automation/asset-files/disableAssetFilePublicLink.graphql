@@ -1,0 +1,6 @@
+mutation DisableAssetFilePublicLink($id: ID!) {
+    disableAssetFilePublicLink(id: $id) {
+        id
+        publicLinkUrl
+    }
+}
