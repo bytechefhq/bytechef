@@ -304,8 +304,8 @@ spring:
     username: ${bytechef.rabbitmq.username}
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
+      max-file-size: 64MB
+      max-request-size: 80MB
   shell:
     interactive:
       enabled: false
