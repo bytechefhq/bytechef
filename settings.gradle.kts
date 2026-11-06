@@ -712,6 +712,8 @@ include("server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-
 include("server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-observability:platform-ai-observability-api")
 include("server:ee:libs:platform:platform-ai:platform-ai-observability:platform-ai-observability-service")
+include("server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-api")
+include("server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-client")
 include("server:ee:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-remote-client")
 include("server:ee:libs:platform:platform-ai:platform-ai-workspace")
