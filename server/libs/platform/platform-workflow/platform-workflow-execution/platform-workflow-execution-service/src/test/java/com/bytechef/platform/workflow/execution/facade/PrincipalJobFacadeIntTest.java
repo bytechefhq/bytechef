@@ -22,6 +22,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -35,6 +37,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.config.PrincipalJobFacadeIntTestConfiguration;
+import com.bytechef.platform.workflow.execution.service.LicenceJobUsageService;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Map;
@@ -73,6 +76,9 @@ class PrincipalJobFacadeIntTest {
 
     @Autowired
     private JobService jobService;
+
+    @MockitoBean
+    private LicenceJobUsageService licenceJobUsageService;
 
     @Autowired
     private PrincipalJobFacade principalJobFacade;
@@ -115,6 +121,8 @@ class PrincipalJobFacadeIntTest {
         assertThat(principalJobService.fetchJobPrincipalId(jobId, PlatformType.AUTOMATION)).contains(PRINCIPAL_ID);
         assertThat(startedJobPrincipalRecorder.principalIdsAtStart()).containsExactly(
             Map.entry(jobId, Optional.of(PRINCIPAL_ID)));
+
+        verify(licenceJobUsageService).consumeOrThrow();
     }
 
     @Test
@@ -128,6 +136,8 @@ class PrincipalJobFacadeIntTest {
             .contains(PRINCIPAL_ID);
         assertThat(startedJobPrincipalRecorder.principalIdsAtStart()).containsExactly(
             Map.entry(childJobId, Optional.of(PRINCIPAL_ID)));
+
+        verify(licenceJobUsageService, never()).consumeOrThrow();
     }
 
     @Test
@@ -152,6 +162,8 @@ class PrincipalJobFacadeIntTest {
         assertThat(principalJobService.fetchJobPrincipalId(jobId, PlatformType.AUTOMATION)).contains(PRINCIPAL_ID);
         assertThat(startedJobPrincipalRecorder.principalIdsAtStart()).containsExactly(
             Map.entry(jobId, Optional.of(PRINCIPAL_ID)));
+
+        verify(licenceJobUsageService, never()).consumeOrThrow();
     }
 
     @Test
