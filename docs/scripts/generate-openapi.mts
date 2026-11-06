@@ -39,10 +39,10 @@ const GROUP_META: Record<
     navTitle: 'Tools',
     description: "List a connected user's available tools, and execute one.",
   },
-  'embedded-tool-invocation': {
-    title: 'Embedded Tool Invocations',
-    navTitle: 'Tool Invocations',
-    description: "List a connected user's recorded tool invocations.",
+  'embedded-external-invocation': {
+    title: 'Embedded External Invocations',
+    navTitle: 'External Invocations',
+    description: "List a connected user's recorded external invocations.",
   },
   'embedded-configuration-integration': {
     title: 'Embedded Integrations',
