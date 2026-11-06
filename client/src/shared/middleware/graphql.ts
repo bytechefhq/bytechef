@@ -426,6 +426,95 @@ export type UpdateApprovalTaskMutationVariables = Exact<{
 
 export type UpdateApprovalTaskMutation = { updateApprovalTask: { assigneeId: string | null, description: string | null, dueDate: string | null, id: string, name: string, priority: Types.ApprovalTaskPriority, status: Types.ApprovalTaskStatus, version: number } | null };
 
+export type DeleteAssetFileMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAssetFileMutation = { deleteAssetFile: boolean };
+
+export type DisableAssetFilePublicLinkMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DisableAssetFilePublicLinkMutation = { disableAssetFilePublicLink: { id: string, publicLinkUrl: string | null } };
+
+export type EnableAssetFilePublicLinkMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type EnableAssetFilePublicLinkMutation = { enableAssetFilePublicLink: { id: string, publicLinkUrl: string | null } };
+
+export type GetAssetFileQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetAssetFileQuery = { assetFile: { createdBy: string | null, createdDate: any, description: string | null, downloadUrl: string, environmentId: any, format: string | null, generatedByAgentSource: number | null, generatedFromPrompt: string | null, id: string, lastModifiedBy: string | null, lastModifiedDate: any, metadataJson: string | null, mimeType: string, name: string, publicLinkUrl: string | null, sizeBytes: any, source: Types.AssetFileSource, tags: Array<{ id: string, name: string }> } | null };
+
+export type GetAssetFileTagsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type GetAssetFileTagsQuery = { assetFileTags: Array<{ id: string, name: string }> };
+
+export type GetAssetFileTextContentQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetAssetFileTextContentQuery = { assetFileTextContent: string | null };
+
+export type GetAssetFileVersionsQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetAssetFileVersionsQuery = { assetFileVersions: Array<{ createdBy: string | null, createdDate: any, id: string, mimeType: string, sizeBytes: any, versionNumber: number }> };
+
+export type GetAssetFilesQueryVariables = Exact<{
+  workspaceId: string | number;
+  environment?: number | null | undefined;
+  tagIds?: Array<string | number> | string | number | null | undefined;
+  mimeTypePrefix?: string | null | undefined;
+}>;
+
+
+export type GetAssetFilesQuery = { assetFiles: Array<{ createdBy: string | null, createdDate: any, description: string | null, downloadUrl: string, environmentId: any, format: string | null, generatedByAgentSource: number | null, generatedFromPrompt: string | null, id: string, lastModifiedBy: string | null, lastModifiedDate: any, metadataJson: string | null, mimeType: string, name: string, publicLinkUrl: string | null, sizeBytes: any, source: Types.AssetFileSource, tags: Array<{ id: string, name: string }> }> };
+
+export type RestoreAssetFileVersionMutationVariables = Exact<{
+  id: string | number;
+  versionId: string | number;
+}>;
+
+
+export type RestoreAssetFileVersionMutation = { restoreAssetFileVersion: { id: string, lastModifiedDate: any, mimeType: string, name: string, sizeBytes: any } };
+
+export type UpdateAssetFileMutationVariables = Exact<{
+  input: Types.UpdateAssetFileInput;
+}>;
+
+
+export type UpdateAssetFileMutation = { updateAssetFile: { createdBy: string | null, createdDate: any, description: string | null, downloadUrl: string, id: string, lastModifiedBy: string | null, lastModifiedDate: any, mimeType: string, name: string, sizeBytes: any, source: Types.AssetFileSource } };
+
+export type UpdateAssetFileTagsMutationVariables = Exact<{
+  input: Types.UpdateAssetFileTagsInput;
+}>;
+
+
+export type UpdateAssetFileTagsMutation = { updateAssetFileTags: { id: string, tags: Array<{ id: string, name: string }> } };
+
+export type UpdateAssetFileTextContentMutationVariables = Exact<{
+  id: string | number;
+  content: string;
+}>;
+
+
+export type UpdateAssetFileTextContentMutation = { updateAssetFileTextContent: { id: string, lastModifiedDate: any, sizeBytes: any } };
+
 export type A2aEligibleProjectVersionWorkflowsQueryVariables = Exact<{
   projectId: string | number;
   projectVersion: number;
@@ -1119,6 +1208,7 @@ export type AutomationSearchQueryVariables = Exact<{
 export type AutomationSearchQuery = { automationSearch: Array<
     | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { collectionId: string, path: string | null, id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
     | { knowledgeBaseId: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
@@ -4016,6 +4106,342 @@ export const useUpdateApprovalTaskMutation = <
       {
     mutationKey: ['updateApprovalTask'],
     mutationFn: (variables?: UpdateApprovalTaskMutationVariables) => fetcher<UpdateApprovalTaskMutation, UpdateApprovalTaskMutationVariables>(UpdateApprovalTaskDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAssetFileDocument = new TypedDocumentString(`
+    mutation DeleteAssetFile($id: ID!) {
+  deleteAssetFile(id: $id)
+}
+    `);
+
+export const useDeleteAssetFileMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAssetFileMutation, TError, DeleteAssetFileMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAssetFileMutation, TError, DeleteAssetFileMutationVariables, TContext>(
+      {
+    mutationKey: ['DeleteAssetFile'],
+    mutationFn: (variables?: DeleteAssetFileMutationVariables) => fetcher<DeleteAssetFileMutation, DeleteAssetFileMutationVariables>(DeleteAssetFileDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DisableAssetFilePublicLinkDocument = new TypedDocumentString(`
+    mutation DisableAssetFilePublicLink($id: ID!) {
+  disableAssetFilePublicLink(id: $id) {
+    id
+    publicLinkUrl
+  }
+}
+    `);
+
+export const useDisableAssetFilePublicLinkMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DisableAssetFilePublicLinkMutation, TError, DisableAssetFilePublicLinkMutationVariables, TContext>) => {
+    
+    return useMutation<DisableAssetFilePublicLinkMutation, TError, DisableAssetFilePublicLinkMutationVariables, TContext>(
+      {
+    mutationKey: ['DisableAssetFilePublicLink'],
+    mutationFn: (variables?: DisableAssetFilePublicLinkMutationVariables) => fetcher<DisableAssetFilePublicLinkMutation, DisableAssetFilePublicLinkMutationVariables>(DisableAssetFilePublicLinkDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableAssetFilePublicLinkDocument = new TypedDocumentString(`
+    mutation EnableAssetFilePublicLink($id: ID!) {
+  enableAssetFilePublicLink(id: $id) {
+    id
+    publicLinkUrl
+  }
+}
+    `);
+
+export const useEnableAssetFilePublicLinkMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableAssetFilePublicLinkMutation, TError, EnableAssetFilePublicLinkMutationVariables, TContext>) => {
+    
+    return useMutation<EnableAssetFilePublicLinkMutation, TError, EnableAssetFilePublicLinkMutationVariables, TContext>(
+      {
+    mutationKey: ['EnableAssetFilePublicLink'],
+    mutationFn: (variables?: EnableAssetFilePublicLinkMutationVariables) => fetcher<EnableAssetFilePublicLinkMutation, EnableAssetFilePublicLinkMutationVariables>(EnableAssetFilePublicLinkDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GetAssetFileDocument = new TypedDocumentString(`
+    query GetAssetFile($id: ID!) {
+  assetFile(id: $id) {
+    createdBy
+    createdDate
+    description
+    downloadUrl
+    environmentId
+    format
+    generatedByAgentSource
+    generatedFromPrompt
+    id
+    lastModifiedBy
+    lastModifiedDate
+    metadataJson
+    mimeType
+    name
+    publicLinkUrl
+    sizeBytes
+    source
+    tags {
+      id
+      name
+    }
+  }
+}
+    `);
+
+export const useGetAssetFileQuery = <
+      TData = GetAssetFileQuery,
+      TError = unknown
+    >(
+      variables: GetAssetFileQueryVariables,
+      options?: Omit<UseQueryOptions<GetAssetFileQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAssetFileQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetAssetFileQuery, TError, TData>(
+      {
+    queryKey: ['GetAssetFile', variables],
+    queryFn: fetcher<GetAssetFileQuery, GetAssetFileQueryVariables>(GetAssetFileDocument, variables),
+    ...options
+  }
+    )};
+
+export const GetAssetFileTagsDocument = new TypedDocumentString(`
+    query GetAssetFileTags($workspaceId: ID!) {
+  assetFileTags(workspaceId: $workspaceId) {
+    id
+    name
+  }
+}
+    `);
+
+export const useGetAssetFileTagsQuery = <
+      TData = GetAssetFileTagsQuery,
+      TError = unknown
+    >(
+      variables: GetAssetFileTagsQueryVariables,
+      options?: Omit<UseQueryOptions<GetAssetFileTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAssetFileTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetAssetFileTagsQuery, TError, TData>(
+      {
+    queryKey: ['GetAssetFileTags', variables],
+    queryFn: fetcher<GetAssetFileTagsQuery, GetAssetFileTagsQueryVariables>(GetAssetFileTagsDocument, variables),
+    ...options
+  }
+    )};
+
+export const GetAssetFileTextContentDocument = new TypedDocumentString(`
+    query GetAssetFileTextContent($id: ID!) {
+  assetFileTextContent(id: $id)
+}
+    `);
+
+export const useGetAssetFileTextContentQuery = <
+      TData = GetAssetFileTextContentQuery,
+      TError = unknown
+    >(
+      variables: GetAssetFileTextContentQueryVariables,
+      options?: Omit<UseQueryOptions<GetAssetFileTextContentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAssetFileTextContentQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetAssetFileTextContentQuery, TError, TData>(
+      {
+    queryKey: ['GetAssetFileTextContent', variables],
+    queryFn: fetcher<GetAssetFileTextContentQuery, GetAssetFileTextContentQueryVariables>(GetAssetFileTextContentDocument, variables),
+    ...options
+  }
+    )};
+
+export const GetAssetFileVersionsDocument = new TypedDocumentString(`
+    query GetAssetFileVersions($id: ID!) {
+  assetFileVersions(id: $id) {
+    createdBy
+    createdDate
+    id
+    mimeType
+    sizeBytes
+    versionNumber
+  }
+}
+    `);
+
+export const useGetAssetFileVersionsQuery = <
+      TData = GetAssetFileVersionsQuery,
+      TError = unknown
+    >(
+      variables: GetAssetFileVersionsQueryVariables,
+      options?: Omit<UseQueryOptions<GetAssetFileVersionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAssetFileVersionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetAssetFileVersionsQuery, TError, TData>(
+      {
+    queryKey: ['GetAssetFileVersions', variables],
+    queryFn: fetcher<GetAssetFileVersionsQuery, GetAssetFileVersionsQueryVariables>(GetAssetFileVersionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const GetAssetFilesDocument = new TypedDocumentString(`
+    query GetAssetFiles($workspaceId: ID!, $environment: Int, $tagIds: [ID!], $mimeTypePrefix: String) {
+  assetFiles(
+    workspaceId: $workspaceId
+    environment: $environment
+    tagIds: $tagIds
+    mimeTypePrefix: $mimeTypePrefix
+  ) {
+    createdBy
+    createdDate
+    description
+    downloadUrl
+    environmentId
+    format
+    generatedByAgentSource
+    generatedFromPrompt
+    id
+    lastModifiedBy
+    lastModifiedDate
+    metadataJson
+    mimeType
+    name
+    publicLinkUrl
+    sizeBytes
+    source
+    tags {
+      id
+      name
+    }
+  }
+}
+    `);
+
+export const useGetAssetFilesQuery = <
+      TData = GetAssetFilesQuery,
+      TError = unknown
+    >(
+      variables: GetAssetFilesQueryVariables,
+      options?: Omit<UseQueryOptions<GetAssetFilesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAssetFilesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetAssetFilesQuery, TError, TData>(
+      {
+    queryKey: ['GetAssetFiles', variables],
+    queryFn: fetcher<GetAssetFilesQuery, GetAssetFilesQueryVariables>(GetAssetFilesDocument, variables),
+    ...options
+  }
+    )};
+
+export const RestoreAssetFileVersionDocument = new TypedDocumentString(`
+    mutation RestoreAssetFileVersion($id: ID!, $versionId: ID!) {
+  restoreAssetFileVersion(id: $id, versionId: $versionId) {
+    id
+    lastModifiedDate
+    mimeType
+    name
+    sizeBytes
+  }
+}
+    `);
+
+export const useRestoreAssetFileVersionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RestoreAssetFileVersionMutation, TError, RestoreAssetFileVersionMutationVariables, TContext>) => {
+    
+    return useMutation<RestoreAssetFileVersionMutation, TError, RestoreAssetFileVersionMutationVariables, TContext>(
+      {
+    mutationKey: ['RestoreAssetFileVersion'],
+    mutationFn: (variables?: RestoreAssetFileVersionMutationVariables) => fetcher<RestoreAssetFileVersionMutation, RestoreAssetFileVersionMutationVariables>(RestoreAssetFileVersionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAssetFileDocument = new TypedDocumentString(`
+    mutation UpdateAssetFile($input: UpdateAssetFileInput!) {
+  updateAssetFile(input: $input) {
+    createdBy
+    createdDate
+    description
+    downloadUrl
+    id
+    lastModifiedBy
+    lastModifiedDate
+    mimeType
+    name
+    sizeBytes
+    source
+  }
+}
+    `);
+
+export const useUpdateAssetFileMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAssetFileMutation, TError, UpdateAssetFileMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAssetFileMutation, TError, UpdateAssetFileMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateAssetFile'],
+    mutationFn: (variables?: UpdateAssetFileMutationVariables) => fetcher<UpdateAssetFileMutation, UpdateAssetFileMutationVariables>(UpdateAssetFileDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAssetFileTagsDocument = new TypedDocumentString(`
+    mutation UpdateAssetFileTags($input: UpdateAssetFileTagsInput!) {
+  updateAssetFileTags(input: $input) {
+    id
+    tags {
+      id
+      name
+    }
+  }
+}
+    `);
+
+export const useUpdateAssetFileTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAssetFileTagsMutation, TError, UpdateAssetFileTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAssetFileTagsMutation, TError, UpdateAssetFileTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateAssetFileTags'],
+    mutationFn: (variables?: UpdateAssetFileTagsMutationVariables) => fetcher<UpdateAssetFileTagsMutation, UpdateAssetFileTagsMutationVariables>(UpdateAssetFileTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAssetFileTextContentDocument = new TypedDocumentString(`
+    mutation UpdateAssetFileTextContent($id: ID!, $content: String!) {
+  updateAssetFileTextContent(id: $id, content: $content) {
+    id
+    lastModifiedDate
+    sizeBytes
+  }
+}
+    `);
+
+export const useUpdateAssetFileTextContentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAssetFileTextContentMutation, TError, UpdateAssetFileTextContentMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAssetFileTextContentMutation, TError, UpdateAssetFileTextContentMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateAssetFileTextContent'],
+    mutationFn: (variables?: UpdateAssetFileTextContentMutationVariables) => fetcher<UpdateAssetFileTextContentMutation, UpdateAssetFileTextContentMutationVariables>(UpdateAssetFileTextContentDocument, variables)(),
     ...options
   }
     )};
