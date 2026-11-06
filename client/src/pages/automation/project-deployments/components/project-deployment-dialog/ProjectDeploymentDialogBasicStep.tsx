@@ -408,7 +408,7 @@ const ProjectDeploymentDialogBasicStep = ({
 
                                                         return (
                                                             <SelectItem
-                                                                className="*:[span]:last:w-full"
+                                                                className="pr-2 *:[span]:first:hidden *:[span]:last:w-full"
                                                                 key={
                                                                     deployment.id?.toString() ??
                                                                     `${deployment.name ?? 'deployment'}-${deployment.projectVersion}`
