@@ -1,0 +1,17 @@
+extend type Query {
+    workspaceSystemPrompt(workspaceId: ID!): WorkspaceSystemPrompt
+}
+
+extend type Mutation {
+    updateWorkspaceSystemPrompt(input: WorkspaceSystemPromptInput!): WorkspaceSystemPrompt
+}
+
+type WorkspaceSystemPrompt {
+    workspaceId: ID!
+    prompt: String!
+}
+
+input WorkspaceSystemPromptInput {
+    workspaceId: ID!
+    prompt: String
+}

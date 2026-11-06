@@ -325,6 +325,8 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-opennlp"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-workspace"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-workspace-prompt:platform-ai-workspace-prompt-graphql"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-workspace-prompt:platform-ai-workspace-prompt-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-service"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-service"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-file-storage:platform-ai-skill-file-storage-impl"))
