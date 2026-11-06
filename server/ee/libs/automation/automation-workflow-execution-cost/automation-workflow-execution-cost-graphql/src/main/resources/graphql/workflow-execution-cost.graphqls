@@ -1,0 +1,12 @@
+extend type Query {
+    workflowExecutionCost(jobId: ID!): WorkflowExecutionCost
+}
+
+type WorkflowExecutionCost {
+    id: ID!
+    jobId: ID!
+    baseRunCharge: Float!
+    aiCost: Float!
+    totalCost: Float!
+    currency: String!
+}
