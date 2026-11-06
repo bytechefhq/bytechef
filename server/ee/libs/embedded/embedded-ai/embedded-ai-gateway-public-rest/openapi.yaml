@@ -1,0 +1,340 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Embedded AI Gateway Public V1 API"
+  version: "1"
+  description: >-
+    The embedded surface's own chat-completion endpoint. It is deliberately disjoint from the automation gateway's
+    /api/ai-gateway/v1/chat/completions: the connected user is taken from the authenticated principal and verified
+    against the {externalUserId} path parameter, never from a caller-settable header. An unknown or disabled
+    connected user is rejected and is never auto-created.
+servers:
+  - url: "/api/embedded/v1"
+tags:
+  - name: "chat-completion"
+    description: "The Embedded AI Gateway Chat Completion Public API"
+paths:
+  /{externalUserId}/ai-gateway/chat/completions:
+    post:
+      description: >-
+        Create a chat completion for a connected user. The response shape is selected by the Accept header, NOT by the
+        `stream` request field: send `Accept: application/json` for a single JSON response, or
+        `Accept: text/event-stream` for a Server-Sent Events stream. This differs from the automation gateway, whose
+        spec documents `stream=true` switching the response to SSE on an otherwise identical request. Here the two are
+        separate Spring mappings with disjoint `produces` conditions, so `stream: true` sent with
+        `Accept: application/json` is rejected with 400 rather than silently answered as a single JSON body.
+      summary: "Create a chat completion for a connected user"
+      tags:
+        - "chat-completion"
+      operationId: "chatCompletions"
+      parameters:
+        - name: "externalUserId"
+          in: "path"
+          required: true
+          description: >-
+            The connected user's external id. It must match the authenticated principal's own identity; addressing
+            another customer's external id is rejected with 403.
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatCompletionRequest"
+        required: true
+      responses:
+        "200":
+          description: >-
+            The chat completion. Returned as a single JSON object for `Accept: application/json`, or as a stream of
+            SSE frames for `Accept: text/event-stream`. The streaming schema below is the `data` of one frame: a
+            normal frame carries a ChatCompletionResponse, and a failure that occurs after the stream has opened
+            arrives as a frame with `event: error` whose data is a StreamErrorChunk instead. The x-gateway-* headers below are emitted on the JSON response only, and each is omitted
+            when the gateway did not populate it.
+          headers:
+            x-gateway-provider:
+              description: "Resolved provider name (e.g. openai, anthropic)"
+              schema: {type: "string"}
+            x-gateway-model:
+              description: "Model that actually served the request after routing"
+              schema: {type: "string"}
+            x-gateway-latency-ms:
+              description: "Gateway-observed end-to-end latency in milliseconds"
+              schema: {type: "integer"}
+            x-gateway-cache-hit:
+              description: "true when the response came from the request cache"
+              schema: {type: "boolean"}
+            x-gateway-routing-policy:
+              description: "Routing policy name or ID that selected the provider/model"
+              schema: {type: "string"}
+            x-gateway-request-id:
+              description: "Opaque request correlation ID"
+              schema: {type: "string"}
+            x-gateway-budget-warning:
+              description: "Remaining USD budget when the connected user has crossed the soft warning threshold"
+              schema: {type: "string"}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatCompletionResponse"
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/ChatCompletionResponse"
+        "400":
+          description: >-
+            Invalid request. `model` missing or blank, `messages` missing or empty, a `tool_choice` that is neither a
+            string nor an object carrying `function.name`, or `stream: true` sent without
+            `Accept: text/event-stream`. Error `type` is `invalid_request_error`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "402":
+          description: >-
+            Budget hard limit reached. The error object additionally carries `budgetUsd` and `spentUsd` when the
+            gateway knows them. Error `type` is `budget_exceeded`. Clients should surface a billing flow, not a retry.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: >-
+            The authenticated principal does not match `externalUserId`, or that external id resolves to no connected
+            user, or to one that is disabled. These three cases are deliberately indistinguishable to the caller, and
+            none of them creates a connected user.
+        "422":
+          description: "A guardrail rejected the request or the model's response."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          description: >-
+            Rate limit exceeded. Carries a Retry-After header, in seconds, holding the limiter's window reset.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "502":
+          description: "The upstream model provider returned an error."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "504":
+          description: "The upstream model provider did not respond in time."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    ChatCompletionRequest:
+      description: >-
+        A chat completion request. Field-for-field the same OpenAI-compatible shape the automation gateway accepts;
+        the two are kept in step by hand, not by a shared generated model.
+      type: "object"
+      required:
+        - "model"
+        - "messages"
+      properties:
+        model:
+          description: "The model to use in provider/model format."
+          type: "string"
+        messages:
+          description: "The messages to generate chat completions for. Must not be empty."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+        temperature:
+          description: "Sampling temperature between 0 and 2."
+          type: "number"
+          format: "double"
+        max_tokens:
+          description: "Maximum number of tokens to generate."
+          type: "integer"
+        top_p:
+          description: "Nucleus sampling parameter."
+          type: "number"
+          format: "double"
+        stream:
+          description: >-
+            Whether the caller intends to stream. It does NOT select the response shape -- the Accept header does.
+            Sending true without `Accept: text/event-stream` is a 400. Omitted is treated as false.
+          type: "boolean"
+          default: false
+        routing_policy:
+          description: >-
+            The name of the routing policy to use. When omitted, the connected user's default routing policy applies,
+            falling back to the embedded default for the environment.
+          type: "string"
+        cache:
+          description: "Whether to enable response caching."
+          type: "boolean"
+        tool_choice:
+          description: >-
+            Controls which tool is called by the model. Either a bare string ("auto", "none", "required") or an object
+            of the form {"type": "function", "function": {"name": "..."}}. Any other shape is a 400. Typed as object
+            rather than a oneOf because openapi-generator renders a oneOf as an empty marker interface that nothing
+            can implement; the generated field is a raw Object, which accepts both shapes.
+          type: "object"
+        tools:
+          description: "A list of tools the model may call."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tool"
+        tags:
+          description: "Custom tags for the request."
+          type: "object"
+          additionalProperties:
+            type: "string"
+    ChatMessage:
+      description: "A chat message."
+      type: "object"
+      properties:
+        role:
+          description: "The role of the message author."
+          type: "string"
+        content:
+          description: "The content of the message."
+          type: "string"
+        tool_calls:
+          description: "Tool calls generated by the model."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ToolCall"
+        tool_call_id:
+          description: "The ID of the tool call this message is responding to."
+          type: "string"
+        content_blocks:
+          description: "Multimodal content blocks."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ContentBlock"
+    ContentBlock:
+      description: "A content block for multimodal messages."
+      type: "object"
+      properties:
+        type:
+          description: "The type of content block."
+          type: "string"
+        text:
+          description: "The text content."
+          type: "string"
+        image_url:
+          description: "The image URL."
+          type: "object"
+          properties:
+            url:
+              type: "string"
+            detail:
+              type: "string"
+    Tool:
+      description: "A tool the model may call."
+      type: "object"
+      properties:
+        type:
+          description: "The type of the tool."
+          type: "string"
+        function:
+          description: "The function definition."
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            description:
+              type: "string"
+            parameters:
+              type: "object"
+    ToolCall:
+      description: "A tool call generated by the model."
+      type: "object"
+      properties:
+        id:
+          description: "The ID of the tool call."
+          type: "string"
+        type:
+          description: "The type of the tool call."
+          type: "string"
+        function:
+          description: "The function the model called."
+          type: "object"
+          properties:
+            name:
+              type: "string"
+            arguments:
+              type: "string"
+    ChatCompletionResponse:
+      description: >-
+        A chat completion response. The gateway's own routing metadata is NOT part of this body -- it is emitted as
+        x-gateway-* response headers instead.
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        object:
+          type: "string"
+        created:
+          type: "integer"
+          format: "int64"
+        model:
+          type: "string"
+        choices:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Choice"
+        usage:
+          $ref: "#/components/schemas/Usage"
+    Choice:
+      description: "A chat completion choice."
+      type: "object"
+      properties:
+        index:
+          type: "integer"
+        message:
+          $ref: "#/components/schemas/ChatMessage"
+        finish_reason:
+          type: "string"
+    Usage:
+      description: "Token usage information."
+      type: "object"
+      properties:
+        prompt_tokens:
+          type: "integer"
+          format: "int64"
+        completion_tokens:
+          type: "integer"
+          format: "int64"
+        total_tokens:
+          type: "integer"
+          format: "int64"
+    StreamErrorChunk:
+      description: >-
+        The data of an SSE frame whose event is "error". Sent when a request fails after the stream has already
+        opened, so the failure cannot be reported as an HTTP status. Identity and connected-user rejections happen
+        before the stream opens and arrive as a real 403 instead.
+      type: "object"
+      properties:
+        type:
+          description: >-
+            "budget_exceeded" for a budget hard limit, otherwise the simple class name of the underlying exception.
+          type: "string"
+        message:
+          type: "string"
+    Error:
+      description: "The error envelope shared by every non-2xx JSON response."
+      type: "object"
+      properties:
+        error:
+          type: "object"
+          properties:
+            type:
+              description: "A stable machine-readable error type, e.g. invalid_request_error or budget_exceeded."
+              type: "string"
+            message:
+              type: "string"
+            budgetUsd:
+              description: "Present on 402 only, when known."
+              type: "number"
+            spentUsd:
+              description: "Present on 402 only, when known."
+              type: "number"
