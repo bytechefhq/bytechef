@@ -617,6 +617,213 @@ export type UnpinAiModelMutationVariables = Exact<{
 
 export type UnpinAiModelMutation = { unpinAiModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
 
+export type AiObservabilityAlertEventsQueryVariables = Exact<{
+  alertRuleId: string | number;
+}>;
+
+
+export type AiObservabilityAlertEventsQuery = { aiObservabilityAlertEvents: Array<{ alertRuleId: string, createdDate: any, id: string, message: string | null, status: Types.AiObservabilityAlertEventStatus, triggeredValue: number | null } | null> | null };
+
+export type AcknowledgeAiObservabilityAlertEventMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AcknowledgeAiObservabilityAlertEventMutation = { acknowledgeAiObservabilityAlertEvent: { alertRuleId: string, createdDate: any, id: string, message: string | null, status: Types.AiObservabilityAlertEventStatus, triggeredValue: number | null } | null };
+
+export type AiObservabilityAlertRulesQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiObservabilityAlertRulesQuery = { aiObservabilityAlertRules: Array<{ notificationIds: Array<string | null> | null, condition: Types.AiObservabilityAlertCondition, cooldownMinutes: number, createdDate: any, enabled: boolean, filters: string | null, id: string, lastModifiedDate: any, metric: Types.AiObservabilityAlertMetric, name: string, projectId: string | null, snoozedUntil: any, threshold: number, version: number | null, windowMinutes: number } | null> | null };
+
+export type AiObservabilityAlertRuleQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiObservabilityAlertRuleQuery = { aiObservabilityAlertRule: { notificationIds: Array<string | null> | null, condition: Types.AiObservabilityAlertCondition, cooldownMinutes: number, createdDate: any, enabled: boolean, filters: string | null, id: string, lastModifiedDate: any, metric: Types.AiObservabilityAlertMetric, name: string, projectId: string | null, snoozedUntil: any, threshold: number, version: number | null, windowMinutes: number } | null };
+
+export type CreateAiObservabilityAlertRuleMutationVariables = Exact<{
+  input: Types.AiObservabilityAlertRuleInput;
+}>;
+
+
+export type CreateAiObservabilityAlertRuleMutation = { createAiObservabilityAlertRule: { notificationIds: Array<string | null> | null, condition: Types.AiObservabilityAlertCondition, cooldownMinutes: number, createdDate: any, enabled: boolean, filters: string | null, id: string, lastModifiedDate: any, metric: Types.AiObservabilityAlertMetric, name: string, projectId: string | null, threshold: number, version: number | null, windowMinutes: number } | null };
+
+export type UpdateAiObservabilityAlertRuleMutationVariables = Exact<{
+  id: string | number;
+  input: Types.AiObservabilityAlertRuleInput;
+}>;
+
+
+export type UpdateAiObservabilityAlertRuleMutation = { updateAiObservabilityAlertRule: { notificationIds: Array<string | null> | null, condition: Types.AiObservabilityAlertCondition, cooldownMinutes: number, createdDate: any, enabled: boolean, filters: string | null, id: string, lastModifiedDate: any, metric: Types.AiObservabilityAlertMetric, name: string, projectId: string | null, threshold: number, version: number | null, windowMinutes: number } | null };
+
+export type DeleteAiObservabilityAlertRuleMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiObservabilityAlertRuleMutation = { deleteAiObservabilityAlertRule: boolean | null };
+
+export type TestAiObservabilityAlertRuleMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type TestAiObservabilityAlertRuleMutation = { testAiObservabilityAlertRule: number | null };
+
+export type SnoozeAiObservabilityAlertRuleMutationVariables = Exact<{
+  id: string | number;
+  until: any;
+}>;
+
+
+export type SnoozeAiObservabilityAlertRuleMutation = { snoozeAiObservabilityAlertRule: { id: string, snoozedUntil: any } | null };
+
+export type UnsnoozeAiObservabilityAlertRuleMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type UnsnoozeAiObservabilityAlertRuleMutation = { unsnoozeAiObservabilityAlertRule: { id: string, snoozedUntil: any } | null };
+
+export type AiObservabilityExportJobsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiObservabilityExportJobsQuery = { aiObservabilityExportJobs: Array<{ createdBy: string, createdDate: any, errorMessage: string | null, filePath: string | null, filters: string | null, format: Types.AiObservabilityExportFormat, id: string, projectId: string | null, recordCount: number | null, scope: Types.AiObservabilityExportScope, status: Types.AiObservabilityExportJobStatus, type: Types.AiObservabilityExportJobType } | null> | null };
+
+export type AiObservabilityExportJobQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiObservabilityExportJobQuery = { aiObservabilityExportJob: { createdBy: string, createdDate: any, errorMessage: string | null, filePath: string | null, filters: string | null, format: Types.AiObservabilityExportFormat, id: string, projectId: string | null, recordCount: number | null, scope: Types.AiObservabilityExportScope, status: Types.AiObservabilityExportJobStatus, type: Types.AiObservabilityExportJobType } | null };
+
+export type CreateAiObservabilityExportJobMutationVariables = Exact<{
+  workspaceId: string | number;
+  projectId?: string | number | null | undefined;
+  format: Types.AiObservabilityExportFormat;
+  scope: Types.AiObservabilityExportScope;
+  filters?: string | null | undefined;
+}>;
+
+
+export type CreateAiObservabilityExportJobMutation = { createAiObservabilityExportJob: { createdBy: string, createdDate: any, format: Types.AiObservabilityExportFormat, id: string, scope: Types.AiObservabilityExportScope, status: Types.AiObservabilityExportJobStatus, type: Types.AiObservabilityExportJobType } | null };
+
+export type CancelAiObservabilityExportJobMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type CancelAiObservabilityExportJobMutation = { cancelAiObservabilityExportJob: { id: string, status: Types.AiObservabilityExportJobStatus } | null };
+
+export type AiObservabilitySessionsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiObservabilitySessionsQuery = { aiObservabilitySessions: Array<{ createdDate: any, id: string, lastModifiedDate: any, name: string | null, projectId: string | null, traceCount: number | null, userId: string | null, version: number | null, workspaceId: string } | null> | null };
+
+export type AiObservabilitySessionQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiObservabilitySessionQuery = { aiObservabilitySession: { createdDate: any, id: string, lastModifiedDate: any, name: string | null, projectId: string | null, userId: string | null, version: number | null, workspaceId: string, traces: Array<{ createdDate: any, id: string, name: string | null, source: Types.AiObservabilityTraceSource, status: Types.AiObservabilityTraceStatus, totalCost: number | null, totalInputTokens: number | null, totalLatencyMs: number | null, totalOutputTokens: number | null, userId: string | null } | null> | null } | null };
+
+export type AiObservabilityTracesQueryVariables = Exact<{
+  endDate: any;
+  model?: string | null | undefined;
+  source?: Types.AiObservabilityTraceSource | null | undefined;
+  startDate: any;
+  status?: Types.AiObservabilityTraceStatus | null | undefined;
+  tagId?: string | number | null | undefined;
+  userId?: string | null | undefined;
+  workspaceId: string | number;
+}>;
+
+
+export type AiObservabilityTracesQuery = { aiObservabilityTraces: Array<{ createdDate: any, id: string, input: string | null, lastModifiedDate: any, metadata: string | null, name: string | null, output: string | null, projectId: string | null, sessionId: string | null, source: Types.AiObservabilityTraceSource, status: Types.AiObservabilityTraceStatus, totalCost: number | null, totalInputTokens: number | null, totalLatencyMs: number | null, totalOutputTokens: number | null, userId: string | null, version: number | null, workspaceId: string } | null> | null };
+
+export type AiObservabilityTraceQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiObservabilityTraceQuery = { aiObservabilityTrace: { createdDate: any, id: string, input: string | null, lastModifiedDate: any, metadata: string | null, name: string | null, output: string | null, projectId: string | null, sessionId: string | null, source: Types.AiObservabilityTraceSource, status: Types.AiObservabilityTraceStatus, tagIds: Array<string> | null, totalCost: number | null, totalInputTokens: number | null, totalLatencyMs: number | null, totalOutputTokens: number | null, userId: string | null, version: number | null, workspaceId: string, spans: Array<{ cost: number | null, createdDate: any, endTime: any, id: string, input: string | null, inputTokens: number | null, latencyMs: number | null, level: Types.AiObservabilitySpanLevel, metadata: string | null, model: string | null, name: string | null, output: string | null, outputTokens: number | null, parentSpanId: string | null, provider: string | null, startTime: any, status: Types.AiObservabilitySpanStatus, traceId: string, type: Types.AiObservabilitySpanType, version: number | null } | null> | null } | null };
+
+export type SetAiObservabilityTraceTagsMutationVariables = Exact<{
+  traceId: string | number;
+  tagIds: Array<string | number> | string | number;
+}>;
+
+
+export type SetAiObservabilityTraceTagsMutation = { setAiObservabilityTraceTags: { id: string, tagIds: Array<string> | null } | null };
+
+export type AiObservabilityWebhookDeliveriesQueryVariables = Exact<{
+  subscriptionId: string | number;
+}>;
+
+
+export type AiObservabilityWebhookDeliveriesQuery = { aiObservabilityWebhookDeliveries: Array<{ attemptCount: number, createdDate: any, deliveredDate: any, errorMessage: string | null, eventType: string | null, httpStatus: number | null, id: string, status: Types.AiObservabilityWebhookDeliveryStatus, subscriptionId: string } | null> | null };
+
+export type AiObservabilityWebhookSubscriptionsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiObservabilityWebhookSubscriptionsQuery = { aiObservabilityWebhookSubscriptions: Array<{ createdDate: any, enabled: boolean, events: string, id: string, lastModifiedDate: any, lastTriggeredDate: any, name: string, projectId: string | null, url: string, version: number | null } | null> | null };
+
+export type AiObservabilityWebhookSubscriptionQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiObservabilityWebhookSubscriptionQuery = { aiObservabilityWebhookSubscription: { createdDate: any, enabled: boolean, events: string, id: string, lastModifiedDate: any, lastTriggeredDate: any, name: string, projectId: string | null, url: string, version: number | null } | null };
+
+export type CreateAiObservabilityWebhookSubscriptionMutationVariables = Exact<{
+  workspaceId: string | number;
+  projectId?: string | number | null | undefined;
+  name: string;
+  url: string;
+  secret?: string | null | undefined;
+  events: string;
+  enabled: boolean;
+}>;
+
+
+export type CreateAiObservabilityWebhookSubscriptionMutation = { createAiObservabilityWebhookSubscription: { createdDate: any, enabled: boolean, events: string, id: string, name: string, url: string, version: number | null } | null };
+
+export type UpdateAiObservabilityWebhookSubscriptionMutationVariables = Exact<{
+  id: string | number;
+  name: string;
+  url: string;
+  secret?: string | null | undefined;
+  events: string;
+  enabled: boolean;
+}>;
+
+
+export type UpdateAiObservabilityWebhookSubscriptionMutation = { updateAiObservabilityWebhookSubscription: { createdDate: any, enabled: boolean, events: string, id: string, name: string, url: string, version: number | null } | null };
+
+export type DeleteAiObservabilityWebhookSubscriptionMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiObservabilityWebhookSubscriptionMutation = { deleteAiObservabilityWebhookSubscription: boolean | null };
+
+export type TestAiObservabilityWebhookSubscriptionMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type TestAiObservabilityWebhookSubscriptionMutation = { testAiObservabilityWebhookSubscription: boolean | null };
+
 export type WorkspaceAiGatewayProvidersQueryVariables = Exact<{
   workspaceId: string | number;
 }>;
@@ -5251,6 +5458,828 @@ export const useUnpinAiModelMutation = <
       {
     mutationKey: ['unpinAiModel'],
     mutationFn: (variables?: UnpinAiModelMutationVariables) => fetcher<UnpinAiModelMutation, UnpinAiModelMutationVariables>(UnpinAiModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiObservabilityAlertEventsDocument = new TypedDocumentString(`
+    query aiObservabilityAlertEvents($alertRuleId: ID!) {
+  aiObservabilityAlertEvents(alertRuleId: $alertRuleId) {
+    alertRuleId
+    createdDate
+    id
+    message
+    status
+    triggeredValue
+  }
+}
+    `);
+
+export const useAiObservabilityAlertEventsQuery = <
+      TData = AiObservabilityAlertEventsQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityAlertEventsQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityAlertEventsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityAlertEventsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityAlertEventsQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityAlertEvents', variables],
+    queryFn: fetcher<AiObservabilityAlertEventsQuery, AiObservabilityAlertEventsQueryVariables>(AiObservabilityAlertEventsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AcknowledgeAiObservabilityAlertEventDocument = new TypedDocumentString(`
+    mutation acknowledgeAiObservabilityAlertEvent($id: ID!) {
+  acknowledgeAiObservabilityAlertEvent(id: $id) {
+    alertRuleId
+    createdDate
+    id
+    message
+    status
+    triggeredValue
+  }
+}
+    `);
+
+export const useAcknowledgeAiObservabilityAlertEventMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AcknowledgeAiObservabilityAlertEventMutation, TError, AcknowledgeAiObservabilityAlertEventMutationVariables, TContext>) => {
+    
+    return useMutation<AcknowledgeAiObservabilityAlertEventMutation, TError, AcknowledgeAiObservabilityAlertEventMutationVariables, TContext>(
+      {
+    mutationKey: ['acknowledgeAiObservabilityAlertEvent'],
+    mutationFn: (variables?: AcknowledgeAiObservabilityAlertEventMutationVariables) => fetcher<AcknowledgeAiObservabilityAlertEventMutation, AcknowledgeAiObservabilityAlertEventMutationVariables>(AcknowledgeAiObservabilityAlertEventDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiObservabilityAlertRulesDocument = new TypedDocumentString(`
+    query aiObservabilityAlertRules($workspaceId: ID!) {
+  aiObservabilityAlertRules(workspaceId: $workspaceId) {
+    notificationIds
+    condition
+    cooldownMinutes
+    createdDate
+    enabled
+    filters
+    id
+    lastModifiedDate
+    metric
+    name
+    projectId
+    snoozedUntil
+    threshold
+    version
+    windowMinutes
+  }
+}
+    `);
+
+export const useAiObservabilityAlertRulesQuery = <
+      TData = AiObservabilityAlertRulesQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityAlertRulesQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityAlertRulesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityAlertRulesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityAlertRulesQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityAlertRules', variables],
+    queryFn: fetcher<AiObservabilityAlertRulesQuery, AiObservabilityAlertRulesQueryVariables>(AiObservabilityAlertRulesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiObservabilityAlertRuleDocument = new TypedDocumentString(`
+    query aiObservabilityAlertRule($id: ID!) {
+  aiObservabilityAlertRule(id: $id) {
+    notificationIds
+    condition
+    cooldownMinutes
+    createdDate
+    enabled
+    filters
+    id
+    lastModifiedDate
+    metric
+    name
+    projectId
+    snoozedUntil
+    threshold
+    version
+    windowMinutes
+  }
+}
+    `);
+
+export const useAiObservabilityAlertRuleQuery = <
+      TData = AiObservabilityAlertRuleQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityAlertRuleQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityAlertRuleQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityAlertRuleQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityAlertRuleQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityAlertRule', variables],
+    queryFn: fetcher<AiObservabilityAlertRuleQuery, AiObservabilityAlertRuleQueryVariables>(AiObservabilityAlertRuleDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiObservabilityAlertRuleDocument = new TypedDocumentString(`
+    mutation createAiObservabilityAlertRule($input: AiObservabilityAlertRuleInput!) {
+  createAiObservabilityAlertRule(input: $input) {
+    notificationIds
+    condition
+    cooldownMinutes
+    createdDate
+    enabled
+    filters
+    id
+    lastModifiedDate
+    metric
+    name
+    projectId
+    threshold
+    version
+    windowMinutes
+  }
+}
+    `);
+
+export const useCreateAiObservabilityAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiObservabilityAlertRuleMutation, TError, CreateAiObservabilityAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiObservabilityAlertRuleMutation, TError, CreateAiObservabilityAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiObservabilityAlertRule'],
+    mutationFn: (variables?: CreateAiObservabilityAlertRuleMutationVariables) => fetcher<CreateAiObservabilityAlertRuleMutation, CreateAiObservabilityAlertRuleMutationVariables>(CreateAiObservabilityAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiObservabilityAlertRuleDocument = new TypedDocumentString(`
+    mutation updateAiObservabilityAlertRule($id: ID!, $input: AiObservabilityAlertRuleInput!) {
+  updateAiObservabilityAlertRule(id: $id, input: $input) {
+    notificationIds
+    condition
+    cooldownMinutes
+    createdDate
+    enabled
+    filters
+    id
+    lastModifiedDate
+    metric
+    name
+    projectId
+    threshold
+    version
+    windowMinutes
+  }
+}
+    `);
+
+export const useUpdateAiObservabilityAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiObservabilityAlertRuleMutation, TError, UpdateAiObservabilityAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiObservabilityAlertRuleMutation, TError, UpdateAiObservabilityAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiObservabilityAlertRule'],
+    mutationFn: (variables?: UpdateAiObservabilityAlertRuleMutationVariables) => fetcher<UpdateAiObservabilityAlertRuleMutation, UpdateAiObservabilityAlertRuleMutationVariables>(UpdateAiObservabilityAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiObservabilityAlertRuleDocument = new TypedDocumentString(`
+    mutation deleteAiObservabilityAlertRule($id: ID!) {
+  deleteAiObservabilityAlertRule(id: $id)
+}
+    `);
+
+export const useDeleteAiObservabilityAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiObservabilityAlertRuleMutation, TError, DeleteAiObservabilityAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiObservabilityAlertRuleMutation, TError, DeleteAiObservabilityAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiObservabilityAlertRule'],
+    mutationFn: (variables?: DeleteAiObservabilityAlertRuleMutationVariables) => fetcher<DeleteAiObservabilityAlertRuleMutation, DeleteAiObservabilityAlertRuleMutationVariables>(DeleteAiObservabilityAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const TestAiObservabilityAlertRuleDocument = new TypedDocumentString(`
+    mutation testAiObservabilityAlertRule($id: ID!) {
+  testAiObservabilityAlertRule(id: $id)
+}
+    `);
+
+export const useTestAiObservabilityAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TestAiObservabilityAlertRuleMutation, TError, TestAiObservabilityAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<TestAiObservabilityAlertRuleMutation, TError, TestAiObservabilityAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['testAiObservabilityAlertRule'],
+    mutationFn: (variables?: TestAiObservabilityAlertRuleMutationVariables) => fetcher<TestAiObservabilityAlertRuleMutation, TestAiObservabilityAlertRuleMutationVariables>(TestAiObservabilityAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SnoozeAiObservabilityAlertRuleDocument = new TypedDocumentString(`
+    mutation snoozeAiObservabilityAlertRule($id: ID!, $until: Long!) {
+  snoozeAiObservabilityAlertRule(id: $id, until: $until) {
+    id
+    snoozedUntil
+  }
+}
+    `);
+
+export const useSnoozeAiObservabilityAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SnoozeAiObservabilityAlertRuleMutation, TError, SnoozeAiObservabilityAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<SnoozeAiObservabilityAlertRuleMutation, TError, SnoozeAiObservabilityAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['snoozeAiObservabilityAlertRule'],
+    mutationFn: (variables?: SnoozeAiObservabilityAlertRuleMutationVariables) => fetcher<SnoozeAiObservabilityAlertRuleMutation, SnoozeAiObservabilityAlertRuleMutationVariables>(SnoozeAiObservabilityAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnsnoozeAiObservabilityAlertRuleDocument = new TypedDocumentString(`
+    mutation unsnoozeAiObservabilityAlertRule($id: ID!) {
+  unsnoozeAiObservabilityAlertRule(id: $id) {
+    id
+    snoozedUntil
+  }
+}
+    `);
+
+export const useUnsnoozeAiObservabilityAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnsnoozeAiObservabilityAlertRuleMutation, TError, UnsnoozeAiObservabilityAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<UnsnoozeAiObservabilityAlertRuleMutation, TError, UnsnoozeAiObservabilityAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['unsnoozeAiObservabilityAlertRule'],
+    mutationFn: (variables?: UnsnoozeAiObservabilityAlertRuleMutationVariables) => fetcher<UnsnoozeAiObservabilityAlertRuleMutation, UnsnoozeAiObservabilityAlertRuleMutationVariables>(UnsnoozeAiObservabilityAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiObservabilityExportJobsDocument = new TypedDocumentString(`
+    query aiObservabilityExportJobs($workspaceId: ID!) {
+  aiObservabilityExportJobs(workspaceId: $workspaceId) {
+    createdBy
+    createdDate
+    errorMessage
+    filePath
+    filters
+    format
+    id
+    projectId
+    recordCount
+    scope
+    status
+    type
+  }
+}
+    `);
+
+export const useAiObservabilityExportJobsQuery = <
+      TData = AiObservabilityExportJobsQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityExportJobsQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityExportJobsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityExportJobsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityExportJobsQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityExportJobs', variables],
+    queryFn: fetcher<AiObservabilityExportJobsQuery, AiObservabilityExportJobsQueryVariables>(AiObservabilityExportJobsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiObservabilityExportJobDocument = new TypedDocumentString(`
+    query aiObservabilityExportJob($id: ID!) {
+  aiObservabilityExportJob(id: $id) {
+    createdBy
+    createdDate
+    errorMessage
+    filePath
+    filters
+    format
+    id
+    projectId
+    recordCount
+    scope
+    status
+    type
+  }
+}
+    `);
+
+export const useAiObservabilityExportJobQuery = <
+      TData = AiObservabilityExportJobQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityExportJobQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityExportJobQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityExportJobQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityExportJobQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityExportJob', variables],
+    queryFn: fetcher<AiObservabilityExportJobQuery, AiObservabilityExportJobQueryVariables>(AiObservabilityExportJobDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiObservabilityExportJobDocument = new TypedDocumentString(`
+    mutation createAiObservabilityExportJob($workspaceId: ID!, $projectId: ID, $format: AiObservabilityExportFormat!, $scope: AiObservabilityExportScope!, $filters: String) {
+  createAiObservabilityExportJob(
+    workspaceId: $workspaceId
+    projectId: $projectId
+    format: $format
+    scope: $scope
+    filters: $filters
+  ) {
+    createdBy
+    createdDate
+    format
+    id
+    scope
+    status
+    type
+  }
+}
+    `);
+
+export const useCreateAiObservabilityExportJobMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiObservabilityExportJobMutation, TError, CreateAiObservabilityExportJobMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiObservabilityExportJobMutation, TError, CreateAiObservabilityExportJobMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiObservabilityExportJob'],
+    mutationFn: (variables?: CreateAiObservabilityExportJobMutationVariables) => fetcher<CreateAiObservabilityExportJobMutation, CreateAiObservabilityExportJobMutationVariables>(CreateAiObservabilityExportJobDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CancelAiObservabilityExportJobDocument = new TypedDocumentString(`
+    mutation cancelAiObservabilityExportJob($id: ID!) {
+  cancelAiObservabilityExportJob(id: $id) {
+    id
+    status
+  }
+}
+    `);
+
+export const useCancelAiObservabilityExportJobMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CancelAiObservabilityExportJobMutation, TError, CancelAiObservabilityExportJobMutationVariables, TContext>) => {
+    
+    return useMutation<CancelAiObservabilityExportJobMutation, TError, CancelAiObservabilityExportJobMutationVariables, TContext>(
+      {
+    mutationKey: ['cancelAiObservabilityExportJob'],
+    mutationFn: (variables?: CancelAiObservabilityExportJobMutationVariables) => fetcher<CancelAiObservabilityExportJobMutation, CancelAiObservabilityExportJobMutationVariables>(CancelAiObservabilityExportJobDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiObservabilitySessionsDocument = new TypedDocumentString(`
+    query aiObservabilitySessions($workspaceId: ID!) {
+  aiObservabilitySessions(workspaceId: $workspaceId) {
+    createdDate
+    id
+    lastModifiedDate
+    name
+    projectId
+    traceCount
+    userId
+    version
+    workspaceId
+  }
+}
+    `);
+
+export const useAiObservabilitySessionsQuery = <
+      TData = AiObservabilitySessionsQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilitySessionsQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilitySessionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilitySessionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilitySessionsQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilitySessions', variables],
+    queryFn: fetcher<AiObservabilitySessionsQuery, AiObservabilitySessionsQueryVariables>(AiObservabilitySessionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiObservabilitySessionDocument = new TypedDocumentString(`
+    query aiObservabilitySession($id: ID!) {
+  aiObservabilitySession(id: $id) {
+    createdDate
+    id
+    lastModifiedDate
+    name
+    projectId
+    traces {
+      createdDate
+      id
+      name
+      source
+      status
+      totalCost
+      totalInputTokens
+      totalLatencyMs
+      totalOutputTokens
+      userId
+    }
+    userId
+    version
+    workspaceId
+  }
+}
+    `);
+
+export const useAiObservabilitySessionQuery = <
+      TData = AiObservabilitySessionQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilitySessionQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilitySessionQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilitySessionQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilitySessionQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilitySession', variables],
+    queryFn: fetcher<AiObservabilitySessionQuery, AiObservabilitySessionQueryVariables>(AiObservabilitySessionDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiObservabilityTracesDocument = new TypedDocumentString(`
+    query aiObservabilityTraces($endDate: Long!, $model: String, $source: AiObservabilityTraceSource, $startDate: Long!, $status: AiObservabilityTraceStatus, $tagId: ID, $userId: String, $workspaceId: ID!) {
+  aiObservabilityTraces(
+    endDate: $endDate
+    model: $model
+    source: $source
+    startDate: $startDate
+    status: $status
+    tagId: $tagId
+    userId: $userId
+    workspaceId: $workspaceId
+  ) {
+    createdDate
+    id
+    input
+    lastModifiedDate
+    metadata
+    name
+    output
+    projectId
+    sessionId
+    source
+    status
+    totalCost
+    totalInputTokens
+    totalLatencyMs
+    totalOutputTokens
+    userId
+    version
+    workspaceId
+  }
+}
+    `);
+
+export const useAiObservabilityTracesQuery = <
+      TData = AiObservabilityTracesQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityTracesQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityTracesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityTracesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityTracesQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityTraces', variables],
+    queryFn: fetcher<AiObservabilityTracesQuery, AiObservabilityTracesQueryVariables>(AiObservabilityTracesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiObservabilityTraceDocument = new TypedDocumentString(`
+    query aiObservabilityTrace($id: ID!) {
+  aiObservabilityTrace(id: $id) {
+    createdDate
+    id
+    input
+    lastModifiedDate
+    metadata
+    name
+    output
+    projectId
+    sessionId
+    source
+    spans {
+      cost
+      createdDate
+      endTime
+      id
+      input
+      inputTokens
+      latencyMs
+      level
+      metadata
+      model
+      name
+      output
+      outputTokens
+      parentSpanId
+      provider
+      startTime
+      status
+      traceId
+      type
+      version
+    }
+    status
+    tagIds
+    totalCost
+    totalInputTokens
+    totalLatencyMs
+    totalOutputTokens
+    userId
+    version
+    workspaceId
+  }
+}
+    `);
+
+export const useAiObservabilityTraceQuery = <
+      TData = AiObservabilityTraceQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityTraceQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityTraceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityTraceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityTraceQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityTrace', variables],
+    queryFn: fetcher<AiObservabilityTraceQuery, AiObservabilityTraceQueryVariables>(AiObservabilityTraceDocument, variables),
+    ...options
+  }
+    )};
+
+export const SetAiObservabilityTraceTagsDocument = new TypedDocumentString(`
+    mutation setAiObservabilityTraceTags($traceId: ID!, $tagIds: [ID!]!) {
+  setAiObservabilityTraceTags(traceId: $traceId, tagIds: $tagIds) {
+    id
+    tagIds
+  }
+}
+    `);
+
+export const useSetAiObservabilityTraceTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAiObservabilityTraceTagsMutation, TError, SetAiObservabilityTraceTagsMutationVariables, TContext>) => {
+    
+    return useMutation<SetAiObservabilityTraceTagsMutation, TError, SetAiObservabilityTraceTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['setAiObservabilityTraceTags'],
+    mutationFn: (variables?: SetAiObservabilityTraceTagsMutationVariables) => fetcher<SetAiObservabilityTraceTagsMutation, SetAiObservabilityTraceTagsMutationVariables>(SetAiObservabilityTraceTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiObservabilityWebhookDeliveriesDocument = new TypedDocumentString(`
+    query aiObservabilityWebhookDeliveries($subscriptionId: ID!) {
+  aiObservabilityWebhookDeliveries(subscriptionId: $subscriptionId) {
+    attemptCount
+    createdDate
+    deliveredDate
+    errorMessage
+    eventType
+    httpStatus
+    id
+    status
+    subscriptionId
+  }
+}
+    `);
+
+export const useAiObservabilityWebhookDeliveriesQuery = <
+      TData = AiObservabilityWebhookDeliveriesQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityWebhookDeliveriesQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityWebhookDeliveriesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityWebhookDeliveriesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityWebhookDeliveriesQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityWebhookDeliveries', variables],
+    queryFn: fetcher<AiObservabilityWebhookDeliveriesQuery, AiObservabilityWebhookDeliveriesQueryVariables>(AiObservabilityWebhookDeliveriesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiObservabilityWebhookSubscriptionsDocument = new TypedDocumentString(`
+    query aiObservabilityWebhookSubscriptions($workspaceId: ID!) {
+  aiObservabilityWebhookSubscriptions(workspaceId: $workspaceId) {
+    createdDate
+    enabled
+    events
+    id
+    lastModifiedDate
+    lastTriggeredDate
+    name
+    projectId
+    url
+    version
+  }
+}
+    `);
+
+export const useAiObservabilityWebhookSubscriptionsQuery = <
+      TData = AiObservabilityWebhookSubscriptionsQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityWebhookSubscriptionsQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityWebhookSubscriptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityWebhookSubscriptionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityWebhookSubscriptionsQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityWebhookSubscriptions', variables],
+    queryFn: fetcher<AiObservabilityWebhookSubscriptionsQuery, AiObservabilityWebhookSubscriptionsQueryVariables>(AiObservabilityWebhookSubscriptionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiObservabilityWebhookSubscriptionDocument = new TypedDocumentString(`
+    query aiObservabilityWebhookSubscription($id: ID!) {
+  aiObservabilityWebhookSubscription(id: $id) {
+    createdDate
+    enabled
+    events
+    id
+    lastModifiedDate
+    lastTriggeredDate
+    name
+    projectId
+    url
+    version
+  }
+}
+    `);
+
+export const useAiObservabilityWebhookSubscriptionQuery = <
+      TData = AiObservabilityWebhookSubscriptionQuery,
+      TError = unknown
+    >(
+      variables: AiObservabilityWebhookSubscriptionQueryVariables,
+      options?: Omit<UseQueryOptions<AiObservabilityWebhookSubscriptionQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiObservabilityWebhookSubscriptionQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiObservabilityWebhookSubscriptionQuery, TError, TData>(
+      {
+    queryKey: ['aiObservabilityWebhookSubscription', variables],
+    queryFn: fetcher<AiObservabilityWebhookSubscriptionQuery, AiObservabilityWebhookSubscriptionQueryVariables>(AiObservabilityWebhookSubscriptionDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiObservabilityWebhookSubscriptionDocument = new TypedDocumentString(`
+    mutation createAiObservabilityWebhookSubscription($workspaceId: ID!, $projectId: ID, $name: String!, $url: String!, $secret: String, $events: String!, $enabled: Boolean!) {
+  createAiObservabilityWebhookSubscription(
+    workspaceId: $workspaceId
+    projectId: $projectId
+    name: $name
+    url: $url
+    secret: $secret
+    events: $events
+    enabled: $enabled
+  ) {
+    createdDate
+    enabled
+    events
+    id
+    name
+    url
+    version
+  }
+}
+    `);
+
+export const useCreateAiObservabilityWebhookSubscriptionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiObservabilityWebhookSubscriptionMutation, TError, CreateAiObservabilityWebhookSubscriptionMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiObservabilityWebhookSubscriptionMutation, TError, CreateAiObservabilityWebhookSubscriptionMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiObservabilityWebhookSubscription'],
+    mutationFn: (variables?: CreateAiObservabilityWebhookSubscriptionMutationVariables) => fetcher<CreateAiObservabilityWebhookSubscriptionMutation, CreateAiObservabilityWebhookSubscriptionMutationVariables>(CreateAiObservabilityWebhookSubscriptionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiObservabilityWebhookSubscriptionDocument = new TypedDocumentString(`
+    mutation updateAiObservabilityWebhookSubscription($id: ID!, $name: String!, $url: String!, $secret: String, $events: String!, $enabled: Boolean!) {
+  updateAiObservabilityWebhookSubscription(
+    id: $id
+    name: $name
+    url: $url
+    secret: $secret
+    events: $events
+    enabled: $enabled
+  ) {
+    createdDate
+    enabled
+    events
+    id
+    name
+    url
+    version
+  }
+}
+    `);
+
+export const useUpdateAiObservabilityWebhookSubscriptionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiObservabilityWebhookSubscriptionMutation, TError, UpdateAiObservabilityWebhookSubscriptionMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiObservabilityWebhookSubscriptionMutation, TError, UpdateAiObservabilityWebhookSubscriptionMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiObservabilityWebhookSubscription'],
+    mutationFn: (variables?: UpdateAiObservabilityWebhookSubscriptionMutationVariables) => fetcher<UpdateAiObservabilityWebhookSubscriptionMutation, UpdateAiObservabilityWebhookSubscriptionMutationVariables>(UpdateAiObservabilityWebhookSubscriptionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiObservabilityWebhookSubscriptionDocument = new TypedDocumentString(`
+    mutation deleteAiObservabilityWebhookSubscription($id: ID!) {
+  deleteAiObservabilityWebhookSubscription(id: $id)
+}
+    `);
+
+export const useDeleteAiObservabilityWebhookSubscriptionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiObservabilityWebhookSubscriptionMutation, TError, DeleteAiObservabilityWebhookSubscriptionMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiObservabilityWebhookSubscriptionMutation, TError, DeleteAiObservabilityWebhookSubscriptionMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiObservabilityWebhookSubscription'],
+    mutationFn: (variables?: DeleteAiObservabilityWebhookSubscriptionMutationVariables) => fetcher<DeleteAiObservabilityWebhookSubscriptionMutation, DeleteAiObservabilityWebhookSubscriptionMutationVariables>(DeleteAiObservabilityWebhookSubscriptionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const TestAiObservabilityWebhookSubscriptionDocument = new TypedDocumentString(`
+    mutation testAiObservabilityWebhookSubscription($id: ID!) {
+  testAiObservabilityWebhookSubscription(id: $id)
+}
+    `);
+
+export const useTestAiObservabilityWebhookSubscriptionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TestAiObservabilityWebhookSubscriptionMutation, TError, TestAiObservabilityWebhookSubscriptionMutationVariables, TContext>) => {
+    
+    return useMutation<TestAiObservabilityWebhookSubscriptionMutation, TError, TestAiObservabilityWebhookSubscriptionMutationVariables, TContext>(
+      {
+    mutationKey: ['testAiObservabilityWebhookSubscription'],
+    mutationFn: (variables?: TestAiObservabilityWebhookSubscriptionMutationVariables) => fetcher<TestAiObservabilityWebhookSubscriptionMutation, TestAiObservabilityWebhookSubscriptionMutationVariables>(TestAiObservabilityWebhookSubscriptionDocument, variables)(),
     ...options
   }
     )};

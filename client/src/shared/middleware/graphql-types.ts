@@ -650,6 +650,244 @@ export type AiModel = {
   version?: Maybe<Scalars['Int']['output']>;
 };
 
+export enum AiObservabilityAlertCondition {
+  Equals = 'EQUALS',
+  GreaterThan = 'GREATER_THAN',
+  LessThan = 'LESS_THAN'
+}
+
+export type AiObservabilityAlertEvent = {
+  __typename?: 'AiObservabilityAlertEvent';
+  alertRuleId: Scalars['ID']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  message?: Maybe<Scalars['String']['output']>;
+  status: AiObservabilityAlertEventStatus;
+  triggeredValue?: Maybe<Scalars['Float']['output']>;
+};
+
+export enum AiObservabilityAlertEventStatus {
+  Acknowledged = 'ACKNOWLEDGED',
+  Resolved = 'RESOLVED',
+  Triggered = 'TRIGGERED'
+}
+
+export enum AiObservabilityAlertMetric {
+  Cost = 'COST',
+  ErrorRate = 'ERROR_RATE',
+  LatencyP95 = 'LATENCY_P95',
+  RequestVolume = 'REQUEST_VOLUME',
+  TokenUsage = 'TOKEN_USAGE'
+}
+
+export type AiObservabilityAlertRule = {
+  __typename?: 'AiObservabilityAlertRule';
+  condition: AiObservabilityAlertCondition;
+  cooldownMinutes: Scalars['Int']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  filters?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  metric: AiObservabilityAlertMetric;
+  name: Scalars['String']['output'];
+  notificationIds?: Maybe<Array<Maybe<Scalars['ID']['output']>>>;
+  projectId?: Maybe<Scalars['ID']['output']>;
+  snoozedUntil?: Maybe<Scalars['Long']['output']>;
+  threshold: Scalars['Float']['output'];
+  version?: Maybe<Scalars['Int']['output']>;
+  windowMinutes: Scalars['Int']['output'];
+};
+
+export type AiObservabilityAlertRuleInput = {
+  condition: AiObservabilityAlertCondition;
+  cooldownMinutes: Scalars['Int']['input'];
+  enabled: Scalars['Boolean']['input'];
+  filters?: InputMaybe<Scalars['String']['input']>;
+  metric: AiObservabilityAlertMetric;
+  name: Scalars['String']['input'];
+  notificationIds?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  threshold: Scalars['Float']['input'];
+  windowMinutes: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+export enum AiObservabilityExportFormat {
+  Csv = 'CSV',
+  Json = 'JSON',
+  Jsonl = 'JSONL'
+}
+
+export type AiObservabilityExportJob = {
+  __typename?: 'AiObservabilityExportJob';
+  createdBy: Scalars['String']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  cronExpression?: Maybe<Scalars['String']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  filePath?: Maybe<Scalars['String']['output']>;
+  filters?: Maybe<Scalars['String']['output']>;
+  format: AiObservabilityExportFormat;
+  id: Scalars['ID']['output'];
+  projectId?: Maybe<Scalars['ID']['output']>;
+  recordCount?: Maybe<Scalars['Int']['output']>;
+  scope: AiObservabilityExportScope;
+  status: AiObservabilityExportJobStatus;
+  type: AiObservabilityExportJobType;
+};
+
+export enum AiObservabilityExportJobStatus {
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Processing = 'PROCESSING'
+}
+
+export enum AiObservabilityExportJobType {
+  OnDemand = 'ON_DEMAND',
+  Scheduled = 'SCHEDULED'
+}
+
+export enum AiObservabilityExportScope {
+  RequestLogs = 'REQUEST_LOGS',
+  Sessions = 'SESSIONS',
+  Traces = 'TRACES'
+}
+
+export type AiObservabilitySession = {
+  __typename?: 'AiObservabilitySession';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  projectId?: Maybe<Scalars['ID']['output']>;
+  traceCount?: Maybe<Scalars['Int']['output']>;
+  traces?: Maybe<Array<Maybe<AiObservabilityTrace>>>;
+  userId?: Maybe<Scalars['String']['output']>;
+  version?: Maybe<Scalars['Int']['output']>;
+  workspaceId: Scalars['ID']['output'];
+};
+
+export type AiObservabilitySpan = {
+  __typename?: 'AiObservabilitySpan';
+  cost?: Maybe<Scalars['Float']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  endTime?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  input?: Maybe<Scalars['String']['output']>;
+  inputTokens?: Maybe<Scalars['Int']['output']>;
+  latencyMs?: Maybe<Scalars['Int']['output']>;
+  level: AiObservabilitySpanLevel;
+  metadata?: Maybe<Scalars['String']['output']>;
+  model?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  output?: Maybe<Scalars['String']['output']>;
+  outputTokens?: Maybe<Scalars['Int']['output']>;
+  parentSpanId?: Maybe<Scalars['ID']['output']>;
+  promptId?: Maybe<Scalars['ID']['output']>;
+  promptVersionId?: Maybe<Scalars['ID']['output']>;
+  provider?: Maybe<Scalars['String']['output']>;
+  startTime?: Maybe<Scalars['Long']['output']>;
+  status: AiObservabilitySpanStatus;
+  traceId: Scalars['ID']['output'];
+  type: AiObservabilitySpanType;
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
+export enum AiObservabilitySpanLevel {
+  Debug = 'DEBUG',
+  Default = 'DEFAULT',
+  Error = 'ERROR',
+  Warning = 'WARNING'
+}
+
+export enum AiObservabilitySpanStatus {
+  Active = 'ACTIVE',
+  Completed = 'COMPLETED',
+  Error = 'ERROR'
+}
+
+export enum AiObservabilitySpanType {
+  Event = 'EVENT',
+  Generation = 'GENERATION',
+  Span = 'SPAN',
+  ToolCall = 'TOOL_CALL'
+}
+
+export type AiObservabilityTrace = {
+  __typename?: 'AiObservabilityTrace';
+  apiKeyId?: Maybe<Scalars['ID']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  input?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  metadata?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  output?: Maybe<Scalars['String']['output']>;
+  projectId?: Maybe<Scalars['ID']['output']>;
+  sessionId?: Maybe<Scalars['ID']['output']>;
+  source: AiObservabilityTraceSource;
+  spans?: Maybe<Array<Maybe<AiObservabilitySpan>>>;
+  status: AiObservabilityTraceStatus;
+  tagIds?: Maybe<Array<Scalars['ID']['output']>>;
+  totalCost?: Maybe<Scalars['Float']['output']>;
+  totalInputTokens?: Maybe<Scalars['Int']['output']>;
+  totalLatencyMs?: Maybe<Scalars['Int']['output']>;
+  totalOutputTokens?: Maybe<Scalars['Int']['output']>;
+  userId?: Maybe<Scalars['String']['output']>;
+  version?: Maybe<Scalars['Int']['output']>;
+  workspaceId: Scalars['ID']['output'];
+};
+
+export enum AiObservabilityTraceSource {
+  Api = 'API',
+  Experiment = 'EXPERIMENT',
+  Otlp = 'OTLP',
+  Playground = 'PLAYGROUND'
+}
+
+export enum AiObservabilityTraceStatus {
+  Active = 'ACTIVE',
+  Completed = 'COMPLETED',
+  Error = 'ERROR'
+}
+
+export type AiObservabilityWebhookDelivery = {
+  __typename?: 'AiObservabilityWebhookDelivery';
+  attemptCount: Scalars['Int']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  deliveredDate?: Maybe<Scalars['Long']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  eventType?: Maybe<Scalars['String']['output']>;
+  httpStatus?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
+  payload?: Maybe<Scalars['String']['output']>;
+  status: AiObservabilityWebhookDeliveryStatus;
+  subscriptionId: Scalars['ID']['output'];
+};
+
+export enum AiObservabilityWebhookDeliveryStatus {
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Retrying = 'RETRYING',
+  Success = 'SUCCESS'
+}
+
+export type AiObservabilityWebhookSubscription = {
+  __typename?: 'AiObservabilityWebhookSubscription';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  events: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  lastTriggeredDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  projectId?: Maybe<Scalars['ID']['output']>;
+  url: Scalars['String']['output'];
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
 export type AiProviderCatalogItem = {
   __typename?: 'AiProviderCatalogItem';
   enabled: Scalars['Boolean']['output'];
@@ -2234,9 +2472,11 @@ export type McpToolInputForComponent = {
 export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
+  acknowledgeAiObservabilityAlertEvent?: Maybe<AiObservabilityAlertEvent>;
   addDataTableColumn: Scalars['Boolean']['output'];
   assignNotificationToWorkspace: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
+  cancelAiObservabilityExportJob?: Maybe<AiObservabilityExportJob>;
   cancelGenerationJob: Scalars['Boolean']['output'];
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
@@ -2261,6 +2501,9 @@ export type Mutation = {
    */
   createAiGuardrailCustomRule: AiGuardrailCustomRule;
   createAiModel?: Maybe<AiModel>;
+  createAiObservabilityAlertRule?: Maybe<AiObservabilityAlertRule>;
+  createAiObservabilityExportJob?: Maybe<AiObservabilityExportJob>;
+  createAiObservabilityWebhookSubscription?: Maybe<AiObservabilityWebhookSubscription>;
   createAiSkill: AiSkill;
   createAiSkillFromInstructions: AiSkill;
   createApiConnector: ApiConnector;
@@ -2308,6 +2551,8 @@ export type Mutation = {
   deleteAiGatewayRoutingPolicy?: Maybe<Scalars['Boolean']['output']>;
   deleteAiGuardrailCustomRule: Scalars['Boolean']['output'];
   deleteAiModel?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiObservabilityAlertRule?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiObservabilityWebhookSubscription?: Maybe<Scalars['Boolean']['output']>;
   deleteAiSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
@@ -2383,16 +2628,21 @@ export type Mutation = {
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   sendTestWorkflowAlert: Scalars['Boolean']['output'];
   setAiGuardrailCustomRuleEnabled: AiGuardrailCustomRule;
+  setAiObservabilityTraceTags?: Maybe<AiObservabilityTrace>;
+  snoozeAiObservabilityAlertRule?: Maybe<AiObservabilityAlertRule>;
   startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
   startGenerateFromDocumentationPreview: GenerationJobStatus;
+  testAiObservabilityAlertRule?: Maybe<Scalars['Float']['output']>;
+  testAiObservabilityWebhookSubscription?: Maybe<Scalars['Boolean']['output']>;
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
   testWorkspaceAiGatewayProviderConnection?: Maybe<ProviderConnectionResult>;
   unassignNotificationFromWorkspace: Scalars['Boolean']['output'];
   unpinAiModel?: Maybe<AiModel>;
   unpinWorkspaceAiModel?: Maybe<AiModel>;
+  unsnoozeAiObservabilityAlertRule?: Maybe<AiObservabilityAlertRule>;
   updateA2aProject?: Maybe<A2aProject>;
   updateA2aProjectWorkflowEnabled?: Maybe<A2aProjectWorkflow>;
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
@@ -2423,6 +2673,8 @@ export type Mutation = {
   updateAiGuardrailCustomRulePattern: AiGuardrailCustomRule;
   updateAiGuardrailsWorkspaceSettings?: Maybe<AiGuardrailsWorkspaceSettings>;
   updateAiModel?: Maybe<AiModel>;
+  updateAiObservabilityAlertRule?: Maybe<AiObservabilityAlertRule>;
+  updateAiObservabilityWebhookSubscription?: Maybe<AiObservabilityWebhookSubscription>;
   updateAiSkill: AiSkill;
   updateAiSkillContent: AiSkill;
   updateAiSkillTags: AiSkill;
@@ -2470,6 +2722,11 @@ export type Mutation = {
 };
 
 
+export type MutationAcknowledgeAiObservabilityAlertEventArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationAddDataTableColumnArgs = {
   input: AddColumnInput;
 };
@@ -2482,6 +2739,11 @@ export type MutationAssignNotificationToWorkspaceArgs = {
 
 
 export type MutationCancelAiAgentEvalRunArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationCancelAiObservabilityExportJobArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2584,6 +2846,33 @@ export type MutationCreateAiGuardrailCustomRuleArgs = {
 
 export type MutationCreateAiModelArgs = {
   input: CreateAiModelInput;
+};
+
+
+export type MutationCreateAiObservabilityAlertRuleArgs = {
+  input: AiObservabilityAlertRuleInput;
+};
+
+
+export type MutationCreateAiObservabilityExportJobArgs = {
+  cronExpression?: InputMaybe<Scalars['String']['input']>;
+  filters?: InputMaybe<Scalars['String']['input']>;
+  format: AiObservabilityExportFormat;
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  scope: AiObservabilityExportScope;
+  type?: InputMaybe<AiObservabilityExportJobType>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateAiObservabilityWebhookSubscriptionArgs = {
+  enabled: Scalars['Boolean']['input'];
+  events: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  secret?: InputMaybe<Scalars['String']['input']>;
+  url: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2817,6 +3106,16 @@ export type MutationDeleteAiGuardrailCustomRuleArgs = {
 
 
 export type MutationDeleteAiModelArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiObservabilityAlertRuleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiObservabilityWebhookSubscriptionArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -3237,6 +3536,18 @@ export type MutationSetAiGuardrailCustomRuleEnabledArgs = {
 };
 
 
+export type MutationSetAiObservabilityTraceTagsArgs = {
+  tagIds: Array<Scalars['ID']['input']>;
+  traceId: Scalars['ID']['input'];
+};
+
+
+export type MutationSnoozeAiObservabilityAlertRuleArgs = {
+  id: Scalars['ID']['input'];
+  until: Scalars['Long']['input'];
+};
+
+
 export type MutationStartAiAgentEvalRunArgs = {
   agentEvalTestId: Scalars['ID']['input'];
   aiAgentJudgeIds?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -3258,6 +3569,16 @@ export type MutationStartGenerateForEndpointsArgs = {
 
 export type MutationStartGenerateFromDocumentationPreviewArgs = {
   input: GenerateFromDocumentationInput;
+};
+
+
+export type MutationTestAiObservabilityAlertRuleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationTestAiObservabilityWebhookSubscriptionArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3298,6 +3619,11 @@ export type MutationUnpinAiModelArgs = {
 export type MutationUnpinWorkspaceAiModelArgs = {
   modelId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationUnsnoozeAiObservabilityAlertRuleArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3431,6 +3757,22 @@ export type MutationUpdateAiGuardrailsWorkspaceSettingsArgs = {
 export type MutationUpdateAiModelArgs = {
   id: Scalars['ID']['input'];
   input: UpdateAiModelInput;
+};
+
+
+export type MutationUpdateAiObservabilityAlertRuleArgs = {
+  id: Scalars['ID']['input'];
+  input: AiObservabilityAlertRuleInput;
+};
+
+
+export type MutationUpdateAiObservabilityWebhookSubscriptionArgs = {
+  enabled: Scalars['Boolean']['input'];
+  events: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  secret?: InputMaybe<Scalars['String']['input']>;
+  url: Scalars['String']['input'];
 };
 
 
@@ -4099,6 +4441,18 @@ export type Query = {
   aiModel?: Maybe<AiModel>;
   aiModels?: Maybe<Array<Maybe<AiModel>>>;
   aiModelsByProvider?: Maybe<Array<Maybe<AiModel>>>;
+  aiObservabilityAlertEvents?: Maybe<Array<Maybe<AiObservabilityAlertEvent>>>;
+  aiObservabilityAlertRule?: Maybe<AiObservabilityAlertRule>;
+  aiObservabilityAlertRules?: Maybe<Array<Maybe<AiObservabilityAlertRule>>>;
+  aiObservabilityExportJob?: Maybe<AiObservabilityExportJob>;
+  aiObservabilityExportJobs?: Maybe<Array<Maybe<AiObservabilityExportJob>>>;
+  aiObservabilitySession?: Maybe<AiObservabilitySession>;
+  aiObservabilitySessions?: Maybe<Array<Maybe<AiObservabilitySession>>>;
+  aiObservabilityTrace?: Maybe<AiObservabilityTrace>;
+  aiObservabilityTraces?: Maybe<Array<Maybe<AiObservabilityTrace>>>;
+  aiObservabilityWebhookDeliveries?: Maybe<Array<Maybe<AiObservabilityWebhookDelivery>>>;
+  aiObservabilityWebhookSubscription?: Maybe<AiObservabilityWebhookSubscription>;
+  aiObservabilityWebhookSubscriptions?: Maybe<Array<Maybe<AiObservabilityWebhookSubscription>>>;
   aiProviderCatalog: Array<AiProviderCatalogItem>;
   aiSkill: AiSkill;
   aiSkillFileContent: Scalars['String']['output'];
@@ -4462,6 +4816,73 @@ export type QueryAiModelArgs = {
 
 export type QueryAiModelsByProviderArgs = {
   providerId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityAlertEventsArgs = {
+  alertRuleId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityAlertRuleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityAlertRulesArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityExportJobArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityExportJobsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilitySessionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilitySessionsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityTraceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityTracesArgs = {
+  endDate: Scalars['Long']['input'];
+  model?: InputMaybe<Scalars['String']['input']>;
+  source?: InputMaybe<AiObservabilityTraceSource>;
+  startDate: Scalars['Long']['input'];
+  status?: InputMaybe<AiObservabilityTraceStatus>;
+  tagId?: InputMaybe<Scalars['ID']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityWebhookDeliveriesArgs = {
+  subscriptionId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityWebhookSubscriptionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiObservabilityWebhookSubscriptionsArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 
