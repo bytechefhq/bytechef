@@ -204,13 +204,13 @@ describe('IntegrationInstanceConfigurationListItem tags', () => {
     it('should show the tags by default', () => {
         renderItem();
 
-        expect(screen.getByText('Tags:')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Add tag'})).toBeInTheDocument();
     });
 
     it('should hide the tags when showTags is false', () => {
         renderItem({}, undefined, false);
 
-        expect(screen.queryByText('Tags:')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Add tag'})).not.toBeInTheDocument();
     });
 });
 

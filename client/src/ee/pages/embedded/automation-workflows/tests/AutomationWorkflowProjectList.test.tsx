@@ -137,7 +137,7 @@ describe('AutomationWorkflowProjectList', () => {
         expect(onUpdateTags.mock.calls[0][1]).toEqual([]);
     });
 
-    it('calls onUpdateTags with new tag name when a tag is added via the + button', async () => {
+    it('calls onUpdateTags with new tag name when a tag is added via the Add tag button', async () => {
         const user = userEvent.setup();
 
         const allTags: EmbeddedTagType[] = [
@@ -149,12 +149,7 @@ describe('AutomationWorkflowProjectList', () => {
 
         renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} tags={allTags} />);
 
-        // The + (add tag) button follows the "Tags:" label
-        const tagsLabel = screen.getByText('Tags:');
-        const tagListContainer = tagsLabel.closest('div')!;
-        const addButton = tagListContainer.querySelector('button');
-
-        await user.click(addButton!);
+        await user.click(screen.getByRole('button', {name: 'Add tag'}));
 
         const input = await screen.findByRole('combobox');
 
