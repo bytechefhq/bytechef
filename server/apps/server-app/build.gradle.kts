@@ -334,6 +334,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-handler"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-graphql"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
+    implementation(project(":server:ee:libs:licence:licence-service"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-rest"))
