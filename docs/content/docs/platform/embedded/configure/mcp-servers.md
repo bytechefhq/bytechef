@@ -146,7 +146,7 @@ When the run finishes, the tool returns the workflow's output. A failed run retu
 
 ### Recorded tool calls
 
-Every component tool and workflow tool call made through an embedded MCP server is recorded, including calls that return `connection_required` and workflow runs that time out. The records are listed under **Monitor > [Tool Invocations](/platform/embedded/monitor/tool-invocations)**. A workflow tool's record carries the `jobId` of the run it started, so you can find the run in [Workflow Executions](/platform/embedded/monitor/workflow-executions).
+Every component tool and workflow tool call made through an embedded MCP server is recorded, including calls that return `connection_required` and workflow runs that time out. The records are listed under **Monitor > [External Invocations](/platform/embedded/monitor/external-invocations)**. A workflow tool's record carries the `jobId` of the run it started, so you can find the run in [Workflow Executions](/platform/embedded/monitor/workflow-executions).
 
 ### Tenant scoping
 

@@ -29,7 +29,7 @@
     "--- Monitor ---",
     "monitor/workflow-executions",
     "monitor/connected-users",
-    "monitor/tool-invocations",
+    "monitor/external-invocations",
     "monitor/failures-and-retries",
     "monitor/troubleshooting",
     "--- Administration ---",
