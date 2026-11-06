@@ -281,4 +281,26 @@ describe('ExternalInvocations', () => {
         expect(renderedItemValues()).toContain('11');
         expect(screen.getByRole('list', {name: 'MCP Server'})).toBeInTheDocument();
     });
+
+    it.each([
+        ['A2A', false, true],
+        ['MCP_AUTOMATION', true, false],
+        [undefined, true, true],
+    ])(
+        'with the %s surface selected shows the MCP server filter %s and the A2A server filter %s',
+        (surface, mcp, a2a) => {
+            hoisted.useExternalInvocationsMock.mockReturnValue({
+                ...recordedExternalInvocationsState(),
+                filterSurface: surface,
+            });
+
+            renderExternalInvocations({
+                a2aServerOptions: [{label: 'Research agent', value: '4'}],
+                mcpServerOptions: [{label: 'Sales tools', value: '11'}],
+            });
+
+            expect(!!screen.queryByText('MCP Server', {selector: 'label'})).toBe(mcp);
+            expect(!!screen.queryByText('A2A Server', {selector: 'label'})).toBe(a2a);
+        }
+    );
 });
