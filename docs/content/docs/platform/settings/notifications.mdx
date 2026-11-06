@@ -123,8 +123,8 @@ the workflow was deleted), the field is left out and the notification is still s
 as the `X-ByteChef-Timestamp` header. The header is in milliseconds since the epoch, the body field is
 ISO-8601.
 
-`executionUrl` opens the execution in ByteChef: `<public-url>/automation/executions?id=<jobId>` for an
-automation run and `<public-url>/embedded/executions?id=<jobId>` for an embedded run. It is left out
+`executionUrl` opens the execution in ByteChef: `<public-url>/automation/workflow-executions?id=<jobId>` for an
+automation run and `<public-url>/embedded/workflow-executions?id=<jobId>` for an embedded run. It is left out
 when `bytechef.public-url` is not set.
 
 Task inputs and outputs are never included. Open the execution through `executionUrl` to see them.
@@ -163,7 +163,7 @@ A `JOB_FAILED` event from an automation run:
     "message": "401 Unauthorized",
     "stackTrace": "com.bytechef.exception.ConfigurationException: 401 Unauthorized\n\tat ..."
   },
-  "executionUrl": "https://bytechef.example.com/automation/executions?id=1042"
+  "executionUrl": "https://bytechef.example.com/automation/workflow-executions?id=1042"
 }
 ```
 
@@ -262,7 +262,7 @@ sends this body for the `JOB_FAILED` event above:
 {
   "text": "Sync new leads failed in PRODUCTION: 401 Unauthorized",
   "jobId": "1042",
-  "link": "https://bytechef.example.com/automation/executions?id=1042"
+  "link": "https://bytechef.example.com/automation/workflow-executions?id=1042"
 }
 ```
 
