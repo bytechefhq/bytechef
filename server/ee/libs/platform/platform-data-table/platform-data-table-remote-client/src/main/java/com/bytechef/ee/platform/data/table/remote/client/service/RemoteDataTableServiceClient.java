@@ -12,6 +12,8 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import java.util.List;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -75,6 +77,16 @@ public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
     public void duplicateTable(String fromBaseName, String toBaseName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<DataTableInfo> fetchDataTableInfo(String baseName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateDescription(String baseName, @Nullable String description) {
         throw new UnsupportedOperationException();
     }
 }

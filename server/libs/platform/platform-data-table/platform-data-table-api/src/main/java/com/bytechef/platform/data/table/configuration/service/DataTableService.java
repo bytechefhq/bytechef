@@ -19,6 +19,8 @@ package com.bytechef.platform.data.table.configuration.service;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import java.util.List;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Unified service for managing dynamic data tables and querying their metadata.
@@ -99,6 +101,8 @@ public interface DataTableService {
      * @return The base name of the data table corresponding to the given identifier. If no table is found for the
      *         provided ID, the method may return null or an empty string.
      */
+    Optional<DataTableInfo> fetchDataTableInfo(String baseName, long environmentId);
+
     String getBaseNameById(long id);
 
     /**
@@ -154,4 +158,6 @@ public interface DataTableService {
      * @param environmentId The target environment ID.
      */
     void renameTable(String fromBaseName, String toBaseName, long environmentId);
+
+    void updateDescription(String baseName, @Nullable String description);
 }

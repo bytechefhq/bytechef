@@ -61,7 +61,8 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
                 Objects.requireNonNull(row, "row must not be null");
 
                 return new DataTableRow(
-                    row.id(), copy(Objects.requireNonNull(row.values(), "row values must not be null")));
+                    row.id(), row.externalId(),
+                    copy(Objects.requireNonNull(row.values(), "row values must not be null")));
             })
             .toList();
     }

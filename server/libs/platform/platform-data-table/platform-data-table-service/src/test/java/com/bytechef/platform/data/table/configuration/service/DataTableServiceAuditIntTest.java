@@ -30,6 +30,7 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
 import com.bytechef.platform.data.table.audit.DataTableAuditMapper;
@@ -120,14 +121,14 @@ class DataTableServiceAuditIntTest {
         ColumnSpec columnSpec = new ColumnSpec("amount", ColumnType.NUMBER);
 
         assertThatThrownBy(() -> dataTableService.addColumn("missing", columnSpec, ENVIRONMENT_ID))
-            .isInstanceOf(BadSqlGrammarException.class);
+            .isInstanceOf(ExecutionException.class);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_ADDED);
 
         assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "ERROR")
-            .containsEntry("errorClass", BadSqlGrammarException.class.getName())
+            .containsEntry("errorClass", ExecutionException.class.getName())
             .containsEntry("baseName", "missing")
             .containsEntry("columnName", "amount")
             .containsEntry("columnType", ColumnType.NUMBER.name())

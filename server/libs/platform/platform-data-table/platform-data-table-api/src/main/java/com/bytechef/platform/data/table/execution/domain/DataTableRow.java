@@ -18,6 +18,7 @@ package com.bytechef.platform.data.table.execution.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a single row in a dynamic data table with a stable primary key id and a map of column values.
@@ -25,5 +26,9 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record DataTableRow(long id, Map<String, Object> values) {
+public record DataTableRow(long id, @Nullable String externalId, Map<String, Object> values) {
+
+    public DataTableRow(long id, Map<String, Object> values) {
+        this(id, null, values);
+    }
 }

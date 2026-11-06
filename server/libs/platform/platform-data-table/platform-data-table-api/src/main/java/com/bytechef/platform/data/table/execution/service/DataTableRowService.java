@@ -16,11 +16,16 @@
 
 package com.bytechef.platform.data.table.execution.service;
 
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
+import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,6 +39,8 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public interface DataTableRowService {
+
+    long countRows(String baseName, DataTableRowConditions conditions, long environmentId);
 
     /**
      * Deletes a row by id.
@@ -82,6 +89,8 @@ public interface DataTableRowService {
     @Nullable
     DataTableRow getRow(String baseName, long id, long environmentId);
 
+    Optional<DataTableRow> fetchRowByExternalId(String baseName, String externalId, long environmentId);
+
     /**
      * Inserts a row with provided values. Returns the created row including generated id.
      *
@@ -95,6 +104,9 @@ public interface DataTableRowService {
      */
     DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId);
 
+    DataTableRow
+        insertRow(String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId);
+
     /**
      * Inserts rows in one transaction: a row that is not valid stops the insert and no row is inserted. One created
      * event holding every inserted row is published; webhooks are called once the transaction commits.
@@ -106,6 +118,9 @@ public interface DataTableRowService {
      * @throws IllegalArgumentException if a value is not valid for the column type; the message names the row
      */
     List<DataTableRow> insertRows(String baseName, List<Map<String, Object>> rowValues, long environmentId);
+
+    List<DataTableRow> insertRows(
+        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId);
 
     /**
      * Lists rows of a dynamic table ordered by id ascending, with pagination.
@@ -138,6 +153,10 @@ public interface DataTableRowService {
         String baseName, DataTableRowConditions conditions, @Nullable DataTableRowSort sort, int limit,
         int offset, long environmentId);
 
+    List<DataTableRow> queryRows(
+        String baseName, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit, int offset,
+        long environmentId);
+
     /**
      * Exports the entire table (excluding the primary key column 'id' in the header) as CSV text. The first row is a
      * header with column names in their physical order.
@@ -159,7 +178,7 @@ public interface DataTableRowService {
      * @throws IllegalArgumentException if the header matches no column of the table, or a cell is not valid for its
      *                                  column type; the message names the CSV line
      */
-    void importCsv(String baseName, String csv, long environmentId);
+    int importCsv(String baseName, String csv, long environmentId);
 
     /**
      * Updates a row by its stable id. Returns the updated row.
@@ -175,6 +194,10 @@ public interface DataTableRowService {
      *                                  none of them names a column, or no row with that id exists
      */
     DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId);
+
+    DataTableRow updateRow(
+        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long environmentId);
 
     /**
      * Updates every row that satisfies the given conditions in one transaction. One updated event holding every updated
@@ -193,4 +216,6 @@ public interface DataTableRowService {
      */
     List<DataTableRow> updateRows(
         String baseName, DataTableRowConditions conditions, Map<String, Object> values, long environmentId);
+
+    UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId);
 }

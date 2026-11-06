@@ -30,6 +30,7 @@ import static org.mockito.Mockito.mockingDetails;
 
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
@@ -1162,9 +1163,12 @@ class DataTableRowServiceIntTest {
         assertEquals("Banana", dataTableRow.values()
             .get("title"));
 
-        assertMessageContains(
-            "Row not found",
+        DataTableException dataTableException = assertThrows(
+            DataTableException.class,
             () -> dataTableRowService.updateRow("items", Long.MAX_VALUE, Map.of(), DEV_ENVIRONMENT_ID));
+
+        assertTrue(dataTableException.getMessage()
+            .contains("Row not found"));
     }
 
     @Test
