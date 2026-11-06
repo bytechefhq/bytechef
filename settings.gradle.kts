@@ -678,6 +678,7 @@ include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:e
 include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service")
 
 include("server:ee:libs:licence:licence-service")
+include("server:ee:libs:licence:licence-web")
 
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-api")
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-service")

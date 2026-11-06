@@ -37,6 +37,7 @@ import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentJudgeVerdictService
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentScenarioJudgeService;
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentScenarioToolSimulationService;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -52,6 +53,7 @@ import org.springframework.stereotype.Controller;
  * @author Ivica Cardic
  */
 @Controller
+@ConditionalOnEEVersion
 @SuppressFBWarnings("EI") // Spring GraphQL controllers intentionally return domain objects for serialization
 class AiAgentEvalGraphQlController {
 
