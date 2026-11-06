@@ -31,6 +31,7 @@ import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
 import com.bytechef.platform.data.table.audit.DataTableAuditMapper;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
@@ -45,7 +46,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -137,14 +137,14 @@ class WorkspaceDataTableFacadeAuditIntTest {
 
         assertThatThrownBy(
             () -> workspaceDataTableFacade.createTable("audited", null, COLUMN_SPECS, WORKSPACE_ID, ENVIRONMENT_ID))
-                .isInstanceOf(BadSqlGrammarException.class);
+                .isInstanceOf(DataTableException.class);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_CREATED);
 
         assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "ERROR")
-            .containsEntry("errorClass", BadSqlGrammarException.class.getName())
+            .containsEntry("errorClass", DataTableException.class.getName())
             .containsEntry("baseName", "audited")
             .containsEntry("workspaceId", String.valueOf(WORKSPACE_ID))
             .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID));

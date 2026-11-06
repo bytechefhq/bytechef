@@ -25,14 +25,22 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -205,6 +213,54 @@ class WorkspaceDataTableFacadeIntTest {
         assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
             .extracting(DataTableInfo::baseName)
             .containsExactly("events");
+    }
+
+    @Test
+    void testRowOperationsResolveTheTableById() {
+        workspaceDataTableFacade.createTable("events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        long dataTableId = dataTableService.getIdByBaseName("events");
+
+        assertThat(workspaceDataTableFacade.getWorkspaceId(dataTableId)).isEqualTo(WORKSPACE_ID);
+        assertThat(workspaceDataTableFacade.getTable(dataTableId, DEV_ENVIRONMENT_ID)
+            .baseName()).isEqualTo("events");
+
+        DataTableRow keyedDataTableRow = workspaceDataTableFacade.insertRow(
+            dataTableId, Map.of("title", "a"), "EVT-1", DEV_ENVIRONMENT_ID);
+
+        List<DataTableRow> insertedDataTableRows = workspaceDataTableFacade.insertRows(
+            dataTableId, List.of(new NewRow(Map.of("title", "b"), null), new NewRow(Map.of("title", "c"), null)),
+            CreateStrategy.INSERT, DEV_ENVIRONMENT_ID);
+
+        assertThat(insertedDataTableRows).hasSize(2);
+
+        Page<DataTableRow> page = workspaceDataTableFacade.listRows(
+            dataTableId, DataTableRowConditions.matchAll(),
+            List.of(new DataTableRowSort("title", DataTableRowSort.Direction.DESC)), 0, 2, DEV_ENVIRONMENT_ID);
+
+        assertThat(page.getTotalElements()).isEqualTo(3);
+        assertThat(page.getContent())
+            .extracting(dataTableRow -> dataTableRow.values()
+                .get("title"))
+            .containsExactly("c", "b");
+
+        UpsertResult upsertResult = workspaceDataTableFacade.upsertRow(
+            dataTableId, "EVT-1", Map.of("title", "z"), DEV_ENVIRONMENT_ID);
+
+        assertThat(upsertResult.created()).isFalse();
+        assertThat(upsertResult.row()
+            .id()).isEqualTo(keyedDataTableRow.id());
+
+        List<Long> deletedRowIds = workspaceDataTableFacade.deleteRows(
+            dataTableId, List.of(insertedDataTableRows.getFirst()
+                .id()),
+            DEV_ENVIRONMENT_ID);
+
+        assertThat(deletedRowIds).containsExactly(insertedDataTableRows.getFirst()
+            .id());
+        assertThat(workspaceDataTableFacade.deleteRowByExternalId(dataTableId, "EVT-1", DEV_ENVIRONMENT_ID)).isTrue();
+        assertThat(workspaceDataTableFacade.deleteRowByExternalId(dataTableId, "EVT-1", DEV_ENVIRONMENT_ID)).isFalse();
+        assertThat(workspaceDataTableFacade.clearRows(dataTableId, DEV_ENVIRONMENT_ID)).isEqualTo(1);
     }
 
     private void dropTestTables() {
