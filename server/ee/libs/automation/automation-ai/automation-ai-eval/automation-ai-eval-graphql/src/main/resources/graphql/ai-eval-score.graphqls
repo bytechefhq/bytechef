@@ -1,0 +1,71 @@
+extend type Query {
+    aiEvalScores(workspaceId: ID!): [AiEvalScore]
+    aiEvalScoresByTrace(traceId: ID!): [AiEvalScore]
+    aiEvalScoreAnalytics(workspaceId: ID!, startDate: Long!, endDate: Long!): [AiEvalScoreAnalytics]
+    aiEvalScoreTrend(workspaceId: ID!, name: String!, startDate: Long!, endDate: Long!): [AiEvalScoreTrendPoint]
+}
+
+extend type Mutation {
+    createAiEvalScore(
+        comment: String,
+        dataType: AiEvalScoreDataType!,
+        name: String!,
+        source: AiEvalScoreSource!,
+        spanId: ID,
+        stringValue: String,
+        traceId: ID!,
+        value: Float,
+        workspaceId: ID!
+    ): AiEvalScore
+
+    deleteAiEvalScore(id: ID!): Boolean
+}
+
+type AiEvalScore {
+    comment: String
+    createdBy: String
+    createdDate: Long
+    dataType: AiEvalScoreDataType
+    evalRuleId: ID
+    id: ID!
+    name: String!
+    source: AiEvalScoreSource!
+    spanId: ID
+    stringValue: String
+    traceId: ID!
+    value: Float
+    workspaceId: ID!
+}
+
+enum AiEvalScoreDataType {
+    BOOLEAN
+    CATEGORICAL
+    NUMERIC
+}
+
+enum AiEvalScoreSource {
+    API
+    LLM_JUDGE
+    MANUAL
+}
+
+type AiEvalScoreAnalytics {
+    name: String
+    dataType: AiEvalScoreDataType
+    count: Int
+    average: Float
+    min: Float
+    max: Float
+    distribution: [AiEvalScoreDistributionEntry]
+}
+
+type AiEvalScoreDistributionEntry {
+    value: String
+    count: Int
+}
+
+type AiEvalScoreTrendPoint {
+    day: Long!
+    average: Float
+    count: Int!
+}

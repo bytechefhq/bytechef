@@ -32,6 +32,9 @@ include("cli:commands:component:init:openapi")
 
 include("server:apps:server-app")
 
+include("server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-api")
+include("server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-graphql")
+include("server:ee:libs:automation:automation-ai:automation-ai-eval:automation-ai-eval-service")
 include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-api")
 include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-graphql")
 include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-public-rest")
