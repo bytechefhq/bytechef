@@ -18,16 +18,16 @@ describe('TagList', () => {
             </TooltipProvider>
         );
 
-    it('hides the "Tags:" label when there are no tags', () => {
+    it('hides the tags icon when there are no tags', () => {
         renderTagList();
 
-        expect(screen.queryByText('Tags:')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Tags')).not.toBeInTheDocument();
     });
 
-    it('shows the "Tags:" label when there are tags', () => {
+    it('shows the tags icon when there are tags', () => {
         renderTagList([{id: 2, name: 'finance'}]);
 
-        expect(screen.getByText('Tags:')).toBeInTheDocument();
+        expect(screen.getByLabelText('Tags')).toBeInTheDocument();
     });
 
     it('renders a labeled "Add tag" button', () => {

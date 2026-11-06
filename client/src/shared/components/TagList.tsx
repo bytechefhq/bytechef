@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import CreatableSelect, {SelectOptionType} from '@/components/CreatableSelect/CreatableSelect';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ChevronDownIcon, PlusIcon, XIcon} from 'lucide-react';
+import {ChevronDownIcon, PlusIcon, TagIcon, XIcon} from 'lucide-react';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 
@@ -71,8 +71,8 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
     };
 
     return (
-        <div className="mr-4 flex h-7 items-center justify-center gap-2">
-            {tags.length > 0 && <span className="text-xs text-content-neutral-secondary">Tags:</span>}
+        <div className="mr-4 flex h-7 items-center justify-center gap-1.5">
+            {tags.length > 0 && <TagIcon aria-label="Tags" className="size-3.5 text-content-neutral-secondary" />}
 
             {tags.slice(0, 3).map((tag) => (
                 <Tag key={tag.id ?? tag.name} onDeleteTag={handleDeleteTag} tag={tag} />
