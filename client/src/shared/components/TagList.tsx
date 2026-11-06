@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import CreatableSelect, {SelectOptionType} from '@/components/CreatableSelect/CreatableSelect';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ChevronDownIcon, PlusIcon, TagIcon, XIcon} from 'lucide-react';
+import {ChevronDownIcon, TagIcon, XIcon} from 'lucide-react';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 
@@ -159,8 +159,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                 </>
             ) : (
                 <Button
-                    className="rounded-full border border-dashed border-border pl-1.5 text-content-neutral-secondary hover:border-solid hover:text-content-neutral-primary [&_svg]:size-3"
-                    icon={<PlusIcon />}
+                    className="rounded-full border border-dashed border-border text-content-neutral-secondary hover:border-solid hover:text-content-neutral-primary"
                     label="Add tag"
                     onClick={(event) => {
                         event.preventDefault();
