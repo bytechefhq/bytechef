@@ -357,6 +357,49 @@ class ScimUserFacadeIntTest {
     }
 
     @Test
+    void testPatchUserReplaceOfTheWholeNameClearsTheOmittedNameParts() {
+        User existingUser = createStoredUser("john.doe", "john@example.com");
+
+        scimUserFacade.patchUser(
+            existingUser.getId(),
+            createPatchRequest(new ScimPatchOperation("replace", "name", Map.of("givenName", "Jane"))));
+
+        User storedUser = fetchStoredUser(existingUser.getId());
+
+        assertThat(storedUser.getFirstName()).isEqualTo("Jane");
+        assertThat(storedUser.getLastName()).isNull();
+    }
+
+    @Test
+    void testPatchUserPathlessReplaceOfTheWholeNameClearsTheOmittedNameParts() {
+        User existingUser = createStoredUser("john.doe", "john@example.com");
+
+        scimUserFacade.patchUser(
+            existingUser.getId(),
+            createPatchRequest(
+                new ScimPatchOperation("replace", null, Map.of("name", Map.of("familyName", "Smith")))));
+
+        User storedUser = fetchStoredUser(existingUser.getId());
+
+        assertThat(storedUser.getFirstName()).isNull();
+        assertThat(storedUser.getLastName()).isEqualTo("Smith");
+    }
+
+    @Test
+    void testPatchUserAddOfTheWholeNameKeepsTheOmittedNameParts() {
+        User existingUser = createStoredUser("john.doe", "john@example.com");
+
+        scimUserFacade.patchUser(
+            existingUser.getId(),
+            createPatchRequest(new ScimPatchOperation("add", "name", Map.of("givenName", "Jane"))));
+
+        User storedUser = fetchStoredUser(existingUser.getId());
+
+        assertThat(storedUser.getFirstName()).isEqualTo("Jane");
+        assertThat(storedUser.getLastName()).isEqualTo("Doe");
+    }
+
+    @Test
     void testPatchUserReplacesTheExternalIdSoTheNewValueCanBeFilteredBy() {
         User existingUser = createStoredUser("john.doe", "john@example.com");
 
