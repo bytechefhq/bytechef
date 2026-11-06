@@ -15,6 +15,7 @@ interface UseInviteUserDialogI {
     handleRoleChange: (role: string) => void;
     inviteDisabled: boolean;
     inviteEmail: string;
+    invitePending: boolean;
     inviteRole: string | null;
     open: boolean;
     roleSelectVisible: boolean;
@@ -38,7 +39,8 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
 
     const authorities = useMemo(() => authoritiesData?.authorities ?? [], [authoritiesData]);
     const roleSelectVisible = !ceEdition;
-    const inviteDisabled = !inviteEmail || (roleSelectVisible && !inviteRole);
+    const invitePending = inviteUserMutation.isPending;
+    const inviteDisabled = invitePending || !inviteEmail || (roleSelectVisible && !inviteRole);
 
     useEffect(() => {
         if (roleSelectVisible && open && !inviteRole && authorities.length > 0) {
@@ -69,6 +71,10 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
     };
 
     const handleInvite = () => {
+        if (invitePending) {
+            return;
+        }
+
         const role = ceEdition ? AUTHORITIES.ADMIN : inviteRole;
 
         if (inviteEmail && role) {
@@ -89,6 +95,7 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
         handleRoleChange,
         inviteDisabled,
         inviteEmail,
+        invitePending,
         inviteRole,
         open,
         roleSelectVisible,

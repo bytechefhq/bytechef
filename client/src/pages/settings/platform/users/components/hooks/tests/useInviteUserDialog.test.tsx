@@ -7,6 +7,7 @@ const hoisted = vi.hoisted(() => {
     return {
         application: {edition: 'EE'} as {edition: string} | null,
         inviteUserMutate: vi.fn(),
+        inviteUserPending: false,
         storeState: {
             inviteEmail: '',
             inviteRole: null as string | null,
@@ -52,6 +53,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
         data: {authorities: ['ROLE_ADMIN', 'ROLE_USER']},
     })),
     useInviteUserMutation: vi.fn((options: {onSuccess: () => void}) => ({
+        isPending: hoisted.inviteUserPending,
         mutate: (vars: unknown) => {
             hoisted.inviteUserMutate(vars);
             options.onSuccess();
@@ -78,6 +80,7 @@ describe('useInviteUserDialog', () => {
         hoisted.storeState.inviteRole = null;
         hoisted.storeState.open = false;
         hoisted.application = {edition: 'EE'};
+        hoisted.inviteUserPending = false;
     });
 
     describe('initial state', () => {
@@ -189,6 +192,21 @@ describe('useInviteUserDialog', () => {
                 email: 'newuser@test.com',
                 role: 'ROLE_ADMIN',
             });
+        });
+
+        it('does not call invite mutation again while an invite is pending', () => {
+            hoisted.inviteUserPending = true;
+            hoisted.storeState.open = true;
+            hoisted.storeState.inviteEmail = 'newuser@test.com';
+            hoisted.storeState.inviteRole = 'ROLE_ADMIN';
+            const {result} = renderHook(() => useInviteUserDialog());
+
+            act(() => {
+                result.current.handleInvite();
+            });
+
+            expect(hoisted.inviteUserMutate).not.toHaveBeenCalled();
+            expect(result.current.inviteDisabled).toBe(true);
         });
 
         it('closes dialog after successful invite', () => {

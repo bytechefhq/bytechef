@@ -23,6 +23,7 @@ const InviteUserDialog = () => {
         handleRoleChange,
         inviteDisabled,
         inviteEmail,
+        invitePending,
         inviteRole,
         open,
         roleSelectVisible,
@@ -80,7 +81,11 @@ const InviteUserDialog = () => {
                             <Button label="Cancel" onClick={handleClose} variant="outline" />
                         </DialogClose>
 
-                        <Button disabled={inviteDisabled} label="Invite" onClick={handleInvite} />
+                        <Button
+                            disabled={inviteDisabled}
+                            label={invitePending ? 'Inviting...' : 'Invite'}
+                            onClick={handleInvite}
+                        />
                     </DialogFooter>
                 </DialogMain>
             </DialogContent>
