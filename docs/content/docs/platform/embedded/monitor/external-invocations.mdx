@@ -56,6 +56,7 @@ Each call is one row, newest first:
 | **Source** | What ran: the component and operation, such as `slack / sendMessage`, or the name of the workflow a workflow tool ran. |
 | **Duration** | How long the call took, in milliseconds. |
 | **Date** | When the call was made. |
+| **Actions** | **View** opens the workflow run a workflow tool started, with the input and output of each step. **Stop** stops that run while it is still going: the call ended with `TIMEOUT`, `APPROVAL_REQUIRED` or `SUSPENDED`. Both are unavailable for component tool and action calls, which start no workflow run. |
 
 The list shows 50 rows per page. Use the **Refresh** button in the page header to load the latest
 calls.
