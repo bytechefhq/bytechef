@@ -59,7 +59,7 @@ export default function useOpenInEmbeddedEditor() {
     const openIntegrationWorkflow = useCallback(
         async (integrationId: number, workflowUuid?: string) => {
             try {
-                const integrationWorkflows = await queryClient.fetchQuery({
+                const integrationWorkflows = await queryClient.query({
                     queryFn: () => new WorkflowApi().getIntegrationWorkflows({id: integrationId}),
                     queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
                 });
