@@ -17,31 +17,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The outcome of a tool invocation.
+ * What a external invocation ran.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T11:35:37.822293+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public enum ToolInvocationOutcomeModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+public enum ExternalInvocationKindModel {
   
-  SUCCESS("SUCCESS"),
+  COMPONENT("COMPONENT"),
   
-  ERROR("ERROR"),
-  
-  CONNECTION_REQUIRED("CONNECTION_REQUIRED"),
-  
-  TIMEOUT("TIMEOUT"),
-  
-  APPROVAL_REQUIRED("APPROVAL_REQUIRED"),
-  
-  APPROVAL_DENIED("APPROVAL_DENIED"),
-  
-  RULE_BLOCKED("RULE_BLOCKED"),
-  
-  SUSPENDED("SUSPENDED");
+  WORKFLOW("WORKFLOW");
 
   private final String value;
 
-  ToolInvocationOutcomeModel(String value) {
+  ExternalInvocationKindModel(String value) {
     this.value = value;
   }
 
@@ -56,8 +44,8 @@ public enum ToolInvocationOutcomeModel {
   }
 
   @JsonCreator
-  public static ToolInvocationOutcomeModel fromValue(String value) {
-    for (ToolInvocationOutcomeModel b : ToolInvocationOutcomeModel.values()) {
+  public static ExternalInvocationKindModel fromValue(String value) {
+    for (ExternalInvocationKindModel b : ExternalInvocationKindModel.values()) {
       if (b.value.equalsIgnoreCase(value)) {
         return b;
       }

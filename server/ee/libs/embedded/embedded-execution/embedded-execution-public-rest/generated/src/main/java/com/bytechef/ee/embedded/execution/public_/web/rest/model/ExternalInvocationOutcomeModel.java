@@ -17,21 +17,31 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The surface a tool invocation was made through.
+ * The outcome of a external invocation.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T09:08:13.694310+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public enum ToolInvocationSurfaceModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+public enum ExternalInvocationOutcomeModel {
   
-  MCP_EMBEDDED("MCP_EMBEDDED"),
+  SUCCESS("SUCCESS"),
   
-  EMBEDDED_API_ACTION("EMBEDDED_API_ACTION"),
+  ERROR("ERROR"),
   
-  EMBEDDED_API_TOOL("EMBEDDED_API_TOOL");
+  CONNECTION_REQUIRED("CONNECTION_REQUIRED"),
+  
+  TIMEOUT("TIMEOUT"),
+  
+  APPROVAL_REQUIRED("APPROVAL_REQUIRED"),
+  
+  APPROVAL_DENIED("APPROVAL_DENIED"),
+  
+  RULE_BLOCKED("RULE_BLOCKED"),
+  
+  SUSPENDED("SUSPENDED");
 
   private final String value;
 
-  ToolInvocationSurfaceModel(String value) {
+  ExternalInvocationOutcomeModel(String value) {
     this.value = value;
   }
 
@@ -46,8 +56,8 @@ public enum ToolInvocationSurfaceModel {
   }
 
   @JsonCreator
-  public static ToolInvocationSurfaceModel fromValue(String value) {
-    for (ToolInvocationSurfaceModel b : ToolInvocationSurfaceModel.values()) {
+  public static ExternalInvocationOutcomeModel fromValue(String value) {
+    for (ExternalInvocationOutcomeModel b : ExternalInvocationOutcomeModel.values()) {
       if (b.value.equalsIgnoreCase(value)) {
         return b;
       }

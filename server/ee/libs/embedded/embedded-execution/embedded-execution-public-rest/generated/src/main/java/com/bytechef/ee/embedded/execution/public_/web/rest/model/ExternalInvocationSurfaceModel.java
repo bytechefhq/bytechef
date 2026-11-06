@@ -17,19 +17,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * What a tool invocation ran.
+ * The surface a external invocation was made through.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-02T21:09:06.459171+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public enum ToolInvocationKindModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+public enum ExternalInvocationSurfaceModel {
   
-  COMPONENT("COMPONENT"),
+  MCP_EMBEDDED("MCP_EMBEDDED"),
   
-  WORKFLOW("WORKFLOW");
+  EMBEDDED_API_ACTION("EMBEDDED_API_ACTION"),
+  
+  EMBEDDED_API_TOOL("EMBEDDED_API_TOOL");
 
   private final String value;
 
-  ToolInvocationKindModel(String value) {
+  ExternalInvocationSurfaceModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +46,8 @@ public enum ToolInvocationKindModel {
   }
 
   @JsonCreator
-  public static ToolInvocationKindModel fromValue(String value) {
-    for (ToolInvocationKindModel b : ToolInvocationKindModel.values()) {
+  public static ExternalInvocationSurfaceModel fromValue(String value) {
+    for (ExternalInvocationSurfaceModel b : ExternalInvocationSurfaceModel.values()) {
       if (b.value.equalsIgnoreCase(value)) {
         return b;
       }

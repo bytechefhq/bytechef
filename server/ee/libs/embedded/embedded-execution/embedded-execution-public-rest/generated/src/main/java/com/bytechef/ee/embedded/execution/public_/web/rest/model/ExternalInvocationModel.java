@@ -2,9 +2,9 @@ package com.bytechef.ee.embedded.execution.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationKindModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationOutcomeModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationSurfaceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationKindModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationOutcomeModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSurfaceModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -23,13 +23,13 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A record of a single tool invocation.
+ * A record of a single external invocation.
  */
 
-@Schema(name = "ToolInvocation", description = "A record of a single tool invocation.")
-@JsonTypeName("ToolInvocation")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T09:08:13.694310+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public class ToolInvocationModel {
+@Schema(name = "ExternalInvocation", description = "A record of a single external invocation.")
+@JsonTypeName("ExternalInvocation")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+public class ExternalInvocationModel {
 
   private @Nullable String componentName;
 
@@ -50,17 +50,17 @@ public class ToolInvocationModel {
 
   private @Nullable Long jobId;
 
-  private @Nullable ToolInvocationKindModel kind;
+  private @Nullable ExternalInvocationKindModel kind;
 
   private @Nullable String operationName;
 
-  private @Nullable ToolInvocationOutcomeModel outcome;
+  private @Nullable ExternalInvocationOutcomeModel outcome;
 
-  private @Nullable ToolInvocationSurfaceModel surface;
+  private @Nullable ExternalInvocationSurfaceModel surface;
 
   private @Nullable String toolName;
 
-  public ToolInvocationModel componentName(@Nullable String componentName) {
+  public ExternalInvocationModel componentName(@Nullable String componentName) {
     this.componentName = componentName;
     return this;
   }
@@ -81,7 +81,7 @@ public class ToolInvocationModel {
     this.componentName = componentName;
   }
 
-  public ToolInvocationModel componentVersion(@Nullable Integer componentVersion) {
+  public ExternalInvocationModel componentVersion(@Nullable Integer componentVersion) {
     this.componentVersion = componentVersion;
     return this;
   }
@@ -102,7 +102,7 @@ public class ToolInvocationModel {
     this.componentVersion = componentVersion;
   }
 
-  public ToolInvocationModel createdDate(@Nullable OffsetDateTime createdDate) {
+  public ExternalInvocationModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -123,7 +123,7 @@ public class ToolInvocationModel {
     this.createdDate = createdDate;
   }
 
-  public ToolInvocationModel durationMs(@Nullable Integer durationMs) {
+  public ExternalInvocationModel durationMs(@Nullable Integer durationMs) {
     this.durationMs = durationMs;
     return this;
   }
@@ -144,7 +144,7 @@ public class ToolInvocationModel {
     this.durationMs = durationMs;
   }
 
-  public ToolInvocationModel errorMessage(@Nullable String errorMessage) {
+  public ExternalInvocationModel errorMessage(@Nullable String errorMessage) {
     this.errorMessage = errorMessage;
     return this;
   }
@@ -165,7 +165,7 @@ public class ToolInvocationModel {
     this.errorMessage = errorMessage;
   }
 
-  public ToolInvocationModel errorType(@Nullable String errorType) {
+  public ExternalInvocationModel errorType(@Nullable String errorType) {
     this.errorType = errorType;
     return this;
   }
@@ -186,7 +186,7 @@ public class ToolInvocationModel {
     this.errorType = errorType;
   }
 
-  public ToolInvocationModel id(@Nullable Long id) {
+  public ExternalInvocationModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
@@ -207,7 +207,7 @@ public class ToolInvocationModel {
     this.id = id;
   }
 
-  public ToolInvocationModel integrationInstanceId(@Nullable Long integrationInstanceId) {
+  public ExternalInvocationModel integrationInstanceId(@Nullable Long integrationInstanceId) {
     this.integrationInstanceId = integrationInstanceId;
     return this;
   }
@@ -228,7 +228,7 @@ public class ToolInvocationModel {
     this.integrationInstanceId = integrationInstanceId;
   }
 
-  public ToolInvocationModel jobId(@Nullable Long jobId) {
+  public ExternalInvocationModel jobId(@Nullable Long jobId) {
     this.jobId = jobId;
     return this;
   }
@@ -249,7 +249,7 @@ public class ToolInvocationModel {
     this.jobId = jobId;
   }
 
-  public ToolInvocationModel kind(@Nullable ToolInvocationKindModel kind) {
+  public ExternalInvocationModel kind(@Nullable ExternalInvocationKindModel kind) {
     this.kind = kind;
     return this;
   }
@@ -261,16 +261,16 @@ public class ToolInvocationModel {
   @Valid 
   @Schema(name = "kind", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("kind")
-  public @Nullable ToolInvocationKindModel getKind() {
+  public @Nullable ExternalInvocationKindModel getKind() {
     return kind;
   }
 
   @JsonProperty("kind")
-  public void setKind(@Nullable ToolInvocationKindModel kind) {
+  public void setKind(@Nullable ExternalInvocationKindModel kind) {
     this.kind = kind;
   }
 
-  public ToolInvocationModel operationName(@Nullable String operationName) {
+  public ExternalInvocationModel operationName(@Nullable String operationName) {
     this.operationName = operationName;
     return this;
   }
@@ -291,7 +291,7 @@ public class ToolInvocationModel {
     this.operationName = operationName;
   }
 
-  public ToolInvocationModel outcome(@Nullable ToolInvocationOutcomeModel outcome) {
+  public ExternalInvocationModel outcome(@Nullable ExternalInvocationOutcomeModel outcome) {
     this.outcome = outcome;
     return this;
   }
@@ -303,16 +303,16 @@ public class ToolInvocationModel {
   @Valid 
   @Schema(name = "outcome", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outcome")
-  public @Nullable ToolInvocationOutcomeModel getOutcome() {
+  public @Nullable ExternalInvocationOutcomeModel getOutcome() {
     return outcome;
   }
 
   @JsonProperty("outcome")
-  public void setOutcome(@Nullable ToolInvocationOutcomeModel outcome) {
+  public void setOutcome(@Nullable ExternalInvocationOutcomeModel outcome) {
     this.outcome = outcome;
   }
 
-  public ToolInvocationModel surface(@Nullable ToolInvocationSurfaceModel surface) {
+  public ExternalInvocationModel surface(@Nullable ExternalInvocationSurfaceModel surface) {
     this.surface = surface;
     return this;
   }
@@ -324,16 +324,16 @@ public class ToolInvocationModel {
   @Valid 
   @Schema(name = "surface", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("surface")
-  public @Nullable ToolInvocationSurfaceModel getSurface() {
+  public @Nullable ExternalInvocationSurfaceModel getSurface() {
     return surface;
   }
 
   @JsonProperty("surface")
-  public void setSurface(@Nullable ToolInvocationSurfaceModel surface) {
+  public void setSurface(@Nullable ExternalInvocationSurfaceModel surface) {
     this.surface = surface;
   }
 
-  public ToolInvocationModel toolName(@Nullable String toolName) {
+  public ExternalInvocationModel toolName(@Nullable String toolName) {
     this.toolName = toolName;
     return this;
   }
@@ -362,21 +362,21 @@ public class ToolInvocationModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ToolInvocationModel toolInvocation = (ToolInvocationModel) o;
-    return Objects.equals(this.componentName, toolInvocation.componentName) &&
-        Objects.equals(this.componentVersion, toolInvocation.componentVersion) &&
-        Objects.equals(this.createdDate, toolInvocation.createdDate) &&
-        Objects.equals(this.durationMs, toolInvocation.durationMs) &&
-        Objects.equals(this.errorMessage, toolInvocation.errorMessage) &&
-        Objects.equals(this.errorType, toolInvocation.errorType) &&
-        Objects.equals(this.id, toolInvocation.id) &&
-        Objects.equals(this.integrationInstanceId, toolInvocation.integrationInstanceId) &&
-        Objects.equals(this.jobId, toolInvocation.jobId) &&
-        Objects.equals(this.kind, toolInvocation.kind) &&
-        Objects.equals(this.operationName, toolInvocation.operationName) &&
-        Objects.equals(this.outcome, toolInvocation.outcome) &&
-        Objects.equals(this.surface, toolInvocation.surface) &&
-        Objects.equals(this.toolName, toolInvocation.toolName);
+    ExternalInvocationModel externalInvocation = (ExternalInvocationModel) o;
+    return Objects.equals(this.componentName, externalInvocation.componentName) &&
+        Objects.equals(this.componentVersion, externalInvocation.componentVersion) &&
+        Objects.equals(this.createdDate, externalInvocation.createdDate) &&
+        Objects.equals(this.durationMs, externalInvocation.durationMs) &&
+        Objects.equals(this.errorMessage, externalInvocation.errorMessage) &&
+        Objects.equals(this.errorType, externalInvocation.errorType) &&
+        Objects.equals(this.id, externalInvocation.id) &&
+        Objects.equals(this.integrationInstanceId, externalInvocation.integrationInstanceId) &&
+        Objects.equals(this.jobId, externalInvocation.jobId) &&
+        Objects.equals(this.kind, externalInvocation.kind) &&
+        Objects.equals(this.operationName, externalInvocation.operationName) &&
+        Objects.equals(this.outcome, externalInvocation.outcome) &&
+        Objects.equals(this.surface, externalInvocation.surface) &&
+        Objects.equals(this.toolName, externalInvocation.toolName);
   }
 
   @Override
@@ -387,7 +387,7 @@ public class ToolInvocationModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ToolInvocationModel {\n");
+    sb.append("class ExternalInvocationModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
