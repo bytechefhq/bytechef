@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="00000000000001" author="Ivica Cardic">
+        <createTable tableName="asset_file">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="mime_type" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="size_bytes" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="generated_by_agent_source" type="SMALLINT"/>
+            <column name="generated_from_prompt" type="TEXT"/>
+            <column name="format" type="SMALLINT"/>
+            <column name="metadata_json" type="TEXT"/>
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="public_link_token" type="VARCHAR(64)"/>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="asset_file" indexName="idx_asset_file_name">
+            <column name="name"/>
+        </createIndex>
+
+        <createIndex tableName="asset_file" indexName="idx_asset_file_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <createIndex tableName="asset_file" indexName="idx_asset_file_environment">
+            <column name="environment"/>
+        </createIndex>
+
+        <createIndex tableName="asset_file" indexName="uk_asset_file_public_link_token" unique="true">
+            <column name="public_link_token"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="asset_file"
+            baseColumnNames="workspace_id"
+            constraintName="fk_asset_file_workspace"
+            referencedTableName="workspace"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="asset_file_tag">
+            <column name="asset_file_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="asset_file_tag" columnNames="asset_file_id,tag_id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="asset_file_tag"
+            baseColumnNames="asset_file_id"
+            constraintName="fk_asset_file_tag_asset_file"
+            referencedTableName="asset_file"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="asset_file_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_asset_file_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="asset_file_version">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="asset_file_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mime_type" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="size_bytes" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            tableName="asset_file_version"
+            columnNames="asset_file_id,version_number"
+            constraintName="uk_asset_file_version_number"/>
+
+        <createIndex tableName="asset_file_version" indexName="idx_asset_file_version_asset_file">
+            <column name="asset_file_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="asset_file_version"
+            baseColumnNames="asset_file_id"
+            constraintName="fk_asset_file_version_asset_file"
+            referencedTableName="asset_file"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="asset_file_orphan_blob">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="file" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempts" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_attempt_date" type="TIMESTAMP"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
