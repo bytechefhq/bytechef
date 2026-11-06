@@ -112,11 +112,16 @@ const onProjectDeploymentSaved = vi.fn();
 
 const project = {id: 7, lastProjectVersion: 3, lastPublishedDate: new Date(), name: 'Orders'} as Project;
 
-const renderProjectDeploymentsPanel = (expandedProjectDeploymentId?: number, renderedProject: Project = project) =>
+const renderProjectDeploymentsPanel = (
+    expandedProjectDeploymentId?: number,
+    renderedProject: Project = project,
+    expandAll = false
+) =>
     render(
         <TooltipProvider>
             <ProjectDeploymentsPanel
                 enabled
+                expandAll={expandAll}
                 expandedProjectDeploymentId={expandedProjectDeploymentId}
                 onProjectDeploymentSaved={onProjectDeploymentSaved}
                 project={renderedProject}
@@ -142,28 +147,52 @@ describe('ProjectDeploymentsPanel', () => {
         environmentStore.setState({currentEnvironmentId: 0});
     });
 
-    it('shows a skeleton card for each known deployment while the deployments load', () => {
+    it('shows a single skeleton card however many deployments are known', () => {
         hoisted.isLoading = true;
         hoisted.projectDeployments = undefined;
 
         renderProjectDeploymentsPanel(undefined, {...project, developmentDeploymentCount: 2} as Project);
 
-        expect(within(screen.getByRole('list', {name: 'Loading deployments'})).getAllByRole('listitem')).toHaveLength(
-            2
-        );
+        expect(screen.getAllByRole('status', {name: 'Loading deployments'})).toHaveLength(1);
     });
 
-    it('shows one skeleton card while deployments of an environment without a known count load', () => {
+    it('shows a skeleton card while deployments of an environment without a known count load', () => {
         hoisted.isLoading = true;
         hoisted.projectDeployments = undefined;
 
         environmentStore.setState({currentEnvironmentId: 2});
 
-        renderProjectDeploymentsPanel(undefined, {...project, developmentDeploymentCount: 2} as Project);
+        renderProjectDeploymentsPanel(undefined, {...project, developmentDeploymentCount: 0} as Project);
 
-        expect(within(screen.getByRole('list', {name: 'Loading deployments'})).getAllByRole('listitem')).toHaveLength(
-            1
+        expect(screen.getAllByRole('status', {name: 'Loading deployments'})).toHaveLength(1);
+    });
+
+    it('shows a skeleton workflow row with a run button per project workflow when deployments render expanded', () => {
+        hoisted.isLoading = true;
+        hoisted.projectDeployments = undefined;
+
+        renderProjectDeploymentsPanel(
+            undefined,
+            {...project, developmentDeploymentCount: 2, projectWorkflowIds: [1, 2]} as Project,
+            true
         );
+
+        expect(within(screen.getByRole('list', {name: 'Loading workflows'})).getAllByRole('listitem')).toHaveLength(2);
+        expect(screen.getAllByTestId('workflow-run-button-skeleton')).toHaveLength(2);
+    });
+
+    it('shows no skeleton workflow rows when deployments render collapsed', () => {
+        hoisted.isLoading = true;
+        hoisted.projectDeployments = undefined;
+
+        renderProjectDeploymentsPanel(undefined, {
+            ...project,
+            developmentDeploymentCount: 2,
+            projectWorkflowIds: [1, 2],
+        } as Project);
+
+        expect(screen.getByRole('status', {name: 'Loading deployments'})).toBeInTheDocument();
+        expect(screen.queryByRole('list', {name: 'Loading workflows'})).not.toBeInTheDocument();
     });
 
     it('shows no skeleton while the deployments of a project without deployments load', () => {
@@ -172,7 +201,7 @@ describe('ProjectDeploymentsPanel', () => {
 
         renderProjectDeploymentsPanel(undefined, {...project, developmentDeploymentCount: 0} as Project);
 
-        expect(screen.queryByRole('list', {name: 'Loading deployments'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('status', {name: 'Loading deployments'})).not.toBeInTheDocument();
     });
 
     it('shows only the deployments of the current environment', () => {

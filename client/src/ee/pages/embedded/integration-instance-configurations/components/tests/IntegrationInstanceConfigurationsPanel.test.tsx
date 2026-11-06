@@ -129,38 +129,33 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
         expect(screen.queryByText(/Configuration dialog/)).not.toBeInTheDocument();
     });
 
-    it('shows one skeleton card per known Development configuration while loading, up to 3', () => {
+    it('shows one skeleton card with a row per integration workflow while loading', () => {
         hoisted.integrationInstanceConfigurations = undefined;
         hoisted.isLoading = true;
 
-        renderPanel({developmentConfigurationCount: 2});
+        renderPanel({developmentConfigurationCount: 2, integrationWorkflowIds: [1, 2]});
 
-        expect(
-            within(screen.getByRole('list', {name: 'Loading configurations'})).getAllByRole('listitem')
-        ).toHaveLength(2);
+        expect(screen.getAllByRole('status', {name: 'Loading configurations'})).toHaveLength(1);
+        expect(within(screen.getByRole('list', {name: 'Loading workflows'})).getAllByRole('listitem')).toHaveLength(2);
         expect(screen.queryByText('No configurations in Development')).not.toBeInTheDocument();
     });
 
-    it('caps the skeleton cards at 3', () => {
+    it('shows a single skeleton card however many configurations are known', () => {
         hoisted.integrationInstanceConfigurations = undefined;
         hoisted.isLoading = true;
 
         renderPanel({developmentConfigurationCount: 7});
 
-        expect(
-            within(screen.getByRole('list', {name: 'Loading configurations'})).getAllByRole('listitem')
-        ).toHaveLength(3);
+        expect(screen.getAllByRole('status', {name: 'Loading configurations'})).toHaveLength(1);
     });
 
-    it('shows one skeleton card while loading when the configuration count is unknown', () => {
+    it('shows a skeleton card while loading when the configuration count is unknown', () => {
         hoisted.integrationInstanceConfigurations = undefined;
         hoisted.isLoading = true;
 
         renderPanel({developmentConfigurationCount: undefined});
 
-        expect(
-            within(screen.getByRole('list', {name: 'Loading configurations'})).getAllByRole('listitem')
-        ).toHaveLength(1);
+        expect(screen.getAllByRole('status', {name: 'Loading configurations'})).toHaveLength(1);
     });
 
     it('shows no skeleton cards while loading when the integration is known to have no configurations', () => {
@@ -169,7 +164,7 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
 
         renderPanel({developmentConfigurationCount: 0});
 
-        expect(screen.queryByRole('list', {name: 'Loading configurations'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('status', {name: 'Loading configurations'})).not.toBeInTheDocument();
         expect(screen.queryByText('No configurations in Development')).not.toBeInTheDocument();
     });
 

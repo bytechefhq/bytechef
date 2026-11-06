@@ -40,6 +40,7 @@ describe('McpComponentDialogToolSelectionStep', () => {
 
         expect(screen.getByRole('status', {name: 'Loading tools'})).toBeInTheDocument();
         expect(screen.queryByText('No tools available for this component.')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('mcp-tools-heading-skeleton')).not.toBeInTheDocument();
     });
 
     it('lists the tools once the component definition has loaded', () => {

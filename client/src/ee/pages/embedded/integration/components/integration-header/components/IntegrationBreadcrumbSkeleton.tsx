@@ -7,13 +7,15 @@ const IntegrationBreadcrumbSkeleton = () => (
             <BreadcrumbItem className="gap-2">
                 <Skeleton className="h-5 w-40" />
 
-                <Skeleton className="h-6 w-20 rounded-full" />
+                <Skeleton className="h-5 w-20 rounded-full" />
             </BreadcrumbItem>
 
             <BreadcrumbSeparator />
 
-            <BreadcrumbItem className="px-1.5">
-                <Skeleton className="h-5 w-44" />
+            <BreadcrumbItem className="gap-1 px-1.5 py-1">
+                <Skeleton className="h-5 w-40" />
+
+                <Skeleton className="size-4" />
             </BreadcrumbItem>
         </BreadcrumbList>
     </Breadcrumb>

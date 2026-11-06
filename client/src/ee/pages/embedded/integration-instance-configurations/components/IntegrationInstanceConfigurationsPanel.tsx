@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
 import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
@@ -9,6 +8,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import WorkflowGroupCardSkeleton from '@/shared/components/WorkflowGroupCardSkeleton';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {AlertTriangleIcon, PlusIcon, SendIcon, Settings2Icon} from 'lucide-react';
@@ -66,8 +66,6 @@ const IntegrationInstanceConfigurationsPanel = ({
 
     const knownIntegrationInstanceConfigurationCount = integration.developmentConfigurationCount;
 
-    const skeletonIntegrationInstanceConfigurationCount = Math.min(knownIntegrationInstanceConfigurationCount ?? 1, 3);
-
     return (
         <>
             {integrationInstanceConfigurationsIsLoading && knownIntegrationInstanceConfigurationCount === 0 && (
@@ -77,26 +75,10 @@ const IntegrationInstanceConfigurationsPanel = ({
             )}
 
             {integrationInstanceConfigurationsIsLoading && knownIntegrationInstanceConfigurationCount !== 0 && (
-                <ul aria-busy="true" aria-label="Loading configurations">
-                    {Array.from({length: skeletonIntegrationInstanceConfigurationCount}, (_, index) => (
-                        <li
-                            className="mb-2 flex items-center justify-between rounded border border-border/50 p-3"
-                            key={index}
-                        >
-                            <div className="space-y-2">
-                                <Skeleton className="h-5 w-40" />
-
-                                <Skeleton className="h-4 w-24" />
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <Skeleton className="h-6 w-9 rounded-full" />
-
-                                <Skeleton className="h-6 w-11 rounded-full" />
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                <WorkflowGroupCardSkeleton
+                    label="Loading configurations"
+                    workflowCount={integration.integrationWorkflowIds?.length ?? 1}
+                />
             )}
 
             {integrationInstanceConfigurationsLoadFailed && (
