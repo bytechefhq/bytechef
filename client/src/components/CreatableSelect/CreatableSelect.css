@@ -74,8 +74,25 @@
     @apply bg-surface-neutral-secondary!;
 }
 
+.dark .react-select__multi-value {
+    @apply bg-surface-neutral-tertiary!;
+}
+
 .react-select__multi-value__label {
     @apply text-content-neutral-primary!;
+}
+
+.react-select__multi-value__remove {
+    @apply text-content-neutral-secondary!;
+}
+
+.react-select__multi-value__remove:hover {
+    @apply bg-surface-neutral-secondary-hover!;
+    @apply text-content-neutral-primary!;
+}
+
+.dark .react-select__multi-value__remove:hover {
+    @apply bg-surface-neutral-tertiary-hover!;
 }
 
 .react-select__indicator-separator {
