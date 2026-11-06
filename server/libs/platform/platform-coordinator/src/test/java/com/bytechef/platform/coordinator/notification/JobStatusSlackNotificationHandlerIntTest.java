@@ -38,7 +38,7 @@ class JobStatusSlackNotificationHandlerIntTest {
     void testTextStartsWithIconAndAppendsDetails() {
         NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
             .eventType(Type.JOB_FAILED)
-            .executionUrl("https://x/automation/executions?id=42")
+            .executionUrl("https://x/automation/workflow-executions?id=42")
             .jobId(42L)
             .jobName("Daily sync")
             .build();
@@ -47,6 +47,6 @@ class JobStatusSlackNotificationHandlerIntTest {
 
         assertThat(text)
             .startsWith(":rotating_light: ")
-            .endsWith("\nExecution: https://x/automation/executions?id=42");
+            .endsWith("\nExecution: https://x/automation/workflow-executions?id=42");
     }
 }

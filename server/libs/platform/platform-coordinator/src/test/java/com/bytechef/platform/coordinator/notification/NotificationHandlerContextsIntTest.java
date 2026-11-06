@@ -148,7 +148,7 @@ class NotificationHandlerContextsIntTest {
         assertEquals(new WorkflowSummary("wf-1", "Daily sync"), context.getWorkflow());
         assertEquals(
             new JobSummary(jobId, "Daily sync", "FAILED", START_DATE, END_DATE, 5000L), context.getJob());
-        assertEquals(PUBLIC_URL + "/automation/executions?id=" + jobId, context.getExecutionUrl());
+        assertEquals(PUBLIC_URL + "/automation/workflow-executions?id=" + jobId, context.getExecutionUrl());
         assertNotNull(context.getDeliveryId());
         assertNotNull(context.getTimestamp());
     }
@@ -180,7 +180,7 @@ class NotificationHandlerContextsIntTest {
         assertEquals("EMBEDDED", context.getSource());
         assertEquals(new ProjectSummary(5L, "HubSpot", 2), context.getProject());
         assertEquals("STAGING", context.getEnvironment());
-        assertEquals(PUBLIC_URL + "/embedded/executions?id=" + jobId, context.getExecutionUrl());
+        assertEquals(PUBLIC_URL + "/embedded/workflow-executions?id=" + jobId, context.getExecutionUrl());
     }
 
     @Test
@@ -304,7 +304,7 @@ class NotificationHandlerContextsIntTest {
         assertNull(context.getProject());
         assertNull(context.getEnvironment());
         assertEquals("AUTOMATION", context.getSource());
-        assertEquals(PUBLIC_URL + "/automation/executions?id=" + jobId, context.getExecutionUrl());
+        assertEquals(PUBLIC_URL + "/automation/workflow-executions?id=" + jobId, context.getExecutionUrl());
     }
 
     @Test

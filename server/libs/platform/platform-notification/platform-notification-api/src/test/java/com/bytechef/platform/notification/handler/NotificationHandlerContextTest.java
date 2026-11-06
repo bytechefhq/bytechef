@@ -142,7 +142,7 @@ class NotificationHandlerContextTest {
             .project(new ProjectSummary(1L, "CRM", 3))
             .environment("PRODUCTION")
             .error(new ErrorSummary("Send email", "email/v1/send", null, "java.io.IOException"))
-            .executionUrl("https://x/automation/executions?id=42")
+            .executionUrl("https://x/automation/workflow-executions?id=42")
             .build();
 
         Map<String, Object> map = context.toMap();
@@ -175,12 +175,12 @@ class NotificationHandlerContextTest {
             .project(new ProjectSummary(1L, "CRM", 3))
             .environment("PRODUCTION")
             .error(new ErrorSummary("Send email", "email/v1/send", "boom", null))
-            .executionUrl("https://x/automation/executions?id=42")
+            .executionUrl("https://x/automation/workflow-executions?id=42")
             .build();
 
         assertEquals(
             "Workflow: Daily sync\nProject: CRM (v3)\nEnvironment: PRODUCTION\n" +
-                "Failed task: Send email (email/v1/send)\nError: boom\nExecution: https://x/automation/executions?id=42",
+                "Failed task: Send email (email/v1/send)\nError: boom\nExecution: https://x/automation/workflow-executions?id=42",
             full.toDetailsText());
 
         NotificationHandlerContext partial = new NotificationHandlerContext.Builder()

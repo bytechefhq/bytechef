@@ -158,7 +158,7 @@ public class NotificationHandlerContext {
             .deliveryId("00000000-0000-0000-0000-000000000000")
             .source("AUTOMATION")
             .environment("PRODUCTION")
-            .executionUrl("https://example.com/automation/executions?id=1")
+            .executionUrl("https://example.com/automation/workflow-executions?id=1")
             .job(new JobSummary(1L, "Example workflow", "FAILED", timestamp, timestamp, 0L))
             .workflow(new WorkflowSummary("example-workflow", "Example workflow"))
             .project(new ProjectSummary(1L, "Example project", 1))
