@@ -16,8 +16,8 @@ vi.mock('@/pages/automation/tool-invocations/hooks/useToolInvocations', () => ({
 }));
 
 vi.mock('@/components/ComboBox/ComboBox', () => ({
-    default: ({items}: {items: Array<ComboBoxItemType>}) => (
-        <ul>
+    default: ({'aria-label': ariaLabel, items}: {'aria-label'?: string; items: Array<ComboBoxItemType>}) => (
+        <ul aria-label={ariaLabel}>
             {items.map((item) => (
                 <li data-testid="combo-box-item" key={item.value}>
                     {item.value}
@@ -257,6 +257,7 @@ describe('ToolInvocations', () => {
 
         expect(screen.getByText('A2A Server', {selector: 'label'})).toBeInTheDocument();
         expect(renderedItemValues()).toContain('4');
+        expect(screen.getByRole('list', {name: 'A2A Server'})).toBeInTheDocument();
     });
 
     it('offers the MCP server filter only when the workspace has MCP servers', () => {
@@ -272,5 +273,6 @@ describe('ToolInvocations', () => {
 
         expect(screen.getByText('MCP Server', {selector: 'label'})).toBeInTheDocument();
         expect(renderedItemValues()).toContain('11');
+        expect(screen.getByRole('list', {name: 'MCP Server'})).toBeInTheDocument();
     });
 });
