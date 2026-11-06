@@ -197,8 +197,9 @@ class QuartzJobReaderTest {
             .usingJobData("workflowExecutionId", "wfe-3")
             .build();
         JobDetail resume = JobBuilder.newJob(OneTimeSchedulerJob.class)
-            .withIdentity("42", "OneTimeTask")
+            .withIdentity("000001:42", "OneTimeTask")
             .usingJobData("jobId", 42L)
+            .usingJobData("tenantId", "000001")
             .build();
         Trigger pollingTrigger = TriggerBuilder.newTrigger()
             .withIdentity("wfe-3", "PollingTrigger")
@@ -208,14 +209,15 @@ class QuartzJobReaderTest {
 
         computeFirstFireTime(pollingTrigger);
         stub(List.of(oauth, polling, resume),
-            List.of(oneShot("00000177", "ConnectionOauth2TokenRefresh"), pollingTrigger, oneShot("42", "OneTimeTask")));
+            List.of(oneShot("00000177", "ConnectionOauth2TokenRefresh"), pollingTrigger,
+                oneShot("000001:42", "OneTimeTask")));
 
         Assertions.assertThat(reader.read()
             .jobs())
             .containsExactlyInAnyOrder(
                 new ImportedJob.OAuth2TokenRefresh("00000177", 77L, "000001", nextFireTime.toInstant()),
                 new ImportedJob.PollingTrigger("wfe-3", nextFireTime.toInstant()),
-                new ImportedJob.OneTimeResume("42", 42L, null, nextFireTime.toInstant()));
+                new ImportedJob.OneTimeResume("000001:42", 42L, null, "000001", nextFireTime.toInstant()));
     }
 
     @Test
@@ -231,7 +233,7 @@ class QuartzJobReaderTest {
         Assertions.assertThat(reader.read()
             .jobs())
             .containsExactly(
-                new ImportedJob.OneTimeResume("44", 44L, "{\"step\":\"1\"}", nextFireTime.toInstant()));
+                new ImportedJob.OneTimeResume("44", 44L, "{\"step\":\"1\"}", null, nextFireTime.toInstant()));
     }
 
     @Test
@@ -289,7 +291,7 @@ class QuartzJobReaderTest {
         Assertions.assertThat(result.failed())
             .isEqualTo(1);
         Assertions.assertThat(result.jobs())
-            .containsExactly(new ImportedJob.OneTimeResume("43", 43L, null, nextFireTime.toInstant()));
+            .containsExactly(new ImportedJob.OneTimeResume("43", 43L, null, null, nextFireTime.toInstant()));
     }
 
     @Test

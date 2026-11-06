@@ -66,7 +66,7 @@ class DbTriggerSchedulerTest {
 
     @Test
     void testCancelOneTimeTaskCancelsTheScheduledResumeOfTheJob() {
-        TaskInstanceId taskInstanceId = DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("42");
+        TaskInstanceId taskInstanceId = DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("public:42");
 
         Mockito.when(schedulerClient.getScheduledExecution(taskInstanceId))
             .thenReturn(Optional.of(Mockito.mock(ScheduledExecution.class)));
@@ -75,19 +75,85 @@ class DbTriggerSchedulerTest {
 
         Mockito.verify(schedulerClient)
             .cancel(taskInstanceId);
+        Mockito.verify(schedulerClient, Mockito.never())
+            .getScheduledExecution(DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("42"));
     }
 
     @Test
     void testCancelOneTimeTaskSkipsAJobWithoutAScheduledResume() {
-        TaskInstanceId taskInstanceId = DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("42");
-
-        Mockito.when(schedulerClient.getScheduledExecution(taskInstanceId))
+        Mockito.when(schedulerClient.getScheduledExecution(Mockito.any()))
             .thenReturn(Optional.empty());
 
         triggerScheduler.cancelOneTimeTask(42L);
 
         Mockito.verify(schedulerClient, Mockito.never())
             .cancel(Mockito.any());
+    }
+
+    @Test
+    void testCancelOneTimeTaskCancelsAResumeScheduledUnderTheLegacyInstanceId() {
+        TaskInstanceId legacyTaskInstanceId = DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("42");
+
+        ScheduledExecution<Object> legacyScheduledExecution = scheduledExecution(
+            new OneTimeResumeData(42L, null, "tenant_1"));
+
+        Mockito.when(schedulerClient.getScheduledExecution(Mockito.any()))
+            .thenReturn(Optional.empty());
+        Mockito.when(schedulerClient.getScheduledExecution(legacyTaskInstanceId))
+            .thenReturn(Optional.of(legacyScheduledExecution));
+
+        TenantContext.runWithTenantId("tenant_1", () -> triggerScheduler.cancelOneTimeTask(42L));
+
+        Mockito.verify(schedulerClient)
+            .cancel(legacyTaskInstanceId);
+    }
+
+    @Test
+    void testCancelOneTimeTaskKeepsALegacyResumeOfAnotherTenant() {
+        TaskInstanceId legacyTaskInstanceId = DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("42");
+
+        ScheduledExecution<Object> legacyScheduledExecution = scheduledExecution(
+            new OneTimeResumeData(42L, null, "tenant_2"));
+
+        Mockito.when(schedulerClient.getScheduledExecution(Mockito.any()))
+            .thenReturn(Optional.empty());
+        Mockito.when(schedulerClient.getScheduledExecution(legacyTaskInstanceId))
+            .thenReturn(Optional.of(legacyScheduledExecution));
+
+        TenantContext.runWithTenantId("tenant_1", () -> triggerScheduler.cancelOneTimeTask(42L));
+
+        Mockito.verify(schedulerClient, Mockito.never())
+            .cancel(Mockito.any());
+    }
+
+    @Test
+    void testCancelOneTimeTaskKeepsTheLegacyResumeWhenTheTenantScopedResumeExists() {
+        TaskInstanceId taskInstanceId = DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("tenant_1:42");
+
+        Mockito.when(schedulerClient.getScheduledExecution(taskInstanceId))
+            .thenReturn(Optional.of(Mockito.mock(ScheduledExecution.class)));
+
+        TenantContext.runWithTenantId("tenant_1", () -> triggerScheduler.cancelOneTimeTask(42L));
+
+        Mockito.verify(schedulerClient)
+            .cancel(taskInstanceId);
+        Mockito.verify(schedulerClient, Mockito.never())
+            .cancel(DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("42"));
+    }
+
+    @Test
+    void testScheduleOneTimeTaskKeepsTheResumesOfTwoTenantsWithTheSameJobIdApart() {
+        Instant executeAt = Instant.parse("2031-01-01T00:00:00Z");
+
+        TenantContext.runWithTenantId(
+            "tenant_1", () -> triggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), 42L));
+        TenantContext.runWithTenantId(
+            "tenant_2", () -> triggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), 42L));
+
+        Assertions.assertThat(existingInstanceKeys)
+            .contains(
+                DbSchedulerTaskDescriptors.ONE_TIME_RESUME.getTaskName() + "|tenant_1:42",
+                DbSchedulerTaskDescriptors.ONE_TIME_RESUME.getTaskName() + "|tenant_2:42");
     }
 
     @Test
@@ -176,6 +242,8 @@ class DbTriggerSchedulerTest {
         Assertions.assertThat((OneTimeResumeData) instance.getTaskInstance()
             .getData())
             .isEqualTo(new OneTimeResumeData(44L, null, "tenant_1"));
+        Assertions.assertThat(instance.getId())
+            .isEqualTo("tenant_1:44");
     }
 
     @Test
@@ -251,6 +319,16 @@ class DbTriggerSchedulerTest {
         }
 
         return rescheduleExistingInstanceOrThrow(instance);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ScheduledExecution<Object> scheduledExecution(OneTimeResumeData oneTimeResumeData) {
+        ScheduledExecution<Object> scheduledExecution = Mockito.mock(ScheduledExecution.class);
+
+        Mockito.when(scheduledExecution.getData())
+            .thenReturn(oneTimeResumeData);
+
+        return scheduledExecution;
     }
 
     private static String instanceKey(SchedulableInstance<?> instance) {

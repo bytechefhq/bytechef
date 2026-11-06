@@ -29,6 +29,7 @@ import com.bytechef.platform.scheduler.db.task.PollingTriggerData;
 import com.bytechef.platform.scheduler.db.task.ScheduleTriggerData;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
+import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.exceptions.TaskInstanceException;
 import com.github.kagkarlsson.scheduler.task.SchedulableInstance;
@@ -37,6 +38,8 @@ import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,12 +66,25 @@ public class DbTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void cancelOneTimeTask(long jobId) {
-        TaskInstanceId taskInstanceId = ONE_TIME_RESUME.instanceId(String.valueOf(jobId));
+        String tenantId = TenantContext.getCurrentTenantId();
 
-        if (schedulerClient.getScheduledExecution(taskInstanceId)
+        String oneTimeTaskInstanceId = getOneTimeTaskInstanceId(tenantId, jobId);
+
+        if (schedulerClient.getScheduledExecution(ONE_TIME_RESUME.instanceId(oneTimeTaskInstanceId))
             .isPresent()) {
 
-            cancel(ONE_TIME_RESUME, String.valueOf(jobId));
+            cancel(ONE_TIME_RESUME, oneTimeTaskInstanceId);
+
+            return;
+        }
+
+        String legacyInstanceId = String.valueOf(jobId);
+
+        Optional<ScheduledExecution<Object>> legacyScheduledExecution = schedulerClient.getScheduledExecution(
+            ONE_TIME_RESUME.instanceId(legacyInstanceId));
+
+        if (legacyScheduledExecution.isPresent() && isOfTenant(legacyScheduledExecution.get(), tenantId)) {
+            cancel(ONE_TIME_RESUME, legacyInstanceId);
         }
     }
 
@@ -117,9 +133,31 @@ public class DbTriggerScheduler implements TriggerScheduler {
         String tenantId = TenantContext.getCurrentTenantId();
 
         replace(
-            ONE_TIME_RESUME.instance(String.valueOf(jobId))
+            ONE_TIME_RESUME.instance(getOneTimeTaskInstanceId(tenantId, jobId))
                 .data(new OneTimeResumeData(jobId, continueParameters, tenantId))
                 .scheduledTo(executeAt));
+    }
+
+    static String getOneTimeTaskInstanceId(String tenantId, long jobId) {
+        return tenantId + ":" + jobId;
+    }
+
+    private static boolean isOfTenant(ScheduledExecution<Object> scheduledExecution, String tenantId) {
+        Object data;
+
+        try {
+            data = scheduledExecution.getData();
+        } catch (RuntimeException exception) {
+            log.warn("Unable to read the data of task instance {}", scheduledExecution.getTaskInstance(), exception);
+
+            return true;
+        }
+
+        if (data instanceof OneTimeResumeData oneTimeResumeData && oneTimeResumeData.tenantId() != null) {
+            return Objects.equals(oneTimeResumeData.tenantId(), tenantId);
+        }
+
+        return true;
     }
 
     private void cancel(TaskDescriptor<?> taskDescriptor, String instanceId) {

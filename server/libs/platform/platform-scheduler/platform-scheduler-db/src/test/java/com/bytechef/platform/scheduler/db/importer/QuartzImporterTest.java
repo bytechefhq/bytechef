@@ -50,7 +50,7 @@ class QuartzImporterTest {
                     new ImportedJob.PollingTrigger("wfe-2", future),
                     new ImportedJob.DynamicWebhookRefresh("wfe-3", 99L, future),
                     new ImportedJob.OAuth2TokenRefresh("00000177", 77L, "000001", future),
-                    new ImportedJob.OneTimeResume("42", 42L, "{\"step\":\"1\"}", future)),
+                    new ImportedJob.OneTimeResume("000001:42", 42L, "{\"step\":\"1\"}", "000001", future)),
                 0, 0, 0, 0, true));
         Mockito.when(schedulerClient.scheduleIfNotExists(Mockito.any(SchedulableInstance.class)))
             .thenReturn(true);
@@ -112,11 +112,11 @@ class QuartzImporterTest {
             .isEqualTo(DbSchedulerTaskDescriptors.ONE_TIME_RESUME_NAME);
         Assertions.assertThat(instances.get(4)
             .getId())
-            .isEqualTo("42");
+            .isEqualTo("000001:42");
         Assertions.assertThat((OneTimeResumeData) instances.get(4)
             .getTaskInstance()
             .getData())
-            .isEqualTo(new OneTimeResumeData(42L, "{\"step\":\"1\"}", null));
+            .isEqualTo(new OneTimeResumeData(42L, "{\"step\":\"1\"}", "000001"));
         Assertions.assertThat(summary.imported())
             .isEqualTo(5);
         Assertions.assertThat(summary.scanned())
@@ -129,7 +129,7 @@ class QuartzImporterTest {
 
         Mockito.when(reader.read())
             .thenReturn(new QuartzJobReader.ReadResult(
-                List.of(new ImportedJob.OneTimeResume("42", 42L, null, past)), 0, 0, 0, 0, true));
+                List.of(new ImportedJob.OneTimeResume("42", 42L, null, null, past)), 0, 0, 0, 0, true));
         Mockito.when(schedulerClient.scheduleIfNotExists(Mockito.any(SchedulableInstance.class)))
             .thenReturn(true);
         Instant before = Instant.now();

@@ -104,7 +104,8 @@ public class QuartzImporter {
                 .data(new OAuth2TokenRefreshData(oAuth2TokenRefresh.connectionId(), oAuth2TokenRefresh.tenantId()))
                 .scheduledTo(executionTime);
             case ImportedJob.OneTimeResume oneTimeResume -> ONE_TIME_RESUME.instance(oneTimeResume.instanceId())
-                .data(new OneTimeResumeData(oneTimeResume.jobId(), oneTimeResume.continueParameters(), null))
+                .data(new OneTimeResumeData(
+                    oneTimeResume.jobId(), oneTimeResume.continueParameters(), oneTimeResume.tenantId()))
                 .scheduledTo(executionTime);
         };
     }

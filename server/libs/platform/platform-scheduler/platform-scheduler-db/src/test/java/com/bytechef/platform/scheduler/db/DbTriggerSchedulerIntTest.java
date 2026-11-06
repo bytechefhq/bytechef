@@ -21,7 +21,9 @@ import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.scheduler.db.config.DbSchedulerTestConfiguration;
 import com.bytechef.platform.scheduler.db.task.DbSchedulerTaskDescriptors;
+import com.bytechef.platform.scheduler.db.task.OneTimeResumeData;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
@@ -132,7 +134,7 @@ class DbTriggerSchedulerIntTest {
         Awaitility.await()
             .atMost(Duration.ofSeconds(5))
             .until(() -> schedulerClient.getScheduledExecution(
-                DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("42"))
+                DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("public:42"))
                 .isEmpty());
     }
 
@@ -146,6 +148,34 @@ class DbTriggerSchedulerIntTest {
 
         Assertions.assertThat(schedulerClient.getScheduledExecution(
             DbSchedulerTaskDescriptors.SCHEDULE_TRIGGER.instanceId(workflowExecutionId.toString())))
+            .isEmpty();
+    }
+
+    @Test
+    void testCancelOneTimeTaskRemovesTheTenantScopedAndTheLegacyInstance() {
+        Instant executeAt = Instant.now()
+            .plus(Duration.ofHours(1));
+
+        schedulerClient.scheduleIfNotExists(
+            DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instance("77")
+                .data(new OneTimeResumeData(77L, null, null))
+                .scheduledTo(executeAt));
+        TenantContext.runWithTenantId(
+            "tenant_1", () -> triggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), 77L));
+
+        TenantContext.runWithTenantId("tenant_1", () -> triggerScheduler.cancelOneTimeTask(77L));
+
+        Assertions.assertThat(schedulerClient.getScheduledExecution(
+            DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("tenant_1:77")))
+            .isEmpty();
+        Assertions.assertThat(schedulerClient.getScheduledExecution(
+            DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("77")))
+            .isPresent();
+
+        TenantContext.runWithTenantId("tenant_1", () -> triggerScheduler.cancelOneTimeTask(77L));
+
+        Assertions.assertThat(schedulerClient.getScheduledExecution(
+            DbSchedulerTaskDescriptors.ONE_TIME_RESUME.instanceId("77")))
             .isEmpty();
     }
 

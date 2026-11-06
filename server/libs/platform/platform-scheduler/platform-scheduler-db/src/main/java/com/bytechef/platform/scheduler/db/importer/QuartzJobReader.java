@@ -180,7 +180,8 @@ public class QuartzJobReader {
                 requireStringValue(jobDataMap, "tenantId", jobKey), nextFireTime);
             case "OneTimeSchedulerJob" -> new ImportedJob.OneTimeResume(
                 instanceId, requireLongValue(jobDataMap, "jobId", jobKey),
-                optionalStringValue(jobDataMap, "continueParameters"), nextFireTime);
+                optionalStringValue(jobDataMap, "continueParameters"), optionalStringValue(jobDataMap, "tenantId"),
+                nextFireTime);
             default -> throw new IllegalStateException("Unexpected job class " + jobClassName);
         };
     }

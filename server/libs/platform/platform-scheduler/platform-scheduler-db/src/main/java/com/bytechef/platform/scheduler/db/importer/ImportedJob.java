@@ -42,7 +42,8 @@ public sealed interface ImportedJob {
         implements ImportedJob {
     }
 
-    record OneTimeResume(String instanceId, long jobId, @Nullable String continueParameters, Instant nextFireTime)
-        implements ImportedJob {
+    record OneTimeResume(
+        String instanceId, long jobId, @Nullable String continueParameters, @Nullable String tenantId,
+        Instant nextFireTime) implements ImportedJob {
     }
 }
