@@ -1,5 +1,5 @@
-import LoadingIcon from '@/components/LoadingIcon';
 import {Checkbox} from '@/components/ui/checkbox';
+import McpToolSelectionListSkeleton from '@/pages/platform/mcp-servers/components/McpToolSelectionListSkeleton';
 import {ComponentDefinition, EmbeddedMcpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
 
 import useMcpComponentDialogToolSelectionStep, {SelectedToolI} from './hooks/useMcpComponentDialogToolSelectionStep';
@@ -34,9 +34,7 @@ const McpComponentDialogToolSelectionStep = ({
     return (
         <div className="space-y-4 py-4">
             {isLoadingComponentDefinition ? (
-                <div className="flex items-center justify-center py-8">
-                    <LoadingIcon className="size-6" />
-                </div>
+                <McpToolSelectionListSkeleton />
             ) : toolElements.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">No tools available for this component.</div>
             ) : (
