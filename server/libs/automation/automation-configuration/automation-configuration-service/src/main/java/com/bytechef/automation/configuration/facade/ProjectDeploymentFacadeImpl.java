@@ -550,14 +550,14 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     public void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
-        validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
-
         ProjectDeploymentWorkflow oldProjectDeploymentWorkflow =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
                 Validate.notNull(projectDeploymentWorkflow.getId(), "id"));
 
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
             oldProjectDeploymentWorkflow.getProjectDeploymentId());
+
+        validateProjectDeploymentWorkflow(projectDeployment, projectDeploymentWorkflow);
 
         ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowService.update(
             projectDeploymentWorkflow);
@@ -641,7 +641,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
             }
 
-            validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+            validateProjectDeploymentWorkflow(projectDeployment, projectDeploymentWorkflow);
 
             if (oldProjectDeploymentWorkflow == null) {
                 projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
@@ -1021,19 +1021,23 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             workflowUuid);
     }
 
-    private void validateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+    private void validateProjectDeploymentWorkflow(
+        ProjectDeployment projectDeployment, ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+
         if (projectDeploymentWorkflow.isEnabled()) {
             List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections =
                 projectDeploymentWorkflow.getConnections();
             Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
-            validateProjectDeploymentWorkflowConnections(projectDeploymentWorkflowConnections, workflow);
+            validateProjectDeploymentWorkflowConnections(
+                projectDeploymentWorkflowConnections, workflow, projectDeployment.getEnvironmentId());
             validateProjectDeploymentWorkflowInputs(projectDeploymentWorkflow.getInputs(), workflow);
         }
     }
 
     private void validateProjectDeploymentWorkflowConnections(
-        List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections, Workflow workflow) {
+        List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections, Workflow workflow,
+        long environmentId) {
 
         for (ProjectDeploymentWorkflowConnection projectDeploymentWorkflowConnection : projectDeploymentWorkflowConnections) {
             Connection connection = connectionService.getConnection(
@@ -1047,6 +1051,13 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 throw new ConfigurationException(
                     "Connection component name does not match workflow connection component name",
                     ConnectionErrorType.INVALID_CONNECTION_COMPONENT_NAME);
+            }
+
+            if (connection.getEnvironmentId() != environmentId) {
+                throw new ConfigurationException(
+                    "Connection id=%s does not belong to the deployment environment".formatted(
+                        connection.getId()),
+                    ConnectionErrorType.INVALID_CONNECTION_ENVIRONMENT);
             }
         }
     }
