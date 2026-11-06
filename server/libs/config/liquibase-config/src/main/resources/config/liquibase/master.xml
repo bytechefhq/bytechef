@@ -60,6 +60,10 @@
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/observability" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/model_catalog" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/gateway" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/platform/ai/prompt" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/platform/ai/eval" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" maxDepth="1" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/platform/ai/eval/dataset" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/platform/ai/eval/experiment" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
 
     <!-- billing -->
     <includeAll path="classpath:config/liquibase/changelog/platform/billing/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or multitenant" />
