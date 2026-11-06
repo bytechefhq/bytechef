@@ -30,6 +30,7 @@ const DataTable = () => {
         gridColumns,
         gridRowsWithAdd,
         handleCellClick,
+        handleCellKeyDown,
         handleGridScroll,
         handleRowsChange,
         handleSelectedRowsChange,
@@ -70,6 +71,7 @@ const DataTable = () => {
                         bottomSummaryRows={[{}]}
                         columns={gridColumns}
                         onCellClick={handleCellClick}
+                        onCellKeyDown={handleCellKeyDown}
                         onRowsChange={handleRowsChange}
                         onScroll={handleGridScroll}
                         onSelectedRowsChange={handleSelectedRowsChange}

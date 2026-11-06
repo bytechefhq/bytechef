@@ -1,5 +1,11 @@
 import {render, renderHook, resetAll, screen} from '@/shared/util/test-utils';
-import {type ColSpanArgs, type Column, type RenderSummaryCellProps} from 'react-data-grid';
+import {
+    type CellKeyDownArgs,
+    type CellKeyboardEvent,
+    type ColSpanArgs,
+    type Column,
+    type RenderSummaryCellProps,
+} from 'react-data-grid';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {type GridRowType, type SummaryRowType} from '../../components/cell-renderers';
@@ -18,6 +24,7 @@ const hoisted = vi.hoisted(() => {
     return {
         dataTable,
         defaultColumns: dataTable.columns,
+        insertRowMutate: vi.fn(),
         rowsQueryResult: {
             data: {
                 pages: [
@@ -56,7 +63,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
     return {
         ...actual,
         useDataTablesQuery: () => hoisted.tablesQueryResult,
-        useInsertDataTableRowMutation: () => ({mutate: vi.fn()}),
+        useInsertDataTableRowMutation: () => ({mutate: hoisted.insertRowMutate}),
         useUpdateDataTableRowMutation: () => ({mutate: vi.fn()}),
     };
 });
@@ -83,6 +90,11 @@ const summaryCellProps = {} as RenderSummaryCellProps<SummaryRowType, GridRowTyp
 
 const renderSummaryCell = (column: Column<GridRowType, SummaryRowType>) =>
     render(<>{column.renderSummaryCell?.(summaryCellProps)}</>);
+
+const createKeyDownArgs = (rowId: string) =>
+    ({mode: 'ACTIVE', row: {id: rowId}, rowIdx: 0}) as CellKeyDownArgs<GridRowType, SummaryRowType>;
+
+const createKeyboardEvent = (key: string) => ({key, preventGridDefault: vi.fn()}) as unknown as CellKeyboardEvent;
 
 const renderUseDataTable = () => renderHook(() => useDataTable({tableId: 'table-1'}));
 
@@ -156,6 +168,43 @@ describe('useDataTable', () => {
             renderSummaryCell(idColumn);
 
             expect(screen.getByText('Total rows: 2')).toBeInTheDocument();
+        });
+    });
+
+    describe('add row cell keyboard', () => {
+        it('should insert a row when Enter is pressed on the add row cell', () => {
+            const {result} = renderUseDataTable();
+
+            const keyboardEvent = createKeyboardEvent('Enter');
+
+            result.current.handleCellKeyDown(createKeyDownArgs('-1'), keyboardEvent);
+
+            expect(keyboardEvent.preventGridDefault).toHaveBeenCalled();
+            expect(hoisted.insertRowMutate).toHaveBeenCalledWith({
+                input: {environmentId: '0', tableId: 'table-1', values: {}},
+            });
+        });
+
+        it('should not insert a row when Enter is pressed on a data row', () => {
+            const {result} = renderUseDataTable();
+
+            const keyboardEvent = createKeyboardEvent('Enter');
+
+            result.current.handleCellKeyDown(createKeyDownArgs('row-1'), keyboardEvent);
+
+            expect(keyboardEvent.preventGridDefault).not.toHaveBeenCalled();
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+        });
+
+        it('should not insert a row when another key is pressed on the add row cell', () => {
+            const {result} = renderUseDataTable();
+
+            const keyboardEvent = createKeyboardEvent('ArrowDown');
+
+            result.current.handleCellKeyDown(createKeyDownArgs('-1'), keyboardEvent);
+
+            expect(keyboardEvent.preventGridDefault).not.toHaveBeenCalled();
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
         });
     });
 });
