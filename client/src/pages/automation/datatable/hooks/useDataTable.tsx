@@ -11,7 +11,15 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {Plus} from 'lucide-react';
 import {Dispatch, SetStateAction, type UIEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {type CellMouseArgs, type CellMouseEvent, type ColSpanArgs, Column, RowsChangeData} from 'react-data-grid';
+import {
+    type CellKeyDownArgs,
+    type CellKeyboardEvent,
+    type CellMouseArgs,
+    type CellMouseEvent,
+    type ColSpanArgs,
+    Column,
+    RowsChangeData,
+} from 'react-data-grid';
 
 import BottomLoader from '../components/BottomLoader';
 import {
@@ -441,6 +449,19 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         [handleAddRow]
     );
 
+    const handleCellKeyDown = useCallback(
+        ({row}: CellKeyDownArgs<GridRowType, SummaryRowType>, event: CellKeyboardEvent) => {
+            if (row?.id !== '-1' || event.key !== 'Enter') {
+                return;
+            }
+
+            event.preventGridDefault();
+
+            handleAddRow();
+        },
+        [handleAddRow]
+    );
+
     const localRowCount = localRows.length;
 
     const gridColumns: Column<GridRowType, SummaryRowType>[] = useMemo(
@@ -507,6 +528,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         gridColumns,
         gridRowsWithAdd,
         handleCellClick,
+        handleCellKeyDown,
         handleGridScroll,
         handleRowsChange,
         handleSelectedRowsChange,
