@@ -75,6 +75,12 @@ describe('InviteUserDialog', () => {
         expect(screen.queryByRole('button', {name: 'Regenerate'})).not.toBeInTheDocument();
     });
 
+    it('should display the selected role as a readable label', () => {
+        renderInviteUserDialog();
+
+        expect(screen.getByRole('combobox')).toHaveTextContent('Admin');
+    });
+
     it('should display Role label', () => {
         renderInviteUserDialog();
 

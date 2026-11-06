@@ -10,6 +10,7 @@ import {
 } from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {getRoleLabel} from '@/shared/util/role-utils';
 
 import useInviteUserDialog from './hooks/useInviteUserDialog';
 
@@ -65,7 +66,7 @@ const InviteUserDialog = () => {
                                         <SelectContent>
                                             {authorities.map((authority) => (
                                                 <SelectItem key={authority} value={authority}>
-                                                    {authority}
+                                                    {getRoleLabel(authority)}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
