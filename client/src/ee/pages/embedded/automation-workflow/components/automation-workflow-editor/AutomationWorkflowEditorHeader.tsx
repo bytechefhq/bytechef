@@ -2,7 +2,6 @@ import AutomationWorkflowEditorBreadcrumb from '@/ee/pages/embedded/automation-w
 import AutomationWorkflowEditorSettingsMenu from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorSettingsMenu';
 import AutomationWorkflowEditorWorkflowSelect from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorWorkflowSelect';
 import AutomationWorkflowProjectVersionHistorySheet from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowProjectVersionHistorySheet';
-import LeftSidebarButton from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/LeftSidebarButton';
 import OutputButton from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/PublishPopover';
 import {useAutomationWorkflowEditorHeader} from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/hooks/useAutomationWorkflowEditorHeader';
@@ -23,6 +22,7 @@ import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDi
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
 import {
     useAutomationWorkflowProjectCategoriesQuery,
     useAutomationWorkflowProjectTagsQuery,
@@ -318,7 +318,10 @@ const AutomationWorkflowEditorHeader = ({
             )}
         >
             <div className="flex items-center gap-2">
-                <LeftSidebarButton onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)} />
+                <LeftSidebarButton
+                    onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+                    tooltip="See workflows"
+                />
 
                 <AutomationWorkflowEditorBreadcrumb
                     itemSelect={

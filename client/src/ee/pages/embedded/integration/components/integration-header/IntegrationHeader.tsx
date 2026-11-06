@@ -2,7 +2,6 @@ import IntegrationBreadcrumb from '@/ee/pages/embedded/integration/components/in
 import IntegrationBreadcrumbSkeleton from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationBreadcrumbSkeleton';
 import IntegrationItemSelect from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationItemSelect';
 import IntegrationSkeleton from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationSkeleton';
-import LeftSidebarButton from '@/ee/pages/embedded/integration/components/integration-header/components/LeftSidebarButton';
 import OutputPanelButton from '@/ee/pages/embedded/integration/components/integration-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/integration/components/integration-header/components/PublishPopover';
 import SettingsMenu from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/SettingsMenu';
@@ -15,6 +14,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
 import {RefObject, useSyncExternalStore} from 'react';
@@ -96,7 +96,10 @@ const IntegrationHeader = ({
             )}
         >
             <div className="flex items-center gap-2">
-                <LeftSidebarButton onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)} />
+                <LeftSidebarButton
+                    onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+                    tooltip="See integrations"
+                />
 
                 {integrationWorkflows ? (
                     <IntegrationBreadcrumb
