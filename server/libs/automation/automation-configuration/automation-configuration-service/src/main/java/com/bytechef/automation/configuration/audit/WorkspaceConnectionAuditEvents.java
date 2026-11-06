@@ -21,6 +21,8 @@ package com.bytechef.automation.configuration.audit;
  */
 public final class WorkspaceConnectionAuditEvents {
 
+    public static final String CONNECTION_CREATED = "CONNECTION_CREATED";
+    public static final String CONNECTION_DELETED = "CONNECTION_DELETED";
     public static final String CONNECTION_DISCONNECTED = "CONNECTION_DISCONNECTED";
 
     private WorkspaceConnectionAuditEvents() {

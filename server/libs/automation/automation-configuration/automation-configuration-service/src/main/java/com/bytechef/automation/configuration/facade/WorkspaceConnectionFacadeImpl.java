@@ -63,6 +63,12 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREATED, data = {
+        @AuditData(key = "connectionId", value = "#result"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "name", value = "#connectionDTO.name"),
+        @AuditData(key = "componentName", value = "#connectionDTO.componentName")
+    })
     public long create(long workspaceId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
@@ -72,6 +78,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_DELETED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId")
+    })
     public void delete(long connectionId) {
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 

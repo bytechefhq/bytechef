@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
@@ -22,6 +23,7 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -60,6 +62,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class WorkspaceConnectionAuditIntTest {
 
     private static final long CONNECTION_ID = 42L;
+    private static final long WORKSPACE_ID = 7L;
+
+    @MockitoBean
+    private ConnectionFacade connectionFacade;
 
     @MockitoBean
     private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -78,6 +84,72 @@ class WorkspaceConnectionAuditIntTest {
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testCreateRecordsTheNewConnection() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .componentName("github")
+            .name("GitHub")
+            .build();
+
+        when(connectionFacade.create(connectionDTO, PlatformType.AUTOMATION)).thenReturn(CONNECTION_ID);
+
+        authenticate(AuthorityConstants.ADMIN);
+
+        workspaceConnectionFacade.create(WORKSPACE_ID, connectionDTO);
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceConnectionAuditEvents.CONNECTION_CREATED);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectionId", String.valueOf(CONNECTION_ID))
+            .containsEntry("workspaceId", String.valueOf(WORKSPACE_ID))
+            .containsEntry("name", "GitHub")
+            .containsEntry("componentName", "github")
+            .doesNotContainKey("dataError");
+    }
+
+    @Test
+    void testFailedCreateIsRecordedAsAnError() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .componentName("github")
+            .name("GitHub")
+            .build();
+
+        when(connectionFacade.create(connectionDTO, PlatformType.AUTOMATION))
+            .thenThrow(new IllegalStateException("boom"));
+
+        authenticate(AuthorityConstants.ADMIN);
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.create(WORKSPACE_ID, connectionDTO))
+            .isInstanceOf(IllegalStateException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceConnectionAuditEvents.CONNECTION_CREATED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("workspaceId", String.valueOf(WORKSPACE_ID))
+            .containsEntry("name", "GitHub");
+    }
+
+    @Test
+    void testDeleteRecordsTheConnection() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        workspaceConnectionFacade.delete(CONNECTION_ID);
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceConnectionAuditEvents.CONNECTION_DELETED);
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectionId", String.valueOf(CONNECTION_ID))
+            .doesNotContainKey("dataError");
     }
 
     @Test
@@ -149,10 +221,10 @@ class WorkspaceConnectionAuditIntTest {
 
         @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
-            ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+            ConnectionFacade connectionFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), projectDeploymentWorkflowService,
+                connectionFacade, mock(ConnectionLifecycleFacade.class), projectDeploymentWorkflowService,
                 mock(WorkflowTestConfigurationService.class), mock(WorkspaceConnectionService.class));
         }
     }
