@@ -2432,6 +2432,13 @@ export type UsersQueryVariables = Exact<{
 
 export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
 
+export type WorkspaceNotificationsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceNotificationsQuery = { workspaceNotifications: Array<{ id: string, name: string, type: string }> };
+
 export type ToolInvocationLogsQueryVariables = Exact<{
   type: Types.PlatformType;
   environmentId?: string | number | null | undefined;
@@ -11598,6 +11605,32 @@ export const useUsersQuery = <
       {
     queryKey: variables === undefined ? ['users'] : ['users', variables],
     queryFn: fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceNotificationsDocument = new TypedDocumentString(`
+    query workspaceNotifications($workspaceId: ID!) {
+  workspaceNotifications(workspaceId: $workspaceId) {
+    id
+    name
+    type
+  }
+}
+    `);
+
+export const useWorkspaceNotificationsQuery = <
+      TData = WorkspaceNotificationsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceNotificationsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceNotificationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceNotificationsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceNotificationsQuery, TError, TData>(
+      {
+    queryKey: ['workspaceNotifications', variables],
+    queryFn: fetcher<WorkspaceNotificationsQuery, WorkspaceNotificationsQueryVariables>(WorkspaceNotificationsDocument, variables),
     ...options
   }
     )};

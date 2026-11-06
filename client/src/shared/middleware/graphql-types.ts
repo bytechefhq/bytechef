@@ -1817,6 +1817,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
+  assignNotificationToWorkspace: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
   createA2aProject?: Maybe<A2aProject>;
@@ -1936,6 +1937,7 @@ export type Mutation = {
   startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
+  unassignNotificationFromWorkspace: Scalars['Boolean']['output'];
   updateA2aProject?: Maybe<A2aProject>;
   updateA2aProjectWorkflowEnabled?: Maybe<A2aProjectWorkflow>;
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
@@ -2000,6 +2002,12 @@ export type Mutation = {
 
 export type MutationAddDataTableColumnArgs = {
   input: AddColumnInput;
+};
+
+
+export type MutationAssignNotificationToWorkspaceArgs = {
+  notificationId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2665,6 +2673,11 @@ export type MutationTestWorkflowNodeScriptArgs = {
   inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationUnassignNotificationFromWorkspaceArgs = {
+  notificationId: Scalars['ID']['input'];
 };
 
 
@@ -3505,6 +3518,7 @@ export type Query = {
   workspaceChatWorkflows: Array<ChatWorkflow>;
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
+  workspaceNotifications: Array<WorkspaceScopedNotification>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
   workspaceToolInvocationLogs: ToolInvocationLogPageType;
 };
@@ -4408,6 +4422,11 @@ export type QueryWorkspaceMcpServersArgs = {
 };
 
 
+export type QueryWorkspaceNotificationsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkspaceProjectDeploymentsArgs = {
   environmentId: Scalars['ID']['input'];
   projectId?: InputMaybe<Scalars['ID']['input']>;
@@ -4934,4 +4953,11 @@ export type WorkflowValidationResult = {
   errors: Array<Scalars['String']['output']>;
   nodeIssues: Array<NodeValidationIssue>;
   warnings: Array<Scalars['String']['output']>;
+};
+
+export type WorkspaceScopedNotification = {
+  __typename?: 'WorkspaceScopedNotification';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: Scalars['String']['output'];
 };
