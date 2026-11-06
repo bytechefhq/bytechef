@@ -35,22 +35,30 @@ vi.mock(
     () => ({default: () => null})
 );
 
+vi.mock('@/ee/pages/embedded/shared/OpenIntegrationWorkflowButton', () => ({
+    default: ({integrationId, workflowUuid}: {integrationId: number; workflowUuid?: string}) => (
+        <button type="button">{`Open ${workflowUuid} in integration ${integrationId}`}</button>
+    ),
+}));
+
 const workflow = {
     id: 'workflow1',
     label: 'Sync contacts',
     triggers: [{type: 'hubspot/v1/newContact'}],
     workflowTriggerComponentNames: ['hubspot'],
+    workflowUuid: 'workflow-uuid-1',
 } as unknown as Workflow;
 
 const workflowComponentDefinitions = {hubspot: {icon: 'hubspot.svg', name: 'hubspot', title: 'HubSpot'}};
 
-const renderItem = () =>
+const renderItem = (showOpenInIntegration?: boolean) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
             <TooltipProvider>
                 <IntegrationInstanceConfigurationWorkflowListItem
                     componentName="hubspot"
                     filteredComponentNames={['hubspot', 'logger']}
+                    integrationId={1}
                     integrationInstanceConfigurationId={1}
                     integrationInstanceConfigurationName="HubSpot Dev"
                     integrationInstanceConfigurationWorkflow={
@@ -58,6 +66,7 @@ const renderItem = () =>
                     }
                     integrationVersion={3}
                     isMcpWorkflow={false}
+                    showOpenInIntegration={showOpenInIntegration}
                     workflow={workflow}
                     workflowComponentDefinitions={workflowComponentDefinitions as never}
                     workflowTaskDispatcherDefinitions={{}}
@@ -73,6 +82,18 @@ describe('IntegrationInstanceConfigurationWorkflowListItem', () => {
         useIntegrationInstanceConfigurationWorkflowSheetStore.setState({
             integrationInstanceConfigurationWorkflowSheetOpen: false,
         });
+    });
+
+    it('does not offer opening the workflow in its integration by default', () => {
+        renderItem();
+
+        expect(screen.queryByText(/in integration/)).not.toBeInTheDocument();
+    });
+
+    it('offers opening the workflow in its integration when asked to', () => {
+        renderItem(true);
+
+        expect(screen.getByText('Open workflow-uuid-1 in integration 1')).toBeInTheDocument();
     });
 
     it('shows the trigger and components like the projects page', () => {

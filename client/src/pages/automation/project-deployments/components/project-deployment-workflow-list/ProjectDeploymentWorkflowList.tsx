@@ -117,7 +117,7 @@ const ProjectDeploymentWorkflowList = ({
     });
 
     return (
-        <div className="pt-3">
+        <div className="pt-3 pb-2">
             <h3 className="flex justify-start pl-3 text-sm heading-tertiary">Workflows</h3>
 
             {enabledWorkflows.length === 0 ? (

@@ -6,6 +6,7 @@ import IntegrationInstanceConfigurationsFilterTitle from '@/ee/pages/embedded/in
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
 import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-executions-sheet/IntegrationInstanceConfigurationWorkflowExecutionsSheet';
+import useOpenInEmbeddedEditor from '@/ee/pages/embedded/shared/useOpenInEmbeddedEditor';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
@@ -13,6 +14,7 @@ import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ListGroupHeader from '@/shared/components/ListGroupHeader';
+import OpenInButton from '@/shared/components/OpenInButton';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -35,6 +37,8 @@ const IntegrationInstanceConfigurations = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const [searchParams] = useSearchParams();
+
+    const {openIntegration} = useOpenInEmbeddedEditor();
 
     const integrationId = searchParams.get('integrationId');
     const tagId = searchParams.get('tagId');
@@ -64,7 +68,7 @@ const IntegrationInstanceConfigurations = () => {
         error: integrationsError,
         isLoading: integrationsLoading,
     } = useGetIntegrationsQuery({
-        includeAllFields: false,
+        includeAllFields: true,
         integrationInstanceConfigurations: true,
     });
 
@@ -258,6 +262,14 @@ const IntegrationInstanceConfigurations = () => {
                                     tags && (
                                         <section key={integrationId}>
                                             <ListGroupHeader
+                                                action={
+                                                    !!integration.integrationWorkflowIds?.length && (
+                                                        <OpenInButton
+                                                            label="Open integration"
+                                                            onClick={() => openIntegration(integration)}
+                                                        />
+                                                    )
+                                                }
                                                 icon={
                                                     integration.icon ? (
                                                         <InlineSVG className="size-6 shrink-0" src={integration.icon} />
@@ -275,6 +287,7 @@ const IntegrationInstanceConfigurations = () => {
                                                     integrationId
                                                 )!}
                                                 showIntegrationIcon={false}
+                                                showOpenInIntegration
                                                 tags={tags}
                                                 taskDispatcherDefinitions={taskDispatcherDefinitions}
                                             />

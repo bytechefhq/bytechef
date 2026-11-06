@@ -148,6 +148,19 @@ describe('AutomationWorkflowConfigurations', () => {
         vi.clearAllMocks();
     });
 
+    it('offers opening a project that has workflows from its header', () => {
+        mocks.projects = [
+            {
+                ...makeProject('live', 'Live Project', true, 1),
+                workflowTemplates: [{components: [], label: 'Mailer', triggers: [], workflowUuid: 'wf-1'}],
+            },
+        ];
+
+        renderPage();
+
+        expect(screen.getByRole('button', {name: 'Open project'})).toBeInTheDocument();
+    });
+
     it('lists only the projects with configurations in the selected environment', () => {
         mocks.projects = [
             makeProject('live', 'Live Project', true, 1),
@@ -161,6 +174,7 @@ describe('AutomationWorkflowConfigurations', () => {
         expect(screen.getByText('Projects: All Projects')).toBeInTheDocument();
         expect(listedProjectIds()).toEqual(['live']);
         expect(screen.getByRole('heading', {name: 'Live Project'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
         expect(
             within(screen.getByText('PRODUCTION').closest('[data-state]') as HTMLElement).queryByText('Live Project')
         ).not.toBeInTheDocument();

@@ -48,6 +48,7 @@ interface AutomationWorkflowProjectConfigurationListItemProps {
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     project: AutomationWorkflowProjectType;
+    showOpenInProject?: boolean;
     showProjectName?: boolean;
 }
 
@@ -60,6 +61,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
     onEdit,
     onUpdateVersion,
     project,
+    showOpenInProject = false,
     showProjectName = false,
 }: AutomationWorkflowProjectConfigurationListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -125,7 +127,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
     }, []);
 
     return (
-        <Collapsible className="rounded border border-border/50" defaultOpen={workflowCount > 0}>
+        <Collapsible className="rounded border border-border/50">
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={handleConfigurationListItemClick}
@@ -284,7 +286,11 @@ const AutomationWorkflowProjectConfigurationListItem = ({
             </div>
 
             <CollapsibleContent>
-                <AutomationWorkflowProjectConfigurationWorkflowList configuration={configuration} project={project} />
+                <AutomationWorkflowProjectConfigurationWorkflowList
+                    configuration={configuration}
+                    project={project}
+                    showOpenInProject={showOpenInProject}
+                />
             </CollapsibleContent>
 
             <AlertDialog

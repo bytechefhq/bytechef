@@ -5,6 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import IntegrationInstanceConfigurationWorkflowListItemDropDownMenu from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
+import OpenIntegrationWorkflowButton from '@/ee/pages/embedded/shared/OpenIntegrationWorkflowButton';
 import {IntegrationInstanceConfigurationWorkflow, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {useEnableIntegrationInstanceConfigurationWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
@@ -19,22 +20,26 @@ import {twMerge} from 'tailwind-merge';
 const IntegrationInstanceConfigurationWorkflowListItem = ({
     componentName,
     filteredComponentNames,
+    integrationId,
     integrationInstanceConfigurationId,
     integrationInstanceConfigurationName,
     integrationInstanceConfigurationWorkflow,
     integrationVersion,
     isMcpWorkflow,
+    showOpenInIntegration = false,
     workflow,
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
 }: {
     componentName: string;
     filteredComponentNames?: string[];
+    integrationId: number;
     integrationInstanceConfigurationId: number;
     integrationInstanceConfigurationName?: string;
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
     integrationVersion?: number;
     isMcpWorkflow: boolean;
+    showOpenInIntegration?: boolean;
     workflow: Workflow;
     workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
@@ -107,6 +112,13 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                     <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
 
                     {workflow.label}
+
+                    {showOpenInIntegration && (
+                        <OpenIntegrationWorkflowButton
+                            integrationId={integrationId}
+                            workflowUuid={workflow.workflowUuid}
+                        />
+                    )}
 
                     {isMcpWorkflow && <Badge label="MCP" styleType="secondary-outline" />}
                 </div>
