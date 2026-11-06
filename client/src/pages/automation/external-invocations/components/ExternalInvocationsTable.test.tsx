@@ -39,10 +39,17 @@ describe('ExternalInvocationsTable', () => {
         expect(screen.getByText('slack / sendMessage')).toBeInTheDocument();
     });
 
+    it('renders the status as the first column', () => {
+        render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);
+
+        expect(screen.getAllByRole('columnheader')[0]).toHaveTextContent('Status');
+        expect(screen.getAllByRole('cell')[0]).toHaveTextContent('SUCCESS');
+    });
+
     it('renders an em dash when the tool name is missing', () => {
         render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, id: '2', toolName: null}]} />);
 
-        const toolNameCell = screen.getAllByRole('cell')[0];
+        const toolNameCell = screen.getAllByRole('cell')[1];
 
         expect(toolNameCell).toHaveTextContent(/^—$/);
     });

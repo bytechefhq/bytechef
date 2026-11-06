@@ -183,7 +183,7 @@ describe('ExternalInvocations', () => {
         renderExternalInvocations();
 
         expect(screen.getByText('No Matching External Invocations')).toBeInTheDocument();
-        expect(screen.getByText('Outcome')).toBeInTheDocument();
+        expect(screen.getByText('Status')).toBeInTheDocument();
         expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
     });
 
