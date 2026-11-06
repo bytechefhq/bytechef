@@ -1,0 +1,14 @@
+extend type Query {
+    workspaceNotifications(workspaceId: ID!): [WorkspaceScopedNotification!]!
+}
+
+extend type Mutation {
+    assignNotificationToWorkspace(notificationId: ID!, workspaceId: ID!): Boolean!
+    unassignNotificationFromWorkspace(notificationId: ID!): Boolean!
+}
+
+type WorkspaceScopedNotification {
+    id: ID!
+    name: String!
+    type: String!
+}
