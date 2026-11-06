@@ -16,9 +16,15 @@
 
 package com.bytechef.cli;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.shell.core.command.CommandOption;
+import org.springframework.shell.core.command.CommandRegistry;
+import org.springframework.shell.core.command.DefaultCommandParser;
+import org.springframework.shell.core.command.ParsedInput;
 
 /**
  * @author Ivica Cardic
@@ -37,5 +43,44 @@ class CliApplicationExitCodeTest {
         int code = CliApplication.execute();
 
         assertEquals(0, code);
+    }
+
+    @Test
+    void testValuesWithWhitespaceSurviveTheShellParser() {
+        ParsedInput parsedInput = parse(
+            "app", "--name", "Airtable Dashboard", "--description=Records from a table", "--empty", "",
+            "--quote", "say \"hi\" now", "--path", "C:\\My Files", "--offset", "-5 days");
+
+        assertEquals("Airtable Dashboard", getOptionValue(parsedInput, "name"));
+        assertEquals("Records from a table", getOptionValue(parsedInput, "description"));
+        assertEquals("", getOptionValue(parsedInput, "empty"));
+        assertEquals("say \"hi\" now", getOptionValue(parsedInput, "quote"));
+        assertEquals("C:\\My Files", getOptionValue(parsedInput, "path"));
+        assertEquals("-5 days", getOptionValue(parsedInput, "offset"));
+    }
+
+    @Test
+    void testValuesWithoutWhitespaceAreLeftAsTheyAre() {
+        assertArrayEquals(
+            new String[] {
+                "app", "--name", "dashboard", "--setting=key=value", "-x"
+            },
+            CliApplication.quoteArguments("app", "--name", "dashboard", "--setting=key=value", "-x"));
+    }
+
+    private static String getOptionValue(ParsedInput parsedInput, String longName) {
+        List<CommandOption> options = parsedInput.options();
+
+        return options.stream()
+            .filter(option -> longName.equals(option.longName()))
+            .map(CommandOption::value)
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private static ParsedInput parse(String... arguments) {
+        DefaultCommandParser commandParser = new DefaultCommandParser(new CommandRegistry());
+
+        return commandParser.parse(String.join(" ", CliApplication.quoteArguments(arguments)));
     }
 }
