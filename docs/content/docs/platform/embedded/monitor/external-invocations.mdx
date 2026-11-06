@@ -1,12 +1,12 @@
 ---
-title: "Tool Invocations"
+title: "External Invocations"
 description: "A log of the tools and actions your connected users' AI agents and your own code ran through ByteChef - which one ran, for whom, how it ended, and how long it took."
 ---
 
 When a connected user's AI agent calls a tool on an [embedded MCP server](/platform/embedded/configure/mcp-servers),
 or your backend executes an action or a tool through the [Component Kit](/platform/embedded/build/component-kit),
-ByteChef records the call. **Tool Invocations** lists those records, so you can see which tools your
-customers use, which ones fail, and how long they take. Open it from **Tool Invocations** in the left
+ByteChef records the call. **External Invocations** lists those records, so you can see which tools your
+customers use, which ones fail, and how long they take. Open it from **External Invocations** in the left
 sidebar, next to **Workflow Executions**.
 
 The page is available on Enterprise Edition only.
@@ -38,7 +38,7 @@ API returns it as `jobId`, so you can find the run in
 [Workflow Executions](/platform/embedded/monitor/workflow-executions).
 
 The page lists embedded calls only. Calls made through an automation MCP server are recorded
-separately and appear on the automation [Tool Invocations](/platform/automation/monitor/tool-invocations)
+separately and appear on the automation [External Invocations](/platform/automation/monitor/external-invocations)
 page.
 
 ---
@@ -87,7 +87,7 @@ the call returned:
 ## One connected user's calls
 
 To see the calls made for a single connected user, open the user from
-[Connected Users](/platform/embedded/monitor/connected-users) and select the **Tool Invocations** tab
+[Connected Users](/platform/embedded/monitor/connected-users) and select the **External Invocations** tab
 in the user's sheet. It lists that user's most recent calls with the same columns.
 
 Your own application can read the same history for a connected user from the embedded API:
@@ -128,7 +128,7 @@ the others.
 
 | Property | Purpose |
 |---|---|
-| `bytechef.tool-invocation-log.retention-days` | How many days a record is kept. Defaults to `90`. |
+| `bytechef.external-invocation-log.retention-days` | How many days a record is kept. Defaults to `90`. |
 
 ---
 

@@ -1,11 +1,11 @@
 ---
-title: "Tool Invocations"
+title: "External Invocations"
 description: "A log of the tools AI clients called through your MCP servers and the management MCP server - which tool ran, how it ended, and how long it took."
 ---
 
 When an AI client calls a tool on one of your [MCP servers](/platform/automation/deploy/mcp-servers)
-or on the [management MCP server](/platform/settings/mcp-server), ByteChef records the call. **Tool Invocations** lists those records, so you can see which tools are
-being used, which ones fail, and how long they take. Open it from **Tool Invocations** in the left
+or on the [management MCP server](/platform/settings/mcp-server), ByteChef records the call. **External Invocations** lists those records, so you can see which tools are
+being used, which ones fail, and how long they take. Open it from **External Invocations** in the left
 sidebar, next to **Workflow Executions**.
 
 The page is available on Enterprise Edition only.
@@ -35,7 +35,7 @@ while you belong to several is recorded but appears on no page. A management too
 an error is recorded as `ERROR`.
 
 The page lists automation calls only. Calls made through an embedded integration are recorded
-separately and appear on the embedded [Tool Invocations](/platform/embedded/monitor/tool-invocations)
+separately and appear on the embedded [External Invocations](/platform/embedded/monitor/external-invocations)
 page.
 
 Tool calls an AI Agent makes while a workflow runs are not recorded here either. They appear in the
@@ -111,7 +111,7 @@ the others.
 
 | Property | Purpose |
 |---|---|
-| `bytechef.tool-invocation-log.retention-days` | How many days a record is kept. Defaults to `90`. |
+| `bytechef.external-invocation-log.retention-days` | How many days a record is kept. Defaults to `90`. |
 
 ---
 

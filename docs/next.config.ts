@@ -98,6 +98,16 @@ const config: NextConfig = {
         permanent: true,
       },
       {
+        source: '/platform/automation/monitor/tool-invocations',
+        destination: '/platform/automation/monitor/external-invocations',
+        permanent: true,
+      },
+      {
+        source: '/platform/embedded/monitor/tool-invocations',
+        destination: '/platform/embedded/monitor/external-invocations',
+        permanent: true,
+      },
+      {
         // Tenant-Isolated Security merged into the White-Label Execution page.
         source: '/platform/embedded/get-started/tenant-isolated-security',
         destination:
