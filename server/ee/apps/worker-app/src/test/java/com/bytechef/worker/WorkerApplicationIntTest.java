@@ -7,8 +7,14 @@
 
 package com.bytechef.worker;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * @version ee
@@ -18,7 +24,28 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = WorkerApplication.class)
 public class WorkerApplicationIntTest {
 
+    private static final String AGENTIC_AI_COMPONENT_HANDLER_BEAN_NAME = "agenticAi_v1_ComponentHandler";
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
     @Test
     public void testContextLoads() {
+        assertThat(applicationContext.containsBean(AGENTIC_AI_COMPONENT_HANDLER_BEAN_NAME)).isFalse();
+    }
+
+    @Nested
+    @ActiveProfiles({
+        "testint", "agentic"
+    })
+    class AgenticProfile {
+
+        @Autowired
+        private ApplicationContext agenticApplicationContext;
+
+        @Test
+        void testAgenticAiComponentRegistered() {
+            assertThat(agenticApplicationContext.containsBean(AGENTIC_AI_COMPONENT_HANDLER_BEAN_NAME)).isTrue();
+        }
     }
 }

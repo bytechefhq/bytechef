@@ -30,8 +30,10 @@ import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.log.JdbcLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -72,6 +74,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.NestedTestConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
@@ -83,6 +86,8 @@ import org.springframework.test.context.TestPropertySource;
     PostgreSQLContainerConfiguration.class, ServerApplicationIntTest.ServerApplicationIntTestConfiguration.class
 })
 class ServerApplicationIntTest {
+
+    private static final String AGENTIC_AI_COMPONENT_HANDLER_BEAN_NAME = "agenticAi_v1_ComponentHandler";
 
     private static final Class<?>[] WEBHOOK_ENDPOINT_TYPES = {
         WebhookTriggerController.class, CallbackController.class, ApprovalController.class,
@@ -116,6 +121,11 @@ class ServerApplicationIntTest {
             "SELECT lock_name FROM qrtz_locks", String.class);
 
         assertThat(lockNames).contains("TRIGGER_ACCESS");
+    }
+
+    @Test
+    void testAgenticAiComponentHandlerNotPresentByDefault() {
+        assertThat(applicationContext.containsBean(AGENTIC_AI_COMPONENT_HANDLER_BEAN_NAME)).isFalse();
     }
 
     @Test
@@ -166,6 +176,29 @@ class ServerApplicationIntTest {
             return Class.forName("com.bytechef.platform.webhook.web.rest.TwilioCallbackController");
         } catch (ClassNotFoundException classNotFoundException) {
             throw new IllegalStateException(classNotFoundException);
+        }
+    }
+
+    @Nested
+    @ActiveProfiles({
+        "testint", "agentic"
+    })
+    class AgenticProfile {
+
+        @Autowired
+        private ApplicationContext agenticApplicationContext;
+
+        @Autowired
+        private ComponentDefinitionService componentDefinitionService;
+
+        @Test
+        void testAgenticAiComponentRegistered() {
+            assertThat(agenticApplicationContext.containsBean(AGENTIC_AI_COMPONENT_HANDLER_BEAN_NAME)).isTrue();
+
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                "agenticAi", 1);
+
+            assertThat(componentDefinition.getName()).isEqualTo("agenticAi");
         }
     }
 
