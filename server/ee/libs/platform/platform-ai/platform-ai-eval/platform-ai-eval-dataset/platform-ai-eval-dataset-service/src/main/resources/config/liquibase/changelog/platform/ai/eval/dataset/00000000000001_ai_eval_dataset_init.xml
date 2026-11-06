@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260423000002" author="ivicac">
+        <createTable tableName="ai_eval_dataset">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="tags" type="TEXT"/>
+            <column name="archived_date" type="DATETIME"/>
+            <column name="created_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </createTable>
+        <createIndex tableName="ai_eval_dataset" indexName="idx_ai_eval_dataset_workspace_name">
+            <column name="workspace_id"/>
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="20260423000003" author="ivicac">
+        <createTable tableName="ai_eval_dataset_version">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="dataset_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_eval_dataset_version_dataset"
+                             references="ai_eval_dataset(id)"/>
+            </column>
+            <column name="version_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(128)"/>
+            <column name="frozen" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="created_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+            tableName="ai_eval_dataset_version"
+            constraintName="uk_ai_eval_dataset_version_number"
+            columnNames="dataset_id,version_number"/>
+        <sql dbms="postgresql">
+            CREATE UNIQUE INDEX ux_ai_eval_dataset_version_unfrozen_per_dataset
+                ON ai_eval_dataset_version (dataset_id)
+                WHERE frozen = false;
+        </sql>
+    </changeSet>
+    <changeSet id="20260423000004" author="ivicac">
+        <createTable tableName="ai_eval_dataset_item">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="dataset_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_eval_dataset_item_dataset"
+                             references="ai_eval_dataset(id)"/>
+            </column>
+            <column name="dataset_version_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_eval_dataset_item_version"
+                             references="ai_eval_dataset_version(id)"/>
+            </column>
+            <column name="input" type="CLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expected_output" type="CLOB"/>
+            <column name="metadata" type="CLOB"/>
+            <column name="source_trace_id" type="BIGINT"/>
+            <column name="created_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="ai_eval_dataset_item" indexName="idx_ai_eval_dataset_item_version">
+            <column name="dataset_version_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
