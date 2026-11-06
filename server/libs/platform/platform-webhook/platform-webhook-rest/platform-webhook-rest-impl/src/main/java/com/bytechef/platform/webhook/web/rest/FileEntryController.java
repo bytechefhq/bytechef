@@ -17,8 +17,18 @@
 package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.exception.FileStorageException;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,22 +45,77 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnWebhook
 public class FileEntryController {
 
-    private final TempFileStorage tempFileStorage;
+    private static final Logger log = LoggerFactory.getLogger(FileEntryController.class);
+    private static final Marker LEGACY_MARKER = MarkerFactory.getMarker("FILE_ENTRY_LEGACY");
+    private static final long LEGACY_WARN_INTERVAL_MS = 60_000L;
 
-    public FileEntryController(TempFileStorage tempFileStorage) {
+    private final TempFileStorage tempFileStorage;
+    private final FileEntryTokens fileEntryTokens;
+    private final boolean signedRequired;
+    private final AtomicLong lastLegacyWarnEpochMs = new AtomicLong();
+
+    @SuppressFBWarnings("EI")
+    public FileEntryController(
+        TempFileStorage tempFileStorage, FileEntryTokens fileEntryTokens,
+        @Value("${bytechef.file-storage.signed-url.required:false}") boolean signedRequired) {
+
         this.tempFileStorage = tempFileStorage;
+        this.fileEntryTokens = fileEntryTokens;
+        this.signedRequired = signedRequired;
     }
 
     @GetMapping("/file-entries/{id}/content")
     @ResponseBody
     public ResponseEntity<InputStreamResource> getFileEntryContent(@PathVariable("id") String id) {
-        FileEntry fileEntry = FileEntry.parse(id);
+        Optional<FileEntry> fileEntry = resolve(id);
 
-        return ResponseEntity.ok()
-            .contentType(
-                fileEntry.getMimeType() == null
-                    ? MediaType.APPLICATION_OCTET_STREAM
-                    : MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())))
-            .body(new InputStreamResource(tempFileStorage.getInputStream(fileEntry)));
+        if (fileEntry.isEmpty()) {
+            return ResponseEntity.notFound()
+                .build();
+        }
+
+        FileEntry resolved = fileEntry.get();
+
+        try {
+            return ResponseEntity.ok()
+                .contentType(
+                    resolved.getMimeType() == null
+                        ? MediaType.APPLICATION_OCTET_STREAM
+                        : MediaType.asMediaType(MimeType.valueOf(resolved.getMimeType())))
+                .body(new InputStreamResource(tempFileStorage.getInputStream(resolved)));
+        } catch (FileStorageException e) {
+            log.debug("File not accessible for entry; returning 404", e);
+
+            return ResponseEntity.notFound()
+                .build();
+        }
+    }
+
+    private Optional<FileEntry> resolve(String id) {
+        if (fileEntryTokens.looksLikeSignedToken(id)) {
+            return fileEntryTokens.parseSignedToken(id);
+        }
+
+        if (signedRequired) {
+            return Optional.empty();
+        }
+
+        maybeLogLegacyAccess();
+
+        try {
+            return Optional.of(FileEntry.parse(id));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
+    private void maybeLogLegacyAccess() {
+        long now = System.currentTimeMillis();
+        long last = lastLegacyWarnEpochMs.get();
+
+        if (now - last >= LEGACY_WARN_INTERVAL_MS && lastLegacyWarnEpochMs.compareAndSet(last, now)) {
+            log.warn(LEGACY_MARKER,
+                "Accepted legacy unsigned file-entry id. Migrate clients to signed URLs; this path will be removed.");
+        }
     }
 }

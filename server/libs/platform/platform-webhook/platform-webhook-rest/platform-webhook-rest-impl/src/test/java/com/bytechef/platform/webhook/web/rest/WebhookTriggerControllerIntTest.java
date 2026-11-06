@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
@@ -73,6 +74,9 @@ class WebhookTriggerControllerIntTest {
 
     @MockitoBean
     private ApplicationProperties applicationProperties;
+
+    @MockitoBean
+    private FileEntryTokens fileEntryTokens;
 
     @Autowired
     private MockMvc mockMvc;

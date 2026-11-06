@@ -19,6 +19,7 @@ package com.bytechef.platform.webhook.web.rest;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.exception.AbstractException;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -60,10 +61,10 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
     @SuppressFBWarnings("EI")
     public WebhookTriggerController(
-        ApplicationProperties applicationProperties, TempFileStorage tempFileStorage,
-        WebhookWorkflowExecutor webhookWorkflowExecutor) {
+        ApplicationProperties applicationProperties, FileEntryTokens fileEntryTokens,
+        TempFileStorage tempFileStorage, WebhookWorkflowExecutor webhookWorkflowExecutor) {
 
-        super(applicationProperties.getPublicUrl(), tempFileStorage, webhookWorkflowExecutor);
+        super(fileEntryTokens, applicationProperties.getPublicUrl(), tempFileStorage, webhookWorkflowExecutor);
 
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
     }

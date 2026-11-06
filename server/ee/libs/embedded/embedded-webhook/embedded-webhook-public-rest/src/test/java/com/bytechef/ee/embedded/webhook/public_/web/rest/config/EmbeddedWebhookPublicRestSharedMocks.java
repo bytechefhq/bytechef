@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
@@ -35,7 +36,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = EnvironmentService.class, answers = Answers.CALLS_REAL_METHODS)
 @MockitoBean(types = {
-    ConnectedUserService.class, ConnectedUserWorkflowReferenceFacade.class,
+    ConnectedUserService.class, ConnectedUserWorkflowReferenceFacade.class, FileEntryTokens.class,
     IntegrationInstanceConfigurationWorkflowService.class, IntegrationInstanceService.class,
     IntegrationInstanceWorkflowService.class, IntegrationWorkflowService.class, ProjectDeploymentService.class,
     ProjectWorkflowService.class, TempFileStorage.class, WebhookWorkflowExecutor.class, WorkflowService.class
