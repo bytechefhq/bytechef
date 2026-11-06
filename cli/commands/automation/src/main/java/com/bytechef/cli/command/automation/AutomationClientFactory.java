@@ -26,6 +26,8 @@ import com.bytechef.cli.client.automationapp.api.AppApi;
 import com.bytechef.cli.client.automationapp.api.AppApiCollectionBindingApi;
 import com.bytechef.cli.client.automationapp.api.AppWorkflowBindingApi;
 import com.bytechef.cli.client.automationapp.api.WorkspaceConnectionApi;
+import com.bytechef.cli.client.automationdatatable.api.DataTableApi;
+import com.bytechef.cli.client.automationdatatable.api.DataTableRowApi;
 import com.bytechef.cli.core.config.CliConfig;
 import com.bytechef.cli.core.error.CliException;
 import com.bytechef.cli.core.http.AuthInterceptor;
@@ -122,6 +124,24 @@ final class AutomationClientFactory {
         return new ApiCollectionEndpointApi(apiPlatformApiClient(config));
     }
 
+    static com.bytechef.cli.client.automationdatatable.ApiClient dataTableApiClient(CliConfig config) {
+        com.bytechef.cli.client.automationdatatable.ApiClient apiClient =
+            new com.bytechef.cli.client.automationdatatable.ApiClient();
+
+        apiClient.updateBaseUri(AuthInterceptor.baseUri(config, AUTOMATION_API_PATH));
+        apiClient.setRequestInterceptor(new AuthInterceptor(config));
+
+        return apiClient;
+    }
+
+    static DataTableApi dataTableApi(CliConfig config) {
+        return new DataTableApi(dataTableApiClient(config));
+    }
+
+    static DataTableRowApi dataTableRowApi(CliConfig config) {
+        return new DataTableRowApi(dataTableApiClient(config));
+    }
+
     static CliException toCliException(ApiException exception) {
         return toCliException(exception.getCode());
     }
@@ -153,6 +173,10 @@ final class AutomationClientFactory {
     static CliException toCliException(com.bytechef.cli.client.automationapiplatform.ApiException exception) {
         return toCliException(
             exception.getCode(), exception.getMessage(), exception.getResponseBody(), NEUTRAL_FORBIDDEN_HINT);
+    }
+
+    static CliException toCliException(com.bytechef.cli.client.automationdatatable.ApiException exception) {
+        return toCliException(exception.getCode());
     }
 
     private static CliException toCliException(

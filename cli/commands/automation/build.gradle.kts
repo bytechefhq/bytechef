@@ -5,6 +5,7 @@ dependencies {
     implementation(project(":cli:clients:automation-app"))
     implementation(project(":cli:clients:automation-api-platform"))
     implementation(project(":cli:clients:automation-configuration"))
+    implementation(project(":cli:clients:automation-data-table"))
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.springframework.shell:spring-shell-core:${rootProject.libs.versions.spring.shell.get()}")
 

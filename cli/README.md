@@ -70,6 +70,54 @@ bytechef automation api-collection endpoint disable --id 9
   with the `Environment` schema inlined. When the server spec changes, copy it again, inline `Environment`, and run
   `./gradlew :cli:clients:automation-api-platform:generateClient`.
 
+## Data table commands
+
+Data tables, their columns and their rows are addressed by name and managed in any environment (`--environment`),
+with the same profile and `X-Environment` handling as the other automation commands. Output is JSON by default.
+
+```bash
+bytechef automation data-table list --workspace-id 1 --tag hot
+bytechef automation data-table get --name orders
+bytechef automation data-table create --workspace-id 1 --name orders \
+  --column total:NUMBER --column sku:STRING --tag hot
+bytechef automation data-table update --name orders --description "New description" --tag hot --tag cold
+bytechef automation data-table delete --name orders
+bytechef automation data-table column add --name orders --column sku:STRING
+bytechef automation data-table column remove --name orders --column sku
+bytechef automation data-table column rename --name orders --column sku --new-name productSku
+
+bytechef automation data-table row list --name orders --filter total:GTE:5 --filter sku:IN:a,b \
+  --sort total:DESC --page-size 20
+bytechef automation data-table row get --name orders --id 7
+bytechef automation data-table row get --name orders --external-id ext-1
+bytechef automation data-table row insert --name orders --values '{"total":5,"sku":"a"}' --external-id ext-2
+bytechef automation data-table row update --name orders --id 7 --values '{"total":9}'
+bytechef automation data-table row upsert --name orders --external-id ext-2 --values '{"total":9}'
+bytechef automation data-table row delete --name orders --id 7
+bytechef automation data-table row delete --name orders --ids 1,2,3
+bytechef automation data-table row delete --name orders --external-id ext-2
+bytechef automation data-table row batch --name orders --file ./rows.json --strategy upsert
+bytechef automation data-table row clear --name orders --yes true
+bytechef automation data-table row import --name orders --file ./rows.csv
+bytechef automation data-table row export --name orders --file ./export.csv
+```
+
+- `--column` on `create` and `column add` is `name:TYPE` (`STRING`, `NUMBER`, `INTEGER`, `DATE`, `DATE_TIME`,
+  `BOOLEAN`). A malformed value or an unknown type fails locally before any request is sent.
+- `--filter` and `--sort` on `row list`, and `--column` and `--tag` on `create` and `update`, are repeatable. Filters
+  and sorts are forwarded to the API as given: a filter is `column:OPERATOR:value` (`EQ`, `NEQ`, `IN`, `CONTAINS`,
+  `STARTS_WITH`, `GT`, `GTE`, `LT`, `LTE`, `BETWEEN`) and a sort is `column:ASC` or `column:DESC`.
+- `row delete` takes exactly one of `--id`, `--ids` (comma-separated) or `--external-id`.
+- `row clear` runs only with `--yes true`; a bare `--yes` is not read as a flag on multi-word commands.
+- `row update --external-id` can set an external id but not clear one, and `update --tag` can replace a table's tags
+  but not clear them: the generated client is built with `openApiNullable=false`, so an omitted value means "leave it
+  as it is" and an explicit null cannot be sent.
+- `row export` writes the CSV to `--file`, or to stdout without it. It sends its request directly instead of through
+  the generated `DataTableRowApi#exportRows`, which tries to read the `text/csv` reply as JSON.
+- `cli/clients/automation-data-table/openapi.yaml` is a copy of
+  `server/ee/libs/automation/automation-data-table/automation-data-table-public-rest/openapi.yaml`. When the server
+  spec changes, copy it again and run `./gradlew :cli:clients:automation-data-table:generateClient`.
+
 ## App commands (DEVELOPMENT only)
 
 For an app made from the `create-bytechef-app` template, usually run by a coding agent (the template's `AGENTS.md`
