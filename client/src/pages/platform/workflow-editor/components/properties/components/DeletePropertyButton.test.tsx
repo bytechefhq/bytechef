@@ -25,6 +25,15 @@ describe('DeletePropertyButton', () => {
         expect(deleteButton).not.toHaveClass('text-content-onsurface-primary');
     });
 
+    it('matches the height of the small Formula switch and keeps some space from it', () => {
+        renderDeletePropertyButton();
+
+        const deleteButton = screen.getByRole('button', {name: 'Delete brojEtaza'});
+
+        expect(deleteButton).toHaveClass('ml-1', 'size-3.5', 'p-0', '[&_svg]:size-2.5');
+        expect(deleteButton).not.toHaveClass('size-5', 'p-1', '[&_svg]:size-3');
+    });
+
     it('calls onClick when clicked', () => {
         const onClick = vi.fn();
 
