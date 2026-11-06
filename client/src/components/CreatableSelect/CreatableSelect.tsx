@@ -1,10 +1,11 @@
+import {useCallback, useState} from 'react';
 import ReactSelectCreatable, {CreatableProps} from 'react-select/creatable';
 import {twMerge} from 'tailwind-merge';
 
 import './CreatableSelect.css';
 
 import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
-import {GroupBase} from 'react-select';
+import {CSSObjectWithLabel, GroupBase} from 'react-select';
 
 export type SelectOptionType = {
     value: string;
@@ -31,6 +32,16 @@ type CreatableSelectProps<
     options: Array<SelectOptionType>;
 } & CreatableProps<Option, IsMulti, Group>;
 
+const getDialogMenuPortalStyles = (dialogContentElement: HTMLElement, base: CSSObjectWithLabel): CSSObjectWithLabel => {
+    const dialogContentRect = dialogContentElement.getBoundingClientRect();
+
+    return Object.assign({}, base, {
+        left: Number(base.left) - dialogContentRect.left - dialogContentElement.clientLeft,
+        top: Number(base.top) - dialogContentRect.top - dialogContentElement.clientTop,
+        zIndex: 50,
+    });
+};
+
 const CreatableSelect = <
     Option,
     IsMulti extends boolean = false,
@@ -44,33 +55,56 @@ const CreatableSelect = <
     isMulti,
     label,
     name,
+    styles,
     ...props
-}: CreatableSelectProps<Option, IsMulti, Group, TFieldValues, TName>) => (
-    <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
-        {label && (
-            <label className="text-sm font-medium text-content-neutral-secondary" htmlFor={name || field?.name}>
-                {label}
-            </label>
-        )}
+}: CreatableSelectProps<Option, IsMulti, Group, TFieldValues, TName>) => {
+    const [dialogContentElement, setDialogContentElement] = useState<HTMLElement | null>(null);
 
-        <div className={twMerge([label && 'mt-1'])}>
-            <ReactSelectCreatable
-                {...field}
-                classNamePrefix="react-select"
-                isMulti={isMulti}
-                noOptionsMessage={() => 'Type to create a new value'}
-                placeholder="Select or type to create..."
-                {...props}
-            />
-        </div>
+    const selectContainerCallbackRef = useCallback((element: HTMLDivElement | null) => {
+        setDialogContentElement(element?.closest<HTMLElement>('[data-slot="dialog-content"]') || null);
+    }, []);
 
-        {error && (
-            <p className="mt-2 text-sm text-destructive" id={`${name}-error`} role="alert">
-                This field is required
-            </p>
-        )}
-    </fieldset>
-);
+    return (
+        <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
+            {label && (
+                <label className="text-sm font-medium text-content-neutral-secondary" htmlFor={name || field?.name}>
+                    {label}
+                </label>
+            )}
+
+            <div className={twMerge([label && 'mt-1'])} ref={selectContainerCallbackRef}>
+                <ReactSelectCreatable
+                    {...field}
+                    classNamePrefix="react-select"
+                    isMulti={isMulti}
+                    menuPortalTarget={dialogContentElement}
+                    menuPosition={dialogContentElement ? 'fixed' : undefined}
+                    noOptionsMessage={() => 'Type to create a new value'}
+                    placeholder="Select or type to create..."
+                    styles={
+                        dialogContentElement
+                            ? {
+                                  ...styles,
+                                  menuPortal: (base, state) =>
+                                      getDialogMenuPortalStyles(
+                                          dialogContentElement,
+                                          styles?.menuPortal ? styles.menuPortal(base, state) : base
+                                      ),
+                              }
+                            : styles
+                    }
+                    {...props}
+                />
+            </div>
+
+            {error && (
+                <p className="mt-2 text-sm text-destructive" id={`${name}-error`} role="alert">
+                    This field is required
+                </p>
+            )}
+        </fieldset>
+    );
+};
 
 CreatableSelect.displayName = 'CreatableSelect';
 
