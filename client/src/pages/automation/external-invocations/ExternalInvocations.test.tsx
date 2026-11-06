@@ -103,7 +103,7 @@ describe('ExternalInvocations', () => {
         expect(itemValues).toEqual(expect.arrayContaining(['A2A', 'MCP_AUTOMATION']));
         expect(itemValues).not.toContain('MCP_EMBEDDED');
         expect(screen.getByText('Surface', {selector: 'label'})).toBeInTheDocument();
-        expect(screen.getByRole('cell', {name: 'Automation MCP'})).toBeInTheDocument();
+        expect(screen.getByRole('cell', {name: 'MCP'})).toBeInTheDocument();
     });
 
     it('shows the name of the A2A server an A2A skill call came through', () => {

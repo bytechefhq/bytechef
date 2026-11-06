@@ -15,7 +15,7 @@ const SURFACE_LABELS: Record<string, string> = {
     A2A: 'A2A',
     EMBEDDED_API_ACTION: 'Embedded API (Action)',
     EMBEDDED_API_TOOL: 'Embedded API (Tool)',
-    MCP_AUTOMATION: 'Automation MCP',
+    MCP_AUTOMATION: 'MCP',
     MCP_EMBEDDED: 'Embedded MCP',
 };
 

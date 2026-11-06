@@ -198,7 +198,7 @@ describe('useExternalInvocations', () => {
         });
 
         act(() => {
-            result.current.handleSurfaceChange({label: 'Automation MCP', value: 'MCP_AUTOMATION'});
+            result.current.handleSurfaceChange({label: 'MCP', value: 'MCP_AUTOMATION'});
             result.current.handleOutcomeChange({label: 'Error', value: 'ERROR'});
             result.current.handleStartDateChange(startDate);
             result.current.handleEndDateChange(endDate);

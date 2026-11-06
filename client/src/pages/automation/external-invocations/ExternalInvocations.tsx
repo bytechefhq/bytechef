@@ -35,7 +35,7 @@ const outcomeOptions = [
 
 const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
     [PlatformType.Automation]: [
-        {label: 'Automation MCP', value: 'MCP_AUTOMATION'},
+        {label: 'MCP', value: 'MCP_AUTOMATION'},
         {label: 'A2A', value: 'A2A'},
     ],
     [PlatformType.Embedded]: [
