@@ -1,3 +1,5 @@
+import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
+import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {render, screen} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 
@@ -35,7 +37,7 @@ describe('ExternalInvocationsTable', () => {
         expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
         expect(screen.getByText('MCP')).toBeInTheDocument();
         expect(screen.getByText('SUCCESS')).toBeInTheDocument();
-        expect(screen.getByText('42 ms')).toBeInTheDocument();
+        expect(screen.getByText('42ms')).toBeInTheDocument();
         expect(screen.getByText('slack / sendMessage')).toBeInTheDocument();
     });
 
@@ -184,7 +186,7 @@ describe('ExternalInvocationsTable', () => {
             />
         );
 
-        expect(screen.getByText(new Date(createdDate).toLocaleString())).toBeInTheDocument();
+        expect(screen.getByText(formatDateTime(new Date(createdDate)))).toBeInTheDocument();
 
         const undatedRow = screen.getByText('undated_tool').closest('tr');
 
