@@ -57,6 +57,7 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -813,6 +814,45 @@ public class ProjectDeploymentFacadeIntTest {
             .executeTriggerEnable(any(), any(), any(), any(), eq(newConnectionId), any(), anyLong());
     }
 
+    @Test
+    public void testCreateProjectDeploymentRejectsConnectionFromAnotherEnvironment() {
+        stubScheduleConnection(Environment.PRODUCTION);
+
+        assertThatThrownBy(() -> createCronInputProjectDeployment(
+            "0/5 15 * * ?", List.of(new ProjectDeploymentWorkflowConnection(1001L, "connection", "trigger_1"))))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("does not belong to the deployment environment");
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowRejectsConnectionFromAnotherEnvironment() {
+        stubScheduleConnection(Environment.DEVELOPMENT);
+
+        long projectDeploymentId = createCronInputProjectDeployment(
+            "0/5 15 * * ?", List.of(new ProjectDeploymentWorkflowConnection(1001L, "connection", "trigger_1")));
+
+        stubScheduleConnection(Environment.PRODUCTION);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentWorkflow.setConnections(
+            List.of(new ProjectDeploymentWorkflowConnection(1002L, "connection", "trigger_1")));
+
+        assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("does not belong to the deployment environment");
+
+        ProjectDeploymentWorkflow savedProjectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        assertThat(savedProjectDeploymentWorkflow.getConnections())
+            .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .containsExactly(1001L);
+    }
+
     @Disabled
     @Test
     public void testUpdateProjectDeploymentTags() {
@@ -1083,6 +1123,23 @@ public class ProjectDeploymentFacadeIntTest {
 
         return projectWorkflowRepository.findAllByProjectIdAndProjectVersion(projectDTO.id(), 1)
             .getFirst();
+    }
+
+    private void stubScheduleConnection(Environment environment) {
+        ComponentConnection componentConnection = new ComponentConnection(
+            "schedule", 1, "trigger_1", "connection", false);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTrigger.class)))
+            .thenReturn(List.of(componentConnection));
+        when(componentConnectionFacade.getComponentConnection(anyString(), anyString(), anyString()))
+            .thenReturn(componentConnection);
+
+        Connection connection = new Connection();
+
+        connection.setComponentName("schedule");
+        connection.setEnvironmentId(environment.ordinal());
+
+        when(connectionService.getConnection(anyLong())).thenReturn(connection);
     }
 
     private long createCronInputProjectDeployment(String cronExpression) {

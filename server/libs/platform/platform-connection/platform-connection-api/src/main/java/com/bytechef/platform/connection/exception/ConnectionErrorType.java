@@ -27,6 +27,7 @@ public class ConnectionErrorType extends AbstractErrorType {
     public static final ConnectionErrorType CONNECTION_IS_USED = new ConnectionErrorType(100);
     public static final ConnectionErrorType INVALID_CONNECTION = new ConnectionErrorType(101);
     public static final ConnectionErrorType INVALID_CONNECTION_COMPONENT_NAME = new ConnectionErrorType(102);
+    public static final ConnectionErrorType INVALID_CONNECTION_ENVIRONMENT = new ConnectionErrorType(103);
 
     private ConnectionErrorType(int errorKey) {
         super(Connection.class, errorKey);
