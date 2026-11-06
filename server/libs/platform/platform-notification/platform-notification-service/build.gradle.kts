@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-delivery"))
 
+    testImplementation("org.springframework:spring-context-support")
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation(project(":server:libs:config:app-config"))

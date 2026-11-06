@@ -66,7 +66,7 @@ class EmailNotificationSenderIntTest {
             createNotification(Map.of("email", "approver@example.com")), emailNotificationHandler,
             notificationHandlerContext);
 
-        verify(mailService).sendEmail("approver@example.com", "Subject", "Content", false, true);
+        verify(mailService).sendEmailOrThrow("approver@example.com", "Subject", "Content", false, true);
     }
 
     @Test
@@ -86,7 +86,8 @@ class EmailNotificationSenderIntTest {
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("no email address");
 
-        verify(mailService, never()).sendEmail(anyString(), anyString(), anyString(), anyBoolean(), anyBoolean());
+        verify(mailService, never()).sendEmailOrThrow(anyString(), anyString(), anyString(), anyBoolean(),
+            anyBoolean());
     }
 
     @Test
@@ -96,7 +97,8 @@ class EmailNotificationSenderIntTest {
                 createNotification(Map.of("email", " ")), emailNotificationHandler, notificationHandlerContext))
                     .isInstanceOf(IllegalStateException.class);
 
-        verify(mailService, never()).sendEmail(anyString(), anyString(), anyString(), anyBoolean(), anyBoolean());
+        verify(mailService, never()).sendEmailOrThrow(anyString(), anyString(), anyString(), anyBoolean(),
+            anyBoolean());
     }
 
     @Test

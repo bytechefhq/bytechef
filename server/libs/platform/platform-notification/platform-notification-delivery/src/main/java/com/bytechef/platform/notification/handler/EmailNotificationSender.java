@@ -16,10 +16,12 @@
 
 package com.bytechef.platform.notification.handler;
 
-import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.notification.domain.Notification;
+import com.bytechef.platform.notification.email.NotificationEmailGateway;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mail.MailException;
 import org.springframework.stereotype.Component;
 
@@ -33,10 +35,11 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
     private static final int MAX_ERROR_LENGTH = 200;
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
-    private final MailService mailService;
+    private final ObjectProvider<NotificationEmailGateway> notificationEmailGatewayObjectProvider;
 
-    public EmailNotificationSender(MailService mailService) {
-        this.mailService = mailService;
+    @SuppressFBWarnings("EI2")
+    public EmailNotificationSender(ObjectProvider<NotificationEmailGateway> notificationEmailGatewayObjectProvider) {
+        this.notificationEmailGatewayObjectProvider = notificationEmailGatewayObjectProvider;
     }
 
     @Override
@@ -56,9 +59,16 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
                 "Notification " + notification.getId() + " has no email address configured");
         }
 
-        mailService.sendEmail(
+        NotificationEmailGateway notificationEmailGateway = notificationEmailGatewayObjectProvider.getIfAvailable();
+
+        if (notificationEmailGateway == null) {
+            throw new IllegalStateException(
+                "No email gateway is available in this deployment to deliver notification " + notification.getId());
+        }
+
+        notificationEmailGateway.sendEmail(
             email, emailNotificationHandler.getSubject(notificationHandlerContext),
-            emailNotificationHandler.getContent(notificationHandlerContext), false,
+            emailNotificationHandler.getContent(notificationHandlerContext),
             emailNotificationHandler.isHtml());
 
         return CompletableFuture.completedFuture(null);
@@ -75,8 +85,14 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
             return NotificationTestResult.failed("Email address is required");
         }
 
+        NotificationEmailGateway notificationEmailGateway = notificationEmailGatewayObjectProvider.getIfAvailable();
+
+        if (notificationEmailGateway == null) {
+            return NotificationTestResult.failed("No email gateway is available in this deployment");
+        }
+
         try {
-            mailService.sendEmailNow(
+            notificationEmailGateway.sendEmailNow(
                 email, emailNotificationHandler.getSubject(notificationHandlerContext),
                 emailNotificationHandler.getContent(notificationHandlerContext), emailNotificationHandler.isHtml());
         } catch (MailException | IllegalStateException exception) {
