@@ -4,6 +4,7 @@ import PageLoader from '@/components/PageLoader';
 import AutomationWorkflowExecutionsSheet from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-executions-sheet/AutomationWorkflowExecutionsSheet';
 import AutomationWorkflowProjectConfigurationDialog from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-dialog/AutomationWorkflowProjectConfigurationDialog';
 import AutomationWorkflowProjectConfigurationList from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationList';
+import ListGroupHeader from '@/shared/components/ListGroupHeader';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
@@ -15,7 +16,7 @@ import {
     useAutomationWorkflowProjectsQuery,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {SlidersHorizontalIcon} from 'lucide-react';
+import {FolderIcon, SlidersHorizontalIcon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
 import {flushSync} from 'react-dom';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -119,17 +120,22 @@ const AutomationWorkflowConfigurations = () => {
                 {listedProjects.length > 0 ? (
                     <div className="flex w-full flex-col gap-2 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                         {listedProjects.map((project) => (
-                            <AutomationWorkflowProjectConfigurationList
-                                environmentId={currentEnvironmentId}
-                                key={project.id}
-                                onCreate={() => setConfigurationDialog({project})}
-                                onEdit={(configuration) => setConfigurationDialog({configuration, project})}
-                                onUpdateVersion={(configuration) =>
-                                    setConfigurationDialog({configuration, project, updateProjectVersion: true})
-                                }
-                                project={project}
-                                showProjectName
-                            />
+                            <section key={project.id}>
+                                <ListGroupHeader
+                                    icon={<FolderIcon aria-hidden="true" className="size-6 shrink-0" />}
+                                    name={project.name}
+                                />
+
+                                <AutomationWorkflowProjectConfigurationList
+                                    environmentId={currentEnvironmentId}
+                                    onCreate={() => setConfigurationDialog({project})}
+                                    onEdit={(configuration) => setConfigurationDialog({configuration, project})}
+                                    onUpdateVersion={(configuration) =>
+                                        setConfigurationDialog({configuration, project, updateProjectVersion: true})
+                                    }
+                                    project={project}
+                                />
+                            </section>
                         ))}
                     </div>
                 ) : selectedProject ? (
