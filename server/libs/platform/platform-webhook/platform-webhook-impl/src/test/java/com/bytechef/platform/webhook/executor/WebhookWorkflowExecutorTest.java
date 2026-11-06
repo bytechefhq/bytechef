@@ -78,6 +78,7 @@ public class WebhookWorkflowExecutorTest {
 
     private Evaluator evaluator;
     private ApplicationEventPublisher eventPublisher;
+    private JobPrincipalAccessor jobPrincipalAccessor;
     private JobSyncExecutor jobSyncExecutor;
     private PrincipalJobFacade principalJobFacade;
     private SseStreamBridgeRegistry sseStreamBridgeRegistry;
@@ -95,7 +96,8 @@ public class WebhookWorkflowExecutorTest {
         webhookWorkflowSyncExecutor = mock(WebhookWorkflowSyncExecutor.class);
         workflowService = mock(WorkflowService.class);
 
-        JobPrincipalAccessor jobPrincipalAccessor = mock(JobPrincipalAccessor.class);
+        jobPrincipalAccessor = mock(JobPrincipalAccessor.class);
+
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry = mock(JobPrincipalAccessorRegistry.class);
 
         when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(any())).thenReturn(jobPrincipalAccessor);
@@ -138,6 +140,23 @@ public class WebhookWorkflowExecutorTest {
 
         assertThat(jobParametersArgumentCaptor.getValue()
             .getMetadata()).containsEntry(MetadataConstants.STREAMED_EXECUTION, true);
+    }
+
+    @Test
+    public void testStreamOfADisabledWorkflowReportsAnErrorWithoutRunningTheTrigger() {
+        SseStreamBridge sseStreamBridge = mock(SseStreamBridge.class);
+
+        when(jobPrincipalAccessor.isWorkflowEnabled(anyLong(), anyString())).thenReturn(false);
+
+        webhookWorkflowExecutor.stream(workflowExecutionId, webhookRequest, sseStreamBridge);
+
+        ArgumentCaptor<Throwable> throwableArgumentCaptor = ArgumentCaptor.forClass(Throwable.class);
+
+        verify(sseStreamBridge).onError(throwableArgumentCaptor.capture());
+
+        assertThat(throwableArgumentCaptor.getValue()).hasMessage("Workflow is disabled.");
+
+        verifyNoInteractions(webhookWorkflowSyncExecutor, principalJobFacade);
     }
 
     @Test
