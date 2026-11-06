@@ -5,13 +5,17 @@ import {useSearchParams} from 'react-router-dom';
 
 import AiObservabilityAlerts from './components/alerts/AiObservabilityAlerts';
 import AiGatewayBudget from './components/budget/AiGatewayBudget';
+import AiDatasets from './components/datasets/AiDatasets';
+import AiExperiments from './components/experiments/AiExperiments';
 import AiObservabilityExports from './components/exports/AiObservabilityExports';
 import AiGatewayModels from './components/models/AiGatewayModels';
 import AiGatewayDashboard from './components/monitoring/AiGatewayDashboard';
 import AiGatewayProjects from './components/projects/AiGatewayProjects';
+import AiPrompts from './components/prompts/AiPrompts';
 import AiGatewayProviders from './components/providers/AiGatewayProviders';
 import AiGatewayRateLimits from './components/rate-limits/AiGatewayRateLimits';
 import AiGatewayRoutingPolicies from './components/routing/AiGatewayRoutingPolicies';
+import AiEvalScores from './components/scores/AiEvalScores';
 import AiObservabilitySessionDetail from './components/sessions/AiObservabilitySessionDetail';
 import AiObservabilitySessions from './components/sessions/AiObservabilitySessions';
 import AiGatewaySettings from './components/settings/AiGatewaySettings';
@@ -21,13 +25,17 @@ import AiObservabilityTraces from './components/traces/AiObservabilityTraces';
 type AiGatewayPageType =
     | 'alerts'
     | 'budget'
+    | 'datasets'
+    | 'experiments'
     | 'exports'
     | 'models'
     | 'monitoring'
     | 'projects'
+    | 'prompts'
     | 'providers'
     | 'rateLimits'
     | 'routing'
+    | 'scores'
     | 'sessions'
     | 'settings'
     | 'traces';
@@ -37,12 +45,16 @@ const GATEWAY_SECTIONS: {id: AiGatewayPageType; label: string}[] = [
     {id: 'models', label: 'Models'},
     {id: 'projects', label: 'Projects'},
     {id: 'routing', label: 'Routing Policies'},
+    {id: 'prompts', label: 'Prompts'},
     {id: 'settings', label: 'Settings'},
     {id: 'budget', label: 'Budget'},
     {id: 'rateLimits', label: 'Rate Limits'},
     {id: 'monitoring', label: 'Monitoring'},
+    {id: 'datasets', label: 'Datasets'},
+    {id: 'experiments', label: 'Experiments'},
     {id: 'traces', label: 'Traces'},
     {id: 'sessions', label: 'Sessions'},
+    {id: 'scores', label: 'Scores'},
     {id: 'alerts', label: 'Alerts'},
     {id: 'exports', label: 'Exports'},
 ];
@@ -105,6 +117,8 @@ const AiGateway = () => {
 
             {activePage === 'routing' && <AiGatewayRoutingPolicies />}
 
+            {activePage === 'prompts' && <AiPrompts />}
+
             {activePage === 'settings' && <AiGatewaySettings />}
 
             {activePage === 'budget' && <AiGatewayBudget />}
@@ -123,6 +137,16 @@ const AiGateway = () => {
                     <AiObservabilityTraces onSelectTrace={(traceId) => updateQueryParam('traceId', traceId)} />
                 ))}
 
+            {activePage === 'scores' && <AiEvalScores />}
+
+            {activePage === 'datasets' && <AiDatasets />}
+
+            {activePage === 'experiments' && <AiExperiments />}
+
+            {activePage === 'alerts' && <AiObservabilityAlerts />}
+
+            {activePage === 'exports' && <AiObservabilityExports />}
+
             {activePage === 'sessions' &&
                 (selectedSessionId ? (
                     <AiObservabilitySessionDetail
@@ -134,10 +158,6 @@ const AiGateway = () => {
                         onSelectSession={(sessionId) => updateQueryParam('sessionId', sessionId)}
                     />
                 ))}
-
-            {activePage === 'alerts' && <AiObservabilityAlerts />}
-
-            {activePage === 'exports' && <AiObservabilityExports />}
         </LayoutContainer>
     );
 };
