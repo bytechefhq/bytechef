@@ -49,11 +49,11 @@ Each call is one row, newest first:
 
 | Column | What it shows |
 |---|---|
+| **Status** | How the call ended, for example `SUCCESS`, `ERROR`, `CONNECTION_REQUIRED` or `TIMEOUT`. |
 | **Tool** | The tool name the AI agent called, or the action name your code executed. |
 | **Surface** | Where the call came in: **Embedded MCP**, **Embedded API (Action)** or **Embedded API (Tool)**. |
 | **Server** | The embedded MCP server the call came through. Embedded API calls show a dash. |
 | **Source** | What ran: the component and operation, such as `slack / sendMessage`, or the name of the workflow a workflow tool ran. |
-| **Outcome** | How the call ended, for example `SUCCESS`, `ERROR`, `CONNECTION_REQUIRED` or `TIMEOUT`. |
 | **Duration** | How long the call took, in milliseconds. |
 | **Date** | When the call was made. |
 
@@ -62,10 +62,10 @@ calls.
 
 ### How a workflow tool call ends
 
-A workflow tool starts a workflow run and waits for it. The outcome reflects where the run was when
+A workflow tool starts a workflow run and waits for it. The status reflects where the run was when
 the call returned:
 
-| Outcome | The workflow run |
+| Status | The workflow run |
 |---|---|
 | `SUCCESS` | Completed, and the call returned its output. |
 | `ERROR` | Failed, could not start, or was stopped before it finished. |
@@ -80,7 +80,7 @@ the call returned:
 | Filter | Narrows the list to |
 |---|---|
 | **Surface** | Calls that came in through one surface. |
-| **Outcome** | Calls that ended one way. |
+| **Status** | Calls that ended one way. |
 | **MCP Server** | Calls made through one embedded MCP server. The filter appears when there is at least one embedded MCP server. |
 | **Start date** / **End date** | Calls made within a date range. |
 
