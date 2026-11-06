@@ -18,8 +18,8 @@ export const MCP_SERVERS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/
 
 export const PROJECTS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/automation/build/workflows/projects';
 
-export const TOOL_INVOCATIONS_DOCUMENTATION_URL =
-    'https://docs.bytechef.io/platform/automation/monitor/tool-invocations';
+export const EXTERNAL_INVOCATIONS_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/automation/monitor/external-invocations';
 
 export const WORKFLOW_EXECUTIONS_DOCUMENTATION_URL =
     'https://docs.bytechef.io/platform/automation/monitor/workflow-executions';

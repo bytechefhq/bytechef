@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 
-import ToolInvocationsTable from './ToolInvocationsTable';
+import ExternalInvocationsTable from './ExternalInvocationsTable';
 
 const baseLog = {
     a2aServerId: null,
@@ -28,9 +28,9 @@ const baseLog = {
     workspaceId: null,
 };
 
-describe('ToolInvocationsTable', () => {
+describe('ExternalInvocationsTable', () => {
     it('renders a row with the tool name, mapped surface label and outcome', () => {
-        render(<ToolInvocationsTable toolInvocationLogs={[baseLog]} />);
+        render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);
 
         expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
         expect(screen.getByText('Automation MCP')).toBeInTheDocument();
@@ -40,7 +40,7 @@ describe('ToolInvocationsTable', () => {
     });
 
     it('renders an em dash when the tool name is missing', () => {
-        render(<ToolInvocationsTable toolInvocationLogs={[{...baseLog, id: '2', toolName: null}]} />);
+        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, id: '2', toolName: null}]} />);
 
         const toolNameCell = screen.getAllByRole('cell')[0];
 
@@ -55,7 +55,7 @@ describe('ToolInvocationsTable', () => {
         ['MCP_EMBEDDED', 'Embedded MCP'],
         ['FUTURE_SURFACE', 'FUTURE_SURFACE'],
     ])('labels the %s surface as %s', (surface, label) => {
-        render(<ToolInvocationsTable toolInvocationLogs={[{...baseLog, surface}]} />);
+        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, surface}]} />);
 
         expect(screen.getByText(label)).toBeInTheDocument();
     });
@@ -70,14 +70,14 @@ describe('ToolInvocationsTable', () => {
         ['APPROVAL_REQUIRED', 'bg-surface-neutral-secondary'],
         ['SUSPENDED', 'bg-surface-neutral-secondary'],
     ])('colours the %s outcome with %s', (outcome, className) => {
-        render(<ToolInvocationsTable toolInvocationLogs={[{...baseLog, outcome}]} />);
+        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, outcome}]} />);
 
         expect(screen.getByText(outcome)).toHaveClass(className);
         expect(screen.getByText(outcome)).toHaveClass('border-transparent');
     });
 
     it('shows only the component name when the call has no operation', () => {
-        render(<ToolInvocationsTable toolInvocationLogs={[{...baseLog, operationName: null}]} />);
+        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, operationName: null}]} />);
 
         expect(screen.getByText('slack')).toBeInTheDocument();
         expect(screen.queryByText('slack / sendMessage')).not.toBeInTheDocument();
@@ -85,8 +85,8 @@ describe('ToolInvocationsTable', () => {
 
     it('shows the workflow name in the source column for a workflow tool', () => {
         render(
-            <ToolInvocationsTable
-                toolInvocationLogs={[
+            <ExternalInvocationsTable
+                externalInvocationLogs={[
                     {
                         ...baseLog,
                         componentName: null,
@@ -105,8 +105,8 @@ describe('ToolInvocationsTable', () => {
 
     it('falls back to Workflow in the source column when the workflow name cannot be resolved', () => {
         render(
-            <ToolInvocationsTable
-                toolInvocationLogs={[
+            <ExternalInvocationsTable
+                externalInvocationLogs={[
                     {...baseLog, componentName: null, kind: 'WORKFLOW', operationName: null, toolName: 'runReport'},
                 ]}
             />
@@ -117,12 +117,12 @@ describe('ToolInvocationsTable', () => {
 
     it('shows the MCP server name and a dash when the server is missing or unknown', () => {
         render(
-            <ToolInvocationsTable
-                mcpServerNames={{'5': 'Sales MCP'}}
-                toolInvocationLogs={[
+            <ExternalInvocationsTable
+                externalInvocationLogs={[
                     {...baseLog, id: '1', mcpServerId: 5, toolName: 'named_server_tool'},
                     {...baseLog, id: '2', mcpServerId: 9, toolName: 'unknown_server_tool'},
                 ]}
+                mcpServerNames={{'5': 'Sales MCP'}}
             />
         );
 
@@ -135,10 +135,9 @@ describe('ToolInvocationsTable', () => {
 
     it('shows the A2A server name of an A2A skill call', () => {
         render(
-            <ToolInvocationsTable
+            <ExternalInvocationsTable
                 a2aServerNames={{'4': 'Research agent'}}
-                mcpServerNames={{'4': 'Sales MCP'}}
-                toolInvocationLogs={[
+                externalInvocationLogs={[
                     {
                         ...baseLog,
                         a2aServerId: 4,
@@ -149,6 +148,7 @@ describe('ToolInvocationsTable', () => {
                         toolName: 'Summarize',
                     },
                 ]}
+                mcpServerNames={{'4': 'Sales MCP'}}
             />
         );
 
@@ -157,7 +157,7 @@ describe('ToolInvocationsTable', () => {
     });
 
     it('hides the surface column when showSurface is false', () => {
-        render(<ToolInvocationsTable showSurface={false} toolInvocationLogs={[baseLog]} />);
+        render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} showSurface={false} />);
 
         expect(screen.queryByText('Surface')).not.toBeInTheDocument();
         expect(screen.queryByText('Automation MCP')).not.toBeInTheDocument();
@@ -169,8 +169,8 @@ describe('ToolInvocationsTable', () => {
         const createdDate = Date.UTC(2026, 9, 31, 12, 0, 0);
 
         render(
-            <ToolInvocationsTable
-                toolInvocationLogs={[
+            <ExternalInvocationsTable
+                externalInvocationLogs={[
                     {...baseLog, createdDate, id: '1'},
                     {...baseLog, createdDate: null, id: '2', toolName: 'undated_tool'},
                 ]}
@@ -186,8 +186,8 @@ describe('ToolInvocationsTable', () => {
 
     it('renders one row per invocation', () => {
         render(
-            <ToolInvocationsTable
-                toolInvocationLogs={[
+            <ExternalInvocationsTable
+                externalInvocationLogs={[
                     {...baseLog, id: '1', toolName: 'first_tool'},
                     {...baseLog, id: '2', toolName: 'second_tool'},
                 ]}

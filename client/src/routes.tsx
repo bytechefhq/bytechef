@@ -43,9 +43,9 @@ const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
 const AutomationConnections = lazy(() =>
     import('@/pages/automation/connections/Connections').then((module) => ({default: module.Connections}))
 );
-const AutomationToolInvocations = lazy(() =>
-    import('@/pages/automation/tool-invocations/AutomationToolInvocations').then((module) => ({
-        default: module.AutomationToolInvocations,
+const AutomationExternalInvocations = lazy(() =>
+    import('@/pages/automation/external-invocations/AutomationExternalInvocations').then((module) => ({
+        default: module.AutomationExternalInvocations,
     }))
 );
 const AutomationWorkflowExecutions = lazy(() =>
@@ -105,9 +105,9 @@ const EmbeddedConnections = lazy(() =>
     import('@/ee/pages/embedded/connections/Connections').then((module) => ({default: module.Connections}))
 );
 const EmbeddedMcpServers = lazy(() => import('@/ee/pages/embedded/mcp-servers/McpServers'));
-const EmbeddedToolInvocations = lazy(() =>
-    import('@/ee/pages/embedded/tool-invocations/EmbeddedToolInvocations').then((module) => ({
-        default: module.EmbeddedToolInvocations,
+const EmbeddedExternalInvocations = lazy(() =>
+    import('@/ee/pages/embedded/external-invocations/EmbeddedExternalInvocations').then((module) => ({
+        default: module.EmbeddedExternalInvocations,
     }))
 );
 const EmbeddedIntegrationWorkflowExecutions = lazy(() =>
@@ -798,12 +798,12 @@ export const getRouter = (queryClient: QueryClient) =>
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
-                                                    <AutomationToolInvocations />
+                                                    <AutomationExternalInvocations />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'executions/tool-invocations',
+                                    path: 'executions/external-invocations',
                                 },
                                 {
                                     element: (
@@ -1114,12 +1114,12 @@ export const getRouter = (queryClient: QueryClient) =>
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
-                                                    <EmbeddedToolInvocations />
+                                                    <EmbeddedExternalInvocations />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'executions/tool-invocations',
+                                    path: 'executions/external-invocations',
                                 },
                                 {
                                     element: (

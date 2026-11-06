@@ -1,28 +1,28 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {
+    ExternalInvocationLogsQuery,
+    ExternalInvocationLogsQueryVariables,
     PlatformType,
-    ToolInvocationLogsQuery,
-    ToolInvocationLogsQueryVariables,
-    useToolInvocationLogsQuery,
-    useWorkspaceToolInvocationLogsQuery,
+    useExternalInvocationLogsQuery,
+    useWorkspaceExternalInvocationLogsQuery,
 } from '@/shared/middleware/graphql';
 import {endOfDay} from 'date-fns';
 import {useState} from 'react';
 
-type ToolInvocationLogItemType = ToolInvocationLogsQuery['toolInvocationLogs']['content'][number];
+type ExternalInvocationLogItemType = ExternalInvocationLogsQuery['externalInvocationLogs']['content'][number];
 
-export interface ToolInvocationsWorkspaceScopeI {
+export interface ExternalInvocationsWorkspaceScopeI {
     environmentId: number | undefined;
     workspaceId: number | undefined;
 }
 
-export interface UseToolInvocationsOptionsI {
+export interface UseExternalInvocationsOptionsI {
     environmentId?: number;
     type: PlatformType;
-    workspaceScope?: ToolInvocationsWorkspaceScopeI;
+    workspaceScope?: ExternalInvocationsWorkspaceScopeI;
 }
 
-interface ToolInvocationsFiltersI {
+interface ExternalInvocationsFiltersI {
     a2aServerId: string | undefined;
     endDate: Date | undefined;
     mcpServerId: string | undefined;
@@ -32,7 +32,7 @@ interface ToolInvocationsFiltersI {
     surface: string | undefined;
 }
 
-interface UseToolInvocationsI {
+interface UseExternalInvocationsI {
     filterA2aServerId: string | undefined;
     filterEndDate: Date | undefined;
     filterMcpServerId: string | undefined;
@@ -47,19 +47,19 @@ interface UseToolInvocationsI {
     handlePaginationClick: (pageNumber: number) => void;
     handleStartDateChange: (date: Date | undefined) => void;
     handleSurfaceChange: (item?: ComboBoxItemType) => void;
-    refetchToolInvocations: () => void;
-    toolInvocationLogPage: ToolInvocationLogsQuery['toolInvocationLogs'] | undefined;
-    toolInvocationLogs: Array<ToolInvocationLogItemType>;
-    toolInvocationLogsError: Error | null;
-    toolInvocationLogsIsFetching: boolean;
-    toolInvocationLogsIsLoading: boolean;
+    refetchExternalInvocations: () => void;
+    externalInvocationLogPage: ExternalInvocationLogsQuery['externalInvocationLogs'] | undefined;
+    externalInvocationLogs: Array<ExternalInvocationLogItemType>;
+    externalInvocationLogsError: Error | null;
+    externalInvocationLogsIsFetching: boolean;
+    externalInvocationLogsIsLoading: boolean;
 }
 
 const toFilterVariables = (
-    filters: ToolInvocationsFiltersI,
+    filters: ExternalInvocationsFiltersI,
     type: PlatformType,
     environmentId?: number
-): ToolInvocationLogsQueryVariables => ({
+): ExternalInvocationLogsQueryVariables => ({
     a2aServerId: filters.a2aServerId ? Number(filters.a2aServerId) : undefined,
     environmentId: environmentId != null ? String(environmentId) : undefined,
     fromDate: filters.startDate ? filters.startDate.getTime() : undefined,
@@ -71,11 +71,11 @@ const toFilterVariables = (
     type,
 });
 
-export const useToolInvocations = ({
+export const useExternalInvocations = ({
     environmentId,
     type,
     workspaceScope,
-}: UseToolInvocationsOptionsI): UseToolInvocationsI => {
+}: UseExternalInvocationsOptionsI): UseExternalInvocationsI => {
     const [filterA2aServerId, setFilterA2aServerId] = useState<string | undefined>(undefined);
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(undefined);
     const [filterMcpServerId, setFilterMcpServerId] = useState<string | undefined>(undefined);
@@ -99,9 +99,9 @@ export const useToolInvocations = ({
     );
     const workspaceScoped = workspaceScope !== undefined;
 
-    const tenantQuery = useToolInvocationLogsQuery(filterVariables, {enabled: !workspaceScoped});
+    const tenantQuery = useExternalInvocationLogsQuery(filterVariables, {enabled: !workspaceScoped});
 
-    const workspaceQuery = useWorkspaceToolInvocationLogsQuery(
+    const workspaceQuery = useWorkspaceExternalInvocationLogsQuery(
         {
             ...filterVariables,
             environmentId: String(workspaceScope?.environmentId),
@@ -111,9 +111,9 @@ export const useToolInvocations = ({
     );
 
     const activeQuery = workspaceScoped ? workspaceQuery : tenantQuery;
-    const toolInvocationLogPage = workspaceScoped
-        ? workspaceQuery.data?.workspaceToolInvocationLogs
-        : tenantQuery.data?.toolInvocationLogs;
+    const externalInvocationLogPage = workspaceScoped
+        ? workspaceQuery.data?.workspaceExternalInvocationLogs
+        : tenantQuery.data?.externalInvocationLogs;
 
     const handleA2aServerChange = (item?: ComboBoxItemType) => {
         setFilterA2aServerId(item?.value ? String(item.value) : undefined);
@@ -148,6 +148,11 @@ export const useToolInvocations = ({
     };
 
     return {
+        externalInvocationLogPage,
+        externalInvocationLogs: externalInvocationLogPage?.content ?? [],
+        externalInvocationLogsError: (activeQuery.error as Error | null) ?? null,
+        externalInvocationLogsIsFetching: activeQuery.isFetching,
+        externalInvocationLogsIsLoading: activeQuery.isLoading,
         filterA2aServerId,
         filterEndDate,
         filterMcpServerId,
@@ -162,11 +167,6 @@ export const useToolInvocations = ({
         handlePaginationClick,
         handleStartDateChange,
         handleSurfaceChange,
-        refetchToolInvocations: activeQuery.refetch,
-        toolInvocationLogPage,
-        toolInvocationLogs: toolInvocationLogPage?.content ?? [],
-        toolInvocationLogsError: (activeQuery.error as Error | null) ?? null,
-        toolInvocationLogsIsFetching: activeQuery.isFetching,
-        toolInvocationLogsIsLoading: activeQuery.isLoading,
+        refetchExternalInvocations: activeQuery.refetch,
     };
 };

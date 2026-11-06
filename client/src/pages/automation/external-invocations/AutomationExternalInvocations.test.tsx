@@ -1,5 +1,5 @@
+import {useExternalInvocations} from '@/pages/automation/external-invocations/hooks/useExternalInvocations';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useToolInvocations} from '@/pages/automation/tool-invocations/hooks/useToolInvocations';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {act} from '@testing-library/react';
@@ -7,23 +7,23 @@ import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {AutomationToolInvocations} from './AutomationToolInvocations';
+import {AutomationExternalInvocations} from './AutomationExternalInvocations';
 
 const hoisted = vi.hoisted(() => ({
     grantedScopes: new Set<string>(),
     useA2aServersQueryMock: vi.fn(),
-    useToolInvocationLogsQueryMock: vi.fn(),
+    useExternalInvocationLogsQueryMock: vi.fn(),
+    useWorkspaceExternalInvocationLogsQueryMock: vi.fn(),
     useWorkspaceMcpServersQueryMock: vi.fn(),
-    useWorkspaceToolInvocationLogsQueryMock: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     PlatformType: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
     useA2aServersQuery: hoisted.useA2aServersQueryMock,
     useEnvironmentsQuery: () => ({data: undefined}),
-    useToolInvocationLogsQuery: hoisted.useToolInvocationLogsQueryMock,
+    useExternalInvocationLogsQuery: hoisted.useExternalInvocationLogsQueryMock,
+    useWorkspaceExternalInvocationLogsQuery: hoisted.useWorkspaceExternalInvocationLogsQueryMock,
     useWorkspaceMcpServersQuery: hoisted.useWorkspaceMcpServersQueryMock,
-    useWorkspaceToolInvocationLogsQuery: hoisted.useWorkspaceToolInvocationLogsQueryMock,
 }));
 
 vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
@@ -34,8 +34,8 @@ vi.mock('@/shared/hooks/useLoadWorkspaceScopes', () => ({
     useLoadWorkspaceScopes: () => ({error: false, loading: false}),
 }));
 
-vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
-    ToolInvocations: ({
+vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
+    ExternalInvocations: ({
         a2aServerOptions,
         firstRunEmptyState,
         mcpServerOptions,
@@ -45,7 +45,7 @@ vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
         a2aServerOptions: Array<{label: string; value: string}>;
         firstRunEmptyState: ReactNode;
         mcpServerOptions: Array<{label: string; value: string}>;
-    } & Parameters<typeof useToolInvocations>[0]) => {
+    } & Parameters<typeof useExternalInvocations>[0]) => {
         const {
             filterA2aServerId,
             filterMcpServerId,
@@ -55,7 +55,7 @@ vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
             handleMcpServerChange,
             handleOutcomeChange,
             handlePaginationClick,
-        } = useToolInvocations({type, workspaceScope});
+        } = useExternalInvocations({type, workspaceScope});
 
         return (
             <div>
@@ -104,21 +104,21 @@ const emptyQueryResult = () => ({
 const renderPage = () =>
     render(
         <MemoryRouter>
-            <AutomationToolInvocations />
+            <AutomationExternalInvocations />
         </MemoryRouter>
     );
 
-describe('AutomationToolInvocations', () => {
+describe('AutomationExternalInvocations', () => {
     beforeEach(() => {
         hoisted.grantedScopes = new Set(['A2A_VIEW', 'MCP_VIEW']);
         hoisted.useA2aServersQueryMock.mockReset();
         hoisted.useA2aServersQueryMock.mockReturnValue({data: undefined});
-        hoisted.useToolInvocationLogsQueryMock.mockReset();
-        hoisted.useToolInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
+        hoisted.useExternalInvocationLogsQueryMock.mockReset();
+        hoisted.useExternalInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
         hoisted.useWorkspaceMcpServersQueryMock.mockReset();
         hoisted.useWorkspaceMcpServersQueryMock.mockReturnValue({data: undefined});
-        hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReset();
-        hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
+        hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReset();
+        hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
 
         environmentStore.setState({currentEnvironmentId: 2});
         useWorkspaceStore.setState({currentWorkspaceId: 7});
@@ -137,7 +137,7 @@ describe('AutomationToolInvocations', () => {
             await userEvent.click(screen.getByRole('button', {name: 'next pages'}));
 
             expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=9;outcome=ERROR;page=3');
-            expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+            expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     environmentId: '2',
                     mcpServerId: 9,
@@ -154,7 +154,7 @@ describe('AutomationToolInvocations', () => {
             });
 
             expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=;outcome=;page=0');
-            expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+            expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     environmentId,
                     mcpServerId: undefined,
@@ -211,13 +211,13 @@ describe('AutomationToolInvocations', () => {
         }
     );
 
-    it('queries the tool invocations of the picked A2A server', async () => {
+    it('queries the external invocations of the picked A2A server', async () => {
         renderPage();
 
         await userEvent.click(screen.getByRole('button', {name: 'pick a2a server'}));
 
         expect(screen.getByTestId('filters')).toHaveTextContent('a2a=4;mcp=;outcome=;page=0');
-        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({a2aServerId: 4, mcpServerId: undefined, type: 'AUTOMATION'}),
             {enabled: true}
         );

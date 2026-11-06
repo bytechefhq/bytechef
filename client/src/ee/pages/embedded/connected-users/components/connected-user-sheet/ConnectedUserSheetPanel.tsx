@@ -1,8 +1,8 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import ConnectedUserSheetPanelExternalInvocationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelExternalInvocationList';
 import ConnectedUserSheetPanelIntegrationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationList';
 import ConnectedUserSheetPanelMcpServerList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelMcpServerList';
 import ConnectedUserSheetPanelProfile from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelProfile';
-import ConnectedUserSheetPanelToolInvocationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelToolInvocationList';
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 
@@ -36,8 +36,8 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                         Automation Workflows
                     </TabsTrigger>
 
-                    <TabsTrigger className={tabsTriggerClassName} value="tool-invocations">
-                        Tool Invocations
+                    <TabsTrigger className={tabsTriggerClassName} value="external-invocations">
+                        External Invocations
                     </TabsTrigger>
                 </TabsList>
 
@@ -70,9 +70,9 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     )}
                 </TabsContent>
 
-                <TabsContent value="tool-invocations">
+                <TabsContent value="external-invocations">
                     {connectedUser.id != null && (
-                        <ConnectedUserSheetPanelToolInvocationList connectedUserId={connectedUser.id} />
+                        <ConnectedUserSheetPanelExternalInvocationList connectedUserId={connectedUser.id} />
                     )}
                 </TabsContent>
             </Tabs>

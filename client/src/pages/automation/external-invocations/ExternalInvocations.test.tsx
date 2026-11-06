@@ -5,14 +5,14 @@ import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {ToolInvocations} from './ToolInvocations';
+import {ExternalInvocations} from './ExternalInvocations';
 
 const hoisted = vi.hoisted(() => ({
-    useToolInvocationsMock: vi.fn(),
+    useExternalInvocationsMock: vi.fn(),
 }));
 
-vi.mock('@/pages/automation/tool-invocations/hooks/useToolInvocations', () => ({
-    useToolInvocations: hoisted.useToolInvocationsMock,
+vi.mock('@/pages/automation/external-invocations/hooks/useExternalInvocations', () => ({
+    useExternalInvocations: hoisted.useExternalInvocationsMock,
 }));
 
 vi.mock('@/components/ComboBox/ComboBox', () => ({
@@ -27,7 +27,12 @@ vi.mock('@/components/ComboBox/ComboBox', () => ({
     ),
 }));
 
-const toolInvocationsState = () => ({
+const externalInvocationsState = () => ({
+    externalInvocationLogPage: undefined,
+    externalInvocationLogs: [],
+    externalInvocationLogsError: null,
+    externalInvocationLogsIsFetching: false,
+    externalInvocationLogsIsLoading: false,
     filterPageNumber: 0,
     handleEndDateChange: vi.fn(),
     handleMcpServerChange: vi.fn(),
@@ -35,19 +40,14 @@ const toolInvocationsState = () => ({
     handlePaginationClick: vi.fn(),
     handleStartDateChange: vi.fn(),
     handleSurfaceChange: vi.fn(),
-    refetchToolInvocations: vi.fn(),
-    toolInvocationLogPage: undefined,
-    toolInvocationLogs: [],
-    toolInvocationLogsError: null,
-    toolInvocationLogsIsFetching: false,
-    toolInvocationLogsIsLoading: false,
+    refetchExternalInvocations: vi.fn(),
 });
 
-const renderToolInvocations = (props: Partial<Parameters<typeof ToolInvocations>[0]> = {}) =>
+const renderExternalInvocations = (props: Partial<Parameters<typeof ExternalInvocations>[0]> = {}) =>
     render(
         <MemoryRouter>
             <TooltipProvider>
-                <ToolInvocations
+                <ExternalInvocations
                     firstRunEmptyState={<div>First-run guide</div>}
                     type={PlatformType.Automation}
                     {...props}
@@ -56,7 +56,7 @@ const renderToolInvocations = (props: Partial<Parameters<typeof ToolInvocations>
         </MemoryRouter>
     );
 
-const toolInvocationLog = {
+const externalInvocationLog = {
     a2aServerId: null,
     componentName: 'slack',
     componentVersion: 1,
@@ -80,20 +80,23 @@ const toolInvocationLog = {
     workflowName: null,
 };
 
-const recordedToolInvocationsState = () => ({...toolInvocationsState(), toolInvocationLogs: [toolInvocationLog]});
+const recordedExternalInvocationsState = () => ({
+    ...externalInvocationsState(),
+    externalInvocationLogs: [externalInvocationLog],
+});
 
 const renderedItemValues = () => screen.getAllByTestId('combo-box-item').map((item) => item.textContent);
 
-describe('ToolInvocations', () => {
+describe('ExternalInvocations', () => {
     beforeEach(() => {
-        hoisted.useToolInvocationsMock.mockReset();
-        hoisted.useToolInvocationsMock.mockReturnValue(toolInvocationsState());
+        hoisted.useExternalInvocationsMock.mockReset();
+        hoisted.useExternalInvocationsMock.mockReturnValue(externalInvocationsState());
     });
 
     it('offers the automation MCP and A2A surfaces on the automation page', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+        hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
-        renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
+        renderExternalInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         const itemValues = renderedItemValues();
 
@@ -104,11 +107,11 @@ describe('ToolInvocations', () => {
     });
 
     it('shows the name of the A2A server an A2A skill call came through', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue({
-            ...toolInvocationsState(),
-            toolInvocationLogs: [
+        hoisted.useExternalInvocationsMock.mockReturnValue({
+            ...externalInvocationsState(),
+            externalInvocationLogs: [
                 {
-                    ...toolInvocationLog,
+                    ...externalInvocationLog,
                     a2aServerId: 4,
                     componentName: null,
                     kind: 'WORKFLOW',
@@ -120,24 +123,24 @@ describe('ToolInvocations', () => {
             ],
         });
 
-        renderToolInvocations({a2aServerOptions: [{label: 'Research agent', value: '4'}]});
+        renderExternalInvocations({a2aServerOptions: [{label: 'Research agent', value: '4'}]});
 
         expect(screen.getByRole('cell', {name: 'Research agent'})).toBeInTheDocument();
         expect(screen.getByRole('cell', {name: 'A2A'})).toBeInTheDocument();
     });
 
     it('shows the name of the MCP server each invocation came through', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+        hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
-        renderToolInvocations({mcpServerOptions: [{label: 'Sales MCP', value: '11'}]});
+        renderExternalInvocations({mcpServerOptions: [{label: 'Sales MCP', value: '11'}]});
 
         expect(screen.getByRole('cell', {name: 'Sales MCP'})).toBeInTheDocument();
     });
 
     it('offers only the embedded surfaces on the embedded page', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+        hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
-        renderToolInvocations({environmentId: 1, type: PlatformType.Embedded});
+        renderExternalInvocations({environmentId: 1, type: PlatformType.Embedded});
 
         const itemValues = renderedItemValues();
 
@@ -148,17 +151,17 @@ describe('ToolInvocations', () => {
     });
 
     it('offers a paused run as an outcome filter', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+        hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
-        renderToolInvocations();
+        renderExternalInvocations();
 
         expect(renderedItemValues()).toContain('SUSPENDED');
     });
 
     it('reads the invocations of the platform type and environment it is given', () => {
-        renderToolInvocations({environmentId: 1, type: PlatformType.Embedded});
+        renderExternalInvocations({environmentId: 1, type: PlatformType.Embedded});
 
-        expect(hoisted.useToolInvocationsMock).toHaveBeenCalledWith({
+        expect(hoisted.useExternalInvocationsMock).toHaveBeenCalledWith({
             environmentId: 1,
             type: PlatformType.Embedded,
             workspaceScope: undefined,
@@ -166,7 +169,7 @@ describe('ToolInvocations', () => {
     });
 
     it('shows the first-run empty state without filters or pagination when nothing has been recorded', () => {
-        renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
+        renderExternalInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         expect(screen.getByText('First-run guide')).toBeInTheDocument();
         expect(screen.queryByText('Surface')).not.toBeInTheDocument();
@@ -175,31 +178,31 @@ describe('ToolInvocations', () => {
     });
 
     it('keeps the filters and shows a no-match state when a filter hides every record', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue({...toolInvocationsState(), filterOutcome: 'ERROR'});
+        hoisted.useExternalInvocationsMock.mockReturnValue({...externalInvocationsState(), filterOutcome: 'ERROR'});
 
-        renderToolInvocations();
+        renderExternalInvocations();
 
-        expect(screen.getByText('No Matching Tool Invocations')).toBeInTheDocument();
+        expect(screen.getByText('No Matching External Invocations')).toBeInTheDocument();
         expect(screen.getByText('Outcome')).toBeInTheDocument();
         expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
     });
 
     it('lists the invocations with pagination and moves to the page that is clicked', async () => {
-        const pagedToolInvocationsState = {
-            ...hoisted.useToolInvocationsMock(),
-            toolInvocationLogPage: {
-                content: [toolInvocationLog],
+        const pagedExternalInvocationsState = {
+            ...hoisted.useExternalInvocationsMock(),
+            externalInvocationLogPage: {
+                content: [externalInvocationLog],
                 number: 0,
                 size: 1,
                 totalElements: 2,
                 totalPages: 2,
             },
-            toolInvocationLogs: [toolInvocationLog],
+            externalInvocationLogs: [externalInvocationLog],
         };
 
-        hoisted.useToolInvocationsMock.mockReturnValue(pagedToolInvocationsState);
+        hoisted.useExternalInvocationsMock.mockReturnValue(pagedExternalInvocationsState);
 
-        renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
+        renderExternalInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
         expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
@@ -207,53 +210,56 @@ describe('ToolInvocations', () => {
 
         await userEvent.click(screen.getByText('2'));
 
-        expect(pagedToolInvocationsState.handlePaginationClick).toHaveBeenCalledWith(1);
+        expect(pagedExternalInvocationsState.handlePaginationClick).toHaveBeenCalledWith(1);
     });
 
     it('refreshes the invocations from the header button', async () => {
-        const currentToolInvocationsState = hoisted.useToolInvocationsMock();
+        const currentExternalInvocationsState = hoisted.useExternalInvocationsMock();
 
-        renderToolInvocations();
+        renderExternalInvocations();
 
-        const refreshButton = screen.getByRole('button', {name: 'Refresh tool invocations'});
+        const refreshButton = screen.getByRole('button', {name: 'Refresh external invocations'});
 
         expect(refreshButton).toBeEnabled();
 
         await userEvent.click(refreshButton);
 
-        expect(currentToolInvocationsState.refetchToolInvocations).toHaveBeenCalledTimes(1);
+        expect(currentExternalInvocationsState.refetchExternalInvocations).toHaveBeenCalledTimes(1);
     });
 
     it('disables the refresh button while the invocations are being fetched', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue({...toolInvocationsState(), toolInvocationLogsIsFetching: true});
+        hoisted.useExternalInvocationsMock.mockReturnValue({
+            ...externalInvocationsState(),
+            externalInvocationLogsIsFetching: true,
+        });
 
-        renderToolInvocations();
+        renderExternalInvocations();
 
-        expect(screen.getByRole('button', {name: 'Refresh tool invocations'})).toBeDisabled();
+        expect(screen.getByRole('button', {name: 'Refresh external invocations'})).toBeDisabled();
     });
 
     it('shows an error instead of the list when the query fails', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue({
-            ...toolInvocationsState(),
-            toolInvocationLogsError: new Error('Access denied'),
+        hoisted.useExternalInvocationsMock.mockReturnValue({
+            ...externalInvocationsState(),
+            externalInvocationLogsError: new Error('Access denied'),
         });
 
-        renderToolInvocations();
+        renderExternalInvocations();
 
         expect(screen.getByText('Some error occurred.')).toBeInTheDocument();
         expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
     });
 
     it('offers the A2A server filter only when the workspace has A2A servers', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+        hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
-        const {unmount} = renderToolInvocations({a2aServerOptions: []});
+        const {unmount} = renderExternalInvocations({a2aServerOptions: []});
 
         expect(screen.queryByText('A2A Server', {selector: 'label'})).not.toBeInTheDocument();
 
         unmount();
 
-        renderToolInvocations({a2aServerOptions: [{label: 'Research agent', value: '4'}]});
+        renderExternalInvocations({a2aServerOptions: [{label: 'Research agent', value: '4'}]});
 
         expect(screen.getByText('A2A Server', {selector: 'label'})).toBeInTheDocument();
         expect(renderedItemValues()).toContain('4');
@@ -261,15 +267,15 @@ describe('ToolInvocations', () => {
     });
 
     it('offers the MCP server filter only when the workspace has MCP servers', () => {
-        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+        hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
-        const {unmount} = renderToolInvocations({mcpServerOptions: []});
+        const {unmount} = renderExternalInvocations({mcpServerOptions: []});
 
         expect(screen.queryByText('MCP Server', {selector: 'label'})).not.toBeInTheDocument();
 
         unmount();
 
-        renderToolInvocations({mcpServerOptions: [{label: 'Sales tools', value: '11'}]});
+        renderExternalInvocations({mcpServerOptions: [{label: 'Sales tools', value: '11'}]});
 
         expect(screen.getByText('MCP Server', {selector: 'label'})).toBeInTheDocument();
         expect(renderedItemValues()).toContain('11');

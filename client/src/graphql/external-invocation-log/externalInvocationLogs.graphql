@@ -1,4 +1,4 @@
-query ToolInvocationLogs(
+query ExternalInvocationLogs(
     $type: PlatformType!
     $environmentId: ID
     $surface: String
@@ -11,7 +11,7 @@ query ToolInvocationLogs(
     $toDate: Long
     $page: Int
 ) {
-    toolInvocationLogs(
+    externalInvocationLogs(
         type: $type
         environmentId: $environmentId
         surface: $surface

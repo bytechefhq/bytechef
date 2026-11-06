@@ -6,14 +6,14 @@ import {HammerIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-export interface ToolInvocationsConnectStepI {
+export interface ExternalInvocationsConnectStepI {
     description: string;
     id: string;
     label: string;
 }
 
-interface ToolInvocationsEmptyStateProps {
-    connectStep: ToolInvocationsConnectStepI;
+interface ExternalInvocationsEmptyStateProps {
+    connectStep: ExternalInvocationsConnectStepI;
     createMcpServerDescription: string;
     description: string;
     documentationUrl: string;
@@ -26,17 +26,17 @@ interface ToolInvocationsEmptyStateProps {
  * a server in this environment, then connecting an AI client to it. Automation and embedded differ only in wording and
  * where the MCP Servers page lives.
  */
-const ToolInvocationsEmptyState = ({
+const ExternalInvocationsEmptyState = ({
     connectStep,
     createMcpServerDescription,
     description,
     documentationUrl,
     hasMcpServer,
     mcpServersPath,
-}: ToolInvocationsEmptyStateProps) => {
+}: ExternalInvocationsEmptyStateProps) => {
     const navigate = useNavigate();
 
-    const environmentScopeNote = useEnvironmentScopeNote('Tool invocations');
+    const environmentScopeNote = useEnvironmentScopeNote('External invocations');
 
     const steps: JourneyStepI[] = useMemo(() => {
         const goToMcpServersButton = (
@@ -68,7 +68,7 @@ const ToolInvocationsEmptyState = ({
     return (
         <EmptyState
             description={description}
-            docsLink={{href: documentationUrl, label: 'How tool invocations work'}}
+            docsLink={{href: documentationUrl, label: 'How external invocations work'}}
             icon={<HammerIcon />}
             note={environmentScopeNote}
             title="No tool calls yet"
@@ -78,4 +78,4 @@ const ToolInvocationsEmptyState = ({
     );
 };
 
-export default ToolInvocationsEmptyState;
+export default ExternalInvocationsEmptyState;
