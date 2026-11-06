@@ -1,0 +1,15 @@
+dependencies {
+    implementation("io.micrometer:micrometer-core")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+
+    api(project(":server:libs:platform:platform-external-invocation:platform-external-invocation-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.springframework:spring-test")
+    testImplementation("org.springframework.boot:spring-boot-test")
+}

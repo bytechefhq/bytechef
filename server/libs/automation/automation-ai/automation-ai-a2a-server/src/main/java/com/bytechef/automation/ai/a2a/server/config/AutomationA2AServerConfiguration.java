@@ -28,7 +28,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.a2a.A2AAgentCardFactory;
 import com.bytechef.platform.ai.a2a.A2AProtocolHandler;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -60,7 +60,7 @@ public class AutomationA2AServerConfiguration {
         PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         @Qualifier("syncWorkerExecutor") TaskExecutor syncWorkerExecutor, TaskExecutionService taskExecutionService,
-        TaskFileStorage durableTaskFileStorage, ToolExecutionRecorder toolExecutionRecorder,
+        TaskFileStorage durableTaskFileStorage, ExternalInvocationRecorder externalInvocationRecorder,
         WorkflowService workflowService) {
 
         return new A2AAgentExecutorImpl(
@@ -68,7 +68,7 @@ public class AutomationA2AServerConfiguration {
             jobCompletionAwaiter, jobService, principalJobFacade, principalJobService,
             projectDeploymentWorkflowService, applicationProperties.getPublicUrl(),
             runCompletionExecutor(syncWorkerExecutor),
-            taskExecutionService, durableTaskFileStorage, toolExecutionRecorder, workflowService);
+            taskExecutionService, durableTaskFileStorage, externalInvocationRecorder, workflowService);
     }
 
     static Executor runCompletionExecutor(Executor syncWorkerExecutor) {

@@ -15,11 +15,11 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -38,17 +38,17 @@ public class ActionFacadeImpl implements ActionFacade {
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectionIdHelper connectionIdHelper;
-    private final ToolExecutionRecorder toolExecutionRecorder;
+    private final ExternalInvocationRecorder externalInvocationRecorder;
 
     @SuppressFBWarnings("EI")
     public ActionFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, ComponentDefinitionService componentDefinitionService,
-        ConnectionIdHelper connectionIdHelper, ToolExecutionRecorder toolExecutionRecorder) {
+        ConnectionIdHelper connectionIdHelper, ExternalInvocationRecorder externalInvocationRecorder) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.componentDefinitionService = componentDefinitionService;
         this.connectionIdHelper = connectionIdHelper;
-        this.toolExecutionRecorder = toolExecutionRecorder;
+        this.externalInvocationRecorder = externalInvocationRecorder;
     }
 
     @Override
@@ -61,9 +61,9 @@ public class ActionFacadeImpl implements ActionFacade {
 
         Long connectionId = connectedUserConnection.connectionId();
 
-        ToolExecutionEvent.Builder eventBuilder = ToolExecutionEvent
+        ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
             .builder(
-                PlatformType.EMBEDDED, ToolExecutionSurface.EMBEDDED_API_ACTION, ToolExecutionKind.COMPONENT,
+                PlatformType.EMBEDDED, ExternalInvocationSurface.EMBEDDED_API_ACTION, ExternalInvocationKind.COMPONENT,
                 actionName)
             .componentName(componentName)
             .componentVersion(componentVersion)
@@ -80,15 +80,15 @@ public class ActionFacadeImpl implements ActionFacade {
             null, null, null);
 
         if (connectionId == null && isConnectionRequired(componentName, componentVersion)) {
-            toolExecutionRecorder.record(
+            externalInvocationRecorder.record(
                 eventBuilder
-                    .outcome(ToolExecutionOutcome.CONNECTION_REQUIRED)
+                    .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
                     .build());
 
             return execution.get();
         }
 
-        return toolExecutionRecorder.record(eventBuilder, execution);
+        return externalInvocationRecorder.record(eventBuilder, execution);
     }
 
     private boolean isConnectionRequired(String componentName, Integer componentVersion) {

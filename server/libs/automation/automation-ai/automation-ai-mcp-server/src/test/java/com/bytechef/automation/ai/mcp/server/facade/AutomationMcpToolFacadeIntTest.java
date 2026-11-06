@@ -63,16 +63,16 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorderImpl;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorderImpl;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
@@ -164,7 +164,7 @@ class AutomationMcpToolFacadeIntTest {
 
         reset(mcpProjectServiceTarget, mcpServerServiceTarget, mcpToolServiceTarget);
 
-        ToolExecutionRecorder toolExecutionRecorder = new ToolExecutionRecorderImpl(
+        ExternalInvocationRecorder externalInvocationRecorder = new ExternalInvocationRecorderImpl(
             publishedEvents::add, mock(ObjectProvider.class));
 
         facade = new AutomationMcpToolFacade(
@@ -172,7 +172,7 @@ class AutomationMcpToolFacadeIntTest {
             clusterElementDefinitionService, mock(Evaluator.class), jobCompletionAwaiter, jobResumeFacade,
             jobService, mcpComponentService, mcpProjectService, mcpProjectWorkflowService, mcpServerService,
             mcpToolService, principalJobFacade, projectDeploymentWorkflowService, "https://example.com",
-            taskExecutionService, taskFileStorage, toolExecutionRecorder, workflowService,
+            taskExecutionService, taskFileStorage, externalInvocationRecorder, workflowService,
             workspaceMcpServerService);
     }
 
@@ -660,10 +660,10 @@ class AutomationMcpToolFacadeIntTest {
                 .containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, "newWorkflowCall_1")
                 .containsKey("newWorkflowCall_1");
 
-            ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+            ExternalInvocationEvent externalInvocationEvent = captureRecordedExternalInvocationEvent();
 
-            assertThat(toolExecutionEvent.type()).isEqualTo(PlatformType.AUTOMATION);
-            assertThat(toolExecutionEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
+            assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.AUTOMATION);
+            assertThat(externalInvocationEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
         }
     }
 
@@ -676,11 +676,11 @@ class AutomationMcpToolFacadeIntTest {
         when(mcpToolServiceTarget.fetchMcpTool(3L)).thenReturn(Optional.of(mcpTool(true)));
         functionToolCallback.call("{}");
 
-        ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+        ExternalInvocationEvent externalInvocationEvent = captureRecordedExternalInvocationEvent();
 
-        assertThat(toolExecutionEvent.type()).isEqualTo(PlatformType.AUTOMATION);
-        assertThat(toolExecutionEvent.workspaceId()).isEqualTo(4L);
-        assertThat(toolExecutionEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
+        assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(externalInvocationEvent.workspaceId()).isEqualTo(4L);
+        assertThat(externalInvocationEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
     }
 
     @Test
@@ -695,7 +695,8 @@ class AutomationMcpToolFacadeIntTest {
         ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(job);
 
         assertThat(toolCallback.call("{}")).contains("approval_required");
-        assertThat(captureRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_REQUIRED);
+        assertThat(captureRecordedExternalInvocationEvent().outcome())
+            .isEqualTo(ExternalInvocationOutcome.APPROVAL_REQUIRED);
     }
 
     @Test
@@ -711,7 +712,7 @@ class AutomationMcpToolFacadeIntTest {
             .readJobOutputs(outputs);
 
         assertThat(toolCallback.call("{}")).contains("approval_required");
-        assertThat(captureRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
+        assertThat(captureRecordedExternalInvocationEvent().outcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
     }
 
     @Test
@@ -735,7 +736,7 @@ class AutomationMcpToolFacadeIntTest {
         when(approvalTokens.toSignedTokenIfConfigured(eq("resume-5"), any(Duration.class)))
             .thenReturn(Optional.of("v1.signed"));
 
-        ToolExecutionRecorder toolExecutionRecorder = new ToolExecutionRecorderImpl(
+        ExternalInvocationRecorder externalInvocationRecorder = new ExternalInvocationRecorderImpl(
             publishedEvents::add, mock(ObjectProvider.class));
 
         facade = new AutomationMcpToolFacade(
@@ -743,7 +744,7 @@ class AutomationMcpToolFacadeIntTest {
             mock(Evaluator.class), jobCompletionAwaiter, jobResumeFacade, jobService, mcpComponentService,
             mcpProjectService, mcpProjectWorkflowService, mcpServerService, mcpToolService, principalJobFacade,
             projectDeploymentWorkflowService, "https://example.com", taskExecutionService, taskFileStorage,
-            toolExecutionRecorder, workflowService, workspaceMcpServerService);
+            externalInvocationRecorder, workflowService, workspaceMcpServerService);
 
         ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(job);
 
@@ -773,7 +774,7 @@ class AutomationMcpToolFacadeIntTest {
             .doesNotContain("approval_required")
             .doesNotContain("resumeToken")
             .doesNotContain("formUrl");
-        assertThat(captureRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.SUSPENDED);
+        assertThat(captureRecordedExternalInvocationEvent().outcome()).isEqualTo(ExternalInvocationOutcome.SUSPENDED);
     }
 
     @Test
@@ -820,10 +821,10 @@ class AutomationMcpToolFacadeIntTest {
             .hasMessageContaining("was stopped")
             .hasCauseInstanceOf(ExecutionException.class);
 
-        ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+        ExternalInvocationEvent externalInvocationEvent = captureRecordedExternalInvocationEvent();
 
-        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
-        assertThat(toolExecutionEvent.errorMessage()).contains("was stopped");
+        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationEvent.errorMessage()).contains("was stopped");
     }
 
     @Test
@@ -836,10 +837,10 @@ class AutomationMcpToolFacadeIntTest {
         assertThatThrownBy(() -> toolCallback.call("{}"))
             .hasMessageContaining("did not finish");
 
-        ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+        ExternalInvocationEvent externalInvocationEvent = captureRecordedExternalInvocationEvent();
 
-        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.TIMEOUT);
-        assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
+        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.TIMEOUT);
+        assertThat(externalInvocationEvent.jobId()).isEqualTo(5L);
     }
 
     @Test
@@ -852,13 +853,13 @@ class AutomationMcpToolFacadeIntTest {
         assertThatThrownBy(() -> toolCallback.call("{}"))
             .hasMessageContaining("Missing required input: email");
 
-        ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+        ExternalInvocationEvent externalInvocationEvent = captureRecordedExternalInvocationEvent();
 
-        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
-        assertThat(toolExecutionEvent.errorType()).isEqualTo("IllegalArgumentException");
-        assertThat(toolExecutionEvent.errorMessage()).isEqualTo("Missing required input: email");
-        assertThat(toolExecutionEvent.mcpServerId()).isEqualTo(30L);
-        assertThat(toolExecutionEvent.jobId()).isNull();
+        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationEvent.errorType()).isEqualTo("IllegalArgumentException");
+        assertThat(externalInvocationEvent.errorMessage()).isEqualTo("Missing required input: email");
+        assertThat(externalInvocationEvent.mcpServerId()).isEqualTo(30L);
+        assertThat(externalInvocationEvent.jobId()).isNull();
     }
 
     @Test
@@ -867,7 +868,7 @@ class AutomationMcpToolFacadeIntTest {
 
         toolCallback.call("{}");
 
-        assertThat(captureRecordedToolExecutionEvent().jobId()).isEqualTo(5L);
+        assertThat(captureRecordedExternalInvocationEvent().jobId()).isEqualTo(5L);
     }
 
     private ToolDefinition getToolDefinition(Map<String, Object> parameters) {
@@ -922,10 +923,10 @@ class AutomationMcpToolFacadeIntTest {
         }
     }
 
-    private ToolExecutionEvent captureRecordedToolExecutionEvent() {
+    private ExternalInvocationEvent captureRecordedExternalInvocationEvent() {
         assertThat(publishedEvents).hasSize(1);
 
-        return (ToolExecutionEvent) publishedEvents.getFirst();
+        return (ExternalInvocationEvent) publishedEvents.getFirst();
     }
 
     private static Job completedJob() {

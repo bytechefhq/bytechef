@@ -28,8 +28,8 @@ import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestConfigu
 import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestSupport;
 import com.bytechef.ee.embedded.execution.constant.EmbeddedToolConstants;
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
-import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
-import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogService;
+import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
+import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -39,9 +39,9 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +75,7 @@ class ToolFacadeIntTest {
     private ToolFacade toolFacade;
 
     @Autowired
-    private ToolInvocationLogService toolInvocationLogService;
+    private ExternalInvocationLogService externalInvocationLogService;
 
     @BeforeEach
     void beforeEach() {
@@ -127,20 +127,20 @@ class ToolFacadeIntTest {
         toolFacade.executeTool(
             "user-1", "slack_send", Map.of(), integrationInstance.getId(), Environment.PRODUCTION);
 
-        assertThat(getToolInvocationLogs(connectedUserId)).singleElement()
-            .satisfies(toolInvocationLog -> {
-                assertThat(toolInvocationLog.getType()).isEqualTo(PlatformType.EMBEDDED);
-                assertThat(toolInvocationLog.getSurface()).isEqualTo(ToolExecutionSurface.EMBEDDED_API_TOOL);
-                assertThat(toolInvocationLog.getKind()).isEqualTo(ToolExecutionKind.COMPONENT);
-                assertThat(toolInvocationLog.getToolName()).isEqualTo("slack_send");
-                assertThat(toolInvocationLog.getComponentName()).isEqualTo("slack");
-                assertThat(toolInvocationLog.getOperationName()).isEqualTo("send");
-                assertThat(toolInvocationLog.getConnectionId()).isEqualTo(7L);
-                assertThat(toolInvocationLog.getEnvironment()).isEqualTo(Environment.PRODUCTION.ordinal());
-                assertThat(toolInvocationLog.getExternalUserId()).isEqualTo("user-1");
-                assertThat(toolInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
-                assertThat(toolInvocationLog.getIntegrationInstanceId()).isEqualTo(integrationInstance.getId());
-                assertThat(toolInvocationLog.getOutcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
+        assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
+            .satisfies(externalInvocationLog -> {
+                assertThat(externalInvocationLog.getType()).isEqualTo(PlatformType.EMBEDDED);
+                assertThat(externalInvocationLog.getSurface()).isEqualTo(ExternalInvocationSurface.EMBEDDED_API_TOOL);
+                assertThat(externalInvocationLog.getKind()).isEqualTo(ExternalInvocationKind.COMPONENT);
+                assertThat(externalInvocationLog.getToolName()).isEqualTo("slack_send");
+                assertThat(externalInvocationLog.getComponentName()).isEqualTo("slack");
+                assertThat(externalInvocationLog.getOperationName()).isEqualTo("send");
+                assertThat(externalInvocationLog.getConnectionId()).isEqualTo(7L);
+                assertThat(externalInvocationLog.getEnvironment()).isEqualTo(Environment.PRODUCTION.ordinal());
+                assertThat(externalInvocationLog.getExternalUserId()).isEqualTo("user-1");
+                assertThat(externalInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
+                assertThat(externalInvocationLog.getIntegrationInstanceId()).isEqualTo(integrationInstance.getId());
+                assertThat(externalInvocationLog.getOutcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
             });
     }
 
@@ -157,13 +157,13 @@ class ToolFacadeIntTest {
             () -> toolFacade.executeTool("user-1", "slack_send", Map.of(), null, Environment.PRODUCTION))
                 .hasMessage("Channel not found");
 
-        assertThat(getToolInvocationLogs(connectedUserId)).singleElement()
-            .satisfies(toolInvocationLog -> {
-                assertThat(toolInvocationLog.getOutcome()).isEqualTo(ToolExecutionOutcome.ERROR);
-                assertThat(toolInvocationLog.getErrorType()).isEqualTo("IllegalStateException");
-                assertThat(toolInvocationLog.getErrorMessage()).isEqualTo("Channel not found");
-                assertThat(toolInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
-                assertThat(toolInvocationLog.getIntegrationInstanceId()).isNull();
+        assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
+            .satisfies(externalInvocationLog -> {
+                assertThat(externalInvocationLog.getOutcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+                assertThat(externalInvocationLog.getErrorType()).isEqualTo("IllegalStateException");
+                assertThat(externalInvocationLog.getErrorMessage()).isEqualTo("Channel not found");
+                assertThat(externalInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
+                assertThat(externalInvocationLog.getIntegrationInstanceId()).isNull();
             });
     }
 
@@ -180,13 +180,13 @@ class ToolFacadeIntTest {
             () -> toolFacade.executeTool("user-1", "slack_send", Map.of(), null, Environment.PRODUCTION))
                 .hasMessage("Connection is required");
 
-        assertThat(getToolInvocationLogs(connectedUserId)).singleElement()
-            .satisfies(toolInvocationLog -> {
-                assertThat(toolInvocationLog.getOutcome()).isEqualTo(ToolExecutionOutcome.CONNECTION_REQUIRED);
-                assertThat(toolInvocationLog.getSurface()).isEqualTo(ToolExecutionSurface.EMBEDDED_API_TOOL);
-                assertThat(toolInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
-                assertThat(toolInvocationLog.getConnectionId()).isNull();
-                assertThat(toolInvocationLog.getErrorType()).isNull();
+        assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
+            .satisfies(externalInvocationLog -> {
+                assertThat(externalInvocationLog.getOutcome()).isEqualTo(ExternalInvocationOutcome.CONNECTION_REQUIRED);
+                assertThat(externalInvocationLog.getSurface()).isEqualTo(ExternalInvocationSurface.EMBEDDED_API_TOOL);
+                assertThat(externalInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
+                assertThat(externalInvocationLog.getConnectionId()).isNull();
+                assertThat(externalInvocationLog.getErrorType()).isNull();
             });
     }
 
@@ -202,9 +202,9 @@ class ToolFacadeIntTest {
         Object result = toolFacade.executeTool("user-1", "slack_send", Map.of(), null, Environment.PRODUCTION);
 
         assertEquals("ok", result);
-        assertThat(getToolInvocationLogs(connectedUserId)).singleElement()
-            .satisfies(toolInvocationLog -> assertThat(toolInvocationLog.getOutcome())
-                .isEqualTo(ToolExecutionOutcome.SUCCESS));
+        assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
+            .satisfies(externalInvocationLog -> assertThat(externalInvocationLog.getOutcome())
+                .isEqualTo(ExternalInvocationOutcome.SUCCESS));
     }
 
     @Test
@@ -219,9 +219,9 @@ class ToolFacadeIntTest {
         Object result = toolFacade.executeTool("user-1", "slack_send", Map.of(), null, Environment.PRODUCTION);
 
         assertEquals("ok", result);
-        assertThat(getToolInvocationLogs(connectedUserId)).singleElement()
-            .satisfies(toolInvocationLog -> assertThat(toolInvocationLog.getOutcome())
-                .isEqualTo(ToolExecutionOutcome.SUCCESS));
+        assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
+            .satisfies(externalInvocationLog -> assertThat(externalInvocationLog.getOutcome())
+                .isEqualTo(ExternalInvocationOutcome.SUCCESS));
     }
 
     @Test
@@ -255,9 +255,9 @@ class ToolFacadeIntTest {
         assertFalse(parameters.contains("toolDescription"), parameters);
     }
 
-    private List<ToolInvocationLog> getToolInvocationLogs(long connectedUserId) {
-        return toolInvocationLogService
-            .getToolInvocationLogs(
+    private List<ExternalInvocationLog> getExternalInvocationLogs(long connectedUserId) {
+        return externalInvocationLogService
+            .getExternalInvocationLogs(
                 PlatformType.EMBEDDED, null, null, null, null, null, connectedUserId, null, null, null, 0)
             .getContent();
     }

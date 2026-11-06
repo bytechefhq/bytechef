@@ -1,0 +1,2 @@
+com.bytechef.ee.platform.external.invocation.log.config.ExternalInvocationLogJdbcRepositoryConfiguration
+com.bytechef.ee.platform.external.invocation.log.config.ExternalInvocationLogRetentionConfiguration

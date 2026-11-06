@@ -19,7 +19,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.repository.ConnectedUserRepository;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.ee.platform.tool.invocation.log.repository.ToolInvocationLogRepository;
+import com.bytechef.ee.platform.external.invocation.log.repository.ExternalInvocationLogRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class EmbeddedExecutionIntTestSupport {
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationRepository integrationRepository;
     private final IntegrationService integrationService;
-    private final ToolInvocationLogRepository toolInvocationLogRepository;
+    private final ExternalInvocationLogRepository externalInvocationLogRepository;
 
     public EmbeddedExecutionIntTestSupport(
         ConnectedUserRepository connectedUserRepository, ConnectedUserService connectedUserService,
@@ -52,7 +52,7 @@ public class EmbeddedExecutionIntTestSupport {
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceRepository integrationInstanceRepository,
         IntegrationInstanceService integrationInstanceService, IntegrationRepository integrationRepository,
-        IntegrationService integrationService, ToolInvocationLogRepository toolInvocationLogRepository) {
+        IntegrationService integrationService, ExternalInvocationLogRepository externalInvocationLogRepository) {
 
         this.connectedUserRepository = connectedUserRepository;
         this.connectedUserService = connectedUserService;
@@ -62,7 +62,7 @@ public class EmbeddedExecutionIntTestSupport {
         this.integrationInstanceService = integrationInstanceService;
         this.integrationRepository = integrationRepository;
         this.integrationService = integrationService;
-        this.toolInvocationLogRepository = toolInvocationLogRepository;
+        this.externalInvocationLogRepository = externalInvocationLogRepository;
     }
 
     public long createConnectedUser(String externalUserId, Environment environment) {
@@ -97,7 +97,7 @@ public class EmbeddedExecutionIntTestSupport {
     }
 
     public void deleteAll() {
-        toolInvocationLogRepository.deleteAll();
+        externalInvocationLogRepository.deleteAll();
         integrationInstanceRepository.deleteAll();
         integrationInstanceConfigurationRepository.deleteAll();
         integrationRepository.deleteAll();

@@ -32,11 +32,11 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -62,7 +62,7 @@ public class ToolFacadeImpl implements ToolFacade {
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
-    private final ToolExecutionRecorder toolExecutionRecorder;
+    private final ExternalInvocationRecorder externalInvocationRecorder;
 
     @SuppressFBWarnings("EI")
     public ToolFacadeImpl(
@@ -72,7 +72,7 @@ public class ToolFacadeImpl implements ToolFacade {
         ConnectionIdHelper connectionIdHelper,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        ToolExecutionRecorder toolExecutionRecorder) {
+        ExternalInvocationRecorder externalInvocationRecorder) {
 
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
@@ -82,7 +82,7 @@ public class ToolFacadeImpl implements ToolFacade {
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
-        this.toolExecutionRecorder = toolExecutionRecorder;
+        this.externalInvocationRecorder = externalInvocationRecorder;
     }
 
     @Override
@@ -144,8 +144,9 @@ public class ToolFacadeImpl implements ToolFacade {
         Map<String, Object> parameters = EmbeddedToolConstants.withConnectedUserContext(
             inputParameters, externalUserId, environment);
 
-        ToolExecutionEvent.Builder eventBuilder = ToolExecutionEvent
-            .builder(PlatformType.EMBEDDED, ToolExecutionSurface.EMBEDDED_API_TOOL, ToolExecutionKind.COMPONENT,
+        ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
+            .builder(PlatformType.EMBEDDED, ExternalInvocationSurface.EMBEDDED_API_TOOL,
+                ExternalInvocationKind.COMPONENT,
                 toolName)
             .componentName(result.componentName())
             .operationName(result.clusterElementName())
@@ -159,15 +160,15 @@ public class ToolFacadeImpl implements ToolFacade {
             result.componentName(), result.clusterElementName(), parameters, connectionId);
 
         if (connectionId == null && isConnectionRequired(result.componentName())) {
-            toolExecutionRecorder.record(
+            externalInvocationRecorder.record(
                 eventBuilder
-                    .outcome(ToolExecutionOutcome.CONNECTION_REQUIRED)
+                    .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
                     .build());
 
             return execution.get();
         }
 
-        return toolExecutionRecorder.record(eventBuilder, execution);
+        return externalInvocationRecorder.record(eventBuilder, execution);
     }
 
     private boolean isConnectionRequired(String componentName) {

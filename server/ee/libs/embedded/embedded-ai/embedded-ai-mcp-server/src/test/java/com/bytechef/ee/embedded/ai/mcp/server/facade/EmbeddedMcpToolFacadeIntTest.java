@@ -55,6 +55,12 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.config.ExternalInvocationConfiguration;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -63,12 +69,6 @@ import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
-import com.bytechef.platform.tool.execution.config.ToolExecutionConfiguration;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -303,7 +303,7 @@ class EmbeddedMcpToolFacadeIntTest {
         verify(jwtTokenService, never()).generateJwtToken(any(), anyLong(), anyInt(), any());
         verify(clusterElementDefinitionFacade, never()).executeTool(any(), anyInt(), any(), any(), any());
 
-        assertThat(getToolExecutionEvents()).isEmpty();
+        assertThat(getExternalInvocationEvents()).isEmpty();
     }
 
     @Test
@@ -459,9 +459,9 @@ class EmbeddedMcpToolFacadeIntTest {
         Map<String, Object> result = readResult(toolCallback.call("{}"));
 
         assertThat(result).containsEntry("status", "approval_required");
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> assertThat(toolExecutionEvent.outcome())
-                .isEqualTo(ToolExecutionOutcome.SUCCESS));
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> assertThat(externalInvocationEvent.outcome())
+                .isEqualTo(ExternalInvocationOutcome.SUCCESS));
     }
 
     @Test
@@ -498,10 +498,10 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThat(result)
             .containsEntry("status", "approval_required")
             .containsEntry("jobId", 5);
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_REQUIRED);
-                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.APPROVAL_REQUIRED);
+                assertThat(externalInvocationEvent.jobId()).isEqualTo(5L);
             });
 
         verify(principalJobFacade).createJob(any(), eq(integrationInstanceId), eq(PlatformType.EMBEDDED));
@@ -523,12 +523,12 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThat(result)
             .containsEntry("status", "stopped")
             .containsEntry("jobId", 5);
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
-                assertThat(toolExecutionEvent.errorMessage())
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+                assertThat(externalInvocationEvent.errorMessage())
                     .isEqualTo("The workflow run was stopped before it finished.");
-                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
+                assertThat(externalInvocationEvent.jobId()).isEqualTo(5L);
             });
     }
 
@@ -552,11 +552,11 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThat(result)
             .containsEntry("status", "suspended")
             .containsEntry("jobId", 5);
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.SUSPENDED);
-                assertThat(toolExecutionEvent.errorMessage()).isNull();
-                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.SUSPENDED);
+                assertThat(externalInvocationEvent.errorMessage()).isNull();
+                assertThat(externalInvocationEvent.jobId()).isEqualTo(5L);
             });
     }
 
@@ -740,23 +740,23 @@ class EmbeddedMcpToolFacadeIntTest {
 
         functionToolCallback.call("{}");
 
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.type()).isEqualTo(PlatformType.EMBEDDED);
-                assertThat(toolExecutionEvent.surface()).isEqualTo(ToolExecutionSurface.MCP_EMBEDDED);
-                assertThat(toolExecutionEvent.kind()).isEqualTo(ToolExecutionKind.COMPONENT);
-                assertThat(toolExecutionEvent.toolName()).isEqualTo("HTTPCLIENT_POST");
-                assertThat(toolExecutionEvent.componentName()).isEqualTo("httpClient");
-                assertThat(toolExecutionEvent.componentVersion()).isEqualTo(1);
-                assertThat(toolExecutionEvent.operationName()).isEqualTo("post");
-                assertThat(toolExecutionEvent.connectionId()).isEqualTo(connectionId);
-                assertThat(toolExecutionEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
-                assertThat(toolExecutionEvent.externalUserId()).isEqualTo(CONNECTED_EXTERNAL_USER_ID);
-                assertThat(toolExecutionEvent.connectedUserId()).isEqualTo(connectedUserId);
-                assertThat(toolExecutionEvent.integrationInstanceId()).isEqualTo(ownIntegrationInstanceId);
-                assertThat(toolExecutionEvent.mcpServerId()).isEqualTo(mcpServerId);
-                assertThat(toolExecutionEvent.jobId()).isNull();
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.EMBEDDED);
+                assertThat(externalInvocationEvent.surface()).isEqualTo(ExternalInvocationSurface.MCP_EMBEDDED);
+                assertThat(externalInvocationEvent.kind()).isEqualTo(ExternalInvocationKind.COMPONENT);
+                assertThat(externalInvocationEvent.toolName()).isEqualTo("HTTPCLIENT_POST");
+                assertThat(externalInvocationEvent.componentName()).isEqualTo("httpClient");
+                assertThat(externalInvocationEvent.componentVersion()).isEqualTo(1);
+                assertThat(externalInvocationEvent.operationName()).isEqualTo("post");
+                assertThat(externalInvocationEvent.connectionId()).isEqualTo(connectionId);
+                assertThat(externalInvocationEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
+                assertThat(externalInvocationEvent.externalUserId()).isEqualTo(CONNECTED_EXTERNAL_USER_ID);
+                assertThat(externalInvocationEvent.connectedUserId()).isEqualTo(connectedUserId);
+                assertThat(externalInvocationEvent.integrationInstanceId()).isEqualTo(ownIntegrationInstanceId);
+                assertThat(externalInvocationEvent.mcpServerId()).isEqualTo(mcpServerId);
+                assertThat(externalInvocationEvent.jobId()).isNull();
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
             });
     }
 
@@ -773,13 +773,13 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThatThrownBy(() -> functionToolCallback.call("{}"))
             .hasStackTraceContaining("Bad request");
 
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
-                assertThat(toolExecutionEvent.errorType()).isEqualTo("IllegalArgumentException");
-                assertThat(toolExecutionEvent.errorMessage()).isEqualTo("Bad request");
-                assertThat(toolExecutionEvent.externalUserId()).isEqualTo(UNCONNECTED_EXTERNAL_USER_ID);
-                assertThat(toolExecutionEvent.connectedUserId()).isNull();
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+                assertThat(externalInvocationEvent.errorType()).isEqualTo("IllegalArgumentException");
+                assertThat(externalInvocationEvent.errorMessage()).isEqualTo("Bad request");
+                assertThat(externalInvocationEvent.externalUserId()).isEqualTo(UNCONNECTED_EXTERNAL_USER_ID);
+                assertThat(externalInvocationEvent.connectedUserId()).isNull();
             });
     }
 
@@ -810,12 +810,12 @@ class EmbeddedMcpToolFacadeIntTest {
 
         functionToolCallback.call("{}");
 
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.CONNECTION_REQUIRED);
-                assertThat(toolExecutionEvent.connectedUserId()).isEqualTo(connectedUserId);
-                assertThat(toolExecutionEvent.connectionId()).isNull();
-                assertThat(toolExecutionEvent.integrationInstanceId()).isNull();
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.CONNECTION_REQUIRED);
+                assertThat(externalInvocationEvent.connectedUserId()).isEqualTo(connectedUserId);
+                assertThat(externalInvocationEvent.connectionId()).isNull();
+                assertThat(externalInvocationEvent.integrationInstanceId()).isNull();
             });
     }
 
@@ -829,20 +829,20 @@ class EmbeddedMcpToolFacadeIntTest {
 
         toolCallback.call("{}");
 
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.type()).isEqualTo(PlatformType.EMBEDDED);
-                assertThat(toolExecutionEvent.surface()).isEqualTo(ToolExecutionSurface.MCP_EMBEDDED);
-                assertThat(toolExecutionEvent.kind()).isEqualTo(ToolExecutionKind.WORKFLOW);
-                assertThat(toolExecutionEvent.toolName()).isEqualTo("mappedTool");
-                assertThat(toolExecutionEvent.componentName()).isEqualTo("myComponent");
-                assertThat(toolExecutionEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
-                assertThat(toolExecutionEvent.externalUserId()).isEqualTo(CONNECTED_EXTERNAL_USER_ID);
-                assertThat(toolExecutionEvent.connectedUserId()).isEqualTo(workflowConnectedUserId);
-                assertThat(toolExecutionEvent.integrationInstanceId()).isEqualTo(integrationInstanceId);
-                assertThat(toolExecutionEvent.mcpServerId()).isEqualTo(mcpServerId);
-                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.EMBEDDED);
+                assertThat(externalInvocationEvent.surface()).isEqualTo(ExternalInvocationSurface.MCP_EMBEDDED);
+                assertThat(externalInvocationEvent.kind()).isEqualTo(ExternalInvocationKind.WORKFLOW);
+                assertThat(externalInvocationEvent.toolName()).isEqualTo("mappedTool");
+                assertThat(externalInvocationEvent.componentName()).isEqualTo("myComponent");
+                assertThat(externalInvocationEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
+                assertThat(externalInvocationEvent.externalUserId()).isEqualTo(CONNECTED_EXTERNAL_USER_ID);
+                assertThat(externalInvocationEvent.connectedUserId()).isEqualTo(workflowConnectedUserId);
+                assertThat(externalInvocationEvent.integrationInstanceId()).isEqualTo(integrationInstanceId);
+                assertThat(externalInvocationEvent.mcpServerId()).isEqualTo(mcpServerId);
+                assertThat(externalInvocationEvent.jobId()).isEqualTo(5L);
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
             });
     }
 
@@ -857,11 +857,11 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThatThrownBy(() -> toolCallback.call("{}"))
             .hasMessage("Job 5 did not finish within 300 seconds");
 
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.TIMEOUT);
-                assertThat(toolExecutionEvent.jobId()).isEqualTo(5L);
-                assertThat(toolExecutionEvent.integrationInstanceId()).isEqualTo(integrationInstanceId);
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.TIMEOUT);
+                assertThat(externalInvocationEvent.jobId()).isEqualTo(5L);
+                assertThat(externalInvocationEvent.integrationInstanceId()).isEqualTo(integrationInstanceId);
             });
     }
 
@@ -875,13 +875,13 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThatThrownBy(() -> toolCallback.call("{}"))
             .hasMessageContaining("Missing required input: email");
 
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
-                assertThat(toolExecutionEvent.errorType()).isEqualTo("IllegalArgumentException");
-                assertThat(toolExecutionEvent.errorMessage()).isEqualTo("Missing required input: email");
-                assertThat(toolExecutionEvent.integrationInstanceId()).isEqualTo(integrationInstanceId);
-                assertThat(toolExecutionEvent.jobId()).isNull();
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+                assertThat(externalInvocationEvent.errorType()).isEqualTo("IllegalArgumentException");
+                assertThat(externalInvocationEvent.errorMessage()).isEqualTo("Missing required input: email");
+                assertThat(externalInvocationEvent.integrationInstanceId()).isEqualTo(integrationInstanceId);
+                assertThat(externalInvocationEvent.jobId()).isNull();
             });
 
         verifyNoInteractions(jobCompletionAwaiter);
@@ -899,20 +899,20 @@ class EmbeddedMcpToolFacadeIntTest {
         Map<String, Object> result = readResult(toolCallback.call("{}"));
 
         assertThat(result).containsEntry("error", "connection_required");
-        assertThat(getToolExecutionEvents()).singleElement()
-            .satisfies(toolExecutionEvent -> {
-                assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.CONNECTION_REQUIRED);
-                assertThat(toolExecutionEvent.toolName()).isEqualTo("mappedTool");
-                assertThat(toolExecutionEvent.externalUserId()).isEqualTo(UNCONNECTED_EXTERNAL_USER_ID);
-                assertThat(toolExecutionEvent.integrationInstanceId()).isNull();
-                assertThat(toolExecutionEvent.jobId()).isNull();
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.CONNECTION_REQUIRED);
+                assertThat(externalInvocationEvent.toolName()).isEqualTo("mappedTool");
+                assertThat(externalInvocationEvent.externalUserId()).isEqualTo(UNCONNECTED_EXTERNAL_USER_ID);
+                assertThat(externalInvocationEvent.integrationInstanceId()).isNull();
+                assertThat(externalInvocationEvent.jobId()).isNull();
             });
 
         verifyNoInteractions(principalJobFacade, jobCompletionAwaiter);
     }
 
-    private List<ToolExecutionEvent> getToolExecutionEvents() {
-        return applicationEvents.stream(ToolExecutionEvent.class)
+    private List<ExternalInvocationEvent> getExternalInvocationEvents() {
+        return applicationEvents.stream(ExternalInvocationEvent.class)
             .toList();
     }
 
@@ -1236,7 +1236,7 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     @Configuration
-    @Import(ToolExecutionConfiguration.class)
+    @Import(ExternalInvocationConfiguration.class)
     static class FacadeIntTestConfiguration {
 
         @Bean
@@ -1254,7 +1254,7 @@ class EmbeddedMcpToolFacadeIntTest {
             McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
             McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
             PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
-            TaskFileStorage taskFileStorage, ToolExecutionRecorder toolExecutionRecorder,
+            TaskFileStorage taskFileStorage, ExternalInvocationRecorder externalInvocationRecorder,
             WorkflowService workflowService) {
 
             return new EmbeddedMcpToolFacade(
@@ -1264,7 +1264,7 @@ class EmbeddedMcpToolFacadeIntTest {
                 integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
                 mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
                 mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade, "http://localhost:8080",
-                taskExecutionService, taskFileStorage, toolExecutionRecorder, workflowService);
+                taskExecutionService, taskFileStorage, externalInvocationRecorder, workflowService);
         }
     }
 }

@@ -38,10 +38,10 @@ import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -104,7 +104,8 @@ class AutomationMcpWorkflowToolFacadeIntTest {
             mock(JobResumeFacade.class), mock(JobService.class), mock(McpComponentService.class), mcpProjectService,
             mcpProjectWorkflowService, mcpServerService, mcpToolService, mock(PrincipalJobFacade.class),
             projectDeploymentWorkflowService, "https://example.com", mock(TaskExecutionService.class),
-            mock(TaskFileStorage.class), mock(ToolExecutionRecorder.class), workflowService, workspaceMcpServerService);
+            mock(TaskFileStorage.class), mock(ExternalInvocationRecorder.class), workflowService,
+            workspaceMcpServerService);
     }
 
     @AfterEach

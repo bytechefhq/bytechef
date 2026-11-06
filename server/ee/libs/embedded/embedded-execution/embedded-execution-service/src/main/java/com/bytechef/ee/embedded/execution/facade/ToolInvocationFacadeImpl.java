@@ -9,13 +9,13 @@ package com.bytechef.ee.embedded.execution.facade;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
-import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogService;
+import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
+import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import org.jspecify.annotations.Nullable;
@@ -33,26 +33,26 @@ import org.springframework.stereotype.Service;
 public class ToolInvocationFacadeImpl implements ToolInvocationFacade {
 
     private final ConnectedUserService connectedUserService;
-    private final ToolInvocationLogService toolInvocationLogService;
+    private final ExternalInvocationLogService externalInvocationLogService;
 
     @SuppressFBWarnings("EI")
     public ToolInvocationFacadeImpl(
-        ConnectedUserService connectedUserService, ToolInvocationLogService toolInvocationLogService) {
+        ConnectedUserService connectedUserService, ExternalInvocationLogService externalInvocationLogService) {
 
         this.connectedUserService = connectedUserService;
-        this.toolInvocationLogService = toolInvocationLogService;
+        this.externalInvocationLogService = externalInvocationLogService;
     }
 
     @Override
     @PreAuthorize("#externalUserId == authentication.name")
-    public Page<ToolInvocationLog> getToolInvocations(
-        String externalUserId, Environment environment, @Nullable ToolExecutionSurface surface,
-        @Nullable ToolExecutionOutcome outcome, @Nullable Instant startDate, @Nullable Instant endDate,
+    public Page<ExternalInvocationLog> getToolInvocations(
+        String externalUserId, Environment environment, @Nullable ExternalInvocationSurface surface,
+        @Nullable ExternalInvocationOutcome outcome, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
-        return toolInvocationLogService.getToolInvocationLogs(
+        return externalInvocationLogService.getExternalInvocationLogs(
             PlatformType.EMBEDDED, environment.ordinal(), surface, outcome, null, null, connectedUser.getId(), null,
             startDate, endDate, pageNumber);
     }

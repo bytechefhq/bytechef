@@ -6,15 +6,15 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
-    implementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-api"))
+    implementation(project(":server:libs:platform:platform-external-invocation:platform-external-invocation-api"))
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-api"))
-    implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-api"))
+    implementation(project(":server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-api"))
     implementation("org.springframework.security:spring-security-core")
 
-    runtimeOnly(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-service"))
+    runtimeOnly(project(":server:libs:platform:platform-external-invocation:platform-external-invocation-service"))
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.mockito:mockito-core")
@@ -35,11 +35,11 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
-    testImplementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-service"))
+    testImplementation(project(":server:libs:platform:platform-external-invocation:platform-external-invocation-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
     testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
-    testImplementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-service"))
+    testImplementation(project(":server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-service"))
 
     testRuntimeOnly("org.postgresql:postgresql")
 }

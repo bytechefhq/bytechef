@@ -10,7 +10,7 @@ package com.bytechef.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.bytechef.ee.platform.tool.invocation.log.job.ToolInvocationLogRetentionJob;
+import com.bytechef.ee.platform.external.invocation.log.job.ExternalInvocationLogRetentionJob;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -30,19 +30,19 @@ import org.springframework.context.annotation.Import;
 public class ExecutionApplicationIntTest {
 
     @Autowired
-    private ObjectProvider<ToolInvocationLogRetentionJob> toolInvocationLogRetentionJobProvider;
+    private ObjectProvider<ExternalInvocationLogRetentionJob> externalInvocationLogRetentionJobProvider;
 
     @Test
     void testContextLoads() {
     }
 
     @Test
-    void testToolInvocationLogRetentionJobPurgesTheExecutionDatabase() {
-        ToolInvocationLogRetentionJob toolInvocationLogRetentionJob =
-            toolInvocationLogRetentionJobProvider.getIfAvailable();
+    void testExternalInvocationLogRetentionJobPurgesTheExecutionDatabase() {
+        ExternalInvocationLogRetentionJob externalInvocationLogRetentionJob =
+            externalInvocationLogRetentionJobProvider.getIfAvailable();
 
-        assertThat(toolInvocationLogRetentionJob).isNotNull();
+        assertThat(externalInvocationLogRetentionJob).isNotNull();
 
-        assertThatCode(toolInvocationLogRetentionJob::purgeExpiredLogs).doesNotThrowAnyException();
+        assertThatCode(externalInvocationLogRetentionJob::purgeExpiredLogs).doesNotThrowAnyException();
     }
 }

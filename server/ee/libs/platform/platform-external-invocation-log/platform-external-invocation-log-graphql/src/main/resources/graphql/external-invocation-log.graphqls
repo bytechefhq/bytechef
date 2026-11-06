@@ -1,0 +1,62 @@
+extend type Query {
+    externalInvocationLogs(
+        type: PlatformType!
+        environmentId: ID
+        surface: String
+        outcome: String
+        mcpServerId: Long
+        a2aServerId: Long
+        connectedUserId: Long
+        integrationInstanceId: Long
+        fromDate: Long
+        toDate: Long
+        page: Int = 0
+    ): ExternalInvocationLogPageType!
+    workspaceExternalInvocationLogs(
+        type: PlatformType!
+        workspaceId: ID!
+        environmentId: ID!
+        surface: String
+        outcome: String
+        mcpServerId: Long
+        a2aServerId: Long
+        connectedUserId: Long
+        integrationInstanceId: Long
+        fromDate: Long
+        toDate: Long
+        page: Int = 0
+    ): ExternalInvocationLogPageType!
+}
+
+type ExternalInvocationLogType {
+    id: ID!
+    surface: String!
+    kind: String!
+    toolName: String
+    componentName: String
+    componentVersion: Int
+    operationName: String
+    connectionId: Long
+    environment: Int
+    workspaceId: Long
+    externalUserId: String
+    connectedUserId: Long
+    integrationInstanceId: Long
+    mcpServerId: Long
+    a2aServerId: Long
+    jobId: Long
+    workflowName: String
+    outcome: String!
+    errorType: String
+    errorMessage: String
+    durationMs: Int!
+    createdDate: Long
+}
+
+type ExternalInvocationLogPageType {
+    content: [ExternalInvocationLogType!]!
+    number: Int!
+    size: Int!
+    totalElements: Int!
+    totalPages: Int!
+}
