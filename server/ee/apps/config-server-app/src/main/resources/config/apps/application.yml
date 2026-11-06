@@ -292,6 +292,17 @@ bytechef:
     provider: FILESYSTEM
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
+    signed-url:
+      # Tolerance applied to signed file entry URL expiry checks default: PT60S
+      clock-skew: PT60S
+      # Lifetime of a signed public file entry URL default: PT24H
+      default-ttl: PT24H
+      # Base64 signing secrets accepted for verification after a rotation
+      # previous-secrets:
+      # Accept only signed file entry URLs and reject legacy unsigned ids default: false
+      required: false
+      # Base64 HMAC-SHA256 signing secret; derived from the encryption key when unset
+      # secret:
   # Enabled feature flags, e.g. [ff-123, ff-456]
   feature-flags: []
   mail:

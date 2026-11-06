@@ -4006,6 +4006,8 @@ public class ApplicationProperties {
          */
         private Provider provider;
 
+        private SignedUrl signedUrl = new SignedUrl();
+
         public Aws getAws() {
             return aws;
         }
@@ -4018,6 +4020,10 @@ public class ApplicationProperties {
             return provider;
         }
 
+        public SignedUrl getSignedUrl() {
+            return signedUrl;
+        }
+
         public void setAws(Aws aws) {
             this.aws = aws;
         }
@@ -4028,6 +4034,10 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+
+        public void setSignedUrl(SignedUrl signedUrl) {
+            this.signedUrl = signedUrl;
         }
 
         /**
@@ -4065,6 +4075,59 @@ public class ApplicationProperties {
 
             public void setBasedir(String basedir) {
                 this.basedir = basedir;
+            }
+        }
+
+        public static class SignedUrl {
+
+            private Duration clockSkew;
+
+            private Duration defaultTtl;
+
+            private List<String> previousSecrets = new ArrayList<>();
+
+            private boolean required;
+
+            private String secret;
+
+            public Duration getClockSkew() {
+                return clockSkew;
+            }
+
+            public Duration getDefaultTtl() {
+                return defaultTtl;
+            }
+
+            public List<String> getPreviousSecrets() {
+                return previousSecrets;
+            }
+
+            public String getSecret() {
+                return secret;
+            }
+
+            public boolean isRequired() {
+                return required;
+            }
+
+            public void setClockSkew(Duration clockSkew) {
+                this.clockSkew = clockSkew;
+            }
+
+            public void setDefaultTtl(Duration defaultTtl) {
+                this.defaultTtl = defaultTtl;
+            }
+
+            public void setPreviousSecrets(List<String> previousSecrets) {
+                this.previousSecrets = previousSecrets;
+            }
+
+            public void setRequired(boolean required) {
+                this.required = required;
+            }
+
+            public void setSecret(String secret) {
+                this.secret = secret;
             }
         }
     }

@@ -133,6 +133,33 @@ class ApplicationPropertiesTest {
     }
 
     @Test
+    void testBindsTheFileStorageSignedUrlSettingsWithoutUnknownProperties() {
+        Map<String, String> properties = new HashMap<>();
+
+        properties.put("bytechef.file-storage.signed-url.secret", "active-secret");
+        properties.put("bytechef.file-storage.signed-url.required", "true");
+        properties.put("bytechef.file-storage.signed-url.default-ttl", "PT24H");
+        properties.put("bytechef.file-storage.signed-url.clock-skew", "PT60S");
+        properties.put("bytechef.file-storage.signed-url.previous-secrets[0]", "previous-secret-1");
+
+        Binder binder = new Binder(new MapConfigurationPropertySource(properties));
+
+        ApplicationProperties applicationProperties = binder.bind(
+            "bytechef", Bindable.of(ApplicationProperties.class), new NoUnboundElementsBindHandler(BindHandler.DEFAULT))
+            .get();
+
+        ApplicationProperties.FileStorage fileStorage = applicationProperties.getFileStorage();
+
+        ApplicationProperties.FileStorage.SignedUrl signedUrl = fileStorage.getSignedUrl();
+
+        assertThat(signedUrl.getSecret()).isEqualTo("active-secret");
+        assertThat(signedUrl.isRequired()).isTrue();
+        assertThat(signedUrl.getDefaultTtl()).isEqualTo(Duration.ofHours(24));
+        assertThat(signedUrl.getClockSkew()).isEqualTo(Duration.ofSeconds(60));
+        assertThat(signedUrl.getPreviousSecrets()).containsExactly("previous-secret-1");
+    }
+
+    @Test
     void testLeavesTheOptionalApprovalAndExecutionMonitorSettingsNullUntilBound() {
         ApplicationProperties applicationProperties = bind(
             new MapPropertySource("test", Map.of("bytechef.workflow.execution.approval-expiry.enabled", "true")));
