@@ -4,7 +4,6 @@ import ProjectDeploymentsSheet, {
     ProjectDeploymentsSheetStateI,
 } from '@/pages/automation/project/components/ProjectDeploymentsSheet';
 import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
-import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
 import ProjectBreadcrumb from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumb';
 import ProjectBreadcrumbSkeleton from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumbSkeleton';
@@ -21,6 +20,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
 import {RefObject, useState, useSyncExternalStore} from 'react';
@@ -116,7 +116,10 @@ const ProjectHeader = ({
             )}
         >
             <div className="flex items-center gap-2">
-                <LeftSidebarButton onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)} />
+                <LeftSidebarButton
+                    onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)}
+                    tooltip="See projects"
+                />
 
                 {projectWorkflows ? (
                     <ProjectBreadcrumb
