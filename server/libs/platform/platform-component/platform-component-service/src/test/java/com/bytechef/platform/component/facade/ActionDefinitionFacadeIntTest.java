@@ -63,7 +63,7 @@ public class ActionDefinitionFacadeIntTest {
     @Test
     public void testExecutePerform() {
         ActionDefinitionFacadeImpl actionDefinitionFacade = new ActionDefinitionFacadeImpl(
-            connectionService, actionDefinitionService);
+            connectionService, actionDefinitionService, null);
 
         Object result = actionDefinitionFacade.executePerform(
             "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), 1000L, 1000L, 1000L, 1000L, "123456789",

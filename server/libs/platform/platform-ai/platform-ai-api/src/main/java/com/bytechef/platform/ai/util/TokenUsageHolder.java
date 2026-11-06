@@ -52,6 +52,10 @@ public class TokenUsageHolder {
         TOKEN_USAGE.remove();
     }
 
+    public static boolean isTracking() {
+        return Boolean.TRUE.equals(TRACKING_ENABLED.get());
+    }
+
     /**
      * Accumulates token usage for the current thread. This is a no-op unless {@link #start()} has been called on the
      * current thread, preventing unintended accumulation across unrelated requests on pooled threads.
@@ -60,6 +64,10 @@ public class TokenUsageHolder {
      * @param completionTokens the number of tokens used in the completion (output)
      */
     public static void capture(int promptTokens, int completionTokens) {
+        capture(null, promptTokens, completionTokens);
+    }
+
+    public static void capture(String model, int promptTokens, int completionTokens) {
         if (!Boolean.TRUE.equals(TRACKING_ENABLED.get())) {
             return;
         }
@@ -68,9 +76,11 @@ public class TokenUsageHolder {
 
         if (existing != null) {
             TOKEN_USAGE.set(
-                new TokenUsage(existing.promptTokens() + promptTokens, existing.completionTokens() + completionTokens));
+                new TokenUsage(
+                    model != null ? model : existing.model(), existing.promptTokens() + promptTokens,
+                    existing.completionTokens() + completionTokens));
         } else {
-            TOKEN_USAGE.set(new TokenUsage(promptTokens, completionTokens));
+            TOKEN_USAGE.set(new TokenUsage(model, promptTokens, completionTokens));
         }
     }
 
@@ -94,8 +104,8 @@ public class TokenUsageHolder {
      * @param promptTokens     the number of tokens used in the prompt (input)
      * @param completionTokens the number of tokens used in the completion (output)
      */
-    public record TokenUsage(int promptTokens, int completionTokens) {
+    public record TokenUsage(String model, int promptTokens, int completionTokens) {
 
-        public static final TokenUsage EMPTY = new TokenUsage(0, 0);
+        public static final TokenUsage EMPTY = new TokenUsage(null, 0, 0);
     }
 }
