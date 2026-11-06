@@ -1,0 +1,18 @@
+spring:
+  liquibase:
+    contexts: mono
+
+bytechef:
+  edition: ee
+  ai:
+    gateway:
+      enabled: true
+      otlp:
+        # Tighter than the production default (1000) so the 413-cap integration test does not need to
+        # materialise a 1001-span protobuf body. The controller's count-before-mapper logic is the behaviour
+        # under test; the absolute number is irrelevant.
+        max-spans-per-request: 5
+      rate-limiting:
+        enabled: false
+  file-storage:
+    provider: jdbc

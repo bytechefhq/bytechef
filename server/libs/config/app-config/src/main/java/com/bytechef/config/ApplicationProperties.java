@@ -1447,6 +1447,7 @@ public class ApplicationProperties {
 
             private boolean enabled;
             private Guardrails guardrails = new Guardrails();
+            private Otlp otlp = new Otlp();
             private String promptComplexityScorer;
             private RateLimiting rateLimiting = new RateLimiting();
 
@@ -1464,6 +1465,14 @@ public class ApplicationProperties {
 
             public void setGuardrails(Guardrails guardrails) {
                 this.guardrails = guardrails;
+            }
+
+            public Otlp getOtlp() {
+                return otlp;
+            }
+
+            public void setOtlp(Otlp otlp) {
+                this.otlp = otlp;
             }
 
             public String getPromptComplexityScorer() {
@@ -1564,6 +1573,19 @@ public class ApplicationProperties {
 
                 public void setSecretRedactionEnabled(boolean secretRedactionEnabled) {
                     this.secretRedactionEnabled = secretRedactionEnabled;
+                }
+            }
+
+            public static class Otlp {
+
+                private int maxSpansPerRequest = 1_000;
+
+                public int getMaxSpansPerRequest() {
+                    return maxSpansPerRequest;
+                }
+
+                public void setMaxSpansPerRequest(int maxSpansPerRequest) {
+                    this.maxSpansPerRequest = maxSpansPerRequest;
                 }
             }
 

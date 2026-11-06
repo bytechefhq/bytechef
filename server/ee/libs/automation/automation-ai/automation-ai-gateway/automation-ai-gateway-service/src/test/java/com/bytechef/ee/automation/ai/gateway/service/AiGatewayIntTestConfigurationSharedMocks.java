@@ -10,7 +10,11 @@ package com.bytechef.ee.automation.ai.gateway.service;
 import com.bytechef.ee.platform.ai.gateway.metrics.AiGatewayMetrics;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayEmbeddingModelFactory;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilityNotificationDispatcher;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.scheduler.AlertScheduler;
+import com.bytechef.platform.scheduler.ExportScheduler;
 import com.bytechef.platform.tag.service.TagService;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.lang.annotation.ElementType;
@@ -28,7 +32,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     AiGatewayChatModelFactory.class, AiGatewayEmbeddingModelFactory.class, AiGatewayMetrics.class,
-    MeterRegistry.class, PropertyService.class, TagService.class
+    AiObservabilityNotificationDispatcher.class, AlertScheduler.class, ExportScheduler.class,
+    FileStorageService.class, MeterRegistry.class, PropertyService.class, TagService.class
 })
 public @interface AiGatewayIntTestConfigurationSharedMocks {
 }

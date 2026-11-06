@@ -14,12 +14,17 @@ import com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails;
 import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker;
 import com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsService;
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProjectService;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilitySessionService;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.platform.ai.gateway.cache.AiGatewayResponseCache;
 import com.bytechef.ee.platform.ai.gateway.compression.AiGatewayContextCompressor;
 import com.bytechef.ee.platform.ai.gateway.cost.AiGatewayCostCalculator;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayConnectedUserSettings;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayEmbeddedSettings;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayModelDeployment;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProject;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderScopeViolationException;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRoutingPolicy;
 import com.bytechef.ee.platform.ai.gateway.domain.BudgetExceededException;
@@ -31,6 +36,7 @@ import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlock;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingResponse;
 import com.bytechef.ee.platform.ai.gateway.event.AiGatewayBudgetExceededEvent;
+import com.bytechef.ee.platform.ai.gateway.event.AiGatewayTraceCompletedEvent;
 import com.bytechef.ee.platform.ai.gateway.metrics.AiGatewayMetrics;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayEmbeddingModelFactory;
@@ -39,29 +45,55 @@ import com.bytechef.ee.platform.ai.gateway.reliability.AiGatewayRetryHandler;
 import com.bytechef.ee.platform.ai.gateway.routing.AiGatewayRouter;
 import com.bytechef.ee.platform.ai.gateway.routing.AiGatewayRoutingContext;
 import com.bytechef.ee.platform.ai.gateway.routing.PromptComplexityScorer;
+import com.bytechef.ee.platform.ai.gateway.service.AiGatewayConnectedUserSettingsService;
+import com.bytechef.ee.platform.ai.gateway.service.AiGatewayEmbeddedSettingsService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayModelDeploymentService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayRoutingPolicyService;
+import com.bytechef.ee.platform.ai.gateway.service.AiGatewaySpendService;
+import com.bytechef.ee.platform.ai.gateway.util.AiGatewayConstraintMatchers;
 import com.bytechef.ee.platform.ai.gateway.util.AiGatewayUrlValidator;
 import com.bytechef.ee.platform.ai.guardrails.StreamingResponseRedactor;
+import com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService;
 import com.bytechef.ee.platform.ai.llm.usage.AiLlmUsage;
 import com.bytechef.ee.platform.ai.llm.usage.Money;
 import com.bytechef.ee.platform.ai.llm.usage.service.AiLlmUsageService;
 import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
 import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySession;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpan;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpanStatus;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpanType;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceStatus;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceTag;
+import com.bytechef.ee.platform.ai.observability.facade.AiObservabilityTracingHeaders;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySessionService;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySpanService;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
 import com.bytechef.platform.ai.sensitivedata.tokenization.PiiToken;
 import com.bytechef.platform.ai.sensitivedata.tokenization.PiiTokenSession;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -83,9 +115,11 @@ import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -97,7 +131,6 @@ import reactor.core.publisher.Flux;
 
 /**
  * @version ee
- *
  * @author Ivica Cardic
  */
 @Component
@@ -113,9 +146,14 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private static final BigDecimal DEFAULT_FALLBACK_COST_PER_M_TOKENS = new BigDecimal("10.00");
     private static final Logger log = LoggerFactory.getLogger(AiGatewayFacadeImpl.class);
 
+    private static final String TRACE_DEDUP_INDEX = "uq_ai_obs_trace_ext_trace_id";
+    private static final Pattern TRACE_DEDUP_INDEX_PATTERN =
+        AiGatewayConstraintMatchers.wordBoundaryPattern(TRACE_DEDUP_INDEX);
+
     private final AiGatewayBudgetChecker aiGatewayBudgetChecker;
     private final @Nullable AiGatewayRateLimitChecker aiGatewayRateLimitChecker;
     private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
+    private final AiGatewayConnectedUserSettingsService aiGatewayConnectedUserSettingsService;
     private final AiGatewayContextCompressor aiGatewayContextCompressor;
     private final AiGatewayCostCalculator aiGatewayCostCalculator;
     private final AiGatewayGuardrails aiGatewayGuardrails;
@@ -130,9 +168,19 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private final AiGatewayRetryHandler aiGatewayRetryHandler;
     private final AiGatewayRouter aiGatewayRouter;
     private final AiGatewayRoutingPolicyService aiGatewayRoutingPolicyService;
+    private final AiGatewaySpendService aiGatewaySpendService;
     private final PromptComplexityScorer promptComplexityScorer;
+    private final AiObservabilitySessionService aiObservabilitySessionService;
+    private final WorkspaceAiObservabilitySessionService workspaceAiObservabilitySessionService;
+    private final WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
+    private final TagService tagService;
     private final AiGatewayWorkspaceSettingsService aiGatewayWorkspaceSettingsService;
+    private final AiGuardrailsWorkspaceSettingsService aiGuardrailsWorkspaceSettingsService;
+    private final AiObservabilitySpanService aiObservabilitySpanService;
+    private final AiObservabilityTraceService aiObservabilityTraceService;
     private final ObjectProvider<AiGatewayMetrics> aiGatewayMetricsProvider;
+    private final ObjectProvider<AiGatewayEmbeddedSettingsService> embeddedSettingsServiceProvider;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final @Nullable PermissionService permissionService;
     private final TransactionTemplate transactionTemplate;
 
@@ -140,6 +188,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         AiGatewayBudgetChecker aiGatewayBudgetChecker,
         @Nullable AiGatewayRateLimitChecker aiGatewayRateLimitChecker,
         AiGatewayChatModelFactory aiGatewayChatModelFactory,
+        AiGatewayConnectedUserSettingsService aiGatewayConnectedUserSettingsService,
         AiGatewayContextCompressor aiGatewayContextCompressor,
         AiGatewayCostCalculator aiGatewayCostCalculator,
         AiGatewayGuardrails aiGatewayGuardrails,
@@ -154,15 +203,26 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         AiGatewayRetryHandler aiGatewayRetryHandler,
         AiGatewayRouter aiGatewayRouter,
         AiGatewayRoutingPolicyService aiGatewayRoutingPolicyService,
+        AiGatewaySpendService aiGatewaySpendService,
         PromptComplexityScorer promptComplexityScorer,
+        AiObservabilitySessionService aiObservabilitySessionService,
+        WorkspaceAiObservabilitySessionService workspaceAiObservabilitySessionService,
+        WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService,
+        AiObservabilitySpanService aiObservabilitySpanService,
+        AiObservabilityTraceService aiObservabilityTraceService,
+        TagService tagService,
         AiGatewayWorkspaceSettingsService aiGatewayWorkspaceSettingsService,
+        AiGuardrailsWorkspaceSettingsService aiGuardrailsWorkspaceSettingsService,
         ObjectProvider<AiGatewayMetrics> aiGatewayMetricsProvider,
+        ObjectProvider<AiGatewayEmbeddedSettingsService> embeddedSettingsServiceProvider,
+        ApplicationEventPublisher applicationEventPublisher,
         @Nullable PermissionService permissionService,
         PlatformTransactionManager transactionManager) {
 
         this.aiGatewayBudgetChecker = aiGatewayBudgetChecker;
         this.aiGatewayRateLimitChecker = aiGatewayRateLimitChecker;
         this.aiGatewayChatModelFactory = aiGatewayChatModelFactory;
+        this.aiGatewayConnectedUserSettingsService = aiGatewayConnectedUserSettingsService;
         this.aiGatewayContextCompressor = aiGatewayContextCompressor;
         this.aiGatewayCostCalculator = aiGatewayCostCalculator;
         this.aiGatewayGuardrails = aiGatewayGuardrails;
@@ -177,53 +237,21 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         this.aiGatewayRetryHandler = aiGatewayRetryHandler;
         this.aiGatewayRouter = aiGatewayRouter;
         this.aiGatewayRoutingPolicyService = aiGatewayRoutingPolicyService;
+        this.aiGatewaySpendService = aiGatewaySpendService;
         this.promptComplexityScorer = promptComplexityScorer;
+        this.aiObservabilitySessionService = aiObservabilitySessionService;
+        this.workspaceAiObservabilitySessionService = workspaceAiObservabilitySessionService;
+        this.workspaceAiObservabilityTraceService = workspaceAiObservabilityTraceService;
+        this.aiObservabilitySpanService = aiObservabilitySpanService;
+        this.aiObservabilityTraceService = aiObservabilityTraceService;
+        this.tagService = tagService;
         this.aiGatewayWorkspaceSettingsService = aiGatewayWorkspaceSettingsService;
+        this.aiGuardrailsWorkspaceSettingsService = aiGuardrailsWorkspaceSettingsService;
         this.aiGatewayMetricsProvider = aiGatewayMetricsProvider;
+        this.embeddedSettingsServiceProvider = embeddedSettingsServiceProvider;
+        this.applicationEventPublisher = applicationEventPublisher;
         this.permissionService = permissionService;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public AiGatewayChatCompletionResponse chatCompletion(AiGatewayChatCompletionRequest request) {
-        checkBudget(request.tags(), request.model());
-        checkRateLimits(request.tags());
-
-        Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
-        Long projectId = resolveProjectId(request.tags());
-
-        PiiTokenSession session = aiGatewayGuardrails.newTokenSession();
-
-        try {
-            request = aiGatewayGuardrails.apply(request, workspaceId, projectId, session);
-
-            long startTime = System.currentTimeMillis();
-
-            request = applyRoutingPolicyPrecedence(request);
-
-            AiGatewayChatCompletionResponse response;
-
-            if (request.routingPolicy() != null) {
-                response = chatCompletionWithRouting(request);
-            } else {
-                response = chatCompletionDirect(request);
-            }
-
-            response = aiGatewayGuardrails.scanResponse(response, workspaceId, projectId);
-
-            response = aiGatewayGuardrails.restoreResponse(response, session);
-
-            return withGatewayMetadata(response, request, startTime);
-        } finally {
-            session.close();
-        }
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public Flux<AiGatewayChatCompletionResponse> chatCompletionStream(AiGatewayChatCompletionRequest request) {
-        return Flux.defer(() -> chatCompletionStreamInternal(request));
     }
 
     private void recordRequestLogPersistFailure(String kind, String outcome) {
@@ -267,22 +295,167 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         }
     }
 
-    private AiGatewayChatCompletionRequest applyRoutingPolicyPrecedence(AiGatewayChatCompletionRequest request) {
-        if (request.routingPolicy() != null) {
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public AiGatewayChatCompletionResponse chatCompletion(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders) {
+
+        return chatCompletion(request, tracingHeaders, null);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public AiGatewayChatCompletionResponse chatCompletion(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable Long connectedUserId) {
+
+        if (tracingHeaders == null) {
+            tracingHeaders = new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of());
+        }
+
+        long environmentId = resolveConnectedUserEnvironmentId(connectedUserId);
+
+        checkRequestScope(request.tags(), request.model(), connectedUserId);
+
+        EmbeddedRequestSettings requestSettings = resolveEmbeddedSettingsAndCheckBudget(connectedUserId, environmentId);
+
+        Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
+        Long projectId = resolveProjectId(request.tags());
+
+        PiiTokenSession session = aiGatewayGuardrails.newTokenSession();
+
+        try {
+            request = aiGatewayGuardrails.apply(
+                request, resolvePlatformType(connectedUserId), workspaceId, projectId, session);
+
+            long startTime = System.currentTimeMillis();
+
+            AiGatewayChatCompletionResponse response;
+            boolean success = true;
+
+            request = applyRoutingPolicyPrecedence(request, connectedUserId, requestSettings);
+
+            try {
+                if (request.routingPolicy() != null) {
+                    response = chatCompletionWithRouting(request, connectedUserId);
+                } else {
+                    response = chatCompletionDirect(request, connectedUserId);
+                }
+            } catch (Exception exception) {
+                success = false;
+
+                processTracingHeaders(
+                    tracingHeaders, workspaceId, request, null, startTime, false, connectedUserId);
+
+                throw exception;
+            }
+
+            AiGatewayChatCompletionResponse scannedResponse =
+                aiGatewayGuardrails.scanResponse(
+                    response, resolvePlatformType(connectedUserId), workspaceId, projectId);
+
+            processTracingHeaders(
+                tracingHeaders, workspaceId, request, scannedResponse, startTime, success, connectedUserId);
+
+            response = aiGatewayGuardrails.restoreResponse(scannedResponse, session);
+
+            return withGatewayMetadata(response, request, startTime);
+        } finally {
+            session.close();
+        }
+
+    }
+
+    private AiGatewayChatCompletionRequest applyRoutingPolicyPrecedence(
+        AiGatewayChatCompletionRequest request, @Nullable Long connectedUserId,
+        EmbeddedRequestSettings requestSettings) {
+
+        String requestedRoutingPolicy = request.routingPolicy();
+
+        if (requestedRoutingPolicy != null) {
+            requireRequestedRoutingPolicyIsAssignedPlan(requestedRoutingPolicy, connectedUserId, requestSettings);
+
             return request;
         }
 
-        return applyResolvedRoutingPolicy(request, resolveModelDefaultRoutingPolicyId(request.model()));
+        Long routingPolicyId = resolveAssignedRoutingPolicyId(requestSettings);
+
+        if (routingPolicyId == null) {
+            routingPolicyId = resolveModelDefaultRoutingPolicyId(request.model());
+        }
+
+        if (routingPolicyId == null) {
+            routingPolicyId =
+                resolveEmbeddedDefaultRoutingPolicyId(connectedUserId, requestSettings.embeddedSettings());
+        }
+
+        return applyResolvedRoutingPolicy(request, routingPolicyId, connectedUserId);
+    }
+
+    private @Nullable Long resolveAssignedRoutingPolicyId(EmbeddedRequestSettings requestSettings) {
+        Long assignedRoutingPolicyId = requestSettings.connectedUserSettings()
+            .map(AiGatewayConnectedUserSettings::getRoutingPolicyId)
+            .orElse(null);
+
+        if (assignedRoutingPolicyId == null) {
+            return null;
+        }
+
+        try {
+            AiGatewayRoutingPolicy assignedPolicy =
+                aiGatewayRoutingPolicyService.getRoutingPolicy(assignedRoutingPolicyId);
+
+            return assignedPolicy.isEnabled() ? assignedRoutingPolicyId : null;
+        } catch (IllegalArgumentException missingPolicy) {
+            return null;
+        }
+    }
+
+    private void requireRequestedRoutingPolicyIsAssignedPlan(
+        String requestedRoutingPolicy, @Nullable Long connectedUserId, EmbeddedRequestSettings requestSettings) {
+
+        if (connectedUserId == null) {
+            return;
+        }
+
+        Long assignedRoutingPolicyId = requestSettings.connectedUserSettings()
+            .map(AiGatewayConnectedUserSettings::getRoutingPolicyId)
+            .orElse(null);
+
+        if (assignedRoutingPolicyId == null) {
+            throw new IllegalArgumentException("Routing policy not found: " + requestedRoutingPolicy);
+        }
+
+        AiGatewayRoutingPolicy assignedPolicy = aiGatewayRoutingPolicyService.getRoutingPolicy(assignedRoutingPolicyId);
+
+        if (!requestedRoutingPolicy.equals(assignedPolicy.getName())) {
+            throw new IllegalArgumentException("Routing policy not found: " + requestedRoutingPolicy);
+        }
+
+        if (assignedPolicy.getWorkspaceId() != null) {
+            throw new IllegalArgumentException("Routing policy not found: " + requestedRoutingPolicy);
+        }
     }
 
     private AiGatewayChatCompletionRequest applyResolvedRoutingPolicy(
-        AiGatewayChatCompletionRequest request, @Nullable Long routingPolicyId) {
+        AiGatewayChatCompletionRequest request, @Nullable Long routingPolicyId,
+        @Nullable Long connectedUserId) {
+
         if (routingPolicyId == null) {
             return request;
         }
 
         try {
             AiGatewayRoutingPolicy policy = aiGatewayRoutingPolicyService.getRoutingPolicy(routingPolicyId);
+
+            if (connectedUserId != null && policy.getWorkspaceId() != null) {
+                log.warn(
+                    "Resolved routing_policy_id={} for model '{}' belongs to workspace {}, which embedded traffic " +
+                        "cannot route through; falling back to direct routing",
+                    routingPolicyId, request.model(), policy.getWorkspaceId());
+
+                return request;
+            }
 
             return new AiGatewayChatCompletionRequest(
                 request.model(), request.messages(), request.temperature(), request.maxTokens(), request.topP(),
@@ -297,9 +470,57 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         }
     }
 
+    Long resolveEmbeddedDefaultRoutingPolicyId(@Nullable Long connectedUserId, long environmentId) {
+        return resolveEmbeddedDefaultRoutingPolicyId(
+            connectedUserId, resolveEmbeddedSettingsOnce(connectedUserId, environmentId));
+    }
+
+    private Long resolveEmbeddedDefaultRoutingPolicyId(
+        @Nullable Long connectedUserId, Optional<AiGatewayEmbeddedSettings> embeddedSettings) {
+
+        if (connectedUserId == null) {
+            return null;
+        }
+
+        return embeddedSettings.map(AiGatewayEmbeddedSettings::defaultRoutingPolicyId)
+            .orElse(null);
+    }
+
+    private Optional<AiGatewayEmbeddedSettings> resolveEmbeddedSettingsOnce(
+        @Nullable Long connectedUserId, long environmentId) {
+
+        if (connectedUserId == null) {
+            return Optional.empty();
+        }
+
+        AiGatewayEmbeddedSettingsService embeddedSettingsService = embeddedSettingsServiceProvider.getIfAvailable();
+
+        if (embeddedSettingsService == null) {
+            return Optional.empty();
+        }
+
+        return embeddedSettingsService.find(environmentId);
+    }
+
+    private EmbeddedRequestSettings resolveEmbeddedSettingsAndCheckBudget(
+        @Nullable Long connectedUserId, long environmentId) {
+
+        if (connectedUserId == null) {
+            return EmbeddedRequestSettings.NONE;
+        }
+
+        EmbeddedRequestSettings requestSettings = new EmbeddedRequestSettings(
+            resolveEmbeddedSettingsOnce(connectedUserId, environmentId),
+            aiGatewayConnectedUserSettingsService.fetchByConnectedUserId(connectedUserId));
+
+        checkConnectedUserBudget(connectedUserId, requestSettings);
+
+        return requestSettings;
+    }
+
     private Long resolveModelDefaultRoutingPolicyId(String modelIdentifier) {
         try {
-            ModelResolution resolution = resolveModel(modelIdentifier);
+            ModelResolution resolution = resolveModel(modelIdentifier, null);
 
             return resolution.model() != null ? resolution.model()
                 .getDefaultRoutingPolicyId() : null;
@@ -316,6 +537,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
     private AiGatewayChatCompletionResponse withGatewayMetadata(
         AiGatewayChatCompletionResponse response, AiGatewayChatCompletionRequest request, long startTime) {
+
         if (response == null || response.gatewayMetadata() != null) {
             return response;
         }
@@ -370,23 +592,61 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         return slash > 0 ? modelIdentifier.substring(0, slash) : null;
     }
 
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders) {
+
+        return chatCompletionStream(request, tracingHeaders, (AtomicLong) null);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable AtomicLong traceIdHolder) {
+
+        return chatCompletionStream(request, tracingHeaders, null, traceIdHolder);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable Long connectedUserId, @Nullable AtomicLong traceIdHolder) {
+
+        return Flux.defer(
+            () -> chatCompletionStreamInternal(request, tracingHeaders, connectedUserId, traceIdHolder));
+    }
+
     private Flux<AiGatewayChatCompletionResponse> chatCompletionStreamInternal(
-        AiGatewayChatCompletionRequest request) {
-        checkBudget(request.tags(), request.model());
-        checkRateLimits(request.tags());
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable Long connectedUserId, @Nullable AtomicLong traceIdHolder) {
+
+        AiObservabilityTracingHeaders effectiveTracingHeaders = tracingHeaders != null
+            ? tracingHeaders
+            : new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of());
+
+        long environmentId = resolveConnectedUserEnvironmentId(connectedUserId);
+
+        checkRequestScope(request.tags(), request.model(), connectedUserId);
+
+        EmbeddedRequestSettings requestSettings = resolveEmbeddedSettingsAndCheckBudget(connectedUserId, environmentId);
 
         Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
         Long projectId = resolveProjectId(request.tags());
 
         AiGatewayChatCompletionRequest effectiveRequest = applyRoutingPolicyPrecedence(
-            aiGatewayGuardrails.apply(request, workspaceId, projectId, null));
+            aiGatewayGuardrails.apply(
+                request, resolvePlatformType(connectedUserId), workspaceId, projectId, null),
+            connectedUserId, requestSettings);
 
         long startTime = System.currentTimeMillis();
 
         AiGatewayProject project = resolveProject(effectiveRequest.tags());
 
         StreamModelResolution streamModelResolution =
-            resolveStreamModelResolution(effectiveRequest, workspaceId, startTime);
+            resolveStreamModelResolution(effectiveRequest, workspaceId, startTime, connectedUserId);
 
         RoutedDeployments routedDeployments = streamModelResolution.routedDeployments();
         ModelResolution modelResolution = streamModelResolution.modelResolution();
@@ -400,9 +660,11 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         AtomicLong streamInputTokens = new AtomicLong(0);
         AtomicLong streamOutputTokens = new AtomicLong(0);
         AtomicReference<Throwable> streamError = new AtomicReference<>();
+        StringBuilder streamOutputContent = new StringBuilder();
 
         StreamingResponseRedactor responseRedactor =
-            aiGatewayGuardrails.newStreamingResponseRedactor(workspaceId, projectId);
+            aiGatewayGuardrails.newStreamingResponseRedactor(
+                resolvePlatformType(connectedUserId), workspaceId, projectId);
         AtomicReference<String> deferredFinishReason = new AtomicReference<>();
 
         Flux<ChatResponse> chatResponseFlux;
@@ -414,8 +676,10 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 routedDeployments.orderedDeployments(),
                 deployment -> {
                     AiModel deploymentModel = routedModelMap.get(deployment.getModelId());
-                    AiGatewayProvider deploymentProvider =
+                    AiGatewayProvider deploymentTenantProvider =
                         aiGatewayProviderService.getProvider(deploymentModel.getProviderId());
+                    AiGatewayProvider deploymentProvider =
+                        applyByokOverride(deploymentTenantProvider, connectedUserId);
                     ChatModel deploymentChatModel = aiGatewayChatModelFactory.getChatModel(deploymentProvider);
                     Prompt deploymentPrompt = buildPrompt(
                         compressMessages(effectiveRequest, deploymentModel, project), deploymentModel.getName());
@@ -435,8 +699,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
         Flux<AiGatewayChatCompletionResponse> chunkFlux = chatResponseFlux
             .map(chatResponse -> toStreamChunkResponse(
-                chatResponse, effectiveRequest, streamInputTokens, streamOutputTokens, responseRedactor,
-                deferredFinishReason));
+                chatResponse, effectiveRequest, streamInputTokens, streamOutputTokens, streamOutputContent,
+                responseRedactor, deferredFinishReason));
 
         if (responseRedactor != null) {
             chunkFlux = chunkFlux.concatWith(Flux.defer(() -> {
@@ -458,16 +722,19 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         return chunkFlux
             .doOnError(streamError::set)
             .doFinally(signalType -> finalizeStreamRequest(
-                signalType, streamInputTokens, streamOutputTokens, streamError, effectiveRequest, workspaceId,
-                servedModel.get(), servedProvider.get(), project, startTime));
+                signalType, streamInputTokens, streamOutputTokens, streamError, streamOutputContent,
+                effectiveRequest, effectiveTracingHeaders, workspaceId, servedModel.get(), servedProvider.get(),
+                project, startTime, traceIdHolder, connectedUserId));
     }
 
     private AiGatewayChatCompletionResponse toStreamChunkResponse(
         ChatResponse chatResponse, AiGatewayChatCompletionRequest effectiveRequest, AtomicLong streamInputTokens,
-        AtomicLong streamOutputTokens, @Nullable StreamingResponseRedactor responseRedactor,
-        AtomicReference<String> deferredFinishReason) {
+        AtomicLong streamOutputTokens, StringBuilder streamOutputContent,
+        @Nullable StreamingResponseRedactor responseRedactor, AtomicReference<String> deferredFinishReason) {
+
         if (chatResponse.getMetadata() != null && chatResponse.getMetadata()
             .getUsage() != null) {
+
             long promptTokens = chatResponse.getMetadata()
                 .getUsage()
                 .getPromptTokens();
@@ -497,6 +764,10 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         String chunkText = generation.getOutput()
             .getText();
 
+        if (chunkText != null) {
+            streamOutputContent.append(chunkText);
+        }
+
         String deltaText = chunkText;
         String finishReason = generation.getMetadata()
             .getFinishReason();
@@ -516,6 +787,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
     private static AiGatewayChatCompletionResponse streamChunkOf(
         String model, @Nullable String deltaText, @Nullable String finishReason) {
+
         AiGatewayChatMessage delta = new AiGatewayChatMessage(AiGatewayChatRole.ASSISTANT, deltaText);
 
         AiGatewayChatCompletionResponse.Choice choice =
@@ -530,9 +802,11 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
     private void finalizeStreamRequest(
         reactor.core.publisher.SignalType signalType, AtomicLong streamInputTokens, AtomicLong streamOutputTokens,
-        AtomicReference<Throwable> streamError, AiGatewayChatCompletionRequest effectiveRequest, Long workspaceId,
-        AiModel model, AiGatewayProvider provider,
-        AiGatewayProject project, long startTime) {
+        AtomicReference<Throwable> streamError, StringBuilder streamOutputContent,
+        AiGatewayChatCompletionRequest effectiveRequest, AiObservabilityTracingHeaders effectiveTracingHeaders,
+        Long workspaceId, AiModel model, AiGatewayProvider provider, AiGatewayProject project,
+        long startTime, @Nullable AtomicLong traceIdHolder, @Nullable Long connectedUserId) {
+
         int inputTokens = (int) Math.min(streamInputTokens.get(), Integer.MAX_VALUE);
         int outputTokens = (int) Math.min(streamOutputTokens.get(), Integer.MAX_VALUE);
 
@@ -587,9 +861,11 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         setProjectIdFromProject(requestLog, project);
         setApiKeyIdFromAuthentication(requestLog);
 
+        requestLog.setUserId(connectedUserId);
+
         try {
             transactionTemplate.executeWithoutResult(
-                status -> aiGatewayRequestLogService.create(requestLog, workspaceId));
+                status -> persistUsage(requestLog, workspaceId, connectedUserId));
         } catch (Exception exception) {
             recordRequestLogPersistFailure("streaming", "success");
 
@@ -598,12 +874,28 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 effectiveRequest.model(), exception);
         }
 
-        enforcePostRequestBudget(effectiveRequest.tags());
+        boolean streamSuccess = streamError.get() == null;
+
+        String accumulatedOutput = streamOutputContent.toString();
+
+        processStreamingTracingHeaders(
+            effectiveTracingHeaders, workspaceId, effectiveRequest, model, provider, inputTokens,
+            outputTokens,
+            startTime, streamSuccess, accumulatedOutput.isEmpty() ? null : accumulatedOutput, traceIdHolder,
+            connectedUserId);
+
+        enforcePostRequestBudget(effectiveRequest.tags(), connectedUserId);
     }
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public AiGatewayEmbeddingResponse embedding(AiGatewayEmbeddingRequest request) {
+    public AiGatewayEmbeddingResponse embedding(
+        AiGatewayEmbeddingRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders) {
+
+        if (tracingHeaders == null) {
+            tracingHeaders = new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of());
+        }
+
         checkBudget(request.tags(), request.model());
         checkRateLimits(request.tags());
 
@@ -614,7 +906,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
         long startTime = System.currentTimeMillis();
 
-        ModelResolution modelResolution = resolveModel(request.model());
+        ModelResolution modelResolution = resolveModel(request.model(), null);
 
         AiGatewayProvider provider = modelResolution.provider();
         AiModel model = modelResolution.model();
@@ -649,6 +941,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
             if (embeddingResponse.getMetadata() != null && embeddingResponse.getMetadata()
                 .getUsage() != null) {
+
                 promptTokens = (int) Math.min(
                     embeddingResponse.getMetadata()
                         .getUsage()
@@ -707,6 +1000,9 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 new AiGatewayEmbeddingResponse.Usage(promptTokens, promptTokens),
                 embeddingMetadata);
 
+            processEmbeddingTracingHeaders(
+                tracingHeaders, workspaceId, request, promptTokens, startTime, true);
+
             return embeddingResult;
         } catch (Exception exception) {
             AiLlmUsage errorLog = new AiLlmUsage(
@@ -732,14 +1028,17 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                     request.model(), exception.getMessage(), logException);
             }
 
+            processEmbeddingTracingHeaders(
+                tracingHeaders, workspaceId, request, 0, startTime, false);
+
             throw exception;
         }
     }
 
     private AiGatewayChatCompletionResponse chatCompletionDirect(
-        AiGatewayChatCompletionRequest request) {
+        AiGatewayChatCompletionRequest request, @Nullable Long connectedUserId) {
         if (isCacheable(request)) {
-            String cacheKey = aiGatewayResponseCache.computeCacheKey(request, null);
+            String cacheKey = aiGatewayResponseCache.computeCacheKey(request, connectedUserId);
             AiGatewayChatCompletionResponse cached = aiGatewayResponseCache.get(cacheKey);
 
             if (cached != null) {
@@ -750,7 +1049,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
         long startTime = System.currentTimeMillis();
 
-        ModelResolution modelResolution = resolveModel(request.model());
+        ModelResolution modelResolution = resolveModel(request.model(), connectedUserId);
 
         AiGatewayProvider provider = modelResolution.provider();
         AiModel model = modelResolution.model();
@@ -769,12 +1068,12 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
             int[] tokenCounts = extractTokenCounts(chatResponse);
 
             AiLlmUsage requestLog = createSuccessLog(
-                request, model, provider, startTime, tokenCounts[0], tokenCounts[1]);
+                request, model, provider, startTime, tokenCounts[0], tokenCounts[1], connectedUserId);
 
             setProjectIdFromProject(requestLog, project);
 
             try {
-                aiGatewayRequestLogService.create(requestLog, workspaceId);
+                persistUsage(requestLog, workspaceId, connectedUserId);
             } catch (Exception logException) {
                 recordRequestLogPersistFailure("chat", "success");
 
@@ -784,12 +1083,12 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                     request.model(), requestLog.getCost(), logException);
             }
 
-            enforcePostRequestBudget(request.tags());
+            enforcePostRequestBudget(request.tags(), connectedUserId);
 
             AiGatewayChatCompletionResponse response = toResponse(chatResponse, request.model());
 
             if (isCacheable(request)) {
-                String cacheKey = aiGatewayResponseCache.computeCacheKey(request, null);
+                String cacheKey = aiGatewayResponseCache.computeCacheKey(request, connectedUserId);
 
                 try {
                     aiGatewayResponseCache.put(cacheKey, response);
@@ -804,11 +1103,11 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
             return response;
         } catch (Exception exception) {
             try {
-                AiLlmUsage errorLog = createErrorLog(request, startTime, exception);
+                AiLlmUsage errorLog = createErrorLog(request, startTime, exception, connectedUserId);
 
                 setProjectIdFromProject(errorLog, project);
 
-                aiGatewayRequestLogService.create(errorLog, workspaceId);
+                persistUsage(errorLog, workspaceId, connectedUserId);
             } catch (Exception logException) {
                 recordRequestLogPersistFailure("chat", "error");
 
@@ -821,9 +1120,10 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     }
 
     private AiGatewayChatCompletionResponse chatCompletionWithRouting(
-        AiGatewayChatCompletionRequest request) {
+        AiGatewayChatCompletionRequest request, @Nullable Long connectedUserId) {
+
         if (isCacheable(request)) {
-            String cacheKey = aiGatewayResponseCache.computeCacheKey(request, null);
+            String cacheKey = aiGatewayResponseCache.computeCacheKey(request, connectedUserId);
             AiGatewayChatCompletionResponse cached = aiGatewayResponseCache.get(cacheKey);
 
             if (cached != null) {
@@ -875,6 +1175,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         for (AiGatewayModelDeployment deployment : enabledDeployments) {
             if (!deployment.getId()
                 .equals(primaryDeployment.getId())) {
+
                 orderedDeployments.add(deployment);
             }
         }
@@ -883,7 +1184,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
             AiGatewayChatCompletionResponse response =
                 aiGatewayRetryHandler.executeWithRetry(orderedDeployments, deployment -> {
                     AiModel model = modelMap.get(deployment.getModelId());
-                    AiGatewayProvider provider = aiGatewayProviderService.getProvider(model.getProviderId());
+                    AiGatewayProvider tenantProvider = aiGatewayProviderService.getProvider(model.getProviderId());
+                    AiGatewayProvider provider = applyByokOverride(tenantProvider, connectedUserId);
 
                     ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
 
@@ -896,7 +1198,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                     int[] tokenCounts = extractTokenCounts(chatResponse);
 
                     AiLlmUsage requestLog = createSuccessLog(
-                        request, model, provider, startTime, tokenCounts[0], tokenCounts[1]);
+                        request, model, provider, startTime, tokenCounts[0], tokenCounts[1], connectedUserId);
 
                     setProjectIdFromProject(requestLog, project);
 
@@ -906,7 +1208,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                             .ordinal());
 
                     try {
-                        aiGatewayRequestLogService.create(requestLog, workspaceId);
+                        persistUsage(requestLog, workspaceId, connectedUserId);
                     } catch (Exception logException) {
                         recordRequestLogPersistFailure("routing", "success");
 
@@ -916,13 +1218,13 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                             request.model(), requestLog.getCost(), logException);
                     }
 
-                    enforcePostRequestBudget(request.tags());
+                    enforcePostRequestBudget(request.tags(), connectedUserId);
 
                     return toResponse(chatResponse, request.model());
                 });
 
             if (isCacheable(request)) {
-                String cacheKey = aiGatewayResponseCache.computeCacheKey(request, null);
+                String cacheKey = aiGatewayResponseCache.computeCacheKey(request, connectedUserId);
 
                 try {
                     aiGatewayResponseCache.put(cacheKey, response);
@@ -937,7 +1239,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
             return response;
         } catch (Exception exception) {
             try {
-                AiLlmUsage errorLog = createErrorLog(request, startTime, exception);
+                AiLlmUsage errorLog = createErrorLog(request, startTime, exception, connectedUserId);
 
                 setProjectIdFromProject(errorLog, project);
 
@@ -945,7 +1247,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 errorLog.setRoutingStrategy(routingPolicy.getStrategy() == null ? null : routingPolicy.getStrategy()
                     .ordinal());
 
-                aiGatewayRequestLogService.create(errorLog, workspaceId);
+                persistUsage(errorLog, workspaceId, connectedUserId);
             } catch (Exception logException) {
                 recordRequestLogPersistFailure("routing", "error");
 
@@ -955,6 +1257,40 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
             throw exception;
         }
+    }
+
+    private void checkRequestScope(Map<String, String> tags, String model, @Nullable Long connectedUserId) {
+        if (connectedUserId == null) {
+            checkBudget(tags, model);
+            checkRateLimits(tags);
+
+            return;
+        }
+
+        if (tags != null && (tags.containsKey("workspace_id") || tags.containsKey("project_id"))) {
+            throw new IllegalArgumentException(
+                "Embedded requests must not carry a 'workspace_id' or 'project_id' tag");
+        }
+    }
+
+    private void persistUsage(AiLlmUsage usage, @Nullable Long workspaceId, @Nullable Long connectedUserId) {
+        if (connectedUserId == null) {
+            aiGatewayRequestLogService.create(usage, workspaceId);
+        } else {
+            aiGatewayRequestLogService.createForConnectedUser(usage, connectedUserId);
+        }
+    }
+
+    private void enforcePostRequestBudget(Map<String, String> tags, @Nullable Long connectedUserId) {
+        if (connectedUserId != null) {
+            return;
+        }
+
+        enforcePostRequestBudget(tags);
+    }
+
+    private static @Nullable PlatformType resolvePlatformType(@Nullable Long connectedUserId) {
+        return connectedUserId == null ? null : PlatformType.EMBEDDED;
     }
 
     private void checkBudget(Map<String, String> tags, String model) {
@@ -972,12 +1308,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 aiGatewayBudgetChecker.checkBudget(workspaceId);
 
             if (!budgetResult.requestAllowed()) {
-                AiGatewayMetrics metrics = aiGatewayMetricsProvider.getIfAvailable();
-
-                if (metrics != null) {
-                    metrics.onBudgetExceeded(new AiGatewayBudgetExceededEvent(
-                        workspaceId, model, budgetResult.currentSpend(), budgetResult.budgetAmount()));
-                }
+                applicationEventPublisher.publishEvent(new AiGatewayBudgetExceededEvent(
+                    workspaceId, model, budgetResult.currentSpend(), budgetResult.budgetAmount()));
 
                 throw new BudgetExceededException(
                     "Budget limit exceeded for workspace " + workspaceId +
@@ -996,6 +1328,48 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
             throw new IllegalArgumentException(
                 "Invalid workspace_id tag: " + tags.get("workspace_id"), numberFormatException);
         }
+    }
+
+    private void checkConnectedUserBudget(long connectedUserId, EmbeddedRequestSettings requestSettings) {
+        BigDecimal cap = resolveBudgetCap(requestSettings);
+
+        if (cap == null) {
+            return;
+        }
+
+        Instant periodStart = currentBillingPeriodStart();
+
+        Money currentSpend =
+            aiGatewaySpendService.getTotalCostByConnectedUserId(connectedUserId, periodStart, Instant.now());
+        Money capMoney = Money.usd(cap);
+
+        if (currentSpend.compareTo(capMoney) >= 0) {
+            throw new BudgetExceededException(
+                "Budget cap exceeded for connected user " + connectedUserId +
+                    ". Current spend: $" + currentSpend.amount() + " / Cap: $" + cap,
+                capMoney, currentSpend);
+        }
+    }
+
+    private static @Nullable BigDecimal resolveBudgetCap(EmbeddedRequestSettings requestSettings) {
+        BigDecimal connectedUserCap = requestSettings.connectedUserSettings()
+            .map(AiGatewayConnectedUserSettings::getBudgetCap)
+            .orElse(null);
+
+        if (connectedUserCap != null) {
+            return connectedUserCap;
+        }
+
+        return requestSettings.embeddedSettings()
+            .map(AiGatewayEmbeddedSettings::defaultConnectedUserBudgetCap)
+            .orElse(null);
+    }
+
+    private static Instant currentBillingPeriodStart() {
+        return ZonedDateTime.now(ZoneOffset.UTC)
+            .withDayOfMonth(1)
+            .truncatedTo(ChronoUnit.DAYS)
+            .toInstant();
     }
 
     private void checkRateLimits(Map<String, String> tags) {
@@ -1109,6 +1483,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
     private AiGatewayRoutingContext buildRoutingContext(
         AiGatewayChatCompletionRequest request, Map<Long, AiModel> modelMap) {
+
         Map<String, Double> latencyByModelName = aiGatewayRequestLogService.getAverageLatencyByModel(
             Instant.now()
                 .minus(Duration.ofHours(1)));
@@ -1181,6 +1556,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         for (AiGatewayModelDeployment deployment : enabledDeployments) {
             if (!deployment.getId()
                 .equals(primaryDeployment.getId())) {
+
                 orderedDeployments.add(deployment);
             }
         }
@@ -1197,7 +1573,9 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     }
 
     private StreamModelResolution resolveStreamModelResolution(
-        AiGatewayChatCompletionRequest effectiveRequest, Long workspaceId, long startTime) {
+        AiGatewayChatCompletionRequest effectiveRequest, Long workspaceId, long startTime,
+        @Nullable Long connectedUserId) {
+
         RoutedDeployments routedDeployments = null;
         ModelResolution modelResolution;
 
@@ -1209,15 +1587,19 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                     .get(0);
                 AiModel primaryModel = routedDeployments.modelMap()
                     .get(primaryDeployment.getModelId());
-                AiGatewayProvider primaryProvider = aiGatewayProviderService.getProvider(primaryModel.getProviderId());
+                AiGatewayProvider primaryTenantProvider =
+                    aiGatewayProviderService.getProvider(primaryModel.getProviderId());
+                AiGatewayProvider primaryProvider = applyByokOverride(primaryTenantProvider, connectedUserId);
 
                 modelResolution = new ModelResolution(primaryProvider, primaryModel);
             } else {
-                modelResolution = resolveModel(effectiveRequest.model());
+                modelResolution = resolveModel(effectiveRequest.model(), connectedUserId);
             }
         } catch (Exception exception) {
             try {
-                aiGatewayRequestLogService.create(createErrorLog(effectiveRequest, startTime, exception), workspaceId);
+                persistUsage(
+                    createErrorLog(effectiveRequest, startTime, exception, connectedUserId), workspaceId,
+                    connectedUserId);
             } catch (Exception logException) {
                 log.error("Failed to log streaming setup error for model '{}'. Original error: {}",
                     effectiveRequest.model(), exception.getMessage(), logException);
@@ -1229,7 +1611,33 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         return new StreamModelResolution(modelResolution, routedDeployments);
     }
 
-    private ModelResolution resolveModel(String modelIdentifier) {
+    private AiGatewayProvider applyByokOverride(AiGatewayProvider tenantProvider, @Nullable Long connectedUserId) {
+        if (connectedUserId == null) {
+            return tenantProvider;
+        }
+
+        Optional<AiGatewayProvider> connectedUserProvider = aiGatewayProviderService
+            .fetchProviderByConnectedUserIdAndType(connectedUserId, tenantProvider.getType());
+
+        return connectedUserProvider.filter(AiGatewayProvider::isEnabled)
+            .orElseGet(() -> requireTenantProviderUsableByConnectedUser(tenantProvider, connectedUserId));
+    }
+
+    private AiGatewayProvider requireTenantProviderUsableByConnectedUser(
+        AiGatewayProvider tenantProvider, long connectedUserId) {
+
+        Long tenantProviderConnectedUserId = tenantProvider.getConnectedUserId();
+
+        if (tenantProviderConnectedUserId != null && !tenantProviderConnectedUserId.equals(connectedUserId)) {
+            throw new AiGatewayProviderScopeViolationException(
+                "Provider " + tenantProvider.getId() + " is scoped to a different connected user",
+                tenantProvider.getId(), connectedUserId, tenantProviderConnectedUserId);
+        }
+
+        return tenantProvider;
+    }
+
+    private ModelResolution resolveModel(String modelIdentifier, @Nullable Long connectedUserId) {
         String[] parts = modelIdentifier.split("/", 2);
 
         if (parts.length != 2) {
@@ -1241,9 +1649,13 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
             .replace("-", "_");
         String modelName = parts[1];
 
-        AiGatewayProvider provider = resolveTenantProviderByTypeName(providerTypeName);
+        AiGatewayProvider tenantProvider = resolveTenantProviderByTypeName(providerTypeName);
 
-        AiModel model = aiModelService.getModel(provider.getId(), modelName);
+        AiModel model = aiModelService.getModel(tenantProvider.getId(), modelName);
+
+        AiGatewayProvider provider = connectedUserId == null
+            ? tenantProvider
+            : aiGatewayProviderResolver.resolve(connectedUserId, tenantProvider.getType());
 
         return new ModelResolution(provider, model);
     }
@@ -1264,6 +1676,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private AiGatewayChatCompletionRequest compressMessages(
         AiGatewayChatCompletionRequest request, AiModel model,
         @Nullable AiGatewayProject project) {
+
         if (!resolveCompressionEnabled(project)) {
             return request;
         }
@@ -1365,6 +1778,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
         if (chatResponse.getMetadata() != null && chatResponse.getMetadata()
             .getUsage() != null) {
+
             org.springframework.ai.chat.metadata.Usage chatResponseUsage = chatResponse.getMetadata()
                 .getUsage();
 
@@ -1550,6 +1964,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
         if (chatResponse.getMetadata() != null && chatResponse.getMetadata()
             .getUsage() != null) {
+
             inputTokens = (int) Math.min(
                 chatResponse.getMetadata()
                     .getUsage()
@@ -1569,7 +1984,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
     private AiLlmUsage createSuccessLog(
         AiGatewayChatCompletionRequest request, AiModel model, AiGatewayProvider provider,
-        long startTime, int inputTokens, int outputTokens) {
+        long startTime, int inputTokens, int outputTokens, @Nullable Long connectedUserId) {
+
         AiLlmUsage requestLog = new AiLlmUsage(
             UUID.randomUUID()
                 .toString(),
@@ -1589,6 +2005,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
         setApiKeyIdFromAuthentication(requestLog);
 
+        requestLog.setUserId(connectedUserId);
+
         return requestLog;
     }
 
@@ -1601,7 +2019,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     }
 
     private static Long resolveAuthenticatedApiKeyId() {
-        org.springframework.security.core.context.SecurityContext context = SecurityContextHolder.getContext();
+        SecurityContext context = SecurityContextHolder.getContext();
 
         if (context == null) {
             return null;
@@ -1616,8 +2034,26 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         return null;
     }
 
+    private static long resolveConnectedUserEnvironmentId(@Nullable Long connectedUserId) {
+        if (connectedUserId == null) {
+            return 0L;
+        }
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        if (securityContext
+            .getAuthentication() instanceof AbstractApiKeyAuthenticationToken apiKeyAuthenticationToken) {
+            return apiKeyAuthenticationToken.getEnvironmentId();
+        }
+
+        throw new AccessDeniedException(
+            "Connected user " + connectedUserId + " is not authenticated into an environment");
+    }
+
     private AiLlmUsage createErrorLog(
-        AiGatewayChatCompletionRequest request, long startTime, Exception exception) {
+        AiGatewayChatCompletionRequest request, long startTime, Exception exception,
+        @Nullable Long connectedUserId) {
+
         AiLlmUsage errorLog = new AiLlmUsage(
             UUID.randomUUID()
                 .toString(),
@@ -1628,6 +2064,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         errorLog.setErrorMessage(exception.getMessage());
 
         setApiKeyIdFromAuthentication(errorLog);
+
+        errorLog.setUserId(connectedUserId);
 
         return errorLog;
     }
@@ -1681,6 +2119,415 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         return 500;
     }
 
+    private void processTracingHeaders(
+        AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable Long workspaceId,
+        AiGatewayChatCompletionRequest request,
+        @Nullable AiGatewayChatCompletionResponse response,
+        long startTime,
+        boolean success,
+        @Nullable Long connectedUserId) {
+
+        if (workspaceId == null) {
+            return;
+        }
+
+        try {
+            String inputText = request.messages()
+                .stream()
+                .map(message -> message.content() != null ? message.content() : "")
+                .reduce("", (accumulator, content) -> accumulator + content);
+            String outputText = null;
+
+            int inputTokens = 0;
+            int outputTokens = 0;
+
+            if (response != null && response.usage() != null) {
+                inputTokens = response.usage()
+                    .promptTokens();
+                outputTokens = response.usage()
+                    .completionTokens();
+            }
+
+            if (response != null && response.choices() != null && !response.choices()
+                .isEmpty()) {
+
+                AiGatewayChatCompletionResponse.Choice firstChoice = response.choices()
+                    .getFirst();
+
+                if (firstChoice.message() != null) {
+                    outputText = firstChoice.message()
+                        .content();
+                }
+            }
+
+            int latencyMs = (int) (System.currentTimeMillis() - startTime);
+
+            String[] modelParts = request.model()
+                .split("/", 2);
+            String providerName = modelParts.length > 0 ? modelParts[0] : request.model();
+            String modelName = modelParts.length > 1 ? modelParts[1] : request.model();
+
+            BigDecimal cost = calculateTraceCost(request.model(), inputTokens, outputTokens);
+
+            AiGatewayProject project = resolveProject(request.tags());
+
+            AiObservabilityTrace trace = resolveOrCreateTrace(
+                tracingHeaders, workspaceId, modelName, inputText, outputText, inputTokens, outputTokens,
+                latencyMs, cost, success, project);
+
+            AiObservabilitySpan span = new AiObservabilitySpan(trace.getId(), AiObservabilitySpanType.GENERATION);
+
+            span.setStartTime(Instant.ofEpochMilli(startTime));
+            span.setName(tracingHeaders.spanName() != null ? tracingHeaders.spanName() : modelName);
+            span.setModel(modelName);
+            span.setProvider(providerName);
+            span.setInput(inputText);
+            span.setOutput(outputText);
+            span.setInputTokens(inputTokens);
+            span.setOutputTokens(outputTokens);
+            span.setLatencyMs(latencyMs);
+            span.setCost(cost);
+
+            Instant spanEndTime = Instant.now();
+
+            if (tracingHeaders.parentSpanId() != null) {
+                try {
+                    span.setParentSpanId(Long.parseLong(tracingHeaders.parentSpanId()));
+                } catch (NumberFormatException numberFormatException) {
+                    log.warn("Invalid parentSpanId header value '{}' — ignoring",
+                        tracingHeaders.parentSpanId());
+                }
+            }
+
+            applyConnectedUserSpanAttribute(span, connectedUserId);
+
+            span.close(spanEndTime, success ? AiObservabilitySpanStatus.COMPLETED : AiObservabilitySpanStatus.ERROR);
+
+            aiObservabilitySpanService.create(span);
+
+            if (trace.getStatus() == AiObservabilityTraceStatus.COMPLETED
+                || trace.getStatus() == AiObservabilityTraceStatus.ERROR) {
+
+                try {
+                    publishTraceCompletedEvent(trace, request.model());
+                } catch (Exception publishException) {
+                    log.error(
+                        "Failed to publish trace-completed event for model '{}' (traceId={})",
+                        request.model(), trace.getId(), publishException);
+                }
+            }
+
+        } catch (Exception exception) {
+            log.error(
+                "Failed to persist trace/span for model '{}' — tracing data will be missing",
+                request.model(), exception);
+        }
+    }
+
+    private void publishTraceCompletedEvent(AiObservabilityTrace trace, String modelName) {
+        applicationEventPublisher.publishEvent(new AiGatewayTraceCompletedEvent(
+            workspaceAiObservabilityTraceService.getWorkspaceId(trace.getId()),
+            trace.getId(),
+            trace.getExternalTraceId(),
+            modelName,
+            trace.getTotalInputTokens(),
+            trace.getTotalOutputTokens(),
+            trace.getTotalLatencyMs(),
+            trace.getTotalCost(),
+            trace.getStatus() == AiObservabilityTraceStatus.COMPLETED,
+            Instant.now()));
+    }
+
+    @SuppressFBWarnings("REC_CATCH_EXCEPTION")
+    private void processStreamingTracingHeaders(
+        AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable Long workspaceId,
+        AiGatewayChatCompletionRequest request,
+        AiModel model,
+        AiGatewayProvider provider,
+        int inputTokens,
+        int outputTokens,
+        long startTime,
+        boolean success,
+        @Nullable String outputText,
+        @Nullable AtomicLong traceIdHolder,
+        @Nullable Long connectedUserId) {
+
+        if (workspaceId == null) {
+            return;
+        }
+
+        try {
+            String inputText = request.messages()
+                .stream()
+                .map(message -> message.content() != null ? message.content() : "")
+                .reduce("", (accumulator, content) -> accumulator + content);
+
+            int latencyMs = (int) (System.currentTimeMillis() - startTime);
+
+            BigDecimal cost = calculateTraceCost(request.model(), inputTokens, outputTokens);
+
+            AiGatewayProject project = resolveProject(request.tags());
+
+            AiObservabilityTrace trace = resolveOrCreateTrace(
+                tracingHeaders, workspaceId, model.getName(), inputText, outputText, inputTokens, outputTokens,
+                latencyMs, cost, success, project);
+
+            if (traceIdHolder != null && trace.getId() != null) {
+                traceIdHolder.set(trace.getId());
+            }
+
+            AiObservabilitySpan span = new AiObservabilitySpan(trace.getId(), AiObservabilitySpanType.GENERATION);
+
+            span.setStartTime(Instant.ofEpochMilli(startTime));
+            span.setName(tracingHeaders.spanName() != null ? tracingHeaders.spanName() : model.getName());
+            span.setModel(model.getName());
+            span.setProvider(provider.getType()
+                .name());
+            span.setInput(inputText);
+            span.setOutput(outputText);
+            span.setInputTokens(inputTokens);
+            span.setOutputTokens(outputTokens);
+            span.setLatencyMs(latencyMs);
+            span.setCost(cost);
+
+            Instant spanEndTime = Instant.now();
+
+            if (tracingHeaders.parentSpanId() != null) {
+                try {
+                    span.setParentSpanId(Long.parseLong(tracingHeaders.parentSpanId()));
+                } catch (NumberFormatException numberFormatException) {
+                    log.warn("Invalid parentSpanId header value '{}' — ignoring",
+                        tracingHeaders.parentSpanId());
+                }
+            }
+
+            applyConnectedUserSpanAttribute(span, connectedUserId);
+
+            span.close(spanEndTime, success ? AiObservabilitySpanStatus.COMPLETED : AiObservabilitySpanStatus.ERROR);
+
+            transactionTemplate.executeWithoutResult(
+                status -> aiObservabilitySpanService.create(span));
+        } catch (Exception exception) {
+            log.error("Failed to process streaming tracing headers for model '{}' — tracing data will be missing",
+                request.model(), exception);
+        }
+    }
+
+    private static void applyConnectedUserSpanAttribute(AiObservabilitySpan span, @Nullable Long connectedUserId) {
+        if (connectedUserId != null) {
+            span.setMetadata("{\"connectedUserId\":" + connectedUserId + "}");
+        }
+    }
+
+    private void processEmbeddingTracingHeaders(
+        AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable Long workspaceId,
+        AiGatewayEmbeddingRequest request,
+        int inputTokens,
+        long startTime,
+        boolean success) {
+
+        if (workspaceId == null) {
+            return;
+        }
+
+        try {
+            String inputText = String.join(", ", request.input());
+
+            int latencyMs = (int) (System.currentTimeMillis() - startTime);
+
+            String[] modelParts = request.model()
+                .split("/", 2);
+            String providerName = modelParts.length > 0 ? modelParts[0] : request.model();
+            String modelName = modelParts.length > 1 ? modelParts[1] : request.model();
+
+            BigDecimal cost = calculateTraceCost(request.model(), inputTokens, 0);
+
+            AiObservabilityTrace trace = resolveOrCreateTrace(
+                tracingHeaders, workspaceId, modelName, inputText, null, inputTokens, 0,
+                latencyMs, cost, success, null);
+
+            AiObservabilitySpan span = new AiObservabilitySpan(trace.getId(), AiObservabilitySpanType.GENERATION);
+
+            span.setStartTime(Instant.ofEpochMilli(startTime));
+            span.setName(tracingHeaders.spanName() != null ? tracingHeaders.spanName() : modelName);
+            span.setModel(modelName);
+            span.setProvider(providerName);
+            span.setInput(inputText);
+            span.setInputTokens(inputTokens);
+            span.setLatencyMs(latencyMs);
+            span.setCost(cost);
+
+            Instant spanEndTime = Instant.now();
+
+            if (tracingHeaders.parentSpanId() != null) {
+                try {
+                    span.setParentSpanId(Long.parseLong(tracingHeaders.parentSpanId()));
+                } catch (NumberFormatException numberFormatException) {
+                    log.warn("Invalid parentSpanId header value '{}' — ignoring",
+                        tracingHeaders.parentSpanId());
+                }
+            }
+
+            span.close(spanEndTime, success ? AiObservabilitySpanStatus.COMPLETED : AiObservabilitySpanStatus.ERROR);
+
+            aiObservabilitySpanService.create(span);
+        } catch (Exception exception) {
+            log.error("Failed to process tracing headers for embedding model '{}' — tracing data will be missing",
+                request.model(), exception);
+        }
+    }
+
+    private AiObservabilityTrace resolveOrCreateTrace(
+        AiObservabilityTracingHeaders tracingHeaders,
+        Long workspaceId,
+        String modelName,
+        String inputText,
+        @Nullable String outputText,
+        int inputTokens,
+        int outputTokens,
+        int latencyMs,
+        @Nullable BigDecimal cost,
+        boolean success,
+        @Nullable AiGatewayProject project) {
+
+        String externalTraceId = tracingHeaders.traceId();
+
+        if (tracingHeaders.hasExternalTraceId()) {
+            AiObservabilityTrace existingTrace = workspaceAiObservabilityTraceService
+                .findByExternalTraceId(workspaceId, externalTraceId)
+                .orElse(null);
+
+            if (existingTrace != null) {
+                Integer existingInputTokens = existingTrace.getTotalInputTokens();
+                Integer existingOutputTokens = existingTrace.getTotalOutputTokens();
+                Integer existingLatencyMs = existingTrace.getTotalLatencyMs();
+                BigDecimal existingCost = existingTrace.getTotalCost();
+
+                existingTrace.setTotalInputTokens(
+                    (existingInputTokens != null ? existingInputTokens : 0) + inputTokens);
+                existingTrace.setTotalOutputTokens(
+                    (existingOutputTokens != null ? existingOutputTokens : 0) + outputTokens);
+                existingTrace.setTotalLatencyMs(
+                    (existingLatencyMs != null ? existingLatencyMs : 0) + latencyMs);
+
+                if (cost != null) {
+                    existingTrace.setTotalCost(
+                        existingCost != null ? existingCost.add(cost) : cost);
+                }
+
+                if (!success) {
+                    existingTrace.setStatus(AiObservabilityTraceStatus.ERROR);
+                }
+
+                aiObservabilityTraceService.update(existingTrace);
+
+                return existingTrace;
+            }
+        }
+
+        boolean redact = isPiiRedactionEnabled(workspaceId);
+
+        AiObservabilityTrace trace = new AiObservabilityTrace(tracingHeaders.source());
+
+        trace.setExternalTraceId(externalTraceId);
+        trace.setName(tracingHeaders.spanName() != null ? tracingHeaders.spanName() : modelName);
+        trace.setInput(redact ? redactedDigest(inputText) : inputText);
+        trace.setOutput(redact ? redactedDigest(outputText) : outputText);
+        trace.setPiiRedacted(redact);
+        trace.setApiKeyId(resolveAuthenticatedApiKeyId());
+        trace.setTotalInputTokens(inputTokens);
+        trace.setTotalOutputTokens(outputTokens);
+        trace.setTotalLatencyMs(latencyMs);
+        trace.setTotalCost(cost);
+        trace.setUserId(tracingHeaders.userId());
+        trace.setStatus(success ? AiObservabilityTraceStatus.COMPLETED : AiObservabilityTraceStatus.ERROR);
+
+        if (!tracingHeaders.metadata()
+            .isEmpty()) {
+
+            StringBuilder metadataJson = new StringBuilder("{");
+            boolean first = true;
+
+            for (Map.Entry<String, String> entry : tracingHeaders.metadata()
+                .entrySet()) {
+
+                if (!first) {
+                    metadataJson.append(",");
+                }
+
+                metadataJson.append("\"")
+                    .append(entry.getKey()
+                        .replace("\"", "\\\""))
+                    .append("\":\"")
+                    .append(entry.getValue()
+                        .replace("\"", "\\\""))
+                    .append("\"");
+                first = false;
+            }
+
+            metadataJson.append("}");
+
+            trace.setMetadata(metadataJson.toString());
+        }
+
+        if (project != null) {
+            trace.setProjectId(project.getId());
+        }
+
+        if (tracingHeaders.sessionId() != null) {
+            AiObservabilitySession session = workspaceAiObservabilitySessionService.getOrCreateSessionByExternalId(
+                workspaceId, tracingHeaders.sessionId(), project != null ? project.getId() : null,
+                tracingHeaders.userId());
+
+            trace.setSessionId(session.getId());
+        }
+
+        if (!tracingHeaders.tagNames()
+            .isEmpty()) {
+
+            List<com.bytechef.platform.tag.domain.Tag> savedTags = tagService.save(
+                tracingHeaders.tagNames()
+                    .stream()
+                    .map(com.bytechef.platform.tag.domain.Tag::new)
+                    .toList());
+
+            Set<AiObservabilityTraceTag> traceTags = savedTags.stream()
+                .map(tag -> new AiObservabilityTraceTag(tag.getId()))
+                .collect(Collectors.toCollection(HashSet::new));
+
+            trace.setTags(traceTags);
+        }
+
+        if (tracingHeaders.hasExternalTraceId()) {
+            try {
+                workspaceAiObservabilityTraceService.createInWorkspace(trace, workspaceId);
+            } catch (org.springframework.dao.DuplicateKeyException duplicate) {
+                if (!AiGatewayConstraintMatchers.matchesConstraint(
+                    duplicate, TRACE_DEDUP_INDEX, TRACE_DEDUP_INDEX_PATTERN)) {
+
+                    throw duplicate;
+                }
+
+                AiObservabilityTrace winner = workspaceAiObservabilityTraceService
+                    .findByExternalTraceId(workspaceId, externalTraceId)
+                    .orElseThrow(() -> duplicate);
+
+                mergeIntoExistingTrace(winner, trace);
+
+                aiObservabilityTraceService.update(winner);
+
+                return winner;
+            }
+        } else {
+            workspaceAiObservabilityTraceService.createInWorkspace(trace, workspaceId);
+        }
+
+        return trace;
+    }
+
     private boolean isWorkspaceCachingEnabled(@Nullable Map<String, String> tags) {
         if (tags == null || !tags.containsKey("workspace_id")) {
             return true;
@@ -1709,11 +2556,90 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
             if (content != null && PiiToken.pattern()
                 .matcher(content)
                 .find()) {
+
                 return true;
             }
         }
 
         return false;
+    }
+
+    private boolean isPiiRedactionEnabled(@Nullable Long workspaceId) {
+        if (workspaceId == null) {
+            return false;
+        }
+
+        return aiGuardrailsWorkspaceSettingsService.fetchSettings(workspaceId)
+            .map(settings -> Boolean.TRUE.equals(settings.redactPii()))
+            .orElse(false);
+    }
+
+    private static String redactedDigest(@Nullable String content) {
+        if (content == null || content.isEmpty()) {
+            return content;
+        }
+
+        byte[] bytes = content.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        try {
+            byte[] hash = java.security.MessageDigest.getInstance("SHA-256")
+                .digest(bytes);
+
+            StringBuilder hex = new StringBuilder(hash.length * 2);
+
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+
+            return String.format("[redacted len=%d sha256=%s]", bytes.length, hex.substring(0, 16));
+        } catch (java.security.NoSuchAlgorithmException noSha256) {
+            return String.format("[redacted len=%d]", bytes.length);
+        }
+    }
+
+    private static void mergeIntoExistingTrace(AiObservabilityTrace winner, AiObservabilityTrace current) {
+        Integer existingInputTokens = winner.getTotalInputTokens();
+        Integer existingOutputTokens = winner.getTotalOutputTokens();
+        Integer existingLatencyMs = winner.getTotalLatencyMs();
+        BigDecimal existingCost = winner.getTotalCost();
+
+        Integer addInputTokens = current.getTotalInputTokens();
+        Integer addOutputTokens = current.getTotalOutputTokens();
+        Integer addLatencyMs = current.getTotalLatencyMs();
+        BigDecimal addCost = current.getTotalCost();
+
+        winner.setTotalInputTokens(
+            (existingInputTokens != null ? existingInputTokens : 0) + (addInputTokens != null ? addInputTokens : 0));
+        winner.setTotalOutputTokens(
+            (existingOutputTokens != null ? existingOutputTokens : 0) +
+                (addOutputTokens != null ? addOutputTokens : 0));
+        winner.setTotalLatencyMs(
+            (existingLatencyMs != null ? existingLatencyMs : 0) + (addLatencyMs != null ? addLatencyMs : 0));
+
+        if (addCost != null) {
+            winner.setTotalCost(existingCost != null ? existingCost.add(addCost) : addCost);
+        }
+
+        if (current.getStatus() == AiObservabilityTraceStatus.ERROR) {
+            winner.setStatus(AiObservabilityTraceStatus.ERROR);
+        }
+    }
+
+    @Nullable
+    private BigDecimal calculateTraceCost(String modelIdentifier, int inputTokens, int outputTokens) {
+        try {
+            ModelResolution modelResolution = resolveModel(modelIdentifier, null);
+
+            return aiGatewayCostCalculator.calculateCost(
+                modelResolution.model(), inputTokens, outputTokens);
+        } catch (Exception exception) {
+            log.error(
+                "Failed to calculate cost for trace — model '{}'; persisting null (unknown) cost. " +
+                    "Cost dashboards and cost-based alert rules MUST exclude null cost rows.",
+                modelIdentifier, exception);
+
+            return null;
+        }
     }
 
     static String validateExternalUrl(String url) {
@@ -1723,5 +2649,13 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     }
 
     private record ModelResolution(AiGatewayProvider provider, AiModel model) {
+    }
+
+    private record EmbeddedRequestSettings(
+        Optional<AiGatewayEmbeddedSettings> embeddedSettings,
+        Optional<AiGatewayConnectedUserSettings> connectedUserSettings) {
+
+        private static final EmbeddedRequestSettings NONE =
+            new EmbeddedRequestSettings(Optional.empty(), Optional.empty());
     }
 }

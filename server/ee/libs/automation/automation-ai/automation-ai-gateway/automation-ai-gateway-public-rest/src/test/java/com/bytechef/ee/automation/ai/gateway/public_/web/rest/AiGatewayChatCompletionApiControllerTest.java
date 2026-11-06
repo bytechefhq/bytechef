@@ -55,8 +55,8 @@ class AiGatewayChatCompletionApiControllerTest {
     void setUp() {
         aiGatewayFacade = mock(AiGatewayFacade.class);
 
-        when(aiGatewayFacade.chatCompletion(any())).thenReturn(chatCompletionResponse());
-        when(aiGatewayFacade.chatCompletionStream(any()))
+        when(aiGatewayFacade.chatCompletion(any(), any())).thenReturn(chatCompletionResponse());
+        when(aiGatewayFacade.chatCompletionStream(any(), any()))
             .thenReturn(Flux.just(chatCompletionResponse()));
 
         mockMvc = MockMvcBuilders.standaloneSetup(new AiGatewayChatCompletionApiController(aiGatewayFacade))
@@ -84,8 +84,8 @@ class AiGatewayChatCompletionApiControllerTest {
         assertTrue(responseBody.contains("data:"), "Expected an SSE data frame but got: " + responseBody);
         assertTrue(responseBody.contains("chatcmpl-1"), "Expected the streamed chunk payload but got: " + responseBody);
 
-        verify(aiGatewayFacade).chatCompletionStream(any());
-        verify(aiGatewayFacade, never()).chatCompletion(any());
+        verify(aiGatewayFacade).chatCompletionStream(any(), any());
+        verify(aiGatewayFacade, never()).chatCompletion(any(), any());
     }
 
     @Test
@@ -101,8 +101,8 @@ class AiGatewayChatCompletionApiControllerTest {
             .andExpect(jsonPath("$.id").value("chatcmpl-1"))
             .andExpect(header().string("x-gateway-provider", "openai"));
 
-        verify(aiGatewayFacade).chatCompletion(any());
-        verify(aiGatewayFacade, never()).chatCompletionStream(any());
+        verify(aiGatewayFacade).chatCompletion(any(), any());
+        verify(aiGatewayFacade, never()).chatCompletionStream(any(), any());
     }
 
     @Test

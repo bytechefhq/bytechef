@@ -22,5 +22,7 @@ public interface AiGatewayRateLimitChecker {
         long workspaceId, @Nullable Long projectId, @Nullable String userId,
         @Nullable Map<String, String> customProperties);
 
+    AiGatewayRateLimitResult checkOtlpIngest(long workspaceId);
+
     AiGatewayRateLimitResult checkWorkspaceRequest(long workspaceId, String endpointTag);
 }

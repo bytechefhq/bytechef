@@ -43,6 +43,9 @@ public class AiGatewayRateLimitCheckerImpl implements AiGatewayRateLimitChecker 
     private static final Logger log = LoggerFactory.getLogger(AiGatewayRateLimitCheckerImpl.class);
 
     private static final String API_KEY_RATE_LIMIT_KEY_PREFIX = "ai_gateway_api_key_rate_limit_";
+    private static final String OTLP_RATE_LIMIT_PROPERTY_KEY = "ai_gateway_otlp_rate_limit";
+    private static final int OTLP_DEFAULT_RPM = 10_000;
+    private static final int OTLP_WINDOW_SECONDS = 60;
 
     private static final String CONTROL_PLANE_RATE_LIMIT_PROPERTY_KEY = "ai_gateway_control_plane_rate_limit";
     private static final int CONTROL_PLANE_DEFAULT_RPM = 600;
@@ -158,6 +161,23 @@ public class AiGatewayRateLimitCheckerImpl implements AiGatewayRateLimitChecker 
                         result.resetAtEpochMs());
                 }
             });
+    }
+
+    @Override
+    public AiGatewayRateLimitResult checkOtlpIngest(long workspaceId) {
+        int rpm = readRpmOverride(OTLP_RATE_LIMIT_PROPERTY_KEY, workspaceId, OTLP_DEFAULT_RPM);
+
+        String key = "ai-gw-rl:otlp:workspace:" + workspaceId;
+
+        AiGatewayRateLimitResult result = aiGatewayRateLimiter.tryAcquire(key, rpm, OTLP_WINDOW_SECONDS);
+
+        if (!result.allowed()) {
+            log.warn("OTLP ingest rate limit exceeded for workspace {}: {} rpm", workspaceId, rpm);
+
+            aiGatewayMetrics.incrementRateLimitRejection("otlp_ingest");
+        }
+
+        return result;
     }
 
     @Override

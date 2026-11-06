@@ -1,7 +1,10 @@
 dependencies {
     api("org.springframework.data:spring-data-commons")
+    api(project(":server:ee:libs:automation:automation-ai:automation-ai-observability:automation-ai-observability-api"))
     api(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-api"))
+    api(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway-otlp:platform-ai-gateway-otlp-api"))
     api(project(":server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-api"))
+    api(project(":server:ee:libs:platform:platform-ai:platform-ai-observability:platform-ai-observability-api"))
     api(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 
     implementation("com.fasterxml.jackson.core:jackson-annotations")

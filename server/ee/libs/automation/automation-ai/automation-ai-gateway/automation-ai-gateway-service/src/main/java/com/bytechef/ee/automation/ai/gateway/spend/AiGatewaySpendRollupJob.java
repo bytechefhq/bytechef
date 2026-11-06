@@ -9,7 +9,9 @@ package com.bytechef.ee.automation.ai.gateway.spend;
 
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewaySpendService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewaySpendSummary;
+import com.bytechef.ee.platform.ai.gateway.service.AiGatewaySpendService;
 import com.bytechef.ee.platform.ai.llm.usage.AiLlmUsage;
+import com.bytechef.ee.platform.ai.llm.usage.LlmUsageSource;
 import com.bytechef.ee.platform.ai.llm.usage.service.AiLlmUsageService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -41,12 +44,16 @@ public class AiGatewaySpendRollupJob {
 
     private static final String UNKNOWN = "unknown";
 
+    private final AiGatewaySpendService aiGatewaySpendService;
     private final AiLlmUsageService aiLlmUsageService;
     private final WorkspaceAiGatewaySpendService workspaceAiGatewaySpendService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiGatewaySpendRollupJob(
-        AiLlmUsageService aiLlmUsageService, WorkspaceAiGatewaySpendService workspaceAiGatewaySpendService) {
+        AiGatewaySpendService aiGatewaySpendService, AiLlmUsageService aiLlmUsageService,
+        WorkspaceAiGatewaySpendService workspaceAiGatewaySpendService) {
+
+        this.aiGatewaySpendService = aiGatewaySpendService;
         this.aiLlmUsageService = aiLlmUsageService;
         this.workspaceAiGatewaySpendService = workspaceAiGatewaySpendService;
     }
@@ -66,6 +73,12 @@ public class AiGatewaySpendRollupJob {
             } catch (RuntimeException exception) {
                 log.warn("Spend rollup failed for workspace {}", workspaceId, exception);
             }
+        }
+
+        try {
+            rollUpConnectedUsersWithoutWorkspace(periodStart, periodEnd);
+        } catch (RuntimeException exception) {
+            log.warn("Spend rollup failed for workspace-less connected-user usage", exception);
         }
     }
 
@@ -98,8 +111,41 @@ public class AiGatewaySpendRollupJob {
         }
     }
 
+    private void rollUpConnectedUsersWithoutWorkspace(Instant periodStart, Instant periodEnd) {
+        boolean alreadyRolledUp = aiGatewaySpendService.getSpendSummariesWithoutWorkspace(periodStart, periodEnd)
+            .stream()
+            .anyMatch(summary -> periodStart.equals(summary.getPeriodStart()));
+
+        if (alreadyRolledUp) {
+            return;
+        }
+
+        List<AiLlmUsage> usages = aiLlmUsageService
+            .getConnectedUserRequestLogsWithoutWorkspace(periodStart, periodEnd)
+            .stream()
+            .filter(usage -> connectedUserIdOf(usage) != null)
+            .toList();
+
+        if (usages.isEmpty()) {
+            return;
+        }
+
+        List<AiGatewaySpendSummary> summaries = toSummaries(usages, periodStart, periodEnd);
+
+        for (AiGatewaySpendSummary summary : summaries) {
+            aiGatewaySpendService.create(summary);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "Rolled up {} workspace-less connected-user usage rows into {} spend summaries ({} - {})",
+                usages.size(), summaries.size(), periodStart, periodEnd);
+        }
+    }
+
     private static List<AiGatewaySpendSummary> toSummaries(
         List<AiLlmUsage> usages, Instant periodStart, Instant periodEnd) {
+
         Map<GroupKey, List<AiLlmUsage>> groups = usages.stream()
             .collect(Collectors.groupingBy(AiGatewaySpendRollupJob::toGroupKey));
 
@@ -114,6 +160,7 @@ public class AiGatewaySpendRollupJob {
             summary.setModel(groupKey.model());
             summary.setApiKeyId(groupKey.apiKeyId());
             summary.setProjectId(groupKey.projectId());
+            summary.setConnectedUserId(groupKey.connectedUserId());
 
             List<AiLlmUsage> groupUsages = group.getValue();
 
@@ -148,9 +195,15 @@ public class AiGatewaySpendRollupJob {
         return new GroupKey(
             usage.getRoutedProvider() != null ? usage.getRoutedProvider() : UNKNOWN,
             model != null ? model : UNKNOWN,
-            usage.getApiKeyId(), usage.getProjectId());
+            usage.getApiKeyId(), usage.getProjectId(), connectedUserIdOf(usage));
     }
 
-    private record GroupKey(String provider, String model, Long apiKeyId, Long projectId) {
+    private static @Nullable Long connectedUserIdOf(AiLlmUsage usage) {
+        LlmUsageSource source = usage.getSource();
+
+        return source == null || source == LlmUsageSource.AI_GATEWAY ? usage.getUserId() : null;
+    }
+
+    private record GroupKey(String provider, String model, Long apiKeyId, Long projectId, Long connectedUserId) {
     }
 }

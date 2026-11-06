@@ -13,6 +13,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.ai.workspace.JobPrincipalWorkspaceResolver;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.file.storage.base64.config.Base64FileStorageConfiguration;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.ai.sensitivedata.SensitiveDataRedactor;
@@ -41,21 +42,30 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @ComponentScan(
     basePackages = {
         "com.bytechef.ee.automation.ai.gateway.service",
+        "com.bytechef.ee.automation.ai.gateway.cleanup",
         "com.bytechef.ee.automation.ai.gateway.budget",
         "com.bytechef.ee.automation.ai.gateway.ratelimit",
+        "com.bytechef.ee.automation.ai.gateway.routing",
+        "com.bytechef.ee.automation.ai.gateway.cost",
         "com.bytechef.ee.automation.ai.gateway.facade",
         "com.bytechef.ee.automation.ai.gateway.guardrail",
         "com.bytechef.ee.platform.ai.guardrails",
+        "com.bytechef.ee.automation.ai.observability",
         "com.bytechef.ee.platform.ai.gateway",
         "com.bytechef.ee.platform.ai.model.catalog",
         "com.bytechef.ee.platform.ai.llm.usage",
-        "com.bytechef.encryption"
+        "com.bytechef.ee.platform.ai.observability",
+        "com.bytechef.ee.embedded.connected.user.service",
+        "com.bytechef.ee.embedded.connected.user.event",
+        "com.bytechef.ee.embedded.connected.user.gateway.facade",
+        "com.bytechef.encryption",
+        "com.bytechef.file.storage"
     })
 @EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
-    JacksonConfiguration.class, LiquibaseConfiguration.class
+    Base64FileStorageConfiguration.class, JacksonConfiguration.class, LiquibaseConfiguration.class
 })
 @Configuration
 public class AiGatewayIntTestConfiguration {

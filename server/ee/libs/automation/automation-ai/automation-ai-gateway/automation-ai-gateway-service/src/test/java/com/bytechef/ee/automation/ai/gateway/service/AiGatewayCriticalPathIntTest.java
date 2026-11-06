@@ -12,6 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.ee.automation.ai.gateway.budget.AiGatewayBudgetChecker;
 import com.bytechef.ee.automation.ai.gateway.config.AiGatewayIntTestConfiguration;
 import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilitySessionService;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayBudget;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayBudgetEnforcementMode;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayBudgetPeriod;
@@ -21,6 +23,12 @@ import com.bytechef.ee.platform.ai.gateway.service.AiGatewayBudgetService;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayRateLimitService;
 import com.bytechef.ee.platform.ai.llm.usage.AiLlmUsage;
 import com.bytechef.ee.platform.ai.llm.usage.service.AiLlmUsageService;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpan;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpanType;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceSource;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySpanService;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.math.BigDecimal;
 import java.util.List;
@@ -48,7 +56,19 @@ public class AiGatewayCriticalPathIntTest {
     private static final Long WORKSPACE_B = 2L;
 
     @Autowired
+    private WorkspaceAiObservabilitySessionService workspaceAiObservabilitySessionService;
+
+    @Autowired
+    private WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
+
+    @Autowired
     private AiLlmUsageService aiGatewayRequestLogService;
+
+    @Autowired
+    private AiObservabilityTraceService aiObservabilityTraceService;
+
+    @Autowired
+    private AiObservabilitySpanService aiObservabilitySpanService;
 
     @Autowired
     private AiGatewayRateLimitService aiGatewayRateLimitService;
@@ -72,7 +92,7 @@ public class AiGatewayCriticalPathIntTest {
     private com.bytechef.ee.platform.ai.gateway.ratelimit.AiGatewayRateLimiter aiGatewayRateLimiter;
 
     @Test
-    public void testCriticalPathEndToEndSuccessfulRequestPersistsLog() {
+    public void testCriticalPathEndToEndSuccessfulRequestPersistsLogAndTrace() {
         aiGatewayRateLimitChecker.checkRateLimits(WORKSPACE_A, null, "user-1", Map.of());
 
         AiGatewayBudgetChecker.BudgetCheckResult budgetResult = aiGatewayBudgetChecker.checkBudget(WORKSPACE_A);
@@ -93,6 +113,27 @@ public class AiGatewayCriticalPathIntTest {
 
         aiGatewayRequestLogService.create(log, WORKSPACE_A);
 
+        AiObservabilityTrace trace = new AiObservabilityTrace(AiObservabilityTraceSource.API);
+
+        trace.setTotalInputTokens(100);
+        trace.setTotalOutputTokens(50);
+        trace.setTotalLatencyMs(250);
+        trace.setTotalCost(new BigDecimal("0.0125"));
+
+        workspaceAiObservabilityTraceService.createInWorkspace(trace, WORKSPACE_A);
+
+        AiObservabilitySpan span = new AiObservabilitySpan(trace.getId(), AiObservabilitySpanType.GENERATION);
+
+        span.setName("gpt-4o");
+        span.setModel("gpt-4o");
+        span.setProvider("OPENAI");
+        span.setInputTokens(100);
+        span.setOutputTokens(50);
+        span.setLatencyMs(250);
+        span.setCost(new BigDecimal("0.0125"));
+
+        aiObservabilitySpanService.create(span);
+
         List<AiLlmUsage> logs = aiGatewayRequestLogService.getRequestLogsByWorkspace(
             WORKSPACE_A, java.time.Instant.now()
                 .minusSeconds(60),
@@ -103,6 +144,17 @@ public class AiGatewayCriticalPathIntTest {
             .as("the request log must be readable by its workspace")
             .extracting(AiLlmUsage::getId)
             .contains(log.getId());
+
+        List<AiObservabilitySpan> spans = aiObservabilitySpanService.getSpansByTrace(trace.getId());
+
+        assertThat(spans)
+            .as("trace→span relation must survive the persistence round-trip")
+            .hasSize(1)
+            .first()
+            .satisfies(retrievedSpan -> {
+                assertThat(retrievedSpan.getModel()).isEqualTo("gpt-4o");
+                assertThat(retrievedSpan.getTraceId()).isEqualTo(trace.getId());
+            });
     }
 
     @Test

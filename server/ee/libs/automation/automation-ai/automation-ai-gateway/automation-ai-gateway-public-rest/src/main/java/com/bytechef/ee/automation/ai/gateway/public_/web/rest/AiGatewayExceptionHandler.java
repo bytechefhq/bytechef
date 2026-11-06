@@ -7,9 +7,11 @@
 
 package com.bytechef.ee.automation.ai.gateway.public_.web.rest;
 
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderScopeViolationException;
 import com.bytechef.ee.platform.ai.gateway.domain.BudgetExceededException;
 import com.bytechef.ee.platform.ai.gateway.domain.RateLimitExceededException;
 import com.bytechef.ee.platform.ai.gateway.exception.AiGatewayGuardrailException;
+import com.bytechef.ee.platform.ai.gateway.exception.AiScoreWorkspaceBoundaryException;
 import com.bytechef.ee.platform.ai.gateway.exception.BadRequestException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -115,6 +117,14 @@ public class AiGatewayExceptionHandler {
             .body(Map.of("error", errorFields));
     }
 
+    @ExceptionHandler(AiScoreWorkspaceBoundaryException.class)
+    ResponseEntity<Map<String, Object>> handleWorkspaceBoundary(AiScoreWorkspaceBoundaryException exception) {
+        log.error("Cross-workspace request rejected: {}", exception.getMessage(), exception);
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(toErrorBody("workspace_boundary", exception.getMessage()));
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<Map<String, Object>> handleMalformedRequest(HttpMessageNotReadableException exception) {
         log.debug("Malformed request body", exception);
@@ -180,6 +190,18 @@ public class AiGatewayExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
             .body(toErrorBody("service_unavailable", "Service temporarily unavailable"));
+    }
+
+    @ExceptionHandler(AiGatewayProviderScopeViolationException.class)
+    ResponseEntity<Map<String, Object>>
+        handleProviderScopeViolation(AiGatewayProviderScopeViolationException exception) {
+
+        log.error("Provider scope violation: providerId={} connectedUserId={} providerConnectedUserId={}",
+            exception.getProviderId(), exception.getConnectedUserId(), exception.getProviderConnectedUserId(),
+            exception);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(toErrorBody("internal_error", "An internal error occurred"));
     }
 
     @ExceptionHandler(UnsupportedOperationException.class)

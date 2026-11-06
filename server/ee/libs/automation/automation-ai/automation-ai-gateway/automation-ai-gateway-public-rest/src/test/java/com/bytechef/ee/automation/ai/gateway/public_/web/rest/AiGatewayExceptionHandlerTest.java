@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.ai.gateway.public_.web.rest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderScopeViolationException;
 import com.bytechef.ee.platform.ai.gateway.domain.BudgetExceededException;
 import com.bytechef.ee.platform.ai.gateway.exception.BadRequestException;
 import com.bytechef.ee.platform.ai.gateway.exception.SafeMessage;
@@ -97,6 +98,16 @@ class AiGatewayExceptionHandlerTest {
 
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
         assertErrorBody(response.getBody(), "service_unavailable", "Service temporarily unavailable");
+    }
+
+    @Test
+    void testProviderScopeViolationExceptionReturnsInternalServerError() {
+        ResponseEntity<Map<String, Object>> response = exceptionHandler.handleProviderScopeViolation(
+            new AiGatewayProviderScopeViolationException(
+                "Provider 3 is scoped to a different connected user", 3L, 5L, 99L));
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertErrorBody(response.getBody(), "internal_error", "An internal error occurred");
     }
 
     @Test

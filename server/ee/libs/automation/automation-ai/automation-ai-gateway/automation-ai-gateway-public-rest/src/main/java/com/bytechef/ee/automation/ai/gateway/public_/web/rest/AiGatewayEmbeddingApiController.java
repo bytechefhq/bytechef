@@ -15,8 +15,14 @@ import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.EmbeddingUsa
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingResponse;
+import com.bytechef.ee.platform.ai.observability.facade.AiObservabilityTracingHeaders;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +30,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * @version ee
@@ -55,7 +63,9 @@ class AiGatewayEmbeddingApiController implements EmbeddingApi {
         AiGatewayEmbeddingRequest request = new AiGatewayEmbeddingRequest(
             embeddingRequestModel.getModel(), embeddingRequestModel.getInput(), tags);
 
-        AiGatewayEmbeddingResponse domainResponse = aiGatewayFacade.embedding(request);
+        AiObservabilityTracingHeaders tracingHeaders = resolveTracingHeaders();
+
+        AiGatewayEmbeddingResponse domainResponse = aiGatewayFacade.embedding(request, tracingHeaders);
 
         ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
 
@@ -66,6 +76,7 @@ class AiGatewayEmbeddingApiController implements EmbeddingApi {
 
     private static void applyGatewayMetadataHeaders(
         ResponseEntity.BodyBuilder builder, AiGatewayChatCompletionResponse.GatewayMetadata metadata) {
+
         if (metadata == null) {
             return;
         }
@@ -100,6 +111,58 @@ class AiGatewayEmbeddingApiController implements EmbeddingApi {
                 metadata.budgetWarningRemainingUsd()
                     .toPlainString());
         }
+    }
+
+    private AiObservabilityTracingHeaders resolveTracingHeaders() {
+        ServletRequestAttributes requestAttributes =
+            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        if (requestAttributes == null) {
+            return new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of());
+        }
+
+        return extractTracingHeaders(requestAttributes.getRequest());
+    }
+
+    private AiObservabilityTracingHeaders extractTracingHeaders(HttpServletRequest httpServletRequest) {
+        String traceId = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_TRACE_ID);
+        String sessionId = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_SESSION_ID);
+        String spanName = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_SPAN_NAME);
+        String parentSpanId = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_PARENT_SPAN_ID);
+        String userId = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_USER_ID);
+
+        Map<String, String> metadata = new HashMap<>();
+
+        Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
+
+        if (headerNames != null) {
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+
+                if (headerName.toLowerCase()
+                    .startsWith(AiObservabilityTracingHeaders.HEADER_METADATA_PREFIX.toLowerCase())) {
+
+                    String metadataKey = headerName.substring(
+                        AiObservabilityTracingHeaders.HEADER_METADATA_PREFIX.length());
+
+                    metadata.put(metadataKey, httpServletRequest.getHeader(headerName));
+                }
+            }
+        }
+
+        List<String> tagNames = new ArrayList<>();
+
+        String tagsHeader = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_TAGS);
+
+        if (tagsHeader != null && !tagsHeader.isBlank()) {
+            tagNames = Arrays.stream(tagsHeader.split(","))
+                .map(String::trim)
+                .filter(tagName -> !tagName.isEmpty())
+                .toList();
+        }
+
+        return new AiObservabilityTracingHeaders(
+            traceId, sessionId, spanName, parentSpanId, userId, metadata, tagNames);
     }
 
     private EmbeddingResponseModel toResponseModel(AiGatewayEmbeddingResponse domainResponse) {

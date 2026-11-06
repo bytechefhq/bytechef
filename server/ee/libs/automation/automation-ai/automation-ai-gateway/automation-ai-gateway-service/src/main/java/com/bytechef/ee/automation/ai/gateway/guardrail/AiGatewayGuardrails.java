@@ -18,12 +18,14 @@ import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.ai.guardrails.StreamingResponseRedactor;
 import com.bytechef.ee.platform.ai.guardrails.classifier.AiGuardrailInjectionClassifier;
 import com.bytechef.ee.platform.ai.guardrails.classifier.AiGuardrailModerationClassifier;
+import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsSettingsScope;
 import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsSettingsTarget;
 import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsWorkspaceSettings;
 import com.bytechef.ee.platform.ai.guardrails.exception.AiGuardrailRejectionException;
 import com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService;
 import com.bytechef.platform.ai.sensitivedata.tokenization.PiiTokenSession;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -94,7 +96,15 @@ public class AiGatewayGuardrails {
     public AiGatewayChatCompletionRequest apply(
         AiGatewayChatCompletionRequest request, @Nullable Long workspaceId, @Nullable Long projectId,
         @Nullable PiiTokenSession session) {
-        AiGuardrailsSettingsTarget target = resolveTarget(workspaceId);
+
+        return apply(request, null, workspaceId, projectId, session);
+    }
+
+    public AiGatewayChatCompletionRequest apply(
+        AiGatewayChatCompletionRequest request, @Nullable PlatformType platformType, @Nullable Long workspaceId,
+        @Nullable Long projectId, @Nullable PiiTokenSession session) {
+
+        AiGuardrailsSettingsTarget target = AiGuardrailsSettingsTarget.resolve(platformType, workspaceId);
         AiGatewayProjectSettings projectSettings = findProjectSettings(projectId);
         boolean moderate = moderationClassifier != null && resolveModerationEnabled(target, projectSettings);
 
@@ -161,7 +171,7 @@ public class AiGatewayGuardrails {
             return inputs;
         }
 
-        AiGuardrailsSettingsTarget target = resolveTarget(workspaceId);
+        AiGuardrailsSettingsTarget target = AiGuardrailsSettingsTarget.resolve(null, workspaceId);
         List<String> engineProcessed = applyEngine(inputs, target, null);
         AiGatewayProjectSettings projectSettings = findProjectSettings(projectId);
 
@@ -203,6 +213,14 @@ public class AiGatewayGuardrails {
 
     public AiGatewayChatCompletionResponse scanResponse(
         AiGatewayChatCompletionResponse response, @Nullable Long workspaceId, @Nullable Long projectId) {
+
+        return scanResponse(response, null, workspaceId, projectId);
+    }
+
+    public AiGatewayChatCompletionResponse scanResponse(
+        AiGatewayChatCompletionResponse response, @Nullable PlatformType platformType, @Nullable Long workspaceId,
+        @Nullable Long projectId) {
+
         if (response == null || response.choices() == null || response.choices()
             .isEmpty()) {
             return response;
@@ -210,7 +228,7 @@ public class AiGatewayGuardrails {
 
         AiGatewayProjectSettings projectSettings = findProjectSettings(projectId);
         boolean projectScanResponses = projectSettings != null && Boolean.TRUE.equals(projectSettings.scanResponses());
-        AiGuardrailsSettingsTarget target = resolveTarget(workspaceId);
+        AiGuardrailsSettingsTarget target = AiGuardrailsSettingsTarget.resolve(platformType, workspaceId);
         double projectOverlayMinConfidence = projectScanResponses ? aiGuardrails.resolveMinConfidence(target) : 0;
 
         List<AiGatewayChatCompletionResponse.Choice> choices = response.choices();
@@ -329,7 +347,14 @@ public class AiGatewayGuardrails {
 
     public @Nullable StreamingResponseRedactor newStreamingResponseRedactor(
         @Nullable Long workspaceId, @Nullable Long projectId) {
-        AiGuardrailsSettingsTarget target = resolveTarget(workspaceId);
+
+        return newStreamingResponseRedactor(null, workspaceId, projectId);
+    }
+
+    public @Nullable StreamingResponseRedactor newStreamingResponseRedactor(
+        @Nullable PlatformType platformType, @Nullable Long workspaceId, @Nullable Long projectId) {
+
+        AiGuardrailsSettingsTarget target = AiGuardrailsSettingsTarget.resolve(platformType, workspaceId);
         StreamingResponseRedactor redactor = aiGuardrails.newStreamingResponseRedactor(target, metrics);
 
         if (redactor != null) {
@@ -435,7 +460,9 @@ public class AiGatewayGuardrails {
     private @Nullable AiGuardrailsWorkspaceSettings fetchSettings(AiGuardrailsSettingsTarget target) {
         try {
             Optional<AiGuardrailsWorkspaceSettings> settingsOptional =
-                aiGuardrailsWorkspaceSettingsService.fetchSettings(target.workspaceId());
+                target.scope() == AiGuardrailsSettingsScope.EMBEDDED
+                    ? aiGuardrailsWorkspaceSettingsService.fetchEmbeddedSettings()
+                    : aiGuardrailsWorkspaceSettingsService.fetchSettings(target.workspaceId());
 
             return settingsOptional.orElse(null);
         } catch (Exception exception) {
@@ -487,10 +514,5 @@ public class AiGatewayGuardrails {
         }
 
         return terms;
-    }
-
-    private static AiGuardrailsSettingsTarget resolveTarget(@Nullable Long workspaceId) {
-        return workspaceId == null
-            ? AiGuardrailsSettingsTarget.platform() : AiGuardrailsSettingsTarget.workspace(workspaceId);
     }
 }

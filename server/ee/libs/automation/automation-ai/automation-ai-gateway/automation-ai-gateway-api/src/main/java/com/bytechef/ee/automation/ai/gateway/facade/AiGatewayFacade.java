@@ -11,6 +11,9 @@ import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingResponse;
+import com.bytechef.ee.platform.ai.observability.facade.AiObservabilityTracingHeaders;
+import java.util.concurrent.atomic.AtomicLong;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 
 /**
@@ -20,9 +23,24 @@ import reactor.core.publisher.Flux;
  */
 public interface AiGatewayFacade {
 
-    AiGatewayChatCompletionResponse chatCompletion(AiGatewayChatCompletionRequest request);
+    AiGatewayChatCompletionResponse chatCompletion(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders);
 
-    Flux<AiGatewayChatCompletionResponse> chatCompletionStream(AiGatewayChatCompletionRequest request);
+    AiGatewayChatCompletionResponse chatCompletion(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable Long connectedUserId);
 
-    AiGatewayEmbeddingResponse embedding(AiGatewayEmbeddingRequest request);
+    Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders);
+
+    Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable AtomicLong traceIdHolder);
+
+    Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable Long connectedUserId, @Nullable AtomicLong traceIdHolder);
+
+    AiGatewayEmbeddingResponse embedding(
+        AiGatewayEmbeddingRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders);
 }

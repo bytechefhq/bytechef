@@ -25,8 +25,14 @@ import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlock;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlockType;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayTool;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayToolChoice;
+import com.bytechef.ee.platform.ai.observability.facade.AiObservabilityTracingHeaders;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,6 +44,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import reactor.core.publisher.Flux;
 
 /**
@@ -64,6 +72,7 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ChatCompletionResponseModel> chatCompletions(
         ChatCompletionRequestModel chatCompletionRequestModel) {
+
         AiGatewayChatCompletionRequest request = toDomainRequest(chatCompletionRequestModel);
 
         if (Boolean.TRUE.equals(chatCompletionRequestModel.getStream())) {
@@ -71,7 +80,10 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
                 "Streaming requests must use Accept: text/event-stream header");
         }
 
-        AiGatewayChatCompletionResponse domainResponse = aiGatewayFacade.chatCompletion(request);
+        AiObservabilityTracingHeaders tracingHeaders = resolveTracingHeaders();
+
+        AiGatewayChatCompletionResponse domainResponse =
+            aiGatewayFacade.chatCompletion(request, tracingHeaders);
 
         ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
 
@@ -82,6 +94,7 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
 
     private static void applyGatewayMetadataHeaders(
         ResponseEntity.BodyBuilder builder, AiGatewayChatCompletionResponse domainResponse) {
+
         AiGatewayChatCompletionResponse.GatewayMetadata metadata = domainResponse.gatewayMetadata();
 
         if (metadata == null) {
@@ -123,10 +136,13 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
     @PostMapping(value = PATH_CHAT_COMPLETIONS, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     Flux<ServerSentEvent<Object>> chatCompletionsStream(
         @RequestBody ChatCompletionRequestModel chatCompletionRequestModel) {
+
         return Flux.defer(() -> {
             AiGatewayChatCompletionRequest request = toDomainRequest(chatCompletionRequestModel);
 
-            return aiGatewayFacade.chatCompletionStream(request)
+            AiObservabilityTracingHeaders tracingHeaders = resolveTracingHeaders();
+
+            return aiGatewayFacade.chatCompletionStream(request, tracingHeaders)
                 .<ServerSentEvent<Object>>map(domainResponse -> ServerSentEvent.<Object>builder()
                     .data(toResponseModel(domainResponse))
                     .build());
@@ -151,14 +167,68 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
     public record StreamErrorChunkModel(String type, String message) {
     }
 
+    private AiObservabilityTracingHeaders resolveTracingHeaders() {
+        ServletRequestAttributes requestAttributes =
+            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        if (requestAttributes == null) {
+            return new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of());
+        }
+
+        return extractTracingHeaders(requestAttributes.getRequest());
+    }
+
+    private AiObservabilityTracingHeaders extractTracingHeaders(HttpServletRequest httpServletRequest) {
+        String traceId = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_TRACE_ID);
+        String sessionId = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_SESSION_ID);
+        String spanName = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_SPAN_NAME);
+        String parentSpanId = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_PARENT_SPAN_ID);
+        String userId = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_USER_ID);
+
+        Map<String, String> metadata = new HashMap<>();
+
+        Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
+
+        if (headerNames != null) {
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+
+                if (headerName.toLowerCase()
+                    .startsWith(AiObservabilityTracingHeaders.HEADER_METADATA_PREFIX.toLowerCase())) {
+
+                    String metadataKey = headerName.substring(
+                        AiObservabilityTracingHeaders.HEADER_METADATA_PREFIX.length());
+
+                    metadata.put(metadataKey, httpServletRequest.getHeader(headerName));
+                }
+            }
+        }
+
+        List<String> tagNames = new ArrayList<>();
+
+        String tagsHeader = httpServletRequest.getHeader(AiObservabilityTracingHeaders.HEADER_TAGS);
+
+        if (tagsHeader != null && !tagsHeader.isBlank()) {
+            tagNames = Arrays.stream(tagsHeader.split(","))
+                .map(String::trim)
+                .filter(tagName -> !tagName.isEmpty())
+                .toList();
+        }
+
+        return new AiObservabilityTracingHeaders(
+            traceId, sessionId, spanName, parentSpanId, userId, metadata, tagNames);
+    }
+
     private AiGatewayChatCompletionRequest toDomainRequest(ChatCompletionRequestModel model) {
         if (model.getModel() == null || model.getModel()
             .isBlank()) {
+
             throw new IllegalArgumentException("'model' field is required");
         }
 
         if (model.getMessages() == null || model.getMessages()
             .isEmpty()) {
+
             throw new IllegalArgumentException("'messages' field is required and must not be empty");
         }
 
