@@ -1,5 +1,4 @@
 import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
-import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {render, screen} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 
