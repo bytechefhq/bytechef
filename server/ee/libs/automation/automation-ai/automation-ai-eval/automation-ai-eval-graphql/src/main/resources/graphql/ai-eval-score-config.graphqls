@@ -1,0 +1,42 @@
+extend type Query {
+    aiEvalScoreConfig(id: ID!): AiEvalScoreConfig
+    aiEvalScoreConfigs(workspaceId: ID!): [AiEvalScoreConfig]
+}
+
+extend type Mutation {
+    createAiEvalScoreConfig(
+        categories: String,
+        dataType: AiEvalScoreDataType,
+        description: String,
+        maxValue: Float,
+        minValue: Float,
+        name: String!,
+        workspaceId: ID!
+    ): AiEvalScoreConfig
+
+    deleteAiEvalScoreConfig(id: ID!): Boolean
+
+    updateAiEvalScoreConfig(
+        categories: String,
+        dataType: AiEvalScoreDataType,
+        description: String,
+        id: ID!,
+        maxValue: Float,
+        minValue: Float,
+        name: String!
+    ): AiEvalScoreConfig
+}
+
+type AiEvalScoreConfig {
+    categories: String
+    createdDate: Long
+    dataType: AiEvalScoreDataType
+    description: String
+    id: ID!
+    lastModifiedDate: Long
+    maxValue: Float
+    minValue: Float
+    name: String!
+    version: Int
+    workspaceId: ID!
+}
