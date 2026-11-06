@@ -3,21 +3,6 @@ import type {CodegenConfig} from '@graphql-codegen/cli';
 const config: CodegenConfig = {
     documents: ['src/graphql/**/*.graphql'],
     generates: {
-        // Schema types (objects, inputs, enums, scalars) live in their own file. Since
-        // @graphql-codegen/typescript-operations v6 re-emits every input/enum it references,
-        // combining it with the `typescript` plugin in a single file produces duplicate
-        // declarations. The split lets operations import the base types via
-        // `importSchemaTypesFrom` instead of re-declaring them.
-        'src/shared/middleware/graphql-types.ts': {
-            config: {
-                scalars: {
-                    Any: 'any',
-                    Long: 'any',
-                    Map: 'any',
-                },
-            },
-            plugins: ['typescript'],
-        },
         // Operation types + React Query hooks. Re-exports the schema types so existing
         // imports from `graphql.ts` keep resolving.
         'src/shared/middleware/graphql.ts': {
@@ -55,6 +40,21 @@ const config: CodegenConfig = {
                 'typescript-operations',
                 'typescript-react-query',
             ],
+        },
+        // Schema types (objects, inputs, enums, scalars) live in their own file. Since
+        // @graphql-codegen/typescript-operations v6 re-emits every input/enum it references,
+        // combining it with the `typescript` plugin in a single file produces duplicate
+        // declarations. The split lets operations import the base types via
+        // `importSchemaTypesFrom` instead of re-declaring them.
+        'src/shared/middleware/graphql-types.ts': {
+            config: {
+                scalars: {
+                    Any: 'any',
+                    Long: 'any',
+                    Map: 'any',
+                },
+            },
+            plugins: ['typescript'],
         },
     },
     hooks: {
