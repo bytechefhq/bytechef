@@ -93,6 +93,8 @@ const config: CodegenConfig = {
         '../server/ee/libs/platform/platform-ai/platform-ai-guardrails/platform-ai-guardrails-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/platform/platform-ai/platform-ai-skill/platform-ai-skill-graphql/src/main/resources/graphql/**/*.graphqls',
         '../server/ee/libs/platform/platform-audit/platform-audit-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/ee/libs/automation/automation-workflow-execution-cost/automation-workflow-execution-cost-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/ee/libs/automation/automation-workflow-alert/automation-workflow-alert-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/platform/platform-notification/platform-notification-workspace/src/main/resources/graphql/*.graphqls',
     ],
 };

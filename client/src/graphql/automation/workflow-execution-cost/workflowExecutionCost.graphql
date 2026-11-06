@@ -1,0 +1,10 @@
+query workflowExecutionCost($jobId: ID!) {
+    workflowExecutionCost(jobId: $jobId) {
+        aiCost
+        baseRunCharge
+        currency
+        id
+        jobId
+        totalCost
+    }
+}
