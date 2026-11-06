@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20261106000001-1" author="Ivica Cardic">
+        <renameTable oldTableName="tool_invocation_log" newTableName="external_invocation_log"/>
+
+        <sql dbms="postgresql">
+            ALTER TABLE external_invocation_log RENAME CONSTRAINT tool_invocation_log_pkey TO external_invocation_log_pkey;
+            ALTER SEQUENCE tool_invocation_log_id_seq RENAME TO external_invocation_log_id_seq;
+            ALTER INDEX idx_tool_invocation_log_type_created RENAME TO idx_external_invocation_log_type_created;
+            ALTER INDEX idx_tool_invocation_log_mcp_server_created RENAME TO idx_external_invocation_log_mcp_server_created;
+            ALTER INDEX idx_tool_invocation_log_connected_user_created RENAME TO idx_external_invocation_log_connected_user_created;
+            ALTER INDEX idx_tool_invocation_log_workspace_environment_created RENAME TO idx_external_invocation_log_workspace_environment_created;
+            ALTER INDEX idx_tool_invocation_log_a2a_server_created RENAME TO idx_external_invocation_log_a2a_server_created;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
