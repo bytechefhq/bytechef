@@ -1,5 +1,12 @@
 import Badge, {type BadgeStyleType} from '@/components/Badge/Badge';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
+import {
+    EXECUTIONS_TABLE_CELL_CLASS_NAME,
+    EXECUTIONS_TABLE_HEADER_CLASS_NAME,
+    EXECUTIONS_TABLE_HEAD_CLASS_NAME,
+    EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME,
+} from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
 import {ExternalInvocationLogsQuery} from '@/shared/middleware/graphql';
 
 type ExternalInvocationLogItemType = ExternalInvocationLogsQuery['externalInvocationLogs']['content'][number];
@@ -60,7 +67,7 @@ const formatCreatedDate = (createdDate: unknown): string => {
         return '';
     }
 
-    return new Date(Number(createdDate)).toLocaleString();
+    return formatDateTime(new Date(Number(createdDate)));
 };
 
 const ExternalInvocationsTable = ({
@@ -70,51 +77,64 @@ const ExternalInvocationsTable = ({
     showSurface = true,
 }: ExternalInvocationsTableProps) => (
     <Table>
-        <TableHeader>
+        <TableHeader className={EXECUTIONS_TABLE_HEADER_CLASS_NAME}>
             <TableRow>
-                <TableHead>Status</TableHead>
+                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Status</TableHead>
 
-                <TableHead>Tool</TableHead>
+                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Tool</TableHead>
 
-                {showSurface && <TableHead>Surface</TableHead>}
+                {showSurface && <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Surface</TableHead>}
 
-                <TableHead>Server</TableHead>
+                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Server</TableHead>
 
-                <TableHead>Source</TableHead>
+                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Source</TableHead>
 
-                <TableHead>Duration</TableHead>
+                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Duration</TableHead>
 
-                <TableHead>Date</TableHead>
+                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Date</TableHead>
             </TableRow>
         </TableHeader>
 
         <TableBody>
             {externalInvocationLogs.map((externalInvocationLog) => (
-                <TableRow key={externalInvocationLog.id}>
-                    <TableCell>
+                <TableRow
+                    className={`border-0 ${EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME}`}
+                    key={externalInvocationLog.id}
+                >
+                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
                         <Badge
-                            className="border-transparent"
+                            className="border-transparent uppercase"
                             label={externalInvocationLog.outcome}
                             styleType={OUTCOME_STYLE_TYPES[externalInvocationLog.outcome] || 'secondary-filled'}
                             weight="semibold"
                         />
                     </TableCell>
 
-                    <TableCell className="font-semibold">{externalInvocationLog.toolName || '—'}</TableCell>
+                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                        {externalInvocationLog.toolName || '—'}
+                    </TableCell>
 
                     {showSurface && (
-                        <TableCell>
+                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
                             {SURFACE_LABELS[externalInvocationLog.surface] || externalInvocationLog.surface}
                         </TableCell>
                     )}
 
-                    <TableCell>{serverLabel(externalInvocationLog, mcpServerNames, a2aServerNames)}</TableCell>
+                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                        {serverLabel(externalInvocationLog, mcpServerNames, a2aServerNames)}
+                    </TableCell>
 
-                    <TableCell>{sourceLabel(externalInvocationLog)}</TableCell>
+                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                        {sourceLabel(externalInvocationLog)}
+                    </TableCell>
 
-                    <TableCell>{externalInvocationLog.durationMs} ms</TableCell>
+                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                        {externalInvocationLog.durationMs}ms
+                    </TableCell>
 
-                    <TableCell>{formatCreatedDate(externalInvocationLog.createdDate)}</TableCell>
+                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                        {formatCreatedDate(externalInvocationLog.createdDate)}
+                    </TableCell>
                 </TableRow>
             ))}
         </TableBody>
