@@ -71,4 +71,5 @@
 
     <!-- scheduler lock -->
     <includeAll path="classpath:config/liquibase/changelog/scheduler/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler or configuration" />
+    <includeAll path="classpath:config/liquibase/changelog/db-scheduler/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler" />
 </databaseChangeLog>
