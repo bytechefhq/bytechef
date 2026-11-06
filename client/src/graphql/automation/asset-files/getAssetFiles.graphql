@@ -1,0 +1,30 @@
+query GetAssetFiles($workspaceId: ID!, $environment: Int, $tagIds: [ID!], $mimeTypePrefix: String) {
+    assetFiles(
+        workspaceId: $workspaceId
+        environment: $environment
+        tagIds: $tagIds
+        mimeTypePrefix: $mimeTypePrefix
+    ) {
+        createdBy
+        createdDate
+        description
+        downloadUrl
+        environmentId
+        format
+        generatedByAgentSource
+        generatedFromPrompt
+        id
+        lastModifiedBy
+        lastModifiedDate
+        metadataJson
+        mimeType
+        name
+        publicLinkUrl
+        sizeBytes
+        source
+        tags {
+            id
+            name
+        }
+    }
+}
