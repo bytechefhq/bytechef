@@ -17,6 +17,7 @@
 package com.bytechef.platform.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -27,8 +28,12 @@ import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.user.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.dto.AdminUserDTO;
+import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
+import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +47,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -63,6 +70,10 @@ class UserServiceIntTest {
     private static final String DEFAULT_IMAGEURL = "http://placehold.it/50x50";
     private static final String DEFAULT_LANGKEY = "dummy";
     private static final String NEW_PASSWORD = "new-password";
+    private static final String REGISTRATION_EMAIL = "johndoe@example.com";
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -84,6 +95,11 @@ class UserServiceIntTest {
     @BeforeEach
     public void init() {
         persistentTokenRepository.deleteAll();
+
+        for (String cacheName : cacheManager.getCacheNames()) {
+            Objects.requireNonNull(cacheManager.getCache(cacheName))
+                .clear();
+        }
 
         user = new User();
 
@@ -446,6 +462,213 @@ class UserServiceIntTest {
             .orElseThrow();
 
         assertThat(passwordEncoder.matches(NEW_PASSWORD, resetUser.getPassword())).isTrue();
+    }
+
+    @Test
+    @Transactional
+    void testRegisterUserKeepsADeactivatedUserWithTheSameLogin() {
+        long userId = saveDeactivatedUser();
+
+        AdminUserDTO adminUserDTO = createRegistration(DEFAULT_LOGIN, "other@example.com");
+
+        assertThatThrownBy(() -> userService.registerUser(adminUserDTO, NEW_PASSWORD))
+            .isInstanceOf(LoginAlreadyUsedException.class);
+
+        assertThat(userRepository.findById(userId)).isPresent();
+        assertThat(findAllUsers()).extracting(User::getEmail)
+            .doesNotContain("other@example.com");
+    }
+
+    @Test
+    @Transactional
+    void testRegisterUserKeepsADeactivatedUserWithTheSameEmail() {
+        long userId = saveDeactivatedUser();
+
+        AdminUserDTO adminUserDTO = createRegistration("other-login", REGISTRATION_EMAIL);
+
+        assertThatThrownBy(() -> userService.registerUser(adminUserDTO, NEW_PASSWORD))
+            .isInstanceOf(EmailAlreadyUsedException.class);
+
+        assertThat(userRepository.findById(userId)).isPresent();
+        assertThat(findAllUsers()).extracting(User::getLogin)
+            .doesNotContain("other-login");
+    }
+
+    @Test
+    @Transactional
+    void testRegisterUserKeepsAPendingInvitation() {
+        user.setEmail(REGISTRATION_EMAIL);
+
+        long inviteeId = saveInvitee(Instant.now()
+            .minus(1, ChronoUnit.HOURS), true);
+
+        AdminUserDTO adminUserDTO = createRegistration("other-login", REGISTRATION_EMAIL);
+
+        assertThatThrownBy(() -> userService.registerUser(adminUserDTO, NEW_PASSWORD))
+            .isInstanceOf(EmailAlreadyUsedException.class);
+
+        User invitee = userRepository.findById(inviteeId)
+            .orElseThrow();
+
+        assertThat(invitee.isInvited()).isTrue();
+        assertThat(invitee.getActivationKey()).isEqualTo(ACTIVATION_KEY);
+    }
+
+    @Test
+    @Transactional
+    void testRegisterUserReplacesAPendingRegistration() {
+        user.setEmail(REGISTRATION_EMAIL);
+
+        long pendingUserId = saveInvitee(Instant.now()
+            .minus(1, ChronoUnit.HOURS), false);
+
+        User registeredUser = userService.registerUser(
+            createRegistration(DEFAULT_LOGIN, REGISTRATION_EMAIL), NEW_PASSWORD);
+
+        assertThat(userRepository.findById(pendingUserId)).isEmpty();
+        assertThat(registeredUser.getId()).isNotEqualTo(pendingUserId);
+
+        User storedUser = userRepository.findById(Objects.requireNonNull(registeredUser.getId()))
+            .orElseThrow();
+
+        assertThat(storedUser.getLogin()).isEqualTo(DEFAULT_LOGIN);
+        assertThat(storedUser.getActivationKey()).isNotNull()
+            .isNotEqualTo(ACTIVATION_KEY);
+    }
+
+    @Test
+    @Transactional
+    void testSaveEvictsTheCachedLoginAndEmailOfTheStoredAndTheSavedUser() {
+        User savedUser = userRepository.save(user);
+
+        Cache usersByLoginCache = Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE));
+        Cache usersByEmailCache = Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE));
+
+        String oldLoginKey = TenantCacheKeyUtils.getKey(DEFAULT_LOGIN);
+        String oldEmailKey = TenantCacheKeyUtils.getKey(DEFAULT_EMAIL);
+        String newLoginKey = TenantCacheKeyUtils.getKey("janedoe");
+        String newEmailKey = TenantCacheKeyUtils.getKey("janedoe@localhost");
+
+        usersByLoginCache.put(oldLoginKey, Optional.of(savedUser));
+        usersByEmailCache.put(oldEmailKey, Optional.of(savedUser));
+        usersByLoginCache.put(newLoginKey, Optional.empty());
+        usersByEmailCache.put(newEmailKey, Optional.empty());
+
+        savedUser.setActivated(false);
+        savedUser.setEmail("janedoe@localhost");
+        savedUser.setLogin("janedoe");
+
+        userService.save(savedUser);
+
+        assertThat(usersByLoginCache.get(oldLoginKey)).isNull();
+        assertThat(usersByEmailCache.get(oldEmailKey)).isNull();
+        assertThat(usersByLoginCache.get(newLoginKey)).isNull();
+        assertThat(usersByEmailCache.get(newEmailKey)).isNull();
+
+        User storedUser = userRepository.findById(Objects.requireNonNull(savedUser.getId()))
+            .orElseThrow();
+
+        assertThat(storedUser.getLogin()).isEqualTo("janedoe");
+        assertThat(storedUser.isActivated()).isFalse();
+    }
+
+    @Test
+    @Transactional
+    void testCreateAndUpdatePersistTheExternalId() {
+        AdminUserDTO adminUserDTO = createRegistration(DEFAULT_LOGIN, REGISTRATION_EMAIL);
+
+        adminUserDTO.setExternalId("00u-external");
+
+        User createdUser = userService.create(adminUserDTO);
+
+        long userId = Objects.requireNonNull(createdUser.getId());
+
+        User storedUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(storedUser.getExternalId()).isEqualTo("00u-external");
+
+        AdminUserDTO storedAdminUserDTO = new AdminUserDTO(storedUser, List.of());
+
+        storedAdminUserDTO.setFirstName("Janet");
+
+        userService.update(storedAdminUserDTO);
+
+        storedUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(storedUser.getFirstName()).isEqualTo("Janet");
+        assertThat(storedUser.getExternalId()).isEqualTo("00u-external");
+
+        adminUserDTO.setId(userId);
+        adminUserDTO.setExternalId("00u-replaced");
+
+        userService.update(adminUserDTO);
+
+        storedUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(storedUser.getExternalId()).isEqualTo("00u-replaced");
+    }
+
+    @Test
+    @Transactional
+    void testGetUsersByExternalIdMatchesTheExternalIdExactly() {
+        user.setExternalId("00u-external");
+
+        User firstUser = userRepository.save(user);
+
+        User secondUser = new User();
+
+        secondUser.setActivated(false);
+        secondUser.setEmail(REGISTRATION_EMAIL);
+        secondUser.setExternalId("00u-external");
+        secondUser.setLogin("janedoe");
+        secondUser.setPassword(RandomStringUtils.randomAlphanumeric(60));
+
+        secondUser = userRepository.save(secondUser);
+
+        User thirdUser = new User();
+
+        thirdUser.setActivated(true);
+        thirdUser.setEmail("other@example.com");
+        thirdUser.setExternalId("00U-EXTERNAL");
+        thirdUser.setLogin("other");
+        thirdUser.setPassword(RandomStringUtils.randomAlphanumeric(60));
+
+        userRepository.save(thirdUser);
+
+        assertThat(userService.getUsersByExternalId("00u-external"))
+            .extracting(User::getId)
+            .containsExactly(firstUser.getId(), secondUser.getId());
+        assertThat(userService.getUsersByExternalId(DEFAULT_EMAIL)).isEmpty();
+        assertThat(userService.getUsersByExternalId("00u")).isEmpty();
+    }
+
+    private List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    private static AdminUserDTO createRegistration(String login, String email) {
+        AdminUserDTO adminUserDTO = new AdminUserDTO();
+
+        adminUserDTO.setEmail(email);
+        adminUserDTO.setFirstName(DEFAULT_FIRSTNAME);
+        adminUserDTO.setLangKey(DEFAULT_LANGKEY);
+        adminUserDTO.setLastName(DEFAULT_LASTNAME);
+        adminUserDTO.setLogin(login);
+
+        return adminUserDTO;
+    }
+
+    private long saveDeactivatedUser() {
+        user.setActivated(false);
+        user.setActivationKey(null);
+        user.setEmail(REGISTRATION_EMAIL);
+
+        User savedUser = userRepository.save(user);
+
+        return Objects.requireNonNull(savedUser.getId());
     }
 
     private long saveInvitee(Instant createdDate, boolean invited) {

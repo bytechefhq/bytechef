@@ -323,7 +323,7 @@ export default function useEndpointForm({endpoint, onClose, onSave, open}: UseEn
                     return;
                 }
 
-                if (!parsed.paths) {
+                if (!parsed?.paths) {
                     toast.error('Invalid OpenAPI structure', {
                         description: 'The YAML must contain a "paths" section to switch to form view.',
                     });

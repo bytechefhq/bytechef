@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.exception.ScimBadRequestException;
 import com.bytechef.ee.platform.user.scim.facade.ScimGroupFacade;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser.ScimFilter;
@@ -18,12 +19,15 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.service.AuthorityService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,36 +60,37 @@ class ScimGroupController {
     }
 
     @GetMapping
-    ResponseEntity<ScimListResponse<ScimGroup>> listGroups(
+    ResponseEntity<Object> listGroups(
         @RequestParam(defaultValue = "1") int startIndex,
         @RequestParam(defaultValue = "100") int count,
         @RequestParam(required = false) String filter) {
 
-        if (filter != null) {
+        Predicate<Authority> authorityPredicate = authority -> true;
+
+        if (filter != null && !filter.isBlank()) {
             ScimFilter scimFilter = ScimFilterParser.parse(filter);
 
-            if (scimFilter != null && "displayName".equalsIgnoreCase(scimFilter.attributeName())) {
-                List<Authority> authorities = authorityService.getAuthorities();
-
-                List<ScimGroup> matchedGroups = authorities
-                    .stream()
-                    .filter(authority -> scimFilter.value()
-                        .equalsIgnoreCase(authority.getName()))
-                    .map(this::toScimGroup)
-                    .toList();
-
-                return ResponseEntity.ok(ScimListResponse.of(matchedGroups, startIndex));
+            if (scimFilter == null || !"displayName".equalsIgnoreCase(scimFilter.attributeName())) {
+                return ScimErrors.invalidFilter(filter);
             }
+
+            String displayName = scimFilter.value();
+
+            authorityPredicate = authority -> displayName.equalsIgnoreCase(authority.getName());
         }
 
         List<Authority> authorities = authorityService.getAuthorities();
 
         List<ScimGroup> groups = authorities
             .stream()
+            .filter(authorityPredicate)
+            .sorted(Comparator.comparing(Authority::getId, Comparator.nullsLast(Comparator.naturalOrder())))
             .map(this::toScimGroup)
             .toList();
 
-        return ResponseEntity.ok(ScimListResponse.of(groups, startIndex));
+        return ResponseEntity.ok(
+            ScimListResponse.slice(
+                groups, ScimPagination.normalizeStartIndex(startIndex), ScimPagination.normalizeCount(count)));
     }
 
     @GetMapping("/{id}")
@@ -102,6 +107,8 @@ class ScimGroupController {
 
     @PostMapping
     ResponseEntity<ScimGroup> createGroup(@RequestBody ScimGroup scimGroup) {
+        ScimGroupFacade.validate(scimGroup);
+
         Authority createdAuthority = scimGroupFacade.createGroup(scimGroup);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -110,6 +117,8 @@ class ScimGroupController {
 
     @PutMapping("/{id}")
     ResponseEntity<Object> replaceGroup(@PathVariable long id, @RequestBody ScimGroup scimGroup) {
+        ScimGroupFacade.validate(scimGroup);
+
         Optional<Authority> updatedAuthority = scimGroupFacade.replaceGroup(id, scimGroup);
 
         if (updatedAuthority.isEmpty()) {
@@ -140,6 +149,11 @@ class ScimGroupController {
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @ExceptionHandler(ScimBadRequestException.class)
+    ResponseEntity<Object> handleScimBadRequestException(ScimBadRequestException scimBadRequestException) {
+        return ScimErrors.badRequest(scimBadRequestException);
     }
 
     private Map<String, Object> notFoundError(String resourceType, String id) {

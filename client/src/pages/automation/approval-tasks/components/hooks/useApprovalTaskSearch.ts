@@ -67,8 +67,7 @@ export function useApprovalTaskSearch(): UseApprovalTaskSearchReturnI {
             )
             .map((approvalTask) => approvalTask.assignee);
 
-        const allSuggestions = [...titleSuggestions, ...assigneeSuggestions].slice(0, 5);
-        const uniqueSuggestions = [...new Set(allSuggestions)];
+        const uniqueSuggestions = [...new Set([...titleSuggestions, ...assigneeSuggestions])].slice(0, 5);
 
         return uniqueSuggestions.map((suggestion) => ({
             highlighted: highlightText(suggestion, searchQuery),

@@ -170,7 +170,7 @@ rebel.xml
 ######################
 # TypeScript
 ######################
-**/tsconfig.tsbuildinfo
+**/*.tsbuildinfo
 
 ######################
 # Svelte

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.exception.ScimBadRequestException;
 import com.bytechef.ee.platform.user.scim.facade.ScimUserFacade;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser.ScimFilter;
@@ -21,13 +22,15 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +53,9 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 class ScimUserController {
 
+    private static final String EXTERNAL_ID = "externalId";
+    private static final String USER_NAME = "userName";
+
     private final ScimUserFacade scimUserFacade;
     private final UserService userService;
 
@@ -60,45 +66,57 @@ class ScimUserController {
     }
 
     @GetMapping
-    ResponseEntity<ScimListResponse<ScimUser>> listUsers(
+    ResponseEntity<Object> listUsers(
         @RequestParam(defaultValue = "1") int startIndex,
         @RequestParam(defaultValue = "100") int count,
         @RequestParam(required = false) String filter) {
 
-        if (filter != null) {
+        int normalizedStartIndex = ScimPagination.normalizeStartIndex(startIndex);
+        int normalizedCount = ScimPagination.normalizeCount(count);
+
+        if (filter != null && !filter.isBlank()) {
             ScimFilter scimFilter = ScimFilterParser.parse(filter);
 
-            if (scimFilter != null && "userName".equalsIgnoreCase(scimFilter.attributeName())) {
-                Optional<User> user = userService.fetchUserByLogin(scimFilter.value());
-
-                if (user.isPresent()) {
-                    return ResponseEntity.ok(ScimListResponse.of(List.of(toScimUser(user.get())), startIndex));
-                }
-
-                return ResponseEntity.ok(ScimListResponse.of(List.of(), startIndex));
+            if (scimFilter == null) {
+                return ScimErrors.invalidFilter(filter);
             }
 
-            if (scimFilter != null && "externalId".equalsIgnoreCase(scimFilter.attributeName())) {
-                Optional<User> user = userService.fetchUserByEmail(scimFilter.value());
+            List<User> users;
 
-                if (user.isPresent()) {
-                    return ResponseEntity.ok(ScimListResponse.of(List.of(toScimUser(user.get())), startIndex));
-                }
+            if (USER_NAME.equalsIgnoreCase(scimFilter.attributeName())) {
+                String value = scimFilter.value();
 
-                return ResponseEntity.ok(ScimListResponse.of(List.of(), startIndex));
+                Optional<User> user = userService.fetchUserByLogin(value.toLowerCase(Locale.ROOT));
+
+                users = user.stream()
+                    .toList();
+            } else if (EXTERNAL_ID.equalsIgnoreCase(scimFilter.attributeName())) {
+                users = userService.getUsersByExternalId(scimFilter.value());
+            } else {
+                return ScimErrors.invalidFilter(filter);
             }
+
+            List<ScimUser> scimUsers = users.stream()
+                .map(this::toScimUser)
+                .toList();
+
+            return ResponseEntity.ok(ScimListResponse.slice(scimUsers, normalizedStartIndex, normalizedCount));
         }
 
-        int pageIndex = Math.max(0, (startIndex - 1) / count);
+        if (normalizedCount == 0) {
+            return ResponseEntity.ok(ScimListResponse.of(List.of(), userService.countUsers(), normalizedStartIndex));
+        }
 
-        Page<User> userPage = userService.getAllActiveUsers(PageRequest.of(pageIndex, count));
+        Page<User> userPage = userService.getAllManagedUsers(
+            ScimOffsetPageRequest.of(normalizedStartIndex, normalizedCount));
 
         List<ScimUser> scimUsers = userPage.getContent()
             .stream()
             .map(this::toScimUser)
             .toList();
 
-        return ResponseEntity.ok(ScimListResponse.of(scimUsers, startIndex));
+        return ResponseEntity.ok(
+            ScimListResponse.of(scimUsers, userPage.getTotalElements(), normalizedStartIndex));
     }
 
     @GetMapping("/{id}")
@@ -115,6 +133,8 @@ class ScimUserController {
 
     @PostMapping
     ResponseEntity<ScimUser> createUser(@RequestBody ScimUser scimUser) {
+        ScimUserFacade.validate(scimUser);
+
         User createdUser = scimUserFacade.createUser(scimUser);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -123,6 +143,8 @@ class ScimUserController {
 
     @PutMapping("/{id}")
     ResponseEntity<Object> replaceUser(@PathVariable long id, @RequestBody ScimUser scimUser) {
+        ScimUserFacade.validate(scimUser);
+
         Optional<User> existingUser = userService.fetchUser(id);
 
         if (existingUser.isEmpty()) {
@@ -143,6 +165,8 @@ class ScimUserController {
 
     @PatchMapping("/{id}")
     ResponseEntity<Object> patchUser(@PathVariable long id, @RequestBody ScimPatchRequest patchRequest) {
+        ScimUserFacade.validate(patchRequest);
+
         Optional<User> existingUser = userService.fetchUser(id);
 
         if (existingUser.isEmpty()) {
@@ -170,6 +194,16 @@ class ScimUserController {
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @ExceptionHandler(ScimBadRequestException.class)
+    ResponseEntity<Object> handleScimBadRequestException(ScimBadRequestException scimBadRequestException) {
+        return ScimErrors.badRequest(scimBadRequestException);
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    ResponseEntity<Object> handleDuplicateKeyException() {
+        return ScimErrors.uniqueness("A user with the same userName or email already exists");
     }
 
     private Map<String, Object> notFoundError(String resourceType, String id) {
@@ -200,7 +234,7 @@ class ScimUserController {
             "/api/scim/v2/Users/" + user.getId());
 
         return new ScimUser(
-            List.of(ScimUser.SCHEMA), String.valueOf(user.getId()), user.getEmail(), user.getLogin(), scimName,
+            List.of(ScimUser.SCHEMA), String.valueOf(user.getId()), user.getExternalId(), user.getLogin(), scimName,
             scimName.formatted(), emails, user.isActivated(), List.of(), meta);
     }
 }

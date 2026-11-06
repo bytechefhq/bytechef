@@ -18,6 +18,7 @@ package com.bytechef.platform.user.service;
 
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,8 @@ public interface UserService {
     Optional<User> completePasswordReset(String newPassword, String key);
 
     long countActiveUsers();
+
+    long countUsers();
 
     User create(AdminUserDTO userDTO);
 
@@ -70,6 +73,8 @@ public interface UserService {
     User getUser(long id);
 
     User getUser(String login);
+
+    List<User> getUsersByExternalId(String externalId);
 
     User registerUser(AdminUserDTO userDTO, String password);
 

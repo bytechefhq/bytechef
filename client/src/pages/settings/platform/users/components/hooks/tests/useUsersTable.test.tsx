@@ -12,6 +12,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
                         activated: true,
                         authorities: ['ROLE_ADMIN'],
                         email: 'admin@test.com',
+                        externalId: 'idp-admin-1',
                         firstName: 'Admin',
                         id: '1',
                         lastName: 'User',
@@ -21,6 +22,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
                         activated: false,
                         authorities: ['ROLE_USER'],
                         email: 'user@test.com',
+                        externalId: null,
                         firstName: 'Regular',
                         id: '2',
                         lastName: 'User',
@@ -48,6 +50,13 @@ describe('useUsersTable', () => {
 
         expect(result.current.users).toHaveLength(2);
         expect(result.current.users[0]?.login).toBe('admin');
+    });
+
+    it('returns the external ID of each user', () => {
+        const {result} = renderHook(() => useUsersTable());
+
+        expect(result.current.users[0]?.externalId).toBe('idp-admin-1');
+        expect(result.current.users[1]?.externalId).toBeNull();
     });
 
     it('returns loading state as false', () => {
