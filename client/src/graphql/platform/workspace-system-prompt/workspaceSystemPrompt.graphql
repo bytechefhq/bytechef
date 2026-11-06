@@ -1,0 +1,13 @@
+query workspaceSystemPrompt($workspaceId: ID!) {
+    workspaceSystemPrompt(workspaceId: $workspaceId) {
+        prompt
+        workspaceId
+    }
+}
+
+mutation updateWorkspaceSystemPrompt($input: WorkspaceSystemPromptInput!) {
+    updateWorkspaceSystemPrompt(input: $input) {
+        prompt
+        workspaceId
+    }
+}
