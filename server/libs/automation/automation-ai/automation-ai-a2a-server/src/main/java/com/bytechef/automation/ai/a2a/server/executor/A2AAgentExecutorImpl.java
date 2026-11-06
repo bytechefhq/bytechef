@@ -50,11 +50,11 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -111,7 +111,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
     private final Executor runCompletionExecutor;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
-    private final ToolExecutionRecorder toolExecutionRecorder;
+    private final ExternalInvocationRecorder externalInvocationRecorder;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -122,7 +122,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, @Nullable String publicUrl,
         Executor runCompletionExecutor, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
-        ToolExecutionRecorder toolExecutionRecorder, WorkflowService workflowService) {
+        ExternalInvocationRecorder externalInvocationRecorder, WorkflowService workflowService) {
 
         this.a2aProjectService = a2aProjectService;
         this.a2aProjectWorkflowService = a2aProjectWorkflowService;
@@ -137,7 +137,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         this.runCompletionExecutor = runCompletionExecutor;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
-        this.toolExecutionRecorder = toolExecutionRecorder;
+        this.externalInvocationRecorder = externalInvocationRecorder;
         this.workflowService = workflowService;
     }
 
@@ -186,9 +186,9 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
 
         Environment environment = a2aServer.getEnvironment();
 
-        ToolExecutionEvent.Builder eventBuilder = ToolExecutionEvent
+        ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
             .builder(
-                PlatformType.AUTOMATION, ToolExecutionSurface.A2A, ToolExecutionKind.WORKFLOW,
+                PlatformType.AUTOMATION, ExternalInvocationSurface.A2A, ExternalInvocationKind.WORKFLOW,
                 getSkillName(exposedWorkflow))
             .environment(environment.ordinal())
             .a2aServerId(a2aServer.getId())
@@ -202,7 +202,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
                 new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs, metadata),
                 projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
         } catch (RuntimeException runtimeException) {
-            recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.ERROR, runtimeException);
+            recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.ERROR, runtimeException);
 
             throw runtimeException;
         }
@@ -220,7 +220,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         } catch (RuntimeException runtimeException) {
             log.error("Failed to await A2A workflow run {}", jobId, runtimeException);
 
-            recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.ERROR, runtimeException);
+            recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.ERROR, runtimeException);
 
             return A2AAgentRun.started(
                 taskReference, CompletableFuture.completedFuture(inProgressResult(taskReference)));
@@ -271,7 +271,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
 
     private A2AAgentResult toRecordedRunResult(
         long jobId, @Nullable Job job, @Nullable Throwable throwable, A2ATaskReference taskReference,
-        ToolExecutionEvent.Builder eventBuilder, long startNanos) {
+        ExternalInvocationEvent.Builder eventBuilder, long startNanos) {
 
         if (throwable == null && job != null) {
             try {
@@ -283,7 +283,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
             } catch (RuntimeException runtimeException) {
                 log.error("Failed to read the result of A2A workflow run {}", jobId, runtimeException);
 
-                recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.ERROR, runtimeException);
+                recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.ERROR, runtimeException);
 
                 return inProgressResult(taskReference);
             }
@@ -293,18 +293,18 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
             completionException.getCause() != null ? completionException.getCause() : throwable;
 
         if (cause instanceof TimeoutException) {
-            recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.TIMEOUT, cause);
+            recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.TIMEOUT, cause);
         } else {
             log.error("Failed to await A2A workflow run {}", jobId, cause);
 
-            recordSkillCall(eventBuilder, startNanos, ToolExecutionOutcome.ERROR, cause);
+            recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.ERROR, cause);
         }
 
         return inProgressResult(taskReference);
     }
 
     private void recordSkillCall(
-        ToolExecutionEvent.Builder eventBuilder, long startNanos, ToolExecutionOutcome outcome,
+        ExternalInvocationEvent.Builder eventBuilder, long startNanos, ExternalInvocationOutcome outcome,
         @Nullable Throwable throwable) {
 
         if (throwable != null) {
@@ -317,15 +317,15 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         eventBuilder.outcome(outcome);
         eventBuilder.durationMs(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos));
 
-        toolExecutionRecorder.record(eventBuilder.build());
+        externalInvocationRecorder.record(eventBuilder.build());
     }
 
-    private static ToolExecutionOutcome getOutcome(A2AAgentResult agentResult) {
+    private static ExternalInvocationOutcome getOutcome(A2AAgentResult agentResult) {
         return switch (agentResult) {
-            case A2AAgentResult.Completed _ -> ToolExecutionOutcome.SUCCESS;
-            case A2AAgentResult.Failed _ -> ToolExecutionOutcome.ERROR;
-            case A2AAgentResult.InputRequired _ -> ToolExecutionOutcome.APPROVAL_REQUIRED;
-            case A2AAgentResult.Working _ -> ToolExecutionOutcome.SUSPENDED;
+            case A2AAgentResult.Completed _ -> ExternalInvocationOutcome.SUCCESS;
+            case A2AAgentResult.Failed _ -> ExternalInvocationOutcome.ERROR;
+            case A2AAgentResult.InputRequired _ -> ExternalInvocationOutcome.APPROVAL_REQUIRED;
+            case A2AAgentResult.Working _ -> ExternalInvocationOutcome.SUSPENDED;
         };
     }
 
@@ -338,7 +338,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
     }
 
     private A2AAgentResult toAgentResult(
-        Job job, A2ATaskReference taskReference, ToolExecutionEvent.@Nullable Builder eventBuilder) {
+        Job job, A2ATaskReference taskReference, ExternalInvocationEvent.@Nullable Builder eventBuilder) {
 
         if (isPausedOnApproval(job)) {
             return A2AAgentResult.ofInputRequired(describePendingApproval(job), taskReference);

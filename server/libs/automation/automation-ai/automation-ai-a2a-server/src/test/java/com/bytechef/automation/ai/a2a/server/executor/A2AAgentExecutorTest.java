@@ -60,11 +60,11 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -109,7 +109,7 @@ class A2AAgentExecutorTest {
         mock(ProjectDeploymentWorkflowService.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     private final TaskFileStorage taskFileStorage = mock(TaskFileStorage.class);
-    private final ToolExecutionRecorder toolExecutionRecorder = mock(ToolExecutionRecorder.class);
+    private final ExternalInvocationRecorder externalInvocationRecorder = mock(ExternalInvocationRecorder.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
 
     @SuppressWarnings("unchecked")
@@ -724,27 +724,27 @@ class A2AAgentExecutorTest {
     }
 
     @Test
-    void testCompletedSkillCallIsRecordedInTheToolInvocationLog() {
+    void testCompletedSkillCallIsRecordedInTheExternalInvocationLog() {
         stubServer();
         stubExposedWorkflow("wf1", 20L, Map.of());
 
         start(CompletableFuture.completedFuture(completedJob(100L)), null).result()
             .join();
 
-        ToolExecutionEvent toolExecutionEvent = getRecordedToolExecutionEvent();
+        ExternalInvocationEvent externalInvocationEvent = getRecordedExternalInvocationEvent();
 
-        assertThat(toolExecutionEvent.type()).isEqualTo(PlatformType.AUTOMATION);
-        assertThat(toolExecutionEvent.surface()).isEqualTo(ToolExecutionSurface.A2A);
-        assertThat(toolExecutionEvent.kind()).isEqualTo(ToolExecutionKind.WORKFLOW);
-        assertThat(toolExecutionEvent.toolName()).isEqualTo("Label wf1");
-        assertThat(toolExecutionEvent.a2aServerId()).isEqualTo(1L);
-        assertThat(toolExecutionEvent.mcpServerId()).isNull();
-        assertThat(toolExecutionEvent.workspaceId()).isEqualTo(5L);
-        assertThat(toolExecutionEvent.environment()).isEqualTo(Environment.DEVELOPMENT.ordinal());
-        assertThat(toolExecutionEvent.jobId()).isEqualTo(100L);
-        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.SUCCESS);
-        assertThat(toolExecutionEvent.errorType()).isNull();
-        assertThat(toolExecutionEvent.durationMs()).isNotNegative();
+        assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(externalInvocationEvent.surface()).isEqualTo(ExternalInvocationSurface.A2A);
+        assertThat(externalInvocationEvent.kind()).isEqualTo(ExternalInvocationKind.WORKFLOW);
+        assertThat(externalInvocationEvent.toolName()).isEqualTo("Label wf1");
+        assertThat(externalInvocationEvent.a2aServerId()).isEqualTo(1L);
+        assertThat(externalInvocationEvent.mcpServerId()).isNull();
+        assertThat(externalInvocationEvent.workspaceId()).isEqualTo(5L);
+        assertThat(externalInvocationEvent.environment()).isEqualTo(Environment.DEVELOPMENT.ordinal());
+        assertThat(externalInvocationEvent.jobId()).isEqualTo(100L);
+        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
+        assertThat(externalInvocationEvent.errorType()).isNull();
+        assertThat(externalInvocationEvent.durationMs()).isNotNegative();
     }
 
     @Test
@@ -758,7 +758,7 @@ class A2AAgentExecutorTest {
         start(CompletableFuture.completedFuture(completedJob(100L)), null).result()
             .join();
 
-        assertThat(getRecordedToolExecutionEvent().toolName()).isEqualTo("Summarize");
+        assertThat(getRecordedExternalInvocationEvent().toolName()).isEqualTo("Summarize");
     }
 
     @Test
@@ -774,11 +774,11 @@ class A2AAgentExecutorTest {
         start(CompletableFuture.completedFuture(job), null).result()
             .join();
 
-        ToolExecutionEvent toolExecutionEvent = getRecordedToolExecutionEvent();
+        ExternalInvocationEvent externalInvocationEvent = getRecordedExternalInvocationEvent();
 
-        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
-        assertThat(toolExecutionEvent.errorType()).isEqualTo("ExecutionException");
-        assertThat(toolExecutionEvent.jobId()).isEqualTo(100L);
+        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationEvent.errorType()).isEqualTo("ExecutionException");
+        assertThat(externalInvocationEvent.jobId()).isEqualTo(100L);
     }
 
     @Test
@@ -798,7 +798,8 @@ class A2AAgentExecutorTest {
         start(CompletableFuture.completedFuture(job), null).result()
             .join();
 
-        assertThat(getRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_REQUIRED);
+        assertThat(getRecordedExternalInvocationEvent().outcome())
+            .isEqualTo(ExternalInvocationOutcome.APPROVAL_REQUIRED);
     }
 
     @Test
@@ -817,7 +818,7 @@ class A2AAgentExecutorTest {
         start(CompletableFuture.completedFuture(job), null).result()
             .join();
 
-        assertThat(getRecordedToolExecutionEvent().outcome()).isEqualTo(ToolExecutionOutcome.SUSPENDED);
+        assertThat(getRecordedExternalInvocationEvent().outcome()).isEqualTo(ExternalInvocationOutcome.SUSPENDED);
     }
 
     @Test
@@ -828,10 +829,10 @@ class A2AAgentExecutorTest {
         start(CompletableFuture.failedFuture(new TimeoutException()), null).result()
             .join();
 
-        ToolExecutionEvent toolExecutionEvent = getRecordedToolExecutionEvent();
+        ExternalInvocationEvent externalInvocationEvent = getRecordedExternalInvocationEvent();
 
-        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.TIMEOUT);
-        assertThat(toolExecutionEvent.errorType()).isEqualTo("TimeoutException");
+        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.TIMEOUT);
+        assertThat(externalInvocationEvent.errorType()).isEqualTo("TimeoutException");
     }
 
     @Test
@@ -844,12 +845,12 @@ class A2AAgentExecutorTest {
         assertThatExceptionOfType(IllegalStateException.class)
             .isThrownBy(() -> a2aAgentExecutor.start(request(null)));
 
-        ToolExecutionEvent toolExecutionEvent = getRecordedToolExecutionEvent();
+        ExternalInvocationEvent externalInvocationEvent = getRecordedExternalInvocationEvent();
 
-        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.ERROR);
-        assertThat(toolExecutionEvent.errorType()).isEqualTo("IllegalStateException");
-        assertThat(toolExecutionEvent.errorMessage()).isEqualTo("boom");
-        assertThat(toolExecutionEvent.jobId()).isNull();
+        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationEvent.errorType()).isEqualTo("IllegalStateException");
+        assertThat(externalInvocationEvent.errorMessage()).isEqualTo("boom");
+        assertThat(externalInvocationEvent.jobId()).isNull();
     }
 
     @Test
@@ -860,16 +861,16 @@ class A2AAgentExecutorTest {
         assertThatExceptionOfType(A2AInvalidParamsException.class)
             .isThrownBy(() -> start(CompletableFuture.completedFuture(completedJob(100L)), "unknown"));
 
-        verify(toolExecutionRecorder, never()).record(any(ToolExecutionEvent.class));
+        verify(externalInvocationRecorder, never()).record(any(ExternalInvocationEvent.class));
     }
 
-    private ToolExecutionEvent getRecordedToolExecutionEvent() {
-        ArgumentCaptor<ToolExecutionEvent> toolExecutionEventArgumentCaptor =
-            ArgumentCaptor.forClass(ToolExecutionEvent.class);
+    private ExternalInvocationEvent getRecordedExternalInvocationEvent() {
+        ArgumentCaptor<ExternalInvocationEvent> externalInvocationEventArgumentCaptor =
+            ArgumentCaptor.forClass(ExternalInvocationEvent.class);
 
-        verify(toolExecutionRecorder).record(toolExecutionEventArgumentCaptor.capture());
+        verify(externalInvocationRecorder).record(externalInvocationEventArgumentCaptor.capture());
 
-        return toolExecutionEventArgumentCaptor.getValue();
+        return externalInvocationEventArgumentCaptor.getValue();
     }
 
     private static Job completedJob(long jobId) {
@@ -897,7 +898,8 @@ class A2AAgentExecutorTest {
         return new A2AAgentExecutorImpl(
             a2aProjectService, a2aProjectWorkflowService, a2aServerService, approvalTokensObjectProvider,
             jobCompletionAwaiter, jobService, principalJobFacade, principalJobService, projectDeploymentWorkflowService,
-            "https://example.com", runCompletionExecutor, taskExecutionService, taskFileStorage, toolExecutionRecorder,
+            "https://example.com", runCompletionExecutor, taskExecutionService, taskFileStorage,
+            externalInvocationRecorder,
             workflowService);
     }
 

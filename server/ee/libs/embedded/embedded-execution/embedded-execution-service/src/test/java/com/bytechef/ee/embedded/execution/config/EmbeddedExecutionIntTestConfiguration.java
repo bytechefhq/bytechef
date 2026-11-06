@@ -19,8 +19,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
-import com.bytechef.ee.platform.tool.invocation.log.listener.ToolInvocationLogEventListener;
-import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogServiceImpl;
+import com.bytechef.ee.platform.external.invocation.log.listener.ExternalInvocationLogEventListener;
+import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogServiceImpl;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -29,7 +29,7 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.tool.execution.config.ToolExecutionConfiguration;
+import com.bytechef.platform.external.invocation.config.ExternalInvocationConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -59,8 +59,8 @@ import tools.jackson.databind.ObjectMapper;
     ConnectedUserServiceImpl.class, IntegrationInstanceConfigurationServiceImpl.class,
     EmbeddedExecutionIntTestSupport.class, IntegrationInstanceServiceImpl.class, IntegrationServiceImpl.class,
     JacksonConfiguration.class,
-    LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class, ToolExecutionConfiguration.class,
-    ToolInvocationLogEventListener.class, ToolInvocationLogServiceImpl.class
+    LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class, ExternalInvocationConfiguration.class,
+    ExternalInvocationLogEventListener.class, ExternalInvocationLogServiceImpl.class
 })
 @Configuration
 public class EmbeddedExecutionIntTestConfiguration {

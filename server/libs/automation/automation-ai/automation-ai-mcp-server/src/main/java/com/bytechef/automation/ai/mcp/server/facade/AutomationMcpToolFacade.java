@@ -49,17 +49,17 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.WorkflowToolRunResult;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
-import com.bytechef.platform.tool.execution.WorkflowToolRunResult;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
@@ -111,7 +111,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
-    private final ToolExecutionRecorder toolExecutionRecorder;
+    private final ExternalInvocationRecorder externalInvocationRecorder;
     private final WorkflowService workflowService;
     private final WorkspaceMcpServerService workspaceMcpServerService;
 
@@ -126,7 +126,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         McpToolService mcpToolService, PrincipalJobFacade principalJobFacade,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         @Nullable String publicUrl, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
-        ToolExecutionRecorder toolExecutionRecorder, WorkflowService workflowService,
+        ExternalInvocationRecorder externalInvocationRecorder, WorkflowService workflowService,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
         super(evaluator);
@@ -147,7 +147,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
-        this.toolExecutionRecorder = toolExecutionRecorder;
+        this.externalInvocationRecorder = externalInvocationRecorder;
         this.workflowService = workflowService;
         this.workspaceMcpServerService = workspaceMcpServerService;
     }
@@ -281,9 +281,10 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                 resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), request));
             }
 
-            return toolExecutionRecorder.record(
-                ToolExecutionEvent
-                    .builder(PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT,
+            return externalInvocationRecorder.record(
+                ExternalInvocationEvent
+                    .builder(PlatformType.AUTOMATION, ExternalInvocationSurface.MCP_AUTOMATION,
+                        ExternalInvocationKind.COMPONENT,
                         toolName)
                     .componentName(componentName)
                     .componentVersion(componentVersion)
@@ -333,14 +334,15 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
             inputs.put(triggerName, resolvedTriggerInputs);
             inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, triggerName);
 
-            ToolExecutionEvent.Builder eventBuilder = ToolExecutionEvent
-                .builder(PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW,
+            ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
+                .builder(PlatformType.AUTOMATION, ExternalInvocationSurface.MCP_AUTOMATION,
+                    ExternalInvocationKind.WORKFLOW,
                     toolName)
                 .environment(Math.toIntExact(mcpServer.getEnvironmentId()))
                 .mcpServerId(mcpServerId)
                 .workspaceId(workspaceId);
 
-            WorkflowToolRunResult workflowToolRunResult = toolExecutionRecorder.record(
+            WorkflowToolRunResult workflowToolRunResult = externalInvocationRecorder.record(
                 eventBuilder,
                 () -> {
                     long jobId = principalJobFacade.createJob(

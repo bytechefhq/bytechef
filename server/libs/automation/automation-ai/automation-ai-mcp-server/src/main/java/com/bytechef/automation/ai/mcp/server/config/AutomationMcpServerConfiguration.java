@@ -33,6 +33,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -43,7 +44,6 @@ import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -107,7 +107,7 @@ public class AutomationMcpServerConfiguration {
         McpToolService mcpToolService, PrincipalJobFacade principalJobFacade,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         @Value("${bytechef.public-url}") @Nullable String publicUrl,
-        TaskExecutionService taskExecutionService, ToolExecutionRecorder toolExecutionRecorder,
+        TaskExecutionService taskExecutionService, ExternalInvocationRecorder externalInvocationRecorder,
         WorkflowService workflowService, WorkspaceMcpServerService workspaceMcpServerService) {
 
         return new AutomationMcpToolFacade(
@@ -115,7 +115,7 @@ public class AutomationMcpServerConfiguration {
             jobCompletionAwaiter, jobResumeFacade, jobService, mcpComponentService, mcpProjectService,
             mcpProjectWorkflowService, mcpServerService, mcpToolService, principalJobFacade,
             projectDeploymentWorkflowService, publicUrl, taskExecutionService,
-            durableTaskFileStorage, toolExecutionRecorder, workflowService, workspaceMcpServerService);
+            durableTaskFileStorage, externalInvocationRecorder, workflowService, workspaceMcpServerService);
     }
 
     @Bean

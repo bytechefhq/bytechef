@@ -15,13 +15,13 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationM
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationOutcomeModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationPageModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationSurfaceModel;
-import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
+import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -62,55 +62,56 @@ public class ToolInvocationApiController implements ToolInvocationApi {
 
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
-        Page<ToolInvocationLog> toolInvocationLogPage = toolInvocationFacade.getToolInvocations(
-            externalUserId, environment, surface == null ? null : ToolExecutionSurface.valueOf(surface.name()),
-            outcome == null ? null : ToolExecutionOutcome.valueOf(outcome.name()), toInstant(startDate),
+        Page<ExternalInvocationLog> externalInvocationLogPage = toolInvocationFacade.getToolInvocations(
+            externalUserId, environment, surface == null ? null : ExternalInvocationSurface.valueOf(surface.name()),
+            outcome == null ? null : ExternalInvocationOutcome.valueOf(outcome.name()), toInstant(startDate),
             toInstant(endDate), pageNumber == null ? 0 : pageNumber);
 
-        return ResponseEntity.ok(toToolInvocationPageModel(toolInvocationLogPage));
+        return ResponseEntity.ok(toToolInvocationPageModel(externalInvocationLogPage));
     }
 
-    static ToolInvocationKindModel toToolInvocationKindModel(ToolExecutionKind kind) {
+    static ToolInvocationKindModel toToolInvocationKindModel(ExternalInvocationKind kind) {
         return ToolInvocationKindModel.valueOf(kind.name());
     }
 
-    static ToolInvocationOutcomeModel toToolInvocationOutcomeModel(ToolExecutionOutcome outcome) {
+    static ToolInvocationOutcomeModel toToolInvocationOutcomeModel(ExternalInvocationOutcome outcome) {
         return ToolInvocationOutcomeModel.valueOf(outcome.name());
     }
 
-    static ToolInvocationSurfaceModel toToolInvocationSurfaceModel(ToolExecutionSurface surface) {
+    static ToolInvocationSurfaceModel toToolInvocationSurfaceModel(ExternalInvocationSurface surface) {
         return ToolInvocationSurfaceModel.valueOf(surface.name());
     }
 
-    private static ToolInvocationModel toToolInvocationModel(ToolInvocationLog toolInvocationLog) {
+    private static ToolInvocationModel toToolInvocationModel(ExternalInvocationLog externalInvocationLog) {
         return new ToolInvocationModel()
-            .componentName(toolInvocationLog.getComponentName())
-            .componentVersion(toolInvocationLog.getComponentVersion())
-            .createdDate(toOffsetDateTime(toolInvocationLog.getCreatedDate()))
-            .durationMs(toolInvocationLog.getDurationMs())
-            .errorMessage(toolInvocationLog.getErrorMessage())
-            .errorType(toolInvocationLog.getErrorType())
-            .id(toolInvocationLog.getId())
-            .integrationInstanceId(toolInvocationLog.getIntegrationInstanceId())
-            .jobId(toolInvocationLog.getJobId())
-            .kind(toToolInvocationKindModel(toolInvocationLog.getKind()))
-            .operationName(toolInvocationLog.getOperationName())
-            .outcome(toToolInvocationOutcomeModel(toolInvocationLog.getOutcome()))
-            .surface(toToolInvocationSurfaceModel(toolInvocationLog.getSurface()))
-            .toolName(toolInvocationLog.getToolName());
+            .componentName(externalInvocationLog.getComponentName())
+            .componentVersion(externalInvocationLog.getComponentVersion())
+            .createdDate(toOffsetDateTime(externalInvocationLog.getCreatedDate()))
+            .durationMs(externalInvocationLog.getDurationMs())
+            .errorMessage(externalInvocationLog.getErrorMessage())
+            .errorType(externalInvocationLog.getErrorType())
+            .id(externalInvocationLog.getId())
+            .integrationInstanceId(externalInvocationLog.getIntegrationInstanceId())
+            .jobId(externalInvocationLog.getJobId())
+            .kind(toToolInvocationKindModel(externalInvocationLog.getKind()))
+            .operationName(externalInvocationLog.getOperationName())
+            .outcome(toToolInvocationOutcomeModel(externalInvocationLog.getOutcome()))
+            .surface(toToolInvocationSurfaceModel(externalInvocationLog.getSurface()))
+            .toolName(externalInvocationLog.getToolName());
     }
 
-    private static ToolInvocationPageModel toToolInvocationPageModel(Page<ToolInvocationLog> toolInvocationLogPage) {
+    private static ToolInvocationPageModel
+        toToolInvocationPageModel(Page<ExternalInvocationLog> externalInvocationLogPage) {
         return new ToolInvocationPageModel()
             .content(
-                toolInvocationLogPage.stream()
+                externalInvocationLogPage.stream()
                     .map(ToolInvocationApiController::toToolInvocationModel)
                     .toList())
-            .number(toolInvocationLogPage.getNumber())
-            .numberOfElements(toolInvocationLogPage.getNumberOfElements())
-            .size(toolInvocationLogPage.getSize())
-            .totalElements(Math.toIntExact(toolInvocationLogPage.getTotalElements()))
-            .totalPages(toolInvocationLogPage.getTotalPages());
+            .number(externalInvocationLogPage.getNumber())
+            .numberOfElements(externalInvocationLogPage.getNumberOfElements())
+            .size(externalInvocationLogPage.getSize())
+            .totalElements(Math.toIntExact(externalInvocationLogPage.getTotalElements()))
+            .totalPages(externalInvocationLogPage.getTotalPages());
     }
 
     private static @Nullable Instant toInstant(@Nullable OffsetDateTime offsetDateTime) {

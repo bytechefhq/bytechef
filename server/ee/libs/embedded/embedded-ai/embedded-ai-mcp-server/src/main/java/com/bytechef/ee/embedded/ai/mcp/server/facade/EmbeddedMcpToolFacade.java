@@ -57,17 +57,17 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.WorkflowToolRunResult;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
-import com.bytechef.platform.tool.execution.ToolExecutionEvent;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
-import com.bytechef.platform.tool.execution.WorkflowToolRunResult;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -127,7 +127,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final String publicUrl;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
-    private final ToolExecutionRecorder toolExecutionRecorder;
+    private final ExternalInvocationRecorder externalInvocationRecorder;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -145,7 +145,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpServerService mcpServerService, PrincipalJobFacade principalJobFacade, String publicUrl,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
-        ToolExecutionRecorder toolExecutionRecorder, WorkflowService workflowService) {
+        ExternalInvocationRecorder externalInvocationRecorder, WorkflowService workflowService) {
 
         super(evaluator);
 
@@ -169,7 +169,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.publicUrl = publicUrl;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
-        this.toolExecutionRecorder = toolExecutionRecorder;
+        this.externalInvocationRecorder = externalInvocationRecorder;
         this.workflowService = workflowService;
     }
 
@@ -381,8 +381,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             Long connectionId = integrationInstance == null ? null : integrationInstance.getConnectionId();
 
-            ToolExecutionEvent.Builder eventBuilder = ToolExecutionEvent
-                .builder(PlatformType.EMBEDDED, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionKind.COMPONENT,
+            ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
+                .builder(PlatformType.EMBEDDED, ExternalInvocationSurface.MCP_EMBEDDED,
+                    ExternalInvocationKind.COMPONENT,
                     toolName)
                 .componentName(componentName)
                 .componentVersion(componentVersion)
@@ -405,9 +406,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                     componentName, environment, externalUserId,
                     integrationId == null ? getIntegrationId(componentName) : integrationId, tenantId);
 
-                toolExecutionRecorder.record(
+                externalInvocationRecorder.record(
                     eventBuilder
-                        .outcome(ToolExecutionOutcome.CONNECTION_REQUIRED)
+                        .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
                         .build());
 
                 return connectionRequiredResponse;
@@ -422,7 +423,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             Map<String, Object> mergedParameters = EmbeddedToolConstants.withConnectedUserContext(
                 MapUtils.concat(request, resolvedParameters), externalUserId, environment);
 
-            return toolExecutionRecorder.record(
+            return externalInvocationRecorder.record(
                 eventBuilder,
                 () -> clusterElementDefinitionFacade.executeTool(
                     componentName, componentVersion, clusterElementName, mergedParameters, connectionId));
@@ -455,8 +456,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             Long integrationInstanceId = fetchConnectedUserIntegrationInstanceId(
                 connectedUserId, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId());
 
-            ToolExecutionEvent.Builder eventBuilder = ToolExecutionEvent
-                .builder(PlatformType.EMBEDDED, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionKind.WORKFLOW, toolName)
+            ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
+                .builder(PlatformType.EMBEDDED, ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationKind.WORKFLOW,
+                    toolName)
                 .componentName(componentName)
                 .environment(environment.ordinal())
                 .externalUserId(externalUserId)
@@ -472,9 +474,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 Map<String, Object> connectionRequiredResponse = getConnectionRequiredResponse(
                     componentName, environment, externalUserId, integrationId, tenantId);
 
-                toolExecutionRecorder.record(
+                externalInvocationRecorder.record(
                     eventBuilder
-                        .outcome(ToolExecutionOutcome.CONNECTION_REQUIRED)
+                        .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
                         .build());
 
                 return connectionRequiredResponse;
@@ -496,7 +498,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             JobParametersDTO jobParametersDTO = new JobParametersDTO(
                 integrationInstanceConfigurationWorkflow.getWorkflowId(), inputs);
 
-            WorkflowToolRunResult workflowToolRunResult = toolExecutionRecorder.record(
+            WorkflowToolRunResult workflowToolRunResult = externalInvocationRecorder.record(
                 eventBuilder,
                 () -> {
                     long jobId = principalJobFacade.createJob(

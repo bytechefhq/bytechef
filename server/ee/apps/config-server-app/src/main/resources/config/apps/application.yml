@@ -287,6 +287,9 @@ bytechef:
   # Encryption key provider (FILESYSTEM - the key generated on filesystem, PROPERTY - the key read from property) default: FILESYSTEM
   encryption:
     provider: FILESYSTEM
+  external-invocation-log:
+    # Number of days external invocation records are kept, default: 90
+    retention-days: 90
   file-storage:
     # File storage provider (AWS(EE) | FILESYSTEM | JDBC) default: FILESYSTEM
     provider: FILESYSTEM
@@ -340,9 +343,6 @@ bytechef:
   # Tenant support mode (SINGLE | MULTI - EE only) default: SINGLE
   tenant:
     mode: SINGLE
-  tool-invocation-log:
-    # Number of days tool invocation records are kept, default: 90
-    retention-days: 90
   webhook-delivery:
     # Hosts that notification webhook and Slack URLs may use even when they resolve to a private or loopback address
     # (comma-separated, matched exactly). Empty blocks every private address.

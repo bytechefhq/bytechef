@@ -12,13 +12,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestConfiguration;
 import com.bytechef.ee.embedded.execution.config.EmbeddedExecutionIntTestSupport;
-import com.bytechef.ee.platform.tool.invocation.log.domain.ToolInvocationLog;
-import com.bytechef.ee.platform.tool.invocation.log.service.ToolInvocationLogService;
+import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
+import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.tool.execution.ToolExecutionKind;
-import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
-import com.bytechef.platform.tool.execution.ToolExecutionSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationKind;
+import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -49,7 +49,7 @@ class ToolInvocationFacadeIntTest {
     private ToolInvocationFacade toolInvocationFacade;
 
     @Autowired
-    private ToolInvocationLogService toolInvocationLogService;
+    private ExternalInvocationLogService externalInvocationLogService;
 
     @AfterEach
     void afterEach() {
@@ -67,38 +67,42 @@ class ToolInvocationFacadeIntTest {
 
         Instant inRange = Instant.parse("2026-07-18T10:30:00Z");
 
-        ToolInvocationLog matchingToolInvocationLog = createToolInvocationLog(
-            PlatformType.EMBEDDED, Environment.STAGING, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionOutcome.ERROR,
+        ExternalInvocationLog matchingExternalInvocationLog = createExternalInvocationLog(
+            PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSurface.MCP_EMBEDDED,
+            ExternalInvocationOutcome.ERROR,
             connectedUserId, inRange);
 
-        createToolInvocationLog(
-            PlatformType.EMBEDDED, Environment.STAGING, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionOutcome.ERROR,
+        createExternalInvocationLog(
+            PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSurface.MCP_EMBEDDED,
+            ExternalInvocationOutcome.ERROR,
             otherConnectedUserId, inRange);
-        createToolInvocationLog(
-            PlatformType.EMBEDDED, Environment.PRODUCTION, ToolExecutionSurface.MCP_EMBEDDED,
-            ToolExecutionOutcome.ERROR, connectedUserId, inRange);
-        createToolInvocationLog(
-            PlatformType.AUTOMATION, Environment.STAGING, ToolExecutionSurface.MCP_EMBEDDED,
-            ToolExecutionOutcome.ERROR, connectedUserId, inRange);
-        createToolInvocationLog(
-            PlatformType.EMBEDDED, Environment.STAGING, ToolExecutionSurface.EMBEDDED_API_TOOL,
-            ToolExecutionOutcome.ERROR, connectedUserId, inRange);
-        createToolInvocationLog(
-            PlatformType.EMBEDDED, Environment.STAGING, ToolExecutionSurface.MCP_EMBEDDED,
-            ToolExecutionOutcome.SUCCESS, connectedUserId, inRange);
-        createToolInvocationLog(
-            PlatformType.EMBEDDED, Environment.STAGING, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionOutcome.ERROR,
+        createExternalInvocationLog(
+            PlatformType.EMBEDDED, Environment.PRODUCTION, ExternalInvocationSurface.MCP_EMBEDDED,
+            ExternalInvocationOutcome.ERROR, connectedUserId, inRange);
+        createExternalInvocationLog(
+            PlatformType.AUTOMATION, Environment.STAGING, ExternalInvocationSurface.MCP_EMBEDDED,
+            ExternalInvocationOutcome.ERROR, connectedUserId, inRange);
+        createExternalInvocationLog(
+            PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSurface.EMBEDDED_API_TOOL,
+            ExternalInvocationOutcome.ERROR, connectedUserId, inRange);
+        createExternalInvocationLog(
+            PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSurface.MCP_EMBEDDED,
+            ExternalInvocationOutcome.SUCCESS, connectedUserId, inRange);
+        createExternalInvocationLog(
+            PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSurface.MCP_EMBEDDED,
+            ExternalInvocationOutcome.ERROR,
             connectedUserId, Instant.parse("2026-07-18T12:00:00Z"));
 
         authenticate(EXTERNAL_USER_ID);
 
-        Page<ToolInvocationLog> toolInvocationLogPage = toolInvocationFacade.getToolInvocations(
-            EXTERNAL_USER_ID, Environment.STAGING, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionOutcome.ERROR,
+        Page<ExternalInvocationLog> externalInvocationLogPage = toolInvocationFacade.getToolInvocations(
+            EXTERNAL_USER_ID, Environment.STAGING, ExternalInvocationSurface.MCP_EMBEDDED,
+            ExternalInvocationOutcome.ERROR,
             START_DATE, END_DATE, 0);
 
-        assertThat(toolInvocationLogPage.getContent())
-            .extracting(ToolInvocationLog::getId)
-            .containsExactly(matchingToolInvocationLog.getId());
+        assertThat(externalInvocationLogPage.getContent())
+            .extracting(ExternalInvocationLog::getId)
+            .containsExactly(matchingExternalInvocationLog.getId());
     }
 
     @Test
@@ -106,9 +110,9 @@ class ToolInvocationFacadeIntTest {
         long connectedUserId = embeddedExecutionIntTestSupport.createConnectedUser(
             EXTERNAL_USER_ID, Environment.PRODUCTION);
 
-        createToolInvocationLog(
-            PlatformType.EMBEDDED, Environment.PRODUCTION, ToolExecutionSurface.MCP_EMBEDDED,
-            ToolExecutionOutcome.SUCCESS, connectedUserId, Instant.now());
+        createExternalInvocationLog(
+            PlatformType.EMBEDDED, Environment.PRODUCTION, ExternalInvocationSurface.MCP_EMBEDDED,
+            ExternalInvocationOutcome.SUCCESS, connectedUserId, Instant.now());
 
         authenticate("external-user-2");
 
@@ -123,22 +127,23 @@ class ToolInvocationFacadeIntTest {
             .setAuthentication(UsernamePasswordAuthenticationToken.authenticated(name, "n/a", List.of()));
     }
 
-    private ToolInvocationLog createToolInvocationLog(
-        PlatformType type, Environment environment, ToolExecutionSurface surface, ToolExecutionOutcome outcome,
+    private ExternalInvocationLog createExternalInvocationLog(
+        PlatformType type, Environment environment, ExternalInvocationSurface surface,
+        ExternalInvocationOutcome outcome,
         long connectedUserId, Instant createdDate) {
 
-        ToolInvocationLog toolInvocationLog = new ToolInvocationLog();
+        ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
 
-        toolInvocationLog.setConnectedUserId(connectedUserId);
-        toolInvocationLog.setCreatedDate(createdDate);
-        toolInvocationLog.setDurationMs(5);
-        toolInvocationLog.setEnvironment(environment.ordinal());
-        toolInvocationLog.setKind(ToolExecutionKind.COMPONENT);
-        toolInvocationLog.setOutcome(outcome);
-        toolInvocationLog.setSurface(surface);
-        toolInvocationLog.setToolName("slack_send");
-        toolInvocationLog.setType(type);
+        externalInvocationLog.setConnectedUserId(connectedUserId);
+        externalInvocationLog.setCreatedDate(createdDate);
+        externalInvocationLog.setDurationMs(5);
+        externalInvocationLog.setEnvironment(environment.ordinal());
+        externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
+        externalInvocationLog.setOutcome(outcome);
+        externalInvocationLog.setSurface(surface);
+        externalInvocationLog.setToolName("slack_send");
+        externalInvocationLog.setType(type);
 
-        return toolInvocationLogService.create(toolInvocationLog);
+        return externalInvocationLogService.create(externalInvocationLog);
     }
 }
