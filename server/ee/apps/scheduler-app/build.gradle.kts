@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-impl"))
+    implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-db"))
 
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
