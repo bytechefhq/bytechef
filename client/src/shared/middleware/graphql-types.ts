@@ -101,6 +101,12 @@ export type AdminUserPage = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type AggregateScoreDelta = {
+  __typename?: 'AggregateScoreDelta';
+  deltas: Array<ExperimentScoreAverage>;
+  scoreName: Scalars['String']['output'];
+};
+
 export type AiAgentEvalResult = {
   __typename?: 'AiAgentEvalResult';
   conclusion?: Maybe<AiAgentEvalResultConclusion>;
@@ -312,6 +318,183 @@ export type AiDefaultModel = {
   __typename?: 'AiDefaultModel';
   model: Scalars['String']['output'];
   provider: Scalars['String']['output'];
+};
+
+export type AiEvalDatasetItemView = {
+  __typename?: 'AiEvalDatasetItemView';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  datasetVersionId: Scalars['ID']['output'];
+  expectedOutput?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  input: Scalars['String']['output'];
+  metadata?: Maybe<Scalars['String']['output']>;
+  sourceTraceId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type AiEvalDatasetVersionView = {
+  __typename?: 'AiEvalDatasetVersionView';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  datasetId: Scalars['ID']['output'];
+  frozen: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  itemCount: Scalars['Int']['output'];
+  label?: Maybe<Scalars['String']['output']>;
+};
+
+export type AiEvalDatasetView = {
+  __typename?: 'AiEvalDatasetView';
+  archivedDate?: Maybe<Scalars['Long']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  tags?: Maybe<Scalars['String']['output']>;
+  workspaceId: Scalars['ID']['output'];
+};
+
+export type AiEvalExecution = {
+  __typename?: 'AiEvalExecution';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  evalRuleId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  scoreId?: Maybe<Scalars['ID']['output']>;
+  status: AiEvalExecutionStatus;
+  traceId: Scalars['ID']['output'];
+};
+
+export enum AiEvalExecutionStatus {
+  Completed = 'COMPLETED',
+  Error = 'ERROR',
+  Pending = 'PENDING'
+}
+
+export type AiEvalExperimentRunView = {
+  __typename?: 'AiEvalExperimentRunView';
+  cost?: Maybe<Scalars['Float']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  datasetItemId: Scalars['ID']['output'];
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  experimentId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  latencyMs?: Maybe<Scalars['Int']['output']>;
+  status: Scalars['String']['output'];
+  traceId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type AiEvalExperimentView = {
+  __typename?: 'AiEvalExperimentView';
+  completedDate?: Maybe<Scalars['Long']['output']>;
+  completedRuns: Scalars['Int']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  datasetVersionId: Scalars['ID']['output'];
+  failedRuns: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  metadata?: Maybe<Scalars['String']['output']>;
+  model?: Maybe<Scalars['String']['output']>;
+  promptVersionId?: Maybe<Scalars['ID']['output']>;
+  startedDate?: Maybe<Scalars['Long']['output']>;
+  status: Scalars['String']['output'];
+  stopRequested: Scalars['Boolean']['output'];
+  totalRuns: Scalars['Int']['output'];
+};
+
+export type AiEvalRule = {
+  __typename?: 'AiEvalRule';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  delaySeconds?: Maybe<Scalars['Int']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  filters?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  model: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  projectId?: Maybe<Scalars['ID']['output']>;
+  promptTemplate: Scalars['String']['output'];
+  samplingRate: Scalars['Float']['output'];
+  scoreConfigId: Scalars['ID']['output'];
+  version?: Maybe<Scalars['Int']['output']>;
+  workspaceId: Scalars['ID']['output'];
+};
+
+export type AiEvalScore = {
+  __typename?: 'AiEvalScore';
+  comment?: Maybe<Scalars['String']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  dataType?: Maybe<AiEvalScoreDataType>;
+  evalRuleId?: Maybe<Scalars['ID']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  source: AiEvalScoreSource;
+  spanId?: Maybe<Scalars['ID']['output']>;
+  stringValue?: Maybe<Scalars['String']['output']>;
+  traceId: Scalars['ID']['output'];
+  value?: Maybe<Scalars['Float']['output']>;
+  workspaceId: Scalars['ID']['output'];
+};
+
+export type AiEvalScoreAnalytics = {
+  __typename?: 'AiEvalScoreAnalytics';
+  average?: Maybe<Scalars['Float']['output']>;
+  count?: Maybe<Scalars['Int']['output']>;
+  dataType?: Maybe<AiEvalScoreDataType>;
+  distribution?: Maybe<Array<Maybe<AiEvalScoreDistributionEntry>>>;
+  max?: Maybe<Scalars['Float']['output']>;
+  min?: Maybe<Scalars['Float']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type AiEvalScoreConfig = {
+  __typename?: 'AiEvalScoreConfig';
+  categories?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  dataType?: Maybe<AiEvalScoreDataType>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  maxValue?: Maybe<Scalars['Float']['output']>;
+  minValue?: Maybe<Scalars['Float']['output']>;
+  name: Scalars['String']['output'];
+  version?: Maybe<Scalars['Int']['output']>;
+  workspaceId: Scalars['ID']['output'];
+};
+
+export enum AiEvalScoreDataType {
+  Boolean = 'BOOLEAN',
+  Categorical = 'CATEGORICAL',
+  Numeric = 'NUMERIC'
+}
+
+export type AiEvalScoreDistributionEntry = {
+  __typename?: 'AiEvalScoreDistributionEntry';
+  count?: Maybe<Scalars['Int']['output']>;
+  value?: Maybe<Scalars['String']['output']>;
+};
+
+export enum AiEvalScoreSource {
+  Api = 'API',
+  LlmJudge = 'LLM_JUDGE',
+  Manual = 'MANUAL'
+}
+
+export type AiEvalScoreTrendPoint = {
+  __typename?: 'AiEvalScoreTrendPoint';
+  average?: Maybe<Scalars['Float']['output']>;
+  count: Scalars['Int']['output'];
+  day: Scalars['Long']['output'];
+};
+
+export type AiEvalTemplate = {
+  __typename?: 'AiEvalTemplate';
+  categories?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  dataType?: Maybe<AiEvalScoreDataType>;
+  description?: Maybe<Scalars['String']['output']>;
+  key: Scalars['String']['output'];
+  maxValue?: Maybe<Scalars['Float']['output']>;
+  minValue?: Maybe<Scalars['Float']['output']>;
+  promptTemplate: Scalars['String']['output'];
+  title: Scalars['String']['output'];
 };
 
 export type AiGatewayBudget = {
@@ -887,6 +1070,38 @@ export type AiObservabilityWebhookSubscription = {
   url: Scalars['String']['output'];
   version?: Maybe<Scalars['Int']['output']>;
 };
+
+export type AiPrompt = {
+  __typename?: 'AiPrompt';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  projectId?: Maybe<Scalars['ID']['output']>;
+  version?: Maybe<Scalars['Int']['output']>;
+  versions?: Maybe<Array<Maybe<AiPromptVersion>>>;
+};
+
+export type AiPromptVersion = {
+  __typename?: 'AiPromptVersion';
+  active: Scalars['Boolean']['output'];
+  commitMessage?: Maybe<Scalars['String']['output']>;
+  content: Scalars['String']['output'];
+  createdBy: Scalars['String']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  environment?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  promptId: Scalars['ID']['output'];
+  type: AiPromptVersionType;
+  variables?: Maybe<Scalars['String']['output']>;
+  versionNumber: Scalars['Int']['output'];
+};
+
+export enum AiPromptVersionType {
+  Chat = 'CHAT',
+  Text = 'TEXT'
+}
 
 export type AiProviderCatalogItem = {
   __typename?: 'AiProviderCatalogItem';
@@ -1630,6 +1845,23 @@ export type CreateAiModelInput = {
   providerId: Scalars['ID']['input'];
 };
 
+export type CreateAiPromptInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type CreateAiPromptVersionInput = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
+  commitMessage?: InputMaybe<Scalars['String']['input']>;
+  content: Scalars['String']['input'];
+  environment?: InputMaybe<Scalars['String']['input']>;
+  promptId: Scalars['ID']['input'];
+  type: AiPromptVersionType;
+  variables?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateApiConnectorInput = {
   connectorVersion: Scalars['Int']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
@@ -1968,6 +2200,48 @@ export type ExecutionError = {
   __typename?: 'ExecutionError';
   message?: Maybe<Scalars['String']['output']>;
   stackTrace?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+};
+
+export type ExperimentComparisonRow = {
+  __typename?: 'ExperimentComparisonRow';
+  datasetItemId: Scalars['ID']['output'];
+  runsByExperiment: Array<ExperimentRunPoint>;
+};
+
+export type ExperimentComparisonView = {
+  __typename?: 'ExperimentComparisonView';
+  aggregateScoreDeltas: Array<AggregateScoreDelta>;
+  experiments: Array<ExperimentSummary>;
+  rows: Array<ExperimentComparisonRow>;
+};
+
+export type ExperimentRunPoint = {
+  __typename?: 'ExperimentRunPoint';
+  cost?: Maybe<Scalars['Float']['output']>;
+  experimentId: Scalars['ID']['output'];
+  latencyMs?: Maybe<Scalars['Int']['output']>;
+  runId: Scalars['ID']['output'];
+  scores: Array<ScorePoint>;
+  status: Scalars['String']['output'];
+  traceId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ExperimentScoreAverage = {
+  __typename?: 'ExperimentScoreAverage';
+  average?: Maybe<Scalars['Float']['output']>;
+  count: Scalars['Int']['output'];
+  experimentId: Scalars['ID']['output'];
+};
+
+export type ExperimentSummary = {
+  __typename?: 'ExperimentSummary';
+  averageLatencyMs?: Maybe<Scalars['Int']['output']>;
+  completedRuns: Scalars['Int']['output'];
+  failedRuns: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  model?: Maybe<Scalars['String']['output']>;
+  totalCost?: Maybe<Scalars['Float']['output']>;
+  totalRuns: Scalars['Int']['output'];
 };
 
 export type FileEntry = {
@@ -2486,6 +2760,9 @@ export type Mutation = {
   createAiAgentJudge: AiAgentJudge;
   createAiAgentScenarioJudge: AiAgentScenarioJudge;
   createAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
+  createAiEvalRule?: Maybe<AiEvalRule>;
+  createAiEvalScore?: Maybe<AiEvalScore>;
+  createAiEvalScoreConfig?: Maybe<AiEvalScoreConfig>;
   createAiGatewayBudget?: Maybe<AiGatewayBudget>;
   createAiGatewayProject?: Maybe<AiGatewayProject>;
   createAiGatewayProvider?: Maybe<AiGatewayProvider>;
@@ -2504,6 +2781,8 @@ export type Mutation = {
   createAiObservabilityAlertRule?: Maybe<AiObservabilityAlertRule>;
   createAiObservabilityExportJob?: Maybe<AiObservabilityExportJob>;
   createAiObservabilityWebhookSubscription?: Maybe<AiObservabilityWebhookSubscription>;
+  createAiPrompt?: Maybe<AiPrompt>;
+  createAiPromptVersion?: Maybe<AiPromptVersion>;
   createAiSkill: AiSkill;
   createAiSkillFromInstructions: AiSkill;
   createApiConnector: ApiConnector;
@@ -2544,6 +2823,9 @@ export type Mutation = {
    * Fails with CONFLICT when another write changes the memory while it is being deleted; reload it and retry.
    */
   deleteAiAutoMemory: Scalars['Boolean']['output'];
+  deleteAiEvalRule?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiEvalScore?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiEvalScoreConfig?: Maybe<Scalars['Boolean']['output']>;
   deleteAiGatewayBudget?: Maybe<Scalars['Boolean']['output']>;
   deleteAiGatewayProject?: Maybe<Scalars['Boolean']['output']>;
   deleteAiGatewayProvider?: Maybe<Scalars['Boolean']['output']>;
@@ -2553,6 +2835,7 @@ export type Mutation = {
   deleteAiModel?: Maybe<Scalars['Boolean']['output']>;
   deleteAiObservabilityAlertRule?: Maybe<Scalars['Boolean']['output']>;
   deleteAiObservabilityWebhookSubscription?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiPrompt?: Maybe<Scalars['Boolean']['output']>;
   deleteAiSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
@@ -2611,6 +2894,7 @@ export type Mutation = {
   importProjectTemplate: Scalars['ID']['output'];
   importWorkflowTemplate: Scalars['ID']['output'];
   insertDataTableRow: DataTableRow;
+  instantiateAiEvalTemplate?: Maybe<AiEvalRule>;
   inviteUser: Scalars['Boolean']['output'];
   moveAutomationWorkflowProjectConfigurationConnectedUsers: ConfigurationMoveResult;
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -2627,6 +2911,7 @@ export type Mutation = {
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   sendTestWorkflowAlert: Scalars['Boolean']['output'];
+  setActiveAiPromptVersion?: Maybe<Scalars['Boolean']['output']>;
   setAiGuardrailCustomRuleEnabled: AiGuardrailCustomRule;
   setAiObservabilityTraceTags?: Maybe<AiObservabilityTrace>;
   snoozeAiObservabilityAlertRule?: Maybe<AiObservabilityAlertRule>;
@@ -2662,6 +2947,8 @@ export type Mutation = {
    * when the memory has changed since expectedVersion, or when another write races this one; reload it and retry.
    */
   updateAiAutoMemory: AiAutoMemory;
+  updateAiEvalRule?: Maybe<AiEvalRule>;
+  updateAiEvalScoreConfig?: Maybe<AiEvalScoreConfig>;
   updateAiGatewayBudget?: Maybe<AiGatewayBudget>;
   updateAiGatewayProject?: Maybe<AiGatewayProject>;
   updateAiGatewayProjectSettings?: Maybe<AiGatewayProjectSettings>;
@@ -2675,6 +2962,7 @@ export type Mutation = {
   updateAiModel?: Maybe<AiModel>;
   updateAiObservabilityAlertRule?: Maybe<AiObservabilityAlertRule>;
   updateAiObservabilityWebhookSubscription?: Maybe<AiObservabilityWebhookSubscription>;
+  updateAiPrompt?: Maybe<AiPrompt>;
   updateAiSkill: AiSkill;
   updateAiSkillContent: AiSkill;
   updateAiSkillTags: AiSkill;
@@ -2814,6 +3102,44 @@ export type MutationCreateAiAgentScenarioToolSimulationArgs = {
 };
 
 
+export type MutationCreateAiEvalRuleArgs = {
+  delaySeconds?: InputMaybe<Scalars['Int']['input']>;
+  enabled: Scalars['Boolean']['input'];
+  filters?: InputMaybe<Scalars['String']['input']>;
+  model: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  promptTemplate: Scalars['String']['input'];
+  samplingRate: Scalars['Float']['input'];
+  scoreConfigId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateAiEvalScoreArgs = {
+  comment?: InputMaybe<Scalars['String']['input']>;
+  dataType: AiEvalScoreDataType;
+  name: Scalars['String']['input'];
+  source: AiEvalScoreSource;
+  spanId?: InputMaybe<Scalars['ID']['input']>;
+  stringValue?: InputMaybe<Scalars['String']['input']>;
+  traceId: Scalars['ID']['input'];
+  value?: InputMaybe<Scalars['Float']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateAiEvalScoreConfigArgs = {
+  categories?: InputMaybe<Scalars['String']['input']>;
+  dataType?: InputMaybe<AiEvalScoreDataType>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  maxValue?: InputMaybe<Scalars['Float']['input']>;
+  minValue?: InputMaybe<Scalars['Float']['input']>;
+  name: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationCreateAiGatewayBudgetArgs = {
   input: CreateAiGatewayBudgetInput;
 };
@@ -2873,6 +3199,16 @@ export type MutationCreateAiObservabilityWebhookSubscriptionArgs = {
   secret?: InputMaybe<Scalars['String']['input']>;
   url: Scalars['String']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateAiPromptArgs = {
+  input: CreateAiPromptInput;
+};
+
+
+export type MutationCreateAiPromptVersionArgs = {
+  input: CreateAiPromptVersionInput;
 };
 
 
@@ -3074,6 +3410,21 @@ export type MutationDeleteAiAutoMemoryArgs = {
 };
 
 
+export type MutationDeleteAiEvalRuleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiEvalScoreArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiEvalScoreConfigArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteAiGatewayBudgetArgs = {
   id: Scalars['ID']['input'];
 };
@@ -3116,6 +3467,11 @@ export type MutationDeleteAiObservabilityAlertRuleArgs = {
 
 
 export type MutationDeleteAiObservabilityWebhookSubscriptionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiPromptArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -3430,6 +3786,15 @@ export type MutationInsertDataTableRowArgs = {
 };
 
 
+export type MutationInstantiateAiEvalTemplateArgs = {
+  model: Scalars['String']['input'];
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  samplingRate: Scalars['Float']['input'];
+  templateKey: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationInviteUserArgs = {
   email: Scalars['String']['input'];
   role: Scalars['String']['input'];
@@ -3526,6 +3891,12 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
 
 export type MutationSendTestWorkflowAlertArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationSetActiveAiPromptVersionArgs = {
+  environment: Scalars['String']['input'];
+  promptVersionId: Scalars['ID']['input'];
 };
 
 
@@ -3702,6 +4073,30 @@ export type MutationUpdateAiAutoMemoryArgs = {
 };
 
 
+export type MutationUpdateAiEvalRuleArgs = {
+  delaySeconds?: InputMaybe<Scalars['Int']['input']>;
+  enabled: Scalars['Boolean']['input'];
+  filters?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  model: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  promptTemplate: Scalars['String']['input'];
+  samplingRate: Scalars['Float']['input'];
+  scoreConfigId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateAiEvalScoreConfigArgs = {
+  categories?: InputMaybe<Scalars['String']['input']>;
+  dataType?: InputMaybe<AiEvalScoreDataType>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  maxValue?: InputMaybe<Scalars['Float']['input']>;
+  minValue?: InputMaybe<Scalars['Float']['input']>;
+  name: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateAiGatewayBudgetArgs = {
   id: Scalars['ID']['input'];
   input: UpdateAiGatewayBudgetInput;
@@ -3773,6 +4168,12 @@ export type MutationUpdateAiObservabilityWebhookSubscriptionArgs = {
   name: Scalars['String']['input'];
   secret?: InputMaybe<Scalars['String']['input']>;
   url: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateAiPromptArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiPromptInput;
 };
 
 
@@ -4412,6 +4813,23 @@ export type Query = {
    */
   aiAutoMemoryPrincipals: Array<AiAutoMemoryPrincipal>;
   aiDefaultModel?: Maybe<AiDefaultModel>;
+  aiEvalDatasetItems: Array<AiEvalDatasetItemView>;
+  aiEvalDatasetVersions: Array<AiEvalDatasetVersionView>;
+  aiEvalDatasets: Array<AiEvalDatasetView>;
+  aiEvalExecutions?: Maybe<Array<Maybe<AiEvalExecution>>>;
+  aiEvalExecutionsByTrace?: Maybe<Array<Maybe<AiEvalExecution>>>;
+  aiEvalExperimentRunByTraceId?: Maybe<AiEvalExperimentRunView>;
+  aiEvalExperimentRuns: Array<AiEvalExperimentRunView>;
+  aiEvalExperiments: Array<AiEvalExperimentView>;
+  aiEvalRule?: Maybe<AiEvalRule>;
+  aiEvalRules?: Maybe<Array<Maybe<AiEvalRule>>>;
+  aiEvalScoreAnalytics?: Maybe<Array<Maybe<AiEvalScoreAnalytics>>>;
+  aiEvalScoreConfig?: Maybe<AiEvalScoreConfig>;
+  aiEvalScoreConfigs?: Maybe<Array<Maybe<AiEvalScoreConfig>>>;
+  aiEvalScoreTrend?: Maybe<Array<Maybe<AiEvalScoreTrendPoint>>>;
+  aiEvalScores?: Maybe<Array<Maybe<AiEvalScore>>>;
+  aiEvalScoresByTrace?: Maybe<Array<Maybe<AiEvalScore>>>;
+  aiEvalTemplates?: Maybe<Array<Maybe<AiEvalTemplate>>>;
   aiGatewayBudget?: Maybe<AiGatewayBudget>;
   aiGatewayProject?: Maybe<AiGatewayProject>;
   aiGatewayProjectSettings?: Maybe<AiGatewayProjectSettings>;
@@ -4453,6 +4871,9 @@ export type Query = {
   aiObservabilityWebhookDeliveries?: Maybe<Array<Maybe<AiObservabilityWebhookDelivery>>>;
   aiObservabilityWebhookSubscription?: Maybe<AiObservabilityWebhookSubscription>;
   aiObservabilityWebhookSubscriptions?: Maybe<Array<Maybe<AiObservabilityWebhookSubscription>>>;
+  aiPrompt?: Maybe<AiPrompt>;
+  aiPromptVersions?: Maybe<Array<Maybe<AiPromptVersion>>>;
+  aiPrompts?: Maybe<Array<Maybe<AiPrompt>>>;
   aiProviderCatalog: Array<AiProviderCatalogItem>;
   aiSkill: AiSkill;
   aiSkillFileContent: Scalars['String']['output'];
@@ -4524,6 +4945,7 @@ export type Query = {
   environments?: Maybe<Array<Maybe<Environment>>>;
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
   evaluatorFunctionDefinitions: Array<EvaluatorFunctionDefinition>;
+  experimentComparison?: Maybe<ExperimentComparisonView>;
   exportDataTableCsv: Scalars['String']['output'];
   generationJobStatus?: Maybe<GenerationJobStatus>;
   identityProvider?: Maybe<IdentityProviderType>;
@@ -4740,6 +5162,91 @@ export type QueryAiDefaultModelArgs = {
 };
 
 
+export type QueryAiEvalDatasetItemsArgs = {
+  versionId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalDatasetVersionsArgs = {
+  datasetId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalDatasetsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalExecutionsArgs = {
+  evalRuleId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalExecutionsByTraceArgs = {
+  traceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalExperimentRunByTraceIdArgs = {
+  traceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalExperimentRunsArgs = {
+  experimentId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalExperimentsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalRuleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalRulesArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalScoreAnalyticsArgs = {
+  endDate: Scalars['Long']['input'];
+  startDate: Scalars['Long']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalScoreConfigArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalScoreConfigsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalScoreTrendArgs = {
+  endDate: Scalars['Long']['input'];
+  name: Scalars['String']['input'];
+  startDate: Scalars['Long']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalScoresArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiEvalScoresByTraceArgs = {
+  traceId: Scalars['ID']['input'];
+};
+
+
 export type QueryAiGatewayBudgetArgs = {
   workspaceId: Scalars['ID']['input'];
 };
@@ -4882,6 +5389,21 @@ export type QueryAiObservabilityWebhookSubscriptionArgs = {
 
 
 export type QueryAiObservabilityWebhookSubscriptionsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiPromptArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiPromptVersionsArgs = {
+  promptId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiPromptsArgs = {
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -5254,6 +5776,11 @@ export type QueryEvaluatorFunctionDefinitionArgs = {
 
 export type QueryEvaluatorFunctionDefinitionsArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryExperimentComparisonArgs = {
+  experimentIds: Array<Scalars['ID']['input']>;
 };
 
 
@@ -5799,6 +6326,14 @@ export type ResponseDefinitionInput = {
   statusCode: Scalars['String']['input'];
 };
 
+export type ScorePoint = {
+  __typename?: 'ScorePoint';
+  dataType: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  stringValue?: Maybe<Scalars['String']['output']>;
+  value?: Maybe<Scalars['Float']['output']>;
+};
+
 export type ScriptTestExecution = {
   __typename?: 'ScriptTestExecution';
   error?: Maybe<ExecutionError>;
@@ -6072,6 +6607,11 @@ export type UpdateAiModelInput = {
   inputCostPerMTokens?: InputMaybe<Scalars['Float']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   outputCostPerMTokens?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type UpdateAiPromptInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateApiConnectorInput = {
