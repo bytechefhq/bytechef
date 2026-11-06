@@ -1,0 +1,25 @@
+query GetAssetFile($id: ID!) {
+    assetFile(id: $id) {
+        createdBy
+        createdDate
+        description
+        downloadUrl
+        environmentId
+        format
+        generatedByAgentSource
+        generatedFromPrompt
+        id
+        lastModifiedBy
+        lastModifiedDate
+        metadataJson
+        mimeType
+        name
+        publicLinkUrl
+        sizeBytes
+        source
+        tags {
+            id
+            name
+        }
+    }
+}

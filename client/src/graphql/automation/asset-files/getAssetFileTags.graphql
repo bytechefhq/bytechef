@@ -1,0 +1,6 @@
+query GetAssetFileTags($workspaceId: ID!) {
+    assetFileTags(workspaceId: $workspaceId) {
+        id
+        name
+    }
+}

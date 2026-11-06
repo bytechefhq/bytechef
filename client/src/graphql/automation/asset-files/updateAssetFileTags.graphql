@@ -1,0 +1,9 @@
+mutation UpdateAssetFileTags($input: UpdateAssetFileTagsInput!) {
+    updateAssetFileTags(input: $input) {
+        id
+        tags {
+            id
+            name
+        }
+    }
+}
