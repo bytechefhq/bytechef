@@ -699,6 +699,8 @@ include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-graphql")
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-api")
+include("server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-dataset:platform-ai-eval-dataset-api")
+include("server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-dataset:platform-ai-eval-dataset-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-gateway-otlp:platform-ai-gateway-otlp-api")
 include("server:ee:libs:platform:platform-ai:platform-ai-gateway-otlp:platform-ai-gateway-otlp-service")
