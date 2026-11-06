@@ -698,6 +698,8 @@ include("server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-l
 include("server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api")
 include("server:ee:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service")
+include("server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-api")
+include("server:ee:libs:platform:platform-ai:platform-ai-prompt:platform-ai-prompt-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-client")
 include("server:ee:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-remote-client")
 include("server:ee:libs:platform:platform-ai:platform-ai-workspace")
