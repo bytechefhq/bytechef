@@ -116,7 +116,6 @@ const ProjectDeploymentsPanel = ({
                     <EmptyState
                         actions={
                             <ProjectDeploymentDialog
-                                environmentEditable
                                 onSuccess={openSavedProjectDeployment}
                                 projectDeployment={{
                                     environmentId: currentEnvironmentId,
