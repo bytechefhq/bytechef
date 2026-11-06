@@ -30,6 +30,9 @@ public class ToolInvocationLogEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(ToolInvocationLogEventListener.class);
 
+    private static final int MAX_ERROR_MESSAGE_LENGTH = 512;
+    private static final int MAX_NAME_LENGTH = 256;
+
     private final ToolInvocationLogService toolInvocationLogService;
 
     @SuppressFBWarnings("EI2")
@@ -55,10 +58,10 @@ public class ToolInvocationLogEventListener {
         toolInvocationLog.setType(event.type());
         toolInvocationLog.setSurface(event.surface());
         toolInvocationLog.setKind(event.kind());
-        toolInvocationLog.setToolName(event.toolName());
-        toolInvocationLog.setComponentName(event.componentName());
+        toolInvocationLog.setToolName(truncate(event.toolName(), MAX_NAME_LENGTH));
+        toolInvocationLog.setComponentName(truncate(event.componentName(), MAX_NAME_LENGTH));
         toolInvocationLog.setComponentVersion(event.componentVersion());
-        toolInvocationLog.setOperationName(event.operationName());
+        toolInvocationLog.setOperationName(truncate(event.operationName(), MAX_NAME_LENGTH));
         toolInvocationLog.setConnectionId(event.connectionId());
         toolInvocationLog.setEnvironment(event.environment());
         toolInvocationLog.setWorkspaceId(event.workspaceId());
@@ -69,11 +72,19 @@ public class ToolInvocationLogEventListener {
         toolInvocationLog.setA2aServerId(event.a2aServerId());
         toolInvocationLog.setJobId(event.jobId());
         toolInvocationLog.setOutcome(event.outcome());
-        toolInvocationLog.setErrorType(event.errorType());
-        toolInvocationLog.setErrorMessage(event.errorMessage());
+        toolInvocationLog.setErrorType(truncate(event.errorType(), MAX_NAME_LENGTH));
+        toolInvocationLog.setErrorMessage(truncate(event.errorMessage(), MAX_ERROR_MESSAGE_LENGTH));
         toolInvocationLog.setDurationMs((int) event.durationMs());
         toolInvocationLog.setCreatedDate(Instant.now());
 
         return toolInvocationLog;
+    }
+
+    private static String truncate(String value, int maxLength) {
+        if (value == null || value.length() <= maxLength) {
+            return value;
+        }
+
+        return value.substring(0, maxLength);
     }
 }

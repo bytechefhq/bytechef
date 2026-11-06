@@ -126,11 +126,38 @@ class ToolInvocationLogEventListenerIntTest {
     }
 
     @Test
+    void testOverlongNamesAndErrorMessageAreTruncatedToTheirColumnSizes() {
+        ToolExecutionEvent toolExecutionEvent = ToolExecutionEvent
+            .builder(PlatformType.AUTOMATION, ToolExecutionSurface.A2A, ToolExecutionKind.WORKFLOW, "s".repeat(300))
+            .componentName("c".repeat(300))
+            .operationName("o".repeat(300))
+            .outcome(ToolExecutionOutcome.ERROR)
+            .errorType("t".repeat(300))
+            .errorMessage("m".repeat(600))
+            .build();
+
+        applicationEventPublisher.publishEvent(toolExecutionEvent);
+
+        await().atMost(Duration.ofSeconds(10))
+            .until(() -> toolInvocationLogRepository.count() == 1);
+
+        ToolInvocationLog toolInvocationLog = toolInvocationLogRepository.findAll()
+            .getFirst();
+
+        assertThat(toolInvocationLog.getToolName()).isEqualTo("s".repeat(256));
+        assertThat(toolInvocationLog.getComponentName()).isEqualTo("c".repeat(256));
+        assertThat(toolInvocationLog.getOperationName()).isEqualTo("o".repeat(256));
+        assertThat(toolInvocationLog.getErrorType()).isEqualTo("t".repeat(256));
+        assertThat(toolInvocationLog.getErrorMessage()).isEqualTo("m".repeat(512));
+    }
+
+    @Test
     void testPersistenceFailureIsSwallowed() {
         ToolExecutionEvent toolExecutionEvent = ToolExecutionEvent
             .builder(
                 PlatformType.EMBEDDED, ToolExecutionSurface.EMBEDDED_API_ACTION, ToolExecutionKind.COMPONENT,
-                "x".repeat(300))
+                "slack_sendMessage")
+            .externalUserId("x".repeat(300))
             .outcome(ToolExecutionOutcome.SUCCESS)
             .build();
 
