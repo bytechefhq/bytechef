@@ -132,25 +132,25 @@ describe('AutomationWorkflowProjectConfigurationList', () => {
         expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
     });
 
-    it('shows one skeleton card per known configuration while loading instead of the empty state', () => {
+    it('shows one skeleton card with a row per workflow while loading instead of the empty state', () => {
         mocks.isLoading = true;
 
-        renderList(vi.fn(), {configurationCount: 2});
+        renderList(vi.fn(), {
+            configurationCount: 2,
+            workflowTemplates: [{}, {}] as (typeof project)['workflowTemplates'],
+        });
 
-        expect(
-            within(screen.getByRole('list', {name: 'Loading Mail Project configurations'})).getAllByRole('listitem')
-        ).toHaveLength(2);
+        expect(screen.getAllByRole('status', {name: 'Loading Mail Project configurations'})).toHaveLength(1);
+        expect(within(screen.getByRole('list', {name: 'Loading workflows'})).getAllByRole('listitem')).toHaveLength(2);
         expect(screen.queryByText('No Configurations')).not.toBeInTheDocument();
     });
 
-    it('caps the skeleton cards at 3', () => {
+    it('shows a single skeleton card however many configurations the project has', () => {
         mocks.isLoading = true;
 
         renderList(vi.fn(), {configurationCount: 5});
 
-        expect(
-            within(screen.getByRole('list', {name: 'Loading Mail Project configurations'})).getAllByRole('listitem')
-        ).toHaveLength(3);
+        expect(screen.getAllByRole('status', {name: 'Loading Mail Project configurations'})).toHaveLength(1);
     });
 
     it('shows neither skeleton cards nor the empty state while loading a project known to have no configurations', () => {
@@ -158,7 +158,7 @@ describe('AutomationWorkflowProjectConfigurationList', () => {
 
         renderList();
 
-        expect(screen.queryByRole('list', {name: 'Loading Mail Project configurations'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('status', {name: 'Loading Mail Project configurations'})).not.toBeInTheDocument();
         expect(screen.queryByText('No Configurations')).not.toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
     });

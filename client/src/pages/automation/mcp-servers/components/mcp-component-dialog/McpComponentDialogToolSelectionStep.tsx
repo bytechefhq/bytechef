@@ -145,7 +145,7 @@ const McpComponentDialogToolSelectionStep = ({
             )}
 
             {isLoadingComponentDefinition ? (
-                <McpToolSelectionListSkeleton />
+                <McpToolSelectionListSkeleton showHeading />
             ) : toolElements.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">No tools available for this component.</div>
             ) : (
