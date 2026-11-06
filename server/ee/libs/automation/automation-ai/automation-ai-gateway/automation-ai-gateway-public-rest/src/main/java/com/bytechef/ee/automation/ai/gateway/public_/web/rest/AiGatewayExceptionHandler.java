@@ -10,6 +10,8 @@ package com.bytechef.ee.automation.ai.gateway.public_.web.rest;
 import com.bytechef.ee.platform.ai.gateway.domain.BudgetExceededException;
 import com.bytechef.ee.platform.ai.gateway.domain.RateLimitExceededException;
 import com.bytechef.ee.platform.ai.gateway.exception.AiGatewayGuardrailException;
+import com.bytechef.ee.platform.ai.gateway.exception.AiScoreTargetNotFoundException;
+import com.bytechef.ee.platform.ai.gateway.exception.AiScoreWorkspaceBoundaryException;
 import com.bytechef.ee.platform.ai.gateway.exception.BadRequestException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -113,6 +115,32 @@ public class AiGatewayExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED)
             .body(Map.of("error", errorFields));
+    }
+
+    @ExceptionHandler(AiScoreWorkspaceBoundaryException.class)
+    ResponseEntity<Map<String, Object>> handleWorkspaceBoundary(AiScoreWorkspaceBoundaryException exception) {
+        log.error("Cross-workspace request rejected: {}", exception.getMessage(), exception);
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(toErrorBody("workspace_boundary", exception.getMessage()));
+    }
+
+    @ExceptionHandler(AiScoreTargetNotFoundException.class)
+    ResponseEntity<Map<String, Object>> handleScoreTargetNotFound(AiScoreTargetNotFoundException exception) {
+        Throwable cause = exception.getCause();
+
+        boolean validationCause = cause instanceof IllegalArgumentException && cause.getMessage() != null &&
+            !cause.getMessage()
+                .isBlank();
+
+        if (validationCause) {
+            log.warn("Target not found (validation cause): {}", exception.getMessage(), exception);
+        } else {
+            log.info("Target not found: {}", exception.getMessage(), exception);
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(toErrorBody("target_not_found", exception.getMessage()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
