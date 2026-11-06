@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bytechef.ee.embedded.execution.facade.ToolInvocationFacade;
+import com.bytechef.ee.embedded.execution.facade.ExternalInvocationFacade;
 import com.bytechef.ee.embedded.execution.public_.web.rest.config.EmbeddedExecutionPublicRestTestConfiguration;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -48,9 +48,9 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @ContextConfiguration(classes = EmbeddedExecutionPublicRestTestConfiguration.class)
 @TestPropertySource(properties = "bytechef.edition=ee")
-@WebMvcTest(ToolInvocationApiController.class)
-@WithMockUser(username = ToolInvocationApiControllerIntTest.EXTERNAL_USER_ID)
-class ToolInvocationApiControllerIntTest {
+@WebMvcTest(ExternalInvocationApiController.class)
+@WithMockUser(username = ExternalInvocationApiControllerIntTest.EXTERNAL_USER_ID)
+class ExternalInvocationApiControllerIntTest {
 
     static final String EXTERNAL_USER_ID = "external-user-1";
 
@@ -68,12 +68,12 @@ class ToolInvocationApiControllerIntTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private ToolInvocationFacade toolInvocationFacade;
+    private ExternalInvocationFacade externalInvocationFacade;
 
     private final AtomicLong externalInvocationLogId = new AtomicLong();
 
     @Test
-    void testGetToolInvocationsPagePassesTheFiltersAndMapsTheInvocations() throws Exception {
+    void testGetExternalInvocationsPagePassesTheFiltersAndMapsTheInvocations() throws Exception {
         ExternalInvocationLog externalInvocationLog = createExternalInvocationLog(
             ExternalInvocationSurface.EMBEDDED_API_ACTION, ExternalInvocationKind.COMPONENT,
             ExternalInvocationOutcome.ERROR);
@@ -84,14 +84,14 @@ class ToolInvocationApiControllerIntTest {
 
         when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
         when(
-            toolInvocationFacade.getToolInvocations(
+            externalInvocationFacade.getExternalInvocations(
                 EXTERNAL_USER_ID, Environment.STAGING, ExternalInvocationSurface.EMBEDDED_API_ACTION,
                 ExternalInvocationOutcome.ERROR, START_DATE, END_DATE, 2))
                     .thenReturn(new PageImpl<>(List.of(externalInvocationLog), PageRequest.of(2, 20), 41));
 
         mockMvc
             .perform(
-                get("/v1/{externalUserId}/tool-invocations", EXTERNAL_USER_ID)
+                get("/v1/{externalUserId}/external-invocations", EXTERNAL_USER_ID)
                     .header("X-Environment", "STAGING")
                     .param("surface", "EMBEDDED_API_ACTION")
                     .param("outcome", "ERROR")
@@ -121,33 +121,33 @@ class ToolInvocationApiControllerIntTest {
     }
 
     @Test
-    void testGetToolInvocationsPageDefaultsToTheDefaultEnvironmentAndTheFirstPage() throws Exception {
+    void testGetExternalInvocationsPageDefaultsToTheDefaultEnvironmentAndTheFirstPage() throws Exception {
         when(environmentService.getEnvironment((String) null)).thenReturn(Environment.PRODUCTION);
         when(
-            toolInvocationFacade.getToolInvocations(
+            externalInvocationFacade.getExternalInvocations(
                 eq(EXTERNAL_USER_ID), eq(Environment.PRODUCTION), isNull(), isNull(), isNull(), isNull(), eq(0)))
                     .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
 
         mockMvc
-            .perform(get("/v1/{externalUserId}/tool-invocations", EXTERNAL_USER_ID))
+            .perform(get("/v1/{externalUserId}/external-invocations", EXTERNAL_USER_ID))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content.length()").value(0));
 
-        verify(toolInvocationFacade).getToolInvocations(
+        verify(externalInvocationFacade).getExternalInvocations(
             eq(EXTERNAL_USER_ID), eq(Environment.PRODUCTION), isNull(), isNull(), isNull(), isNull(), eq(0));
     }
 
     @Test
-    void testGetToolInvocationsPageReturnsInvocationsOfEveryOutcome() throws Exception {
+    void testGetExternalInvocationsPageReturnsInvocationsOfEveryOutcome() throws Exception {
         List<ExternalInvocationLog> externalInvocationLogs = Arrays.stream(ExternalInvocationOutcome.values())
             .map(outcome -> createExternalInvocationLog(
                 ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationKind.WORKFLOW, outcome))
             .toList();
 
-        mockToolInvocations(externalInvocationLogs);
+        mockExternalInvocations(externalInvocationLogs);
 
         mockMvc
-            .perform(get("/v1/{externalUserId}/tool-invocations", EXTERNAL_USER_ID))
+            .perform(get("/v1/{externalUserId}/external-invocations", EXTERNAL_USER_ID))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$.content[*].outcome").value(
@@ -158,16 +158,16 @@ class ToolInvocationApiControllerIntTest {
     }
 
     @Test
-    void testGetToolInvocationsPageReturnsInvocationsOfEveryKind() throws Exception {
+    void testGetExternalInvocationsPageReturnsInvocationsOfEveryKind() throws Exception {
         List<ExternalInvocationLog> externalInvocationLogs = Arrays.stream(ExternalInvocationKind.values())
             .map(kind -> createExternalInvocationLog(ExternalInvocationSurface.MCP_EMBEDDED, kind,
                 ExternalInvocationOutcome.SUCCESS))
             .toList();
 
-        mockToolInvocations(externalInvocationLogs);
+        mockExternalInvocations(externalInvocationLogs);
 
         mockMvc
-            .perform(get("/v1/{externalUserId}/tool-invocations", EXTERNAL_USER_ID))
+            .perform(get("/v1/{externalUserId}/external-invocations", EXTERNAL_USER_ID))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$.content[*].kind").value(
@@ -178,16 +178,16 @@ class ToolInvocationApiControllerIntTest {
     }
 
     @Test
-    void testGetToolInvocationsPageReturnsInvocationsOfEveryEmbeddedSurface() throws Exception {
+    void testGetExternalInvocationsPageReturnsInvocationsOfEveryEmbeddedSurface() throws Exception {
         List<ExternalInvocationLog> externalInvocationLogs = EMBEDDED_SURFACES.stream()
             .map(surface -> createExternalInvocationLog(surface, ExternalInvocationKind.COMPONENT,
                 ExternalInvocationOutcome.SUCCESS))
             .toList();
 
-        mockToolInvocations(externalInvocationLogs);
+        mockExternalInvocations(externalInvocationLogs);
 
         mockMvc
-            .perform(get("/v1/{externalUserId}/tool-invocations", EXTERNAL_USER_ID))
+            .perform(get("/v1/{externalUserId}/external-invocations", EXTERNAL_USER_ID))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$.content[*].surface").value(
@@ -198,19 +198,19 @@ class ToolInvocationApiControllerIntTest {
     }
 
     @Test
-    void testGetToolInvocationsPageAcceptsEveryOutcomeAsAFilter() throws Exception {
+    void testGetExternalInvocationsPageAcceptsEveryOutcomeAsAFilter() throws Exception {
         when(environmentService.getEnvironment((String) null)).thenReturn(Environment.PRODUCTION);
-        when(toolInvocationFacade.getToolInvocations(any(), any(), any(), any(), any(), any(), anyInt()))
+        when(externalInvocationFacade.getExternalInvocations(any(), any(), any(), any(), any(), any(), anyInt()))
             .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
 
         for (ExternalInvocationOutcome outcome : ExternalInvocationOutcome.values()) {
             mockMvc
                 .perform(
-                    get("/v1/{externalUserId}/tool-invocations", EXTERNAL_USER_ID)
+                    get("/v1/{externalUserId}/external-invocations", EXTERNAL_USER_ID)
                         .param("outcome", outcome.name()))
                 .andExpect(status().isOk());
 
-            verify(toolInvocationFacade).getToolInvocations(
+            verify(externalInvocationFacade).getExternalInvocations(
                 eq(EXTERNAL_USER_ID), eq(Environment.PRODUCTION), isNull(), eq(outcome), isNull(), isNull(), eq(0));
         }
     }
@@ -234,10 +234,10 @@ class ToolInvocationApiControllerIntTest {
         return externalInvocationLog;
     }
 
-    private void mockToolInvocations(List<ExternalInvocationLog> externalInvocationLogs) {
+    private void mockExternalInvocations(List<ExternalInvocationLog> externalInvocationLogs) {
         when(environmentService.getEnvironment((String) null)).thenReturn(Environment.PRODUCTION);
         when(
-            toolInvocationFacade.getToolInvocations(
+            externalInvocationFacade.getExternalInvocations(
                 eq(EXTERNAL_USER_ID), eq(Environment.PRODUCTION), isNull(), isNull(), isNull(), isNull(), eq(0)))
                     .thenReturn(
                         new PageImpl<>(externalInvocationLogs, PageRequest.of(0, 20), externalInvocationLogs.size()));

@@ -20,9 +20,9 @@ import org.springframework.data.domain.Page;
  *
  * @author Ivica Cardic
  */
-public interface ToolInvocationFacade {
+public interface ExternalInvocationFacade {
 
-    Page<ExternalInvocationLog> getToolInvocations(
+    Page<ExternalInvocationLog> getExternalInvocations(
         String externalUserId, Environment environment, @Nullable ExternalInvocationSurface surface,
         @Nullable ExternalInvocationOutcome outcome, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber);

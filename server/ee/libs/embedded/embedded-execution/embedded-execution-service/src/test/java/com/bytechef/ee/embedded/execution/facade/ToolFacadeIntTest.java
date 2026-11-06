@@ -115,7 +115,7 @@ class ToolFacadeIntTest {
     }
 
     @Test
-    void testExecuteToolIsRecordedAsAnEmbeddedApiToolInvocationOfTheConnectedUser() {
+    void testExecuteToolIsRecordedAsAnEmbeddedApiToolExternalInvocationOfTheConnectedUser() {
         long connectedUserId = embeddedExecutionIntTestSupport.createConnectedUser("user-1", Environment.PRODUCTION);
 
         IntegrationInstance integrationInstance = embeddedExecutionIntTestSupport.createIntegrationInstance(

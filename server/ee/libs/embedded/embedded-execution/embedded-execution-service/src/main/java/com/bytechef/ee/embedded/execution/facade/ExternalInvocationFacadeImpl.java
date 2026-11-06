@@ -30,13 +30,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnEEVersion
-public class ToolInvocationFacadeImpl implements ToolInvocationFacade {
+public class ExternalInvocationFacadeImpl implements ExternalInvocationFacade {
 
     private final ConnectedUserService connectedUserService;
     private final ExternalInvocationLogService externalInvocationLogService;
 
     @SuppressFBWarnings("EI")
-    public ToolInvocationFacadeImpl(
+    public ExternalInvocationFacadeImpl(
         ConnectedUserService connectedUserService, ExternalInvocationLogService externalInvocationLogService) {
 
         this.connectedUserService = connectedUserService;
@@ -45,7 +45,7 @@ public class ToolInvocationFacadeImpl implements ToolInvocationFacade {
 
     @Override
     @PreAuthorize("#externalUserId == authentication.name")
-    public Page<ExternalInvocationLog> getToolInvocations(
+    public Page<ExternalInvocationLog> getExternalInvocations(
         String externalUserId, Environment environment, @Nullable ExternalInvocationSurface surface,
         @Nullable ExternalInvocationOutcome outcome, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
