@@ -1306,6 +1306,41 @@ export type ExecutionError = {
   stackTrace?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
 
+export type ExternalInvocationLogPageType = {
+  __typename?: 'ExternalInvocationLogPageType';
+  content: Array<ExternalInvocationLogType>;
+  number: Scalars['Int']['output'];
+  size: Scalars['Int']['output'];
+  totalElements: Scalars['Int']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type ExternalInvocationLogType = {
+  __typename?: 'ExternalInvocationLogType';
+  a2aServerId?: Maybe<Scalars['Long']['output']>;
+  componentName?: Maybe<Scalars['String']['output']>;
+  componentVersion?: Maybe<Scalars['Int']['output']>;
+  connectedUserId?: Maybe<Scalars['Long']['output']>;
+  connectionId?: Maybe<Scalars['Long']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  durationMs: Scalars['Int']['output'];
+  environment?: Maybe<Scalars['Int']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  errorType?: Maybe<Scalars['String']['output']>;
+  externalUserId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  integrationInstanceId?: Maybe<Scalars['Long']['output']>;
+  jobId?: Maybe<Scalars['Long']['output']>;
+  kind: Scalars['String']['output'];
+  mcpServerId?: Maybe<Scalars['Long']['output']>;
+  operationName?: Maybe<Scalars['String']['output']>;
+  outcome: Scalars['String']['output'];
+  surface: Scalars['String']['output'];
+  toolName?: Maybe<Scalars['String']['output']>;
+  workflowName?: Maybe<Scalars['String']['output']>;
+  workspaceId?: Maybe<Scalars['Long']['output']>;
+};
+
 export type FileEntry = {
   __typename?: 'FileEntry';
   extension?: Maybe<Scalars['String']['output']>;
@@ -3417,6 +3452,7 @@ export type Query = {
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
   evaluatorFunctionDefinitions: Array<EvaluatorFunctionDefinition>;
   exportDataTableCsv: Scalars['String']['output'];
+  externalInvocationLogs: ExternalInvocationLogPageType;
   generationJobStatus?: Maybe<GenerationJobStatus>;
   identityProvider?: Maybe<IdentityProviderType>;
   identityProviders: Array<Maybe<IdentityProviderType>>;
@@ -3487,7 +3523,6 @@ export type Query = {
   toolEligibleIntegrationInstanceConfigurationWorkflows: Array<IntegrationWorkflow>;
   toolEligibleIntegrationVersionWorkflows: Array<IntegrationWorkflow>;
   toolEligibleProjectVersionWorkflows: Array<ProjectWorkflow>;
-  toolInvocationLogs: ToolInvocationLogPageType;
   triggerDefinition: TriggerDefinition;
   triggerDefinitions: Array<TriggerDefinition>;
   triggerExecutionFileLogs: LogPage;
@@ -3503,10 +3538,10 @@ export type Query = {
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
   workspaceChatWorkflows: Array<ChatWorkflow>;
+  workspaceExternalInvocationLogs: ExternalInvocationLogPageType;
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
-  workspaceToolInvocationLogs: ToolInvocationLogPageType;
 };
 
 
@@ -4002,6 +4037,21 @@ export type QueryExportDataTableCsvArgs = {
 };
 
 
+export type QueryExternalInvocationLogsArgs = {
+  a2aServerId?: InputMaybe<Scalars['Long']['input']>;
+  connectedUserId?: InputMaybe<Scalars['Long']['input']>;
+  environmentId?: InputMaybe<Scalars['ID']['input']>;
+  fromDate?: InputMaybe<Scalars['Long']['input']>;
+  integrationInstanceId?: InputMaybe<Scalars['Long']['input']>;
+  mcpServerId?: InputMaybe<Scalars['Long']['input']>;
+  outcome?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  surface?: InputMaybe<Scalars['String']['input']>;
+  toDate?: InputMaybe<Scalars['Long']['input']>;
+  type: PlatformType;
+};
+
+
 export type QueryGenerationJobStatusArgs = {
   jobId: Scalars['String']['input'];
 };
@@ -4292,21 +4342,6 @@ export type QueryToolEligibleProjectVersionWorkflowsArgs = {
 };
 
 
-export type QueryToolInvocationLogsArgs = {
-  a2aServerId?: InputMaybe<Scalars['Long']['input']>;
-  connectedUserId?: InputMaybe<Scalars['Long']['input']>;
-  environmentId?: InputMaybe<Scalars['ID']['input']>;
-  fromDate?: InputMaybe<Scalars['Long']['input']>;
-  integrationInstanceId?: InputMaybe<Scalars['Long']['input']>;
-  mcpServerId?: InputMaybe<Scalars['Long']['input']>;
-  outcome?: InputMaybe<Scalars['String']['input']>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  surface?: InputMaybe<Scalars['String']['input']>;
-  toDate?: InputMaybe<Scalars['Long']['input']>;
-  type: PlatformType;
-};
-
-
 export type QueryTriggerDefinitionArgs = {
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
@@ -4399,6 +4434,22 @@ export type QueryWorkspaceChatWorkflowsArgs = {
 };
 
 
+export type QueryWorkspaceExternalInvocationLogsArgs = {
+  a2aServerId?: InputMaybe<Scalars['Long']['input']>;
+  connectedUserId?: InputMaybe<Scalars['Long']['input']>;
+  environmentId: Scalars['ID']['input'];
+  fromDate?: InputMaybe<Scalars['Long']['input']>;
+  integrationInstanceId?: InputMaybe<Scalars['Long']['input']>;
+  mcpServerId?: InputMaybe<Scalars['Long']['input']>;
+  outcome?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  surface?: InputMaybe<Scalars['String']['input']>;
+  toDate?: InputMaybe<Scalars['Long']['input']>;
+  type: PlatformType;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkspaceMcpServerTagsArgs = {
   workspaceId: Scalars['ID']['input'];
 };
@@ -4413,22 +4464,6 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
   environmentId: Scalars['ID']['input'];
   projectId?: InputMaybe<Scalars['ID']['input']>;
   tagId?: InputMaybe<Scalars['ID']['input']>;
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type QueryWorkspaceToolInvocationLogsArgs = {
-  a2aServerId?: InputMaybe<Scalars['Long']['input']>;
-  connectedUserId?: InputMaybe<Scalars['Long']['input']>;
-  environmentId: Scalars['ID']['input'];
-  fromDate?: InputMaybe<Scalars['Long']['input']>;
-  integrationInstanceId?: InputMaybe<Scalars['Long']['input']>;
-  mcpServerId?: InputMaybe<Scalars['Long']['input']>;
-  outcome?: InputMaybe<Scalars['String']['input']>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  surface?: InputMaybe<Scalars['String']['input']>;
-  toDate?: InputMaybe<Scalars['Long']['input']>;
-  type: PlatformType;
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -4610,41 +4645,6 @@ export type TimeProperty = Property & {
   placeholder?: Maybe<Scalars['String']['output']>;
   required?: Maybe<Scalars['Boolean']['output']>;
   type: PropertyType;
-};
-
-export type ToolInvocationLogPageType = {
-  __typename?: 'ToolInvocationLogPageType';
-  content: Array<ToolInvocationLogType>;
-  number: Scalars['Int']['output'];
-  size: Scalars['Int']['output'];
-  totalElements: Scalars['Int']['output'];
-  totalPages: Scalars['Int']['output'];
-};
-
-export type ToolInvocationLogType = {
-  __typename?: 'ToolInvocationLogType';
-  a2aServerId?: Maybe<Scalars['Long']['output']>;
-  componentName?: Maybe<Scalars['String']['output']>;
-  componentVersion?: Maybe<Scalars['Int']['output']>;
-  connectedUserId?: Maybe<Scalars['Long']['output']>;
-  connectionId?: Maybe<Scalars['Long']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  durationMs: Scalars['Int']['output'];
-  environment?: Maybe<Scalars['Int']['output']>;
-  errorMessage?: Maybe<Scalars['String']['output']>;
-  errorType?: Maybe<Scalars['String']['output']>;
-  externalUserId?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  integrationInstanceId?: Maybe<Scalars['Long']['output']>;
-  jobId?: Maybe<Scalars['Long']['output']>;
-  kind: Scalars['String']['output'];
-  mcpServerId?: Maybe<Scalars['Long']['output']>;
-  operationName?: Maybe<Scalars['String']['output']>;
-  outcome: Scalars['String']['output'];
-  surface: Scalars['String']['output'];
-  toolName?: Maybe<Scalars['String']['output']>;
-  workflowName?: Maybe<Scalars['String']['output']>;
-  workspaceId?: Maybe<Scalars['Long']['output']>;
 };
 
 export type TriggerDefinition = {

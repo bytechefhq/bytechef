@@ -1731,6 +1731,41 @@ export type UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationV
 
 export type UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation = { upgradeAutomationWorkflowProjectConfigurationConnectedUsers: { movedConnectedUserIds: Array<string>, needsAttentionConnectedUserIds: Array<string>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
 
+export type ExternalInvocationLogsQueryVariables = Exact<{
+  type: Types.PlatformType;
+  environmentId?: string | number | null | undefined;
+  surface?: string | null | undefined;
+  outcome?: string | null | undefined;
+  mcpServerId?: any;
+  a2aServerId?: any;
+  connectedUserId?: any;
+  integrationInstanceId?: any;
+  fromDate?: any;
+  toDate?: any;
+  page?: number | null | undefined;
+}>;
+
+
+export type ExternalInvocationLogsQuery = { externalInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+
+export type WorkspaceExternalInvocationLogsQueryVariables = Exact<{
+  type: Types.PlatformType;
+  workspaceId: string | number;
+  environmentId: string | number;
+  surface?: string | null | undefined;
+  outcome?: string | null | undefined;
+  mcpServerId?: any;
+  a2aServerId?: any;
+  connectedUserId?: any;
+  integrationInstanceId?: any;
+  fromDate?: any;
+  toDate?: any;
+  page?: number | null | undefined;
+}>;
+
+
+export type WorkspaceExternalInvocationLogsQuery = { workspaceExternalInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+
 export type AiDefaultModelQueryVariables = Exact<{
   environment: string | number;
 }>;
@@ -2431,41 +2466,6 @@ export type UsersQueryVariables = Exact<{
 
 
 export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
-
-export type ToolInvocationLogsQueryVariables = Exact<{
-  type: Types.PlatformType;
-  environmentId?: string | number | null | undefined;
-  surface?: string | null | undefined;
-  outcome?: string | null | undefined;
-  mcpServerId?: any;
-  a2aServerId?: any;
-  connectedUserId?: any;
-  integrationInstanceId?: any;
-  fromDate?: any;
-  toDate?: any;
-  page?: number | null | undefined;
-}>;
-
-
-export type ToolInvocationLogsQuery = { toolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
-
-export type WorkspaceToolInvocationLogsQueryVariables = Exact<{
-  type: Types.PlatformType;
-  workspaceId: string | number;
-  environmentId: string | number;
-  surface?: string | null | undefined;
-  outcome?: string | null | undefined;
-  mcpServerId?: any;
-  a2aServerId?: any;
-  connectedUserId?: any;
-  integrationInstanceId?: any;
-  fromDate?: any;
-  toDate?: any;
-  page?: number | null | undefined;
-}>;
-
-
-export type WorkspaceToolInvocationLogsQuery = { workspaceToolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
 
 
 export class TypedDocumentString<TResult, TVariables>
@@ -8715,6 +8715,131 @@ export const useUpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutat
   }
     )};
 
+export const ExternalInvocationLogsDocument = new TypedDocumentString(`
+    query ExternalInvocationLogs($type: PlatformType!, $environmentId: ID, $surface: String, $outcome: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
+  externalInvocationLogs(
+    type: $type
+    environmentId: $environmentId
+    surface: $surface
+    outcome: $outcome
+    mcpServerId: $mcpServerId
+    a2aServerId: $a2aServerId
+    connectedUserId: $connectedUserId
+    integrationInstanceId: $integrationInstanceId
+    fromDate: $fromDate
+    toDate: $toDate
+    page: $page
+  ) {
+    content {
+      id
+      surface
+      kind
+      toolName
+      componentName
+      componentVersion
+      operationName
+      connectionId
+      environment
+      externalUserId
+      connectedUserId
+      integrationInstanceId
+      mcpServerId
+      a2aServerId
+      jobId
+      workflowName
+      outcome
+      errorType
+      errorMessage
+      durationMs
+      createdDate
+    }
+    number
+    size
+    totalElements
+    totalPages
+  }
+}
+    `);
+
+export const useExternalInvocationLogsQuery = <
+      TData = ExternalInvocationLogsQuery,
+      TError = unknown
+    >(
+      variables: ExternalInvocationLogsQueryVariables,
+      options?: Omit<UseQueryOptions<ExternalInvocationLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ExternalInvocationLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ExternalInvocationLogsQuery, TError, TData>(
+      {
+    queryKey: ['ExternalInvocationLogs', variables],
+    queryFn: fetcher<ExternalInvocationLogsQuery, ExternalInvocationLogsQueryVariables>(ExternalInvocationLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceExternalInvocationLogsDocument = new TypedDocumentString(`
+    query WorkspaceExternalInvocationLogs($type: PlatformType!, $workspaceId: ID!, $environmentId: ID!, $surface: String, $outcome: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
+  workspaceExternalInvocationLogs(
+    type: $type
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    surface: $surface
+    outcome: $outcome
+    mcpServerId: $mcpServerId
+    a2aServerId: $a2aServerId
+    connectedUserId: $connectedUserId
+    integrationInstanceId: $integrationInstanceId
+    fromDate: $fromDate
+    toDate: $toDate
+    page: $page
+  ) {
+    content {
+      id
+      surface
+      kind
+      toolName
+      componentName
+      componentVersion
+      operationName
+      connectionId
+      environment
+      externalUserId
+      connectedUserId
+      integrationInstanceId
+      mcpServerId
+      a2aServerId
+      jobId
+      workflowName
+      outcome
+      errorType
+      errorMessage
+      durationMs
+      createdDate
+    }
+    number
+    size
+    totalElements
+    totalPages
+  }
+}
+    `);
+
+export const useWorkspaceExternalInvocationLogsQuery = <
+      TData = WorkspaceExternalInvocationLogsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceExternalInvocationLogsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceExternalInvocationLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceExternalInvocationLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceExternalInvocationLogsQuery, TError, TData>(
+      {
+    queryKey: ['WorkspaceExternalInvocationLogs', variables],
+    queryFn: fetcher<WorkspaceExternalInvocationLogsQuery, WorkspaceExternalInvocationLogsQueryVariables>(WorkspaceExternalInvocationLogsDocument, variables),
+    ...options
+  }
+    )};
+
 export const AiDefaultModelDocument = new TypedDocumentString(`
     query aiDefaultModel($environment: ID!) {
   aiDefaultModel(environment: $environment) {
@@ -11600,131 +11725,6 @@ export const useUsersQuery = <
       {
     queryKey: variables === undefined ? ['users'] : ['users', variables],
     queryFn: fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, variables),
-    ...options
-  }
-    )};
-
-export const ToolInvocationLogsDocument = new TypedDocumentString(`
-    query ToolInvocationLogs($type: PlatformType!, $environmentId: ID, $surface: String, $outcome: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
-  toolInvocationLogs(
-    type: $type
-    environmentId: $environmentId
-    surface: $surface
-    outcome: $outcome
-    mcpServerId: $mcpServerId
-    a2aServerId: $a2aServerId
-    connectedUserId: $connectedUserId
-    integrationInstanceId: $integrationInstanceId
-    fromDate: $fromDate
-    toDate: $toDate
-    page: $page
-  ) {
-    content {
-      id
-      surface
-      kind
-      toolName
-      componentName
-      componentVersion
-      operationName
-      connectionId
-      environment
-      externalUserId
-      connectedUserId
-      integrationInstanceId
-      mcpServerId
-      a2aServerId
-      jobId
-      workflowName
-      outcome
-      errorType
-      errorMessage
-      durationMs
-      createdDate
-    }
-    number
-    size
-    totalElements
-    totalPages
-  }
-}
-    `);
-
-export const useToolInvocationLogsQuery = <
-      TData = ToolInvocationLogsQuery,
-      TError = unknown
-    >(
-      variables: ToolInvocationLogsQueryVariables,
-      options?: Omit<UseQueryOptions<ToolInvocationLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolInvocationLogsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<ToolInvocationLogsQuery, TError, TData>(
-      {
-    queryKey: ['ToolInvocationLogs', variables],
-    queryFn: fetcher<ToolInvocationLogsQuery, ToolInvocationLogsQueryVariables>(ToolInvocationLogsDocument, variables),
-    ...options
-  }
-    )};
-
-export const WorkspaceToolInvocationLogsDocument = new TypedDocumentString(`
-    query WorkspaceToolInvocationLogs($type: PlatformType!, $workspaceId: ID!, $environmentId: ID!, $surface: String, $outcome: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
-  workspaceToolInvocationLogs(
-    type: $type
-    workspaceId: $workspaceId
-    environmentId: $environmentId
-    surface: $surface
-    outcome: $outcome
-    mcpServerId: $mcpServerId
-    a2aServerId: $a2aServerId
-    connectedUserId: $connectedUserId
-    integrationInstanceId: $integrationInstanceId
-    fromDate: $fromDate
-    toDate: $toDate
-    page: $page
-  ) {
-    content {
-      id
-      surface
-      kind
-      toolName
-      componentName
-      componentVersion
-      operationName
-      connectionId
-      environment
-      externalUserId
-      connectedUserId
-      integrationInstanceId
-      mcpServerId
-      a2aServerId
-      jobId
-      workflowName
-      outcome
-      errorType
-      errorMessage
-      durationMs
-      createdDate
-    }
-    number
-    size
-    totalElements
-    totalPages
-  }
-}
-    `);
-
-export const useWorkspaceToolInvocationLogsQuery = <
-      TData = WorkspaceToolInvocationLogsQuery,
-      TError = unknown
-    >(
-      variables: WorkspaceToolInvocationLogsQueryVariables,
-      options?: Omit<UseQueryOptions<WorkspaceToolInvocationLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceToolInvocationLogsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<WorkspaceToolInvocationLogsQuery, TError, TData>(
-      {
-    queryKey: ['WorkspaceToolInvocationLogs', variables],
-    queryFn: fetcher<WorkspaceToolInvocationLogsQuery, WorkspaceToolInvocationLogsQueryVariables>(WorkspaceToolInvocationLogsDocument, variables),
     ...options
   }
     )};
