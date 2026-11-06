@@ -1,5 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
+import LoadingIcon from '@/components/LoadingIcon';
+import {Skeleton} from '@/components/ui/skeleton';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
@@ -34,10 +36,11 @@ const AutomationWorkflowProjectConfigurationList = ({
 }: AutomationWorkflowProjectConfigurationListProps) => {
     const queryClient = useQueryClient();
 
-    const {data: configurationsData} = useAutomationWorkflowProjectConfigurationsQuery({
-        environmentId: String(environmentId),
-        projectId: project.id,
-    });
+    const {data: configurationsData, isLoading: configurationsIsLoading} =
+        useAutomationWorkflowProjectConfigurationsQuery({
+            environmentId: String(environmentId),
+            projectId: project.id,
+        });
 
     const deleteConfigurationMutation = useDeleteAutomationWorkflowProjectConfigurationMutation({
         onSuccess: () => {
@@ -47,6 +50,36 @@ const AutomationWorkflowProjectConfigurationList = ({
     });
 
     const configurations = configurationsData?.automationWorkflowProjectConfigurations ?? [];
+
+    if (configurationsIsLoading && project.configurationCount === 0) {
+        return (
+            <div className="flex items-center justify-center py-6">
+                <LoadingIcon />
+            </div>
+        );
+    }
+
+    if (configurationsIsLoading) {
+        return (
+            <ul aria-busy="true" aria-label={`Loading ${project.name} configurations`} className="flex flex-col gap-2">
+                {Array.from({length: Math.min(project.configurationCount, 3)}, (_, index) => (
+                    <li className="flex items-center justify-between rounded border border-border/50 p-3" key={index}>
+                        <div className="space-y-2">
+                            <Skeleton className="h-5 w-40" />
+
+                            <Skeleton className="h-4 w-24" />
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <Skeleton className="h-6 w-9 rounded-full" />
+
+                            <Skeleton className="h-6 w-11 rounded-full" />
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        );
+    }
 
     if (configurations.length === 0) {
         return (

@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import LoadingIcon from '@/components/LoadingIcon';
+import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
 import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
@@ -63,12 +64,39 @@ const IntegrationInstanceConfigurationsPanel = ({
     const integrationInstanceConfigurationsLoadFailed =
         !!integrationInstanceConfigurationsError && integrationInstanceConfigurations === undefined;
 
+    const knownIntegrationInstanceConfigurationCount = integration.developmentConfigurationCount;
+
+    const skeletonIntegrationInstanceConfigurationCount = Math.min(knownIntegrationInstanceConfigurationCount ?? 1, 3);
+
     return (
         <>
-            {integrationInstanceConfigurationsIsLoading && (
+            {integrationInstanceConfigurationsIsLoading && knownIntegrationInstanceConfigurationCount === 0 && (
                 <div className="flex items-center justify-center py-6">
                     <LoadingIcon />
                 </div>
+            )}
+
+            {integrationInstanceConfigurationsIsLoading && knownIntegrationInstanceConfigurationCount !== 0 && (
+                <ul aria-busy="true" aria-label="Loading configurations">
+                    {Array.from({length: skeletonIntegrationInstanceConfigurationCount}, (_, index) => (
+                        <li
+                            className="mb-2 flex items-center justify-between rounded border border-border/50 p-3"
+                            key={index}
+                        >
+                            <div className="space-y-2">
+                                <Skeleton className="h-5 w-40" />
+
+                                <Skeleton className="h-4 w-24" />
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                <Skeleton className="h-6 w-9 rounded-full" />
+
+                                <Skeleton className="h-6 w-11 rounded-full" />
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             )}
 
             {integrationInstanceConfigurationsLoadFailed && (

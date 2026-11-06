@@ -1,6 +1,6 @@
 import IntegrationInstanceConfigurationsPanel from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsPanel';
 import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
+import {fireEvent, render, screen, within} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
@@ -127,6 +127,50 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
 
         expect(screen.getByText('Publish the integration to configure it')).toBeInTheDocument();
         expect(screen.queryByText(/Configuration dialog/)).not.toBeInTheDocument();
+    });
+
+    it('shows one skeleton card per known Development configuration while loading, up to 3', () => {
+        hoisted.integrationInstanceConfigurations = undefined;
+        hoisted.isLoading = true;
+
+        renderPanel({developmentConfigurationCount: 2});
+
+        expect(
+            within(screen.getByRole('list', {name: 'Loading configurations'})).getAllByRole('listitem')
+        ).toHaveLength(2);
+        expect(screen.queryByText('No configurations in Development')).not.toBeInTheDocument();
+    });
+
+    it('caps the skeleton cards at 3', () => {
+        hoisted.integrationInstanceConfigurations = undefined;
+        hoisted.isLoading = true;
+
+        renderPanel({developmentConfigurationCount: 7});
+
+        expect(
+            within(screen.getByRole('list', {name: 'Loading configurations'})).getAllByRole('listitem')
+        ).toHaveLength(3);
+    });
+
+    it('shows one skeleton card while loading when the configuration count is unknown', () => {
+        hoisted.integrationInstanceConfigurations = undefined;
+        hoisted.isLoading = true;
+
+        renderPanel({developmentConfigurationCount: undefined});
+
+        expect(
+            within(screen.getByRole('list', {name: 'Loading configurations'})).getAllByRole('listitem')
+        ).toHaveLength(1);
+    });
+
+    it('shows no skeleton cards while loading when the integration is known to have no configurations', () => {
+        hoisted.integrationInstanceConfigurations = undefined;
+        hoisted.isLoading = true;
+
+        renderPanel({developmentConfigurationCount: 0});
+
+        expect(screen.queryByRole('list', {name: 'Loading configurations'})).not.toBeInTheDocument();
+        expect(screen.queryByText('No configurations in Development')).not.toBeInTheDocument();
     });
 
     it('offers a retry when the instance configurations fail to load', () => {

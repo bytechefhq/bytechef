@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
     configurationsVariables: undefined as unknown,
     deleteMutate: vi.fn(),
     invalidateQueries: vi.fn(),
+    isLoading: false,
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -20,7 +21,10 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     useAutomationWorkflowProjectConfigurationsQuery: (variables: unknown) => {
         mocks.configurationsVariables = variables;
 
-        return {data: {automationWorkflowProjectConfigurations: mocks.configurations}};
+        return {
+            data: mocks.isLoading ? undefined : {automationWorkflowProjectConfigurations: mocks.configurations},
+            isLoading: mocks.isLoading,
+        };
     },
     useDeleteAutomationWorkflowProjectConfigurationMutation: (options?: {onSuccess?: () => void}) => ({
         isPending: false,
@@ -88,6 +92,7 @@ describe('AutomationWorkflowProjectConfigurationList', () => {
 
         mocks.configurations = [];
         mocks.configurationsVariables = undefined;
+        mocks.isLoading = false;
     });
 
     it('loads only the configurations of the given environment', () => {
@@ -124,6 +129,37 @@ describe('AutomationWorkflowProjectConfigurationList', () => {
         renderList(vi.fn(), {published: false});
 
         expect(screen.getByText('Publish the project to configure it')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
+    });
+
+    it('shows one skeleton card per known configuration while loading instead of the empty state', () => {
+        mocks.isLoading = true;
+
+        renderList(vi.fn(), {configurationCount: 2});
+
+        expect(
+            within(screen.getByRole('list', {name: 'Loading Mail Project configurations'})).getAllByRole('listitem')
+        ).toHaveLength(2);
+        expect(screen.queryByText('No Configurations')).not.toBeInTheDocument();
+    });
+
+    it('caps the skeleton cards at 3', () => {
+        mocks.isLoading = true;
+
+        renderList(vi.fn(), {configurationCount: 5});
+
+        expect(
+            within(screen.getByRole('list', {name: 'Loading Mail Project configurations'})).getAllByRole('listitem')
+        ).toHaveLength(3);
+    });
+
+    it('shows neither skeleton cards nor the empty state while loading a project known to have no configurations', () => {
+        mocks.isLoading = true;
+
+        renderList();
+
+        expect(screen.queryByRole('list', {name: 'Loading Mail Project configurations'})).not.toBeInTheDocument();
+        expect(screen.queryByText('No Configurations')).not.toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
     });
 
