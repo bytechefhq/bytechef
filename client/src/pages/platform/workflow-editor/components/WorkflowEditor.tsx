@@ -7,11 +7,14 @@ import {
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {Background, BackgroundVariant, ReactFlow, useNodesInitialized, useReactFlow, useStore} from '@xyflow/react';
-import {useEffect} from 'react';
+import {useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+import orderExecutedTriggerFanInEdgesLast from '../edges/orderExecutedTriggerFanInEdgesLast';
+import useDisabledTaskNames from '../hooks/useDisabledTaskNames';
 import useWorkflowEditorCanvas from '../hooks/useWorkflowEditorCanvas';
+import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
 import {WorkflowEditorReadOnlyContext} from '../providers/workflowEditorReadOnlyContext';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -104,6 +107,14 @@ const WorkflowEditor = ({
         taskDispatcherDefinitions,
     });
 
+    const disabledTaskNames = useDisabledTaskNames();
+    const workflowTestNodeStates = useWorkflowTestNodeStates();
+
+    const renderedEdges = useMemo(
+        () => orderExecutedTriggerFanInEdgesLast({disabledTaskNames, edges, nodes, workflowTestNodeStates}),
+        [disabledTaskNames, edges, nodes, workflowTestNodeStates]
+    );
+
     useEffect(() => {
         if (!fitsViewOnLoad || !nodesInitialized || !flowWidth || !flowHeight) {
             return;
@@ -151,7 +162,7 @@ const WorkflowEditor = ({
                     defaultViewport={CANVAS_DEFAULT_VIEWPORT}
                     deleteKeyCode={null}
                     edgeTypes={edgeTypes}
-                    edges={edges}
+                    edges={renderedEdges}
                     maxZoom={1.5}
                     minZoom={0.001}
                     nodeTypes={nodeTypes}
