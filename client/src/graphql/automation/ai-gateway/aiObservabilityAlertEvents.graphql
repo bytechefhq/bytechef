@@ -1,0 +1,21 @@
+query aiObservabilityAlertEvents($alertRuleId: ID!) {
+    aiObservabilityAlertEvents(alertRuleId: $alertRuleId) {
+        alertRuleId
+        createdDate
+        id
+        message
+        status
+        triggeredValue
+    }
+}
+
+mutation acknowledgeAiObservabilityAlertEvent($id: ID!) {
+    acknowledgeAiObservabilityAlertEvent(id: $id) {
+        alertRuleId
+        createdDate
+        id
+        message
+        status
+        triggeredValue
+    }
+}

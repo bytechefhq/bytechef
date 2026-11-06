@@ -1,0 +1,93 @@
+query aiObservabilityTraces(
+    $endDate: Long!
+    $model: String
+    $source: AiObservabilityTraceSource
+    $startDate: Long!
+    $status: AiObservabilityTraceStatus
+    $tagId: ID
+    $userId: String
+    $workspaceId: ID!
+) {
+    aiObservabilityTraces(
+        endDate: $endDate
+        model: $model
+        source: $source
+        startDate: $startDate
+        status: $status
+        tagId: $tagId
+        userId: $userId
+        workspaceId: $workspaceId
+    ) {
+        createdDate
+        id
+        input
+        lastModifiedDate
+        metadata
+        name
+        output
+        projectId
+        sessionId
+        source
+        status
+        totalCost
+        totalInputTokens
+        totalLatencyMs
+        totalOutputTokens
+        userId
+        version
+        workspaceId
+    }
+}
+
+query aiObservabilityTrace($id: ID!) {
+    aiObservabilityTrace(id: $id) {
+        createdDate
+        id
+        input
+        lastModifiedDate
+        metadata
+        name
+        output
+        projectId
+        sessionId
+        source
+        spans {
+            cost
+            createdDate
+            endTime
+            id
+            input
+            inputTokens
+            latencyMs
+            level
+            metadata
+            model
+            name
+            output
+            outputTokens
+            parentSpanId
+            provider
+            startTime
+            status
+            traceId
+            type
+            version
+        }
+        status
+        tagIds
+        totalCost
+        totalInputTokens
+        totalLatencyMs
+        totalOutputTokens
+        userId
+        version
+        workspaceId
+    }
+}
+
+mutation setAiObservabilityTraceTags($traceId: ID!, $tagIds: [ID!]!) {
+    setAiObservabilityTraceTags(traceId: $traceId, tagIds: $tagIds) {
+        id
+        tagIds
+    }
+}

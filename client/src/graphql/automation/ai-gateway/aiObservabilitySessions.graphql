@@ -1,0 +1,38 @@
+query aiObservabilitySessions($workspaceId: ID!) {
+    aiObservabilitySessions(workspaceId: $workspaceId) {
+        createdDate
+        id
+        lastModifiedDate
+        name
+        projectId
+        traceCount
+        userId
+        version
+        workspaceId
+    }
+}
+
+query aiObservabilitySession($id: ID!) {
+    aiObservabilitySession(id: $id) {
+        createdDate
+        id
+        lastModifiedDate
+        name
+        projectId
+        traces {
+            createdDate
+            id
+            name
+            source
+            status
+            totalCost
+            totalInputTokens
+            totalLatencyMs
+            totalOutputTokens
+            userId
+        }
+        userId
+        version
+        workspaceId
+    }
+}
