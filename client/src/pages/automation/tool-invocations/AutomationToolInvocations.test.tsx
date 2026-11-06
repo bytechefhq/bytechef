@@ -10,6 +10,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {AutomationToolInvocations} from './AutomationToolInvocations';
 
 const hoisted = vi.hoisted(() => ({
+    grantedScopes: new Set<string>(),
     useA2aServersQueryMock: vi.fn(),
     useToolInvocationLogsQueryMock: vi.fn(),
     useWorkspaceMcpServersQueryMock: vi.fn(),
@@ -23,6 +24,14 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useToolInvocationLogsQuery: hoisted.useToolInvocationLogsQueryMock,
     useWorkspaceMcpServersQuery: hoisted.useWorkspaceMcpServersQueryMock,
     useWorkspaceToolInvocationLogsQuery: hoisted.useWorkspaceToolInvocationLogsQueryMock,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) => hoisted.grantedScopes.has(scope),
+}));
+
+vi.mock('@/shared/hooks/useLoadWorkspaceScopes', () => ({
+    useLoadWorkspaceScopes: () => ({error: false, loading: false}),
 }));
 
 vi.mock('@/pages/automation/tool-invocations/ToolInvocations', () => ({
@@ -101,6 +110,7 @@ const renderPage = () =>
 
 describe('AutomationToolInvocations', () => {
     beforeEach(() => {
+        hoisted.grantedScopes = new Set(['A2A_VIEW', 'MCP_VIEW']);
         hoisted.useA2aServersQueryMock.mockReset();
         hoisted.useA2aServersQueryMock.mockReturnValue({data: undefined});
         hoisted.useToolInvocationLogsQueryMock.mockReset();
@@ -185,6 +195,21 @@ describe('AutomationToolInvocations', () => {
             '5:Billing agent',
         ]);
     });
+
+    it.each([
+        ['A2A_VIEW', () => hoisted.useA2aServersQueryMock, () => hoisted.useWorkspaceMcpServersQueryMock],
+        ['MCP_VIEW', () => hoisted.useWorkspaceMcpServersQueryMock, () => hoisted.useA2aServersQueryMock],
+    ])(
+        'does not query the servers a user without the %s scope may not view',
+        (scope, getDeniedQueryMock, getAllowedQueryMock) => {
+            hoisted.grantedScopes.delete(scope);
+
+            renderPage();
+
+            expect(getDeniedQueryMock()).toHaveBeenCalledWith({workspaceId: '7'}, {enabled: false});
+            expect(getAllowedQueryMock()).toHaveBeenCalledWith({workspaceId: '7'}, {enabled: true});
+        }
+    );
 
     it('queries the tool invocations of the picked A2A server', async () => {
         renderPage();
