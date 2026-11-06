@@ -5,6 +5,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     edition: 'EE',
+    environmentsIsLoading: false,
     mockSetCurrentEnvironmentId: vi.fn(),
 }));
 
@@ -34,6 +35,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
                 {id: '2', name: 'Production'},
             ],
         },
+        isLoading: hoisted.environmentsIsLoading,
     }),
 }));
 
@@ -48,6 +50,7 @@ describe('EnvironmentSelect', () => {
     beforeEach(() => {
         mockScrollIntoView();
         hoisted.edition = 'EE';
+        hoisted.environmentsIsLoading = false;
     });
 
     it('should render badge with current environment label when EE edition', () => {
@@ -77,6 +80,24 @@ describe('EnvironmentSelect', () => {
         expect(screen.queryByText('DEV')).not.toBeInTheDocument();
         expect(screen.queryByText('DEVELOPMENT')).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'DEVELOPMENT'})).toBeInTheDocument();
+    });
+
+    it('should hold the icon badge space with a skeleton while environments load', () => {
+        hoisted.environmentsIsLoading = true;
+
+        renderEnvironmentSelect('icon');
+
+        expect(screen.getByTestId('environment-select-skeleton')).toBeInTheDocument();
+        expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('should not render a skeleton in CE while environments load', () => {
+        hoisted.edition = 'CE';
+        hoisted.environmentsIsLoading = true;
+
+        renderEnvironmentSelect('icon');
+
+        expect(screen.queryByTestId('environment-select-skeleton')).not.toBeInTheDocument();
     });
 
     it('should still offer the full label of every environment in the compact menu', async () => {

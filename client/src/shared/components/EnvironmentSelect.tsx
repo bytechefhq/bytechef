@@ -7,6 +7,7 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {Skeleton} from '@/components/ui/skeleton';
 import {ENVIRONMENT_CONFIGS, type EnvironmentConfigI} from '@/shared/constants/environmentConfigs';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -36,7 +37,7 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
         }))
     );
 
-    const {data: environmentsData} = useEnvironmentsQuery();
+    const {data: environmentsData, isLoading: environmentsIsLoading} = useEnvironmentsQuery();
 
     const environmentOptions = useMemo(() => {
         if (!environmentsData?.environments) {
@@ -57,6 +58,16 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
             return options;
         }, []);
     }, [environmentsData?.environments]);
+
+    if (application?.edition === 'EE' && environmentsIsLoading && variant === 'icon') {
+        return (
+            <Skeleton
+                aria-hidden="true"
+                className="size-5 shrink-0 rounded-full"
+                data-testid="environment-select-skeleton"
+            />
+        );
+    }
 
     if (application?.edition !== 'EE' || environmentOptions.length === 0) {
         return null;
