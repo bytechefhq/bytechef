@@ -677,6 +677,7 @@ include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:e
 include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest")
 include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service")
 
+include("server:ee:libs:licence:licence-graphql")
 include("server:ee:libs:licence:licence-service")
 include("server:ee:libs:licence:licence-web")
 

@@ -1,0 +1,21 @@
+extend type Query {
+    licence: LicenceType
+}
+
+extend type Mutation {
+    uploadLicence(contents: String!): LicenceType!
+    deleteLicence: Boolean!
+}
+
+type LicenceType {
+    id: String
+    holderName: String
+    holderEmail: String
+    issuedAt: String
+    expiresAt: String
+    status: String!
+    features: [String!]!
+    allowedJobs: Long!
+    maxUsers: Int
+    currentMonthJobUsage: Long!
+}
