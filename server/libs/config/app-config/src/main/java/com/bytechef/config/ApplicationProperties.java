@@ -5093,11 +5093,62 @@ public class ApplicationProperties {
              * AWS EventBridge Scheduler
              */
             AWS,
+            DB_SCHEDULER,
             /**
              * Quartz Scheduler
              */
             QUARTZ
         }
+
+        public static class DbScheduler {
+
+            public static class Importer {
+
+                private boolean enabled;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+            }
+
+            public static class Ui {
+
+                private boolean enabled;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+            }
+
+            private Importer importer = new Importer();
+            private Ui ui = new Ui();
+
+            public Importer getImporter() {
+                return importer;
+            }
+
+            public Ui getUi() {
+                return ui;
+            }
+
+            public void setImporter(Importer importer) {
+                this.importer = importer;
+            }
+
+            public void setUi(Ui ui) {
+                this.ui = ui;
+            }
+        }
+
+        private DbScheduler dbScheduler = new DbScheduler();
 
         /**
          * Scheduler provider
@@ -5109,8 +5160,16 @@ public class ApplicationProperties {
          */
         private Quartz quartz = new Quartz();
 
+        public DbScheduler getDbScheduler() {
+            return dbScheduler;
+        }
+
         public Provider getProvider() {
             return provider;
+        }
+
+        public void setDbScheduler(DbScheduler dbScheduler) {
+            this.dbScheduler = dbScheduler;
         }
 
         public void setProvider(Provider provider) {

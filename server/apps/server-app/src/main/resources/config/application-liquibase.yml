@@ -35,6 +35,12 @@ spring:
   quartz:
     auto-startup: false
 
+db-scheduler:
+  enabled: false
+
+db-scheduler-ui:
+  enabled: false
+
 bytechef:
   coordinator:
     enabled: false

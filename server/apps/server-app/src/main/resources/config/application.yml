@@ -320,6 +320,17 @@ spring:
     virtual:
       enabled: true
 
+db-scheduler:
+  polling-interval: 1s
+  polling-strategy: lock-and-fetch
+  threads: 10
+
+db-scheduler-ui:
+  read-only: true
+  task-data: true
+  log:
+    enabled: false
+
 server:
   servlet:
     session:
