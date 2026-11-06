@@ -2321,6 +2321,23 @@ export type EnableCustomComponentMutationVariables = Exact<{
 
 export type EnableCustomComponentMutation = { enableCustomComponent: boolean };
 
+export type DeleteLicenceMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DeleteLicenceMutation = { deleteLicence: boolean };
+
+export type LicenceQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LicenceQuery = { licence: { allowedJobs: any, currentMonthJobUsage: any, expiresAt: string | null, features: Array<string>, holderEmail: string | null, holderName: string | null, id: string | null, issuedAt: string | null, maxUsers: number | null, status: string } | null };
+
+export type UploadLicenceMutationVariables = Exact<{
+  contents: string;
+}>;
+
+
+export type UploadLicenceMutation = { uploadLicence: { allowedJobs: any, currentMonthJobUsage: any, expiresAt: string | null, features: Array<string>, holderEmail: string | null, holderName: string | null, id: string | null, issuedAt: string | null, maxUsers: number | null, status: string } };
+
 export type DeleteRegisteredClientMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -11143,6 +11160,88 @@ export const useEnableCustomComponentMutation = <
       {
     mutationKey: ['enableCustomComponent'],
     mutationFn: (variables?: EnableCustomComponentMutationVariables) => fetcher<EnableCustomComponentMutation, EnableCustomComponentMutationVariables>(EnableCustomComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteLicenceDocument = new TypedDocumentString(`
+    mutation deleteLicence {
+  deleteLicence
+}
+    `);
+
+export const useDeleteLicenceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteLicenceMutation, TError, DeleteLicenceMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteLicenceMutation, TError, DeleteLicenceMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteLicence'],
+    mutationFn: (variables?: DeleteLicenceMutationVariables) => fetcher<DeleteLicenceMutation, DeleteLicenceMutationVariables>(DeleteLicenceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const LicenceDocument = new TypedDocumentString(`
+    query licence {
+  licence {
+    allowedJobs
+    currentMonthJobUsage
+    expiresAt
+    features
+    holderEmail
+    holderName
+    id
+    issuedAt
+    maxUsers
+    status
+  }
+}
+    `);
+
+export const useLicenceQuery = <
+      TData = LicenceQuery,
+      TError = unknown
+    >(
+      variables?: LicenceQueryVariables,
+      options?: Omit<UseQueryOptions<LicenceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<LicenceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<LicenceQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['licence'] : ['licence', variables],
+    queryFn: fetcher<LicenceQuery, LicenceQueryVariables>(LicenceDocument, variables),
+    ...options
+  }
+    )};
+
+export const UploadLicenceDocument = new TypedDocumentString(`
+    mutation uploadLicence($contents: String!) {
+  uploadLicence(contents: $contents) {
+    allowedJobs
+    currentMonthJobUsage
+    expiresAt
+    features
+    holderEmail
+    holderName
+    id
+    issuedAt
+    maxUsers
+    status
+  }
+}
+    `);
+
+export const useUploadLicenceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UploadLicenceMutation, TError, UploadLicenceMutationVariables, TContext>) => {
+    
+    return useMutation<UploadLicenceMutation, TError, UploadLicenceMutationVariables, TContext>(
+      {
+    mutationKey: ['uploadLicence'],
+    mutationFn: (variables?: UploadLicenceMutationVariables) => fetcher<UploadLicenceMutation, UploadLicenceMutationVariables>(UploadLicenceDocument, variables)(),
     ...options
   }
     )};

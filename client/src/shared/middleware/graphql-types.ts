@@ -1592,6 +1592,20 @@ export type KnowledgeBaseTagsEntry = {
   tags: Array<Tag>;
 };
 
+export type LicenceType = {
+  __typename?: 'LicenceType';
+  allowedJobs: Scalars['Long']['output'];
+  currentMonthJobUsage: Scalars['Long']['output'];
+  expiresAt?: Maybe<Scalars['String']['output']>;
+  features: Array<Scalars['String']['output']>;
+  holderEmail?: Maybe<Scalars['String']['output']>;
+  holderName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['String']['output']>;
+  issuedAt?: Maybe<Scalars['String']['output']>;
+  maxUsers?: Maybe<Scalars['Int']['output']>;
+  status: Scalars['String']['output'];
+};
+
 export type LogEntry = {
   __typename?: 'LogEntry';
   clusterElementCallId?: Maybe<Scalars['String']['output']>;
@@ -1882,6 +1896,7 @@ export type Mutation = {
   deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocumentChunk?: Maybe<Scalars['Boolean']['output']>;
+  deleteLicence: Scalars['Boolean']['output'];
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpIntegrationInstanceConfiguration?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpIntegrationInstanceConfigurationWorkflow?: Maybe<Scalars['Boolean']['output']>;
@@ -1995,6 +2010,7 @@ export type Mutation = {
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
   updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
   upgradeAutomationWorkflowProjectConfigurationConnectedUsers: ConfigurationMoveResult;
+  uploadLicence: LicenceType;
 };
 
 
@@ -2983,6 +2999,11 @@ export type MutationUpgradeAutomationWorkflowProjectConfigurationConnectedUsersA
   targetId: Scalars['ID']['input'];
 };
 
+
+export type MutationUploadLicenceArgs = {
+  contents: Scalars['String']['input'];
+};
+
 export type NodeValidationIssue = {
   __typename?: 'NodeValidationIssue';
   kind: WorkflowIssueKind;
@@ -3437,6 +3458,7 @@ export type Query = {
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
+  licence?: Maybe<LicenceType>;
   managementMcpServerCanonicalUrl: Scalars['String']['output'];
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
