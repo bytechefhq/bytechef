@@ -1,0 +1,14 @@
+mutation uploadLicence($contents: String!) {
+    uploadLicence(contents: $contents) {
+        allowedJobs
+        currentMonthJobUsage
+        expiresAt
+        features
+        holderEmail
+        holderName
+        id
+        issuedAt
+        maxUsers
+        status
+    }
+}

@@ -1,0 +1,14 @@
+query licence {
+    licence {
+        allowedJobs
+        currentMonthJobUsage
+        expiresAt
+        features
+        holderEmail
+        holderName
+        id
+        issuedAt
+        maxUsers
+        status
+    }
+}
