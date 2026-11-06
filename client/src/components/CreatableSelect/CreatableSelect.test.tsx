@@ -40,4 +40,33 @@ describe('CreatableSelect', () => {
 
         expect(screen.getByText('Create "marketing"')).toBeInTheDocument();
     });
+
+    it('should render the menu into the dialog content so the scrolling dialog body does not clip it', async () => {
+        render(
+            <div data-slot="dialog-content" data-testid="dialog-content">
+                <div data-testid="dialog-body">
+                    <CreatableSelect name="value" options={[{label: 'billing', value: 'billing'}]} />
+                </div>
+            </div>
+        );
+
+        await userEvent.click(screen.getByRole('combobox'));
+
+        const option = screen.getByText('billing');
+
+        expect(screen.getByTestId('dialog-body')).not.toContainElement(option);
+        expect(screen.getByTestId('dialog-content')).toContainElement(option);
+    });
+
+    it('should keep the menu next to the control outside a dialog', async () => {
+        render(
+            <div data-testid="container">
+                <CreatableSelect name="value" options={[{label: 'billing', value: 'billing'}]} />
+            </div>
+        );
+
+        await userEvent.click(screen.getByRole('combobox'));
+
+        expect(screen.getByTestId('container')).toContainElement(screen.getByText('billing'));
+    });
 });
