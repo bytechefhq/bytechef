@@ -60,7 +60,7 @@ class JobStatusEmailNotificationHandlerIntTest {
             .environment("PRODUCTION")
             .error(new NotificationHandlerContext.ErrorSummary("Send email", "email/v1/send", "boom", null))
             .eventType(Type.JOB_FAILED)
-            .executionUrl("https://x/automation/executions?id=42")
+            .executionUrl("https://x/automation/workflow-executions?id=42")
             .jobId(42L)
             .jobName("Daily sync")
             .project(new NotificationHandlerContext.ProjectSummary(3L, "CRM", 3))
@@ -71,7 +71,7 @@ class JobStatusEmailNotificationHandlerIntTest {
             .isEqualTo(
                 "Job Daily sync (ID: 42) execution failed.\n\nWorkflow: Daily sync\nProject: CRM (v3)\n" +
                     "Environment: PRODUCTION\nFailed task: Send email (email/v1/send)\nError: boom\n" +
-                    "Execution: https://x/automation/executions?id=42");
+                    "Execution: https://x/automation/workflow-executions?id=42");
     }
 
     @ParameterizedTest

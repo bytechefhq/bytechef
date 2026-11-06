@@ -157,7 +157,7 @@ public class NotificationHandlerContexts {
         }
 
         String executionsPath =
-            platformType == PlatformType.EMBEDDED ? "/embedded/executions" : "/automation/executions";
+            platformType == PlatformType.EMBEDDED ? "/embedded/workflow-executions" : "/automation/workflow-executions";
 
         return publicUrl + executionsPath + "?id=" + jobId;
     }
