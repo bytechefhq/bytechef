@@ -24,7 +24,7 @@ A record is written for every call that comes in through one of two surfaces:
 
 | Surface | Calls recorded |
 |---|---|
-| **Automation MCP** | Tool calls an AI client makes through an MCP server in the workspace: **component tools**, a component action exposed as a tool such as Slack's **Send Message**, and **workflow tools**, a project workflow exposed as a tool. |
+| **MCP** | Tool calls an AI client makes through an MCP server in the workspace: **component tools**, a component action exposed as a tool such as Slack's **Send Message**, and **workflow tools**, a project workflow exposed as a tool. |
 | **A2A** | Skill calls another agent makes through an A2A server in the workspace. Each skill runs a project workflow. |
 
 The call is recorded whether it succeeds or fails. A call to a tool, a skill or a server that is turned
@@ -53,7 +53,7 @@ Each call is one row, newest first:
 |---|---|
 | **Status** | How the call ended, for example `SUCCESS`, `ERROR` or `TIMEOUT`. |
 | **Tool** | The tool name the AI client called, or the name of the A2A skill. |
-| **Surface** | Where the call came in: **Automation MCP** or **A2A**. |
+| **Surface** | Where the call came in: **MCP** or **A2A**. |
 | **Server** | The MCP server or the A2A server the call came through. |
 | **Source** | What ran: the component and operation of a component tool, such as `slack / sendMessage`, or the name of the workflow a workflow tool or a skill ran. |
 | **Duration** | How long the call took, in milliseconds. |
