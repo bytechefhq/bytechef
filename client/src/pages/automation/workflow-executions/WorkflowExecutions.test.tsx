@@ -150,7 +150,7 @@ describe('WorkflowExecutions empty states', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Clear filters'}));
 
         expect(hoisted.navigate).toHaveBeenCalledWith(
-            '/automation/executions?status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
+            '/automation/workflow-executions?status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
         );
         expect(screen.getByRole('heading', {level: 2, name: 'No workflow runs yet'})).toBeInTheDocument();
     });
@@ -173,7 +173,7 @@ describe('WorkflowExecutions empty states', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Go to first page'}));
 
         expect(hoisted.navigate).toHaveBeenCalledWith(
-            '/automation/executions?status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
+            '/automation/workflow-executions?status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
         );
     });
 });

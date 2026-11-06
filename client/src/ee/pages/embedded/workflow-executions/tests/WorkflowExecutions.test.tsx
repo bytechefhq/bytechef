@@ -113,7 +113,7 @@ const LocationProbe = () => {
 
 const renderWorkflowExecutions = (search: string) =>
     render(
-        <MemoryRouter initialEntries={[`/embedded/executions?${search}`]}>
+        <MemoryRouter initialEntries={[`/embedded/workflow-executions?${search}`]}>
             <TooltipProvider>
                 <WorkflowExecutions />
 
@@ -207,10 +207,10 @@ describe('WorkflowExecutions', () => {
                             <WorkflowExecutions />
                         </TooltipProvider>
                     ),
-                    path: '/embedded/executions',
+                    path: '/embedded/workflow-executions',
                 },
             ],
-            {initialEntries: ['/embedded/executions?id=42']}
+            {initialEntries: ['/embedded/workflow-executions?id=42']}
         );
 
         render(<RouterProvider router={router} />);
@@ -218,7 +218,7 @@ describe('WorkflowExecutions', () => {
         expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
 
         await act(async () => {
-            await router.navigate('/embedded/executions?automations=1&id=43');
+            await router.navigate('/embedded/workflow-executions?automations=1&id=43');
         });
 
         expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(43);
