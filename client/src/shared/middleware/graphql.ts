@@ -1474,6 +1474,65 @@ export type AutomationSearchQuery = { automationSearch: Array<
     | { projectId: string, label: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
   > };
 
+export type WorkflowAlertRulesQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkflowAlertRulesQuery = { workflowAlertRules: Array<{ cooldownMinutes: number, enabled: boolean, id: string, lastTriggeredDate: string | null, name: string, notificationIds: Array<string>, ruleType: Types.WorkflowAlertRuleType, threshold: number, windowMinutes: number | null, workflowId: string | null }> };
+
+export type WorkflowAlertEventsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkflowAlertEventsQuery = { workflowAlertEvents: Array<{ createdDate: string | null, id: string, jobId: string | null, message: string | null, triggeredValue: number | null, workflowAlertRuleId: string }> };
+
+export type CreateWorkflowAlertRuleMutationVariables = Exact<{
+  workspaceId: string | number;
+  input: Types.WorkflowAlertRuleInput;
+}>;
+
+
+export type CreateWorkflowAlertRuleMutation = { createWorkflowAlertRule: { id: string } };
+
+export type UpdateWorkflowAlertRuleMutationVariables = Exact<{
+  id: string | number;
+  input: Types.WorkflowAlertRuleInput;
+}>;
+
+
+export type UpdateWorkflowAlertRuleMutation = { updateWorkflowAlertRule: { id: string } };
+
+export type DeleteWorkflowAlertRuleMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteWorkflowAlertRuleMutation = { deleteWorkflowAlertRule: boolean };
+
+export type SendTestWorkflowAlertMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type SendTestWorkflowAlertMutation = { sendTestWorkflowAlert: boolean };
+
+export type EnableWorkflowAlertRuleMutationVariables = Exact<{
+  id: string | number;
+  enabled: boolean;
+}>;
+
+
+export type EnableWorkflowAlertRuleMutation = { enableWorkflowAlertRule: { enabled: boolean, id: string } };
+
+export type WorkflowExecutionCostQueryVariables = Exact<{
+  jobId: string | number;
+}>;
+
+
+export type WorkflowExecutionCostQuery = { workflowExecutionCost: { aiCost: number, baseRunCharge: number, currency: string, id: string, jobId: string, totalCost: number } | null };
+
 export type AutomationWorkflowProjectCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -8264,6 +8323,199 @@ export const useAutomationSearchQuery = <
       {
     queryKey: ['automationSearch', variables],
     queryFn: fetcher<AutomationSearchQuery, AutomationSearchQueryVariables>(AutomationSearchDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkflowAlertRulesDocument = new TypedDocumentString(`
+    query workflowAlertRules($workspaceId: ID!) {
+  workflowAlertRules(workspaceId: $workspaceId) {
+    cooldownMinutes
+    enabled
+    id
+    lastTriggeredDate
+    name
+    notificationIds
+    ruleType
+    threshold
+    windowMinutes
+    workflowId
+  }
+}
+    `);
+
+export const useWorkflowAlertRulesQuery = <
+      TData = WorkflowAlertRulesQuery,
+      TError = unknown
+    >(
+      variables: WorkflowAlertRulesQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowAlertRulesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowAlertRulesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowAlertRulesQuery, TError, TData>(
+      {
+    queryKey: ['workflowAlertRules', variables],
+    queryFn: fetcher<WorkflowAlertRulesQuery, WorkflowAlertRulesQueryVariables>(WorkflowAlertRulesDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkflowAlertEventsDocument = new TypedDocumentString(`
+    query workflowAlertEvents($workspaceId: ID!) {
+  workflowAlertEvents(workspaceId: $workspaceId) {
+    createdDate
+    id
+    jobId
+    message
+    triggeredValue
+    workflowAlertRuleId
+  }
+}
+    `);
+
+export const useWorkflowAlertEventsQuery = <
+      TData = WorkflowAlertEventsQuery,
+      TError = unknown
+    >(
+      variables: WorkflowAlertEventsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowAlertEventsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowAlertEventsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowAlertEventsQuery, TError, TData>(
+      {
+    queryKey: ['workflowAlertEvents', variables],
+    queryFn: fetcher<WorkflowAlertEventsQuery, WorkflowAlertEventsQueryVariables>(WorkflowAlertEventsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateWorkflowAlertRuleDocument = new TypedDocumentString(`
+    mutation createWorkflowAlertRule($workspaceId: ID!, $input: WorkflowAlertRuleInput!) {
+  createWorkflowAlertRule(workspaceId: $workspaceId, input: $input) {
+    id
+  }
+}
+    `);
+
+export const useCreateWorkflowAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateWorkflowAlertRuleMutation, TError, CreateWorkflowAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<CreateWorkflowAlertRuleMutation, TError, CreateWorkflowAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['createWorkflowAlertRule'],
+    mutationFn: (variables?: CreateWorkflowAlertRuleMutationVariables) => fetcher<CreateWorkflowAlertRuleMutation, CreateWorkflowAlertRuleMutationVariables>(CreateWorkflowAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkflowAlertRuleDocument = new TypedDocumentString(`
+    mutation updateWorkflowAlertRule($id: ID!, $input: WorkflowAlertRuleInput!) {
+  updateWorkflowAlertRule(id: $id, input: $input) {
+    id
+  }
+}
+    `);
+
+export const useUpdateWorkflowAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkflowAlertRuleMutation, TError, UpdateWorkflowAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkflowAlertRuleMutation, TError, UpdateWorkflowAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWorkflowAlertRule'],
+    mutationFn: (variables?: UpdateWorkflowAlertRuleMutationVariables) => fetcher<UpdateWorkflowAlertRuleMutation, UpdateWorkflowAlertRuleMutationVariables>(UpdateWorkflowAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteWorkflowAlertRuleDocument = new TypedDocumentString(`
+    mutation deleteWorkflowAlertRule($id: ID!) {
+  deleteWorkflowAlertRule(id: $id)
+}
+    `);
+
+export const useDeleteWorkflowAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWorkflowAlertRuleMutation, TError, DeleteWorkflowAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWorkflowAlertRuleMutation, TError, DeleteWorkflowAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteWorkflowAlertRule'],
+    mutationFn: (variables?: DeleteWorkflowAlertRuleMutationVariables) => fetcher<DeleteWorkflowAlertRuleMutation, DeleteWorkflowAlertRuleMutationVariables>(DeleteWorkflowAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SendTestWorkflowAlertDocument = new TypedDocumentString(`
+    mutation sendTestWorkflowAlert($id: ID!) {
+  sendTestWorkflowAlert(id: $id)
+}
+    `);
+
+export const useSendTestWorkflowAlertMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SendTestWorkflowAlertMutation, TError, SendTestWorkflowAlertMutationVariables, TContext>) => {
+    
+    return useMutation<SendTestWorkflowAlertMutation, TError, SendTestWorkflowAlertMutationVariables, TContext>(
+      {
+    mutationKey: ['sendTestWorkflowAlert'],
+    mutationFn: (variables?: SendTestWorkflowAlertMutationVariables) => fetcher<SendTestWorkflowAlertMutation, SendTestWorkflowAlertMutationVariables>(SendTestWorkflowAlertDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableWorkflowAlertRuleDocument = new TypedDocumentString(`
+    mutation enableWorkflowAlertRule($id: ID!, $enabled: Boolean!) {
+  enableWorkflowAlertRule(id: $id, enabled: $enabled) {
+    enabled
+    id
+  }
+}
+    `);
+
+export const useEnableWorkflowAlertRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableWorkflowAlertRuleMutation, TError, EnableWorkflowAlertRuleMutationVariables, TContext>) => {
+    
+    return useMutation<EnableWorkflowAlertRuleMutation, TError, EnableWorkflowAlertRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['enableWorkflowAlertRule'],
+    mutationFn: (variables?: EnableWorkflowAlertRuleMutationVariables) => fetcher<EnableWorkflowAlertRuleMutation, EnableWorkflowAlertRuleMutationVariables>(EnableWorkflowAlertRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WorkflowExecutionCostDocument = new TypedDocumentString(`
+    query workflowExecutionCost($jobId: ID!) {
+  workflowExecutionCost(jobId: $jobId) {
+    aiCost
+    baseRunCharge
+    currency
+    id
+    jobId
+    totalCost
+  }
+}
+    `);
+
+export const useWorkflowExecutionCostQuery = <
+      TData = WorkflowExecutionCostQuery,
+      TError = unknown
+    >(
+      variables: WorkflowExecutionCostQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowExecutionCostQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowExecutionCostQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowExecutionCostQuery, TError, TData>(
+      {
+    queryKey: ['workflowExecutionCost', variables],
+    queryFn: fetcher<WorkflowExecutionCostQuery, WorkflowExecutionCostQueryVariables>(WorkflowExecutionCostDocument, variables),
     ...options
   }
     )};

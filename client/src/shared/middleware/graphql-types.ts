@@ -2281,6 +2281,7 @@ export type Mutation = {
   createMcpProject?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpTool?: Maybe<McpTool>;
+  createWorkflowAlertRule: WorkflowAlertRule;
   createWorkspaceAiGatewayProvider?: Maybe<AiGatewayProvider>;
   createWorkspaceAiGatewayRoutingPolicy?: Maybe<AiGatewayRoutingPolicy>;
   createWorkspaceAiModel?: Maybe<AiModel>;
@@ -2337,6 +2338,7 @@ export type Mutation = {
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
+  deleteWorkflowAlertRule: Scalars['Boolean']['output'];
   deleteWorkspaceAiGatewayProvider?: Maybe<Scalars['Boolean']['output']>;
   deleteWorkspaceAiGatewayRoutingPolicy?: Maybe<Scalars['Boolean']['output']>;
   deleteWorkspaceAiModel?: Maybe<Scalars['Boolean']['output']>;
@@ -2354,6 +2356,7 @@ export type Mutation = {
   enableConnectedUserMcpTool?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   enableCustomComponent: Scalars['Boolean']['output'];
+  enableWorkflowAlertRule: WorkflowAlertRule;
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
   generateFromDocumentation: ApiConnector;
@@ -2378,6 +2381,7 @@ export type Mutation = {
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  sendTestWorkflowAlert: Scalars['Boolean']['output'];
   setAiGuardrailCustomRuleEnabled: AiGuardrailCustomRule;
   startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
@@ -2456,6 +2460,7 @@ export type Mutation = {
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
   updateUser: AdminUser;
+  updateWorkflowAlertRule: WorkflowAlertRule;
   updateWorkspaceAiGatewayProvider?: Maybe<AiGatewayProvider>;
   updateWorkspaceAiGatewayRoutingPolicy?: Maybe<AiGatewayRoutingPolicy>;
   updateWorkspaceAiModel?: Maybe<AiModel>;
@@ -2701,6 +2706,12 @@ export type MutationCreateMcpProjectWorkflowArgs = {
 
 export type MutationCreateMcpToolArgs = {
   input: McpToolInput;
+};
+
+
+export type MutationCreateWorkflowAlertRuleArgs = {
+  input: WorkflowAlertRuleInput;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2961,6 +2972,11 @@ export type MutationDeleteUserArgs = {
 };
 
 
+export type MutationDeleteWorkflowAlertRuleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteWorkspaceAiGatewayProviderArgs = {
   providerId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
@@ -3054,6 +3070,12 @@ export type MutationEnableConnectedUserProjectWorkflowArgs = {
 
 export type MutationEnableCustomComponentArgs = {
   enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableWorkflowAlertRuleArgs = {
+  enabled: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
 };
 
@@ -3200,6 +3222,11 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   workflowConnectionKey: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSendTestWorkflowAlertArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3627,6 +3654,12 @@ export type MutationUpdateMcpToolArgs = {
 export type MutationUpdateUserArgs = {
   login: Scalars['String']['input'];
   role: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateWorkflowAlertRuleArgs = {
+  id: Scalars['ID']['input'];
+  input: WorkflowAlertRuleInput;
 };
 
 
@@ -4217,6 +4250,9 @@ export type Query = {
   users?: Maybe<AdminUserPage>;
   validateWorkflow: WorkflowValidationResult;
   validateWorkflowById: WorkflowValidationResult;
+  workflowAlertEvents: Array<WorkflowAlertEvent>;
+  workflowAlertRules: Array<WorkflowAlertRule>;
+  workflowExecutionCost?: Maybe<WorkflowExecutionCost>;
   workflowNodeComponentConnections: Array<ComponentConnection>;
   workflowNodeMissingRequiredProperties: Array<Scalars['String']['output']>;
   workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
@@ -5165,6 +5201,21 @@ export type QueryValidateWorkflowByIdArgs = {
 };
 
 
+export type QueryWorkflowAlertEventsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkflowAlertRulesArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkflowExecutionCostArgs = {
+  jobId: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkflowNodeComponentConnectionsArgs = {
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
@@ -5688,6 +5739,51 @@ export type Workflow = {
   version?: Maybe<Scalars['Int']['output']>;
 };
 
+export type WorkflowAlertEvent = {
+  __typename?: 'WorkflowAlertEvent';
+  createdDate?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  jobId?: Maybe<Scalars['ID']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  triggeredValue?: Maybe<Scalars['Float']['output']>;
+  workflowAlertRuleId: Scalars['ID']['output'];
+};
+
+export type WorkflowAlertRule = {
+  __typename?: 'WorkflowAlertRule';
+  cooldownMinutes: Scalars['Int']['output'];
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  lastTriggeredDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  notificationIds: Array<Scalars['ID']['output']>;
+  ruleType: WorkflowAlertRuleType;
+  threshold: Scalars['Float']['output'];
+  windowMinutes?: Maybe<Scalars['Int']['output']>;
+  workflowId?: Maybe<Scalars['String']['output']>;
+};
+
+export type WorkflowAlertRuleInput = {
+  cooldownMinutes?: InputMaybe<Scalars['Int']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  name: Scalars['String']['input'];
+  notificationIds: Array<Scalars['ID']['input']>;
+  ruleType: WorkflowAlertRuleType;
+  threshold: Scalars['Float']['input'];
+  windowMinutes?: InputMaybe<Scalars['Int']['input']>;
+  workflowId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum WorkflowAlertRuleType {
+  ConsecutiveFailures = 'CONSECUTIVE_FAILURES',
+  CostThreshold = 'COST_THRESHOLD',
+  ErrorCount = 'ERROR_COUNT',
+  FailureRate = 'FAILURE_RATE',
+  LatencySpike = 'LATENCY_SPIKE',
+  LatencyThreshold = 'LATENCY_THRESHOLD',
+  NoActivity = 'NO_ACTIVITY'
+}
+
 export enum WorkflowChangeType {
   Added = 'ADDED',
   Modified = 'MODIFIED',
@@ -5723,6 +5819,16 @@ export type WorkflowDefinitionValueChange = {
   newValue?: Maybe<Scalars['String']['output']>;
   oldValue?: Maybe<Scalars['String']['output']>;
   path: Scalars['String']['output'];
+};
+
+export type WorkflowExecutionCost = {
+  __typename?: 'WorkflowExecutionCost';
+  aiCost: Scalars['Float']['output'];
+  baseRunCharge: Scalars['Float']['output'];
+  currency: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  jobId: Scalars['ID']['output'];
+  totalCost: Scalars['Float']['output'];
 };
 
 export type WorkflowInfo = {
