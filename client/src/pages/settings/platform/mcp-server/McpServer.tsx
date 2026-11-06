@@ -18,7 +18,7 @@ const McpServer = () => {
             }
             leftSidebarOpen={false}
         >
-            <div className="max-w-(--breakpoint-lg) self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
+            <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                 {canonicalUrlData?.managementMcpServerCanonicalUrl && (
                     <div className="space-y-4">
                         <h2 className="font-semibold text-foreground">MCP server URL</h2>
