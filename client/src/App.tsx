@@ -94,13 +94,13 @@ const automationNavigation: NavigationType[] = [
     },
     {
         group: executionsNavigationGroup,
-        href: '/automation/executions',
+        href: '/automation/workflow-executions',
         icon: HistoryIcon,
         name: 'Workflow Executions',
     },
     {
         group: executionsNavigationGroup,
-        href: '/automation/executions/external-invocations',
+        href: '/automation/external-invocations',
         icon: HammerIcon,
         name: 'External Invocations',
     },
@@ -148,13 +148,13 @@ const embeddedNavigation: NavigationType[] = [
     },
     {
         group: executionsNavigationGroup,
-        href: '/embedded/executions',
+        href: '/embedded/workflow-executions',
         icon: HistoryIcon,
         name: 'Workflow Executions',
     },
     {
         group: executionsNavigationGroup,
-        href: '/embedded/executions/external-invocations',
+        href: '/embedded/external-invocations',
         icon: HammerIcon,
         name: 'External Invocations',
     },
@@ -231,7 +231,7 @@ function App() {
             return ai.knowledgeBase.enabled;
         }
 
-        if (navItem.href === '/automation/executions/external-invocations') {
+        if (navItem.href === '/automation/external-invocations') {
             return edition === EditionType.EE;
         }
 

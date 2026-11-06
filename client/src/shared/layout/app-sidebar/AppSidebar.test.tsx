@@ -50,8 +50,8 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 const navigation = [
     {href: '/automation/ai-hub', icon: MessagesSquareIcon, name: 'AI Hub'},
     {href: '/automation/projects', icon: FolderIcon, name: 'Projects'},
-    {href: '/automation/executions', icon: ActivityIcon, name: 'Workflow Executions'},
-    {href: '/automation/executions/external-invocations', icon: WrenchIcon, name: 'External Invocations'},
+    {href: '/automation/workflow-executions', icon: ActivityIcon, name: 'Workflow Executions'},
+    {href: '/automation/external-invocations', icon: WrenchIcon, name: 'External Invocations'},
 ];
 
 const serversGroup = {icon: ServerCogIcon, name: 'Servers'};
@@ -115,15 +115,15 @@ describe('AppSidebar', () => {
     describe('active item', () => {
         const isActiveLink = (name: string) => screen.getByRole('link', {name}).getAttribute('data-active') === 'true';
 
-        it('marks only the nested entry active on its own page', () => {
-            renderSidebar(true, '/automation/executions/external-invocations');
+        it('marks only External Invocations active on its own page', () => {
+            renderSidebar(true, '/automation/external-invocations');
 
             expect(isActiveLink('External Invocations')).toBe(true);
             expect(isActiveLink('Workflow Executions')).toBe(false);
         });
 
-        it('marks the parent entry active on its own page', () => {
-            renderSidebar(true, '/automation/executions');
+        it('marks only Workflow Executions active on its own page', () => {
+            renderSidebar(true, '/automation/workflow-executions');
 
             expect(isActiveLink('Workflow Executions')).toBe(true);
             expect(isActiveLink('External Invocations')).toBe(false);

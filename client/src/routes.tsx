@@ -791,7 +791,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
-                                    path: 'executions',
+                                    path: 'workflow-executions',
                                 },
                                 {
                                     element: (
@@ -803,7 +803,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'executions/external-invocations',
+                                    path: 'external-invocations',
                                 },
                                 {
                                     element: (
@@ -1107,7 +1107,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'executions',
+                                    path: 'workflow-executions',
                                 },
                                 {
                                     element: (
@@ -1119,7 +1119,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'executions/external-invocations',
+                                    path: 'external-invocations',
                                 },
                                 {
                                     element: (

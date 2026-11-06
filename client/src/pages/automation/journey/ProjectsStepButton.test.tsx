@@ -19,14 +19,14 @@ const renderOnExecutionsPage = (button: ReactElement) => {
     const ExecutionsPage = () => {
         const navigate = useNavigate();
 
-        useOnEnvironmentChange(() => navigate('/automation/executions?status='));
+        useOnEnvironmentChange(() => navigate('/automation/workflow-executions?status='));
 
         return button;
     };
 
     const router = createMemoryRouter(
         [
-            {element: <ExecutionsPage />, path: '/automation/executions'},
+            {element: <ExecutionsPage />, path: '/automation/workflow-executions'},
             {element: <p>Deployments page</p>, path: '/automation/deployments'},
             {
                 element: <p>Projects page</p>,
@@ -41,7 +41,7 @@ const renderOnExecutionsPage = (button: ReactElement) => {
                 path: '/automation/projects/:projectId/project-workflows/:projectWorkflowId',
             },
         ],
-        {initialEntries: ['/automation/executions']}
+        {initialEntries: ['/automation/workflow-executions']}
     );
 
     render(<RouterProvider router={router} />);
