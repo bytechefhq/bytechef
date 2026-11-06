@@ -1,38 +1,40 @@
 ---
 title: "External Invocations"
-description: "A log of the tools AI clients called through your MCP servers and the management MCP server - which tool ran, how it ended, and how long it took."
+description: "A log of the calls made from outside ByteChef through your MCP servers and A2A servers - which tool or skill ran, how it ended, and how long it took."
 ---
 
-When an AI client calls a tool on one of your [MCP servers](/platform/automation/deploy/mcp-servers)
-or on the [management MCP server](/platform/settings/mcp-server), ByteChef records the call. **External Invocations** lists those records, so you can see which tools are
-being used, which ones fail, and how long they take. Open it from **External Invocations** in the left
+When an AI client calls a tool on one of your [MCP servers](/platform/automation/deploy/mcp-servers),
+or another agent calls a skill on one of your [A2A servers](/platform/automation/deploy/a2a-servers),
+ByteChef records the call. **External Invocations** lists those records, so you can see which tools and
+skills are being used, which ones fail, and how long they take. Open it from **External Invocations** in the left
 sidebar, next to **Workflow Executions**.
 
 The page is available on Enterprise Edition only.
 
 <Callout type="info">
-    A record holds the identity and outcome of a call only: which tool ran, through which MCP server,
-    how it ended, and how long it took. The tool's input parameters and its output are never stored.
+    A record holds the identity and outcome of a call only: which tool or skill ran, through which
+    server, how it ended, and how long it took. The input parameters and the output are never stored.
 </Callout>
 
 ---
 
 ## What is recorded
 
-A record is written for every tool call an AI client makes through an MCP server in the workspace:
+A record is written for every call that comes in through one of two surfaces:
 
-- **Component tools** - a component action exposed as a tool, such as Slack's **Send Message**.
-- **Workflow tools** - a project workflow exposed as a tool.
+| Surface | Calls recorded |
+|---|---|
+| **Automation MCP** | Tool calls an AI client makes through an MCP server in the workspace: **component tools**, a component action exposed as a tool such as Slack's **Send Message**, and **workflow tools**, a project workflow exposed as a tool. |
+| **A2A** | Skill calls another agent makes through an A2A server in the workspace. Each skill runs a project workflow. |
 
-The call is recorded whether it succeeds or fails. A call to a tool or a server that is turned off is
-rejected before it runs and is not recorded.
+The call is recorded whether it succeeds or fails. A call to a tool, a skill or a server that is turned
+off is rejected before it runs and is not recorded.
+
+For a workflow tool or an A2A skill, the record also carries the id of the workflow execution the call
+started, so you can find the run in [Workflow Executions](/platform/automation/monitor/workflow-executions).
 
 Calls to the [management MCP server](/platform/settings/mcp-server), such as `listProjects` or
-`buildWorkflow`, are recorded too. A management call is listed under the workspace it worked in: the
-`workspaceId` it was given, or your only workspace when you belong to just one. It is listed under the
-environment it was given, or under Development when it named none. A call that named no workspace
-while you belong to several is recorded but appears on no page. A management tool that answers with
-an error is recorded as `ERROR`.
+`buildWorkflow`, are not recorded.
 
 The page lists automation calls only. Calls made through an embedded integration are recorded
 separately and appear on the embedded [External Invocations](/platform/embedded/monitor/external-invocations)
@@ -49,9 +51,10 @@ Each call is one row, newest first:
 
 | Column | What it shows |
 |---|---|
-| **Tool** | The tool name the AI client called. |
-| **Surface** | Where the call came in: **Automation MCP** for one of your MCP servers, **Management MCP** for the management MCP server. |
-| **Component** | The component and the operation a component tool ran, such as `slack / sendMessage`. Workflow tools show a dash. |
+| **Tool** | The tool name the AI client called, or the name of the A2A skill. |
+| **Surface** | Where the call came in: **Automation MCP** or **A2A**. |
+| **Server** | The MCP server or the A2A server the call came through. |
+| **Source** | What ran: the component and operation of a component tool, such as `slack / sendMessage`, or the name of the workflow a workflow tool or a skill ran. |
 | **Outcome** | How the call ended, for example `SUCCESS`, `ERROR` or `TIMEOUT`. |
 | **Duration** | How long the call took, in milliseconds. |
 | **Date** | When the call was made. |
@@ -59,9 +62,9 @@ Each call is one row, newest first:
 The list shows 50 rows per page. Use the **Refresh** button in the page header to load the latest
 calls.
 
-### How a workflow tool call ends
+### How a workflow call ends
 
-A workflow tool starts a workflow run and waits for it. The outcome reflects where the run was when
+A workflow tool or an A2A skill starts a workflow run and waits for it. The outcome reflects where the run was when
 the call returned:
 
 | Outcome | The workflow run |
@@ -80,7 +83,8 @@ the call returned:
 |---|---|
 | **Surface** | Calls that came in through one surface. |
 | **Outcome** | Calls that ended one way: Success, Error, Connection required, Timeout, Approval required, Approval denied or Suspended. |
-| **MCP Server** | Calls made through one MCP server. The filter appears when the workspace has at least one MCP server. Management MCP calls belong to no MCP server, so choosing one hides them. |
+| **MCP Server** | Calls made through one MCP server. The filter appears when the workspace has at least one MCP server. |
+| **A2A Server** | Calls made through one A2A server. The filter appears when the workspace has at least one A2A server. |
 | **Start date** / **End date** | Calls made within a date range. |
 
 ---
@@ -89,8 +93,8 @@ the call returned:
 
 The list is scoped to the current workspace and the current
 [environment](/platform/automation/deploy/environments). Switching either one in the left sidebar
-reloads the list and clears the filters. A call made through an MCP server in Production does not
-appear while you are looking at Development.
+reloads the list and clears the filters. A call made through a server in Production does not appear
+while you are looking at Development.
 
 ---
 
@@ -119,5 +123,6 @@ the others.
 
 - [MCP Servers](/platform/automation/deploy/mcp-servers) - expose component actions and workflows as
   tools to AI clients.
+- [A2A Servers](/platform/automation/deploy/a2a-servers) - expose workflows as skills to other agents.
 - [Workflow Executions](/platform/automation/monitor/workflow-executions) - the runs started when an
-  AI client calls a workflow tool.
+  AI client calls a workflow tool or an agent calls a skill.

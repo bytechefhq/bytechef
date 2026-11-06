@@ -166,6 +166,16 @@ internal network, including an A2A Server of the same ByteChef reached through `
 
 ---
 
+## Monitoring skill calls
+
+Every skill call is recorded on the [External Invocations](/platform/automation/monitor/external-invocations)
+page under the **A2A** surface, with the skill, the server, how the call ended and how long it took.
+Filter by **A2A Server** to see one server's calls. Each call also starts an ordinary workflow run,
+which appears in [Workflow Executions](/platform/automation/monitor/workflow-executions) with its
+inputs, outputs and per-step trace.
+
+---
+
 ## Deleting
 
 - Deleting an A2A server removes its projects, their skills and the deployments the server created.
