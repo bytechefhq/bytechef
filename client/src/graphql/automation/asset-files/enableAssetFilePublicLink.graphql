@@ -1,0 +1,6 @@
+mutation EnableAssetFilePublicLink($id: ID!) {
+    enableAssetFilePublicLink(id: $id) {
+        id
+        publicLinkUrl
+    }
+}

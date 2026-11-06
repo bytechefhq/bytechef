@@ -1,0 +1,3 @@
+mutation DeleteAssetFile($id: ID!) {
+    deleteAssetFile(id: $id)
+}

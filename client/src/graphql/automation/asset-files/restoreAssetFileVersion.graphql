@@ -1,0 +1,9 @@
+mutation RestoreAssetFileVersion($id: ID!, $versionId: ID!) {
+    restoreAssetFileVersion(id: $id, versionId: $versionId) {
+        id
+        lastModifiedDate
+        mimeType
+        name
+        sizeBytes
+    }
+}
