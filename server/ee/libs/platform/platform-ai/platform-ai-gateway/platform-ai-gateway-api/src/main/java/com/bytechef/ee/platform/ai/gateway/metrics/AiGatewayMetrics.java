@@ -7,17 +7,33 @@
 
 package com.bytechef.ee.platform.ai.gateway.metrics;
 
+import com.bytechef.ee.platform.ai.gateway.event.AiGatewayBudgetExceededEvent;
+import com.bytechef.ee.platform.ai.gateway.event.AiGatewayTraceCompletedEvent;
+
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
 public interface AiGatewayMetrics {
-    void incrementBudgetExceeded(String model);
+
+    void onTraceCompleted(AiGatewayTraceCompletedEvent event);
+
+    void onBudgetExceeded(AiGatewayBudgetExceededEvent event);
 
     void incrementRateLimitRejection(String rateLimitName);
 
+    void incrementWebhookDelivery(String eventType, boolean success);
+
+    void incrementWebhookDispatchFailure(String eventType);
+
+    void incrementWebhookDeliveryRowDivergence();
+
+    void incrementWebhookSubscriptionEventsParseFailure();
+
     void incrementPostRequestBudgetFailure();
+
+    void incrementCleanupFailure();
 
     void incrementRequestLogPersistFailure(String kind, String outcome);
 }

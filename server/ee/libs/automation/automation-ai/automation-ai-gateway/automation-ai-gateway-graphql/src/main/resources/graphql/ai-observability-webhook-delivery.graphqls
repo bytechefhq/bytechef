@@ -1,0 +1,23 @@
+extend type Query {
+    aiObservabilityWebhookDeliveries(subscriptionId: ID!): [AiObservabilityWebhookDelivery]
+}
+
+type AiObservabilityWebhookDelivery {
+    attemptCount: Int!
+    createdDate: Long
+    deliveredDate: Long
+    errorMessage: String
+    eventType: String
+    httpStatus: Int
+    id: ID!
+    payload: String
+    status: AiObservabilityWebhookDeliveryStatus!
+    subscriptionId: ID!
+}
+
+enum AiObservabilityWebhookDeliveryStatus {
+    FAILED
+    PENDING
+    RETRYING
+    SUCCESS
+}

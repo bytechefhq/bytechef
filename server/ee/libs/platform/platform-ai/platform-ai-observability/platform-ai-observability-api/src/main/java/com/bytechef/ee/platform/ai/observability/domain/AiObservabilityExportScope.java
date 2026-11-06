@@ -14,6 +14,5 @@ public enum AiObservabilityExportScope {
 
     TRACES,
     REQUEST_LOGS,
-    SESSIONS,
-    PROMPTS
+    SESSIONS
 }

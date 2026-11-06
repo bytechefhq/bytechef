@@ -30,6 +30,7 @@ import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatRole;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlock;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingResponse;
+import com.bytechef.ee.platform.ai.gateway.event.AiGatewayBudgetExceededEvent;
 import com.bytechef.ee.platform.ai.gateway.metrics.AiGatewayMetrics;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayEmbeddingModelFactory;
@@ -974,7 +975,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 AiGatewayMetrics metrics = aiGatewayMetricsProvider.getIfAvailable();
 
                 if (metrics != null) {
-                    metrics.incrementBudgetExceeded(model);
+                    metrics.onBudgetExceeded(new AiGatewayBudgetExceededEvent(
+                        workspaceId, model, budgetResult.currentSpend(), budgetResult.budgetAmount()));
                 }
 
                 throw new BudgetExceededException(
