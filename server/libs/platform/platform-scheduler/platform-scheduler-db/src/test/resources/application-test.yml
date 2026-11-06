@@ -1,0 +1,26 @@
+bytechef:
+  coordinator:
+    trigger:
+      polling:
+        check-period: 1
+  scheduler:
+    provider: db-scheduler
+  tenant:
+    mode: SINGLE
+
+db-scheduler:
+  polling-interval: 250ms
+  polling-strategy: lock-and-fetch
+  threads: 2
+  delay-startup-until-context-ready: true
+
+spring:
+  liquibase:
+    contexts: mono
+  quartz:
+    auto-startup: false
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate

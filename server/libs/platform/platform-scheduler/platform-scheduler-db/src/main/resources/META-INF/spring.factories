@@ -1,0 +1,2 @@
+org.springframework.boot.EnvironmentPostProcessor=\
+com.bytechef.platform.scheduler.db.config.DbSchedulerEnvironmentPostProcessor
