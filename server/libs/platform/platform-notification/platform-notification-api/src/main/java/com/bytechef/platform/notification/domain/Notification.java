@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -34,7 +35,6 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Matija Petanjek
@@ -83,6 +83,9 @@ public class Notification {
 
     @Version
     private int version;
+
+    @Column("workspace_id")
+    private @Nullable Long workspaceId;
 
     public Long getId() {
         return id;
@@ -146,6 +149,10 @@ public class Notification {
         return version;
     }
 
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -194,6 +201,10 @@ public class Notification {
         this.version = version;
     }
 
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -218,6 +229,7 @@ public class Notification {
     public String toString() {
         return "Notification{" +
             "id=" + id +
+            ", workspaceId=" + workspaceId +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
