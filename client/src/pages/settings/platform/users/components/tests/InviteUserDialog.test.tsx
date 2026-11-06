@@ -26,6 +26,7 @@ const defaultMockReturn = {
     handleRoleChange: hoisted.handleRoleChange,
     inviteDisabled: false,
     inviteEmail: 'test@example.com',
+    invitePending: false,
     inviteRole: 'ROLE_ADMIN',
     open: true,
     roleSelectVisible: true,
@@ -162,6 +163,18 @@ describe('InviteUserDialog inviteDisabled state', () => {
         const inviteButton = screen.getByRole('button', {name: 'Invite'});
 
         expect(inviteButton).toBeDisabled();
+    });
+
+    it('should show a disabled Inviting button while the invite is pending', () => {
+        hoisted.mockUseInviteUserDialog.mockReturnValue({
+            ...defaultMockReturn,
+            inviteDisabled: true,
+            invitePending: true,
+        });
+
+        renderInviteUserDialog();
+
+        expect(screen.getByRole('button', {name: 'Inviting...'})).toBeDisabled();
     });
 });
 
