@@ -688,6 +688,8 @@ include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-file-storage:platform-ai-agent-eval-file-storage-impl")
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-graphql")
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-service")
+include("server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-api")
+include("server:ee:libs:platform:platform-ai:platform-ai-eval:platform-ai-eval-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-api")
 include("server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-api")
