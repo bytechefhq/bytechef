@@ -384,6 +384,216 @@ export type AuditEventTypesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AuditEventTypesQuery = { auditEventTypes: Array<string> };
 
+export type AiDatasetsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiDatasetsQuery = { aiDatasets: Array<{ archivedDate: any, createdDate: any, description: string | null, id: string, name: string, tags: string | null, workspaceId: string }> };
+
+export type AiDatasetVersionsQueryVariables = Exact<{
+  datasetId: string | number;
+}>;
+
+
+export type AiDatasetVersionsQuery = { aiDatasetVersions: Array<{ createdDate: any, datasetId: string, frozen: boolean, id: string, itemCount: number, label: string | null }> };
+
+export type AiDatasetItemsQueryVariables = Exact<{
+  versionId: string | number;
+}>;
+
+
+export type AiDatasetItemsQuery = { aiDatasetItems: Array<{ createdDate: any, datasetVersionId: string, expectedOutput: string | null, id: string, input: string, metadata: string | null, sourceTraceId: string | null }> };
+
+export type AiEvalRulesQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiEvalRulesQuery = { aiEvalRules: Array<{ createdDate: any, delaySeconds: number | null, enabled: boolean, filters: string | null, id: string, lastModifiedDate: any, model: string, name: string, projectId: string | null, promptTemplate: string, samplingRate: number, scoreConfigId: string, version: number | null, workspaceId: string } | null> | null };
+
+export type AiEvalRuleQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiEvalRuleQuery = { aiEvalRule: { createdDate: any, delaySeconds: number | null, enabled: boolean, filters: string | null, id: string, lastModifiedDate: any, model: string, name: string, projectId: string | null, promptTemplate: string, samplingRate: number, scoreConfigId: string, version: number | null, workspaceId: string } | null };
+
+export type AiEvalExecutionsQueryVariables = Exact<{
+  evalRuleId: string | number;
+}>;
+
+
+export type AiEvalExecutionsQuery = { aiEvalExecutions: Array<{ createdDate: any, errorMessage: string | null, evalRuleId: string, id: string, scoreId: string | null, status: Types.AiEvalExecutionStatus, traceId: string } | null> | null };
+
+export type CreateAiEvalRuleMutationVariables = Exact<{
+  delaySeconds?: number | null | undefined;
+  enabled: boolean;
+  filters?: string | null | undefined;
+  model: string;
+  name: string;
+  projectId?: string | number | null | undefined;
+  promptTemplate: string;
+  samplingRate: number;
+  scoreConfigId: string | number;
+  workspaceId: string | number;
+}>;
+
+
+export type CreateAiEvalRuleMutation = { createAiEvalRule: { id: string, name: string } | null };
+
+export type DeleteAiEvalRuleMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiEvalRuleMutation = { deleteAiEvalRule: boolean | null };
+
+export type UpdateAiEvalRuleMutationVariables = Exact<{
+  delaySeconds?: number | null | undefined;
+  enabled: boolean;
+  filters?: string | null | undefined;
+  id: string | number;
+  model: string;
+  name: string;
+  promptTemplate: string;
+  samplingRate: number;
+  scoreConfigId: string | number;
+}>;
+
+
+export type UpdateAiEvalRuleMutation = { updateAiEvalRule: { id: string, name: string } | null };
+
+export type AiEvalScoreConfigsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiEvalScoreConfigsQuery = { aiEvalScoreConfigs: Array<{ categories: string | null, createdDate: any, dataType: Types.AiEvalScoreDataType | null, description: string | null, id: string, lastModifiedDate: any, maxValue: number | null, minValue: number | null, name: string, version: number | null, workspaceId: string } | null> | null };
+
+export type AiEvalScoreConfigQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiEvalScoreConfigQuery = { aiEvalScoreConfig: { categories: string | null, createdDate: any, dataType: Types.AiEvalScoreDataType | null, description: string | null, id: string, lastModifiedDate: any, maxValue: number | null, minValue: number | null, name: string, version: number | null, workspaceId: string } | null };
+
+export type CreateAiEvalScoreConfigMutationVariables = Exact<{
+  categories?: string | null | undefined;
+  dataType?: Types.AiEvalScoreDataType | null | undefined;
+  description?: string | null | undefined;
+  maxValue?: number | null | undefined;
+  minValue?: number | null | undefined;
+  name: string;
+  workspaceId: string | number;
+}>;
+
+
+export type CreateAiEvalScoreConfigMutation = { createAiEvalScoreConfig: { id: string, name: string } | null };
+
+export type DeleteAiEvalScoreConfigMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiEvalScoreConfigMutation = { deleteAiEvalScoreConfig: boolean | null };
+
+export type UpdateAiEvalScoreConfigMutationVariables = Exact<{
+  categories?: string | null | undefined;
+  dataType?: Types.AiEvalScoreDataType | null | undefined;
+  description?: string | null | undefined;
+  id: string | number;
+  maxValue?: number | null | undefined;
+  minValue?: number | null | undefined;
+  name: string;
+}>;
+
+
+export type UpdateAiEvalScoreConfigMutation = { updateAiEvalScoreConfig: { id: string, name: string } | null };
+
+export type AiEvalScoresQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiEvalScoresQuery = { aiEvalScores: Array<{ comment: string | null, createdBy: string | null, createdDate: any, dataType: Types.AiEvalScoreDataType | null, evalRuleId: string | null, id: string, name: string, source: Types.AiEvalScoreSource, spanId: string | null, stringValue: string | null, traceId: string, value: number | null, workspaceId: string } | null> | null };
+
+export type AiEvalScoresByTraceQueryVariables = Exact<{
+  traceId: string | number;
+}>;
+
+
+export type AiEvalScoresByTraceQuery = { aiEvalScoresByTrace: Array<{ comment: string | null, createdBy: string | null, createdDate: any, dataType: Types.AiEvalScoreDataType | null, evalRuleId: string | null, id: string, name: string, source: Types.AiEvalScoreSource, spanId: string | null, stringValue: string | null, traceId: string, value: number | null, workspaceId: string } | null> | null };
+
+export type CreateAiEvalScoreMutationVariables = Exact<{
+  comment?: string | null | undefined;
+  dataType: Types.AiEvalScoreDataType;
+  name: string;
+  source: Types.AiEvalScoreSource;
+  spanId?: string | number | null | undefined;
+  stringValue?: string | null | undefined;
+  traceId: string | number;
+  value?: number | null | undefined;
+  workspaceId: string | number;
+}>;
+
+
+export type CreateAiEvalScoreMutation = { createAiEvalScore: { id: string, name: string } | null };
+
+export type DeleteAiEvalScoreMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiEvalScoreMutation = { deleteAiEvalScore: boolean | null };
+
+export type AiEvalScoreAnalyticsQueryVariables = Exact<{
+  workspaceId: string | number;
+  startDate: any;
+  endDate: any;
+}>;
+
+
+export type AiEvalScoreAnalyticsQuery = { aiEvalScoreAnalytics: Array<{ average: number | null, count: number | null, dataType: Types.AiEvalScoreDataType | null, max: number | null, min: number | null, name: string | null, distribution: Array<{ count: number | null, value: string | null } | null> | null } | null> | null };
+
+export type AiEvalScoreTrendQueryVariables = Exact<{
+  workspaceId: string | number;
+  name: string;
+  startDate: any;
+  endDate: any;
+}>;
+
+
+export type AiEvalScoreTrendQuery = { aiEvalScoreTrend: Array<{ average: number | null, count: number, day: any } | null> | null };
+
+export type AiExperimentComparisonQueryVariables = Exact<{
+  experimentIds: Array<string | number> | string | number;
+}>;
+
+
+export type AiExperimentComparisonQuery = { experimentComparison: { aggregateScoreDeltas: Array<{ scoreName: string, deltas: Array<{ average: number | null, count: number, experimentId: string }> }>, experiments: Array<{ averageLatencyMs: number | null, completedRuns: number, failedRuns: number, id: string, model: string | null, totalCost: number | null, totalRuns: number }>, rows: Array<{ datasetItemId: string, runsByExperiment: Array<{ cost: number | null, experimentId: string, latencyMs: number | null, runId: string, status: string, traceId: string | null, scores: Array<{ dataType: string, name: string, stringValue: string | null, value: number | null }> }> }> } | null };
+
+export type AiExperimentsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiExperimentsQuery = { aiExperiments: Array<{ completedDate: any, completedRuns: number, createdDate: any, datasetVersionId: string, failedRuns: number, id: string, metadata: string | null, model: string | null, promptVersionId: string | null, startedDate: any, status: string, stopRequested: boolean, totalRuns: number }> };
+
+export type AiExperimentRunsQueryVariables = Exact<{
+  experimentId: string | number;
+}>;
+
+
+export type AiExperimentRunsQuery = { aiExperimentRuns: Array<{ cost: number | null, createdDate: any, datasetItemId: string, errorMessage: string | null, experimentId: string, id: string, latencyMs: number | null, status: string, traceId: string | null }> };
+
+export type AiExperimentRunByTraceIdQueryVariables = Exact<{
+  traceId: string | number;
+}>;
+
+
+export type AiExperimentRunByTraceIdQuery = { aiExperimentRunByTraceId: { cost: number | null, createdDate: any, datasetItemId: string, errorMessage: string | null, experimentId: string, id: string, latencyMs: number | null, status: string, traceId: string | null } | null };
+
 export type AiGatewayBudgetQueryVariables = Exact<{
   workspaceId: string | number;
 }>;
@@ -616,6 +826,57 @@ export type UnpinAiModelMutationVariables = Exact<{
 
 
 export type UnpinAiModelMutation = { unpinAiModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+
+export type AiPromptsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiPromptsQuery = { aiPrompts: Array<{ createdDate: any, description: string | null, id: string, lastModifiedDate: any, name: string, projectId: string | null, version: number | null, versions: Array<{ active: boolean, commitMessage: string | null, content: string, createdBy: string, createdDate: any, environment: string | null, id: string, promptId: string, type: Types.AiPromptVersionType, variables: string | null, versionNumber: number } | null> | null } | null> | null };
+
+export type AiPromptQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiPromptQuery = { aiPrompt: { createdDate: any, description: string | null, id: string, lastModifiedDate: any, name: string, projectId: string | null, version: number | null, versions: Array<{ active: boolean, commitMessage: string | null, content: string, createdBy: string, createdDate: any, environment: string | null, id: string, promptId: string, type: Types.AiPromptVersionType, variables: string | null, versionNumber: number } | null> | null } | null };
+
+export type CreateAiPromptMutationVariables = Exact<{
+  input: Types.CreateAiPromptInput;
+}>;
+
+
+export type CreateAiPromptMutation = { createAiPrompt: { createdDate: any, description: string | null, id: string, lastModifiedDate: any, name: string, projectId: string | null, version: number | null } | null };
+
+export type UpdateAiPromptMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateAiPromptInput;
+}>;
+
+
+export type UpdateAiPromptMutation = { updateAiPrompt: { createdDate: any, description: string | null, id: string, lastModifiedDate: any, name: string, projectId: string | null, version: number | null } | null };
+
+export type DeleteAiPromptMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiPromptMutation = { deleteAiPrompt: boolean | null };
+
+export type CreateAiPromptVersionMutationVariables = Exact<{
+  input: Types.CreateAiPromptVersionInput;
+}>;
+
+
+export type CreateAiPromptVersionMutation = { createAiPromptVersion: { active: boolean, commitMessage: string | null, content: string, createdBy: string, createdDate: any, environment: string | null, id: string, promptId: string, type: Types.AiPromptVersionType, variables: string | null, versionNumber: number } | null };
+
+export type SetActiveAiPromptVersionMutationVariables = Exact<{
+  promptVersionId: string | number;
+  environment: string;
+}>;
+
+
+export type SetActiveAiPromptVersionMutation = { setActiveAiPromptVersion: boolean | null };
 
 export type WorkspaceAiGatewayProvidersQueryVariables = Exact<{
   workspaceId: string | number;
@@ -4208,6 +4469,778 @@ export const useAuditEventTypesQuery = <
   }
     )};
 
+export const AiDatasetsDocument = new TypedDocumentString(`
+    query aiDatasets($workspaceId: ID!) {
+  aiDatasets: aiEvalDatasets(workspaceId: $workspaceId) {
+    archivedDate
+    createdDate
+    description
+    id
+    name
+    tags
+    workspaceId
+  }
+}
+    `);
+
+export const useAiDatasetsQuery = <
+      TData = AiDatasetsQuery,
+      TError = unknown
+    >(
+      variables: AiDatasetsQueryVariables,
+      options?: Omit<UseQueryOptions<AiDatasetsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiDatasetsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiDatasetsQuery, TError, TData>(
+      {
+    queryKey: ['aiDatasets', variables],
+    queryFn: fetcher<AiDatasetsQuery, AiDatasetsQueryVariables>(AiDatasetsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiDatasetVersionsDocument = new TypedDocumentString(`
+    query aiDatasetVersions($datasetId: ID!) {
+  aiDatasetVersions: aiEvalDatasetVersions(datasetId: $datasetId) {
+    createdDate
+    datasetId
+    frozen
+    id
+    itemCount
+    label
+  }
+}
+    `);
+
+export const useAiDatasetVersionsQuery = <
+      TData = AiDatasetVersionsQuery,
+      TError = unknown
+    >(
+      variables: AiDatasetVersionsQueryVariables,
+      options?: Omit<UseQueryOptions<AiDatasetVersionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiDatasetVersionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiDatasetVersionsQuery, TError, TData>(
+      {
+    queryKey: ['aiDatasetVersions', variables],
+    queryFn: fetcher<AiDatasetVersionsQuery, AiDatasetVersionsQueryVariables>(AiDatasetVersionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiDatasetItemsDocument = new TypedDocumentString(`
+    query aiDatasetItems($versionId: ID!) {
+  aiDatasetItems: aiEvalDatasetItems(versionId: $versionId) {
+    createdDate
+    datasetVersionId
+    expectedOutput
+    id
+    input
+    metadata
+    sourceTraceId
+  }
+}
+    `);
+
+export const useAiDatasetItemsQuery = <
+      TData = AiDatasetItemsQuery,
+      TError = unknown
+    >(
+      variables: AiDatasetItemsQueryVariables,
+      options?: Omit<UseQueryOptions<AiDatasetItemsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiDatasetItemsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiDatasetItemsQuery, TError, TData>(
+      {
+    queryKey: ['aiDatasetItems', variables],
+    queryFn: fetcher<AiDatasetItemsQuery, AiDatasetItemsQueryVariables>(AiDatasetItemsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiEvalRulesDocument = new TypedDocumentString(`
+    query aiEvalRules($workspaceId: ID!) {
+  aiEvalRules(workspaceId: $workspaceId) {
+    createdDate
+    delaySeconds
+    enabled
+    filters
+    id
+    lastModifiedDate
+    model
+    name
+    projectId
+    promptTemplate
+    samplingRate
+    scoreConfigId
+    version
+    workspaceId
+  }
+}
+    `);
+
+export const useAiEvalRulesQuery = <
+      TData = AiEvalRulesQuery,
+      TError = unknown
+    >(
+      variables: AiEvalRulesQueryVariables,
+      options?: Omit<UseQueryOptions<AiEvalRulesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiEvalRulesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiEvalRulesQuery, TError, TData>(
+      {
+    queryKey: ['aiEvalRules', variables],
+    queryFn: fetcher<AiEvalRulesQuery, AiEvalRulesQueryVariables>(AiEvalRulesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiEvalRuleDocument = new TypedDocumentString(`
+    query aiEvalRule($id: ID!) {
+  aiEvalRule(id: $id) {
+    createdDate
+    delaySeconds
+    enabled
+    filters
+    id
+    lastModifiedDate
+    model
+    name
+    projectId
+    promptTemplate
+    samplingRate
+    scoreConfigId
+    version
+    workspaceId
+  }
+}
+    `);
+
+export const useAiEvalRuleQuery = <
+      TData = AiEvalRuleQuery,
+      TError = unknown
+    >(
+      variables: AiEvalRuleQueryVariables,
+      options?: Omit<UseQueryOptions<AiEvalRuleQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiEvalRuleQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiEvalRuleQuery, TError, TData>(
+      {
+    queryKey: ['aiEvalRule', variables],
+    queryFn: fetcher<AiEvalRuleQuery, AiEvalRuleQueryVariables>(AiEvalRuleDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiEvalExecutionsDocument = new TypedDocumentString(`
+    query aiEvalExecutions($evalRuleId: ID!) {
+  aiEvalExecutions(evalRuleId: $evalRuleId) {
+    createdDate
+    errorMessage
+    evalRuleId
+    id
+    scoreId
+    status
+    traceId
+  }
+}
+    `);
+
+export const useAiEvalExecutionsQuery = <
+      TData = AiEvalExecutionsQuery,
+      TError = unknown
+    >(
+      variables: AiEvalExecutionsQueryVariables,
+      options?: Omit<UseQueryOptions<AiEvalExecutionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiEvalExecutionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiEvalExecutionsQuery, TError, TData>(
+      {
+    queryKey: ['aiEvalExecutions', variables],
+    queryFn: fetcher<AiEvalExecutionsQuery, AiEvalExecutionsQueryVariables>(AiEvalExecutionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiEvalRuleDocument = new TypedDocumentString(`
+    mutation createAiEvalRule($delaySeconds: Int, $enabled: Boolean!, $filters: String, $model: String!, $name: String!, $projectId: ID, $promptTemplate: String!, $samplingRate: Float!, $scoreConfigId: ID!, $workspaceId: ID!) {
+  createAiEvalRule(
+    delaySeconds: $delaySeconds
+    enabled: $enabled
+    filters: $filters
+    model: $model
+    name: $name
+    projectId: $projectId
+    promptTemplate: $promptTemplate
+    samplingRate: $samplingRate
+    scoreConfigId: $scoreConfigId
+    workspaceId: $workspaceId
+  ) {
+    id
+    name
+  }
+}
+    `);
+
+export const useCreateAiEvalRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiEvalRuleMutation, TError, CreateAiEvalRuleMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiEvalRuleMutation, TError, CreateAiEvalRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiEvalRule'],
+    mutationFn: (variables?: CreateAiEvalRuleMutationVariables) => fetcher<CreateAiEvalRuleMutation, CreateAiEvalRuleMutationVariables>(CreateAiEvalRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiEvalRuleDocument = new TypedDocumentString(`
+    mutation deleteAiEvalRule($id: ID!) {
+  deleteAiEvalRule(id: $id)
+}
+    `);
+
+export const useDeleteAiEvalRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiEvalRuleMutation, TError, DeleteAiEvalRuleMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiEvalRuleMutation, TError, DeleteAiEvalRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiEvalRule'],
+    mutationFn: (variables?: DeleteAiEvalRuleMutationVariables) => fetcher<DeleteAiEvalRuleMutation, DeleteAiEvalRuleMutationVariables>(DeleteAiEvalRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiEvalRuleDocument = new TypedDocumentString(`
+    mutation updateAiEvalRule($delaySeconds: Int, $enabled: Boolean!, $filters: String, $id: ID!, $model: String!, $name: String!, $promptTemplate: String!, $samplingRate: Float!, $scoreConfigId: ID!) {
+  updateAiEvalRule(
+    delaySeconds: $delaySeconds
+    enabled: $enabled
+    filters: $filters
+    id: $id
+    model: $model
+    name: $name
+    promptTemplate: $promptTemplate
+    samplingRate: $samplingRate
+    scoreConfigId: $scoreConfigId
+  ) {
+    id
+    name
+  }
+}
+    `);
+
+export const useUpdateAiEvalRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiEvalRuleMutation, TError, UpdateAiEvalRuleMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiEvalRuleMutation, TError, UpdateAiEvalRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiEvalRule'],
+    mutationFn: (variables?: UpdateAiEvalRuleMutationVariables) => fetcher<UpdateAiEvalRuleMutation, UpdateAiEvalRuleMutationVariables>(UpdateAiEvalRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiEvalScoreConfigsDocument = new TypedDocumentString(`
+    query aiEvalScoreConfigs($workspaceId: ID!) {
+  aiEvalScoreConfigs(workspaceId: $workspaceId) {
+    categories
+    createdDate
+    dataType
+    description
+    id
+    lastModifiedDate
+    maxValue
+    minValue
+    name
+    version
+    workspaceId
+  }
+}
+    `);
+
+export const useAiEvalScoreConfigsQuery = <
+      TData = AiEvalScoreConfigsQuery,
+      TError = unknown
+    >(
+      variables: AiEvalScoreConfigsQueryVariables,
+      options?: Omit<UseQueryOptions<AiEvalScoreConfigsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiEvalScoreConfigsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiEvalScoreConfigsQuery, TError, TData>(
+      {
+    queryKey: ['aiEvalScoreConfigs', variables],
+    queryFn: fetcher<AiEvalScoreConfigsQuery, AiEvalScoreConfigsQueryVariables>(AiEvalScoreConfigsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiEvalScoreConfigDocument = new TypedDocumentString(`
+    query aiEvalScoreConfig($id: ID!) {
+  aiEvalScoreConfig(id: $id) {
+    categories
+    createdDate
+    dataType
+    description
+    id
+    lastModifiedDate
+    maxValue
+    minValue
+    name
+    version
+    workspaceId
+  }
+}
+    `);
+
+export const useAiEvalScoreConfigQuery = <
+      TData = AiEvalScoreConfigQuery,
+      TError = unknown
+    >(
+      variables: AiEvalScoreConfigQueryVariables,
+      options?: Omit<UseQueryOptions<AiEvalScoreConfigQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiEvalScoreConfigQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiEvalScoreConfigQuery, TError, TData>(
+      {
+    queryKey: ['aiEvalScoreConfig', variables],
+    queryFn: fetcher<AiEvalScoreConfigQuery, AiEvalScoreConfigQueryVariables>(AiEvalScoreConfigDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiEvalScoreConfigDocument = new TypedDocumentString(`
+    mutation createAiEvalScoreConfig($categories: String, $dataType: AiEvalScoreDataType, $description: String, $maxValue: Float, $minValue: Float, $name: String!, $workspaceId: ID!) {
+  createAiEvalScoreConfig(
+    categories: $categories
+    dataType: $dataType
+    description: $description
+    maxValue: $maxValue
+    minValue: $minValue
+    name: $name
+    workspaceId: $workspaceId
+  ) {
+    id
+    name
+  }
+}
+    `);
+
+export const useCreateAiEvalScoreConfigMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiEvalScoreConfigMutation, TError, CreateAiEvalScoreConfigMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiEvalScoreConfigMutation, TError, CreateAiEvalScoreConfigMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiEvalScoreConfig'],
+    mutationFn: (variables?: CreateAiEvalScoreConfigMutationVariables) => fetcher<CreateAiEvalScoreConfigMutation, CreateAiEvalScoreConfigMutationVariables>(CreateAiEvalScoreConfigDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiEvalScoreConfigDocument = new TypedDocumentString(`
+    mutation deleteAiEvalScoreConfig($id: ID!) {
+  deleteAiEvalScoreConfig(id: $id)
+}
+    `);
+
+export const useDeleteAiEvalScoreConfigMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiEvalScoreConfigMutation, TError, DeleteAiEvalScoreConfigMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiEvalScoreConfigMutation, TError, DeleteAiEvalScoreConfigMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiEvalScoreConfig'],
+    mutationFn: (variables?: DeleteAiEvalScoreConfigMutationVariables) => fetcher<DeleteAiEvalScoreConfigMutation, DeleteAiEvalScoreConfigMutationVariables>(DeleteAiEvalScoreConfigDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiEvalScoreConfigDocument = new TypedDocumentString(`
+    mutation updateAiEvalScoreConfig($categories: String, $dataType: AiEvalScoreDataType, $description: String, $id: ID!, $maxValue: Float, $minValue: Float, $name: String!) {
+  updateAiEvalScoreConfig(
+    categories: $categories
+    dataType: $dataType
+    description: $description
+    id: $id
+    maxValue: $maxValue
+    minValue: $minValue
+    name: $name
+  ) {
+    id
+    name
+  }
+}
+    `);
+
+export const useUpdateAiEvalScoreConfigMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiEvalScoreConfigMutation, TError, UpdateAiEvalScoreConfigMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiEvalScoreConfigMutation, TError, UpdateAiEvalScoreConfigMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiEvalScoreConfig'],
+    mutationFn: (variables?: UpdateAiEvalScoreConfigMutationVariables) => fetcher<UpdateAiEvalScoreConfigMutation, UpdateAiEvalScoreConfigMutationVariables>(UpdateAiEvalScoreConfigDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiEvalScoresDocument = new TypedDocumentString(`
+    query aiEvalScores($workspaceId: ID!) {
+  aiEvalScores(workspaceId: $workspaceId) {
+    comment
+    createdBy
+    createdDate
+    dataType
+    evalRuleId
+    id
+    name
+    source
+    spanId
+    stringValue
+    traceId
+    value
+    workspaceId
+  }
+}
+    `);
+
+export const useAiEvalScoresQuery = <
+      TData = AiEvalScoresQuery,
+      TError = unknown
+    >(
+      variables: AiEvalScoresQueryVariables,
+      options?: Omit<UseQueryOptions<AiEvalScoresQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiEvalScoresQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiEvalScoresQuery, TError, TData>(
+      {
+    queryKey: ['aiEvalScores', variables],
+    queryFn: fetcher<AiEvalScoresQuery, AiEvalScoresQueryVariables>(AiEvalScoresDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiEvalScoresByTraceDocument = new TypedDocumentString(`
+    query aiEvalScoresByTrace($traceId: ID!) {
+  aiEvalScoresByTrace(traceId: $traceId) {
+    comment
+    createdBy
+    createdDate
+    dataType
+    evalRuleId
+    id
+    name
+    source
+    spanId
+    stringValue
+    traceId
+    value
+    workspaceId
+  }
+}
+    `);
+
+export const useAiEvalScoresByTraceQuery = <
+      TData = AiEvalScoresByTraceQuery,
+      TError = unknown
+    >(
+      variables: AiEvalScoresByTraceQueryVariables,
+      options?: Omit<UseQueryOptions<AiEvalScoresByTraceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiEvalScoresByTraceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiEvalScoresByTraceQuery, TError, TData>(
+      {
+    queryKey: ['aiEvalScoresByTrace', variables],
+    queryFn: fetcher<AiEvalScoresByTraceQuery, AiEvalScoresByTraceQueryVariables>(AiEvalScoresByTraceDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiEvalScoreDocument = new TypedDocumentString(`
+    mutation createAiEvalScore($comment: String, $dataType: AiEvalScoreDataType!, $name: String!, $source: AiEvalScoreSource!, $spanId: ID, $stringValue: String, $traceId: ID!, $value: Float, $workspaceId: ID!) {
+  createAiEvalScore(
+    comment: $comment
+    dataType: $dataType
+    name: $name
+    source: $source
+    spanId: $spanId
+    stringValue: $stringValue
+    traceId: $traceId
+    value: $value
+    workspaceId: $workspaceId
+  ) {
+    id
+    name
+  }
+}
+    `);
+
+export const useCreateAiEvalScoreMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiEvalScoreMutation, TError, CreateAiEvalScoreMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiEvalScoreMutation, TError, CreateAiEvalScoreMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiEvalScore'],
+    mutationFn: (variables?: CreateAiEvalScoreMutationVariables) => fetcher<CreateAiEvalScoreMutation, CreateAiEvalScoreMutationVariables>(CreateAiEvalScoreDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiEvalScoreDocument = new TypedDocumentString(`
+    mutation deleteAiEvalScore($id: ID!) {
+  deleteAiEvalScore(id: $id)
+}
+    `);
+
+export const useDeleteAiEvalScoreMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiEvalScoreMutation, TError, DeleteAiEvalScoreMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiEvalScoreMutation, TError, DeleteAiEvalScoreMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiEvalScore'],
+    mutationFn: (variables?: DeleteAiEvalScoreMutationVariables) => fetcher<DeleteAiEvalScoreMutation, DeleteAiEvalScoreMutationVariables>(DeleteAiEvalScoreDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiEvalScoreAnalyticsDocument = new TypedDocumentString(`
+    query aiEvalScoreAnalytics($workspaceId: ID!, $startDate: Long!, $endDate: Long!) {
+  aiEvalScoreAnalytics(
+    workspaceId: $workspaceId
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    average
+    count
+    dataType
+    distribution {
+      count
+      value
+    }
+    max
+    min
+    name
+  }
+}
+    `);
+
+export const useAiEvalScoreAnalyticsQuery = <
+      TData = AiEvalScoreAnalyticsQuery,
+      TError = unknown
+    >(
+      variables: AiEvalScoreAnalyticsQueryVariables,
+      options?: Omit<UseQueryOptions<AiEvalScoreAnalyticsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiEvalScoreAnalyticsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiEvalScoreAnalyticsQuery, TError, TData>(
+      {
+    queryKey: ['aiEvalScoreAnalytics', variables],
+    queryFn: fetcher<AiEvalScoreAnalyticsQuery, AiEvalScoreAnalyticsQueryVariables>(AiEvalScoreAnalyticsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiEvalScoreTrendDocument = new TypedDocumentString(`
+    query aiEvalScoreTrend($workspaceId: ID!, $name: String!, $startDate: Long!, $endDate: Long!) {
+  aiEvalScoreTrend(
+    workspaceId: $workspaceId
+    name: $name
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    average
+    count
+    day
+  }
+}
+    `);
+
+export const useAiEvalScoreTrendQuery = <
+      TData = AiEvalScoreTrendQuery,
+      TError = unknown
+    >(
+      variables: AiEvalScoreTrendQueryVariables,
+      options?: Omit<UseQueryOptions<AiEvalScoreTrendQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiEvalScoreTrendQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiEvalScoreTrendQuery, TError, TData>(
+      {
+    queryKey: ['aiEvalScoreTrend', variables],
+    queryFn: fetcher<AiEvalScoreTrendQuery, AiEvalScoreTrendQueryVariables>(AiEvalScoreTrendDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiExperimentComparisonDocument = new TypedDocumentString(`
+    query aiExperimentComparison($experimentIds: [ID!]!) {
+  experimentComparison(experimentIds: $experimentIds) {
+    aggregateScoreDeltas {
+      deltas {
+        average
+        count
+        experimentId
+      }
+      scoreName
+    }
+    experiments {
+      averageLatencyMs
+      completedRuns
+      failedRuns
+      id
+      model
+      totalCost
+      totalRuns
+    }
+    rows {
+      datasetItemId
+      runsByExperiment {
+        cost
+        experimentId
+        latencyMs
+        runId
+        scores {
+          dataType
+          name
+          stringValue
+          value
+        }
+        status
+        traceId
+      }
+    }
+  }
+}
+    `);
+
+export const useAiExperimentComparisonQuery = <
+      TData = AiExperimentComparisonQuery,
+      TError = unknown
+    >(
+      variables: AiExperimentComparisonQueryVariables,
+      options?: Omit<UseQueryOptions<AiExperimentComparisonQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiExperimentComparisonQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiExperimentComparisonQuery, TError, TData>(
+      {
+    queryKey: ['aiExperimentComparison', variables],
+    queryFn: fetcher<AiExperimentComparisonQuery, AiExperimentComparisonQueryVariables>(AiExperimentComparisonDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiExperimentsDocument = new TypedDocumentString(`
+    query aiExperiments($workspaceId: ID!) {
+  aiExperiments: aiEvalExperiments(workspaceId: $workspaceId) {
+    completedDate
+    completedRuns
+    createdDate
+    datasetVersionId
+    failedRuns
+    id
+    metadata
+    model
+    promptVersionId
+    startedDate
+    status
+    stopRequested
+    totalRuns
+  }
+}
+    `);
+
+export const useAiExperimentsQuery = <
+      TData = AiExperimentsQuery,
+      TError = unknown
+    >(
+      variables: AiExperimentsQueryVariables,
+      options?: Omit<UseQueryOptions<AiExperimentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiExperimentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiExperimentsQuery, TError, TData>(
+      {
+    queryKey: ['aiExperiments', variables],
+    queryFn: fetcher<AiExperimentsQuery, AiExperimentsQueryVariables>(AiExperimentsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiExperimentRunsDocument = new TypedDocumentString(`
+    query aiExperimentRuns($experimentId: ID!) {
+  aiExperimentRuns: aiEvalExperimentRuns(experimentId: $experimentId) {
+    cost
+    createdDate
+    datasetItemId
+    errorMessage
+    experimentId
+    id
+    latencyMs
+    status
+    traceId
+  }
+}
+    `);
+
+export const useAiExperimentRunsQuery = <
+      TData = AiExperimentRunsQuery,
+      TError = unknown
+    >(
+      variables: AiExperimentRunsQueryVariables,
+      options?: Omit<UseQueryOptions<AiExperimentRunsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiExperimentRunsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiExperimentRunsQuery, TError, TData>(
+      {
+    queryKey: ['aiExperimentRuns', variables],
+    queryFn: fetcher<AiExperimentRunsQuery, AiExperimentRunsQueryVariables>(AiExperimentRunsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiExperimentRunByTraceIdDocument = new TypedDocumentString(`
+    query aiExperimentRunByTraceId($traceId: ID!) {
+  aiExperimentRunByTraceId: aiEvalExperimentRunByTraceId(traceId: $traceId) {
+    cost
+    createdDate
+    datasetItemId
+    errorMessage
+    experimentId
+    id
+    latencyMs
+    status
+    traceId
+  }
+}
+    `);
+
+export const useAiExperimentRunByTraceIdQuery = <
+      TData = AiExperimentRunByTraceIdQuery,
+      TError = unknown
+    >(
+      variables: AiExperimentRunByTraceIdQueryVariables,
+      options?: Omit<UseQueryOptions<AiExperimentRunByTraceIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiExperimentRunByTraceIdQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiExperimentRunByTraceIdQuery, TError, TData>(
+      {
+    queryKey: ['aiExperimentRunByTraceId', variables],
+    queryFn: fetcher<AiExperimentRunByTraceIdQuery, AiExperimentRunByTraceIdQueryVariables>(AiExperimentRunByTraceIdDocument, variables),
+    ...options
+  }
+    )};
+
 export const AiGatewayBudgetDocument = new TypedDocumentString(`
     query aiGatewayBudget($workspaceId: ID!) {
   aiGatewayBudget(workspaceId: $workspaceId) {
@@ -5185,6 +6218,218 @@ export const useUnpinAiModelMutation = <
       {
     mutationKey: ['unpinAiModel'],
     mutationFn: (variables?: UnpinAiModelMutationVariables) => fetcher<UnpinAiModelMutation, UnpinAiModelMutationVariables>(UnpinAiModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiPromptsDocument = new TypedDocumentString(`
+    query aiPrompts($workspaceId: ID!) {
+  aiPrompts(workspaceId: $workspaceId) {
+    createdDate
+    description
+    id
+    lastModifiedDate
+    name
+    projectId
+    version
+    versions {
+      active
+      commitMessage
+      content
+      createdBy
+      createdDate
+      environment
+      id
+      promptId
+      type
+      variables
+      versionNumber
+    }
+  }
+}
+    `);
+
+export const useAiPromptsQuery = <
+      TData = AiPromptsQuery,
+      TError = unknown
+    >(
+      variables: AiPromptsQueryVariables,
+      options?: Omit<UseQueryOptions<AiPromptsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiPromptsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiPromptsQuery, TError, TData>(
+      {
+    queryKey: ['aiPrompts', variables],
+    queryFn: fetcher<AiPromptsQuery, AiPromptsQueryVariables>(AiPromptsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiPromptDocument = new TypedDocumentString(`
+    query aiPrompt($id: ID!) {
+  aiPrompt(id: $id) {
+    createdDate
+    description
+    id
+    lastModifiedDate
+    name
+    projectId
+    version
+    versions {
+      active
+      commitMessage
+      content
+      createdBy
+      createdDate
+      environment
+      id
+      promptId
+      type
+      variables
+      versionNumber
+    }
+  }
+}
+    `);
+
+export const useAiPromptQuery = <
+      TData = AiPromptQuery,
+      TError = unknown
+    >(
+      variables: AiPromptQueryVariables,
+      options?: Omit<UseQueryOptions<AiPromptQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiPromptQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiPromptQuery, TError, TData>(
+      {
+    queryKey: ['aiPrompt', variables],
+    queryFn: fetcher<AiPromptQuery, AiPromptQueryVariables>(AiPromptDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiPromptDocument = new TypedDocumentString(`
+    mutation createAiPrompt($input: CreateAiPromptInput!) {
+  createAiPrompt(input: $input) {
+    createdDate
+    description
+    id
+    lastModifiedDate
+    name
+    projectId
+    version
+  }
+}
+    `);
+
+export const useCreateAiPromptMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiPromptMutation, TError, CreateAiPromptMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiPromptMutation, TError, CreateAiPromptMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiPrompt'],
+    mutationFn: (variables?: CreateAiPromptMutationVariables) => fetcher<CreateAiPromptMutation, CreateAiPromptMutationVariables>(CreateAiPromptDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiPromptDocument = new TypedDocumentString(`
+    mutation updateAiPrompt($id: ID!, $input: UpdateAiPromptInput!) {
+  updateAiPrompt(id: $id, input: $input) {
+    createdDate
+    description
+    id
+    lastModifiedDate
+    name
+    projectId
+    version
+  }
+}
+    `);
+
+export const useUpdateAiPromptMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiPromptMutation, TError, UpdateAiPromptMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiPromptMutation, TError, UpdateAiPromptMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiPrompt'],
+    mutationFn: (variables?: UpdateAiPromptMutationVariables) => fetcher<UpdateAiPromptMutation, UpdateAiPromptMutationVariables>(UpdateAiPromptDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiPromptDocument = new TypedDocumentString(`
+    mutation deleteAiPrompt($id: ID!) {
+  deleteAiPrompt(id: $id)
+}
+    `);
+
+export const useDeleteAiPromptMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiPromptMutation, TError, DeleteAiPromptMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiPromptMutation, TError, DeleteAiPromptMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiPrompt'],
+    mutationFn: (variables?: DeleteAiPromptMutationVariables) => fetcher<DeleteAiPromptMutation, DeleteAiPromptMutationVariables>(DeleteAiPromptDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAiPromptVersionDocument = new TypedDocumentString(`
+    mutation createAiPromptVersion($input: CreateAiPromptVersionInput!) {
+  createAiPromptVersion(input: $input) {
+    active
+    commitMessage
+    content
+    createdBy
+    createdDate
+    environment
+    id
+    promptId
+    type
+    variables
+    versionNumber
+  }
+}
+    `);
+
+export const useCreateAiPromptVersionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiPromptVersionMutation, TError, CreateAiPromptVersionMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiPromptVersionMutation, TError, CreateAiPromptVersionMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiPromptVersion'],
+    mutationFn: (variables?: CreateAiPromptVersionMutationVariables) => fetcher<CreateAiPromptVersionMutation, CreateAiPromptVersionMutationVariables>(CreateAiPromptVersionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetActiveAiPromptVersionDocument = new TypedDocumentString(`
+    mutation setActiveAiPromptVersion($promptVersionId: ID!, $environment: String!) {
+  setActiveAiPromptVersion(
+    promptVersionId: $promptVersionId
+    environment: $environment
+  )
+}
+    `);
+
+export const useSetActiveAiPromptVersionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetActiveAiPromptVersionMutation, TError, SetActiveAiPromptVersionMutationVariables, TContext>) => {
+    
+    return useMutation<SetActiveAiPromptVersionMutation, TError, SetActiveAiPromptVersionMutationVariables, TContext>(
+      {
+    mutationKey: ['setActiveAiPromptVersion'],
+    mutationFn: (variables?: SetActiveAiPromptVersionMutationVariables) => fetcher<SetActiveAiPromptVersionMutation, SetActiveAiPromptVersionMutationVariables>(SetActiveAiPromptVersionDocument, variables)(),
     ...options
   }
     )};
