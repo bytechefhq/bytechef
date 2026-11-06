@@ -33,7 +33,7 @@ describe('ExternalInvocationsTable', () => {
         render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);
 
         expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
-        expect(screen.getByText('Automation MCP')).toBeInTheDocument();
+        expect(screen.getByText('MCP')).toBeInTheDocument();
         expect(screen.getByText('SUCCESS')).toBeInTheDocument();
         expect(screen.getByText('42 ms')).toBeInTheDocument();
         expect(screen.getByText('slack / sendMessage')).toBeInTheDocument();
@@ -58,7 +58,7 @@ describe('ExternalInvocationsTable', () => {
         ['A2A', 'A2A'],
         ['EMBEDDED_API_ACTION', 'Embedded API (Action)'],
         ['EMBEDDED_API_TOOL', 'Embedded API (Tool)'],
-        ['MCP_AUTOMATION', 'Automation MCP'],
+        ['MCP_AUTOMATION', 'MCP'],
         ['MCP_EMBEDDED', 'Embedded MCP'],
         ['FUTURE_SURFACE', 'FUTURE_SURFACE'],
     ])('labels the %s surface as %s', (surface, label) => {
@@ -167,7 +167,7 @@ describe('ExternalInvocationsTable', () => {
         render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} showSurface={false} />);
 
         expect(screen.queryByText('Surface')).not.toBeInTheDocument();
-        expect(screen.queryByText('Automation MCP')).not.toBeInTheDocument();
+        expect(screen.queryByText('MCP')).not.toBeInTheDocument();
         expect(screen.getByText('Source')).toBeInTheDocument();
         expect(screen.getByText('Server')).toBeInTheDocument();
     });
