@@ -108,6 +108,11 @@ const config: NextConfig = {
         permanent: true,
       },
       {
+        source: '/openapi/backend/embedded-tool-invocation',
+        destination: '/openapi/backend/embedded-external-invocation',
+        permanent: true,
+      },
+      {
         // Tenant-Isolated Security merged into the White-Label Execution page.
         source: '/platform/embedded/get-started/tenant-isolated-security',
         destination:

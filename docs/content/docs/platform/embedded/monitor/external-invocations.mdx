@@ -95,7 +95,7 @@ in the user's sheet. It lists that user's most recent calls with the same column
 Your own application can read the same history for a connected user from the embedded API:
 
 ```http
-GET /api/embedded/v1/{externalUserId}/tool-invocations HTTP/1.1
+GET /api/embedded/v1/{externalUserId}/external-invocations HTTP/1.1
 Host: your-bytechef-host.example.com
 Authorization: Bearer <API Key>
 X-Environment: PRODUCTION
@@ -103,7 +103,7 @@ X-Environment: PRODUCTION
 
 The endpoint accepts the same `surface`, `outcome`, `startDate` and `endDate` filters as the page, plus
 `pageNumber`. It returns only the calls of the user named in the path. See the
-[API reference](/openapi/backend/embedded-tool-invocation).
+[API reference](/openapi/backend/embedded-external-invocation).
 
 ---
 
