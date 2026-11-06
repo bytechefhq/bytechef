@@ -23,6 +23,7 @@
             </column>
             <column name="config" type="TEXT"/>
             <column name="workspace_id" type="BIGINT"/>
+            <column name="connected_user_id" type="BIGINT"/>
             <column name="created_by" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
@@ -39,6 +40,10 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <sql>ALTER TABLE ai_gateway_provider ADD CONSTRAINT ck_ai_gateway_provider_workspace_connected_user_not_both CHECK (workspace_id IS NULL OR connected_user_id IS NULL);</sql>
+
+        <sql>CREATE UNIQUE INDEX uk_ai_gateway_provider_connected_user_id_type ON ai_gateway_provider (connected_user_id, type) WHERE connected_user_id IS NOT NULL;</sql>
 
         <createTable tableName="ai_gateway_budget">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
@@ -102,6 +107,35 @@
             </column>
         </createTable>
 
+        <createTable tableName="ai_gateway_connected_user_settings">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connected_user_id" type="BIGINT">
+                <constraints nullable="false" unique="true"
+                             uniqueConstraintName="uk_ai_gateway_connected_user_settings_connected_user_id"/>
+            </column>
+            <column name="routing_policy_id" type="BIGINT">
+                <constraints foreignKeyName="fk_ai_gateway_connected_user_settings_policy"
+                             references="ai_gateway_routing_policy(id)"/>
+            </column>
+            <column name="budget_cap" type="NUMERIC(19, 6)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_gateway_connected_user_settings"
+                     indexName="idx_ai_gateway_connected_user_settings_routing_policy_id">
+            <column name="routing_policy_id"/>
+        </createIndex>
+
         <createTable tableName="ai_gateway_model_deployment">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
@@ -159,6 +193,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="workspace_id" type="BIGINT"/>
+            <column name="connected_user_id" type="BIGINT"/>
             <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -166,6 +201,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <createIndex tableName="ai_gateway_spend_summary" indexName="idx_ai_gateway_spend_summary_connected_user_period">
+            <column name="connected_user_id"/>
+            <column name="period_start"/>
+        </createIndex>
 
         <createTable tableName="ai_gateway_project">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
