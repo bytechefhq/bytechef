@@ -1,0 +1,45 @@
+query aiExperiments($workspaceId: ID!) {
+    aiExperiments: aiEvalExperiments(workspaceId: $workspaceId) {
+        completedDate
+        completedRuns
+        createdDate
+        datasetVersionId
+        failedRuns
+        id
+        metadata
+        model
+        promptVersionId
+        startedDate
+        status
+        stopRequested
+        totalRuns
+    }
+}
+
+query aiExperimentRuns($experimentId: ID!) {
+    aiExperimentRuns: aiEvalExperimentRuns(experimentId: $experimentId) {
+        cost
+        createdDate
+        datasetItemId
+        errorMessage
+        experimentId
+        id
+        latencyMs
+        status
+        traceId
+    }
+}
+
+query aiExperimentRunByTraceId($traceId: ID!) {
+    aiExperimentRunByTraceId: aiEvalExperimentRunByTraceId(traceId: $traceId) {
+        cost
+        createdDate
+        datasetItemId
+        errorMessage
+        experimentId
+        id
+        latencyMs
+        status
+        traceId
+    }
+}
