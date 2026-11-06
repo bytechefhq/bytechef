@@ -16,8 +16,10 @@ import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-ex
 import {getExecutionSelectionKey} from '@/shared/components/workflow-executions/util/executionSelectionKey';
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {isClusterElementCallTaskExecution} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
-import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
+import {getWorkflowStatusType, isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {useWorkflowExecutionCostQuery} from '@/shared/middleware/graphql';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {TabValueType} from '@/shared/types';
 import {ReactNode, useCallback, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -85,12 +87,26 @@ const WorkflowExecutionSheetContent = ({
 
     const {useGetWorkflowExecutionTaskExecutionQuery} = useWorkflowExecutionDetailQueries();
 
+    const application = useApplicationInfoStore((state) => state.application);
+
     const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
         useGetWorkflowExecutionTaskExecutionQuery(
             {id: lazy.workflowExecutionId, taskExecutionId: Number(selectedItem?.id)},
             isTaskSelected,
             false
         );
+
+    const {data: workflowExecutionCostData} = useWorkflowExecutionCostQuery(
+        {jobId: String(job?.id)},
+        {
+            enabled:
+                application?.edition === 'EE' &&
+                !!job?.id &&
+                getWorkflowStatusType(job, triggerExecution) !== 'running',
+        }
+    );
+
+    const workflowExecutionCost = workflowExecutionCostData?.workflowExecutionCost || undefined;
 
     const selectedExecutionKey = getExecutionSelectionKey(selectedItem);
 
@@ -117,6 +133,7 @@ const WorkflowExecutionSheetContent = ({
         <div className="flex size-full flex-col">
             <WorkflowExecutionsHeader
                 actions={headerActions}
+                cost={workflowExecutionCost}
                 job={job}
                 taskExecutionCount={taskExecutionCount}
                 triggerExecution={triggerExecution}

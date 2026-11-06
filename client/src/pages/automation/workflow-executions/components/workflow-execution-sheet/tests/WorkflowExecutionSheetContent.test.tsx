@@ -23,6 +23,10 @@ vi.mock('@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem
 
 vi.mock('@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel', () => ({default: () => null}));
 
+vi.mock('@/shared/middleware/graphql', () => ({
+    useWorkflowExecutionCostQuery: () => ({data: undefined}),
+}));
+
 const renderContent = (selectedItem: object) =>
     render(
         <WorkflowExecutionSheetContent
