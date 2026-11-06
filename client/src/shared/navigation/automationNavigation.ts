@@ -3,6 +3,7 @@ import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {EditionType} from '@/shared/stores/useApplicationInfoStore';
 import {
     ActivityIcon,
+    FileTextIcon,
     FolderIcon,
     HammerIcon,
     HistoryIcon,
@@ -97,6 +98,7 @@ export const automationNavigation: NavigationType[] = [
         icon: VectorSquareIcon,
         name: 'Knowledge Base',
     },
+    {href: '/automation/asset-files', icon: FileTextIcon, name: 'Files'},
     {href: '/automation/chats', icon: MessageSquareIcon, name: 'Chats'},
 ];
 

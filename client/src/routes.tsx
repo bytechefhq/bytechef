@@ -64,6 +64,7 @@ const AutomationExternalInvocations = lazy(() =>
         default: module.AutomationExternalInvocations,
     }))
 );
+const AssetFiles = lazy(() => import('@/pages/automation/asset-files/AssetFiles'));
 const AutomationExecutions = lazy(() =>
     import('@/pages/automation/workflow-executions/WorkflowExecutions').then((module) => ({
         default: module.WorkflowExecutions,
@@ -892,6 +893,26 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'knowledge-bases/:id',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <AssetFiles />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'asset-files',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <AssetFiles />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'asset-files/:fileId',
                                 },
                                 {
                                     children: [
