@@ -285,6 +285,8 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:ee:libs:automation:automation-security-web:automation-security-web-impl"))
+    implementation(project(":server:ee:libs:automation:automation-workflow-alert:automation-workflow-alert-graphql"))
+    implementation(project(":server:ee:libs:automation:automation-workflow-alert:automation-workflow-alert-service"))
     implementation(project(":server:ee:libs:automation:automation-workflow-execution-cost:automation-workflow-execution-cost-graphql"))
     implementation(project(":server:ee:libs:automation:automation-workflow-execution-cost:automation-workflow-execution-cost-service"))
     implementation(project(":server:ee:libs:config:cache-invalidation-config"))

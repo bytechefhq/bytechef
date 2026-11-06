@@ -1,0 +1,55 @@
+extend type Query {
+    workflowAlertRules(workspaceId: ID!): [WorkflowAlertRule!]!
+    workflowAlertEvents(workspaceId: ID!): [WorkflowAlertEvent!]!
+}
+
+extend type Mutation {
+    createWorkflowAlertRule(workspaceId: ID!, input: WorkflowAlertRuleInput!): WorkflowAlertRule!
+    updateWorkflowAlertRule(id: ID!, input: WorkflowAlertRuleInput!): WorkflowAlertRule!
+    deleteWorkflowAlertRule(id: ID!): Boolean!
+    enableWorkflowAlertRule(id: ID!, enabled: Boolean!): WorkflowAlertRule!
+    sendTestWorkflowAlert(id: ID!): Boolean!
+}
+
+enum WorkflowAlertRuleType {
+    CONSECUTIVE_FAILURES
+    FAILURE_RATE
+    ERROR_COUNT
+    LATENCY_THRESHOLD
+    LATENCY_SPIKE
+    COST_THRESHOLD
+    NO_ACTIVITY
+}
+
+input WorkflowAlertRuleInput {
+    name: String!
+    workflowId: String
+    ruleType: WorkflowAlertRuleType!
+    threshold: Float!
+    windowMinutes: Int
+    cooldownMinutes: Int
+    notificationIds: [ID!]!
+    enabled: Boolean
+}
+
+type WorkflowAlertRule {
+    id: ID!
+    name: String!
+    workflowId: String
+    ruleType: WorkflowAlertRuleType!
+    threshold: Float!
+    windowMinutes: Int
+    cooldownMinutes: Int!
+    enabled: Boolean!
+    notificationIds: [ID!]!
+    lastTriggeredDate: String
+}
+
+type WorkflowAlertEvent {
+    id: ID!
+    workflowAlertRuleId: ID!
+    jobId: ID
+    triggeredValue: Float
+    message: String
+    createdDate: String
+}
