@@ -8,11 +8,11 @@ package com.bytechef.ee.embedded.execution.public_.web.rest;
 import org.springframework.format.annotation.DateTimeFormat;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecuteAction400ResponseModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationOutcomeModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationPageModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSurfaceModel;
 import org.springframework.lang.Nullable;
 import java.time.OffsetDateTime;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationOutcomeModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationPageModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationSurfaceModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,19 +40,19 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T10:15:08.142495+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
-@Tag(name = "tool-invocation", description = "The Embedded Tool Invocation Public API")
-public interface ToolInvocationApi {
+@Tag(name = "external-invocation", description = "The Embedded External Invocation Public API")
+public interface ExternalInvocationApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
-    String PATH_GET_TOOL_INVOCATIONS_PAGE = "/{externalUserId}/tool-invocations";
+    String PATH_GET_EXTERNAL_INVOCATIONS_PAGE = "/{externalUserId}/external-invocations";
     /**
-     * GET /{externalUserId}/tool-invocations : Returns a page of the connected user&#39;s tool invocations
-     * Returns a page of the connected user&#39;s tool invocations: embedded MCP component and workflow tool calls, executeAction calls and executeTool calls. Tool inputs and outputs are not included.
+     * GET /{externalUserId}/external-invocations : Returns a page of the connected user&#39;s external invocations
+     * Returns a page of the connected user&#39;s external invocations: embedded MCP component and workflow tool calls, executeAction calls and executeTool calls. Tool inputs and outputs are not included.
      *
      * @param externalUserId The external user id. (required)
      * @param xEnvironment The environment. (optional)
@@ -61,7 +61,7 @@ public interface ToolInvocationApi {
      * @param startDate Return only invocations recorded at or after this instant. (optional)
      * @param endDate Return only invocations recorded at or before this instant. (optional)
      * @param pageNumber The number of the page to return. (optional, default to 0)
-     * @return The page of tool invocations. (status code 200)
+     * @return The page of external invocations. (status code 200)
      *         or Bad request (status code 400)
      *         or Unauthorized (status code 401)
      *         or Forbidden (status code 403)
@@ -69,13 +69,13 @@ public interface ToolInvocationApi {
      *         or Internal server error (status code 500)
      */
     @Operation(
-        operationId = "getToolInvocationsPage",
-        summary = "Returns a page of the connected user's tool invocations",
-        description = "Returns a page of the connected user's tool invocations: embedded MCP component and workflow tool calls, executeAction calls and executeTool calls. Tool inputs and outputs are not included.",
-        tags = { "tool-invocation" },
+        operationId = "getExternalInvocationsPage",
+        summary = "Returns a page of the connected user's external invocations",
+        description = "Returns a page of the connected user's external invocations: embedded MCP component and workflow tool calls, executeAction calls and executeTool calls. Tool inputs and outputs are not included.",
+        tags = { "external-invocation" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The page of tool invocations.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ToolInvocationPageModel.class))
+            @ApiResponse(responseCode = "200", description = "The page of external invocations.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExternalInvocationPageModel.class))
             }),
             @ApiResponse(responseCode = "400", description = "Bad request", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteAction400ResponseModel.class))
@@ -100,14 +100,14 @@ public interface ToolInvocationApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = ToolInvocationApi.PATH_GET_TOOL_INVOCATIONS_PAGE,
+        value = ExternalInvocationApi.PATH_GET_EXTERNAL_INVOCATIONS_PAGE,
         produces = { "application/json" }
     )
-    default ResponseEntity<ToolInvocationPageModel> getToolInvocationsPage(
+    default ResponseEntity<ExternalInvocationPageModel> getExternalInvocationsPage(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "surface", description = "Return only invocations made through this surface.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "surface", required = false) @Nullable ToolInvocationSurfaceModel surface,
-        @Parameter(name = "outcome", description = "Return only invocations with this outcome.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "outcome", required = false) @Nullable ToolInvocationOutcomeModel outcome,
+        @Parameter(name = "surface", description = "Return only invocations made through this surface.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "surface", required = false) @Nullable ExternalInvocationSurfaceModel surface,
+        @Parameter(name = "outcome", description = "Return only invocations with this outcome.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "outcome", required = false) @Nullable ExternalInvocationOutcomeModel outcome,
         @Parameter(name = "startDate", description = "Return only invocations recorded at or after this instant.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime startDate,
         @Parameter(name = "endDate", description = "Return only invocations recorded at or before this instant.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime endDate,
         @Parameter(name = "pageNumber", description = "The number of the page to return.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber

@@ -2,7 +2,7 @@ package com.bytechef.ee.embedded.execution.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -21,15 +21,15 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A page of a connected user&#39;s tool invocations.
+ * A page of a connected user&#39;s external invocations.
  */
 
-@Schema(name = "ToolInvocationPage", description = "A page of a connected user's tool invocations.")
-@JsonTypeName("ToolInvocationPage")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T10:15:08.142495+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public class ToolInvocationPageModel {
+@Schema(name = "ExternalInvocationPage", description = "A page of a connected user's external invocations.")
+@JsonTypeName("ExternalInvocationPage")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+public class ExternalInvocationPageModel {
 
-  private List<@Valid ToolInvocationModel> content = new ArrayList<>();
+  private List<@Valid ExternalInvocationModel> content = new ArrayList<>();
 
   private @Nullable Integer number;
 
@@ -41,12 +41,12 @@ public class ToolInvocationPageModel {
 
   private @Nullable Integer totalPages;
 
-  public ToolInvocationPageModel content(List<@Valid ToolInvocationModel> content) {
+  public ExternalInvocationPageModel content(List<@Valid ExternalInvocationModel> content) {
     this.content = content;
     return this;
   }
 
-  public ToolInvocationPageModel addContentItem(ToolInvocationModel contentItem) {
+  public ExternalInvocationPageModel addContentItem(ExternalInvocationModel contentItem) {
     if (this.content == null) {
       this.content = new ArrayList<>();
     }
@@ -55,22 +55,22 @@ public class ToolInvocationPageModel {
   }
 
   /**
-   * The tool invocations on this page.
+   * The external invocations on this page.
    * @return content
    */
   
-  @Schema(name = "content", description = "The tool invocations on this page.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "content", description = "The external invocations on this page.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("content")
-  public List<@Valid ToolInvocationModel> getContent() {
+  public List<@Valid ExternalInvocationModel> getContent() {
     return content;
   }
 
   @JsonProperty("content")
-  public void setContent(List<@Valid ToolInvocationModel> content) {
+  public void setContent(List<@Valid ExternalInvocationModel> content) {
     this.content = content;
   }
 
-  public ToolInvocationPageModel number(@Nullable Integer number) {
+  public ExternalInvocationPageModel number(@Nullable Integer number) {
     this.number = number;
     return this;
   }
@@ -91,7 +91,7 @@ public class ToolInvocationPageModel {
     this.number = number;
   }
 
-  public ToolInvocationPageModel numberOfElements(@Nullable Integer numberOfElements) {
+  public ExternalInvocationPageModel numberOfElements(@Nullable Integer numberOfElements) {
     this.numberOfElements = numberOfElements;
     return this;
   }
@@ -112,7 +112,7 @@ public class ToolInvocationPageModel {
     this.numberOfElements = numberOfElements;
   }
 
-  public ToolInvocationPageModel size(@Nullable Integer size) {
+  public ExternalInvocationPageModel size(@Nullable Integer size) {
     this.size = size;
     return this;
   }
@@ -133,7 +133,7 @@ public class ToolInvocationPageModel {
     this.size = size;
   }
 
-  public ToolInvocationPageModel totalElements(@Nullable Integer totalElements) {
+  public ExternalInvocationPageModel totalElements(@Nullable Integer totalElements) {
     this.totalElements = totalElements;
     return this;
   }
@@ -154,7 +154,7 @@ public class ToolInvocationPageModel {
     this.totalElements = totalElements;
   }
 
-  public ToolInvocationPageModel totalPages(@Nullable Integer totalPages) {
+  public ExternalInvocationPageModel totalPages(@Nullable Integer totalPages) {
     this.totalPages = totalPages;
     return this;
   }
@@ -183,13 +183,13 @@ public class ToolInvocationPageModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ToolInvocationPageModel toolInvocationPage = (ToolInvocationPageModel) o;
-    return Objects.equals(this.content, toolInvocationPage.content) &&
-        Objects.equals(this.number, toolInvocationPage.number) &&
-        Objects.equals(this.numberOfElements, toolInvocationPage.numberOfElements) &&
-        Objects.equals(this.size, toolInvocationPage.size) &&
-        Objects.equals(this.totalElements, toolInvocationPage.totalElements) &&
-        Objects.equals(this.totalPages, toolInvocationPage.totalPages);
+    ExternalInvocationPageModel externalInvocationPage = (ExternalInvocationPageModel) o;
+    return Objects.equals(this.content, externalInvocationPage.content) &&
+        Objects.equals(this.number, externalInvocationPage.number) &&
+        Objects.equals(this.numberOfElements, externalInvocationPage.numberOfElements) &&
+        Objects.equals(this.size, externalInvocationPage.size) &&
+        Objects.equals(this.totalElements, externalInvocationPage.totalElements) &&
+        Objects.equals(this.totalPages, externalInvocationPage.totalPages);
   }
 
   @Override
@@ -200,7 +200,7 @@ public class ToolInvocationPageModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ToolInvocationPageModel {\n");
+    sb.append("class ExternalInvocationPageModel {\n");
     sb.append("    content: ").append(toIndentedString(content)).append("\n");
     sb.append("    number: ").append(toIndentedString(number)).append("\n");
     sb.append("    numberOfElements: ").append(toIndentedString(numberOfElements)).append("\n");

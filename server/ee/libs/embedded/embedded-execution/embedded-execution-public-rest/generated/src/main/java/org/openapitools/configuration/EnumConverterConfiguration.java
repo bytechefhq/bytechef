@@ -5,9 +5,9 @@ import java.net.URI;
 import java.util.UUID;
 
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationKindModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationOutcomeModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationSurfaceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationKindModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationOutcomeModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSurfaceModel;
 
 import jakarta.annotation.Generated;
 
@@ -22,7 +22,7 @@ import org.springframework.core.convert.converter.Converter;
  * correct conversion if the OpenAPI specification is using an `enumPropertyNaming` other than
  * `original` or the specification has an integer enum.
  */
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T09:08:13.694310+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Configuration(value = "org.openapitools.configuration.enumConverterConfiguration")
 public class EnumConverterConfiguration {
 
@@ -35,30 +35,30 @@ public class EnumConverterConfiguration {
             }
         };
     }
-    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.toolInvocationKindConverter")
-    Converter<String, ToolInvocationKindModel> toolInvocationKindConverter() {
-        return new Converter<String, ToolInvocationKindModel>() {
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.externalInvocationKindConverter")
+    Converter<String, ExternalInvocationKindModel> externalInvocationKindConverter() {
+        return new Converter<String, ExternalInvocationKindModel>() {
             @Override
-            public ToolInvocationKindModel convert(String source) {
-                return ToolInvocationKindModel.fromValue(source);
+            public ExternalInvocationKindModel convert(String source) {
+                return ExternalInvocationKindModel.fromValue(source);
             }
         };
     }
-    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.toolInvocationOutcomeConverter")
-    Converter<String, ToolInvocationOutcomeModel> toolInvocationOutcomeConverter() {
-        return new Converter<String, ToolInvocationOutcomeModel>() {
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.externalInvocationOutcomeConverter")
+    Converter<String, ExternalInvocationOutcomeModel> externalInvocationOutcomeConverter() {
+        return new Converter<String, ExternalInvocationOutcomeModel>() {
             @Override
-            public ToolInvocationOutcomeModel convert(String source) {
-                return ToolInvocationOutcomeModel.fromValue(source);
+            public ExternalInvocationOutcomeModel convert(String source) {
+                return ExternalInvocationOutcomeModel.fromValue(source);
             }
         };
     }
-    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.toolInvocationSurfaceConverter")
-    Converter<String, ToolInvocationSurfaceModel> toolInvocationSurfaceConverter() {
-        return new Converter<String, ToolInvocationSurfaceModel>() {
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.externalInvocationSurfaceConverter")
+    Converter<String, ExternalInvocationSurfaceModel> externalInvocationSurfaceConverter() {
+        return new Converter<String, ExternalInvocationSurfaceModel>() {
             @Override
-            public ToolInvocationSurfaceModel convert(String source) {
-                return ToolInvocationSurfaceModel.fromValue(source);
+            public ExternalInvocationSurfaceModel convert(String source) {
+                return ExternalInvocationSurfaceModel.fromValue(source);
             }
         };
     }
