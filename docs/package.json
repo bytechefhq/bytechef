@@ -52,7 +52,7 @@
     "next-themes": "^0.4.6",
     "octokit": "^5.0.5",
     "oxc-transform": "^0.146.0",
-    "posthog-js": "^1.418.10",
+    "posthog-js": "^1.447.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-force-graph-2d": "^1.29.1",
