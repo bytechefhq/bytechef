@@ -1,6 +1,8 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ToolInvocations} from '@/pages/automation/tool-invocations/ToolInvocations';
 import AutomationToolInvocationsEmptyState from '@/pages/automation/tool-invocations/components/AutomationToolInvocationsEmptyState';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {PlatformType, useA2aServersQuery, useWorkspaceMcpServersQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
@@ -9,14 +11,19 @@ export const AutomationToolInvocations = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    useLoadWorkspaceScopes(currentWorkspaceId);
+
+    const canViewA2aServers = useHasWorkspaceScope(currentWorkspaceId, 'A2A_VIEW');
+    const canViewMcpServers = useHasWorkspaceScope(currentWorkspaceId, 'MCP_VIEW');
+
     const {data: a2aServersData} = useA2aServersQuery(
         {workspaceId: currentWorkspaceId + ''},
-        {enabled: currentWorkspaceId != null}
+        {enabled: currentWorkspaceId != null && canViewA2aServers}
     );
 
     const {data} = useWorkspaceMcpServersQuery(
         {workspaceId: currentWorkspaceId + ''},
-        {enabled: currentWorkspaceId != null}
+        {enabled: currentWorkspaceId != null && canViewMcpServers}
     );
 
     const a2aServerOptions = useMemo(
