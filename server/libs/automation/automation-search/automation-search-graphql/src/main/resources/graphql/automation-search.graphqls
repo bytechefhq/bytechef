@@ -19,6 +19,7 @@ enum SearchAssetType {
     KNOWLEDGE_BASE_DOCUMENT
     PROJECT
     WORKFLOW
+    ASSET_FILE
 }
 
 type ProjectSearchResult implements SearchResult {
@@ -84,6 +85,13 @@ type KnowledgeBaseDocumentSearchResult implements SearchResult {
 }
 
 type ConnectionSearchResult implements SearchResult {
+    id: ID!
+    name: String!
+    description: String
+    type: SearchAssetType!
+}
+
+type AssetFileSearchResult implements SearchResult {
     id: ID!
     name: String!
     description: String
