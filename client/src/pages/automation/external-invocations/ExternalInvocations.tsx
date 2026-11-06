@@ -179,7 +179,7 @@ export const ExternalInvocations = ({
                     )}
 
                     <div className="flex flex-col space-y-2">
-                        <Label>Outcome</Label>
+                        <Label>Status</Label>
 
                         <ComboBox items={outcomeOptions} onChange={handleOutcomeChange} value={filterOutcome} />
                     </div>

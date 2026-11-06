@@ -72,6 +72,8 @@ const ExternalInvocationsTable = ({
     <Table>
         <TableHeader>
             <TableRow>
+                <TableHead>Status</TableHead>
+
                 <TableHead>Tool</TableHead>
 
                 {showSurface && <TableHead>Surface</TableHead>}
@@ -79,8 +81,6 @@ const ExternalInvocationsTable = ({
                 <TableHead>Server</TableHead>
 
                 <TableHead>Source</TableHead>
-
-                <TableHead>Outcome</TableHead>
 
                 <TableHead>Duration</TableHead>
 
@@ -91,6 +91,15 @@ const ExternalInvocationsTable = ({
         <TableBody>
             {externalInvocationLogs.map((externalInvocationLog) => (
                 <TableRow key={externalInvocationLog.id}>
+                    <TableCell>
+                        <Badge
+                            className="border-transparent"
+                            label={externalInvocationLog.outcome}
+                            styleType={OUTCOME_STYLE_TYPES[externalInvocationLog.outcome] || 'secondary-filled'}
+                            weight="semibold"
+                        />
+                    </TableCell>
+
                     <TableCell className="font-semibold">{externalInvocationLog.toolName || '—'}</TableCell>
 
                     {showSurface && (
@@ -102,15 +111,6 @@ const ExternalInvocationsTable = ({
                     <TableCell>{serverLabel(externalInvocationLog, mcpServerNames, a2aServerNames)}</TableCell>
 
                     <TableCell>{sourceLabel(externalInvocationLog)}</TableCell>
-
-                    <TableCell>
-                        <Badge
-                            className="border-transparent"
-                            label={externalInvocationLog.outcome}
-                            styleType={OUTCOME_STYLE_TYPES[externalInvocationLog.outcome] || 'secondary-filled'}
-                            weight="semibold"
-                        />
-                    </TableCell>
 
                     <TableCell>{externalInvocationLog.durationMs} ms</TableCell>
 
