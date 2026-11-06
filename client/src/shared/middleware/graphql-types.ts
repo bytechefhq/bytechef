@@ -476,6 +476,51 @@ export type ArrayProperty = Property & {
   type: PropertyType;
 };
 
+export type AssetFile = {
+  __typename?: 'AssetFile';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  downloadUrl: Scalars['String']['output'];
+  environmentId: Scalars['Long']['output'];
+  format?: Maybe<Scalars['String']['output']>;
+  generatedByAgentSource?: Maybe<Scalars['Int']['output']>;
+  generatedFromPrompt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  metadataJson?: Maybe<Scalars['String']['output']>;
+  mimeType: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  publicLinkUrl?: Maybe<Scalars['String']['output']>;
+  sizeBytes: Scalars['Long']['output'];
+  source: AssetFileSource;
+  tags: Array<Tag>;
+};
+
+export type AssetFileSearchResult = SearchResult & {
+  __typename?: 'AssetFileSearchResult';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: SearchAssetType;
+};
+
+export enum AssetFileSource {
+  AiGenerated = 'AI_GENERATED',
+  UserUpload = 'USER_UPLOAD'
+}
+
+export type AssetFileVersion = {
+  __typename?: 'AssetFileVersion';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  mimeType: Scalars['String']['output'];
+  sizeBytes: Scalars['Long']['output'];
+  versionNumber: Scalars['Int']['output'];
+};
+
 export type AuditEventDataEntryType = {
   __typename?: 'AuditEventDataEntryType';
   key: Scalars['String']['output'];
@@ -1867,6 +1912,7 @@ export type Mutation = {
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
+  deleteAssetFile: Scalars['Boolean']['output'];
   deleteAutomationWorkflowProject: Scalars['Boolean']['output'];
   deleteAutomationWorkflowProjectConfiguration: Scalars['Boolean']['output'];
   deleteAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
@@ -1895,12 +1941,14 @@ export type Mutation = {
   deleteUser: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  disableAssetFilePublicLink: AssetFile;
   disconnectConnection: Scalars['Boolean']['output'];
   dropDataTable: Scalars['Boolean']['output'];
   duplicateAutomationWorkflowProject: Scalars['ID']['output'];
   duplicateAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   duplicateDataTable: Scalars['Boolean']['output'];
   enableApiConnector: Scalars['Boolean']['output'];
+  enableAssetFilePublicLink: AssetFile;
   enableAutomationWorkflowProjectConfiguration: Scalars['Boolean']['output'];
   enableAutomationWorkflowProjectConfigurationWorkflow: Scalars['Boolean']['output'];
   enableConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -1925,6 +1973,7 @@ export type Mutation = {
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
+  restoreAssetFileVersion: AssetFile;
   revokeRegisteredClientGrant: Scalars['Boolean']['output'];
   revokeRegisteredClientGrants: Scalars['Boolean']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
@@ -1961,6 +2010,9 @@ export type Mutation = {
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
+  updateAssetFile: AssetFile;
+  updateAssetFileTags: AssetFile;
+  updateAssetFileTextContent: AssetFile;
   updateAutomationWorkflowProject: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectConfiguration: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectConfigurationWorkflow: Scalars['Boolean']['output'];
@@ -2271,6 +2323,11 @@ export type MutationDeleteApprovalTaskArgs = {
 };
 
 
+export type MutationDeleteAssetFileArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteAutomationWorkflowProjectArgs = {
   id: Scalars['ID']['input'];
 };
@@ -2412,6 +2469,11 @@ export type MutationDeleteWorkspaceMcpServerArgs = {
 };
 
 
+export type MutationDisableAssetFilePublicLinkArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDisconnectConnectionArgs = {
   connectionId: Scalars['ID']['input'];
 };
@@ -2439,6 +2501,11 @@ export type MutationDuplicateDataTableArgs = {
 
 export type MutationEnableApiConnectorArgs = {
   enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableAssetFilePublicLinkArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2582,6 +2649,12 @@ export type MutationRenameDataTableArgs = {
 
 export type MutationRenameDataTableColumnArgs = {
   input: RenameColumnInput;
+};
+
+
+export type MutationRestoreAssetFileVersionArgs = {
+  id: Scalars['ID']['input'];
+  versionId: Scalars['ID']['input'];
 };
 
 
@@ -2777,6 +2850,22 @@ export type MutationUpdateApiKeyArgs = {
 
 export type MutationUpdateApprovalTaskArgs = {
   approvalTask: ApprovalTaskInput;
+};
+
+
+export type MutationUpdateAssetFileArgs = {
+  input: UpdateAssetFileInput;
+};
+
+
+export type MutationUpdateAssetFileTagsArgs = {
+  input: UpdateAssetFileTagsInput;
+};
+
+
+export type MutationUpdateAssetFileTextContentArgs = {
+  content: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3358,6 +3447,11 @@ export type Query = {
   approvalTask?: Maybe<ApprovalTask>;
   approvalTasks?: Maybe<Array<Maybe<ApprovalTask>>>;
   approvalTasksByIds?: Maybe<Array<Maybe<ApprovalTask>>>;
+  assetFile?: Maybe<AssetFile>;
+  assetFileTags: Array<Tag>;
+  assetFileTextContent?: Maybe<Scalars['String']['output']>;
+  assetFileVersions: Array<AssetFileVersion>;
+  assetFiles: Array<AssetFile>;
   auditEventTypes: Array<Scalars['String']['output']>;
   auditEvents: AuditEventPageType;
   authorities: Array<Scalars['String']['output']>;
@@ -3674,6 +3768,34 @@ export type QueryApprovalTasksArgs = {
 
 export type QueryApprovalTasksByIdsArgs = {
   ids: Array<Scalars['ID']['input']>;
+};
+
+
+export type QueryAssetFileArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAssetFileTagsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAssetFileTextContentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAssetFileVersionsArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAssetFilesArgs = {
+  environment?: InputMaybe<Scalars['Int']['input']>;
+  mimeTypePrefix?: InputMaybe<Scalars['String']['input']>;
+  tagIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -4505,6 +4627,7 @@ export type ScriptTestExecution = {
 export enum SearchAssetType {
   ApiCollection = 'API_COLLECTION',
   ApiEndpoint = 'API_ENDPOINT',
+  AssetFile = 'ASSET_FILE',
   Connection = 'CONNECTION',
   DataTable = 'DATA_TABLE',
   Deployment = 'DEPLOYMENT',
@@ -4716,6 +4839,17 @@ export type UpdateApiConnectorInput = {
   icon?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateAssetFileInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateAssetFileTagsInput = {
+  id: Scalars['ID']['input'];
+  tags: Array<TagInput>;
 };
 
 export type UpdateDataTableTagsInput = {
