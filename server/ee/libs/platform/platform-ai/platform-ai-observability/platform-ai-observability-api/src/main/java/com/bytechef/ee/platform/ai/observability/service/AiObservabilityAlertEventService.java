@@ -1,0 +1,33 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.platform.ai.observability.service;
+
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityAlertEvent;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * @version ee
+ */
+public interface AiObservabilityAlertEventService {
+
+    AiObservabilityAlertEvent create(AiObservabilityAlertEvent alertEvent);
+
+    void deleteOlderThan(Instant date);
+
+    AiObservabilityAlertEvent getAlertEvent(Long id);
+
+    List<AiObservabilityAlertEvent> getAlertEventsByRule(Long alertRuleId);
+
+    Optional<AiObservabilityAlertEvent> getLatestEventByRule(Long alertRuleId);
+
+    List<AiObservabilityAlertEvent> getAlertEventsByRuleAfter(Long alertRuleId, Instant after);
+
+    AiObservabilityAlertEvent update(AiObservabilityAlertEvent alertEvent);
+}
