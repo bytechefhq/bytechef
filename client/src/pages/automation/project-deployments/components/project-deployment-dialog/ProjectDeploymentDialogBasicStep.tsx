@@ -408,13 +408,14 @@ const ProjectDeploymentDialogBasicStep = ({
 
                                                         return (
                                                             <SelectItem
+                                                                className="*:[span]:last:w-full"
                                                                 key={
                                                                     deployment.id?.toString() ??
                                                                     `${deployment.name ?? 'deployment'}-${deployment.projectVersion}`
                                                                 }
                                                                 value={deployment.id?.toString() ?? ''}
                                                             >
-                                                                <div className="flex items-center gap-2">
+                                                                <div className="flex w-full items-center justify-between gap-2">
                                                                     <span>
                                                                         {`${deployment.name ?? `Deployment ${deployment.id}`} - V${deployment.projectVersion}`}
                                                                     </span>
