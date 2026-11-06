@@ -30,6 +30,7 @@ import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.tenant.TenantContext;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -308,7 +309,15 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
             WebSocketStreamBridge streamBridge = new WebSocketStreamBridge(session);
 
-            webhookWorkflowExecutor.executeAsync(workflowExecutionId, webhookRequest, streamBridge);
+            String currentTenantId = TenantContext.getCurrentTenantId();
+
+            TenantContext.setCurrentTenantId(workflowExecutionId.getTenantId());
+
+            try {
+                webhookWorkflowExecutor.stream(workflowExecutionId, webhookRequest, streamBridge);
+            } finally {
+                TenantContext.setCurrentTenantId(currentTenantId);
+            }
         } catch (Exception exception) {
             log.error("Error executing workflow", exception);
 

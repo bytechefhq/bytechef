@@ -57,10 +57,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -300,7 +302,7 @@ class WebhookWebSocketHandlerTest {
         ArgumentCaptor<WorkflowExecutionId> workflowExecutionIdArgumentCaptor =
             ArgumentCaptor.forClass(WorkflowExecutionId.class);
 
-        verify(webhookWorkflowExecutor).executeAsync(
+        verify(webhookWorkflowExecutor).stream(
             workflowExecutionIdArgumentCaptor.capture(), any(WebhookRequest.class), any(SseStreamBridge.class));
 
         WorkflowExecutionId workflowExecutionId = workflowExecutionIdArgumentCaptor.getValue();
@@ -313,6 +315,27 @@ class WebhookWebSocketHandlerTest {
 
         assertThat(getSentMessages(webSocketSession)).containsExactly(
             Map.of("event", "start", "message", "Workflow execution started", "webhookId", "webhook-1"));
+    }
+
+    @Test
+    void testExecuteStreamsTheWorkflowInTheTenantOfTheWorkflowExecutionId() throws Exception {
+        WebSocketSession webSocketSession = mockWebSocketSession("session-1", "/webhooks/webhook-1");
+        AtomicReference<String> streamTenantIdReference = new AtomicReference<>();
+
+        when(webhookWorkflowExecutor.stream(any(WorkflowExecutionId.class), any(WebhookRequest.class), any()))
+            .thenAnswer(invocation -> {
+                streamTenantIdReference.set(TenantContext.getCurrentTenantId());
+
+                return CompletableFuture.completedFuture(null);
+            });
+
+        webhookWebSocketHandler.handleTextMessage(
+            webSocketSession,
+            new TextMessage(
+                "{\"action\":\"execute\",\"workflowExecutionId\":\"" + createWebhookId("tenant1") + "\"}"));
+
+        assertThat(streamTenantIdReference.get()).isEqualTo("tenant1");
+        assertThat(TenantContext.getCurrentTenantId()).isEqualTo("public");
     }
 
     @Test
@@ -634,14 +657,18 @@ class WebhookWebSocketHandlerTest {
 
         ArgumentCaptor<SseStreamBridge> sseStreamBridgeArgumentCaptor = ArgumentCaptor.forClass(SseStreamBridge.class);
 
-        verify(webhookWorkflowExecutor).executeAsync(
+        verify(webhookWorkflowExecutor).stream(
             any(WorkflowExecutionId.class), any(WebhookRequest.class), sseStreamBridgeArgumentCaptor.capture());
 
         return sseStreamBridgeArgumentCaptor.getValue();
     }
 
     private static String createWebhookId() {
-        TenantContext.setCurrentTenantId("public");
+        return createWebhookId("public");
+    }
+
+    private static String createWebhookId(String tenantId) {
+        TenantContext.setCurrentTenantId(tenantId);
 
         try {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
