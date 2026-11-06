@@ -4228,8 +4228,11 @@ public class ApplicationProperties {
             /**
              * Property-based key storage
              */
-            PROPERTY;
+            PROPERTY,
+            AWS_KMS;
         }
+
+        private AwsKms awsKms = new AwsKms();
 
         /**
          * Encryption provider
@@ -4241,6 +4244,10 @@ public class ApplicationProperties {
          */
         private Property property = new Property();
 
+        public AwsKms getAwsKms() {
+            return awsKms;
+        }
+
         public Provider getProvider() {
             return provider;
         }
@@ -4249,12 +4256,47 @@ public class ApplicationProperties {
             return property;
         }
 
+        public void setAwsKms(AwsKms awsKms) {
+            this.awsKms = awsKms;
+        }
+
         public void setProvider(Provider provider) {
             this.provider = provider;
         }
 
         public void setProperty(Property property) {
             this.property = property;
+        }
+
+        public static class AwsKms {
+
+            private String dataKeyPath = System.getProperty("user.home") + "/.bytechef/aws-kms-data-key";
+            private String endpoint;
+            private String keyId;
+
+            public String getDataKeyPath() {
+                return dataKeyPath;
+            }
+
+            public String getEndpoint() {
+                return endpoint;
+            }
+
+            public String getKeyId() {
+                return keyId;
+            }
+
+            public void setDataKeyPath(String dataKeyPath) {
+                this.dataKeyPath = dataKeyPath;
+            }
+
+            public void setEndpoint(String endpoint) {
+                this.endpoint = endpoint;
+            }
+
+            public void setKeyId(String keyId) {
+                this.keyId = keyId;
+            }
         }
 
         /**
