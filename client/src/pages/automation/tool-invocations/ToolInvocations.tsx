@@ -189,6 +189,7 @@ export const ToolInvocations = ({
                             <Label>MCP Server</Label>
 
                             <ComboBox
+                                aria-label="MCP Server"
                                 items={[ANY_FILTER_OPTION, ...mcpServerOptions]}
                                 onChange={handleMcpServerChange}
                                 value={filterMcpServerId}
@@ -201,6 +202,7 @@ export const ToolInvocations = ({
                             <Label>A2A Server</Label>
 
                             <ComboBox
+                                aria-label="A2A Server"
                                 items={[ANY_FILTER_OPTION, ...a2aServerOptions]}
                                 onChange={handleA2aServerChange}
                                 value={filterA2aServerId}
