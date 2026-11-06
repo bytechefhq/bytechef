@@ -48,6 +48,7 @@ const AutomationToolInvocations = lazy(() =>
         default: module.AutomationToolInvocations,
     }))
 );
+const AssetFiles = lazy(() => import('@/pages/automation/asset-files/AssetFiles'));
 const AutomationWorkflowExecutions = lazy(() =>
     import('@/pages/automation/workflow-executions/WorkflowExecutions').then((module) => ({
         default: module.WorkflowExecutions,
@@ -854,6 +855,26 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'knowledge-bases/:id',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <AssetFiles />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'asset-files',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <AssetFiles />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'asset-files/:fileId',
                                 },
                                 {
                                     children: [

@@ -20,6 +20,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
+    FileTextIcon,
     FolderIcon,
     HammerIcon,
     HistoryIcon,
@@ -115,6 +116,7 @@ const automationNavigation: NavigationType[] = [
         icon: VectorSquareIcon,
         name: 'Knowledge Base',
     },
+    {href: '/automation/asset-files', icon: FileTextIcon, name: 'Files'},
     {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
 ];
 
