@@ -6,9 +6,9 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useOpenInEmbeddedEditor from '../useOpenInEmbeddedEditor';
 
-const {fetchQueryMock, navigateMock, toastMock} = vi.hoisted(() => ({
-    fetchQueryMock: vi.fn(),
+const {navigateMock, queryMock, toastMock} = vi.hoisted(() => ({
     navigateMock: vi.fn(),
+    queryMock: vi.fn(),
     toastMock: vi.fn(),
 }));
 
@@ -17,7 +17,7 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
 
     return {
         ...actual,
-        useQueryClient: () => ({fetchQuery: fetchQueryMock}),
+        useQueryClient: () => ({query: queryMock}),
     };
 });
 
@@ -34,7 +34,7 @@ vi.mock('sonner', () => ({toast: toastMock}));
 
 describe('useOpenInEmbeddedEditor', () => {
     beforeEach(() => {
-        fetchQueryMock.mockReset();
+        queryMock.mockReset();
         navigateMock.mockReset();
         toastMock.mockReset();
 
@@ -84,7 +84,7 @@ describe('useOpenInEmbeddedEditor', () => {
     it("opens the latest integration version's workflow matching the configured workflow's uuid", async () => {
         environmentStore.setState({currentEnvironmentId: STAGING_ENVIRONMENT});
 
-        fetchQueryMock.mockResolvedValue([
+        queryMock.mockResolvedValue([
             {integrationWorkflowId: 41, workflowUuid: 'other-uuid'},
             {integrationWorkflowId: 42, workflowUuid: 'configured-uuid'},
         ]);
@@ -98,7 +98,7 @@ describe('useOpenInEmbeddedEditor', () => {
     });
 
     it('stays put with a toast when the workflow is gone from the latest integration version', async () => {
-        fetchQueryMock.mockResolvedValue([{integrationWorkflowId: 41, workflowUuid: 'other-uuid'}]);
+        queryMock.mockResolvedValue([{integrationWorkflowId: 41, workflowUuid: 'other-uuid'}]);
 
         const {result} = renderHook(() => useOpenInEmbeddedEditor());
 
@@ -111,7 +111,7 @@ describe('useOpenInEmbeddedEditor', () => {
     it('keeps the environment and does not navigate when the lookup fails', async () => {
         environmentStore.setState({currentEnvironmentId: STAGING_ENVIRONMENT});
 
-        fetchQueryMock.mockRejectedValue(new Error('network'));
+        queryMock.mockRejectedValue(new Error('network'));
 
         const {result} = renderHook(() => useOpenInEmbeddedEditor());
 

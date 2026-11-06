@@ -99,7 +99,7 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
 
     return (
         <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
-            <div className="flex flex-1 cursor-pointer items-center" onClick={handleOpenExecutions}>
+            <div className="relative flex flex-1 items-center">
                 <div
                     className={twMerge(
                         'flex w-80 items-center gap-2 text-sm font-semibold',
@@ -108,7 +108,8 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                 >
                     <button
                         aria-label={workflowLabel}
-                        className="flex min-w-0 cursor-pointer items-center gap-2 text-left"
+                        className="flex min-w-0 cursor-pointer items-center gap-2 text-left after:absolute after:inset-0"
+                        onClick={handleOpenExecutions}
                         type="button"
                     >
                         <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
@@ -122,7 +123,7 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                 </div>
 
                 {workflowTemplate && (
-                    <div className="ml-6 flex items-center gap-1">
+                    <div className="relative z-10 ml-6 flex items-center gap-1">
                         <WorkflowTriggerAndComponentsRow
                             className="hidden sm:flex"
                             filteredComponentNames={filteredComponentNames}
