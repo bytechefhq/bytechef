@@ -10,8 +10,8 @@ tags:
     description: "The Embedded App Event Trigger Public API"
   - name: "request-trigger"
     description: "The Embedded Request Trigger Public API"
-  - name: "tool-invocation"
-    description: "The Embedded Tool Invocation Public API"
+  - name: "external-invocation"
+    description: "The Embedded External Invocation Public API"
 paths:
 #  /components:
 #    get:
@@ -513,14 +513,14 @@ paths:
 #          description: "Limit Exceeded"
 #        "500":
 #          description: "Internal Error"
-  /{externalUserId}/tool-invocations:
+  /{externalUserId}/external-invocations:
     get:
-      description: "Returns a page of the connected user's tool invocations: embedded MCP component and workflow\
+      description: "Returns a page of the connected user's external invocations: embedded MCP component and workflow\
         \ tool calls, executeAction calls and executeTool calls. Tool inputs and outputs are not included."
-      summary: "Returns a page of the connected user's tool invocations"
+      summary: "Returns a page of the connected user's external invocations"
       tags:
-        - "tool-invocation"
-      operationId: "getToolInvocationsPage"
+        - "external-invocation"
+      operationId: "getExternalInvocationsPage"
       parameters:
         - name: "X-Environment"
           description: "The environment."
@@ -539,13 +539,13 @@ paths:
           in: "query"
           required: false
           schema:
-            $ref: "#/components/schemas/ToolInvocationSurface"
+            $ref: "#/components/schemas/ExternalInvocationSurface"
         - name: "outcome"
           description: "Return only invocations with this outcome."
           in: "query"
           required: false
           schema:
-            $ref: "#/components/schemas/ToolInvocationOutcome"
+            $ref: "#/components/schemas/ExternalInvocationOutcome"
         - name: "startDate"
           description: "Return only invocations recorded at or after this instant."
           in: "query"
@@ -570,11 +570,11 @@ paths:
             default: 0
       responses:
         "200":
-          description: "The page of tool invocations."
+          description: "The page of external invocations."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ToolInvocationPage"
+                $ref: "#/components/schemas/ExternalInvocationPage"
         "400":
           $ref: "#/components/responses/badRequest"
         "401":
@@ -1164,8 +1164,8 @@ components:
           description: The type of the tool
           type: "string"
           default: "function"
-    ToolInvocation:
-      description: "A record of a single tool invocation."
+    ExternalInvocation:
+      description: "A record of a single external invocation."
       type: "object"
       properties:
         componentName:
@@ -1202,25 +1202,25 @@ components:
           type: "integer"
           format: "int64"
         kind:
-          $ref: "#/components/schemas/ToolInvocationKind"
+          $ref: "#/components/schemas/ExternalInvocationKind"
         operationName:
           description: "The name of the action or cluster element the tool ran."
           type: "string"
         outcome:
-          $ref: "#/components/schemas/ToolInvocationOutcome"
+          $ref: "#/components/schemas/ExternalInvocationOutcome"
         surface:
-          $ref: "#/components/schemas/ToolInvocationSurface"
+          $ref: "#/components/schemas/ExternalInvocationSurface"
         toolName:
           description: "The name of the tool."
           type: "string"
-    ToolInvocationKind:
-      description: "What a tool invocation ran."
+    ExternalInvocationKind:
+      description: "What a external invocation ran."
       type: "string"
       enum:
         - "COMPONENT"
         - "WORKFLOW"
-    ToolInvocationOutcome:
-      description: "The outcome of a tool invocation."
+    ExternalInvocationOutcome:
+      description: "The outcome of a external invocation."
       type: "string"
       enum:
         - "SUCCESS"
@@ -1231,15 +1231,15 @@ components:
         - "APPROVAL_DENIED"
         - "RULE_BLOCKED"
         - "SUSPENDED"
-    ToolInvocationPage:
-      description: "A page of a connected user's tool invocations."
+    ExternalInvocationPage:
+      description: "A page of a connected user's external invocations."
       type: "object"
       properties:
         content:
-          description: "The tool invocations on this page."
+          description: "The external invocations on this page."
           type: "array"
           items:
-            $ref: "#/components/schemas/ToolInvocation"
+            $ref: "#/components/schemas/ExternalInvocation"
         number:
           description: "The current page."
           type: "integer"
@@ -1255,8 +1255,8 @@ components:
         totalPages:
           description: "The total number of pages."
           type: "integer"
-    ToolInvocationSurface:
-      description: "The surface a tool invocation was made through."
+    ExternalInvocationSurface:
+      description: "The surface a external invocation was made through."
       type: "string"
       enum:
         - "MCP_EMBEDDED"
