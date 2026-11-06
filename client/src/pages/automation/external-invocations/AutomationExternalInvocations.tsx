@@ -1,15 +1,21 @@
 import {ExternalInvocations} from '@/pages/automation/external-invocations/ExternalInvocations';
 import AutomationExternalInvocationsEmptyState from '@/pages/automation/external-invocations/components/AutomationExternalInvocationsEmptyState';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import WorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
+import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {PlatformType, useA2aServersQuery, useWorkspaceMcpServersQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 
 export const AutomationExternalInvocations = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const setWorkflowExecutionId = useWorkflowExecutionSheetStore((state) => state.setWorkflowExecutionId);
+    const setWorkflowExecutionSheetOpen = useWorkflowExecutionSheetStore(
+        (state) => state.setWorkflowExecutionSheetOpen
+    );
 
     useLoadWorkspaceScopes(currentWorkspaceId);
 
@@ -55,13 +61,23 @@ export const AutomationExternalInvocations = () => {
         [currentEnvironmentId, currentWorkspaceId]
     );
 
+    const handleViewJob = useCallback(
+        (jobId: number) => {
+            setWorkflowExecutionId(jobId, 'JOB');
+            setWorkflowExecutionSheetOpen(true);
+        },
+        [setWorkflowExecutionId, setWorkflowExecutionSheetOpen]
+    );
+
     return (
         <ExternalInvocations
             a2aServerOptions={a2aServerOptions}
             firstRunEmptyState={<AutomationExternalInvocationsEmptyState hasMcpServer={hasMcpServer} />}
             key={`${currentWorkspaceId}-${currentEnvironmentId}`}
             mcpServerOptions={mcpServerOptions}
+            onViewJob={handleViewJob}
             type={PlatformType.Automation}
+            workflowExecutionSheet={<WorkflowExecutionSheet />}
             workspaceScope={workspaceScope}
         />
     );

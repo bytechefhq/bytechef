@@ -1,3 +1,4 @@
+import useWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {useExternalInvocations} from '@/pages/automation/external-invocations/hooks/useExternalInvocations';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
@@ -22,13 +23,23 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useWorkspaceExternalInvocationLogsQuery: hoisted.useWorkspaceExternalInvocationLogsQueryMock,
 }));
 
+vi.mock('@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet', () => ({
+    default: () => <div data-testid="workflow-execution-sheet" />,
+}));
+
 vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
     ExternalInvocations: ({
         environmentId,
         firstRunEmptyState,
+        onViewJob,
         type,
+        workflowExecutionSheet,
         workspaceScope,
-    }: {firstRunEmptyState: ReactNode} & Parameters<typeof useExternalInvocations>[0]) => {
+    }: {
+        firstRunEmptyState: ReactNode;
+        onViewJob: (jobId: number) => void;
+        workflowExecutionSheet: ReactNode;
+    } & Parameters<typeof useExternalInvocations>[0]) => {
         const {filterOutcome, filterPageNumber, handleOutcomeChange, handlePaginationClick} = useExternalInvocations({
             environmentId,
             type,
@@ -46,6 +57,10 @@ vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
                 <button onClick={() => handlePaginationClick(3)}>next pages</button>
 
                 {firstRunEmptyState}
+
+                <button onClick={() => onViewJob(7)}>view job</button>
+
+                {workflowExecutionSheet}
             </div>
         );
     },
@@ -132,5 +147,17 @@ describe('EmbeddedExternalInvocations', () => {
 
         expect(screen.getByText('Completed:')).toBeInTheDocument();
         expect(screen.getByText('Connect an AI agent').closest('li')).toHaveAttribute('aria-current', 'step');
+    });
+    it('opens the workflow execution sheet of the job a call ran when View is clicked', async () => {
+        renderPage();
+
+        expect(screen.getByTestId('workflow-execution-sheet')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByText('view job'));
+
+        expect(useWorkflowExecutionSheetStore.getState()).toMatchObject({
+            workflowExecutionId: 7,
+            workflowExecutionSheetOpen: true,
+        });
     });
 });

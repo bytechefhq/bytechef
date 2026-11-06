@@ -52,7 +52,9 @@ interface ExternalInvocationsProps {
     /* Shown instead of the filters and the table when nothing has been recorded yet and no filter is set. */
     firstRunEmptyState: ReactNode;
     mcpServerOptions?: Array<ComboBoxItemType>;
+    onViewJob?: (jobId: number) => void;
     type: PlatformType;
+    workflowExecutionSheet?: ReactNode;
     workspaceScope?: ExternalInvocationsWorkspaceScopeI;
 }
 
@@ -61,7 +63,9 @@ export const ExternalInvocations = ({
     environmentId,
     firstRunEmptyState,
     mcpServerOptions,
+    onViewJob,
     type,
+    workflowExecutionSheet,
     workspaceScope,
 }: ExternalInvocationsProps) => {
     const {
@@ -235,6 +239,7 @@ export const ExternalInvocations = ({
                             a2aServerNames={a2aServerNames}
                             externalInvocationLogs={externalInvocationLogs}
                             mcpServerNames={mcpServerNames}
+                            onViewJob={onViewJob}
                             showSurface={showSurface}
                         />
                     </div>
@@ -248,6 +253,8 @@ export const ExternalInvocations = ({
                     />
                 )}
             </PageLoader>
+
+            {workflowExecutionSheet}
         </LayoutContainer>
     );
 };
