@@ -8,13 +8,13 @@
 package com.bytechef.ee.embedded.execution.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.execution.facade.ToolInvocationFacade;
+import com.bytechef.ee.embedded.execution.facade.ExternalInvocationFacade;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationKindModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationOutcomeModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationPageModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolInvocationSurfaceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationKindModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationOutcomeModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationPageModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSurfaceModel;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -41,49 +41,50 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
 @ConditionalOnEEVersion
-public class ToolInvocationApiController implements ToolInvocationApi {
+public class ExternalInvocationApiController implements ExternalInvocationApi {
 
     private final EnvironmentService environmentService;
-    private final ToolInvocationFacade toolInvocationFacade;
+    private final ExternalInvocationFacade externalInvocationFacade;
 
     @SuppressFBWarnings("EI")
-    public ToolInvocationApiController(
-        EnvironmentService environmentService, ToolInvocationFacade toolInvocationFacade) {
+    public ExternalInvocationApiController(
+        EnvironmentService environmentService, ExternalInvocationFacade externalInvocationFacade) {
 
         this.environmentService = environmentService;
-        this.toolInvocationFacade = toolInvocationFacade;
+        this.externalInvocationFacade = externalInvocationFacade;
     }
 
     @Override
-    public ResponseEntity<ToolInvocationPageModel> getToolInvocationsPage(
-        String externalUserId, @Nullable EnvironmentModel xEnvironment, @Nullable ToolInvocationSurfaceModel surface,
-        @Nullable ToolInvocationOutcomeModel outcome, @Nullable OffsetDateTime startDate,
+    public ResponseEntity<ExternalInvocationPageModel> getExternalInvocationsPage(
+        String externalUserId, @Nullable EnvironmentModel xEnvironment,
+        @Nullable ExternalInvocationSurfaceModel surface,
+        @Nullable ExternalInvocationOutcomeModel outcome, @Nullable OffsetDateTime startDate,
         @Nullable OffsetDateTime endDate, @Nullable Integer pageNumber) {
 
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
-        Page<ExternalInvocationLog> externalInvocationLogPage = toolInvocationFacade.getToolInvocations(
+        Page<ExternalInvocationLog> externalInvocationLogPage = externalInvocationFacade.getExternalInvocations(
             externalUserId, environment, surface == null ? null : ExternalInvocationSurface.valueOf(surface.name()),
             outcome == null ? null : ExternalInvocationOutcome.valueOf(outcome.name()), toInstant(startDate),
             toInstant(endDate), pageNumber == null ? 0 : pageNumber);
 
-        return ResponseEntity.ok(toToolInvocationPageModel(externalInvocationLogPage));
+        return ResponseEntity.ok(toExternalInvocationPageModel(externalInvocationLogPage));
     }
 
-    static ToolInvocationKindModel toToolInvocationKindModel(ExternalInvocationKind kind) {
-        return ToolInvocationKindModel.valueOf(kind.name());
+    static ExternalInvocationKindModel toExternalInvocationKindModel(ExternalInvocationKind kind) {
+        return ExternalInvocationKindModel.valueOf(kind.name());
     }
 
-    static ToolInvocationOutcomeModel toToolInvocationOutcomeModel(ExternalInvocationOutcome outcome) {
-        return ToolInvocationOutcomeModel.valueOf(outcome.name());
+    static ExternalInvocationOutcomeModel toExternalInvocationOutcomeModel(ExternalInvocationOutcome outcome) {
+        return ExternalInvocationOutcomeModel.valueOf(outcome.name());
     }
 
-    static ToolInvocationSurfaceModel toToolInvocationSurfaceModel(ExternalInvocationSurface surface) {
-        return ToolInvocationSurfaceModel.valueOf(surface.name());
+    static ExternalInvocationSurfaceModel toExternalInvocationSurfaceModel(ExternalInvocationSurface surface) {
+        return ExternalInvocationSurfaceModel.valueOf(surface.name());
     }
 
-    private static ToolInvocationModel toToolInvocationModel(ExternalInvocationLog externalInvocationLog) {
-        return new ToolInvocationModel()
+    private static ExternalInvocationModel toExternalInvocationModel(ExternalInvocationLog externalInvocationLog) {
+        return new ExternalInvocationModel()
             .componentName(externalInvocationLog.getComponentName())
             .componentVersion(externalInvocationLog.getComponentVersion())
             .createdDate(toOffsetDateTime(externalInvocationLog.getCreatedDate()))
@@ -93,19 +94,19 @@ public class ToolInvocationApiController implements ToolInvocationApi {
             .id(externalInvocationLog.getId())
             .integrationInstanceId(externalInvocationLog.getIntegrationInstanceId())
             .jobId(externalInvocationLog.getJobId())
-            .kind(toToolInvocationKindModel(externalInvocationLog.getKind()))
+            .kind(toExternalInvocationKindModel(externalInvocationLog.getKind()))
             .operationName(externalInvocationLog.getOperationName())
-            .outcome(toToolInvocationOutcomeModel(externalInvocationLog.getOutcome()))
-            .surface(toToolInvocationSurfaceModel(externalInvocationLog.getSurface()))
+            .outcome(toExternalInvocationOutcomeModel(externalInvocationLog.getOutcome()))
+            .surface(toExternalInvocationSurfaceModel(externalInvocationLog.getSurface()))
             .toolName(externalInvocationLog.getToolName());
     }
 
-    private static ToolInvocationPageModel
-        toToolInvocationPageModel(Page<ExternalInvocationLog> externalInvocationLogPage) {
-        return new ToolInvocationPageModel()
+    private static ExternalInvocationPageModel
+        toExternalInvocationPageModel(Page<ExternalInvocationLog> externalInvocationLogPage) {
+        return new ExternalInvocationPageModel()
             .content(
                 externalInvocationLogPage.stream()
-                    .map(ToolInvocationApiController::toToolInvocationModel)
+                    .map(ExternalInvocationApiController::toExternalInvocationModel)
                     .toList())
             .number(externalInvocationLogPage.getNumber())
             .numberOfElements(externalInvocationLogPage.getNumberOfElements())

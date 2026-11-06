@@ -36,7 +36,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = EmbeddedExecutionIntTestConfiguration.class)
-class ToolInvocationFacadeIntTest {
+class ExternalInvocationFacadeIntTest {
 
     private static final Instant END_DATE = Instant.parse("2026-07-18T11:00:00Z");
     private static final String EXTERNAL_USER_ID = "external-user-1";
@@ -46,7 +46,7 @@ class ToolInvocationFacadeIntTest {
     private EmbeddedExecutionIntTestSupport embeddedExecutionIntTestSupport;
 
     @Autowired
-    private ToolInvocationFacade toolInvocationFacade;
+    private ExternalInvocationFacade externalInvocationFacade;
 
     @Autowired
     private ExternalInvocationLogService externalInvocationLogService;
@@ -59,7 +59,7 @@ class ToolInvocationFacadeIntTest {
     }
 
     @Test
-    void testGetToolInvocationsReadsTheEmbeddedLogOfTheCallingConnectedUserInTheEnvironment() {
+    void testGetExternalInvocationsReadsTheEmbeddedLogOfTheCallingConnectedUserInTheEnvironment() {
         long connectedUserId = embeddedExecutionIntTestSupport.createConnectedUser(
             EXTERNAL_USER_ID, Environment.STAGING);
         long otherConnectedUserId = embeddedExecutionIntTestSupport.createConnectedUser(
@@ -95,7 +95,7 @@ class ToolInvocationFacadeIntTest {
 
         authenticate(EXTERNAL_USER_ID);
 
-        Page<ExternalInvocationLog> externalInvocationLogPage = toolInvocationFacade.getToolInvocations(
+        Page<ExternalInvocationLog> externalInvocationLogPage = externalInvocationFacade.getExternalInvocations(
             EXTERNAL_USER_ID, Environment.STAGING, ExternalInvocationSurface.MCP_EMBEDDED,
             ExternalInvocationOutcome.ERROR,
             START_DATE, END_DATE, 0);
@@ -106,7 +106,7 @@ class ToolInvocationFacadeIntTest {
     }
 
     @Test
-    void testGetToolInvocationsDeniesACallerAskingForAnotherConnectedUser() {
+    void testGetExternalInvocationsDeniesACallerAskingForAnotherConnectedUser() {
         long connectedUserId = embeddedExecutionIntTestSupport.createConnectedUser(
             EXTERNAL_USER_ID, Environment.PRODUCTION);
 
@@ -117,7 +117,7 @@ class ToolInvocationFacadeIntTest {
         authenticate("external-user-2");
 
         assertThatThrownBy(
-            () -> toolInvocationFacade.getToolInvocations(
+            () -> externalInvocationFacade.getExternalInvocations(
                 EXTERNAL_USER_ID, Environment.PRODUCTION, null, null, null, null, 0))
                     .isInstanceOf(AccessDeniedException.class);
     }
