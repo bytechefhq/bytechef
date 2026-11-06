@@ -11,6 +11,7 @@ import {
     ExternalInvocationsWorkspaceScopeI,
     useExternalInvocations,
 } from '@/pages/automation/external-invocations/hooks/useExternalInvocations';
+import {surfaceHasA2aServer, surfaceHasMcpServer} from '@/pages/automation/external-invocations/utils/surfaceServers';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -184,7 +185,7 @@ export const ExternalInvocations = ({
                         <ComboBox items={outcomeOptions} onChange={handleOutcomeChange} value={filterOutcome} />
                     </div>
 
-                    {mcpServerOptions && mcpServerOptions.length > 0 && (
+                    {surfaceHasMcpServer(filterSurface) && mcpServerOptions && mcpServerOptions.length > 0 && (
                         <div className="flex flex-col space-y-2">
                             <Label>MCP Server</Label>
 
@@ -197,7 +198,7 @@ export const ExternalInvocations = ({
                         </div>
                     )}
 
-                    {a2aServerOptions && a2aServerOptions.length > 0 && (
+                    {surfaceHasA2aServer(filterSurface) && a2aServerOptions && a2aServerOptions.length > 0 && (
                         <div className="flex flex-col space-y-2">
                             <Label>A2A Server</Label>
 

@@ -130,6 +130,34 @@ describe('useExternalInvocations', () => {
         );
     });
 
+    it('clears the server filter the selected surface cannot have', () => {
+        const {result} = renderUseExternalInvocations({environmentId: 2, workspaceId: 1049});
+
+        act(() => {
+            result.current.handleA2aServerChange({label: 'Research agent', value: '4'});
+            result.current.handleMcpServerChange({label: 'Sales tools', value: '11'});
+        });
+
+        act(() => {
+            result.current.handleSurfaceChange({label: 'A2A', value: 'A2A'});
+        });
+
+        expect(result.current.filterA2aServerId).toBe('4');
+        expect(result.current.filterMcpServerId).toBeUndefined();
+
+        act(() => {
+            result.current.handleMcpServerChange({label: 'Sales tools', value: '11'});
+            result.current.handleSurfaceChange({label: 'MCP', value: 'MCP_AUTOMATION'});
+        });
+
+        expect(result.current.filterA2aServerId).toBeUndefined();
+        expect(result.current.filterMcpServerId).toBe('11');
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
+            expect.objectContaining({a2aServerId: undefined, mcpServerId: 11, surface: 'MCP_AUTOMATION'}),
+            {enabled: true}
+        );
+    });
+
     it('waits for the workspace instead of falling back to the tenant-wide log', () => {
         renderUseExternalInvocations({environmentId: 2, workspaceId: undefined});
 

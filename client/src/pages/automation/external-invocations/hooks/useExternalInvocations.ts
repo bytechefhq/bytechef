@@ -1,4 +1,5 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
+import {surfaceHasA2aServer, surfaceHasMcpServer} from '@/pages/automation/external-invocations/utils/surfaceServers';
 import {
     ExternalInvocationLogsQuery,
     ExternalInvocationLogsQueryVariables,
@@ -143,7 +144,18 @@ export const useExternalInvocations = ({
     };
 
     const handleSurfaceChange = (item?: ComboBoxItemType) => {
-        setFilterSurface(item?.value ? String(item.value) : undefined);
+        const surface = item?.value ? String(item.value) : undefined;
+
+        setFilterSurface(surface);
+
+        if (!surfaceHasA2aServer(surface)) {
+            setFilterA2aServerId(undefined);
+        }
+
+        if (!surfaceHasMcpServer(surface)) {
+            setFilterMcpServerId(undefined);
+        }
+
         setFilterPageNumber(0);
     };
 
