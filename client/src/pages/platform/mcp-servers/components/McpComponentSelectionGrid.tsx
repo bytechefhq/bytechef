@@ -1,6 +1,6 @@
 import {Input} from '@/components/Input/Input';
-import LoadingIcon from '@/components/LoadingIcon';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Skeleton} from '@/components/ui/skeleton';
 import {PackageIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
@@ -43,11 +43,28 @@ const McpComponentSelectionGrid = <T extends McpSelectableComponentI>({
             />
         </div>
 
-        <div className="grid min-h-96 grid-cols-1 content-start gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div
+            aria-busy={isLoading}
+            className="grid min-h-96 grid-cols-1 content-start gap-4 md:grid-cols-2 lg:grid-cols-3"
+        >
             {isLoading ? (
-                <div className="col-span-full flex min-h-96 items-center justify-center">
-                    <LoadingIcon className="size-6" />
-                </div>
+                Array.from({length: 6}, (_, index) => (
+                    <Card aria-hidden="true" data-testid="mcp-component-card-skeleton" key={index}>
+                        <CardHeader className="justify-items-center pb-2">
+                            <Skeleton className="mb-2 size-12 rounded-md" />
+
+                            <Skeleton className="h-4 w-24" />
+                        </CardHeader>
+
+                        <CardContent className="flex flex-col items-center gap-1.5 pt-0">
+                            <Skeleton className="h-3 w-full" />
+
+                            <Skeleton className="h-3 w-4/5" />
+
+                            <Skeleton className="mt-2 h-3 w-12" />
+                        </CardContent>
+                    </Card>
+                ))
             ) : components.length === 0 ? (
                 <div className="col-span-full flex min-h-96 flex-col items-center justify-center gap-2 text-center">
                     <PackageIcon className="size-10 text-muted-foreground" />

@@ -66,4 +66,21 @@ describe('McpComponentSelectionGrid', () => {
 
         expect(screen.queryByText('No components found')).not.toBeInTheDocument();
     });
+
+    it('should show skeleton component cards while loading', () => {
+        render(<McpComponentSelectionGrid {...defaultProps} isLoading />);
+
+        expect(screen.getAllByTestId('mcp-component-card-skeleton')).toHaveLength(6);
+    });
+
+    it('should show no skeleton component cards once loaded', () => {
+        render(
+            <McpComponentSelectionGrid
+                {...defaultProps}
+                components={[{description: 'Team chat', name: 'slack', title: 'Slack', version: 1}]}
+            />
+        );
+
+        expect(screen.queryByTestId('mcp-component-card-skeleton')).not.toBeInTheDocument();
+    });
 });

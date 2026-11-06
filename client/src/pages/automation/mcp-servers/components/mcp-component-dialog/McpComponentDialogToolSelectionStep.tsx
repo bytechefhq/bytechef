@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button';
-import LoadingIcon from '@/components/LoadingIcon';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Label} from '@/components/ui/label';
+import McpToolSelectionListSkeleton from '@/pages/platform/mcp-servers/components/McpToolSelectionListSkeleton';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {McpComponent, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
@@ -145,9 +145,7 @@ const McpComponentDialogToolSelectionStep = ({
             )}
 
             {isLoadingComponentDefinition ? (
-                <div className="flex items-center justify-center py-8">
-                    <LoadingIcon className="size-6" />
-                </div>
+                <McpToolSelectionListSkeleton />
             ) : toolElements.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">No tools available for this component.</div>
             ) : (
