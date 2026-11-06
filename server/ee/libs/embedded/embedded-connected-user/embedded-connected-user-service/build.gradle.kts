@@ -8,6 +8,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-api"))
 
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.springframework.data:spring-data-jdbc")
