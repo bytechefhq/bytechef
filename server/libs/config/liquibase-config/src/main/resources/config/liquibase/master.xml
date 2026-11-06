@@ -57,6 +57,7 @@
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/auto/memory" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/guardrails" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/llm/usage" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+    <includeAll path="classpath:config/liquibase/changelog/platform/ai/observability" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/model_catalog" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/gateway" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
 
