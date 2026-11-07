@@ -18,6 +18,7 @@ export default ({mode}) => {
 
     return defineConfig({
         build: {
+            manifest: true,
             rollupOptions: {
                 input: {
                     automationHub: resolve(__dirname, 'automation-hub.html'),
@@ -28,15 +29,15 @@ export default ({mode}) => {
                 },
                 output: {
                     manualChunks(id) {
-                        if (id.includes('posthog-js')) {
-                            return 'vendor-analytics';
-                        }
-
                         if (id.includes('@tanstack/react-query')) {
                             return 'vendor-query';
                         }
 
-                        if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/react-router-dom/')) {
+                        if (
+                            id.includes('/node_modules/react/') ||
+                            id.includes('/node_modules/react-dom/') ||
+                            id.includes('/node_modules/react-router-dom/')
+                        ) {
                             return 'vendor-react';
                         }
 

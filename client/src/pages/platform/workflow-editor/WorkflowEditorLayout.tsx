@@ -2,10 +2,8 @@ import {ReactFlowProvider} from '@xyflow/react';
 
 import './WorkflowEditorLayout.css';
 
-import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
-import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
 import useClusterElementsViewMode from '@/pages/platform/workflow-editor/hooks/useClusterElementsViewMode';
 import useDelayedUnmount from '@/pages/platform/workflow-editor/hooks/useDelayedUnmount';
 import useWorkflowEditorLayout from '@/pages/platform/workflow-editor/hooks/useWorkflowEditorLayout';
@@ -42,14 +40,21 @@ import WorkflowInputsSheet from './components/workflow-inputs/WorkflowInputsShee
 import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from './stores/useWorkflowTestChatStore';
 import {clearAllWorkflowMutations} from './utils/workflowMutationGuard';
 
 const AiAgentTestingPanel = lazy(
     () =>
         import('@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel')
 );
+const ClusterElementsCanvasDialog = lazy(
+    () => import('@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog')
+);
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
+const WorkflowTestChatPanel = lazy(
+    () => import('@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel')
+);
 const WorkflowIssuesSidebar = lazy(() => import('./components/WorkflowIssuesSidebar'));
 const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSidebar'));
 const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSidebar'));
@@ -107,6 +112,7 @@ const WorkflowEditorLayout = ({
         }))
     );
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
+    const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
     const {setTestingPanelOpen, testingPanelOpen} = useClusterElementsCanvasDialogStore(
         useShallow((state) => ({
             setTestingPanelOpen: state.setTestingPanelOpen,
@@ -276,16 +282,22 @@ const WorkflowEditorLayout = ({
             )}
 
             {clusterDialogMounted && (
-                <ClusterElementsCanvasDialog
-                    onOpenChange={handleClusterElementsCanvasOpenChange}
-                    open={clusterElementsCanvasOpen}
-                    previousComponentDefinitions={previousComponentDefinitions}
-                    updateWorkflowMutation={updateWorkflowMutation!}
-                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                />
+                <Suspense fallback={null}>
+                    <ClusterElementsCanvasDialog
+                        onOpenChange={handleClusterElementsCanvasOpenChange}
+                        open={clusterElementsCanvasOpen}
+                        previousComponentDefinitions={previousComponentDefinitions}
+                        updateWorkflowMutation={updateWorkflowMutation!}
+                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                    />
+                </Suspense>
             )}
 
-            {workflow.id && <WorkflowTestChatPanel />}
+            {workflow.id && workflowTestChatPanelOpen && (
+                <Suspense fallback={null}>
+                    <WorkflowTestChatPanel />
+                </Suspense>
+            )}
 
             {clusterElementsViewMode === 'box' && testingPanelOpen && !clusterElementsCanvasOpen && (
                 <Suspense fallback={null}>
