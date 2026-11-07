@@ -63,6 +63,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             return edition === EditionType.EE && aiHubEnabled;
         }
 
+        if (navItem.href === 'ai/rules') {
+            return edition === EditionType.EE;
+        }
+
         if (navItem.href === 'billing') {
             return billingEnabled;
         }

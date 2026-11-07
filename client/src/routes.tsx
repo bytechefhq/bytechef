@@ -106,6 +106,7 @@ const AutomationWorkflowConfigurations = lazy(
 );
 const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
 const AutomationWorkflow = lazy(() => import('@/ee/pages/embedded/automation-workflow/AutomationWorkflow'));
+const ComponentRules = lazy(() => import('@/ee/pages/settings/automation/ai/rules/ComponentRules'));
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
 const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
 const EmbeddedConnections = lazy(() =>
@@ -227,6 +228,18 @@ const currentWorkspaceSettingsRoutes = {
             ),
             path: 'ai-hub/tool-approvals',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <ComponentRules />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'ai/rules',
+        },
     ],
     navItems: [
         {
@@ -239,6 +252,10 @@ const currentWorkspaceSettingsRoutes = {
         {
             href: 'workspace-api-keys',
             title: 'API Keys',
+        },
+        {
+            href: 'ai/rules',
+            title: 'Agent Rules',
         },
         {
             items: [
