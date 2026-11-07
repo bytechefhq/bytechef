@@ -78,7 +78,7 @@ const serverLabel = (
     return '—';
 };
 
-const sourceLabel = (externalInvocationLog: ExternalInvocationLogItemType): string => {
+const targetLabel = (externalInvocationLog: ExternalInvocationLogItemType): string => {
     if (externalInvocationLog.kind === 'WORKFLOW') {
         return externalInvocationLog.workflowName || externalInvocationLog.componentName || 'Workflow';
     }
@@ -140,7 +140,7 @@ const ExternalInvocationsTable = ({
 
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Server</TableHead>
 
-                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Source</TableHead>
+                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Target</TableHead>
 
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Duration</TableHead>
 
@@ -196,7 +196,7 @@ const ExternalInvocationsTable = ({
                         </TableCell>
 
                         <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                            {sourceLabel(externalInvocationLog)}
+                            {targetLabel(externalInvocationLog)}
                         </TableCell>
 
                         <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>

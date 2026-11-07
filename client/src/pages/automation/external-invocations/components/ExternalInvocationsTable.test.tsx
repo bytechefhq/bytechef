@@ -201,7 +201,7 @@ describe('ExternalInvocationsTable', () => {
 
         expect(screen.queryByText('Surface')).not.toBeInTheDocument();
         expect(screen.queryByText('MCP')).not.toBeInTheDocument();
-        expect(screen.getByText('Source')).toBeInTheDocument();
+        expect(screen.getByText('Target')).toBeInTheDocument();
         expect(screen.getByText('Server')).toBeInTheDocument();
     });
 
