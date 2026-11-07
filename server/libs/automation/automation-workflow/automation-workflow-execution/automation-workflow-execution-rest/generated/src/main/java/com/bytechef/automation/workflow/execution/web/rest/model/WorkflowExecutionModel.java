@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.670834+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T19:50:22.860139+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowExecutionModel {
 
   private List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> focusPath = new ArrayList<>();
@@ -39,6 +40,49 @@ public class WorkflowExecutionModel {
   private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
 
   private @Nullable Integer projectVersion;
+
+  /**
+   * Where the executed workflow is exposed: PROJECT_DEPLOYMENT for a plain project deployment, or MCP_SERVER, A2A_SERVER or API_COLLECTION for a deployment one of them created for its project.
+   */
+  public enum SourceEnum {
+    PROJECT_DEPLOYMENT("PROJECT_DEPLOYMENT"),
+    
+    MCP_SERVER("MCP_SERVER"),
+    
+    A2_A_SERVER("A2A_SERVER"),
+    
+    API_COLLECTION("API_COLLECTION");
+
+    private final String value;
+
+    SourceEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static SourceEnum fromValue(String value) {
+      for (SourceEnum b : SourceEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable SourceEnum source;
+
+  private @Nullable String sourceName;
 
   private @Nullable Long taskExecutionCount;
 
@@ -194,6 +238,48 @@ public class WorkflowExecutionModel {
     this.projectVersion = projectVersion;
   }
 
+  public WorkflowExecutionModel source(@Nullable SourceEnum source) {
+    this.source = source;
+    return this;
+  }
+
+  /**
+   * Where the executed workflow is exposed: PROJECT_DEPLOYMENT for a plain project deployment, or MCP_SERVER, A2A_SERVER or API_COLLECTION for a deployment one of them created for its project.
+   * @return source
+   */
+  
+  @Schema(name = "source", accessMode = Schema.AccessMode.READ_ONLY, description = "Where the executed workflow is exposed: PROJECT_DEPLOYMENT for a plain project deployment, or MCP_SERVER, A2A_SERVER or API_COLLECTION for a deployment one of them created for its project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("source")
+  public @Nullable SourceEnum getSource() {
+    return source;
+  }
+
+  @JsonProperty("source")
+  public void setSource(@Nullable SourceEnum source) {
+    this.source = source;
+  }
+
+  public WorkflowExecutionModel sourceName(@Nullable String sourceName) {
+    this.sourceName = sourceName;
+    return this;
+  }
+
+  /**
+   * The name of the MCP server, A2A server or API collection that exposes the executed workflow; empty for a plain project deployment.
+   * @return sourceName
+   */
+  
+  @Schema(name = "sourceName", accessMode = Schema.AccessMode.READ_ONLY, description = "The name of the MCP server, A2A server or API collection that exposes the executed workflow; empty for a plain project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sourceName")
+  public @Nullable String getSourceName() {
+    return sourceName;
+  }
+
+  @JsonProperty("sourceName")
+  public void setSourceName(@Nullable String sourceName) {
+    this.sourceName = sourceName;
+  }
+
   public WorkflowExecutionModel taskExecutionCount(@Nullable Long taskExecutionCount) {
     this.taskExecutionCount = taskExecutionCount;
     return this;
@@ -272,6 +358,8 @@ public class WorkflowExecutionModel {
         Objects.equals(this.project, workflowExecution.project) &&
         Objects.equals(this.projectDeployment, workflowExecution.projectDeployment) &&
         Objects.equals(this.projectVersion, workflowExecution.projectVersion) &&
+        Objects.equals(this.source, workflowExecution.source) &&
+        Objects.equals(this.sourceName, workflowExecution.sourceName) &&
         Objects.equals(this.taskExecutionCount, workflowExecution.taskExecutionCount) &&
         Objects.equals(this.triggerExecution, workflowExecution.triggerExecution) &&
         Objects.equals(this.workflow, workflowExecution.workflow);
@@ -279,7 +367,7 @@ public class WorkflowExecutionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(focusPath, id, job, project, projectDeployment, projectVersion, taskExecutionCount, triggerExecution, workflow);
+    return Objects.hash(focusPath, id, job, project, projectDeployment, projectVersion, source, sourceName, taskExecutionCount, triggerExecution, workflow);
   }
 
   @Override
@@ -292,6 +380,8 @@ public class WorkflowExecutionModel {
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectDeployment: ").append(toIndentedString(projectDeployment)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
+    sb.append("    source: ").append(toIndentedString(source)).append("\n");
+    sb.append("    sourceName: ").append(toIndentedString(sourceName)).append("\n");
     sb.append("    taskExecutionCount: ").append(toIndentedString(taskExecutionCount)).append("\n");
     sb.append("    triggerExecution: ").append(toIndentedString(triggerExecution)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
