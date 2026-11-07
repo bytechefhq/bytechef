@@ -4,3 +4,4 @@ src/main/java/com/bytechef/platform/workflow/test/web/rest/ApiUtil.java
 src/main/java/com/bytechef/platform/workflow/test/web/rest/WorkflowTestApi.java
 src/main/java/com/bytechef/platform/workflow/test/web/rest/model/WebhookRetryModel.java
 src/main/java/com/bytechef/platform/workflow/test/web/rest/model/WorkflowTestExecutionModel.java
+src/main/java/com/bytechef/platform/workflow/test/web/rest/model/WorkflowTestVoiceSessionTokenModel.java
