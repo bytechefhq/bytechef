@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
+    implementation(project(":server:libs:platform:platform-api"))
     implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
     testImplementation("org.springframework:spring-webflux")
     testImplementation(project(":server:libs:test:test-support"))

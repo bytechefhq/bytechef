@@ -16,6 +16,7 @@ import com.bytechef.ee.platform.customcomponent.tool.ReadCustomComponentTools;
 import com.bytechef.ee.platform.customcomponent.tool.agent.CustomComponentSpringAIAgent;
 import com.bytechef.platform.ai.tool.RehydrateContextToolCallback;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +40,7 @@ import org.springframework.core.io.Resource;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnEEVersion
 @ConditionalOnExpression("${bytechef.ai.copilot.enabled:false} or ${bytechef.ai.hub.enabled:false}")
 public class CustomComponentAgentConfiguration {
 

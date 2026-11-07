@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":server:libs:core:evaluator:evaluator-api"))
     implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
+    implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
