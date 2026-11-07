@@ -59,6 +59,7 @@ const NotificationDialog = ({
     const [isTestPending, setIsTestPending] = useState(false);
     const [testResult, setTestResult] = useState<NotificationTestResultType | undefined>(undefined);
 
+    const testResultRef = useRef<HTMLDivElement>(null);
     const testRunRef = useRef(0);
 
     const isEnterpriseEdition = useApplicationInfoStore((state) => state.application?.edition === EditionType.EE);
@@ -125,6 +126,12 @@ const NotificationDialog = ({
         setIsTestPending(false);
         setTestResult(undefined);
     }, [isEditDialogOpen, notificationType, settingsKey]);
+
+    useEffect(() => {
+        if (testResult) {
+            testResultRef.current?.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+        }
+    }, [testResult]);
 
     return (
         <Dialog
@@ -388,7 +395,12 @@ const NotificationDialog = ({
                                 )}
 
                                 {testResult && (
-                                    <NotificationTestResult notificationType={notificationType} result={testResult} />
+                                    <div ref={testResultRef}>
+                                        <NotificationTestResult
+                                            notificationType={notificationType}
+                                            result={testResult}
+                                        />
+                                    </div>
                                 )}
                             </DialogBody>
 

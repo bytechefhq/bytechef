@@ -348,6 +348,33 @@ describe('NotificationDialog', () => {
         expect(testNotification).toHaveBeenCalledTimes(1);
     });
 
+    it('scrolls the test result into view', async () => {
+        const scrollIntoViewSpy = vi.spyOn(Element.prototype, 'scrollIntoView');
+        const testNotification = vi.fn().mockResolvedValue({signed: false, success: true});
+
+        render(
+            <NotificationDialogHarness
+                saveNotification={vi.fn()}
+                testNotification={testNotification}
+                type={NotificationTypeEnum.Slack}
+            />
+        );
+
+        await userEvent.type(screen.getByLabelText('Slack Webhook URL'), 'https://hooks.slack.com/services/T/B/X');
+
+        scrollIntoViewSpy.mockClear();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Test'}));
+
+        const testResultStatus = await screen.findByRole('status');
+
+        await waitFor(() => {
+            expect(scrollIntoViewSpy.mock.contexts).toContain(testResultStatus.parentElement);
+        });
+
+        scrollIntoViewSpy.mockRestore();
+    });
+
     it('disables Test while a test is running', async () => {
         const testNotification = vi.fn(() => new Promise<NotificationTestResult>(() => {}));
 
