@@ -13,6 +13,8 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -20,13 +22,17 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalFacade;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalRuleFacade;
+import com.bytechef.ee.ai.hub.chat.AiHubChatArtifact;
+import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileFacade;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.TitleGenerationService;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +66,9 @@ class AiHubGraphQlErrorShapeIntTest {
 
     @MockitoBean
     private AiHubChatArtifactService chatArtifactService;
+
+    @MockitoBean
+    private AiHubChatAssetFileFacade chatAssetFileFacade;
 
     @MockitoBean
     private AiHubChatService chatService;
@@ -228,6 +237,78 @@ class AiHubGraphQlErrorShapeIntTest {
             .satisfy(errors -> assertThat(errors.get(0)
                 .getErrorType())
                     .hasToString("BAD_REQUEST"));
+    }
+
+    @Test
+    void testAttachingAnAssetFileTheCallerCannotSeeIsNotFoundAndRecordsNothing() {
+        when(chatAssetFileFacade.attachAssetFile(42L, 7L, 10L, 99L))
+            .thenThrow(new NotFoundException("asset_file", 99L, "Asset file not found"));
+
+        graphQlTester
+            .document(
+                "mutation { recordReferencedAiHubChatArtifact(input: {workspaceId: 7, chatId: 42, " +
+                    "kind: FILE_REFERENCED, artifactId: \"99\", artifactName: \"secret.pdf\"}) { id } }")
+            .execute()
+            .errors()
+            .satisfy(errors -> assertThat(errors.get(0)
+                .getErrorType())
+                    .hasToString("NOT_FOUND"));
+
+        verify(chatArtifactService, never()).recordReference(
+            anyLong(), anyLong(), anyLong(), any(), any(), any(), any());
+    }
+
+    @Test
+    void testAttachingAnAssetFileWithANonNumericIdIsABadRequest() {
+        graphQlTester
+            .document(
+                "mutation { recordReferencedAiHubChatArtifact(input: {workspaceId: 7, chatId: 42, " +
+                    "kind: FILE_REFERENCED, artifactId: \"abc\", artifactName: \"x.pdf\"}) { id } }")
+            .execute()
+            .errors()
+            .satisfy(errors -> assertThat(errors.get(0)
+                .getErrorType())
+                    .hasToString("BAD_REQUEST"));
+
+        verifyNoInteractions(chatAssetFileFacade);
+    }
+
+    @Test
+    void testDeletingAFileReferenceDetachesTheAssetFile() {
+        AiHubChatArtifact artifact = new AiHubChatArtifact();
+
+        artifact.setArtifactId("99");
+        artifact.setChatId(42L);
+        artifact.setKind(AiHubChatArtifactKind.FILE_REFERENCED);
+
+        when(chatArtifactService.deleteReference(5L, 7L, 10L)).thenReturn(Optional.of(artifact));
+
+        graphQlTester
+            .document("mutation { deleteAiHubChatArtifact(input: {workspaceId: 7, artifactId: 5}) }")
+            .execute()
+            .errors()
+            .verify();
+
+        verify(chatAssetFileFacade).detachAssetFile(42L, 7L, 10L, 99L);
+    }
+
+    @Test
+    void testDeletingAWorkflowReferenceDoesNotTouchAssetFiles() {
+        AiHubChatArtifact artifact = new AiHubChatArtifact();
+
+        artifact.setArtifactId("wf-1");
+        artifact.setChatId(42L);
+        artifact.setKind(AiHubChatArtifactKind.WORKFLOW_REFERENCED);
+
+        when(chatArtifactService.deleteReference(5L, 7L, 10L)).thenReturn(Optional.of(artifact));
+
+        graphQlTester
+            .document("mutation { deleteAiHubChatArtifact(input: {workspaceId: 7, artifactId: 5}) }")
+            .execute()
+            .errors()
+            .verify();
+
+        verifyNoInteractions(chatAssetFileFacade);
     }
 
     private String firstErrorSignature(String document) {

@@ -11,12 +11,14 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifact;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileFacade;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,16 +45,18 @@ public class AiHubChatArtifactGraphQlController {
     private static final Logger log = LoggerFactory.getLogger(AiHubChatArtifactGraphQlController.class);
 
     private final AiHubChatArtifactService chatArtifactService;
+    private final AiHubChatAssetFileFacade chatAssetFileFacade;
     private final JsonMapper jsonMapper;
     private final PermissionService permissionService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
     public AiHubChatArtifactGraphQlController(
-        AiHubChatArtifactService chatArtifactService, JsonMapper jsonMapper, PermissionService permissionService,
-        UserService userService) {
+        AiHubChatArtifactService chatArtifactService, AiHubChatAssetFileFacade chatAssetFileFacade,
+        JsonMapper jsonMapper, PermissionService permissionService, UserService userService) {
 
         this.chatArtifactService = chatArtifactService;
+        this.chatAssetFileFacade = chatAssetFileFacade;
         this.jsonMapper = jsonMapper;
         this.permissionService = permissionService;
         this.userService = userService;
@@ -73,8 +77,15 @@ public class AiHubChatArtifactGraphQlController {
                 "Unknown AiHubChatArtifactKind: " + input.kind(), illegalArgumentException);
         }
 
+        long userId = currentUserId();
+
+        if (kind == AiHubChatArtifactKind.FILE_REFERENCED) {
+            chatAssetFileFacade.attachAssetFile(
+                input.chatId(), input.workspaceId(), userId, parseAssetFileId(input.artifactId()));
+        }
+
         return chatArtifactService.recordReference(
-            input.chatId(), input.workspaceId(), currentUserId(), kind, input.artifactId(), input.artifactName(),
+            input.chatId(), input.workspaceId(), userId, kind, input.artifactId(), input.artifactName(),
             parseMetadataJson(input.metadataJson()));
     }
 
@@ -82,7 +93,19 @@ public class AiHubChatArtifactGraphQlController {
     public boolean deleteAiHubChatArtifact(@Argument DeleteAiHubChatArtifactInput input) {
         AiHubWorkspaceAccess.verifyViewer(permissionService, input.workspaceId());
 
-        chatArtifactService.deleteReference(input.artifactId(), input.workspaceId(), currentUserId());
+        long userId = currentUserId();
+
+        Optional<AiHubChatArtifact> deletedArtifact = chatArtifactService.deleteReference(
+            input.artifactId(), input.workspaceId(), userId);
+
+        if (deletedArtifact.isPresent() && deletedArtifact.get()
+            .getKind() == AiHubChatArtifactKind.FILE_REFERENCED) {
+
+            AiHubChatArtifact artifact = deletedArtifact.get();
+
+            chatAssetFileFacade.detachAssetFile(
+                artifact.getChatId(), input.workspaceId(), userId, parseAssetFileId(artifact.getArtifactId()));
+        }
 
         return true;
     }
@@ -118,6 +141,14 @@ public class AiHubChatArtifactGraphQlController {
     private long currentUserId() {
         return userService.getCurrentUser()
             .getId();
+    }
+
+    private static long parseAssetFileId(String artifactId) {
+        try {
+            return Long.parseLong(artifactId);
+        } catch (NumberFormatException numberFormatException) {
+            throw new IllegalArgumentException("Invalid asset file id: " + artifactId, numberFormatException);
+        }
     }
 
     private Map<String, Object> parseMetadataJson(@Nullable String metadataJson) {

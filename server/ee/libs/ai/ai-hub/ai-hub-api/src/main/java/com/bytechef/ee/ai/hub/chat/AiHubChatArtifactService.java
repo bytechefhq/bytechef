@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.chat;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -56,9 +57,9 @@ public interface AiHubChatArtifactService {
         @Nullable Map<String, Object> metadata);
 
     /**
-     * Removes a previously-recorded {@code WORKFLOW_REFERENCED} or {@code AI_AGENT_REFERENCED} artifact. Idempotent:
-     * returns silently when the row is already gone. Verifies the parent chat is viewable by the requester in
-     * {@code requesterWorkspaceId}, same authorization shape as {@link #recordReference}.
+     * Removes a previously-recorded {@code WORKFLOW_REFERENCED}, {@code AI_AGENT_REFERENCED} or {@code FILE_REFERENCED}
+     * artifact and returns it. Idempotent: returns empty when the row is already gone. Verifies the parent chat is
+     * viewable by the requester in {@code requesterWorkspaceId}, same authorization shape as {@link #recordReference}.
      *
      * <p>
      * Throws {@link com.bytechef.ee.ai.hub.exception.NotFoundException} when the chat is not viewable and
@@ -66,7 +67,7 @@ public interface AiHubChatArtifactService {
      * must not be deleted through the user-facing surface.
      * </p>
      */
-    void deleteReference(long artifactId, long requesterWorkspaceId, long requesterUserId);
+    Optional<AiHubChatArtifact> deleteReference(long artifactId, long requesterWorkspaceId, long requesterUserId);
 
     /**
      * Returns the artifacts for the given chat ordered by {@code created_at DESC}, without workflow artifacts whose

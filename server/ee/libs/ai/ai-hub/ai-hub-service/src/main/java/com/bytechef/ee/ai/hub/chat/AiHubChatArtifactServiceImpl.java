@@ -14,6 +14,7 @@ import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,10 @@ import tools.jackson.databind.json.JsonMapper;
 @ConditionalOnAiHub
 @Transactional
 public class AiHubChatArtifactServiceImpl implements AiHubChatArtifactService {
+
+    private static final Set<AiHubChatArtifactKind> DELETABLE_REFERENCE_KINDS = EnumSet.of(
+        AiHubChatArtifactKind.AI_AGENT_REFERENCED, AiHubChatArtifactKind.FILE_REFERENCED,
+        AiHubChatArtifactKind.WORKFLOW_REFERENCED);
 
     private static final int LIST_LIMIT = 100;
 
@@ -246,11 +251,13 @@ public class AiHubChatArtifactServiceImpl implements AiHubChatArtifactService {
     }
 
     @Override
-    public void deleteReference(long artifactId, long requesterWorkspaceId, long requesterUserId) {
+    public Optional<AiHubChatArtifact> deleteReference(
+        long artifactId, long requesterWorkspaceId, long requesterUserId) {
+
         Optional<AiHubChatArtifact> artifactOptional = chatArtifactRepository.findById(artifactId);
 
         if (artifactOptional.isEmpty()) {
-            return;
+            return Optional.empty();
         }
 
         AiHubChatArtifact artifact = artifactOptional.get();
@@ -259,14 +266,15 @@ public class AiHubChatArtifactServiceImpl implements AiHubChatArtifactService {
 
         AiHubChatArtifactKind kind = artifact.getKind();
 
-        if (kind != AiHubChatArtifactKind.WORKFLOW_REFERENCED && kind != AiHubChatArtifactKind.AI_AGENT_REFERENCED) {
+        if (!DELETABLE_REFERENCE_KINDS.contains(kind)) {
             throw new IllegalArgumentException(
-                "Only WORKFLOW_REFERENCED and AI_AGENT_REFERENCED artifacts can be deleted via this surface; got kind="
-                    +
-                    kind);
+                "Only AI_AGENT_REFERENCED, FILE_REFERENCED and WORKFLOW_REFERENCED artifacts can be deleted via this "
+                    + "surface; got kind=" + kind);
         }
 
         chatArtifactRepository.deleteById(artifactId);
+
+        return artifactOptional;
     }
 
     @Override
