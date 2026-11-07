@@ -20,6 +20,7 @@ import com.bytechef.cli.client.embeddedexecution.ApiClient;
 import com.bytechef.cli.client.embeddedexecution.ApiException;
 import com.bytechef.cli.client.embeddedexecution.api.ActionApi;
 import com.bytechef.cli.client.embeddedexecution.api.ToolApi;
+import com.bytechef.cli.client.embeddedexecution.api.WorkflowExecutionApi;
 import com.bytechef.cli.core.config.CliConfig;
 import com.bytechef.cli.core.error.CliException;
 import com.bytechef.cli.core.http.AuthInterceptor;
@@ -41,6 +42,10 @@ final class EmbeddedExecutionClientFactory {
         apiClient.setRequestInterceptor(new AuthInterceptor(config));
 
         return apiClient;
+    }
+
+    static WorkflowExecutionApi workflowExecutionApi(CliConfig config) {
+        return new WorkflowExecutionApi(apiClient(config));
     }
 
     static ToolApi toolApi(CliConfig config) {

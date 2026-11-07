@@ -162,6 +162,19 @@ class EmbeddedCommandCoverageTest {
         assertPath("/user/tools", 200, "{}", "embedded", "tool", "list");
     }
 
+    @Test
+    void testExecutionList() throws Exception {
+        assertPath(
+            "/user/workflow-executions", 200, "{\"content\":[],\"totalElements\":0}", "embedded", "execution", "list");
+    }
+
+    @Test
+    void testExecutionGet() throws Exception {
+        assertPath(
+            "/user/workflow-executions/7", 200, "{\"id\":7,\"status\":\"COMPLETED\"}", "embedded", "execution", "get",
+            "--id", "7");
+    }
+
     private void assertPath(String expectedPathSuffix, int status, String body, String... command) throws Exception {
         try (StubApi stub = StubApi.start(status, body)) {
             List<String> args = new ArrayList<>(List.of(command));

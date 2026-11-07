@@ -60,6 +60,21 @@ class EmbeddedCommandTest {
     }
 
     @Test
+    void testExecutionListHitsExecutionsPath() throws Exception {
+        try (StubApi stub = StubApi.start(200, "{\"content\":[],\"totalElements\":0}")) {
+            int code = CliApplication.execute(
+                "embedded", "execution", "list", "--external-user-id", "user-1", "--host", stub.host(), "--token",
+                "btc_x", "--environment", "PRODUCTION");
+
+            assertEquals(0, code);
+            assertTrue(
+                stub.lastPath()
+                    .startsWith("/api/embedded/v1/user-1/workflow-executions"),
+                stub.lastPath());
+        }
+    }
+
+    @Test
     void testToolExecuteSendsBody() throws Exception {
         try (StubApi stub = StubApi.start(200, "{\"result\":\"ok\"}")) {
             int code = CliApplication.execute(
@@ -150,6 +165,26 @@ class EmbeddedCommandTest {
             assertTrue(
                 stub.lastPath()
                     .startsWith("/api/embedded/v1/user-1/tools"),
+                stub.lastPath());
+        }
+    }
+
+    @Test
+    void testExecutionListForwardsFilters() throws Exception {
+        try (StubApi stub = StubApi.start(200, "{\"content\":[],\"totalElements\":0}")) {
+            int code = CliApplication.execute(
+                "embedded", "execution", "list", "--external-user-id", "user-1", "--status", "COMPLETED",
+                "--start-date", "2026-01-01T00:00:00Z", "--host", stub.host(), "--token", "btc_x", "--environment",
+                "PRODUCTION");
+
+            assertEquals(0, code);
+            assertTrue(
+                stub.lastPath()
+                    .contains("status=COMPLETED"),
+                stub.lastPath());
+            assertTrue(
+                stub.lastPath()
+                    .contains("startDate="),
                 stub.lastPath());
         }
     }
