@@ -1,0 +1,23 @@
+---
+label: "Graph Budget Exhausted With Retries"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    maxTransitions: 3
+    nodes:
+    - name: "xTask"
+      type: "var/v1/set"
+      maxRetries: 2
+      parameters:
+        value: "x"
+    - name: "yTask"
+      type: "var/v1/set"
+      maxRetries: 2
+      parameters:
+        value: "y"
+    transitions:
+    - from: "xTask"
+      to: "yTask"
+    - from: "yTask"
+      to: "xTask"

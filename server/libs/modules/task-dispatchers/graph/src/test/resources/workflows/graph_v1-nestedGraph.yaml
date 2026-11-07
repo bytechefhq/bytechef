@@ -1,0 +1,32 @@
+---
+label: "Graph Nested Graph"
+outputs:
+- name: "result"
+  value: "${outerGraph_1}"
+tasks:
+- name: "outerGraph_1"
+  type: "graph/v1"
+  parameters:
+    nodes:
+    - name: "innerGraph_1"
+      type: "graph/v1"
+      parameters:
+        nodes:
+        - name: "innerFirstTask"
+          type: "var/v1/set"
+          parameters:
+            value: "inner first output"
+        - name: "innerLastTask"
+          type: "var/v1/set"
+          parameters:
+            value: "inner graph output"
+        transitions:
+        - from: "innerFirstTask"
+          to: "innerLastTask"
+    - name: "outerFinalTask"
+      type: "var/v1/set"
+      parameters:
+        value: "outer final output"
+    transitions:
+    - from: "innerGraph_1"
+      to: "outerFinalTask"

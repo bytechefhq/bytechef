@@ -1,0 +1,7 @@
+---
+label: "Graph No Nodes"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    nodes: []

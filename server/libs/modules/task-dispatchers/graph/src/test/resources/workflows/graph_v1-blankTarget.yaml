@@ -1,0 +1,23 @@
+---
+label: "Graph Blank Target"
+inputs:
+- name: "nextNode"
+  type: "string"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    nodes:
+    - name: "router"
+      type: "var/v1/set"
+      parameters:
+        value: "=nextNode"
+    - name: "review"
+      type: "var/v1/set"
+      parameters:
+        value: "review output"
+    transitions:
+    - from: "router"
+      to: "=router"
+    - from: "router"
+      to: "review"

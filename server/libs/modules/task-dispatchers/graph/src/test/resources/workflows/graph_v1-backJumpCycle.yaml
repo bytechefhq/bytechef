@@ -1,0 +1,34 @@
+---
+label: "Graph Back-Jump Cycle"
+inputs:
+- name: "counter"
+  type: "integer"
+  required: true
+outputs:
+- name: "result"
+  value: "${graph_1}"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    nodes:
+    - name: "counter"
+      type: "var/v1/set"
+      parameters:
+        value: "=counter + 1"
+    - name: "bVisit"
+      type: "var/v1/set"
+      parameters:
+        value: "=counter"
+    - name: "cResult"
+      type: "var/v1/set"
+      parameters:
+        value: "=counter"
+    transitions:
+    - from: "counter"
+      to: "bVisit"
+    - from: "bVisit"
+      to: "counter"
+      condition: "=counter < 2"
+    - from: "bVisit"
+      to: "cResult"
