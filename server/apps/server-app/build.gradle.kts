@@ -350,6 +350,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-graphql"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-rest"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-service"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-stt:platform-ai-stt-service"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-graphql"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-impl"))
@@ -406,6 +407,7 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly(project(":server:libs:platform:platform-ai:platform-ai-stt:platform-ai-stt-openai"))
 
     testImplementation(project(":sdks:backend:java:component-api"))
     testImplementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
