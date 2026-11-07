@@ -8,6 +8,10 @@ import {useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
+const MANUAL_COMPONENT_NAME = 'manual';
+
+const MANUAL_TRIGGER = {description: '', label: 'Manual', type: 'manual/v1/manual'};
+
 interface WorkflowTriggerSourceI {
     triggers?: Array<{description?: string; label?: string; type?: string}>;
     workflowTriggerComponentNames?: Array<string>;
@@ -39,8 +43,11 @@ const WorkflowTriggerAndComponentsRow = ({
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
 }: WorkflowTriggerAndComponentsRowProps) => {
-    const triggerComponentName = workflow.workflowTriggerComponentNames?.[0];
-    const triggerType = workflow.triggers?.[0]?.type;
+    const runsManually = workflow.triggers?.length === 0 && (workflow.workflowTriggerComponentNames?.length ?? 0) === 0;
+
+    const triggerFromWorkflow = runsManually ? MANUAL_TRIGGER : workflow.triggers?.[0];
+    const triggerComponentName = runsManually ? MANUAL_COMPONENT_NAME : workflow.workflowTriggerComponentNames?.[0];
+    const triggerType = triggerFromWorkflow?.type;
 
     const triggerVersionNumber = triggerType ? +triggerType.split('/')[1].replace('v', '') : 1;
 
@@ -53,12 +60,12 @@ const WorkflowTriggerAndComponentsRow = ({
     );
 
     const triggerData = useMemo<TriggerDataI | null>(() => {
-        if (!triggerComponentName && !workflow.triggers?.[0]) {
+        if (!triggerComponentName && !triggerFromWorkflow) {
             return null;
         }
 
-        const triggerFromWorkflow = workflow.triggers?.[0];
-        const triggerDefinition = workflowComponentDefinitions[triggerComponentName || ''];
+        const triggerDefinition =
+            workflowComponentDefinitions[triggerComponentName || ''] ?? triggerComponentDefinition;
 
         const matchedTrigger = triggerComponentDefinition?.triggers?.find(
             (trigger) => trigger.name === triggerFromWorkflow?.type?.split('/')[2]
@@ -74,7 +81,7 @@ const WorkflowTriggerAndComponentsRow = ({
             iconSrc: triggerDefinition?.icon || '',
             label: matchedTrigger?.title || triggerFromWorkflow?.label || '',
         };
-    }, [workflow, workflowComponentDefinitions, triggerComponentName, triggerComponentDefinition]);
+    }, [triggerComponentDefinition, triggerComponentName, triggerFromWorkflow, workflowComponentDefinitions]);
 
     const taskOnlyComponentNames = useMemo(() => {
         if (!filteredComponentNames) {
