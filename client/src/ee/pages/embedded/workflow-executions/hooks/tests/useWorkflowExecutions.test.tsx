@@ -1,5 +1,8 @@
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
-import {WorkflowExecutionsSource} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsSources';
+import {
+    WorkflowExecutionsSource,
+    WorkflowExecutionsSourceType,
+} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsSources';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {renderHook, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
@@ -116,5 +119,47 @@ describe('useWorkflowExecutions', () => {
         });
         expect(automationGetWorkflowExecutionsPageMock).not.toHaveBeenCalled();
         expect(embeddedGetWorkflowExecutionsPageMock).not.toHaveBeenCalled();
+    });
+
+    it('drops the previous source page and reports loading while the next source loads', async () => {
+        const integrationPage = {content: [{id: 1}]};
+        let resolveAutomationPage: (page: object) => void = () => {};
+
+        embeddedGetWorkflowExecutionsPageMock.mockResolvedValue(integrationPage);
+        automationGetWorkflowExecutionsPageMock.mockImplementation(
+            () =>
+                new Promise((resolve) => {
+                    resolveAutomationPage = resolve;
+                })
+        );
+
+        const initialProps: {source: WorkflowExecutionsSourceType} = {source: WorkflowExecutionsSource.Integrations};
+
+        const {rerender, result} = renderHook(
+            ({source}: {source: WorkflowExecutionsSourceType}) =>
+                useWorkflowExecutions(source, {environmentId: 0, id: 1}),
+            {initialProps, wrapper: createWrapper()}
+        );
+
+        await waitFor(() => {
+            expect(result.current.workflowExecutionPage).toEqual(integrationPage);
+        });
+
+        rerender({source: WorkflowExecutionsSource.Automations});
+
+        await waitFor(() => {
+            expect(automationGetWorkflowExecutionsPageMock).toHaveBeenCalled();
+        });
+
+        expect(result.current.workflowExecutionsIsLoading).toBe(true);
+        expect(result.current.workflowExecutionPage).toBeUndefined();
+
+        resolveAutomationPage({content: []});
+
+        await waitFor(() => {
+            expect(result.current.workflowExecutionsIsLoading).toBe(false);
+        });
+
+        expect(result.current.workflowExecutionPage).toEqual({content: []});
     });
 });

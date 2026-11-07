@@ -11,8 +11,8 @@ import {WorkflowExecutionApi as AutomationWorkflowExecutionApi} from '@/shared/m
 import {useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {Page} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowExecutionKeys as AutomationWorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
-import {useQueryClient} from '@tanstack/react-query';
-import {useCallback, useEffect, useState} from 'react';
+import {useQuery} from '@tanstack/react-query';
+import {useCallback, useMemo} from 'react';
 
 const getAnyWorkflowExecutionsPageRequest = (request: {
     connectedUserId?: number;
@@ -47,61 +47,38 @@ export const useWorkflowExecutions = (
         workflowId?: string;
     }
 ) => {
-    const [workflowExecutionPage, setWorkflowExecutionPage] = useState<Page | undefined>();
-    const [workflowExecutionsError, setWorkflowExecutionsError] = useState<Error | null>(null);
-    const [workflowExecutionsIsFetching, setWorkflowExecutionsIsFetching] = useState(false);
-    const [workflowExecutionsIsLoading, setWorkflowExecutionsIsLoading] = useState(true);
-    const [refetchToken, setRefetchToken] = useState(0);
-
     const {data: connectedUserProjectsQuery} = useConnectedUserProjectsQuery({
         environmentId: request.environmentId?.toString(),
     });
 
-    const queryClient = useQueryClient();
-
-    const refetchWorkflowExecutions = useCallback(() => setRefetchToken((token) => token + 1), []);
-
-    useEffect(() => {
-        setWorkflowExecutionsIsFetching(true);
-
-        let queryKey;
-        let queryFn: () => Promise<Page>;
-
+    const {queryFn, queryKey} = useMemo(() => {
         if (source === WorkflowExecutionsSource.Any) {
             const anyRequest = getAnyWorkflowExecutionsPageRequest(request);
 
-            queryKey = EmbeddedWorkflowExecutionKeys.filteredAnyWorkflowExecutions(anyRequest);
-            queryFn = () => new EmbeddedWorkflowExecutionApi().getAnyWorkflowExecutionsPage(anyRequest);
-        } else if (source === WorkflowExecutionsSource.Automations) {
-            queryKey = AutomationWorkflowExecutionKeys.filteredWorkflowExecutions({...request, embedded: true});
-            queryFn = () =>
-                new AutomationWorkflowExecutionApi().getWorkflowExecutionsPage({...request, embedded: true});
-        } else {
-            queryKey = EmbeddedWorkflowExecutionKeys.filteredWorkflowExecutions(request);
-            queryFn = () => new EmbeddedWorkflowExecutionApi().getWorkflowExecutionsPage(request);
+            return {
+                queryFn: (): Promise<Page> =>
+                    new EmbeddedWorkflowExecutionApi().getAnyWorkflowExecutionsPage(anyRequest),
+                queryKey: EmbeddedWorkflowExecutionKeys.filteredAnyWorkflowExecutions(anyRequest),
+            };
         }
 
-        if (refetchToken > 0) {
-            queryClient.removeQueries({queryKey});
+        if (source === WorkflowExecutionsSource.Automations) {
+            return {
+                queryFn: (): Promise<Page> =>
+                    new AutomationWorkflowExecutionApi().getWorkflowExecutionsPage({...request, embedded: true}),
+                queryKey: AutomationWorkflowExecutionKeys.filteredWorkflowExecutions({...request, embedded: true}),
+            };
         }
 
-        queryClient
-            .fetchQuery({queryFn, queryKey})
-            .then((response) => {
-                setWorkflowExecutionPage(response);
-                setWorkflowExecutionsError(null);
-            })
-            .catch((error) => setWorkflowExecutionsError(error))
-            .finally(() => {
-                setWorkflowExecutionsIsFetching(false);
-                setWorkflowExecutionsIsLoading(false);
-            });
+        return {
+            queryFn: (): Promise<Page> => new EmbeddedWorkflowExecutionApi().getWorkflowExecutionsPage(request),
+            queryKey: EmbeddedWorkflowExecutionKeys.filteredWorkflowExecutions(request),
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        queryClient,
-        refetchToken,
         request.connectedUserId,
         request.environmentId,
+        request.id,
         request.integrationId,
         request.integrationInstanceConfigurationId,
         request.jobEndDate,
@@ -111,6 +88,18 @@ export const useWorkflowExecutions = (
         request.workflowId,
         source,
     ]);
+
+    const {
+        data: workflowExecutionPage,
+        error: workflowExecutionsError,
+        isFetching: workflowExecutionsIsFetching,
+        isLoading: workflowExecutionsIsLoading,
+        refetch,
+    } = useQuery<Page, Error>({queryFn, queryKey});
+
+    const refetchWorkflowExecutions = useCallback(() => {
+        void refetch();
+    }, [refetch]);
 
     return {
         connectedUserProjects: connectedUserProjectsQuery?.connectedUserProjects,
