@@ -238,7 +238,7 @@ const ProjectListItem = ({
 
         setShowProjectDeploymentDialog(true);
 
-        projectDeploymentsQuery.refetch();
+        void projectDeploymentsQuery.refetch();
     };
 
     const handleProjectListItemClick = useCallback(
