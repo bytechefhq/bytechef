@@ -232,6 +232,18 @@ describe('AiHubToolGroupHeader', () => {
         expect(screen.getByRole('status')).toHaveTextContent('Researching the web...');
     });
 
+    it.each([
+        ['data_analyst', 'Analyzing data...'],
+        ['image_generator', 'Generating image...'],
+        ['slide_builder', 'Building slides...'],
+    ])('labels a running %s call', (toolName, label) => {
+        aiChatToolCallStore.getState().startToolCall('call-1', toolName, 0);
+
+        renderHeader([{toolCallId: 'call-1', toolName}]);
+
+        expect(screen.getByRole('status')).toHaveTextContent(label);
+    });
+
     it('labels any other running call generically', () => {
         aiChatToolCallStore.getState().startToolCall('call-1', 'listWorkflows', 0);
 
