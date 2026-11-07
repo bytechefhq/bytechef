@@ -619,11 +619,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
             oldProjectDeploymentWorkflow.getProjectDeploymentId());
 
-        validateProjectDeploymentWorkflow(projectDeployment, projectDeploymentWorkflow);
-
         checkConnectionAccess(
             Validate.notNull(projectDeployment.getProjectId(), "projectId"), List.of(projectDeploymentWorkflow),
             projectDeployment.getEnvironmentId(), List.of(oldProjectDeploymentWorkflow));
+
+        validateProjectDeploymentWorkflow(projectDeployment, projectDeploymentWorkflow);
 
         ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowService.update(
             projectDeploymentWorkflow);
