@@ -18,7 +18,7 @@ package com.bytechef.automation.workflow.execution.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionChildrenPageModel;
@@ -99,19 +99,19 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
         return ResponseEntity.ok(
             projectWorkflowExecutionFacade
                 .getWorkflowExecutions(
-                    embedded, environmentId, toProjectDeploymentOwner(source),
+                    embedded, environmentId, toWorkflowExecutionSource(source),
                     jobStatus == null ? null : Status.valueOf(jobStatus),
                     jobStartDate == null ? null : jobStartDate.toInstant(),
                     jobEndDate == null ? null : jobEndDate.toInstant(), projectId, projectDeploymentId,
                     connectedUserId, workflowId, projectVersion, workspaceId, pageNumber));
     }
 
-    private static @Nullable ProjectDeploymentOwner toProjectDeploymentOwner(@Nullable String source) {
-        if (source == null || source.equals("PROJECT")) {
-            return null;
+    private static WorkflowExecutionSource toWorkflowExecutionSource(@Nullable String source) {
+        if (source == null) {
+            return WorkflowExecutionSource.PROJECT_DEPLOYMENT;
         }
 
-        return ProjectDeploymentOwner.valueOf(source);
+        return WorkflowExecutionSource.valueOf(source);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

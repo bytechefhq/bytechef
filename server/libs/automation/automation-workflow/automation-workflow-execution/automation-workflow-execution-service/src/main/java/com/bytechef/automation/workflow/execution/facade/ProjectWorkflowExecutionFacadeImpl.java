@@ -35,12 +35,14 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerReference;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
@@ -307,9 +309,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
-        Boolean embedded, Long environmentId, @Nullable ProjectDeploymentOwner projectDeploymentOwner,
-        Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long projectId, Long projectDeploymentId,
-        Long connectedUserId, String workflowId, Integer projectVersion, long workspaceId, int pageNumber) {
+        Boolean embedded, Long environmentId, WorkflowExecutionSource workflowExecutionSource, Status jobStatus,
+        Instant jobStartDate, Instant jobEndDate, Long projectId, Long projectDeploymentId, Long connectedUserId,
+        String workflowId, Integer projectVersion, long workspaceId, int pageNumber) {
 
         if (connectedUserId != null) {
             return getConnectedUserWorkflowExecutions(
@@ -350,9 +352,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             return Page.empty();
         }
 
-        List<Long> projectDeploymentIds = projectDeploymentOwner == null
-            ? getProjectDeploymentIds(embedded, environmentId, projectDeploymentId, embeddedProjectDeployments)
-            : getOwnedProjectDeploymentIds(projectDeploymentOwner, environmentId, projectDeploymentId, workspaceId);
+        List<Long> projectDeploymentIds = getSourceProjectDeploymentIds(
+            workflowExecutionSource, embedded, environmentId, projectDeploymentId, embeddedProjectDeployments,
+            workspaceId);
 
         if (projectDeploymentIds.isEmpty()) {
             return Page.empty();
@@ -415,6 +417,39 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             pageNumber);
 
         return toWorkflowExecutionPage(rowsPage, projectId);
+    }
+
+    private List<Long> getSourceProjectDeploymentIds(
+        WorkflowExecutionSource workflowExecutionSource, Boolean embedded, @Nullable Long environmentId,
+        @Nullable Long projectDeploymentId, @Nullable List<ProjectDeployment> embeddedProjectDeployments,
+        long workspaceId) {
+
+        ProjectDeploymentOwner projectDeploymentOwner = workflowExecutionSource.getProjectDeploymentOwner();
+
+        if (projectDeploymentOwner != null) {
+            return getOwnedProjectDeploymentIds(projectDeploymentOwner, environmentId, projectDeploymentId,
+                workspaceId);
+        }
+
+        if (workflowExecutionSource == WorkflowExecutionSource.PROJECT) {
+            return getProjectDeploymentIds(embedded, environmentId, projectDeploymentId, embeddedProjectDeployments);
+        }
+
+        Set<Long> anySourceProjectDeploymentIds = new LinkedHashSet<>(
+            getProjectDeploymentIds(embedded, environmentId, null, embeddedProjectDeployments));
+
+        for (ProjectDeploymentOwner sourceProjectDeploymentOwner : WorkflowExecutionSource
+            .getProjectDeploymentOwners()) {
+            anySourceProjectDeploymentIds.addAll(
+                getOwnedProjectDeploymentIds(sourceProjectDeploymentOwner, environmentId, null, workspaceId));
+        }
+
+        if (projectDeploymentId != null) {
+            return anySourceProjectDeploymentIds.contains(projectDeploymentId) ? List.of(projectDeploymentId)
+                : List.of();
+        }
+
+        return new ArrayList<>(anySourceProjectDeploymentIds);
     }
 
     private List<Long> getOwnedProjectDeploymentIds(
@@ -512,6 +547,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 .collect(Collectors.toMap(
                     deployment -> Validate.notNull(deployment.getId(), "id"), Function.identity()));
 
+        Map<Long, ProjectDeploymentOwnerReference> projectDeploymentOwnerReferenceMap =
+            projectDeploymentService.getProjectDeploymentOwnerReferences(principalIds);
+
         List<TriggerExecution> triggerExecutions =
             triggerExecutionService.getJobTriggerExecutions(jobIds);
 
@@ -525,7 +563,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         Map<Long, WorkflowExecutionDTO> jobWorkflowExecutionDTOMap = buildWorkflowExecutionDTOs(
             jobIds, jobMap, workflows, projects, projectWorkflowIdsMap, workflowProjectVersionMap,
-            jobToPrincipalMap, projectDeploymentMap, triggerExecutionByJobIdMap)
+            jobToPrincipalMap, projectDeploymentMap, projectDeploymentOwnerReferenceMap, triggerExecutionByJobIdMap)
                 .stream()
                 .collect(Collectors.toMap(WorkflowExecutionDTO::id, Function.identity()));
 
@@ -567,6 +605,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         List<Long> jobIds, Map<Long, Job> jobMap, List<Workflow> workflows, List<Project> projects,
         Map<Long, List<String>> projectWorkflowIdsMap, Map<String, Integer> workflowProjectVersionMap,
         Map<Long, Long> jobToPrincipalMap, Map<Long, ProjectDeployment> deploymentMap,
+        Map<Long, ProjectDeploymentOwnerReference> projectDeploymentOwnerReferenceMap,
         Map<Long, TriggerExecution> triggerExecutionByJobIdMap) {
 
         List<WorkflowExecutionDTO> workflowExecutionDTOs = new ArrayList<>();
@@ -627,7 +666,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     Validate.notNull(job.getId(), "id"), projectOptional.get(), jobProjectDeployment,
                     workflowProjectVersionMap.get(job.getWorkflowId()),
                     new JobDTO(job, outputs, getSubflowJobTaskExecutions(jobId)), workflowOptional.get(),
-                    getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
+                    getTriggerExecutionDTO(deploymentId, triggerExecution, job),
+                    getSource(deploymentId == null ? null : projectDeploymentOwnerReferenceMap.get(deploymentId)),
+                    getSourceName(
+                        deploymentId == null ? null : projectDeploymentOwnerReferenceMap.get(deploymentId))));
         }
 
         return workflowExecutionDTOs;
@@ -698,6 +740,13 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         buildTriggerWorkflowExecutionDTOs(List<TriggerExecution> triggerExecutions) {
         Map<Long, WorkflowExecutionDTO> workflowExecutionDTOMap = new HashMap<>();
 
+        Map<Long, ProjectDeploymentOwnerReference> projectDeploymentOwnerReferenceMap =
+            projectDeploymentService.getProjectDeploymentOwnerReferences(
+                triggerExecutions.stream()
+                    .map(triggerExecution -> triggerExecution.getWorkflowExecutionId()
+                        .getJobPrincipalId())
+                    .toList());
+
         for (TriggerExecution triggerExecution : triggerExecutions) {
             WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
@@ -724,10 +773,25 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     triggerExecution.getId(), projectService.getProject(projectDeployment.getProjectId()),
                     projectDeployment, projectDeployment.getProjectVersion(), null,
                     workflowService.getWorkflow(workflowIdOptional.get()),
-                    getTriggerExecutionDTO(projectDeploymentId, triggerExecution, null)));
+                    getTriggerExecutionDTO(projectDeploymentId, triggerExecution, null),
+                    getSource(projectDeploymentOwnerReferenceMap.get(projectDeploymentId)),
+                    getSourceName(projectDeploymentOwnerReferenceMap.get(projectDeploymentId))));
         }
 
         return workflowExecutionDTOMap;
+    }
+
+    private static @Nullable WorkflowExecutionSource getSource(
+        @Nullable ProjectDeploymentOwnerReference projectDeploymentOwnerReference) {
+
+        return WorkflowExecutionSource.of(
+            projectDeploymentOwnerReference == null ? null : projectDeploymentOwnerReference.projectDeploymentOwner());
+    }
+
+    private static @Nullable String getSourceName(
+        @Nullable ProjectDeploymentOwnerReference projectDeploymentOwnerReference) {
+
+        return projectDeploymentOwnerReference == null ? null : projectDeploymentOwnerReference.name();
     }
 
     private @Nullable Integer getProjectVersion(String workflowId) {
