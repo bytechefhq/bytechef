@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --content-neutral-secondary: 215 19% 35%;
+    --stroke-neutral-secondary: 214 32% 91%;
+    --stroke-neutral-tertiary: 213 27% 84%;
+    --surface-neutral-primary: 0 0% 100%;
+    --surface-neutral-primary-hover: 210 40% 96%;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: hsl(var(--surface-neutral-primary));
+}
