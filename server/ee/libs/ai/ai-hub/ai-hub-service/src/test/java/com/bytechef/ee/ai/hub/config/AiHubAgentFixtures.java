@@ -180,6 +180,12 @@ public final class AiHubAgentFixtures {
         return buildAgent(defaultChatModel, providerOf(overrideChatClientResolver));
     }
 
+    public AiHubSpringAIAgent buildAgent(ChatModel defaultChatModel, IntelligentToolCatalog catalog)
+        throws AGUIException {
+
+        return buildAgent(defaultChatModel, emptyProvider(), catalog);
+    }
+
     private AiHubSpringAIAgent askAgent(
         ChatModel defaultChatModel,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -199,11 +205,20 @@ public final class AiHubAgentFixtures {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
+        return buildAgent(defaultChatModel, overrideChatClientResolverProvider, intelligentToolCatalog);
+    }
+
+    private AiHubSpringAIAgent buildAgent(
+        ChatModel defaultChatModel,
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        IntelligentToolCatalog catalog)
+        throws AGUIException {
+
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools, workflowExecutionTools,
             componentToolsProvider(), persistedWorkflowCheckerProvider(), projectServiceProvider(),
-            deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
-            workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
+            deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, catalog, workspaceFacade,
+            projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
             artifactRecorder,
             securityContextRehydrator, approvalGate, policy, inFlightRunRegistryProvider(),
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),

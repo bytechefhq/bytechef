@@ -29,6 +29,7 @@ import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGateToolCallback;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.progress.SubagentProgressEmitter;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
@@ -254,6 +255,15 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         if (resolvedMode != null) {
             toolContext.put(AiHubApprovalGateToolCallback.TOOL_CONTEXT_MODE_KEY, resolvedMode);
         }
+
+        return toolContext;
+    }
+
+    @Override
+    protected Map<String, Object> toolContext(RunAgentInput input, AgentSubscriber subscriber) {
+        Map<String, Object> toolContext = new HashMap<>(toolContext(input));
+
+        toolContext.put(SubagentProgressEmitter.TOOL_CONTEXT_KEY, new SubagentProgressEmitter(subscriber));
 
         return toolContext;
     }

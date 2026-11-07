@@ -43,6 +43,8 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
+import com.bytechef.ee.ai.hub.progress.SubagentProgressToolCallback;
+import com.bytechef.ee.ai.hub.progress.SubagentStepAdvisor;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
@@ -209,9 +211,11 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(
             intelligentToolCatalog.getByNames(
                 INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,
-                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy),
+                (chatClient, definition) -> SubagentStepAdvisor.attach(
+                    AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy)),
                 (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
-                    new UserRequestForwardingToolCallback(toolCallback), workspaceFacade)));
+                    SubagentProgressToolCallback.wrap(new UserRequestForwardingToolCallback(toolCallback)),
+                    workspaceFacade)));
 
         requireBuildWorkflow(toolCallbacks);
 
