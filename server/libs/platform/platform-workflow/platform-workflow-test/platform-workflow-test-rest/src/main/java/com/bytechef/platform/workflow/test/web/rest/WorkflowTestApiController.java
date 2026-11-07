@@ -212,8 +212,9 @@ public class WorkflowTestApiController implements WorkflowTestApi {
      *
      * @param id                  the identifier of the workflow to test
      * @param environmentId       the identifier of the environment in which the test is to be run
-     * @param testWorkflowRequest an optional request object containing inputs for the test execution; if null or
-     *                            missing inputs, defaults will be applied
+     * @param testWorkflowRequest an optional request object containing inputs for the test execution and the name of
+     *                            the trigger to start from; if null or missing inputs, defaults will be applied, and
+     *                            without a trigger name the first trigger is used
      * @return an {@code SseEmitter} to stream events related to the workflow testing process
      */
     @PostMapping(
@@ -252,8 +253,9 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 
         testWorkflowExecutor.executeAsync(
-            id, inputs, environmentId, (key) -> registerEmitter(key, emitter), WebhookSseStreamBridge::new,
-            workflowExecutions::put, this::whenComplete);
+            id, inputs, testWorkflowRequest == null ? null : testWorkflowRequest.triggerName(), environmentId,
+            (key) -> registerEmitter(key, emitter), WebhookSseStreamBridge::new, workflowExecutions::put,
+            this::whenComplete);
 
         return emitter;
     }
@@ -346,7 +348,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     }
 
     @SuppressFBWarnings("EI")
-    public record TestWorkflowRequest(@Nullable Map<String, Object> inputs) {
+    public record TestWorkflowRequest(@Nullable Map<String, Object> inputs, @Nullable String triggerName) {
     }
 
     /**

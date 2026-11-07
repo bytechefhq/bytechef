@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An interface for managing and testing workflow executions. Provides functionality to monitor workflow execution
@@ -37,6 +38,8 @@ public interface TestWorkflowExecutor {
      *
      * @param workflowId           The unique identifier of the workflow to execute.
      * @param inputs               A map of input parameters required for the workflow execution.
+     * @param triggerName          The name of the workflow trigger the test run starts from; the first trigger when
+     *                             null.
      * @param environmentId        The ID of the environment in which the workflow runs.
      * @param afterStartCallback   A function that is invoked after the workflow starts, providing an SseStreamBridge.
      * @param afterFutureCallback  A bi-consumer called with the workflow ID and a CompletableFuture representing the
@@ -45,7 +48,7 @@ public interface TestWorkflowExecutor {
      *                             ID.
      */
     void executeAsync(
-        String workflowId, Map<String, Object> inputs, long environmentId,
+        String workflowId, Map<String, Object> inputs, @Nullable String triggerName, long environmentId,
         Consumer<String> afterStartCallback, Function<String, SseStreamBridge> sseStreamBridgeFactory,
         BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback,
         Consumer<String> whenCompleteCallback);
@@ -55,11 +58,13 @@ public interface TestWorkflowExecutor {
      *
      * @param workflowId    The unique identifier of the workflow to be tested.
      * @param inputs        A map of input parameters to be supplied to the workflow during execution.
+     * @param triggerName   The name of the workflow trigger the test run starts from; the first trigger when null.
      * @param environmentId The unique identifier of the environment in which the workflow will be executed.
      * @return A {@code WorkflowTestExecutionDTO} object that encapsulates the details of the execution, including the
      *         executed job and any associated trigger execution details.
      */
-    WorkflowTestExecutionDTO executeSync(String workflowId, Map<String, Object> inputs, long environmentId);
+    WorkflowTestExecutionDTO executeSync(
+        String workflowId, Map<String, Object> inputs, @Nullable String triggerName, long environmentId);
 
     /**
      * Stops the execution of a workflow associated with the specified job ID.
