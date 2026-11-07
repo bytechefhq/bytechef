@@ -1,0 +1,17 @@
+query knowledgeBaseSource($id: ID!) {
+    knowledgeBaseSource(id: $id) {
+        id
+        name
+        knowledgeBaseId
+        sourceComponentName
+        sourceComponentVersion
+        sourceClusterElementName
+        connectionId
+        cadence
+        status
+        enabled
+        lastSyncRunAt
+        lastSyncJobExecutionId
+        workflowId
+    }
+}

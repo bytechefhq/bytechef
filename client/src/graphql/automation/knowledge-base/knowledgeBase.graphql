@@ -18,6 +18,8 @@ query knowledgeBase($id: ID!) {
             status
             tags
             createdDate
+            sourceId
+            sourceRecordId
             chunks {
                 id
                 knowledgeBaseDocumentId

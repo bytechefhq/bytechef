@@ -2,8 +2,9 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import KnowledgeBaseSearchInterface from '@/pages/automation/knowledge-base/components/KnowledgeBaseSearchInterface';
 import UploadKnowledgeBaseDocumentDialog from '@/pages/automation/knowledge-base/components/UploadKnowledgeBaseDocumentDialog';
 import KnowledgeBaseDocumentList from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentList';
+import KnowledgeBaseSourcesTab from '@/pages/automation/knowledge-base/components/knowledge-base-source-tab/KnowledgeBaseSourcesTab';
 import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
-import {FileTextIcon, SearchIcon} from 'lucide-react';
+import {FileTextIcon, SearchIcon, WorkflowIcon} from 'lucide-react';
 
 interface KnowledgeBaseTabsProps {
     documents: KnowledgeBaseDocument[];
@@ -24,6 +25,11 @@ const KnowledgeBaseTabs = ({documents, knowledgeBaseId}: KnowledgeBaseTabsProps)
                         <SearchIcon className="mr-2 size-4" />
                         Search
                     </TabsTrigger>
+
+                    <TabsTrigger value="sources">
+                        <WorkflowIcon className="mr-2 size-4" />
+                        Sources
+                    </TabsTrigger>
                 </TabsList>
 
                 <UploadKnowledgeBaseDocumentDialog knowledgeBaseId={knowledgeBaseId} />
@@ -35,6 +41,10 @@ const KnowledgeBaseTabs = ({documents, knowledgeBaseId}: KnowledgeBaseTabsProps)
 
             <TabsContent className="flex-1" value="search">
                 <KnowledgeBaseSearchInterface knowledgeBaseId={knowledgeBaseId} />
+            </TabsContent>
+
+            <TabsContent className="flex-1" value="sources">
+                <KnowledgeBaseSourcesTab knowledgeBaseId={knowledgeBaseId} />
             </TabsContent>
         </Tabs>
     );
