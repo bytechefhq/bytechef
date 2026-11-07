@@ -21,104 +21,70 @@ import { mapValues } from '../runtime';
 export interface AgentChannelDefinition {
     /**
      * The name of the approval cluster element used to gate replies on this channel.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     approvalChannelName?: string;
     /**
      * The path, within the trigger's payload, to the incoming message's attachments.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     attachmentsPath?: string;
     /**
      * The name of the component that declares this channel.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     componentName: string;
     /**
      * The version of the component that declares this channel.
-     * @type {number}
-     * @memberof AgentChannelDefinition
      */
     componentVersion: number;
     /**
      * The path, within the trigger's payload, to the conversation id.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     conversationIdPath: string;
     /**
      * The description.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     description?: string;
     /**
      * The path, within the trigger's payload, to the incoming message text.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     messagePath: string;
     /**
      * The channel's stored key (matches `ai_agent_channel.channel_type`).
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     name: string;
     /**
      * The name of the reply action, if this channel supports replying.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     replyActionName?: string;
     /**
      * The reply action property that carries outgoing attachments.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     replyAttachmentsProperty?: string;
     /**
      * Reply action parameters mapped from trigger property row keys.
-     * @type {{ [key: string]: string; }}
-     * @memberof AgentChannelDefinition
      */
     replyChannelParameters?: { [key: string]: string; };
     /**
      * The reply action property that carries the conversation id.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     replyConversationIdProperty?: string;
     /**
      * Reply action parameters fixed to constant values.
-     * @type {{ [key: string]: any; }}
-     * @memberof AgentChannelDefinition
      */
     replyFixedParameters?: { [key: string]: any; };
     /**
      * The reply action property that carries the outgoing message text.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     replyMessageProperty?: string;
     /**
      * The title
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     title?: string;
     /**
      * The name of the trigger through which incoming messages arrive.
-     * @type {string}
-     * @memberof AgentChannelDefinition
      */
     triggerName: string;
     /**
      * Fixed parameters applied to the trigger when it is used as an agent channel.
-     * @type {{ [key: string]: any; }}
-     * @memberof AgentChannelDefinition
      */
     triggerParameters?: { [key: string]: any; };
 }
