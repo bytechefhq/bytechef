@@ -35,8 +35,9 @@ class AiHubConfigurationToolSetTest {
             .askAgent();
 
         assertThat(toolNames(askAgent)).containsExactlyInAnyOrder(
-            "askUserQuestion", "checkWorkflow", "getWorkflow", "listProjects", "listWorkflows", "openWorkflowChatTab",
-            "openWorkflowTab", "searchProjects", "searchWorkflows");
+            "askUserQuestion", "checkWorkflow", "getAiAgent", "getWorkflow", "listAiAgents", "listProjects",
+            "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "searchAiAgentReferences",
+            "searchAiAgentTools", "searchProjects", "searchWorkflows");
     }
 
     @Test
@@ -67,11 +68,14 @@ class AiHubConfigurationToolSetTest {
             .buildAgent();
 
         assertThat(toolNames(buildAgent)).containsExactlyInAnyOrder(
-            "askUserQuestion", "buildWorkflow", "checkWorkflow", "createConnection", "createProject",
-            "createProjectWorkflow", "getWorkflow", "importWorkflow", "listConnectionsForComponent", "listProjects",
-            "listWorkflows", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection", "searchProjects",
-            "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
-            "selectTriggerPropertyOption");
+            "addAiAgentChannel", "addAiAgentElement", "askUserQuestion", "buildWorkflow", "checkWorkflow",
+            "createAiAgent", "createConnection", "createProject", "createProjectWorkflow", "deleteAiAgentChannel",
+            "deleteAiAgentElement", "getAiAgent", "getWorkflow", "importWorkflow", "listAiAgents",
+            "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab", "openWorkflowChatTab",
+            "openWorkflowTab", "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools",
+            "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
+            "selectPropertyOption", "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement",
+            "updateAiAgentSettings");
     }
 
     @Test
