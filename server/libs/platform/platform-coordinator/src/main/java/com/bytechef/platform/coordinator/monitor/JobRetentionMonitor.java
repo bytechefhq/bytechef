@@ -93,8 +93,14 @@ public class JobRetentionMonitor {
                 continue;
             }
 
+            Long expiredJobId = expiredJob.getId();
+
+            if (expiredJobId == null) {
+                continue;
+            }
+
             try {
-                jobFacade.deleteJob(expiredJob.getId());
+                jobFacade.deleteJob(expiredJobId);
 
                 purgedJobCount++;
             } catch (UnsupportedOperationException exception) {
@@ -102,7 +108,7 @@ public class JobRetentionMonitor {
 
                 return;
             } catch (RuntimeException exception) {
-                log.warn("Failed to purge expired job {}", expiredJob.getId(), exception);
+                log.warn("Failed to purge expired job {}", expiredJobId, exception);
             }
         }
 

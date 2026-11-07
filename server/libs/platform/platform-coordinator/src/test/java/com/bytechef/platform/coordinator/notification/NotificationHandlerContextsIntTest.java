@@ -31,6 +31,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -81,6 +82,9 @@ class NotificationHandlerContextsIntTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @MockitoBean
+    private JobFacade jobFacade;
 
     private final JobPrincipalAccessor jobPrincipalAccessor = mock(JobPrincipalAccessor.class);
 
