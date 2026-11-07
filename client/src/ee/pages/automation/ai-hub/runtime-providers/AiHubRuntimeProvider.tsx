@@ -72,6 +72,19 @@ export const EDIT_NOT_SENT_MESSAGE =
 
 const ASK_WORKFLOW_QUESTION_EVENT_NAME = 'ask-workflow-question';
 
+export const SUBAGENT_PROGRESS_EVENT_NAME = 'subagent-progress';
+
+type SubagentProgressPhaseType = 'done' | 'failed' | 'started' | 'step';
+
+interface SubagentProgressEventI {
+    phase: SubagentProgressPhaseType;
+    subagentName: string;
+    text: string;
+    toolCallId?: string;
+}
+
+const SUBAGENT_PROGRESS_PHASES: ReadonlySet<string> = new Set(['done', 'failed', 'started', 'step']);
+
 type OpenChatTabResultType =
     {chatId: number; opened: true; threadId: string; title: string | null} | {error: string; opened: false};
 
@@ -227,6 +240,30 @@ const toWorkflowQuestion = (value: unknown): AskUserQuestionDataI['questions'][n
         multiSelect: question.multiSelect === true,
         options,
         question: question.question,
+    };
+};
+
+const toSubagentProgressEvent = (value: unknown): SubagentProgressEventI | null => {
+    if (typeof value !== 'object' || value === null) {
+        return null;
+    }
+
+    const record = value as {phase?: unknown; subagentName?: unknown; text?: unknown; toolCallId?: unknown};
+
+    if (
+        typeof record.phase !== 'string' ||
+        !SUBAGENT_PROGRESS_PHASES.has(record.phase) ||
+        typeof record.subagentName !== 'string' ||
+        typeof record.text !== 'string'
+    ) {
+        return null;
+    }
+
+    return {
+        phase: record.phase as SubagentProgressPhaseType,
+        subagentName: record.subagentName,
+        text: record.text,
+        toolCallId: typeof record.toolCallId === 'string' ? record.toolCallId : undefined,
     };
 };
 
@@ -579,6 +616,44 @@ export const buildAiHubSubscriber = ({
         (subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId) ||
         useAiHubStore.getState().transcriptGeneration !== subscriberTranscriptGeneration;
 
+    const resolveSubagentToolCallId = (progressEvent: SubagentProgressEventI): string | undefined => {
+        const toolCallStore = aiChatToolCallStore.getState();
+
+        if (progressEvent.toolCallId !== undefined) {
+            const entry = toolCallStore.toolCalls[progressEvent.toolCallId];
+
+            if (entry?.status === 'running' && (subscriberChatId == null || entry.chatId === subscriberChatId)) {
+                return entry.toolCallId;
+            }
+        }
+
+        return toolCallStore.findRunningToolCallByName(progressEvent.subagentName, subscriberChatId)?.toolCallId;
+    };
+
+    const applySubagentProgress = (value: unknown) => {
+        const progressEvent = toSubagentProgressEvent(value);
+
+        if (progressEvent === null) {
+            return;
+        }
+
+        const toolCallId = resolveSubagentToolCallId(progressEvent);
+
+        if (toolCallId === undefined) {
+            return;
+        }
+
+        const toolCallStore = aiChatToolCallStore.getState();
+
+        if (progressEvent.phase === 'started') {
+            toolCallStore.startProgress(toolCallId, progressEvent.text);
+        } else if (progressEvent.phase === 'step') {
+            toolCallStore.addProgress(toolCallId, progressEvent.text);
+        } else {
+            toolCallStore.finishProgress(toolCallId, progressEvent.phase);
+        }
+    };
+
     const recordToolFailure = (toolName: string, reason: string) => {
         unrecoveredToolFailures.delete(toolName);
         unrecoveredToolFailures.set(toolName, reason);
@@ -755,6 +830,14 @@ export const buildAiHubSubscriber = ({
 
     return {
         onCustomEvent: ({event}) => {
+            if (event.name === SUBAGENT_PROGRESS_EVENT_NAME) {
+                if (!isStaleChat()) {
+                    applySubagentProgress(event.value);
+                }
+
+                return;
+            }
+
             if (event.name !== ASK_WORKFLOW_QUESTION_EVENT_NAME || isStaleChat()) {
                 return;
             }

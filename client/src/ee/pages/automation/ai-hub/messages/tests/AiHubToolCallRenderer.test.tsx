@@ -332,5 +332,76 @@ describe('AiHubToolCallFallback', () => {
 
             expect(container).toBeEmptyDOMElement();
         });
+
+        it('replaces the building label with the latest delegate step as it arrives', () => {
+            aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+            aiChatToolCallStore.getState().startProgress('call-1', 'Build a Gmail to Slack workflow');
+
+            renderInFlight('buildWorkflow');
+
+            expect(screen.getByRole('status')).toHaveTextContent('Building workflow...');
+
+            act(() => {
+                aiChatToolCallStore.getState().addProgress('call-1', 'Searching components');
+                aiChatToolCallStore.getState().addProgress('call-1', 'Saving the workflow');
+            });
+
+            expect(screen.getByText('Saving the workflow')).toHaveClass('font-medium');
+            expect(screen.queryByText('Building workflow...')).toBeNull();
+            expect(screen.getByRole('button', {expanded: false, name: /1 earlier step/})).toBeInTheDocument();
+        });
+
+        it('clears the progress once the delegate reports done', () => {
+            aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+            aiChatToolCallStore.getState().addProgress('call-1', 'Saving the workflow');
+
+            const {container} = renderInFlight('buildWorkflow');
+
+            act(() => {
+                aiChatToolCallStore.getState().finishProgress('call-1', 'done');
+            });
+
+            expect(container).toBeEmptyDOMElement();
+        });
+
+        it('keeps a failed delegate visible after the call completes', () => {
+            aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+            aiChatToolCallStore.getState().addProgress('call-1', 'Saving the workflow');
+
+            renderInFlight('buildWorkflow');
+
+            act(() => {
+                aiChatToolCallStore.getState().finishProgress('call-1', 'failed');
+                aiChatToolCallStore.getState().completeToolCall('call-1', {error: 'boom'}, true);
+            });
+
+            expect(screen.getByRole('status')).toHaveTextContent('Failed');
+            expect(screen.getByRole('status')).toHaveTextContent('at Saving the workflow');
+        });
+    });
+
+    describe('delegate progress on a shown tool card', () => {
+        beforeEach(() => {
+            aiChatToolCallStore.setState({order: [], toolCalls: {}});
+            useAiHubSettingsStore.setState({showToolCalls: true});
+        });
+
+        it('renders the latest step under the card header without expanding the card', () => {
+            aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+            aiChatToolCallStore.getState().addProgress('call-1', 'Configuring "slack › sendChannelMessage"');
+
+            render(<AiHubToolCallRenderer toolCallId="call-1" toolName="buildWorkflow" />);
+
+            expect(screen.getByRole('button', {expanded: false})).toBeInTheDocument();
+            expect(screen.getByRole('status')).toHaveTextContent('Configuring "slack › sendChannelMessage"');
+        });
+
+        it('renders no progress for a running call that reported none', () => {
+            aiChatToolCallStore.getState().startToolCall('call-1', 'listWorkflows', 0);
+
+            render(<AiHubToolCallRenderer toolCallId="call-1" toolName="listWorkflows" />);
+
+            expect(screen.queryByRole('status')).toBeNull();
+        });
     });
 });

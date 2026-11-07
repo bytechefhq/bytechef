@@ -1,4 +1,5 @@
 import {openCodeWorkflowArtifactTab} from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
+import AiHubSubagentProgress from '@/ee/pages/automation/ai-hub/messages/AiHubSubagentProgress';
 import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {ToolCallEntryI, useAiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
@@ -69,11 +70,12 @@ const summarizeArgs = (args: Record<string, unknown> | undefined): string => {
 interface CollapsibleCardProps {
     children: ReactNode;
     expanded: boolean;
+    footer?: ReactNode;
     header: ReactNode;
     onToggle: () => void;
 }
 
-const CollapsibleCard = ({children, expanded, header, onToggle}: CollapsibleCardProps) => {
+const CollapsibleCard = ({children, expanded, footer, header, onToggle}: CollapsibleCardProps) => {
     return (
         <div className="mt-2 flex w-full flex-col rounded-lg border border-border bg-surface-neutral-secondary text-sm">
             <button
@@ -90,6 +92,8 @@ const CollapsibleCard = ({children, expanded, header, onToggle}: CollapsibleCard
 
                 {header}
             </button>
+
+            {footer && <div className="px-3 pb-2 [&>*:first-child]:mt-0">{footer}</div>}
 
             {expanded && <div className="border-t border-border px-3 py-2">{children}</div>}
         </div>
@@ -217,6 +221,12 @@ interface AiHubToolCallRendererProps {
     toolName: string;
 }
 
+const hasSubagentProgress = (entry: ToolCallEntryI): boolean =>
+    entry.progressOutcome === 'failed' ||
+    (entry.status === 'running' &&
+        entry.progressOutcome === undefined &&
+        (entry.progress.length > 0 || entry.progressLabel !== undefined));
+
 const AiHubToolCallRenderer = ({args, argsText, isError, result, toolCallId, toolName}: AiHubToolCallRendererProps) => {
     const [expanded, setExpanded] = useState(false);
 
@@ -241,6 +251,8 @@ const AiHubToolCallRenderer = ({args, argsText, isError, result, toolCallId, too
         args: mergedArgs,
         messageIndex: liveEntry?.messageIndex ?? -1,
         progress: liveEntry?.progress ?? [],
+        progressLabel: liveEntry?.progressLabel,
+        progressOutcome: liveEntry?.progressOutcome,
         progressiveOutput: liveEntry?.progressiveOutput ?? '',
         result: mergedResult,
         status,
@@ -267,6 +279,7 @@ const AiHubToolCallRenderer = ({args, argsText, isError, result, toolCallId, too
     return (
         <CollapsibleCard
             expanded={expanded}
+            footer={hasSubagentProgress(entry) ? <AiHubSubagentProgress entry={entry} /> : undefined}
             header={header}
             onToggle={() => setExpanded((previousExpanded) => !previousExpanded)}
         >
@@ -286,20 +299,17 @@ interface RunningToolCallRowProps {
 }
 
 const RunningToolCallRow = ({toolCallId, toolName}: RunningToolCallRowProps) => {
-    const isRunning = useAiChatToolCallStore((state) =>
-        toolCallId ? state.toolCalls[toolCallId]?.status === 'running' : false
-    );
+    const liveEntry = useAiChatToolCallStore((state) => (toolCallId ? state.toolCalls[toolCallId] : undefined));
 
-    if (!isRunning) {
+    if (!liveEntry || (liveEntry.status !== 'running' && liveEntry.progressOutcome !== 'failed')) {
         return null;
     }
 
     return (
-        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground" role="status">
-            <Loader2Icon className="size-4 animate-spin" />
-
-            <span>{RUNNING_TOOL_CALL_LABELS[toolName] ?? `Running ${toolName}...`}</span>
-        </div>
+        <AiHubSubagentProgress
+            entry={liveEntry}
+            fallbackText={RUNNING_TOOL_CALL_LABELS[toolName] ?? `Running ${toolName}...`}
+        />
     );
 };
 
