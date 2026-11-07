@@ -19,6 +19,7 @@ import com.bytechef.ee.automation.ai.tool.CodeWorkflowTools;
 import com.bytechef.ee.automation.ai.tool.CustomComponentTools;
 import com.bytechef.ee.automation.ai.tool.ReadCodeWorkflowTools;
 import com.bytechef.ee.automation.ai.tool.ReadCustomComponentTools;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +43,7 @@ import org.springframework.core.io.Resource;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnEEVersion
 @ConditionalOnExpression("${bytechef.ai.copilot.enabled:false} or ${bytechef.ai.hub.enabled:false}")
 public class AutomationCopilotConfiguration {
 
