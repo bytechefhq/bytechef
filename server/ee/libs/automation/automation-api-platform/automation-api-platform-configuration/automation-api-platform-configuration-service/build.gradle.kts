@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
 
@@ -33,8 +34,8 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     testImplementation(project(":server:libs:platform:platform-github-proxy-client"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
-    testImplementation(project(":server:libs:platform:platform-user:platform-user-api"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
     testImplementation(project(":server:libs:test:test-int-support"))

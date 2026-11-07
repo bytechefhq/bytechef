@@ -22,6 +22,8 @@ public interface ApiClientService {
 
     void delete(long id);
 
+    Optional<ApiClient> fetchApiClient(long id);
+
     Optional<ApiClient> fetchApiClient(String secretKey, long environmentId);
 
     ApiClient getApiClient(long id);
