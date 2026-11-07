@@ -297,7 +297,7 @@ No authorization required
 
 ## getWorkflowExecutionsPage
 
-> Page getWorkflowExecutionsPage(id, embedded, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, connectedUserId, workflowId, projectVersion, pageNumber)
+> Page getWorkflowExecutionsPage(id, embedded, environmentId, source, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, connectedUserId, workflowId, projectVersion, pageNumber)
 
 Get project workflow executions
 
@@ -323,6 +323,8 @@ async function example() {
     embedded: true,
     // number | The id of an environment. (optional)
     environmentId: 789,
+    // 'PROJECT' | 'MCP_SERVER' | 'A2A_SERVER' | 'API_COLLECTION' | Where the executed workflows are exposed. PROJECT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project. (optional)
+    source: source_example,
     // 'CREATED' | 'STARTED' | 'STOPPED' | 'CANCELLED' | 'FAILED' | 'COMPLETED' | 'PAYMENT_REQUIRED' | The status of an executed job (optional)
     jobStatus: jobStatus_example,
     // Date | The start date of a job. (optional)
@@ -363,6 +365,7 @@ example().catch(console.error);
 | **id** | `number` | The id of a workspace. | [Defaults to `undefined`] |
 | **embedded** | `boolean` | If embedded automation workflows executions should be filtered. | [Optional] [Defaults to `undefined`] |
 | **environmentId** | `number` | The id of an environment. | [Optional] [Defaults to `undefined`] |
+| **source** | `PROJECT`, `MCP_SERVER`, `A2A_SERVER`, `API_COLLECTION` | Where the executed workflows are exposed. PROJECT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project. | [Optional] [Defaults to `&#39;PROJECT&#39;`] [Enum: PROJECT, MCP_SERVER, A2A_SERVER, API_COLLECTION] |
 | **jobStatus** | `CREATED`, `STARTED`, `STOPPED`, `CANCELLED`, `FAILED`, `COMPLETED`, `PAYMENT_REQUIRED` | The status of an executed job | [Optional] [Defaults to `undefined`] [Enum: CREATED, STARTED, STOPPED, CANCELLED, FAILED, COMPLETED, PAYMENT_REQUIRED] |
 | **jobStartDate** | `Date` | The start date of a job. | [Optional] [Defaults to `undefined`] |
 | **jobEndDate** | `Date` | The end date of a job. | [Optional] [Defaults to `undefined`] |
