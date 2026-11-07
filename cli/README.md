@@ -26,6 +26,9 @@ Every value can be overridden per command, in this precedence:
 # Deploy a code-based project archive
 bytechef automation project deploy --workspace-id 1 --project-file ./project.zip
 
+# Deploy and make the published version live in the environment
+bytechef automation project deploy --workspace-id 1 --project-file ./project.zip --enable true
+
 # Pull a project from its git repository
 bytechef automation project pull --id 5
 ```
@@ -65,17 +68,25 @@ bytechef automation api-collection endpoint disable --id 9
   for the others too.
 - `update-version` prints the endpoints it removed, the connections and inputs the new version still needs, and the
   endpoints it disabled because of them.
-- `cli/clients/automation-api-platform/openapi.yaml` is a copy of
-  `server/ee/libs/automation/automation-api-platform/automation-api-platform-configuration/automation-api-platform-configuration-rest/openapi-public.yaml`
-  with the `Environment` schema inlined. When the server spec changes, copy it again, inline `Environment`, and run
-  `./gradlew :cli:clients:automation-api-platform:generateClient`.
+- The client is generated from the server's own spec,
+  `server/ee/libs/automation/automation-api-platform/automation-api-platform-configuration/automation-api-platform-configuration-rest/openapi-public.yaml`.
+  When it changes, run `./gradlew :cli:clients:automation-api-platform:generateClient`.
 
-## App commands (DEVELOPMENT only)
+## App commands
 
 For an app made from the `create-bytechef-app` template, usually run by a coding agent (the template's `AGENTS.md`
-describes the whole loop). Every `automation app` command and `automation connection list` refuses any environment
-but DEVELOPMENT, so use a profile whose token is an **automation API key created in DEVELOPMENT** (an automation API
-key works only in the environment it was created in).
+describes the whole loop). An app has instances, one per environment and possibly several; the key, the URL, the
+bindings and the sign-in mode belong to an instance. The commands address the instance recorded in
+`.bytechef/app.json`, or the one `--instance-id` names. `list`, `instance list` and `status` work in every
+environment; `create`, `link`, `instance create`, `instance update`, `instance deployment-settings set|clear`,
+`key rotate`, `bind` and
+`unbind` refuse any environment but
+DEVELOPMENT before sending a request, so use a profile whose token is an **automation API key created in DEVELOPMENT**
+(an automation API key works only in the environment it was created in). The server refuses the same operations
+outside DEVELOPMENT too. The version and deployment commands (`version create`, `version list`, `deployment deploy`,
+`deployment rollback`, `deployment cancel`, `deployment record`, `deployment list`) and
+`instance deployment-settings get` work in every environment: they are what a CI job runs to deploy the app or after
+it deployed the app.
 
 ```bash
 bytechef configure --profile dev --host https://app.bytechef.io --token <automation-api-key> \
@@ -85,8 +96,15 @@ bytechef configure --profile dev --host https://app.bytechef.io --token <automat
 bytechef automation app create --name my-app --profile dev
 # or, with the optional fields
 bytechef automation app create --name my-app --description "Order tracker" --hosting-target SELF_HOSTED --profile dev
+# an app whose users do not sign in
+bytechef automation app create --name my-app --user-auth-mode NONE --profile dev
 bytechef automation app link --app-id 42 --profile dev
 bytechef automation app list --profile dev
+bytechef automation app instance list --app-id 42 --profile dev
+bytechef automation app instance create --app-id 42 --name Partner --env-file .env.partner --profile dev
+# where the app runs; sign-in registers its callback from it, so set it before the first sign-in
+bytechef automation app instance update --url http://localhost:3000 --profile dev
+bytechef automation app instance update --app-id 42 --instance-id 8 --name Partner --profile dev
 bytechef automation app status --profile dev --output table
 bytechef automation connection list --component-name hubspot --profile dev
 bytechef automation app bind connection --binding-key crm --component-name hubspot \
@@ -98,31 +116,114 @@ bytechef automation app unbind connection --binding-key crm --profile dev
 bytechef automation app unbind workflow --workflow-key onboard-customer --profile dev
 bytechef automation app unbind api-collection --api-collection-id 9 --profile dev
 bytechef automation app key rotate --profile dev
+# an app with several instances in the profile's environment: name the instance
+bytechef automation app status --app-id 42 --instance-id 8 --profile dev
+bytechef automation app key rotate --app-id 42 --instance-id 8 --env-file .env.partner --profile dev
+# the hosting provider connection and settings ByteChef deploys the instance with
+bytechef automation app instance deployment-settings set --connection-id 12 --setting projectId=prj_1 \
+  --setting repository=acme/my-app --setting teamId=team_1 --profile dev
+bytechef automation app instance deployment-settings get --profile dev
+bytechef automation app instance deployment-settings clear --profile dev
+
+# In CI, ByteChef deploys the version through the instance's hosting provider and waits for the result
+bytechef automation app deployment deploy --app-id 42 --instance-id 9 --version 1.4.0 --commit "$GIT_SHA" \
+  --git-ref main --wait --timeout 900 --environment PRODUCTION
+bytechef automation app deployment rollback --app-id 42 --instance-id 9 --version 1.3.2 --wait --environment PRODUCTION
+bytechef automation app deployment cancel --app-id 42 --instance-id 9 --environment PRODUCTION
+
+# In CI, after deploying the app, with a profile or --host/--token/--environment of the target environment
+bytechef automation app version create --app-id 42 --name 1.4.0 --commit "$GIT_SHA" --git-ref main \
+  --description "Spring release" --environment PRODUCTION
+bytechef automation app version list --app-id 42 --environment PRODUCTION --limit 10
+# the versions of an instance your workspace hosts of an app another workspace owns
+bytechef automation app version list --app-id 42 --instance-id 9 --environment PRODUCTION
+bytechef automation app deployment record --app-id 42 --instance-id 9 --version 1.4.0 \
+  --url https://my-app.example.com --commit "$GIT_SHA" --environment PRODUCTION
+bytechef automation app deployment list --app-id 42 --instance-id 9 --environment PRODUCTION --output table
 ```
 
 - `create` writes `BYTECHEF_URL` and `BYTECHEF_APP_KEY` into `--env-file` (default `.env.local`) and
-  `.bytechef/app.json` (`id`, `uuid`, `workspaceId`, `environment`, `host`; no secret, commit it) in the current
+  `.bytechef/app.json` (`id`, `uuid`, `instanceId`, `workspaceId`, `environment`, `host`; no secret, commit it) in the current
   directory. It never prints the key. Only the two `BYTECHEF_*` lines change; every other line stays. The file is
   written to an owner-only (`600`) temporary file and renamed into place, and the CLI warns when git does not ignore
   it. If a write fails after the app was created, the error names the app id: `automation app link --app-id <id>`
   restores `.bytechef/app.json` and `automation app key rotate` writes a new key.
 - `--hosting-target` is `VERCEL` (the default) or `SELF_HOSTED`; `--description` is optional.
+- `--user-auth-mode` is `NONE`, `OPTIONAL` or `REQUIRED` on `create` and `instance create`. Without it the CLI sends
+  no mode and the server picks one: `REQUIRED` when the OAuth2 authorization server is on, `NONE` when it is off; the
+  output's `userAuthMode` names the mode the instance got. When the server picked `NONE`, a warning on stderr says the
+  instance has no end-user sign-in and that anyone with the app's URL can open it. An explicit `OPTIONAL` or `REQUIRED`
+  with the server off answers 409 `APP_USER_AUTH_UNAVAILABLE` and the CLI suggests `--user-auth-mode NONE`.
+- `instance create` adds an instance to an existing app (`--app-id`, or the linked directory) in DEVELOPMENT.
+  `--workspace-id` is the workspace of the new instance and defaults to the profile's workspace; it may differ from the
+  app's, and the server decides whether you may. `--env-file` is required: the new instance's key is written there
+  and never printed, so it cannot overwrite the linked instance's key unless you name that file. `instance create`
+  never writes or changes `.bytechef/app.json`; run `link --app-id <id> --instance-id <id>` in another directory to
+  link the new instance. `instance list` shows each instance's id, name, environment, workspace, status, sign-in mode
+  and URL in the profile's environment.
+- `instance update` sets the URL (`--url`), the name (`--name`) or both of the linked instance, or of the one
+  `--app-id` and `--instance-id` name, in DEVELOPMENT; an option left out keeps its stored value. `create` and
+  `instance create` take no URL, so set it with `instance update` before the first sign-in: an instance that requires
+  sign-in has no sign-in client until its URL is set, and the app's `/auth/login` answers 503 with a message saying so.
+- `--instance-id` on `link`, `status`, `instance update`, `key rotate`, `bind` and `unbind` addresses one instance of the app named by
+  `--app-id` (or by the linked directory); it must be an instance in the profile's environment. Without it the linked
+  directory's instance is used, or the app's only instance in the profile's environment and workspace; an app with
+  several needs `--instance-id`. In a linked directory, `key rotate --instance-id` for another instance than the
+  linked one also needs an explicit `--env-file`. `--app-id` with the linked app's id also works when the profile's
+  environment is not the link's, which is how to read an app from STAGING or PRODUCTION inside its DEVELOPMENT directory.
 - The other commands find the app through `.bytechef/app.json`, walking up from the current directory like git, or
   take `--app-id`. `--env-file` is relative to the directory holding `.bytechef/` when the app is found through it, and
   to the current directory otherwise. A `.bytechef/app.json` written for another host, environment or workspace than
   the resolved profile is an error. `create` and `link` refuse to run where one already exists.
 - An app named by `--app-id` rather than by a matching `.bytechef/app.json` is fetched first: `status`, `key rotate`, `bind` and
-  `unbind` refuse it unless it is a DEVELOPMENT app of the profile's workspace. Inside a directory linked to another
+  `unbind` need one instance in the profile's environment and workspace, or `--instance-id`. Inside a directory linked to another
   app, `key rotate --app-id` also needs an explicit `--env-file`, so it cannot overwrite the linked app's key.
 - `bind connection` makes the binding exactly what it names: an omitted `--actions`, `--tools` or `--proxy` means
   none. Without `--connection-id` the CLI uses the only usable connection of `--component-name` and otherwise lists
   the candidates. Unknown action or tool names fail before anything is written, listing the allowed ones.
+- `status` lists every instance of the app with its sign-in mode, then the bindings of the one instance it addresses.
+- `deployment deploy` deploys `--version` of the app to an instance through the instance's hosting provider, with
+  the instance's deployment settings. A version name the app does not have yet is created only when `--commit` or
+  `--git-ref` says which code it is; without them the command fails (exit code 3) before deploying. An existing name
+  with another `--commit` is refused before anything is sent. `deployment rollback` deploys an existing version again
+  and never creates one. Both print the deployment. With `--wait` they first write the deployment id and status to
+  stderr, then poll it until it is `READY`, `FAILED` or `CANCELED`, for at most `--timeout` seconds (default 600).
+  A poll that fails with a transport error, HTTP 408, 429 or 5xx is retried until the timeout; 401, 403 and 404 stop the wait at
+  once. The exit code is 1 when the deployment ends `FAILED` or `CANCELED`, when the provider could not start it, and
+  when `--wait` times out or is interrupted, and 2 or 3 when a poll is refused or not found. Whenever the wait stops
+  early, the CLI prints the last known deployment and its id; the deployment keeps running on the server, and the
+  error names `deployment cancel --deployment-id <id>`. The server answers 409 when a deployment of the instance is already in progress
+  (`APP_DEPLOYMENT_IN_PROGRESS`), when no hosting provider serves the instance's hosting target, and when the instance
+  has no deployment connection; 400 when the deployment settings are not valid for the provider.
+- `deployment cancel` cancels `--deployment-id`, or without it the instance's one deployment in progress (exit code 3
+  when there is none). A canceled deployment stays in the history as `CANCELED`.
+- `instance deployment-settings set` stores the hosting provider connection (`--connection-id`, required) and the
+  provider settings the instance is deployed with; repeat `--setting key=value` for each, the value being everything
+  after the first `=`. The settings replace the stored ones. `clear` removes both. Both are DEVELOPMENT only, like the
+  other instance changes; `get` shows them in every environment.
+- `deployment record` records that `--version` of the app was deployed to an instance by someone other than ByteChef,
+  and makes it the instance's current deployment. A version name the app does not have yet is created with
+  `--commit`; an existing name with another commit is refused (409 `APP_VERSION_COMMIT_MISMATCH`), so pick a new name.
+  `--url` must be an absolute `http` or `https` URL. An empty `--commit` or `--url` (an unset CI variable) counts as
+  absent. When two jobs record the same new version name at once, the loser gets 409
+  `APP_VERSION_NAME_ALREADY_EXISTS`; `deployment record` retries once on exactly that error.
+- The deployment commands address the instance like `status`: the linked directory's instance,
+  `--instance-id`, or the app's only instance in the profile's environment and workspace. In CI there is usually no
+  `.bytechef/app.json`: `--app-id` with `--instance-id` is enough. `version create` and `version list` need only the
+  app. `deployment deploy` and `deployment rollback` find `--version` through the instance
+  (`GET /app-instances/{id}/versions?name=`), and `version list` reads through the instance when `--instance-id` is
+  given or the directory is linked to one, so a workspace that hosts an instance of an app owned by another workspace
+  can deploy it and list its versions: it needs `APP_VIEW` on the instance, not on the app. When the app itself may not
+  be read, `--instance-id` is checked against the instance instead. Creating a version (`version create`, or `deployment
+  deploy` with a new name) still needs `APP_DEPLOY` on the app. None of the version and deployment commands writes a file, and none needs DEVELOPMENT; they need a role that
+  may deploy the app (`APP_DEPLOY`: deploy, rollback, cancel, record, create) or view it (`APP_VIEW`: list) in the
+  profile's environment, and their 401 and 403 messages name that environment and permission.
+- `deployment list` and `version list` print the newest 50, newest first; `--limit` asks for 1 to 200.
 - `status` shows each connection binding's component version as `none` (`null` in JSON output) when it cannot be resolved (the connection
   can no longer be bound, or you are not a workspace admin).
-- `cli/clients/automation-app/openapi.yaml` is a copy of
-  `server/ee/libs/automation/automation-app/automation-app-public-rest/openapi-management.yaml` with the
-  `Environment` schema inlined (the server file's relative `$ref` does not resolve from the client). When the server
-  spec changes, copy it again, inline `Environment`, and run `./gradlew :cli:clients:automation-app:generateClient`.
+- The client is generated from the server's own spec,
+  `server/ee/libs/automation/automation-app/automation-app-public-rest/openapi-management.yaml`. When it changes, run
+  `./gradlew :cli:clients:automation-app:generateClient`.
 
 ## Embedded commands
 
@@ -171,13 +272,18 @@ The **frontend** variants of the embedded API (connected-user session token, for
 the AI Gateway and webhook endpoints are intentionally not exposed as CLI commands — their auth or
 inbound-call model doesn't fit a CLI.
 
-## Component scaffolding
+## Component scaffolding and deployment
 
 ```bash
 bytechef component init --name my-component --open-api-path ./openapi.yaml --output-path .
+
+# Deploy a custom component (single-file JS/Python/Ruby, or a Java .jar) to a running instance
+bytechef component deploy --file ./my-component.js
 ```
 
-`component init` is local-only and contacts no instance.
+`component init` is local-only and contacts no instance. `component deploy` sends to
+`<host>/api/platform/v1` with `Authorization: Bearer <token>`; the profile token used must be an admin
+platform API key, and the file extension selects the language server-side.
 
 ## Exit codes
 
