@@ -10,8 +10,10 @@ package com.bytechef.ee.ai.hub.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.longThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -37,6 +39,8 @@ import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.agui.server.spring.AgUiParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.automation.assetfile.domain.AssetFile;
+import com.bytechef.automation.assetfile.service.AssetFileSystemFacade;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
@@ -44,15 +48,20 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,6 +105,7 @@ class WebhookBridgeAgentTest {
     private WorkflowChatMetrics metrics;
     private JobFacade jobFacade;
     private InFlightAiHubRunRegistry inFlightRunRegistry;
+    private AssetFileSystemFacade assetFileSystemFacade;
     private SessionRepository sessionRepository;
     private AgentSubscriber subscriber;
 
@@ -108,6 +118,7 @@ class WebhookBridgeAgentTest {
         metrics = mock(WorkflowChatMetrics.class);
         jobFacade = mock(JobFacade.class);
         inFlightRunRegistry = new InFlightAiHubRunRegistry();
+        assetFileSystemFacade = mock(AssetFileSystemFacade.class);
         sessionRepository = InMemorySessionRepository.builder()
             .build();
         subscriber = mock(AgentSubscriber.class);
@@ -233,6 +244,107 @@ class WebhookBridgeAgentTest {
             .containsEntry("message", List.of("Hello"))
             .containsEntry("chatId", List.of(THREAD_ID))
             .containsEntry("conversationId", List.of("workflow-chat:" + THREAD_ID));
+    }
+
+    @Test
+    void testAttachmentsBecomeAssetFilesInTheChatsWorkspaceAndEnvironment() throws AGUIException {
+        givenSyncChat();
+
+        when(chatService.getWorkspaceId(CHAT_ID)).thenReturn(5L);
+        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class), any(LongConsumer.class)))
+            .thenReturn(Map.of("message", "ok"));
+
+        AtomicReference<String> uploadedContent = new AtomicReference<>();
+
+        when(assetFileSystemFacade.createFromUpload(
+            eq(5L), eq(Environment.DEVELOPMENT.ordinal()), eq("notes.txt"), eq("text/plain"),
+            any(InputStream.class)))
+                .thenAnswer(invocation -> {
+                    InputStream inputStream = invocation.getArgument(4);
+
+                    uploadedContent.set(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
+
+                    return newAssetFile("notes.txt", "text/plain", "txt", "jdbc://assets/notes.txt");
+                });
+
+        newAgent().runAgent(
+            parametersOf(buildInput("Hello", null, attachmentsProps(attachment("notes.txt", "text/plain", "hi")))),
+            subscriber);
+
+        assertThat(captureRequestAttachments()).containsExactly(
+            new BridgedFileEntry("notes.txt", "txt", "text/plain", "jdbc://assets/notes.txt"));
+        assertThat(uploadedContent.get()).isEqualTo("hi");
+        verify(metrics, never()).recordAttachmentFailure(anyString());
+    }
+
+    @Test
+    void testUnusableAttachmentsAreDroppedAndCounted() throws AGUIException {
+        givenSyncChat();
+
+        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class), any(LongConsumer.class)))
+            .thenReturn(Map.of("message", "ok"));
+
+        Map<String, Object> oversized = Map.of(
+            "name", "big.bin", "contentType", "application/octet-stream", "base64",
+            "A".repeat(25 * 1024 * 1024 / 3 * 4 + 8));
+
+        newAgent().runAgent(
+            parametersOf(
+                buildInput(
+                    "Hello", null,
+                    attachmentsProps(
+                        "not a map", Map.of("name", "empty.txt"), oversized,
+                        Map.of("name", "broken.txt", "base64", "%%%")))),
+            subscriber);
+
+        assertThat(captureRequestAttachments()).isEmpty();
+        verify(metrics).recordAttachmentFailure("malformed");
+        verify(metrics).recordAttachmentFailure("missing_payload");
+        verify(metrics).recordAttachmentFailure("too_large");
+        verify(metrics).recordAttachmentFailure("decode_failure");
+        verifyNoInteractions(assetFileSystemFacade);
+    }
+
+    @Test
+    void testAFailedUploadDropsOnlyThatAttachment() throws AGUIException {
+        givenSyncChat();
+
+        when(chatService.getWorkspaceId(CHAT_ID)).thenReturn(5L);
+        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class), any(LongConsumer.class)))
+            .thenReturn(Map.of("message", "ok"));
+        when(assetFileSystemFacade.createFromUpload(eq(5L), anyInt(), eq("quota.txt"), any(), any()))
+            .thenThrow(new IllegalStateException("Workspace storage quota exceeded"));
+        when(assetFileSystemFacade.createFromUpload(eq(5L), anyInt(), eq("ok.txt"), any(), any()))
+            .thenReturn(newAssetFile("ok.txt", "text/plain", "txt", "jdbc://assets/ok.txt"));
+
+        newAgent().runAgent(
+            parametersOf(
+                buildInput(
+                    "Hello", null,
+                    attachmentsProps(
+                        attachment("quota.txt", "text/plain", "too much"), attachment("ok.txt", "text/plain", "ok")))),
+            subscriber);
+
+        assertThat(captureRequestAttachments()).containsExactly(
+            new BridgedFileEntry("ok.txt", "txt", "text/plain", "jdbc://assets/ok.txt"));
+        verify(metrics).recordAttachmentFailure("upload_failure");
+    }
+
+    @Test
+    void testAttachmentsAreDroppedWhenAssetFilesAreUnavailable() throws AGUIException {
+        givenSyncChat();
+
+        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class), any(LongConsumer.class)))
+            .thenReturn(Map.of("message", "ok"));
+
+        assetFileSystemFacade = null;
+
+        newAgent().runAgent(
+            parametersOf(buildInput("Hello", null, attachmentsProps(attachment("notes.txt", "text/plain", "hi")))),
+            subscriber);
+
+        assertThat(captureRequestAttachments()).isEmpty();
+        verify(metrics).recordAttachmentFailure("unavailable");
     }
 
     @Test
@@ -660,7 +772,7 @@ class WebhookBridgeAgentTest {
             executor, chatService, resumeRegistry, JsonMapper.builder()
                 .build(),
             metrics, new AiHubSessionMemory(sessionRepository, null), guard, jobFacade,
-            inFlightRunRegistry);
+            inFlightRunRegistry, assetFileSystemFacade);
     }
 
     private void givenChat(AiHubChat chat) {
@@ -776,11 +888,55 @@ class WebhookBridgeAgentTest {
         return chat;
     }
 
+    @SuppressWarnings("unchecked")
+    private List<Object> captureRequestAttachments() {
+        ArgumentCaptor<WebhookRequest> requestCaptor = ArgumentCaptor.forClass(WebhookRequest.class);
+
+        verify(executor, timeout(2000)).executeSync(any(WorkflowExecutionId.class), requestCaptor.capture(),
+            any(LongConsumer.class));
+
+        WebhookRequest webhookRequest = requestCaptor.getValue();
+
+        WebhookRequest.WebhookBodyImpl body = webhookRequest.body();
+
+        Map<String, Object> content = (Map<String, Object>) body.getContent();
+
+        return (List<Object>) content.get("attachments");
+    }
+
+    private static Map<String, Object> attachment(String name, String contentType, String text) {
+        Base64.Encoder encoder = Base64.getEncoder();
+
+        return Map.of(
+            "name", name, "contentType", contentType,
+            "base64", encoder.encodeToString(text.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private static Map<String, Object> attachmentsProps(Object... attachments) {
+        return Map.of("attachments", List.of(attachments));
+    }
+
+    private static AssetFile newAssetFile(String name, String mimeType, String extension, String url) {
+        AssetFile assetFile = new AssetFile();
+
+        assetFile.setName(name);
+        assetFile.setMimeType(mimeType);
+        assetFile.setFile(new FileEntry(name, extension, mimeType, url));
+
+        return assetFile;
+    }
+
     private static RunAgentInput buildInput(String userMessageText) {
         return buildInput(userMessageText, null);
     }
 
     private static RunAgentInput buildInput(String userMessageText, String userMessageId) {
+        return buildInput(userMessageText, userMessageId, null);
+    }
+
+    private static RunAgentInput buildInput(
+        String userMessageText, String userMessageId, Map<String, Object> forwardedProps) {
+
         UserMessage userMessage = new UserMessage();
 
         userMessage.setContent(userMessageText);
@@ -790,7 +946,8 @@ class WebhookBridgeAgentTest {
         }
 
         return new RunAgentInput(
-            THREAD_ID, RUN_ID, new State(), List.of((BaseMessage) userMessage), List.of(), List.of(), null);
+            THREAD_ID, RUN_ID, new State(), List.of((BaseMessage) userMessage), List.of(), List.of(),
+            forwardedProps);
     }
 
     private static AgUiParameters buildAgUiParameters(String userMessageText) {

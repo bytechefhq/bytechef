@@ -30,6 +30,7 @@ import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.datatable.DataTableToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.automation.assetfile.service.AssetFileSystemFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -417,12 +418,14 @@ public class AiHubConfiguration {
         WebhookWorkflowExecutor webhookWorkflowExecutor, AiHubChatService chatService,
         WebhookResumeRegistry webhookResumeRegistry, JsonMapper jsonMapper, WorkflowChatMetrics workflowChatMetrics,
         AiHubSessionMemory aiHubSessionMemory, WorkflowChatGuard workflowChatGuard,
-        ObjectProvider<JobFacade> jobFacadeProvider, InFlightAiHubRunRegistry inFlightRunRegistry)
+        ObjectProvider<JobFacade> jobFacadeProvider, InFlightAiHubRunRegistry inFlightRunRegistry,
+        ObjectProvider<AssetFileSystemFacade> assetFileSystemFacadeProvider)
         throws AGUIException {
 
         return new WebhookBridgeAgent(
             webhookWorkflowExecutor, chatService, webhookResumeRegistry, jsonMapper, workflowChatMetrics,
-            aiHubSessionMemory, workflowChatGuard, jobFacadeProvider.getIfAvailable(), inFlightRunRegistry);
+            aiHubSessionMemory, workflowChatGuard, jobFacadeProvider.getIfAvailable(), inFlightRunRegistry,
+            assetFileSystemFacadeProvider.getIfAvailable());
     }
 
     @Bean

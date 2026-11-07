@@ -26,6 +26,7 @@ public class WorkflowChatMetrics {
     public static final String TURN_BY_WORKSPACE_COUNTER = "bytechef_workflow_chat_turn_by_workspace";
     public static final String RESUME_COUNTER = "bytechef_workflow_chat_resume";
     public static final String UNREACHABLE_COUNTER = "bytechef_workflow_chat_unreachable";
+    public static final String ATTACHMENT_FAILURE_COUNTER = "bytechef_workflow_chat_attachment_failure";
 
     private final ObjectProvider<MeterRegistry> meterRegistryProvider;
 
@@ -97,6 +98,19 @@ public class WorkflowChatMetrics {
         }
 
         Counter.builder(UNREACHABLE_COUNTER)
+            .tag("reason", reason == null ? "unknown" : reason)
+            .register(meterRegistry)
+            .increment();
+    }
+
+    public void recordAttachmentFailure(String reason) {
+        MeterRegistry meterRegistry = meterRegistryProvider.getIfAvailable();
+
+        if (meterRegistry == null) {
+            return;
+        }
+
+        Counter.builder(ATTACHMENT_FAILURE_COUNTER)
             .tag("reason", reason == null ? "unknown" : reason)
             .register(meterRegistry)
             .increment();
