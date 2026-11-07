@@ -129,14 +129,13 @@ public class AiHubConfiguration {
         "searchAiAgentTools", "searchProjects", "searchWorkflows");
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
-        "addAiAgentChannel", "addAiAgentElement", "askUserQuestion", "buildWorkflow", "checkWorkflow",
-        "createAiAgent", "createConnection", "createProject", "createProjectWorkflow", "deleteAiAgentChannel",
-        "deleteAiAgentElement", "getAiAgent", "getWorkflow", "importWorkflow", "listAiAgents",
-        "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab", "openWorkflowChatTab",
-        "openWorkflowTab", "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools",
-        "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
-        "selectPropertyOption", "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement",
-        "updateAiAgentSettings");
+        "addAiAgentChannel", "addAiAgentElement", "askUserQuestion", "buildWorkflow", "checkWorkflow", "createAiAgent",
+        "createConnection", "createProject", "createProjectWorkflow", "getAiAgent", "getWorkflow", "importWorkflow",
+        "listAiAgents", "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab",
+        "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection", "searchAiAgentReferences",
+        "searchAiAgentTools", "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption",
+        "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption", "updateAiAgent",
+        "updateAiAgentElement", "updateAiAgentSettings");
 
     private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
     private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
