@@ -1,54 +1,61 @@
-import {CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET, CANVAS_TOP_OFFSET} from '@/shared/constants';
 import {describe, expect, it} from 'vitest';
 
 import getInitialViewportPosition from '../getInitialViewportPosition';
 
+const LEFT_INSET = 80;
+const TOP_INSET = 120;
+
 describe('getInitialViewportPosition', () => {
-    it('keeps a top-to-bottom workflow at the overlay panels offset', () => {
+    it('should put the topmost node the inset below the top edge and keep the layout x for a top-to-bottom graph', () => {
         expect(
-            getInitialViewportPosition({canvasHeight: 650, flowHeight: 700, layoutDirection: 'TB', offsetX: 0})
-        ).toEqual({x: 0, y: CANVAS_TOP_OFFSET});
-        expect(
-            getInitialViewportPosition({canvasHeight: 650, flowHeight: 700, layoutDirection: 'TB', offsetX: -200})
-        ).toEqual({
-            x: -200,
-            y: CANVAS_TOP_OFFSET,
-        });
+            getInitialViewportPosition({
+                canvasHeight: 1000,
+                layoutDirection: 'TB',
+                leftInset: LEFT_INSET,
+                nodesBounds: {height: 200, width: 400, x: 300, y: 50},
+                offsetX: 16,
+                topInset: TOP_INSET,
+            })
+        ).toEqual({x: 16, y: 70});
     });
 
-    it('insets a left-to-right workflow from the canvas left edge', () => {
-        expect(
-            getInitialViewportPosition({canvasHeight: 650, flowHeight: 650, layoutDirection: 'LR', offsetX: 0})
-        ).toEqual({
-            x: CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET,
-            y: 0,
+    it('should put the leftmost node the inset from the left edge and centre a left-to-right graph vertically', () => {
+        const position = getInitialViewportPosition({
+            canvasHeight: 1000,
+            layoutDirection: 'LR',
+            leftInset: LEFT_INSET,
+            nodesBounds: {height: 400, width: 1200, x: 30, y: 50},
+            offsetX: 16,
+            topInset: TOP_INSET,
         });
+
+        expect(30 + position.x).toBe(96);
+        expect(250 + position.y).toBe(500);
     });
 
-    it('adds the inset on top of the overlay panels offset', () => {
+    it('should fall back to the top placement for a left-to-right graph taller than the canvas', () => {
         expect(
-            getInitialViewportPosition({canvasHeight: 650, flowHeight: 650, layoutDirection: 'LR', offsetX: -200})
-        ).toEqual({
-            x: -200 + CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET,
-            y: 0,
-        });
+            getInitialViewportPosition({
+                canvasHeight: 600,
+                layoutDirection: 'LR',
+                leftInset: LEFT_INSET,
+                nodesBounds: {height: 900, width: 1200, x: 0, y: 0},
+                offsetX: 0,
+                topInset: TOP_INSET,
+            })
+        ).toEqual({x: LEFT_INSET, y: TOP_INSET});
     });
 
-    it('moves the left-to-right row onto the measured flow center', () => {
+    it('should fall back to the top placement while the canvas has not been measured', () => {
         expect(
-            getInitialViewportPosition({canvasHeight: 650, flowHeight: 700, layoutDirection: 'LR', offsetX: 0})
-        ).toEqual({
-            x: CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET,
-            y: 25,
-        });
-    });
-
-    it('trusts the layout centering before the flow is measured', () => {
-        expect(
-            getInitialViewportPosition({canvasHeight: 650, flowHeight: 0, layoutDirection: 'LR', offsetX: 0})
-        ).toEqual({
-            x: CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET,
-            y: 0,
-        });
+            getInitialViewportPosition({
+                canvasHeight: 0,
+                layoutDirection: 'LR',
+                leftInset: LEFT_INSET,
+                nodesBounds: {height: 400, width: 1200, x: 0, y: 0},
+                offsetX: 0,
+                topInset: TOP_INSET,
+            })
+        ).toEqual({x: LEFT_INSET, y: TOP_INSET});
     });
 });

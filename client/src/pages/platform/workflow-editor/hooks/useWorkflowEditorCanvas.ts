@@ -549,7 +549,7 @@ const useWorkflowEditorCanvas = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowUuid]);
 
-    useInitialViewport({canvasHeight, enabled: !fitViewOnLoad, getViewportOffsetX, workflowUuid});
+    useInitialViewport({enabled: !fitViewOnLoad, getViewportOffsetX, workflowId});
 
     return {
         edgeTypes,

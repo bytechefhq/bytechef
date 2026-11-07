@@ -1,25 +1,36 @@
-import {CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET, CANVAS_TOP_OFFSET, LayoutDirectionType} from '@/shared/constants';
-import {XYPosition} from '@xyflow/react';
+import {LayoutDirectionType} from '@/shared/constants';
+import {Rect, XYPosition} from '@xyflow/react';
 
 interface GetInitialViewportPositionProps {
     canvasHeight: number;
-    flowHeight: number;
     layoutDirection: LayoutDirectionType;
+    leftInset: number;
+    nodesBounds: Rect;
     offsetX: number;
+    topInset: number;
 }
 
 export default function getInitialViewportPosition({
     canvasHeight,
-    flowHeight,
     layoutDirection,
+    leftInset,
+    nodesBounds,
     offsetX,
+    topInset,
 }: GetInitialViewportPositionProps): XYPosition {
-    if (layoutDirection === 'LR') {
-        return {
-            x: offsetX + CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET,
-            y: flowHeight ? Math.round((flowHeight - canvasHeight) / 2) : 0,
-        };
+    const topAlignedY = topInset - nodesBounds.y;
+
+    if (layoutDirection !== 'LR') {
+        return {x: offsetX, y: topAlignedY};
     }
 
-    return {x: offsetX, y: CANVAS_TOP_OFFSET};
+    const x = offsetX + leftInset - nodesBounds.x;
+
+    if (canvasHeight <= 0) {
+        return {x, y: topAlignedY};
+    }
+
+    const centeredY = canvasHeight / 2 - (nodesBounds.y + nodesBounds.height / 2);
+
+    return {x, y: Math.max(centeredY, topAlignedY)};
 }
