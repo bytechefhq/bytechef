@@ -384,6 +384,16 @@ public class ManagementMcpServerConfiguration {
         return ToolCallbackProvider.from(toolCallbacks);
     }
 
+    List<McpServerFeatures.AsyncToolSpecification> toolSpecifications() {
+        return toolSpecifications(List.of(toolCallbackProvider().getToolCallbacks()));
+    }
+
+    private List<McpServerFeatures.AsyncToolSpecification> toolSpecifications(List<ToolCallback> toolCallbacks) {
+        return attachMcpAppUi(
+            ToolErrorReportingToolSpecifications.toAsyncToolSpecifications(toolCallbacks),
+            collectMcpAppUiDescriptors());
+    }
+
     private McpAsyncServer createMcpAsyncServer(
         WebMvcStreamableServerTransportProvider transportProvider, String publicUrl) {
 
@@ -407,9 +417,7 @@ public class ManagementMcpServerConfiguration {
                     .prompts(true)
                     .logging()
                     .build())
-            .tools(attachMcpAppUi(
-                ToolErrorReportingToolSpecifications.toAsyncToolSpecifications(toolCallbacks),
-                collectMcpAppUiDescriptors()))
+            .tools(toolSpecifications(toolCallbacks))
             .resources(mcpAppResourceSpecifications(publicUrl))
             .build();
     }

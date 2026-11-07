@@ -19,11 +19,16 @@ package com.bytechef.automation.data.table.tool;
 import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
+import com.bytechef.automation.data.table.tool.datatable.QueryDataTableToolCallback;
 import com.bytechef.commons.util.JsonUtils;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,12 +41,24 @@ import org.springframework.context.annotation.Configuration;
 public class DataTableViewerMcpContributorConfiguration {
 
     @Bean
-    McpServerToolCallbackContributor dataTableViewerMcpContributor() {
+    McpServerToolCallbackContributor dataTableViewerMcpContributor(
+        ObjectProvider<WorkspaceDataTableFacade> workspaceDataTableFacadeProvider,
+        ObjectProvider<WorkspaceFacade> workspaceFacadeProvider) {
+
         return new McpServerToolCallbackContributor() {
 
             @Override
             public List<ToolCallback> getToolCallbacks() {
-                return List.of();
+                WorkspaceDataTableFacade workspaceDataTableFacade = workspaceDataTableFacadeProvider.getIfAvailable();
+                WorkspaceFacade workspaceFacade = workspaceFacadeProvider.getIfAvailable();
+
+                if (workspaceDataTableFacade == null || workspaceFacade == null) {
+                    return List.of();
+                }
+
+                return List.of(
+                    new WorkspaceScopedFlatToolCallback(
+                        new QueryDataTableToolCallback(workspaceDataTableFacade), workspaceFacade));
             }
 
             @Override

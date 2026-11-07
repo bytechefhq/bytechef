@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.server.config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +41,9 @@ final class ManagementMcpInstructions {
 
     private static final List<String> AUTHORING_TOOL_NAMES = List.of(
         "updateWorkflow", "createProjectWorkflow", "getWorkflowBuildInstructions");
+
+    private static final List<String> VIEWER_TOOL_NAMES = List.of(
+        "getWorkflow", "queryDataTable", "getAssetFileContent");
 
     private ManagementMcpInstructions() {
     }
@@ -92,6 +96,12 @@ final class ManagementMcpInstructions {
         }
 
         paragraphs.add(search());
+
+        if (VIEWER_TOOL_NAMES.stream()
+            .anyMatch(names::contains)) {
+
+            paragraphs.add(viewers(names));
+        }
 
         if (names.containsAll(MCP_SERVER_TOOL_NAMES)) {
             paragraphs.add(mcpServers(names));
@@ -226,6 +236,53 @@ final class ManagementMcpInstructions {
             To find something, listProjects and listWorkflows take an optional query that matches names and \
             descriptions; searchWorkflows without a projectId searches the workflows of every project in a \
             workspace. getProject also reports publication state, the last version and deployments.""";
+    }
+
+    private static String viewers(Set<String> names) {
+        List<String> viewers = new ArrayList<>();
+
+        if (names.contains("getWorkflow")) {
+            viewers.add("getWorkflow shows a workflow's canvas" + findHint(names, "listWorkflows", "searchWorkflows"));
+        }
+
+        if (names.contains("queryDataTable")) {
+            viewers.add("queryDataTable shows the rows of a data table by its dataTableId");
+        }
+
+        if (names.contains("getAssetFileContent")) {
+            viewers.add("getAssetFileContent shows the content of a text file by its id");
+        }
+
+        StringBuilder text = new StringBuilder("In clients that support MCP Apps these read-only tools render as a ")
+            .append("viewer: ")
+            .append(String.join("; ", viewers))
+            .append(". When the user asks to see, show, open or review one of these, call its tool rather than ")
+            .append("describing it from memory; the client already displays the result, so reply with a short ")
+            .append("summary instead of repeating the content.");
+
+        List<String> unlistedNames = registered(names, "queryDataTable", "getAssetFileContent");
+
+        if (!unlistedNames.isEmpty()) {
+            text.append(" ")
+                .append(String.join(" and ", unlistedNames))
+                .append(unlistedNames.size() > 1 ? " take" : " takes")
+                .append(" a workspaceId and an environment and no list tool finds the id; ask the user for it, ")
+                .append("which the ByteChef UI shows.");
+        }
+
+        return text.toString();
+    }
+
+    private static String findHint(Set<String> names, String... lookupNames) {
+        List<String> lookups = registered(names, lookupNames);
+
+        return lookups.isEmpty() ? "" : " (find its id by name with " + String.join(" or ", lookups) + ")";
+    }
+
+    private static List<String> registered(Set<String> names, String... candidateNames) {
+        return Arrays.stream(candidateNames)
+            .filter(names::contains)
+            .toList();
     }
 
     private static String mcpServers(Set<String> names) {

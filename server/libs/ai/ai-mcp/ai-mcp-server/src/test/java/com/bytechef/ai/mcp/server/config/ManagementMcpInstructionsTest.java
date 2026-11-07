@@ -52,7 +52,37 @@ class ManagementMcpInstructionsTest {
         "listMcpServers", "updateMcpProjectWorkflowParameters", "lookupPropertyOptions", "buildAiAgent",
         "listAiAgents", "getAiAgent", "createAiAgent", "updateAiAgent", "addAiAgentElement", "updateAiAgentElement",
         "deleteAiAgentElement", "addAiAgentChannel", "deleteAiAgentChannel", "updateAiAgentSettings",
-        "searchAiAgentTools", "searchAiAgentReferences");
+        "searchAiAgentTools", "searchAiAgentReferences", "queryDataTable", "getAssetFileContent");
+
+    @Test
+    void testDescribesTheViewerReadToolsWhenRegistered() {
+        Set<String> toolNames = deterministicToolNames();
+
+        toolNames.addAll(List.of("queryDataTable", "getAssetFileContent"));
+
+        assertThat(ManagementMcpInstructions.build(toolNames))
+            .contains(
+                "getWorkflow shows a workflow's canvas (find its id by name with listWorkflows or searchWorkflows)",
+                "queryDataTable shows the rows of a data table", "getAssetFileContent shows the content",
+                "When the user asks to see, show, open or review one of these, call its tool",
+                "instead of repeating the content",
+                "queryDataTable and getAssetFileContent take a workspaceId and an environment");
+    }
+
+    @Test
+    void testDescribesOnlyTheRegisteredViewerReadTool() {
+        Set<String> toolNames = deterministicToolNames();
+
+        toolNames.add("getAssetFileContent");
+
+        String instructions = ManagementMcpInstructions.build(toolNames);
+
+        assertThat(instructions)
+            .contains("getAssetFileContent shows the content", "getAssetFileContent takes a workspaceId")
+            .doesNotContain("queryDataTable");
+
+        assertNoAbsentToolNamed(toolNames);
+    }
 
     @Test
     void testOmitsIntelligentToolsWhenNotRegistered() {
