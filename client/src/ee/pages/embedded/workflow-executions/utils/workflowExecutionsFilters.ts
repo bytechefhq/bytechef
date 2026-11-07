@@ -1,3 +1,9 @@
+import {
+    WORKFLOW_EXECUTIONS_SOURCE_OPTIONS,
+    WorkflowExecutionsSource,
+    WorkflowExecutionsSourceType,
+} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsSources';
+
 interface IntegrationInstanceConfigurationOptionI {
     id?: number;
     integration?: {componentName?: string; name?: string};
@@ -11,7 +17,6 @@ interface IntegrationOptionI {
 }
 
 interface WorkflowExecutionsFiltersParamsI {
-    automations: number;
     connectedUserId?: number;
     connectedUserProjects?: Array<{connectedUser: {externalId: string; id: number | string}}>;
     connectedUsers?: Array<{externalId: string; id?: number}>;
@@ -22,6 +27,7 @@ interface WorkflowExecutionsFiltersParamsI {
     integrationInstanceConfigurations?: IntegrationInstanceConfigurationOptionI[];
     integrations?: IntegrationOptionI[];
     startDate?: Date;
+    source: WorkflowExecutionsSourceType;
     status?: string;
     workflowId?: string;
     workflows?: Array<{id?: string; label?: string}>;
@@ -35,7 +41,6 @@ export const getIntegrationInstanceConfigurationIntegrationName = (
     integrationInstanceConfiguration?.integration?.name;
 
 export const getWorkflowExecutionsFilters = ({
-    automations,
     connectedUserId,
     connectedUserProjects,
     connectedUsers,
@@ -45,6 +50,7 @@ export const getWorkflowExecutionsFilters = ({
     integrationInstanceConfigurationId,
     integrationInstanceConfigurations,
     integrations,
+    source,
     startDate,
     status,
     workflowId,
@@ -55,7 +61,7 @@ export const getWorkflowExecutionsFilters = ({
     let integrationLabel: string | undefined;
     let workflowLabel: string | undefined;
 
-    if (automations) {
+    if (source === WorkflowExecutionsSource.Automations) {
         if (connectedUserId) {
             const connectedUserProject = connectedUserProjects?.find(
                 (connectedUserProject) => +connectedUserProject.connectedUser.id === connectedUserId
@@ -66,12 +72,12 @@ export const getWorkflowExecutionsFilters = ({
                 : String(connectedUserId);
         }
     } else {
-        if (integrationId) {
+        if (source === WorkflowExecutionsSource.Integrations && integrationId) {
             integrationLabel =
                 integrations?.find((integration) => integration.id === integrationId)?.name || String(integrationId);
         }
 
-        if (integrationInstanceConfigurationId) {
+        if (source === WorkflowExecutionsSource.Integrations && integrationInstanceConfigurationId) {
             const selectedIntegrationInstanceConfiguration =
                 integrationInstanceConfigurations?.find(
                     (configuration) => configuration.id === integrationInstanceConfigurationId
@@ -91,12 +97,15 @@ export const getWorkflowExecutionsFilters = ({
         }
     }
 
-    if (workflowId) {
+    if (source !== WorkflowExecutionsSource.Any && workflowId) {
         workflowLabel = workflows?.find((workflow) => workflow.id === workflowId)?.label || workflowId;
     }
 
     return [
-        {label: 'Type', value: automations ? 'Automations' : 'Integrations'},
+        {
+            label: 'Source',
+            value: WORKFLOW_EXECUTIONS_SOURCE_OPTIONS.find((option) => option.value === source)?.label,
+        },
         {label: 'Status', value: status},
         {label: 'Start date', value: startDate?.toLocaleDateString()},
         {label: 'End date', value: endDate?.toLocaleDateString()},

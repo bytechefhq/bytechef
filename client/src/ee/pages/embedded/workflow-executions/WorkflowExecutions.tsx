@@ -7,13 +7,24 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import AnyWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AnyWorkflowExecutionsTable';
 import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
 import useEmbeddedWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {
+    AnyWorkflowExecutionRowI,
+    toAnyWorkflowExecutionRow,
+} from '@/ee/pages/embedded/workflow-executions/utils/anyWorkflowExecutions';
+import {
     getIntegrationInstanceConfigurationIntegrationName,
     getWorkflowExecutionsFilters,
 } from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsFilters';
+import {
+    WORKFLOW_EXECUTIONS_SOURCE_OPTIONS,
+    WorkflowExecutionsSource,
+    WorkflowExecutionsSourceType,
+    getWorkflowExecutionsSource,
+} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsSources';
 import {Integration, IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {
@@ -107,9 +118,6 @@ export const WorkflowExecutions = () => {
     const [searchParams] = useSearchParams();
 
     const [connectedUserSearch, setConnectedUserSearch] = useState<string>('');
-    const [filterAutomations, setFilterAutomations] = useState<number>(
-        searchParams.get('automations') ? +searchParams.get('automations')! : 0
-    );
     const [filterConnectedUserId, setFilterConnectedUserId] = useState<number | undefined>(
         searchParams.get('connectedUserId') ? +searchParams.get('connectedUserId')! : undefined
     );
@@ -128,6 +136,9 @@ export const WorkflowExecutions = () => {
     );
     const [filterPageNumber, setFilterPageNumber] = useState<number | undefined>(
         searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined
+    );
+    const [filterSource, setFilterSource] = useState<WorkflowExecutionsSourceType>(
+        getWorkflowExecutionsSource(searchParams.get('source'))
     );
     const [filterStatus, setFilterStatus] = useState<GetWorkflowExecutionsPageJobStatusEnum | undefined>(
         searchParams.get('status') ? (searchParams.get('status')! as GetWorkflowExecutionsPageJobStatusEnum) : undefined
@@ -182,12 +193,12 @@ export const WorkflowExecutions = () => {
             integrationId: filterIntegrationId,
             ...(connectedUserSearch ? {search: connectedUserSearch} : {}),
         },
-        !filterAutomations
+        filterSource !== WorkflowExecutionsSource.Automations
     );
 
     const {data: selectedConnectedUser} = useGetConnectedUserQuery(
         filterConnectedUserId!,
-        !!filterConnectedUserId && !filterAutomations
+        !!filterConnectedUserId && filterSource !== WorkflowExecutionsSource.Automations
     );
 
     const {
@@ -197,7 +208,7 @@ export const WorkflowExecutions = () => {
         workflowExecutionsError,
         workflowExecutionsIsFetching,
         workflowExecutionsIsLoading,
-    } = useWorkflowExecutions(filterAutomations, {
+    } = useWorkflowExecutions(filterSource, {
         connectedUserId: filterConnectedUserId,
         environmentId: currentEnvironmentId,
         id: currentWorkspaceId!,
@@ -282,16 +293,19 @@ export const WorkflowExecutions = () => {
             ? "You don't have any executed workflows yet."
             : 'There is no executed workflows for the current criteria.';
 
-    const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecution: object) =>
-        filterAutomations
+    const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecution: object) => {
+        if (filterSource === WorkflowExecutionsSource.Any) {
+            return toAnyWorkflowExecutionRow(workflowExecution);
+        }
+
+        return filterSource === WorkflowExecutionsSource.Automations
             ? AutomationWorkflowExecutionFromJSON(workflowExecution)
-            : EmbeddedWorkflowExecutionFromJSON(workflowExecution)
-    );
+            : EmbeddedWorkflowExecutionFromJSON(workflowExecution);
+    });
 
     const activeFilters = useMemo(
         () =>
             getWorkflowExecutionsFilters({
-                automations: filterAutomations,
                 connectedUserId: filterConnectedUserId,
                 connectedUserProjects,
                 connectedUsers,
@@ -301,22 +315,24 @@ export const WorkflowExecutions = () => {
                 integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
                 integrationInstanceConfigurations,
                 integrations,
+                source: filterSource,
                 startDate: filterStartDate,
                 status: filterStatus,
                 workflowId: filterWorkflowId,
-                workflows: filterAutomations
-                    ? automationWorkflows.map((workflow) => ({id: workflow.id, label: workflow.label ?? undefined}))
-                    : workflows,
+                workflows:
+                    filterSource === WorkflowExecutionsSource.Automations
+                        ? automationWorkflows.map((workflow) => ({id: workflow.id, label: workflow.label ?? undefined}))
+                        : workflows,
             }),
         [
             automationWorkflows,
             connectedUserProjects,
             connectedUsers,
-            filterAutomations,
             filterConnectedUserId,
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
+            filterSource,
             filterStartDate,
             filterStatus,
             filterWorkflowId,
@@ -328,7 +344,7 @@ export const WorkflowExecutions = () => {
     );
 
     function filter(
-        automations?: number,
+        source: WorkflowExecutionsSourceType,
         status?: GetWorkflowExecutionsPageJobStatusEnum,
         startDate?: Date,
         endDate?: Date,
@@ -339,17 +355,19 @@ export const WorkflowExecutions = () => {
         pageNumber?: number
     ) {
         navigate(
-            `/embedded/workflow-executions?automations=${automations ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&connectedUserId=${connectedUserId ? connectedUserId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/embedded/workflow-executions?source=${source}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&connectedUserId=${connectedUserId ? connectedUserId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
-    const handleAutomationChange = (automations: string) => {
-        setFilterAutomations(Number(automations));
+    const handleSourceChange = (value: string) => {
+        const source = getWorkflowExecutionsSource(value);
+
+        setFilterSource(source);
         setFilterPageNumber(undefined);
         setFilterWorkflowId(undefined);
 
         filter(
-            Number(automations),
+            source,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -380,7 +398,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(undefined);
 
         filter(
-            filterAutomations,
+            filterSource,
             filterStatus,
             filterStartDate,
             normalizedDate,
@@ -403,7 +421,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(undefined);
 
         filter(
-            filterAutomations,
+            filterSource,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -426,7 +444,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(undefined);
 
         filter(
-            filterAutomations,
+            filterSource,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -442,7 +460,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(pageNumber);
 
         filter(
-            filterAutomations,
+            filterSource,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -463,7 +481,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(undefined);
 
         filter(
-            filterAutomations,
+            filterSource,
             filterStatus,
             normalizedDate,
             filterEndDate,
@@ -486,7 +504,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(undefined);
 
         filter(
-            filterAutomations,
+            filterSource,
             status,
             filterStartDate,
             filterEndDate,
@@ -509,7 +527,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(undefined);
 
         filter(
-            filterAutomations,
+            filterSource,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -532,7 +550,7 @@ export const WorkflowExecutions = () => {
         setFilterPageNumber(undefined);
 
         filter(
-            filterAutomations,
+            filterSource,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -551,7 +569,7 @@ export const WorkflowExecutions = () => {
         setFilterWorkflowId(undefined);
 
         filter(
-            filterAutomations,
+            filterSource,
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -563,7 +581,7 @@ export const WorkflowExecutions = () => {
         );
     });
 
-    const linkedExecutionAutomations = searchParams.get('automations');
+    const linkedExecutionSource = getWorkflowExecutionsSource(searchParams.get('source'));
     const linkedExecutionIdParameter = searchParams.get('id');
 
     useEffect(() => {
@@ -573,7 +591,7 @@ export const WorkflowExecutions = () => {
             return;
         }
 
-        if (linkedExecutionAutomations === '1') {
+        if (linkedExecutionSource === WorkflowExecutionsSource.Automations) {
             setEmbeddedWorkflowExecutionSheetOpen(false);
             setAutomationWorkflowExecutionId(linkedExecutionId, 'JOB');
             setAutomationWorkflowExecutionSheetOpen(true);
@@ -583,8 +601,8 @@ export const WorkflowExecutions = () => {
             setEmbeddedWorkflowExecutionSheetOpen(true);
         }
     }, [
-        linkedExecutionAutomations,
         linkedExecutionIdParameter,
+        linkedExecutionSource,
         setAutomationWorkflowExecutionId,
         setAutomationWorkflowExecutionSheetOpen,
         setEmbeddedWorkflowExecutionId,
@@ -643,17 +661,19 @@ export const WorkflowExecutions = () => {
             leftSidebarBody={
                 <div className="space-y-4 px-2">
                     <div className="flex flex-col space-y-2">
-                        <Label>Type</Label>
+                        <Label>Source</Label>
 
-                        <Select onValueChange={handleAutomationChange} value={String(filterAutomations)}>
-                            <SelectTrigger className="w-full bg-background">
-                                <SelectValue placeholder="Select environment" />
+                        <Select onValueChange={handleSourceChange} value={filterSource}>
+                            <SelectTrigger aria-label="Source" className="w-full bg-background">
+                                <SelectValue placeholder="Select source" />
                             </SelectTrigger>
 
                             <SelectContent>
-                                <SelectItem value="0">Integrations</SelectItem>
-
-                                <SelectItem value="1">Automations</SelectItem>
+                                {WORKFLOW_EXECUTIONS_SOURCE_OPTIONS.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
@@ -676,7 +696,7 @@ export const WorkflowExecutions = () => {
                         <DatePicker onChange={handleEndDateChange} value={filterEndDate} />
                     </div>
 
-                    {!filterAutomations && (
+                    {filterSource === WorkflowExecutionsSource.Integrations && (
                         <div className="flex flex-col space-y-2">
                             <Label>Integration</Label>
 
@@ -696,7 +716,7 @@ export const WorkflowExecutions = () => {
                         </div>
                     )}
 
-                    {!filterAutomations && (
+                    {filterSource === WorkflowExecutionsSource.Integrations && (
                         <div className="flex flex-col space-y-2">
                             <Label>Instance Configuration</Label>
 
@@ -731,7 +751,7 @@ export const WorkflowExecutions = () => {
                         </div>
                     )}
 
-                    {!filterAutomations && (
+                    {filterSource !== WorkflowExecutionsSource.Automations && (
                         <div className="flex flex-col space-y-2">
                             <Label>Connected User</Label>
 
@@ -751,7 +771,7 @@ export const WorkflowExecutions = () => {
                         </div>
                     )}
 
-                    {!!filterAutomations && (
+                    {filterSource === WorkflowExecutionsSource.Automations && (
                         <div className="flex flex-col space-y-2">
                             <Label>Connected Users</Label>
 
@@ -769,7 +789,7 @@ export const WorkflowExecutions = () => {
                         </div>
                     )}
 
-                    {!!filterAutomations && (
+                    {filterSource === WorkflowExecutionsSource.Automations && (
                         <div className="flex flex-col space-y-2">
                             <Label>Workflow</Label>
 
@@ -789,7 +809,7 @@ export const WorkflowExecutions = () => {
                         </div>
                     )}
 
-                    {!filterAutomations && (
+                    {filterSource === WorkflowExecutionsSource.Integrations && (
                         <div className="flex flex-col space-y-2">
                             <Label>Workflow</Label>
 
@@ -815,7 +835,9 @@ export const WorkflowExecutions = () => {
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
                 {workflowExecutions && workflowExecutions.length > 0 ? (
-                    filterAutomations ? (
+                    filterSource === WorkflowExecutionsSource.Any ? (
+                        <AnyWorkflowExecutionsTable data={workflowExecutions as AnyWorkflowExecutionRowI[]} />
+                    ) : filterSource === WorkflowExecutionsSource.Automations ? (
                         <AutomationWorkflowExecutionsTable data={workflowExecutions as AutomationWorkflowExecution[]} />
                     ) : (
                         <EmbeddedWorkflowExecutionsTable data={workflowExecutions as EmbeddedWorkflowExecution[]} />

@@ -39,6 +39,7 @@ const data = [
             startDate: new Date('2026-10-20T10:00:00Z'),
             status: 'COMPLETED',
         },
+        project: {name: 'Order Processing'},
         projectDeployment: {name: 'Load Test (acme-user-42)', projectVersion: 4},
         workflow: {label: 'Heavy orders load test'},
     },
@@ -57,6 +58,15 @@ describe('AutomationWorkflowExecutionsTable', () => {
         expect(screen.getByText('Connected user')).toBeInTheDocument();
         expect(screen.getByText('2000ms')).toBeInTheDocument();
         expect(screen.getByText('Actions').closest('th')).toHaveClass('sticky', 'right-0');
+    });
+
+    it('renders the project of each run before its connected user', () => {
+        render(<AutomationWorkflowExecutionsTable data={data} />);
+
+        const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+
+        expect(headers.indexOf('Project')).toBe(headers.indexOf('Connected user') - 1);
+        expect(screen.getByRole('cell', {name: 'Order Processing'})).toBeInTheDocument();
     });
 
     it("renders each run's version from its deployment", () => {
