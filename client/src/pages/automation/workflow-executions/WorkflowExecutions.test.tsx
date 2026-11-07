@@ -164,7 +164,7 @@ describe('WorkflowExecutions empty states', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Clear filters'}));
 
         expect(hoisted.navigate).toHaveBeenCalledWith(
-            '/automation/workflow-executions?source=PROJECT&status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
+            '/automation/workflow-executions?source=ANY&status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
         );
         expect(screen.getByRole('heading', {level: 2, name: 'No workflow runs yet'})).toBeInTheDocument();
     });
@@ -187,12 +187,12 @@ describe('WorkflowExecutions empty states', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Go to first page'}));
 
         expect(hoisted.navigate).toHaveBeenCalledWith(
-            '/automation/workflow-executions?source=PROJECT&status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
+            '/automation/workflow-executions?source=ANY&status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
         );
     });
 });
 
-describe('WorkflowExecutions type', () => {
+describe('WorkflowExecutions source', () => {
     beforeEach(() => {
         Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || vi.fn();
         Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture || vi.fn();
@@ -203,18 +203,54 @@ describe('WorkflowExecutions type', () => {
         id: 7,
         job: {id: '7', label: 'Report', status: 'COMPLETED'},
         project: {id: 3, name: 'Sales'},
-        projectDeployment: {id: 5, name: 'Sales MCP', projectVersion: 1},
+        projectDeployment: {id: 5, name: '__MCP_SERVER__5_v1', projectVersion: 1},
+        source: 'MCP_SERVER',
+        sourceName: 'Sales MCP',
     };
 
-    it('requests project executions and keeps the Deployment column and filter by default', () => {
+    const projectExecution = {
+        id: 8,
+        job: {id: '8', label: 'Invoice', status: 'COMPLETED'},
+        project: {id: 3, name: 'Sales'},
+        projectDeployment: {id: 6, name: 'Sales production', projectVersion: 1},
+        source: 'PROJECT_DEPLOYMENT',
+    };
+
+    it('requests the executions of every source by default and shows where each one came from', () => {
+        hoisted.content = [mcpExecution, projectExecution];
+
+        renderWorkflowExecutions();
+
+        expect(hoisted.executionsRequests.at(-1)?.source).toBe('ANY');
+        expect(screen.getByRole('columnheader', {name: 'Source'})).toBeInTheDocument();
+        expect(screen.getByText('Deployment', {selector: 'label'})).toBeInTheDocument();
+        expect(screen.getByRole('combobox', {name: 'Source'})).toHaveTextContent('Any');
+        expect(screen.getByRole('img', {name: 'MCP server'})).toBeInTheDocument();
+        expect(screen.getByRole('img', {name: 'Project deployment'})).toBeInTheDocument();
+    });
+
+    it('shows the source after the workflow as an icon followed by its name and drops the Deployment column', () => {
         hoisted.content = [mcpExecution];
 
         renderWorkflowExecutions();
 
-        expect(hoisted.executionsRequests.at(-1)?.source).toBe('PROJECT');
+        const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+
+        expect(headers.indexOf('Source')).toBe(headers.indexOf('Workflow') + 1);
+        expect(headers).not.toContain('Deployment');
+        expect(screen.getByRole('img', {name: 'MCP server'}).closest('td')).toHaveTextContent(/^Sales MCP$/);
+    });
+
+    it('keeps the Deployment column and filter for project executions', () => {
+        hoisted.content = [projectExecution];
+
+        renderWorkflowExecutions(['/?source=PROJECT_DEPLOYMENT']);
+
+        expect(hoisted.executionsRequests.at(-1)?.source).toBe('PROJECT_DEPLOYMENT');
         expect(screen.getByRole('columnheader', {name: 'Deployment'})).toBeInTheDocument();
         expect(screen.getByText('Deployment', {selector: 'label'})).toBeInTheDocument();
-        expect(screen.getByRole('combobox', {name: 'Type'})).toHaveTextContent('Projects');
+        expect(screen.getByRole('combobox', {name: 'Source'})).toHaveTextContent('Project Deployments');
+        expect(screen.queryByRole('img', {name: 'Project deployment'})).not.toBeInTheDocument();
     });
 
     it('requests the executions of the source in the query and names the deployment column after it', () => {
@@ -225,40 +261,43 @@ describe('WorkflowExecutions type', () => {
         expect(hoisted.executionsRequests.at(-1)?.source).toBe('MCP_SERVER');
         expect(screen.getByRole('columnheader', {name: 'MCP server'})).toBeInTheDocument();
         expect(screen.queryByRole('columnheader', {name: 'Deployment'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('columnheader', {name: 'Source'})).not.toBeInTheDocument();
         expect(screen.queryByText('Deployment', {selector: 'label'})).not.toBeInTheDocument();
-        expect(screen.getByRole('combobox', {name: 'Type'})).toHaveTextContent('MCP Servers');
+        expect(screen.getByRole('combobox', {name: 'Source'})).toHaveTextContent('MCP Servers');
+        expect(screen.getByText('Sales MCP')).toBeInTheDocument();
+        expect(screen.queryByText('__MCP_SERVER__5_v1')).not.toBeInTheDocument();
     });
 
-    it('falls back to project executions for an unknown source', () => {
+    it('falls back to the executions of every source for an unknown source', () => {
         renderWorkflowExecutions(['/?source=UNKNOWN']);
 
-        expect(hoisted.executionsRequests.at(-1)?.source).toBe('PROJECT');
+        expect(hoisted.executionsRequests.at(-1)?.source).toBe('ANY');
     });
 
-    it('keeps the filters visible for a source without executions and clears back to projects', async () => {
+    it('keeps the filters visible for a source without executions and clears back to every source', async () => {
         renderWorkflowExecutions(['/?source=A2A_SERVER']);
 
         expect(screen.getByText('No Matching Executions')).toBeInTheDocument();
-        expect(screen.getByRole('combobox', {name: 'Type'})).toHaveTextContent('A2A Servers');
+        expect(screen.getByRole('combobox', {name: 'Source'})).toHaveTextContent('A2A Servers');
 
         await userEvent.click(screen.getByRole('button', {name: 'Clear filters'}));
 
         expect(hoisted.navigate).toHaveBeenCalledWith(
-            '/automation/workflow-executions?source=PROJECT&status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
+            '/automation/workflow-executions?source=ANY&status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
         );
-        expect(hoisted.executionsRequests.at(-1)?.source).toBe('PROJECT');
+        expect(hoisted.executionsRequests.at(-1)?.source).toBe('ANY');
     });
 
     it.each([
-        ['CE', ['Projects', 'MCP Servers', 'A2A Servers']],
-        ['EE', ['Projects', 'MCP Servers', 'A2A Servers', 'API Collections']],
-    ])('offers the %s sources in the Type select', async (edition, expectedSources) => {
+        ['CE', ['Any', 'Project Deployments', 'MCP Servers', 'A2A Servers']],
+        ['EE', ['Any', 'Project Deployments', 'MCP Servers', 'A2A Servers', 'API Collections']],
+    ])('offers the %s sources in the Source select', async (edition, expectedSources) => {
         hoisted.content = [mcpExecution];
         hoisted.edition = edition;
 
         renderWorkflowExecutions();
 
-        await userEvent.click(screen.getByRole('combobox', {name: 'Type'}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'Source'}));
 
         expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual(expectedSources);
     });
@@ -268,7 +307,7 @@ describe('WorkflowExecutions type', () => {
 
         renderWorkflowExecutions(['/?projectDeploymentId=5']);
 
-        await userEvent.click(screen.getByRole('combobox', {name: 'Type'}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'Source'}));
         await userEvent.click(screen.getByRole('option', {name: 'MCP Servers'}));
 
         expect(hoisted.navigate).toHaveBeenLastCalledWith(

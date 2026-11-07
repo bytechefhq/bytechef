@@ -7,12 +7,20 @@ interface WorkflowExecutionsSourceI {
     value: GetWorkflowExecutionsPageSourceEnum;
 }
 
+export const DEFAULT_WORKFLOW_EXECUTIONS_SOURCE = GetWorkflowExecutionsPageSourceEnum.Any;
+
 export const WORKFLOW_EXECUTIONS_SOURCES: WorkflowExecutionsSourceI[] = [
     {
         deploymentHeader: 'Deployment',
         eeOnly: false,
-        label: 'Projects',
-        value: GetWorkflowExecutionsPageSourceEnum.Project,
+        label: 'Any',
+        value: GetWorkflowExecutionsPageSourceEnum.Any,
+    },
+    {
+        deploymentHeader: 'Deployment',
+        eeOnly: false,
+        label: 'Project Deployments',
+        value: GetWorkflowExecutionsPageSourceEnum.ProjectDeployment,
     },
     {
         deploymentHeader: 'MCP server',
