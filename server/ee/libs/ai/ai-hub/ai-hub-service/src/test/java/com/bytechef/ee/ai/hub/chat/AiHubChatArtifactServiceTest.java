@@ -413,6 +413,60 @@ class AiHubChatArtifactServiceTest {
     }
 
     @Test
+    void testDeleteReferenceRemovesCustomComponentReferencedRow() {
+        AiHubChat chat = buildChat(CHAT_ID, USER_ID, THREAD_ID);
+        AiHubChatArtifact referenced = buildArtifact(605L, "CUSTOM_COMPONENT_REFERENCED", "7");
+
+        when(chatArtifactRepository.findById(605L)).thenReturn(Optional.of(referenced));
+        when(chatService.getViewable(CHAT_ID, WORKSPACE_ID, USER_ID)).thenReturn(chat);
+
+        chatArtifactService.deleteReference(605L, WORKSPACE_ID, USER_ID);
+
+        verify(chatArtifactRepository).deleteById(605L);
+    }
+
+    @Test
+    void testDeleteReferenceRemovesCodeWorkflowReferencedRow() {
+        AiHubChat chat = buildChat(CHAT_ID, USER_ID, THREAD_ID);
+        AiHubChatArtifact referenced = buildArtifact(606L, "CODE_WORKFLOW_REFERENCED", "11");
+
+        when(chatArtifactRepository.findById(606L)).thenReturn(Optional.of(referenced));
+        when(chatService.getViewable(CHAT_ID, WORKSPACE_ID, USER_ID)).thenReturn(chat);
+
+        chatArtifactService.deleteReference(606L, WORKSPACE_ID, USER_ID);
+
+        verify(chatArtifactRepository).deleteById(606L);
+    }
+
+    @Test
+    void testDeleteReferenceThrowsForACustomComponentReferenceWhenChatNotViewable() {
+        AiHubChatArtifact referenced = buildArtifact(607L, "CUSTOM_COMPONENT_REFERENCED", "7");
+
+        when(chatArtifactRepository.findById(607L)).thenReturn(Optional.of(referenced));
+        when(chatService.getViewable(CHAT_ID, WORKSPACE_ID, OTHER_USER_ID))
+            .thenThrow(new NotFoundException("AiHubChat not found"));
+
+        assertThatThrownBy(() -> chatArtifactService.deleteReference(607L, WORKSPACE_ID, OTHER_USER_ID))
+            .isInstanceOf(NotFoundException.class);
+
+        verify(chatArtifactRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void testDeleteReferenceThrowsForACodeWorkflowReferenceWhenChatNotViewable() {
+        AiHubChatArtifact referenced = buildArtifact(608L, "CODE_WORKFLOW_REFERENCED", "11");
+
+        when(chatArtifactRepository.findById(608L)).thenReturn(Optional.of(referenced));
+        when(chatService.getViewable(CHAT_ID, WORKSPACE_ID, OTHER_USER_ID))
+            .thenThrow(new NotFoundException("AiHubChat not found"));
+
+        assertThatThrownBy(() -> chatArtifactService.deleteReference(608L, WORKSPACE_ID, OTHER_USER_ID))
+            .isInstanceOf(NotFoundException.class);
+
+        verify(chatArtifactRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
     void testDeleteReferenceIsIdempotentWhenRowIsGone() {
         when(chatArtifactRepository.findById(600L)).thenReturn(Optional.empty());
 
@@ -437,7 +491,7 @@ class AiHubChatArtifactServiceTest {
     }
 
     @Test
-    void testDeleteReferenceRefusesReferenceKindsOtherThanWorkflowAndAiAgent() {
+    void testDeleteReferenceRefusesReferenceKindsThatAreNotRemovable() {
         AiHubChatArtifact referenced = buildArtifact(602L, "FILE_REFERENCED", "f-1");
 
         when(chatArtifactRepository.findById(602L)).thenReturn(Optional.of(referenced));
