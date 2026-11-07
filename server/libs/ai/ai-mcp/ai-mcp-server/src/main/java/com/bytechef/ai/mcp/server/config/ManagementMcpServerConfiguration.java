@@ -172,6 +172,12 @@ public class ManagementMcpServerConfiguration {
             McpAppResources.DATA_TABLE_VIEWER_URI, "ByteChef Data Table Viewer",
             "Read-only data table rendered while data tables are queried via MCP tools"));
         resourceSpecifications.addAll(McpApps.getResourceSpecifications(
+            McpAppResources.CODE_WORKFLOW_VIEWER_URI, "ByteChef Code Workflow Viewer",
+            "Read-only code workflow source rendered while code workflows are read via MCP tools"));
+        resourceSpecifications.addAll(McpApps.getResourceSpecifications(
+            McpAppResources.CUSTOM_COMPONENT_VIEWER_URI, "ByteChef Custom Component Viewer",
+            "Read-only custom component source rendered while custom components are read via MCP tools"));
+        resourceSpecifications.addAll(McpApps.getResourceSpecifications(
             McpAppResources.FILE_VIEWER_URI, "ByteChef File Viewer",
             "Read-only file content rendered while asset files are read via MCP tools"));
 

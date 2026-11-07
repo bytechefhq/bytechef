@@ -2,6 +2,8 @@ val mcpAppWidgets =
     mapOf(
         "workflow-editor" to "WorkflowEditor",
         "data-table-viewer" to "DataTableViewer",
+        "code-workflow-viewer" to "CodeWorkflowViewer",
+        "custom-component-viewer" to "CustomComponentViewer",
         "file-viewer" to "FileViewer",
     )
 
