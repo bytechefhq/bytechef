@@ -11,6 +11,7 @@ import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTabl
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
@@ -94,6 +95,11 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
 
     @Override
     public DataTableRow getRow(long dataTableId, long rowId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataTableStorageUsage getStorageUsage() {
         throw new UnsupportedOperationException();
     }
 

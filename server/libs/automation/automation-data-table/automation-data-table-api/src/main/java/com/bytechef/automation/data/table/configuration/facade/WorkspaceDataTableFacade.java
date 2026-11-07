@@ -18,6 +18,7 @@ package com.bytechef.automation.data.table.configuration.facade;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
@@ -62,6 +63,8 @@ public interface WorkspaceDataTableFacade {
     Optional<DataTableRow> fetchRowByExternalId(long dataTableId, String externalId, long environmentId);
 
     DataTableRow getRow(long dataTableId, long rowId, long environmentId);
+
+    DataTableStorageUsage getStorageUsage();
 
     DataTableInfo getTable(long dataTableId, long environmentId);
 

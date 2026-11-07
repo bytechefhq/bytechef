@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -129,13 +130,18 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     };
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final DataTableStorageService dataTableStorageService;
     private final JdbcTemplate jdbcTemplate;
 
     private Boolean returningSupported;
 
     @SuppressFBWarnings("EI")
-    public DataTableRowServiceImpl(ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate) {
+    public DataTableRowServiceImpl(
+        ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate,
+        DataTableStorageService dataTableStorageService) {
+
         this.applicationEventPublisher = applicationEventPublisher;
+        this.dataTableStorageService = dataTableStorageService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -393,6 +399,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @Transactional
     public int importCsv(String baseName, String csv, long environmentId) {
+        dataTableStorageService.checkWithinLimit(csv == null ? 0 : csv.getBytes(StandardCharsets.UTF_8).length);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -544,6 +552,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     public DataTableRow insertRow(
         String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId) {
 
+        dataTableStorageService.checkWithinLimit(0);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -565,6 +575,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @Transactional
     public List<DataTableRow> insertRows(String baseName, List<Map<String, Object>> rowValues, long environmentId) {
+        dataTableStorageService.checkWithinLimit(0);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -605,6 +617,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Transactional
     public List<DataTableRow> insertRows(
         String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
+
+        dataTableStorageService.checkWithinLimit(0);
 
         if (createStrategy == CreateStrategy.UPSERT) {
             boolean missingExternalId = newRows.stream()
@@ -865,6 +879,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
         long environmentId) {
 
+        dataTableStorageService.checkWithinLimit(0);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -961,6 +977,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         conditions.requireAtLeastOneCondition();
 
+        dataTableStorageService.checkWithinLimit(0);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -1029,6 +1047,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Transactional
     public UpsertResult upsertRow(
         String baseName, String externalId, Map<String, Object> values, long environmentId) {
+
+        dataTableStorageService.checkWithinLimit(0);
 
         validateBaseName(baseName);
 

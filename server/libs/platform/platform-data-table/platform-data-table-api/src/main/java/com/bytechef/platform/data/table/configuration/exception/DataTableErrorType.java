@@ -39,6 +39,7 @@ public class DataTableErrorType extends AbstractErrorType {
     public static final DataTableErrorType SORT_INVALID = new DataTableErrorType(113);
     public static final DataTableErrorType BATCH_TOO_LARGE = new DataTableErrorType(114);
     public static final DataTableErrorType CSV_INVALID = new DataTableErrorType(115);
+    public static final DataTableErrorType STORAGE_LIMIT_EXCEEDED = new DataTableErrorType(116);
 
     private DataTableErrorType(int errorKey) {
         super(DataTableErrorType.class, errorKey);

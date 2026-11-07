@@ -104,6 +104,8 @@ public class ApplicationProperties {
      */
     private DataStorage dataStorage;
 
+    private DataTable dataTable = new DataTable();
+
     /**
      * Service discovery configuration
      */
@@ -295,6 +297,10 @@ public class ApplicationProperties {
         return dataStorage;
     }
 
+    public DataTable getDataTable() {
+        return dataTable;
+    }
+
     public DiscoveryService getDiscoveryService() {
         return discoveryService;
     }
@@ -461,6 +467,10 @@ public class ApplicationProperties {
 
     public void setDataStorage(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
+    }
+
+    public void setDataTable(DataTable dataTable) {
+        this.dataTable = dataTable;
     }
 
     public void setDiscoveryService(DiscoveryService discoveryService) {
@@ -3923,6 +3933,19 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+    }
+
+    public static class DataTable {
+
+        private long maxSizeBytes;
+
+        public long getMaxSizeBytes() {
+            return maxSizeBytes;
+        }
+
+        public void setMaxSizeBytes(long maxSizeBytes) {
+            this.maxSizeBytes = maxSizeBytes;
         }
     }
 

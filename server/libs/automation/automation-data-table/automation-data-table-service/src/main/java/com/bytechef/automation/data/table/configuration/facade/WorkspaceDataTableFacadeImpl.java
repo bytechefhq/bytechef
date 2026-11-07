@@ -27,6 +27,7 @@ import com.bytechef.platform.data.table.configuration.exception.DataTableExcepti
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
@@ -36,6 +37,7 @@ import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
 import com.bytechef.platform.data.table.execution.domain.NewRow;
 import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -61,16 +63,19 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
 
     private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
+    private final DataTableStorageService dataTableStorageService;
     private final DataTableTagService dataTableTagService;
     private final WorkspaceDataTableService workspaceDataTableService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceDataTableFacadeImpl(
         DataTableRowService dataTableRowService, DataTableService dataTableService,
-        DataTableTagService dataTableTagService, WorkspaceDataTableService workspaceDataTableService) {
+        DataTableStorageService dataTableStorageService, DataTableTagService dataTableTagService,
+        WorkspaceDataTableService workspaceDataTableService) {
 
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
+        this.dataTableStorageService = dataTableStorageService;
         this.dataTableTagService = dataTableTagService;
         this.workspaceDataTableService = workspaceDataTableService;
     }
@@ -194,6 +199,13 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         }
 
         return dataTableRow;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
+    public DataTableStorageUsage getStorageUsage() {
+        return dataTableStorageService.getUsage();
     }
 
     @Override

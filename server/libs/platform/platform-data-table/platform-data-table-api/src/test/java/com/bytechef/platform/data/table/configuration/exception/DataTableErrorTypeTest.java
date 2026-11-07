@@ -41,6 +41,7 @@ class DataTableErrorTypeTest {
         assertThat(DataTableErrorType.SORT_INVALID.getErrorKey()).isEqualTo(113);
         assertThat(DataTableErrorType.BATCH_TOO_LARGE.getErrorKey()).isEqualTo(114);
         assertThat(DataTableErrorType.CSV_INVALID.getErrorKey()).isEqualTo(115);
+        assertThat(DataTableErrorType.STORAGE_LIMIT_EXCEEDED.getErrorKey()).isEqualTo(116);
     }
 
     @Test

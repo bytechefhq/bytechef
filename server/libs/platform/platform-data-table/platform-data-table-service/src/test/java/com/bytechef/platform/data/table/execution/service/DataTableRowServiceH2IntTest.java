@@ -644,7 +644,8 @@ class DataTableRowServiceH2IntTest {
         };
 
         DataTableRowService transactionDataTableRowService = new DataTableRowServiceImpl(
-            mock(ApplicationEventPublisher.class), new JdbcTemplate(countingDataSource));
+            mock(ApplicationEventPublisher.class), new JdbcTemplate(countingDataSource),
+            mock(DataTableStorageService.class));
         TransactionTemplate transactionTemplate = new TransactionTemplate(
             new DataSourceTransactionManager(countingDataSource));
 
@@ -687,7 +688,8 @@ class DataTableRowServiceH2IntTest {
         };
 
         DataTableRowService failingDataTableRowService = new DataTableRowServiceImpl(
-            mock(ApplicationEventPublisher.class), new JdbcTemplate(failingDataSource));
+            mock(ApplicationEventPublisher.class), new JdbcTemplate(failingDataSource),
+            mock(DataTableStorageService.class));
 
         List<DataTableRow> firstInsertedDataTableRows = failingDataTableRowService.insertRows(
             "items", List.of(Map.of("title", "Pear", "amount", 1)), DEV_ENVIRONMENT_ID);

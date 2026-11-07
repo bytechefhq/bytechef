@@ -176,6 +176,9 @@ bytechef:
   data-storage:
     # Data storage provider (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
     provider: JDBC
+  data-table:
+    # Maximum total size in bytes of all data tables in a tenant; 0 means unlimited. Default 50 MB.
+    max-size-bytes: 52428800
   datasource:
     # Maximum JDBC connections. Shared by Quartz's 10 job-store threads, workflow task execution and request
     # threads, so it must stay comfortably above Quartz's thread count on its own.
