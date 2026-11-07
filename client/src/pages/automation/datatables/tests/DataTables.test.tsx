@@ -13,6 +13,7 @@ const renderDataTables = () =>
 
 const hoisted = vi.hoisted(() => {
     return {
+        mockUseDataTableStorageUsageQuery: vi.fn(),
         mockUseDataTables: vi.fn(),
     };
 });
@@ -20,6 +21,15 @@ const hoisted = vi.hoisted(() => {
 vi.mock('@/pages/automation/datatables/components/hooks/useDataTables', () => ({
     default: hoisted.mockUseDataTables,
 }));
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/shared/middleware/graphql')>();
+
+    return {
+        ...actual,
+        useDataTableStorageUsageQuery: hoisted.mockUseDataTableStorageUsageQuery,
+    };
+});
 
 vi.mock('@/pages/automation/datatables/components/CreateDataTableDialog', () => ({
     default: () => <button data-testid="create-dialog-trigger">New Table</button>,
@@ -62,6 +72,7 @@ const defaultMockReturn = {
 beforeEach(() => {
     windowResizeObserver();
     hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn});
+    hoisted.mockUseDataTableStorageUsageQuery.mockReturnValue({data: undefined});
 });
 
 afterEach(() => {
@@ -169,6 +180,38 @@ describe('DataTables', () => {
             expect(screen.getByText('No Matching Tables')).toBeInTheDocument();
             expect(screen.getByText('No data tables match the selected tag.')).toBeInTheDocument();
             expect(screen.getByTestId('left-sidebar-nav')).toBeInTheDocument();
+        });
+    });
+
+    describe('storage usage banner', () => {
+        it('shows the banner when usage is at or above 80 percent', () => {
+            hoisted.mockUseDataTableStorageUsageQuery.mockReturnValue({
+                data: {
+                    dataTableStorageUsage: {limitBytes: 1_000, percentage: 90, unlimited: false, usedBytes: 900},
+                },
+            });
+
+            renderDataTables();
+
+            expect(screen.getByText('Data table storage is at 90%')).toBeInTheDocument();
+        });
+
+        it('hides the banner when the limit is unlimited', () => {
+            hoisted.mockUseDataTableStorageUsageQuery.mockReturnValue({
+                data: {
+                    dataTableStorageUsage: {limitBytes: 0, percentage: 0, unlimited: true, usedBytes: 5_000_000},
+                },
+            });
+
+            renderDataTables();
+
+            expect(screen.queryByText(/storage is at/)).not.toBeInTheDocument();
+        });
+
+        it('hides the banner while usage is unknown', () => {
+            renderDataTables();
+
+            expect(screen.queryByText(/storage is at/)).not.toBeInTheDocument();
         });
     });
 });
