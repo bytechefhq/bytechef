@@ -189,27 +189,6 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     public void deleteWorkflow(String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(project.getId());
-
-        for (ProjectDeployment projectDeployment : projectDeployments) {
-            List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
-                .getProjectDeploymentWorkflows(Validate.notNull(projectDeployment.getId(), "id"));
-
-            if (CollectionUtils.anyMatch(
-                projectDeploymentWorkflows,
-                projectDeploymentWorkflow -> Objects.equals(projectDeploymentWorkflow.getWorkflowId(), workflowId))) {
-
-                projectDeploymentWorkflows.stream()
-                    .filter(
-                        projectDeploymentWorkflow -> Objects.equals(
-                            projectDeploymentWorkflow.getWorkflowId(), workflowId))
-                    .findFirst()
-                    .ifPresent(
-                        projectDeploymentWorkflow -> projectDeploymentWorkflowService.delete(
-                            projectDeploymentWorkflow.getId()));
-            }
-        }
-
         for (ProjectVersion projectVersion : project.getProjectVersions()) {
             projectWorkflowService.delete(project.getId(), projectVersion.getVersion(), workflowId);
         }
@@ -218,9 +197,26 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             listener.onWorkflowPreDelete(workflowId);
         }
 
+        deleteProjectDeploymentWorkflows(project, workflowId);
+
         workflowTestConfigurationService.delete(workflowId);
 
         workflowService.delete(workflowId);
+    }
+
+    private void deleteProjectDeploymentWorkflows(Project project, String workflowId) {
+        for (ProjectDeployment projectDeployment : projectDeploymentService.getAllProjectDeployments(
+            Validate.notNull(project.getId(), "id"))) {
+
+            List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
+                .getProjectDeploymentWorkflows(Validate.notNull(projectDeployment.getId(), "id"));
+
+            for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+                if (Objects.equals(projectDeploymentWorkflow.getWorkflowId(), workflowId)) {
+                    projectDeploymentWorkflowService.delete(projectDeploymentWorkflow.getId());
+                }
+            }
+        }
     }
 
     @Override

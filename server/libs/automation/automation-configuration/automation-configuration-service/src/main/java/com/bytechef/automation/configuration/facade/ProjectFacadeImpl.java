@@ -189,6 +189,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(id);
 
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+                workflowPreDeleteListener.onWorkflowPreDelete(projectWorkflow.getWorkflowId());
+            }
+        }
+
         projectWorkflowService.delete(
             projectWorkflows.stream()
                 .map(ProjectWorkflow::getId)
