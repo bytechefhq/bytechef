@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-tool-usage:platform-ai-tool-usage-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
 
     testImplementation("io.projectreactor:reactor-test")
@@ -77,6 +78,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-tool"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-tool-usage:platform-ai-tool-usage-service"))
     testImplementation(project(":server:ee:libs:ai:ai-hub:ai-hub-rest")) {
         exclude(module = "ai-hub-service")
     }

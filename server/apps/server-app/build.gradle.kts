@@ -299,6 +299,7 @@ dependencies {
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-graphql"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-rest"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-tool-usage:platform-ai-tool-usage-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-graphql"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-rest"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
