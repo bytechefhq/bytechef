@@ -14,6 +14,7 @@ import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,10 @@ public class AiHubChatArtifactServiceImpl implements AiHubChatArtifactService {
         AiHubChatArtifactKind.WORKFLOW_CREATED.ordinal(),
         AiHubChatArtifactKind.WORKFLOW_UPDATED.ordinal(),
         AiHubChatArtifactKind.WORKFLOW_REFERENCED.ordinal());
+
+    private static final Set<AiHubChatArtifactKind> REMOVABLE_REFERENCE_KINDS = EnumSet.of(
+        AiHubChatArtifactKind.WORKFLOW_REFERENCED, AiHubChatArtifactKind.CUSTOM_COMPONENT_REFERENCED,
+        AiHubChatArtifactKind.CODE_WORKFLOW_REFERENCED, AiHubChatArtifactKind.AI_AGENT_REFERENCED);
 
     private static final Logger log = LoggerFactory.getLogger(AiHubChatArtifactServiceImpl.class);
 
@@ -259,11 +264,9 @@ public class AiHubChatArtifactServiceImpl implements AiHubChatArtifactService {
 
         AiHubChatArtifactKind kind = artifact.getKind();
 
-        if (kind != AiHubChatArtifactKind.WORKFLOW_REFERENCED && kind != AiHubChatArtifactKind.AI_AGENT_REFERENCED) {
+        if (!REMOVABLE_REFERENCE_KINDS.contains(kind)) {
             throw new IllegalArgumentException(
-                "Only WORKFLOW_REFERENCED and AI_AGENT_REFERENCED artifacts can be deleted via this surface; got kind="
-                    +
-                    kind);
+                "Only " + REMOVABLE_REFERENCE_KINDS + " artifacts can be deleted via this surface; got kind=" + kind);
         }
 
         chatArtifactRepository.deleteById(artifactId);
