@@ -9,9 +9,15 @@ package com.bytechef.ee.ai.hub.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.NonEmptyToolCallback;
@@ -35,10 +41,11 @@ class AiHubConfigurationToolSetTest {
             .askAgent();
 
         assertThat(toolNames(askAgent)).containsExactlyInAnyOrder(
-            "aggregateDataTable", "askUserQuestion", "checkWorkflow", "describeComponentToolParameters", "getAiAgent",
-            "getAssetFileContent", "getWorkflow", "listAiAgents", "listApiCollections", "listAssetFiles",
-            "listComponentRules", "listDataTables", "listKnowledgeBases", "listProjects", "listWorkflows",
-            "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "proposeComponentRuleCondition",
+            "aggregateDataTable", "askUserQuestion", "checkWorkflow", "describeComponentToolParameters",
+            "explainCodeWorkflow", "explainCustomComponent", "getAiAgent", "getAssetFileContent", "getWorkflow",
+            "listAiAgents", "listApiCollections", "listAssetFiles", "listComponentRules", "listDataTables",
+            "listKnowledgeBases", "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab",
+            "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab", "proposeComponentRuleCondition",
             "queryDataTable", "queryKnowledgeBase", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects",
             "searchWorkflows");
     }
@@ -62,7 +69,36 @@ class AiHubConfigurationToolSetTest {
         assertThat(toolNames(askToolCallbacks.toolCallbacks())).doesNotContain(
             "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
             "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition",
-            "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel");
+            "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel", "importWorkflow", "buildCustomComponent",
+            "buildCodeWorkflow");
+    }
+
+    @Test
+    void testAskRequestsOnlyTheReadOnlyDelegatesFromTheAskSubAgents() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        fixtures.askToolCallbacks();
+
+        verify(fixtures.intelligentToolCatalog).getByNames(
+            eq(Set.of("explainCodeWorkflow", "explainCustomComponent")), eq(IntelligentToolVariant.ASK), any(),
+            any());
+        verify(fixtures.intelligentToolCatalog, never()).getByNames(
+            anySet(), eq(IntelligentToolVariant.BUILD), any(), any());
+    }
+
+    @Test
+    void testAskDelegatesAreWorkspaceScoped() throws AGUIException {
+        AiHubSpringAIAgent askAgent = AiHubAgentFixtures.withBuildWorkflow()
+            .askAgent();
+
+        assertThat(askAgent.pinnedToolCallbacks())
+            .filteredOn(
+                toolCallback -> Set.of("explainCustomComponent", "explainCodeWorkflow")
+                    .contains(toolCallback.getToolDefinition()
+                        .name()))
+            .hasSize(2)
+            .allSatisfy(toolCallback -> assertThat(toolCallback).isInstanceOf(
+                WorkspaceScopedSubAgentToolCallback.class));
     }
 
     @Test
@@ -120,8 +156,19 @@ class AiHubConfigurationToolSetTest {
         AiHubModeToolCallbacks buildToolCallbacks = fixtures.buildToolCallbacks();
 
         assertThat(toolNames(buildToolCallbacks.toolCallbacks()))
-            .containsAll(toolNames(askToolCallbacks.toolCallbacks()));
-        assertThat(toolNames(buildToolCallbacks.pinned())).containsAll(toolNames(askToolCallbacks.pinned()));
+            .containsAll(withoutAskOnlyDelegates(toolNames(askToolCallbacks.toolCallbacks())));
+        assertThat(toolNames(buildToolCallbacks.pinned()))
+            .containsAll(withoutAskOnlyDelegates(toolNames(askToolCallbacks.pinned())));
+    }
+
+    @Test
+    void testBuildReplacesEachAskOnlyDelegateWithItsBuildDelegate() {
+        AiHubModeToolCallbacks buildToolCallbacks = AiHubAgentFixtures.withBuildWorkflow()
+            .buildToolCallbacks();
+
+        assertThat(toolNames(buildToolCallbacks.pinned()))
+            .contains("buildCustomComponent", "buildCodeWorkflow")
+            .doesNotContain("explainCustomComponent", "explainCodeWorkflow");
     }
 
     @Test
@@ -199,6 +246,12 @@ class AiHubConfigurationToolSetTest {
             .hasMessageContaining("buildWorkflow")
             .hasMessageContaining("bytechef.ai.hub.enabled")
             .hasMessageContaining("bytechef.ai.copilot.enabled");
+    }
+
+    private static List<String> withoutAskOnlyDelegates(List<String> toolNames) {
+        return toolNames.stream()
+            .filter(toolName -> !AiHubConfiguration.ASK_INTELLIGENT_TOOL_NAMES.contains(toolName))
+            .toList();
     }
 
     private static List<String> toolNames(AiHubSpringAIAgent agent) {
