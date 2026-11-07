@@ -17,8 +17,11 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.embedded.ai.copilot.agent.EmbeddedCodeWorkflowSpringAIAgent;
+import com.bytechef.ee.embedded.ai.tool.IntegrationCodeWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowTools;
+import com.bytechef.ee.embedded.ai.tool.ReadIntegrationCodeWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationWorkflowTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
@@ -60,6 +63,8 @@ public class EmbeddedCopilotConfiguration {
     private final State state = new State();
     private final WorkflowInstructionTools workflowInstructionTools;
     private final WorkflowValidatorTools workflowValidatorTools;
+    private final String codeWorkflowEmbeddedAskSystemPrompt;
+    private final String codeWorkflowEmbeddedBuildSystemPrompt;
     private final String workflowEditorEmbeddedAskSystemPrompt;
     private final String workflowEditorEmbeddedBuildSystemPrompt;
 
@@ -69,11 +74,15 @@ public class EmbeddedCopilotConfiguration {
     public EmbeddedCopilotConfiguration(
         @Value("classpath:prompt_workflow_editor_embedded_ask.txt") Resource promptWorkflowEditorEmbeddedAskResource,
         @Value("classpath:prompt_workflow_editor_embedded_build.txt") Resource promptWorkflowEditorEmbeddedBuildResource,
+        @Value("classpath:prompt_code_workflow_embedded_ask.txt") Resource promptCodeWorkflowEmbeddedAskResource,
+        @Value("classpath:prompt_code_workflow_embedded_build.txt") Resource promptCodeWorkflowEmbeddedBuildResource,
         WorkflowInstructionTools workflowInstructionTools, WorkflowValidatorTools workflowValidatorTools) {
 
         this.workflowInstructionTools = workflowInstructionTools;
         this.workflowValidatorTools = workflowValidatorTools;
 
+        this.codeWorkflowEmbeddedAskSystemPrompt = getSystemPrompt(promptCodeWorkflowEmbeddedAskResource);
+        this.codeWorkflowEmbeddedBuildSystemPrompt = getSystemPrompt(promptCodeWorkflowEmbeddedBuildResource);
         this.workflowEditorEmbeddedAskSystemPrompt = getSystemPrompt(promptWorkflowEditorEmbeddedAskResource);
         this.workflowEditorEmbeddedBuildSystemPrompt = getSystemPrompt(promptWorkflowEditorEmbeddedBuildResource);
     }
@@ -138,6 +147,40 @@ public class EmbeddedCopilotConfiguration {
             .permissionService(permissionService)
             .securityContextRehydrator(securityContextRehydrator)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+    }
+
+    @Bean
+    EmbeddedCodeWorkflowSpringAIAgent codeWorkflowEmbeddedAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ReadIntegrationCodeWorkflowTools readIntegrationCodeWorkflowTools,
+        SecurityContextRehydrator securityContextRehydrator) throws AGUIException {
+
+        return EmbeddedCodeWorkflowSpringAIAgent.builder()
+            .agentId(CopilotAgentType.CODE_WORKFLOW_EMBEDDED_ASK.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(codeWorkflowEmbeddedAskSystemPrompt)
+            .state(state)
+            .toolCallbacks(wrapTools(securityContextRehydrator, List.of(readIntegrationCodeWorkflowTools)))
+            .build();
+    }
+
+    @Bean
+    EmbeddedCodeWorkflowSpringAIAgent codeWorkflowEmbeddedBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, IntegrationCodeWorkflowTools integrationCodeWorkflowTools,
+        ReadIntegrationCodeWorkflowTools readIntegrationCodeWorkflowTools,
+        SecurityContextRehydrator securityContextRehydrator) throws AGUIException {
+
+        return EmbeddedCodeWorkflowSpringAIAgent.builder()
+            .agentId(CopilotAgentType.CODE_WORKFLOW_EMBEDDED_BUILD.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(codeWorkflowEmbeddedBuildSystemPrompt)
+            .state(state)
+            .toolCallbacks(
+                wrapTools(
+                    securityContextRehydrator,
+                    List.of(integrationCodeWorkflowTools, readIntegrationCodeWorkflowTools)))
             .build();
     }
 
