@@ -31,6 +31,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.ClusterRootWorkflowNode;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -105,17 +106,19 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
             workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+        ClusterRootWorkflowNode clusterRootWorkflowNode = ClusterRootWorkflowNode.of(workflow, workflowNodeName);
 
-        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName(), environmentId);
+        Map<String, ?> outputs = clusterRootWorkflowNode.isTrigger()
+            ? Map.of()
+            : workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+                workflowId, clusterRootWorkflowNode.getName(), environmentId);
 
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(clusterRootWorkflowNode.getType());
 
         ClusterElementType clusterElementType = clusterElementDefinitionService.getClusterElementType(
             workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName);
 
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+        ClusterElementMap clusterElementMap = clusterRootWorkflowNode.getClusterElementMap();
 
         ClusterElement clusterElement = clusterElementMap.getClusterElement(
             clusterElementType, clusterElementWorkflowNodeName);
@@ -137,7 +140,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         return clusterElementDefinitionFacade.executeOptions(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation(), propertyName,
-            evaluator.evaluate(clusterElement.getParameters(), context), workflowTask.getExtensions(),
+            evaluator.evaluate(clusterElement.getParameters(), context), clusterRootWorkflowNode.getExtensions(),
             lookupDependsOnPaths, searchText, connectionId, clusterElementConnectionIds,
             clusterElementInputParameters);
     }

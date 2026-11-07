@@ -43,6 +43,7 @@ import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict.Environ
 import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict.WorkflowIdParam;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.ClusterRootWorkflowNode;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -477,11 +478,11 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+        ClusterRootWorkflowNode clusterRootWorkflowNode = ClusterRootWorkflowNode.of(workflow, workflowNodeName);
 
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(clusterRootWorkflowNode.getType());
 
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+        ClusterElementMap clusterElementMap = clusterRootWorkflowNode.getClusterElementMap();
 
         ClusterElementType clusterElementType = clusterElementDefinitionService.getClusterElementType(
             workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName);
@@ -502,10 +503,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
 
-        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName(), environmentId);
+        Map<String, ?> outputs = clusterRootWorkflowNode.isTrigger()
+            ? Map.of()
+            : workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+                workflowId, clusterRootWorkflowNode.getName(), environmentId);
 
-        Map<String, Object> inputParameters = (Map<String, Object>) workflowTask.evaluateParameters(
+        Map<String, Object> inputParameters = (Map<String, Object>) clusterRootWorkflowNode.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
 
         Map<String, Object> clusterElementInputParameters = evaluator.evaluate(

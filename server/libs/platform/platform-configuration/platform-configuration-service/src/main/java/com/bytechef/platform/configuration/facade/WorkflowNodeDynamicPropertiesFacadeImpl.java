@@ -29,6 +29,7 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.ClusterRootWorkflowNode;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -110,14 +111,16 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
             workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+        ClusterRootWorkflowNode clusterRootWorkflowNode = ClusterRootWorkflowNode.of(workflow, workflowNodeName);
 
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(clusterRootWorkflowNode.getType());
 
-        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName(), environmentId);
+        Map<String, ?> outputs = clusterRootWorkflowNode.isTrigger()
+            ? Map.of()
+            : workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+                workflowId, clusterRootWorkflowNode.getName(), environmentId);
 
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+        ClusterElementMap clusterElementMap = clusterRootWorkflowNode.getClusterElementMap();
 
         ClusterElement clusterElement = clusterElementMap.getClusterElement(
             clusterElementDefinitionService.getClusterElementType(
@@ -135,7 +138,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation(), propertyName,
             evaluator.evaluate(clusterElement.getParameters(), context, true),
-            workflowTask.getExtensions(), lookupDependsOnPaths, connectionId, clusterElementConnectionIds,
+            clusterRootWorkflowNode.getExtensions(), lookupDependsOnPaths, connectionId, clusterElementConnectionIds,
             clusterElementInputParameters);
     }
 

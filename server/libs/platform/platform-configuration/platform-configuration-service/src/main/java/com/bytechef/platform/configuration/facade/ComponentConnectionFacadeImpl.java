@@ -24,6 +24,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.ClusterRootWorkflowNode;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.workflow.connection.ClusterElementConnectionFactory;
@@ -83,11 +84,11 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+        ClusterRootWorkflowNode clusterRootWorkflowNode = ClusterRootWorkflowNode.of(workflow, workflowNodeName);
 
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(clusterRootWorkflowNode.getType());
 
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+        ClusterElementMap clusterElementMap = clusterRootWorkflowNode.getClusterElementMap();
 
         ClusterElementType clusterElementType = clusterElementDefinitionService.getClusterElementType(
             workflowNodeType.name(), workflowNodeType.version(), clusterElementTypeName.toUpperCase());

@@ -321,6 +321,40 @@ class WorkflowNodeTestOutputFacadeIntTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void testSaveClusterElementTestOutputExecutesToolUnderTrigger() {
+        Workflow workflow = createWorkflow(TriggerClusterRootWorkflowFixture.DEFINITION);
+
+        when(clusterElementDefinitionService.getClusterElementType("browser", 1, "TOOLS"))
+            .thenReturn(
+                new ClusterElementType(
+                    "TOOLS", TriggerClusterRootWorkflowFixture.TOOLS_TYPE_NAME, "Tools", true, false));
+        when(clusterElementDefinitionService.executeTool(
+            eq("shopify"), eq(1), eq("getOrder"), anyMap(), isNull(), eq(true)))
+                .thenReturn(Map.of("id", "42"));
+
+        WorkflowNodeTestOutput workflowNodeTestOutput = workflowNodeTestOutputFacade.saveClusterElementTestOutput(
+            workflow.getId(), TriggerClusterRootWorkflowFixture.TRIGGER_NAME, "TOOLS",
+            TriggerClusterRootWorkflowFixture.TOOL_NAME, Map.of(), ENVIRONMENT_ID);
+
+        assertThat(workflowNodeTestOutput).isNotNull();
+
+        ArgumentCaptor<Map<String, ?>> inputParametersArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(clusterElementDefinitionService).executeTool(
+            eq("shopify"), eq(1), eq("getOrder"), inputParametersArgumentCaptor.capture(), isNull(), eq(true));
+
+        Map<String, ?> inputParameters = inputParametersArgumentCaptor.getValue();
+
+        assertThat(inputParameters.get("orderId")).isEqualTo("42");
+
+        WorkflowNodeTestOutput persistedWorkflowNodeTestOutput = getTestOutput(
+            workflow.getId(), TriggerClusterRootWorkflowFixture.TOOL_NAME);
+
+        assertThat(persistedWorkflowNodeTestOutput.getSampleOutput()).isEqualTo(Map.of("id", "42"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void testSaveWorkflowNodeSampleOutputTruncatesLargeLists() {
         Workflow workflow = createWorkflow(
             """

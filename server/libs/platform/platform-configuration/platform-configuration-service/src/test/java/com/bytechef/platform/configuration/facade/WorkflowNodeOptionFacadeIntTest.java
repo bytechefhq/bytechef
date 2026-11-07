@@ -323,6 +323,29 @@ class WorkflowNodeOptionFacadeIntTest {
         assertThat(hubspotParameters.get("apiKey")).isEqualTo("secret");
     }
 
+    @Test
+    void testGetClusterElementNodeOptionsResolvesVoiceAgentUnderTrigger() {
+        Workflow workflow = createWorkflow(TriggerClusterRootWorkflowFixture.DEFINITION);
+
+        when(clusterElementDefinitionService.getClusterElementType(
+            "browser", 1, TriggerClusterRootWorkflowFixture.VOICE_AGENT_TYPE_NAME))
+                .thenReturn(new ClusterElementType("VOICE_AGENT", "voiceAgent", "Voice Agent"));
+
+        List<Option> expectedOptions = List.of(mock(Option.class));
+
+        when(clusterElementDefinitionFacade.executeOptions(
+            eq("deepgram"), eq(1), eq("voiceAgent"), eq("model"), anyMap(), anyMap(), anyList(), isNull(), isNull(),
+            anyMap(), anyMap()))
+                .thenReturn(expectedOptions);
+
+        List<Option> options = workflowNodeOptionFacade.getClusterElementNodeOptions(
+            workflow.getId(), TriggerClusterRootWorkflowFixture.TRIGGER_NAME,
+            TriggerClusterRootWorkflowFixture.VOICE_AGENT_TYPE_NAME, TriggerClusterRootWorkflowFixture.VOICE_AGENT_NAME,
+            "model", List.of(), null, ENVIRONMENT_ID);
+
+        assertThat(options).isEqualTo(expectedOptions);
+    }
+
     private Workflow createWorkflow(String definition) {
         return workflowService.create(definition, Format.JSON, Workflow.SourceType.JDBC);
     }

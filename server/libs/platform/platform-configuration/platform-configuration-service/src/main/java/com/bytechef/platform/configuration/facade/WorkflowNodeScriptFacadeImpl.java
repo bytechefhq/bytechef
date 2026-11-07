@@ -29,6 +29,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.script.CodeEditorScriptInputProvider;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.ClusterRootWorkflowNode;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
@@ -89,11 +90,11 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+        ClusterRootWorkflowNode clusterRootWorkflowNode = ClusterRootWorkflowNode.of(workflow, workflowNodeName);
 
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(clusterRootWorkflowNode.getType());
 
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
+        ClusterElementMap clusterElementMap = clusterRootWorkflowNode.getClusterElementMap();
 
         Optional<ClusterElement> sourceClusterElementOptional = clusterElementMap.fetchClusterElement(SOURCE);
 
@@ -103,8 +104,10 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
         ClusterElement sourceClusterElement = sourceClusterElementOptional.get();
 
-        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowNodeName, environmentId);
+        Map<String, ?> outputs = clusterRootWorkflowNode.isTrigger()
+            ? Map.of()
+            : workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+                workflowId, workflowNodeName, environmentId);
 
         Map<String, ?> sourceInputParameters = evaluator.evaluate(sourceClusterElement.getParameters(), outputs);
 

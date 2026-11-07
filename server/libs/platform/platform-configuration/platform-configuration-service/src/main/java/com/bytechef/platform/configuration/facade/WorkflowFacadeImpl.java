@@ -143,9 +143,16 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         for (WorkflowTrigger workflowTriggerModel : workflowTriggers) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTriggerModel.getType());
+
+            Boolean clusterRoot = componentDefinitionService
+                .fetchComponentDefinition(workflowNodeType.name(), workflowNodeType.version())
+                .map(ComponentDefinition::isClusterRoot)
+                .orElse(Boolean.FALSE);
+
             workflowTriggerDTOs.add(
                 new WorkflowTriggerDTO(
-                    workflowTriggerModel,
+                    workflowTriggerModel, clusterRoot, ClusterElementMap.of(workflowTriggerModel.getExtensions()),
                     componentConnectionFacade.getComponentConnections(
                         CollectionUtils.getFirst(
                             workflowTriggers,

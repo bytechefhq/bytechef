@@ -446,6 +446,29 @@ class WorkflowNodeDynamicPropertiesFacadeIntTest {
             eq("subflow"), eq(1), eq(propertyName), anyMap());
     }
 
+    @Test
+    void testGetClusterElementDynamicPropertiesResolvesToolUnderTrigger() {
+        Workflow workflow = createWorkflow(TriggerClusterRootWorkflowFixture.DEFINITION);
+
+        when(clusterElementDefinitionService.getClusterElementType(
+            "browser", 1, TriggerClusterRootWorkflowFixture.TOOLS_TYPE_NAME))
+                .thenReturn(new ClusterElementType("TOOLS", "tools", "Tools", true, false));
+
+        List<Property> expectedProperties = List.of(mock(Property.class));
+
+        when(clusterElementDefinitionFacade.executeDynamicProperties(
+            eq("shopify"), eq(1), eq("getOrder"), eq("fields"), anyMap(), anyMap(), anyList(), isNull(), anyMap(),
+            anyMap()))
+                .thenReturn(expectedProperties);
+
+        List<Property> properties = workflowNodeDynamicPropertiesFacade.getClusterElementDynamicProperties(
+            workflow.getId(), TriggerClusterRootWorkflowFixture.TRIGGER_NAME,
+            TriggerClusterRootWorkflowFixture.TOOLS_TYPE_NAME, TriggerClusterRootWorkflowFixture.TOOL_NAME, "fields",
+            List.of(), ENVIRONMENT_ID);
+
+        assertThat(properties).isEqualTo(expectedProperties);
+    }
+
     private Workflow createWorkflow(String definition) {
         return workflowService.create(definition, Format.JSON, Workflow.SourceType.JDBC);
     }

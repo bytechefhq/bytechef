@@ -27,12 +27,16 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.jdbc.JdbcWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.definition.voice.VoiceAgentFunction;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfiguration;
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfigurationSharedMocks;
+import com.bytechef.platform.configuration.domain.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
+import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -124,6 +128,60 @@ class WorkflowFacadeIntTest {
 
         assertThat(workflowTaskDTO.getName()).isEqualTo("testTask");
         assertThat(workflowTaskDTO.isClusterRoot()).isTrue();
+    }
+
+    @Test
+    void testGetWorkflowWithClusterRootTrigger() {
+        Workflow workflow = createWorkflow(
+            """
+                {
+                    "label": "Test Workflow",
+                    "description": "Test Description",
+                    "triggers": [
+                        {
+                            "name": "trigger_1",
+                            "type": "browser/v1/voiceSession",
+                            "clusterElements": {
+                                "voiceAgent": {
+                                    "name": "voiceAgent_1",
+                                    "type": "deepgram/v1/voiceAgent",
+                                    "parameters": {
+                                        "prompt": "hi"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "tasks": []
+                }
+                """);
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinition.isClusterRoot()).thenReturn(true);
+        when(componentDefinitionService.fetchComponentDefinition("browser", 1))
+            .thenReturn(Optional.of(componentDefinition));
+
+        ComponentDefinition voiceAgentComponentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinitionService.getComponentDefinition("deepgram", 1))
+            .thenReturn(voiceAgentComponentDefinition);
+
+        WorkflowDTO workflowDTO = workflowFacade.getWorkflow(workflow.getId());
+
+        List<WorkflowTriggerDTO> workflowTriggerDTOs = workflowDTO.getTriggers();
+
+        assertThat(workflowTriggerDTOs).hasSize(1);
+
+        WorkflowTriggerDTO workflowTriggerDTO = workflowTriggerDTOs.getFirst();
+
+        assertThat(workflowTriggerDTO.clusterRoot()).isTrue();
+
+        ClusterElementMap clusterElementMap = workflowTriggerDTO.clusterElements();
+
+        ClusterElement clusterElement = clusterElementMap.getClusterElement(VoiceAgentFunction.VOICE_AGENT);
+
+        assertThat(clusterElement.getType()).isEqualTo("deepgram/v1/voiceAgent");
     }
 
     @Test

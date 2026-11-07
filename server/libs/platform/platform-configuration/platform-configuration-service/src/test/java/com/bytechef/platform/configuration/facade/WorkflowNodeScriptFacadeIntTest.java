@@ -301,6 +301,18 @@ class WorkflowNodeScriptFacadeIntTest {
         assertThat(scriptInput).isEqualTo(Map.of("key", "value"));
     }
 
+    @Test
+    void testGetClusterElementScriptInputResolvesTriggerRootWithoutSource() {
+        Workflow workflow = createWorkflow(TriggerClusterRootWorkflowFixture.DEFINITION);
+
+        Map<String, Object> scriptInput = workflowNodeScriptFacade.getClusterElementScriptInput(
+            workflow.getId(), TriggerClusterRootWorkflowFixture.TRIGGER_NAME,
+            TriggerClusterRootWorkflowFixture.TOOLS_TYPE_NAME, TriggerClusterRootWorkflowFixture.TOOL_NAME,
+            ENVIRONMENT_ID);
+
+        assertThat(scriptInput).isEmpty();
+    }
+
     @SuppressWarnings("unchecked")
     private Map<String, Object> captureScriptInputParameters() {
         ArgumentCaptor<Map<String, Object>> inputParametersArgumentCaptor = ArgumentCaptor.forClass(Map.class);

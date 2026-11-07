@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.dto;
 
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,13 +28,17 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record WorkflowTriggerDTO(
-    List<ComponentConnection> connections, String description, Map<String, ?> metadata, String name, String label,
-    Map<String, ?> parameters, String timeout, String type) {
+    ClusterElementMap clusterElements, boolean clusterRoot, List<ComponentConnection> connections,
+    String description, Map<String, ?> metadata, String name, String label, Map<String, ?> parameters,
+    String timeout, String type) {
 
-    public WorkflowTriggerDTO(WorkflowTrigger workflowTrigger, List<ComponentConnection> connections) {
+    public WorkflowTriggerDTO(
+        WorkflowTrigger workflowTrigger, boolean clusterRoot, ClusterElementMap clusterElements,
+        List<ComponentConnection> connections) {
+
         this(
-            connections, workflowTrigger.getDescription(), workflowTrigger.getMetadata(), workflowTrigger.getName(),
-            workflowTrigger.getLabel(), workflowTrigger.getParameters(), workflowTrigger.getTimeout(),
-            workflowTrigger.getType());
+            clusterElements, clusterRoot, connections, workflowTrigger.getDescription(),
+            workflowTrigger.getMetadata(), workflowTrigger.getName(), workflowTrigger.getLabel(),
+            workflowTrigger.getParameters(), workflowTrigger.getTimeout(), workflowTrigger.getType());
     }
 }

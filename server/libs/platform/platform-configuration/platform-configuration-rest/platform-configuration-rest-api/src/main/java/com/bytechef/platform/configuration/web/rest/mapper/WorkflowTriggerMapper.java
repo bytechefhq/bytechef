@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel;
 import org.mapstruct.Mapper;
@@ -26,9 +27,22 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-public interface WorkflowTriggerMapper extends Converter<WorkflowTrigger, WorkflowTriggerModel> {
+public class WorkflowTriggerMapper {
 
-    @Mapping(target = "connections", ignore = true)
-    WorkflowTriggerModel convert(WorkflowTrigger workflowTrigger);
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    public interface WorkflowTriggerToWorkflowTriggerModelMapper
+        extends Converter<WorkflowTrigger, WorkflowTriggerModel> {
+
+        @Mapping(target = "clusterRoot", ignore = true)
+        @Mapping(target = "clusterElements", ignore = true)
+        @Mapping(target = "connections", ignore = true)
+        WorkflowTriggerModel convert(WorkflowTrigger workflowTrigger);
+    }
+
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    public interface WorkflowTriggerDTOToWorkflowTriggerModelMapper
+        extends Converter<WorkflowTriggerDTO, WorkflowTriggerModel> {
+
+        WorkflowTriggerModel convert(WorkflowTriggerDTO workflowTriggerDTO);
+    }
 }

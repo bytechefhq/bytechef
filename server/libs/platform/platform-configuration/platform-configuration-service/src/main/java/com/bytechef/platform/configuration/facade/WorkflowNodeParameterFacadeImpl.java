@@ -38,6 +38,7 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
 import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -760,9 +761,13 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> previousOutputs = Map.of();
 
-        if (operationType == WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT ||
+        boolean triggerClusterRoot = operationType == WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT &&
+            WorkflowTrigger.fetch(workflow, workflowNodeName)
+                .isPresent();
+
+        if (!triggerClusterRoot && (operationType == WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT ||
             operationType == WorkflowNodeStructure.OperationType.TASK ||
-            operationType == WorkflowNodeStructure.OperationType.TASK_DISPATCHER) {
+            operationType == WorkflowNodeStructure.OperationType.TASK_DISPATCHER)) {
 
             WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
@@ -1177,52 +1182,47 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String workflowNodeName, String clusterElementTypeName, String clusterElementWorkflowNodeName,
         Map<String, ?> definitionMap) {
 
-        Map<String, Object> metadataMap;
+        Map<String, ?> workflowNodeMap = getWorkflowNodeMap(workflowNodeName, definitionMap);
 
-        Map<String, ?> triggerMap = getTrigger(
-            workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowExtConstants.TRIGGERS));
+        Map<String, ?> metadataOwnerMap = clusterElementTypeName == null
+            ? workflowNodeMap
+            : getClusterElementMap(clusterElementTypeName, clusterElementWorkflowNodeName, workflowNodeMap);
 
-        if (triggerMap == null) {
-            Map<String, ?> taskMap = getTask(
-                workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
+        Map<String, Object> metadataMap = (Map<String, Object>) metadataOwnerMap.get(METADATA);
 
-            if (taskMap == null) {
-                throw new ConfigurationException(
-                    "Workflow node with name: %s does not exist".formatted(workflowNodeName),
-                    WorkflowErrorType.WORKFLOW_NODE_NOT_FOUND);
-            }
+        if (metadataMap == null) {
+            metadataMap = new HashMap<>();
 
-            if (clusterElementTypeName == null) {
-                metadataMap = (Map<String, Object>) taskMap.get(METADATA);
-
-                if (metadataMap == null) {
-                    metadataMap = new HashMap<>();
-
-                    ((Map<String, Object>) taskMap).put(METADATA, metadataMap);
-                }
-            } else {
-                Map<String, ?> clusterElementMap = getClusterElementMap(
-                    clusterElementTypeName, clusterElementWorkflowNodeName, taskMap);
-
-                metadataMap = (Map<String, Object>) clusterElementMap.get(METADATA);
-
-                if (metadataMap == null) {
-                    metadataMap = new HashMap<>();
-
-                    ((Map<String, Object>) clusterElementMap).put(METADATA, metadataMap);
-                }
-            }
-        } else {
-            metadataMap = (Map<String, Object>) triggerMap.get(METADATA);
-
-            if (metadataMap == null) {
-                metadataMap = new HashMap<>();
-
-                ((Map<String, Object>) triggerMap).put(METADATA, metadataMap);
-            }
+            ((Map<String, Object>) metadataOwnerMap).put(METADATA, metadataMap);
         }
 
         return metadataMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, ?> getWorkflowNodeMap(String workflowNodeName, Map<String, ?> definitionMap) {
+        Map<String, ?> triggerMap = getTrigger(
+            workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowExtConstants.TRIGGERS));
+
+        if (triggerMap != null) {
+            return triggerMap;
+        }
+
+        return getRequiredTask(workflowNodeName, definitionMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, ?> getRequiredTask(String workflowNodeName, Map<String, ?> definitionMap) {
+        Map<String, ?> taskMap = getTask(
+            workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
+
+        if (taskMap == null) {
+            throw new ConfigurationException(
+                "Workflow node with name: %s does not exist".formatted(workflowNodeName),
+                WorkflowErrorType.WORKFLOW_NODE_NOT_FOUND);
+        }
+
+        return taskMap;
     }
 
     @SuppressWarnings("unchecked")
@@ -1261,66 +1261,58 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Map<String, ?> triggerMap = getTrigger(
             workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowExtConstants.TRIGGERS));
 
+        Map<String, ?> workflowNodeMap = triggerMap == null ? getRequiredTask(workflowNodeName, definitionMap)
+            : triggerMap;
+
         WorkflowNodeStructure.OperationType operationType;
 
-        if (triggerMap == null) {
-            // We need a mutable map
+        if (clusterElementTypeName != null) {
+            Map<String, ?> clusterElementMap = getClusterElementMap(
+                clusterElementTypeName, clusterElementWorkflowNodeName, workflowNodeMap);
 
-            Map<String, ?> taskMap = getTask(
-                workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
+            parameterMap = (Map<String, ?>) clusterElementMap.get(WorkflowConstants.PARAMETERS);
 
-            if (taskMap == null) {
-                throw new ConfigurationException(
-                    "Workflow node with name: %s does not exist".formatted(workflowNodeName),
-                    WorkflowErrorType.WORKFLOW_NODE_NOT_FOUND);
-            }
+            operationType = WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT;
 
-            if (clusterElementTypeName == null) {
-                parameterMap = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
-                    (String) taskMap.get(WorkflowConstants.TYPE));
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
+                (String) clusterElementMap.get(WorkflowConstants.TYPE));
 
-                if (workflowNodeType.operation() == null) {
-                    operationType = WorkflowNodeStructure.OperationType.TASK_DISPATCHER;
+            ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService
+                .getClusterElementDefinition(
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    Objects.requireNonNull(workflowNodeType.operation()));
 
-                    TaskDispatcherDefinition taskDispatcherDefinition =
-                        taskDispatcherDefinitionService.getTaskDispatcherDefinition(
-                            workflowNodeType.name(), workflowNodeType.version());
+            properties = clusterElementDefinition.getProperties();
+            name = clusterElementDefinition.getName();
+        } else if (triggerMap == null) {
+            parameterMap = (Map<String, ?>) workflowNodeMap.get(WorkflowConstants.PARAMETERS);
 
-                    properties = taskDispatcherDefinition.getProperties();
-                    name = taskDispatcherDefinition.getName();
-                } else {
-                    operationType = WorkflowNodeStructure.OperationType.TASK;
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
+                (String) workflowNodeMap.get(WorkflowConstants.TYPE));
 
-                    ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
-                        workflowNodeType.name(), workflowNodeType.version(),
-                        workflowNodeType.operation());
+            if (workflowNodeType.operation() == null) {
+                operationType = WorkflowNodeStructure.OperationType.TASK_DISPATCHER;
 
-                    properties = actionDefinition.getProperties();
-                    name = actionDefinition.getName();
-                }
+                TaskDispatcherDefinition taskDispatcherDefinition =
+                    taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+                        workflowNodeType.name(), workflowNodeType.version());
+
+                properties = taskDispatcherDefinition.getProperties();
+                name = taskDispatcherDefinition.getName();
             } else {
-                Map<String, ?> clusterElementMap = getClusterElementMap(
-                    clusterElementTypeName, clusterElementWorkflowNodeName, taskMap);
+                operationType = WorkflowNodeStructure.OperationType.TASK;
 
-                parameterMap = (Map<String, ?>) clusterElementMap.get(WorkflowConstants.PARAMETERS);
+                ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    workflowNodeType.operation());
 
-                operationType = WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT;
-
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
-                    (String) clusterElementMap.get(WorkflowConstants.TYPE));
-
-                ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService
-                    .getClusterElementDefinition(
-                        workflowNodeType.name(), workflowNodeType.version(),
-                        Objects.requireNonNull(workflowNodeType.operation()));
-
-                properties = clusterElementDefinition.getProperties();
-                name = clusterElementDefinition.getName();
+                properties = actionDefinition.getProperties();
+                name = actionDefinition.getName();
             }
         } else {
             operationType = WorkflowNodeStructure.OperationType.TRIGGER;
             parameterMap = (Map<String, ?>) triggerMap.get(WorkflowConstants.PARAMETERS);
+
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
                 (String) triggerMap.get(WorkflowConstants.TYPE));
 

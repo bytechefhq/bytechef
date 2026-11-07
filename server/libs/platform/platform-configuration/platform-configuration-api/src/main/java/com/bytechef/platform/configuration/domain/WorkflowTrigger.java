@@ -22,6 +22,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Collections;
@@ -75,6 +76,12 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     private WorkflowTrigger() {
+    }
+
+    @JsonAnySetter
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    private void putExtension(String name, Object value) {
+        extensions.put(name, value);
     }
 
     public static List<WorkflowTrigger> of(Workflow workflow) {
