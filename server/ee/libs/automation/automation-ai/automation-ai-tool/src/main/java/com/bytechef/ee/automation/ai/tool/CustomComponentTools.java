@@ -11,6 +11,7 @@ import com.bytechef.ee.automation.ai.tool.exception.CustomComponentToolErrorType
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class CustomComponentTools {
 
     private static final Logger log = LoggerFactory.getLogger(CustomComponentTools.class);
