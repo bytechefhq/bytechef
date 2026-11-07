@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
+import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
@@ -27,10 +28,13 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
@@ -49,12 +53,16 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     private static final String WORKFLOW_TEST_NODE_OUTPUT_CACHE = "workflowTestNodeOutput";
 
     private final CacheManager cacheManager;
+    private final WorkflowCacheManager workflowCacheManager;
     private final WorkflowNodeTestOutputRepository workflowNodeTestOutputRepository;
 
+    @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputServiceImpl(
-        CacheManager cacheManager, WorkflowNodeTestOutputRepository workflowNodeTestOutputRepository) {
+        CacheManager cacheManager, WorkflowCacheManager workflowCacheManager,
+        WorkflowNodeTestOutputRepository workflowNodeTestOutputRepository) {
 
         this.cacheManager = cacheManager;
+        this.workflowCacheManager = workflowCacheManager;
         this.workflowNodeTestOutputRepository = workflowNodeTestOutputRepository;
     }
 
@@ -82,6 +90,32 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
         workflowNodeTestOutputRepository
             .findByWorkflowIdAndWorkflowNodeNameAndEnvironmentId(workflowId, workflowNodeName, environmentId)
             .ifPresent(workflowNodeTestOutputRepository::delete);
+    }
+
+    @Override
+    public void deleteWorkflowNodeTestOutputs(String workflowId) {
+        List<WorkflowNodeTestOutput> workflowNodeTestOutputs =
+            workflowNodeTestOutputRepository.findByWorkflowId(workflowId);
+
+        workflowNodeTestOutputRepository.deleteAll(workflowNodeTestOutputs);
+
+        Set<Long> environmentIds = new HashSet<>();
+
+        for (WorkflowNodeTestOutput workflowNodeTestOutput : workflowNodeTestOutputs) {
+            Long environmentId = workflowNodeTestOutput.getEnvironmentId();
+
+            environmentIds.add(environmentId);
+
+            clearWorkflowTestNodeOutputCache(
+                workflowId, workflowNodeTestOutput.getWorkflowNodeName(), environmentId);
+        }
+
+        for (Long environmentId : environmentIds) {
+            workflowCacheManager.clearCacheForWorkflow(
+                workflowId, WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, environmentId);
+            workflowCacheManager.clearCacheForWorkflow(
+                workflowId, WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE, environmentId);
+        }
     }
 
     @Override

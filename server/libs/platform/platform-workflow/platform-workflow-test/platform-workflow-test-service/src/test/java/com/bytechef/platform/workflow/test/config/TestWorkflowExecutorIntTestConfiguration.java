@@ -339,9 +339,11 @@ public class TestWorkflowExecutorIntTestConfiguration {
 
     @Bean
     WorkflowNodeTestOutputService workflowNodeTestOutputService(
-        CacheManager cacheManager, WorkflowNodeTestOutputRepository workflowNodeTestOutputRepository) {
+        CacheManager cacheManager, WorkflowCacheManager workflowCacheManager,
+        WorkflowNodeTestOutputRepository workflowNodeTestOutputRepository) {
 
-        return new WorkflowNodeTestOutputServiceImpl(cacheManager, workflowNodeTestOutputRepository);
+        return new WorkflowNodeTestOutputServiceImpl(
+            cacheManager, workflowCacheManager, workflowNodeTestOutputRepository);
     }
 
     @Bean
