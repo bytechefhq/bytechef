@@ -66,7 +66,8 @@ class ToolSearchCatalogFeederGlobalToolsTest {
     @Test
     void testMetaTableIsSchemaQualifiedToTheConfiguredSchema() {
         ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, pgVectorJdbcTemplate, "public", "ai_hub_tool_search_vector_store");
+            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            "ai_hub_tool_search_vector_store");
 
         when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
             .thenThrow(new EmptyResultDataAccessException(1));
@@ -84,7 +85,8 @@ class ToolSearchCatalogFeederGlobalToolsTest {
     @Test
     void testReindexDeletesStaleRowsFromEarlierJvmRunsByMetadata() {
         ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, pgVectorJdbcTemplate, "public", "ai_hub_tool_search_vector_store");
+            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            "ai_hub_tool_search_vector_store");
 
         when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
             .thenThrow(new EmptyResultDataAccessException(1));
@@ -104,7 +106,8 @@ class ToolSearchCatalogFeederGlobalToolsTest {
     @Test
     void testPopulateGlobalToolsIndexesEachToolWithNonBlankSummary() {
         ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, pgVectorJdbcTemplate, "public", "ai_hub_tool_search_vector_store");
+            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            "ai_hub_tool_search_vector_store");
 
         when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
             .thenThrow(new EmptyResultDataAccessException(1));
@@ -128,7 +131,8 @@ class ToolSearchCatalogFeederGlobalToolsTest {
     @Test
     void testPopulateGlobalToolsSkipsWhenHashUnchanged() {
         ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, pgVectorJdbcTemplate, "public", "ai_hub_tool_search_vector_store");
+            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            "ai_hub_tool_search_vector_store");
 
         when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
             .thenThrow(new EmptyResultDataAccessException(1));
@@ -149,5 +153,36 @@ class ToolSearchCatalogFeederGlobalToolsTest {
             "ai_hub_tool_catalog:global:ask", List.of(toolCallback("listProjects", "List all projects")));
 
         verify(vectorToolIndex, never()).indexTools(any(), any());
+    }
+
+    @Test
+    void testChangedEmbeddingModelReindexesAnUnchangedCatalog() {
+        ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
+            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            "ai_hub_tool_search_vector_store");
+
+        when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
+            .thenThrow(new EmptyResultDataAccessException(1));
+
+        feeder.populateGlobalTools(
+            "ai_hub_tool_catalog:global:ask", List.of(toolCallback("listProjects", "List all projects")));
+
+        ArgumentCaptor<String> hashCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(pgVectorJdbcTemplate).update(any(), eq("ai_hub_tool_catalog:global:ask"), hashCaptor.capture(), any());
+
+        reset(vectorToolIndex, pgVectorJdbcTemplate);
+
+        when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), eq("ai_hub_tool_catalog:global:ask")))
+            .thenReturn(hashCaptor.getValue());
+
+        ToolSearchCatalogFeeder otherModelFeeder = new ToolSearchCatalogFeeder(
+            vectorToolIndex, "OLLAMA:nomic-embed-text", pgVectorJdbcTemplate, "public",
+            "ai_hub_tool_search_vector_store");
+
+        otherModelFeeder.populateGlobalTools(
+            "ai_hub_tool_catalog:global:ask", List.of(toolCallback("listProjects", "List all projects")));
+
+        verify(vectorToolIndex).indexTools(eq("ai_hub_tool_catalog:global:ask"), any());
     }
 }
