@@ -1,4 +1,6 @@
 dependencies {
+    implementation("org.springframework.ai:spring-ai-model")
+    implementation("org.springframework.ai:spring-ai-client-chat")
     annotationProcessor(rootProject.libs.com.google.auto.service.auto.service)
 
     implementation("com.github.ben-manes.caffeine:caffeine")

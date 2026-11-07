@@ -72,15 +72,17 @@ class AiHubConfigurationToolSetTest {
 
         assertThat(toolNames(buildAgent)).containsExactlyInAnyOrder(
             "addAiAgentChannel", "addAiAgentElement", "addDataTableColumn", "addDataTableRow",
-            "addKnowledgeBaseDocument", "aggregateDataTable", "askUserQuestion", "buildWorkflow", "checkWorkflow",
+            "addKnowledgeBaseDocument", "aggregateDataTable", "askUserQuestion", "buildCodeWorkflow",
+            "buildCustomComponent", "buildWorkflow", "checkWorkflow",
             "cloneAssetFile", "cloneDataTable", "cloneKnowledgeBase", "createAiAgent", "createApiCollection",
             "createAssetFile", "createAssetFileFromUrl", "createBinaryAssetFile", "createComponentRule",
             "createConnection", "createDataTable", "createDataTableFromCsv", "createKnowledgeBase", "createProject",
             "createProjectWorkflow", "describeComponentToolParameters", "getAiAgent", "getAssetFileContent",
             "getWorkflow", "importWorkflow", "listAiAgents", "listApiCollections", "listAssetFiles",
             "listComponentRules", "listConnectionsForComponent", "listDataTables", "listKnowledgeBases", "listProjects",
-            "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab",
-            "proposeComponentRuleCondition", "queryDataTable", "queryKnowledgeBase", "saveWorkflowTestConnection",
+            "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab", "openCustomComponentTab", "openWorkflowChatTab",
+            "openWorkflowTab", "proposeComponentRuleCondition", "queryDataTable", "queryKnowledgeBase",
+            "saveWorkflowTestConnection",
             "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows",
             "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
             "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings",
@@ -149,10 +151,11 @@ class AiHubConfigurationToolSetTest {
             .buildAgent();
 
         assertThat(buildAgent.pinnedToolCallbacks())
-            .filteredOn(toolCallback -> Set.of("buildWorkflow", "importWorkflow")
-                .contains(toolCallback.getToolDefinition()
-                    .name()))
-            .hasSize(2)
+            .filteredOn(
+                toolCallback -> Set.of("buildWorkflow", "importWorkflow", "buildCustomComponent", "buildCodeWorkflow")
+                    .contains(toolCallback.getToolDefinition()
+                        .name()))
+            .hasSize(4)
             .allSatisfy(toolCallback -> assertThat(toolCallback).isInstanceOf(
                 WorkspaceScopedSubAgentToolCallback.class));
     }
