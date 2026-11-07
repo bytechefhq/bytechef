@@ -129,23 +129,26 @@ public class AiHubConfiguration {
     static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of("buildWorkflow", "importWorkflow");
 
     static final Set<String> ASK_PINNED_TOOL_NAMES = Set.of(
-        "aggregateDataTable", "askUserQuestion", "checkWorkflow", "getAiAgent", "getAssetFileContent", "getWorkflow",
-        "listAiAgents", "listAssetFiles", "listDataTables", "listKnowledgeBases", "listProjects", "listWorkflows",
-        "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable", "queryKnowledgeBase",
-        "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows");
+        "aggregateDataTable", "askUserQuestion", "checkWorkflow", "describeComponentToolParameters", "getAiAgent",
+        "getAssetFileContent", "getWorkflow", "listAiAgents", "listApiCollections", "listAssetFiles",
+        "listComponentRules", "listDataTables", "listKnowledgeBases", "listProjects", "listWorkflows", "openAiAgentTab",
+        "openWorkflowChatTab", "openWorkflowTab", "proposeComponentRuleCondition", "queryDataTable",
+        "queryKnowledgeBase", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows");
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
         "addAiAgentChannel", "addAiAgentElement", "addDataTableColumn", "addDataTableRow", "addKnowledgeBaseDocument",
         "aggregateDataTable", "askUserQuestion", "buildWorkflow", "checkWorkflow", "cloneAssetFile", "cloneDataTable",
-        "cloneKnowledgeBase", "createAiAgent", "createAssetFile", "createAssetFileFromUrl", "createBinaryAssetFile",
-        "createConnection", "createDataTable", "createDataTableFromCsv", "createKnowledgeBase", "createProject",
-        "createProjectWorkflow", "getAiAgent", "getAssetFileContent", "getWorkflow", "importWorkflow", "listAiAgents",
-        "listAssetFiles", "listConnectionsForComponent", "listDataTables", "listKnowledgeBases", "listProjects",
-        "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable",
-        "queryKnowledgeBase", "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools",
-        "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
-        "selectPropertyOption", "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement",
-        "updateAiAgentSettings", "updateAssetFileContent", "updateDataTableRow");
+        "cloneKnowledgeBase", "createAiAgent", "createApiCollection", "createAssetFile", "createAssetFileFromUrl",
+        "createBinaryAssetFile", "createComponentRule", "createConnection", "createDataTable", "createDataTableFromCsv",
+        "createKnowledgeBase", "createProject", "createProjectWorkflow", "describeComponentToolParameters",
+        "getAiAgent", "getAssetFileContent", "getWorkflow", "importWorkflow", "listAiAgents", "listApiCollections",
+        "listAssetFiles", "listComponentRules", "listConnectionsForComponent", "listDataTables", "listKnowledgeBases",
+        "listProjects", "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab",
+        "proposeComponentRuleCondition", "queryDataTable", "queryKnowledgeBase", "saveWorkflowTestConnection",
+        "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows",
+        "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption",
+        "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings", "updateAssetFileContent",
+        "updateDataTableRow");
 
     private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
     private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
