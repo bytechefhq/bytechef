@@ -89,6 +89,6 @@ public class AiAgentUtilsComponentHandlerTest {
 
         return new AiAgentUtilsComponentHandler(
             Mockito.mock(AiAgentToolFacade.class), Mockito.mock(AiSkillFacade.class), applicationProperties,
-            List.of(), null, null, null, null);
+            List.of(), null, null, null, null, List.of());
     }
 }
