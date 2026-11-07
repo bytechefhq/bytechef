@@ -17,8 +17,10 @@
 package com.bytechef.platform.workflow.execution.repository;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionScopeDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -53,9 +55,42 @@ public class WorkflowExecutionRowRepositoryImpl implements WorkflowExecutionRowR
         List<String> workflowIds, boolean onlyRootJobs, List<String> failedTriggerWorkflowExecutionIds,
         Pageable pageable) {
 
-        Query rowsQuery = buildRowsQuery(
-            status, startDate, endDate, principalIds, type, workflowIds, onlyRootJobs,
-            failedTriggerWorkflowExecutionIds);
+        return findAll(
+            status, startDate, endDate,
+            List.of(
+                new WorkflowExecutionScopeDTO(
+                    PlatformType.values()[type], principalIds, workflowIds, failedTriggerWorkflowExecutionIds)),
+            onlyRootJobs, pageable);
+    }
+
+    @Override
+    @SuppressFBWarnings(
+        value = "SQL_INJECTION_SPRING_JDBC",
+        justification = "Query is safely built using parameterized placeholders; all user input passed via arguments array")
+    public Page<WorkflowExecutionRowDTO> findAll(
+        Integer status, Instant startDate, Instant endDate, List<WorkflowExecutionScopeDTO> workflowExecutionScopeDTOs,
+        boolean onlyRootJobs, Pageable pageable) {
+
+        if (workflowExecutionScopeDTOs.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        List<String> scopeQueries = new ArrayList<>();
+        List<Object> scopeArguments = new ArrayList<>();
+
+        for (WorkflowExecutionScopeDTO workflowExecutionScopeDTO : workflowExecutionScopeDTOs) {
+            PlatformType platformType = workflowExecutionScopeDTO.type();
+
+            Query scopeQuery = buildRowsQuery(
+                status, startDate, endDate, workflowExecutionScopeDTO.principalIds(), platformType.ordinal(),
+                workflowExecutionScopeDTO.workflowIds(), onlyRootJobs,
+                workflowExecutionScopeDTO.failedTriggerWorkflowExecutionIds());
+
+            scopeQueries.add(scopeQuery.query);
+            scopeArguments.addAll(List.of(scopeQuery.arguments));
+        }
+
+        Query rowsQuery = new Query(String.join("UNION ALL ", scopeQueries), scopeArguments.toArray());
 
         Long total = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM (" + rowsQuery.query + ") execution_rows", Long.class, rowsQuery.arguments);

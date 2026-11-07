@@ -27,6 +27,7 @@ import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO.Kind;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionScopeDTO;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -148,6 +149,50 @@ class WorkflowExecutionRowRepositoryIntTest {
         assertThat(page.getTotalElements()).isZero();
     }
 
+    @Test
+    void testScopesOfDifferentTypesArePagedTogetherByStartDate() {
+        long embeddedJobId = saveJob(
+            21L, "integration-workflow", null, NOW.minus(3, ChronoUnit.HOURS), PlatformType.EMBEDDED);
+
+        saveJob(22L, "integration-workflow", null, NOW, PlatformType.EMBEDDED);
+
+        Page<WorkflowExecutionRowDTO> page = workflowExecutionRowRepository.findAll(
+            null, null, null,
+            List.of(
+                new WorkflowExecutionScopeDTO(
+                    PlatformType.AUTOMATION, List.of(9L), List.of("workflow-1"),
+                    List.of(firstWorkflowExecutionId, secondWorkflowExecutionId)),
+                new WorkflowExecutionScopeDTO(
+                    PlatformType.EMBEDDED, List.of(21L), List.of("integration-workflow"), List.of())),
+            true, PageRequest.of(0, 20));
+
+        assertThat(page.getContent()).containsExactly(
+            new WorkflowExecutionRowDTO(Kind.TRIGGER_EXECUTION, newestTriggerExecutionId),
+            new WorkflowExecutionRowDTO(Kind.JOB, newestJobId),
+            new WorkflowExecutionRowDTO(Kind.JOB, embeddedJobId),
+            new WorkflowExecutionRowDTO(Kind.JOB, olderJobId),
+            new WorkflowExecutionRowDTO(Kind.TRIGGER_EXECUTION, oldestTriggerExecutionId));
+        assertThat(page.getTotalElements()).isEqualTo(5);
+    }
+
+    @Test
+    void testAScopeOnlyMatchesJobsOfItsOwnType() {
+        Page<WorkflowExecutionRowDTO> page = workflowExecutionRowRepository.findAll(
+            null, null, null,
+            List.of(new WorkflowExecutionScopeDTO(PlatformType.EMBEDDED, List.of(9L), List.of("workflow-1"), null)),
+            true, PageRequest.of(0, 20));
+
+        assertThat(page.getContent()).isEmpty();
+    }
+
+    @Test
+    void testNoScopesReturnAnEmptyPage() {
+        Page<WorkflowExecutionRowDTO> page = workflowExecutionRowRepository.findAll(
+            null, null, null, List.of(), true, PageRequest.of(0, 20));
+
+        assertThat(page.getContent()).isEmpty();
+    }
+
     private String getWorkflowExecutionId(String triggerName) {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, 9L, "workflow-uuid", triggerName);
@@ -156,6 +201,12 @@ class WorkflowExecutionRowRepositoryIntTest {
     }
 
     private long saveJob(long principalId, String workflowId, Long parentTaskExecutionId, Instant startDate) {
+        return saveJob(principalId, workflowId, parentTaskExecutionId, startDate, PlatformType.AUTOMATION);
+    }
+
+    private long saveJob(
+        long principalId, String workflowId, Long parentTaskExecutionId, Instant startDate, PlatformType type) {
+
         Long jobId = jdbcTemplate.queryForObject(
             "INSERT INTO job (workflow_id, parent_task_execution_id, status, current_task, start_date, priority, " +
                 "created_date, created_by, last_modified_date, last_modified_by, version) " +
@@ -163,7 +214,7 @@ class WorkflowExecutionRowRepositoryIntTest {
             Long.class, workflowId, parentTaskExecutionId, Job.Status.COMPLETED.ordinal(), Timestamp.from(startDate));
 
         principalJobRepository.save(
-            new PrincipalJob(principalId, Validate.notNull(jobId, "jobId"), PlatformType.AUTOMATION));
+            new PrincipalJob(principalId, Validate.notNull(jobId, "jobId"), type));
 
         return Validate.notNull(jobId, "jobId");
     }

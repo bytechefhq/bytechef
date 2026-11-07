@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.repository;
 
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionScopeDTO;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -46,4 +47,8 @@ public interface WorkflowExecutionRowRepository {
         Integer status, Instant startDate, Instant endDate, List<Long> principalIds, int type,
         List<String> workflowIds, boolean onlyRootJobs, List<String> failedTriggerWorkflowExecutionIds,
         Pageable pageable);
+
+    Page<WorkflowExecutionRowDTO> findAll(
+        Integer status, Instant startDate, Instant endDate, List<WorkflowExecutionScopeDTO> workflowExecutionScopeDTOs,
+        boolean onlyRootJobs, Pageable pageable);
 }
