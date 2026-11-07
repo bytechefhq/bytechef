@@ -36,13 +36,22 @@ const automationJobRow = {
     workflow: {label: 'Sync contacts'},
 } as unknown as AnyWorkflowExecutionRowI;
 
+const failedTriggerExecution = {
+    endDate: new Date('2026-10-20T11:00:00.250Z'),
+    id: 4,
+    startDate: new Date('2026-10-20T11:00:00Z'),
+    status: 'FAILED',
+};
+
 const automationTriggerRow = {
     automationWorkflowExecution: {
         id: 4,
         project: {name: 'Sales Sync'},
         projectDeployment: {name: '__EMBEDDED__user-5__DEVELOPMENT'},
+        triggerExecution: failedTriggerExecution,
         workflow: {label: 'Failed trigger'},
     },
+    triggerExecution: failedTriggerExecution,
     workflow: {label: 'Failed trigger'},
 } as unknown as AnyWorkflowExecutionRowI;
 
@@ -111,6 +120,16 @@ describe('AnyWorkflowExecutionsTable', () => {
         expect(automationCells[2]).toHaveTextContent(/^Sales Sync$/);
         expect(integrationCells[2]).toContainElement(screen.getByRole('img', {name: 'Integration'}));
         expect(integrationCells[2]).toHaveTextContent(/^Gmail$/);
+    });
+
+    it('shows the status, duration and date of a failed trigger that started no job', () => {
+        renderTable([automationTriggerRow]);
+
+        const triggerCells = screen.getAllByRole('row')[1].querySelectorAll('td');
+
+        expect(triggerCells[0]).toHaveTextContent('FAILED');
+        expect(triggerCells[5]).toHaveTextContent('250ms');
+        expect(triggerCells[6]).toHaveTextContent(failedTriggerExecution.startDate.toLocaleDateString());
     });
 
     it('opens the automation execution sheet for an automation run', async () => {
