@@ -61,17 +61,18 @@ paths:
           type: "integer"
           format: "int64"
       - name: "source"
-        description: "Where the executed workflows are exposed. PROJECT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project."
+        description: "Where the executed workflows are exposed. PROJECT_DEPLOYMENT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project; ANY returns all of them."
         in: "query"
         required: false
         schema:
           type: "string"
           enum:
-          - "PROJECT"
+          - "ANY"
+          - "PROJECT_DEPLOYMENT"
           - "MCP_SERVER"
           - "A2A_SERVER"
           - "API_COLLECTION"
-          default: "PROJECT"
+          default: "PROJECT_DEPLOYMENT"
       - name: "jobStatus"
         description: "The status of an executed job"
         in: "query"
@@ -309,6 +310,19 @@ components:
         projectVersion:
           description: "The version of the project the workflow execution ran."
           type: "integer"
+          readOnly: true
+        source:
+          description: "Where the executed workflow is exposed: PROJECT_DEPLOYMENT for a plain project deployment, or MCP_SERVER, A2A_SERVER or API_COLLECTION for a deployment one of them created for its project."
+          type: "string"
+          readOnly: true
+          enum:
+            - "PROJECT_DEPLOYMENT"
+            - "MCP_SERVER"
+            - "A2A_SERVER"
+            - "API_COLLECTION"
+        sourceName:
+          description: "The name of the MCP server, A2A server or API collection that exposes the executed workflow; empty for a plain project deployment."
+          type: "string"
           readOnly: true
         taskExecutionCount:
           description: "The number of task executions of this job, counting only the latest attempt of each task, including the task executions of every loop iteration and branch and excluding subflow jobs; set when the execution is loaded lazily."
