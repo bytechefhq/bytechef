@@ -1,7 +1,7 @@
 import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {render as renderWithProviders} from '@/shared/util/test-utils';
-import {render, screen} from '@testing-library/react';
-import {describe, expect, it} from 'vitest';
+import {fireEvent, render, screen} from '@testing-library/react';
+import {describe, expect, it, vi} from 'vitest';
 
 import ExternalInvocationsTable from './ExternalInvocationsTable';
 
@@ -218,5 +218,36 @@ describe('ExternalInvocationsTable', () => {
 
         expect(screen.getAllByRole('columnheader').at(-1)).toHaveTextContent('Actions');
         expect(screen.getByRole('button', {name: 'External invocation actions'})).toBeInTheDocument();
+    });
+    it('opens the workflow run when the workflow name in the source column is clicked', () => {
+        const onViewJob = vi.fn();
+
+        renderWithProviders(
+            <ExternalInvocationsTable
+                externalInvocationLogs={[
+                    {...baseLog, jobId: '10464', kind: 'WORKFLOW', operationName: null, workflowName: 'Send Message'},
+                ]}
+                onViewJob={onViewJob}
+            />
+        );
+
+        fireEvent.click(screen.getByRole('button', {name: 'Send Message'}));
+
+        expect(onViewJob).toHaveBeenCalledWith(10464);
+    });
+
+    it('shows the source as plain text when the invocation has no workflow run', () => {
+        renderWithProviders(
+            <ExternalInvocationsTable
+                externalInvocationLogs={[
+                    {...baseLog, kind: 'WORKFLOW', operationName: null, workflowName: 'Send Message'},
+                    {...baseLog, id: '2', jobId: '10464'},
+                ]}
+                onViewJob={() => {}}
+            />
+        );
+
+        expect(screen.getByText('Send Message').closest('button')).toBeNull();
+        expect(screen.getByText('slack / sendMessage').closest('button')).toBeNull();
     });
 });
