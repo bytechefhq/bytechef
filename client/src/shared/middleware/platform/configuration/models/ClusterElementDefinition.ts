@@ -71,6 +71,10 @@ export interface ClusterElementDefinition {
      */
     outputSchemaDefined?: boolean;
     /**
+     * How much damage one call of this tool can do.
+     */
+    riskLevel?: ClusterElementDefinitionRiskLevelEnum;
+    /**
      * The cluster element title.
      */
     title?: string;
@@ -87,6 +91,19 @@ export interface ClusterElementDefinition {
      */
     testable?: boolean;
 }
+
+
+/**
+ * @export
+ */
+export const ClusterElementDefinitionRiskLevelEnum = {
+    Low: 'LOW',
+    Medium: 'MEDIUM',
+    High: 'HIGH',
+    Critical: 'CRITICAL',
+} as const;
+export type ClusterElementDefinitionRiskLevelEnum = typeof ClusterElementDefinitionRiskLevelEnum[keyof typeof ClusterElementDefinitionRiskLevelEnum];
+
 
 /**
  * Check if a given object implements the ClusterElementDefinition interface.
@@ -119,6 +136,7 @@ export function ClusterElementDefinitionFromJSONTyped(json: any, ignoreDiscrimin
         'outputDefined': json['outputDefined'],
         'outputFunctionDefined': json['outputFunctionDefined'] == null ? undefined : json['outputFunctionDefined'],
         'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
+        'riskLevel': json['riskLevel'] == null ? undefined : json['riskLevel'],
         'title': json['title'] == null ? undefined : json['title'],
         'type': json['type'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
@@ -146,6 +164,7 @@ export function ClusterElementDefinitionToJSONTyped(value?: ClusterElementDefini
         'outputDefined': value['outputDefined'],
         'outputFunctionDefined': value['outputFunctionDefined'],
         'outputSchemaDefined': value['outputSchemaDefined'],
+        'riskLevel': value['riskLevel'],
         'title': value['title'],
         'type': value['type'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
