@@ -69,6 +69,7 @@ import com.bytechef.ee.ai.hub.tool.OpenCodeWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenCustomComponentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.RunChatWorkflowToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
 import com.bytechef.ee.ai.hub.tool.memory.AiHubAutoMemoryToolsAdvisor;
@@ -93,6 +94,7 @@ import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -281,6 +283,7 @@ public class AiHubConfiguration {
         ObjectProvider<EnvironmentService> environmentServiceProvider, AiHubChatService chatService,
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
         AiHubToolApprovalPolicy toolApprovalPolicy, AiHubSessionMemory aiHubSessionMemory,
+        WorkflowFacade workflowFacade,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
         @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
@@ -314,6 +317,8 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
         toolCallbacks.add(new ListChatWorkflowsToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
+        toolCallbacks.add(
+            new RunChatWorkflowToolCallback(projectDeploymentFacade, workflowFacade, aiHubChatArtifactRecorder));
 
         AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
         AiGuardrailMetrics aiGuardrailMetrics = aiGuardrailMetrics(aiGuardrails, meterRegistryProvider);

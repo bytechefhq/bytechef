@@ -71,7 +71,8 @@ class AiHubConfigurationToolSetTest {
 
         assertThat(toolNames(askToolCallbacks.toolCallbacks())).doesNotContain(
             "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
-            "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition",
+            "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "runChatWorkflow", "listComponents",
+            "getActionDefinition",
             "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel", "importWorkflow", "buildCustomComponent",
             "buildCodeWorkflow", "createAssetFile", "updateAssetFileContent", "createDataTable", "addDataTableRow",
             "dropDataTable", "createKnowledgeBase", "deleteKnowledgeBase", "createApiCollection",
@@ -132,7 +133,8 @@ class AiHubConfigurationToolSetTest {
             "searchDocs", "listProjectDeployments", "createProjectDeployment", "updateProjectDeployment",
             "deleteProjectDeployment", "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow",
             "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
-            "listChatWorkflows", "createWorkflowChat", "listAiAgents", "getAiAgent", "searchAiAgentTools",
+            "listChatWorkflows", "createWorkflowChat", "runChatWorkflow", "listAiAgents", "getAiAgent",
+            "searchAiAgentTools",
             "searchAiAgentReferences", "createAiAgent", "updateAiAgent", "updateAiAgentSettings",
             "addAiAgentElement", "updateAiAgentElement", "deleteAiAgentElement", "addAiAgentChannel",
             "deleteAiAgentChannel", "listAssetFiles", "getAssetFileContent", "createAssetFile", "createBinaryAssetFile",

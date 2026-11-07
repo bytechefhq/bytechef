@@ -83,6 +83,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -145,6 +146,7 @@ public final class AiHubAgentFixtures {
     public final ProjectService projectService = mock(ProjectService.class);
     public final AiHubToolApprovalPolicy policy = mock(AiHubToolApprovalPolicy.class);
     public final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
+    public final WorkflowFacade workflowFacade = mock(WorkflowFacade.class);
     public final ProjectFacade projectFacade = mock(ProjectFacade.class);
     public final ProjectWorkflowFacade projectWorkflowFacade = mock(ProjectWorkflowFacade.class);
     public final ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
@@ -336,7 +338,7 @@ public final class AiHubAgentFixtures {
             projectWorkflowFacade,
             projectDeploymentFacade, availableProvider(environmentPromotionFacade),
             availableProvider(environmentService),
-            chatService, chatAccessPolicy, artifactRecorder, policy, sessionMemory,
+            chatService, chatAccessPolicy, artifactRecorder, policy, sessionMemory, workflowFacade,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
             availableProvider(aiGuardrails), availableProvider(meterRegistry),
             availableProvider(null));
