@@ -58,6 +58,10 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
+import com.bytechef.ee.ai.hub.toolsearch.PinnedToolSearchToolCallingAdvisor;
+import com.bytechef.ee.ai.hub.toolsearch.ToolSearchAdvisorConfiguration;
+import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubChatArtifactGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubChatGraphQlController;
@@ -71,8 +75,11 @@ import java.util.concurrent.Executor;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.ToolAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -199,12 +206,67 @@ class AiHubConfigurationContextTest {
     }
 
     @Test
+    void testStartsWithoutToolSearchWhenThereIsNoVectorStoreOrEmbeddingModel() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        contextRunner(fixtures)
+            .withUserConfiguration(AiHubPgVectorConfiguration.class, ToolSearchAdvisorConfiguration.class)
+            .withPropertyValues("bytechef.ai.hub.enabled=true", "bytechef.ai.copilot.enabled=true")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+                assertThat(context.getBeansOfType(AiHubGlobalToolCatalog.class)).containsOnlyKeys(
+                    "aiHubAskGlobalToolCatalog", "aiHubBuildGlobalToolCatalog");
+                assertThat(context.getBeanProvider(ToolSearchCatalogFeeder.class)
+                    .getIfAvailable()).isNull();
+
+                for (String agentBeanName : List.of("aiHubAskSpringAIAgent", "aiHubBuildSpringAIAgent")) {
+                    assertThat(toolAdvisors(context, agentBeanName)).as(agentBeanName)
+                        .isEmpty();
+                }
+            });
+    }
+
+    @Test
+    void testBothAgentsRegisterOneToolSearchAdvisorWhenTheVectorStoreIsAvailable() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        contextRunner(fixtures)
+            .withUserConfiguration(ToolSearchAdvisorConfiguration.class)
+            .withBean("toolSearchPgVectorStore", VectorStore.class, () -> mock(VectorStore.class))
+            .withBean(PgVectorStoreProperties.class)
+            .withPropertyValues("bytechef.ai.hub.enabled=true", "bytechef.ai.copilot.enabled=true")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+
+                for (String agentBeanName : List.of("aiHubAskSpringAIAgent", "aiHubBuildSpringAIAgent")) {
+                    assertThat(toolAdvisors(context, agentBeanName)).as(agentBeanName)
+                        .singleElement()
+                        .isInstanceOf(PinnedToolSearchToolCallingAdvisor.class);
+                }
+
+                assertThat(toolAdvisors(context, "aiHubAskSpringAIAgent"))
+                    .doesNotContainAnyElementsOf(toolAdvisors(context, "aiHubBuildSpringAIAgent"));
+            });
+    }
+
+    @Test
     void testSessionMemorySitsInsideTheToolCallingLoop() {
         SessionMemoryAdvisor sessionMemoryAdvisor = AiHubAgentFixtures.withBuildWorkflow().sessionMemory
             .createSessionMemoryAdvisor();
 
         assertThat(sessionMemoryAdvisor).isInstanceOf(MemoryAdvisor.class);
         assertThat(sessionMemoryAdvisor.getOrder()).isGreaterThan(ToolCallingAdvisor.DEFAULT_ORDER);
+    }
+
+    private static List<Object> toolAdvisors(ApplicationContext context, String agentBeanName) {
+        AiHubSpringAIAgent agent = context.getBean(agentBeanName, AiHubSpringAIAgent.class);
+
+        List<?> advisors = (List<?>) ReflectionTestUtils.getField(agent, "advisors");
+
+        return advisors == null ? List.of() : advisors.stream()
+            .filter(ToolAdvisor.class::isInstance)
+            .map(Object.class::cast)
+            .toList();
     }
 
     private static void assertInjectedLocalAgentsAreTheTwoRouters(ApplicationContext context) {
