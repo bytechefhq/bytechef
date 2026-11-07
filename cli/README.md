@@ -220,13 +220,18 @@ extension. `--enable` also makes the published integration live in the profile's
 enables the instance configuration when the environment has none, or else moves the existing one to the
 published version and enables it. The deploy is sent with the profile's environment as `X-Environment`.
 
-## Component scaffolding
+## Component scaffolding and deployment
 
 ```bash
 bytechef component init --name my-component --open-api-path ./openapi.yaml --output-path .
+
+# Deploy a custom component (single-file JS/Python/Ruby, or a Java .jar) to a running instance
+bytechef component deploy --file ./my-component.js
 ```
 
-`component init` is local-only and contacts no instance.
+`component init` is local-only and contacts no instance. `component deploy` sends to
+`<host>/api/platform/v1` with `Authorization: Bearer <token>`; the profile token used must be an admin
+platform API key, and the file extension selects the language server-side.
 
 ## Exit codes
 
