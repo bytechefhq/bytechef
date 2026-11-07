@@ -42,8 +42,8 @@ class AiHubConfigurationToolSetTest {
 
         assertThat(toolNames(askAgent)).containsExactlyInAnyOrder(
             "askUserQuestion", "checkWorkflow", "explainCodeWorkflow", "explainCustomComponent", "getWorkflow",
-            "listProjects", "listWorkflows", "openCodeWorkflowTab", "openCustomComponentTab", "openWorkflowChatTab",
-            "openWorkflowTab", "searchProjects", "searchWorkflows");
+            "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab", "openCustomComponentTab",
+            "openWorkflowChatTab", "openWorkflowTab", "searchProjects", "searchWorkflows");
     }
 
     @Test
@@ -55,8 +55,8 @@ class AiHubConfigurationToolSetTest {
             "getProject", "getProjectStatus", "listWorkflowExecutions", "getWorkflowExecution", "getAction",
             "getTrigger", "getClusterElement", "searchDocs", "listProjectDeployments", "listConnectionsForComponent",
             "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
-            "listAiAgents", "getAiAgent", "searchAiAgentTools", "searchAiAgentReferences", "openAiAgentTab",
-            "listAssetFiles", "getAssetFileContent", "listDataTables", "queryDataTable", "aggregateDataTable",
+            "listAiAgents", "getAiAgent", "searchAiAgentTools", "searchAiAgentReferences", "listAssetFiles",
+            "getAssetFileContent", "listDataTables", "queryDataTable", "aggregateDataTable",
             "listKnowledgeBases", "queryKnowledgeBase", "listApiCollections", "listComponentRules",
             "describeComponentToolParameters", "proposeComponentRuleCondition");
     }
@@ -111,7 +111,7 @@ class AiHubConfigurationToolSetTest {
         assertThat(toolNames(buildAgent)).containsExactlyInAnyOrder(
             "askUserQuestion", "buildCodeWorkflow", "buildCustomComponent", "buildWorkflow", "checkWorkflow",
             "createConnection", "createProject", "createProjectWorkflow", "getWorkflow", "importWorkflow",
-            "listConnectionsForComponent", "listProjects", "listWorkflows", "openCodeWorkflowTab",
+            "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab",
             "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection",
             "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
             "selectPropertyOption", "selectTriggerPropertyOption");
@@ -129,7 +129,7 @@ class AiHubConfigurationToolSetTest {
             "deleteProjectDeployment", "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow",
             "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
             "listChatWorkflows", "createWorkflowChat", "listAiAgents", "getAiAgent", "searchAiAgentTools",
-            "searchAiAgentReferences", "openAiAgentTab", "createAiAgent", "updateAiAgent", "updateAiAgentSettings",
+            "searchAiAgentReferences", "createAiAgent", "updateAiAgent", "updateAiAgentSettings",
             "addAiAgentElement", "updateAiAgentElement", "deleteAiAgentElement", "addAiAgentChannel",
             "deleteAiAgentChannel", "listAssetFiles", "getAssetFileContent", "createAssetFile", "createBinaryAssetFile",
             "createAssetFileFromUrl", "updateAssetFileContent", "cloneAssetFile", "listDataTables", "queryDataTable",

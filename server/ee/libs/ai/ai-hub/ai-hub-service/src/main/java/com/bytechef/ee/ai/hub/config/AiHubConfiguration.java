@@ -136,13 +136,13 @@ public class AiHubConfiguration {
 
     static final Set<String> ASK_PINNED_TOOL_NAMES = Set.of(
         "askUserQuestion", "checkWorkflow", "explainCodeWorkflow", "explainCustomComponent", "getWorkflow",
-        "listProjects", "listWorkflows", "openCodeWorkflowTab", "openCustomComponentTab", "openWorkflowChatTab",
-        "openWorkflowTab", "searchProjects", "searchWorkflows");
+        "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab", "openCustomComponentTab",
+        "openWorkflowChatTab", "openWorkflowTab", "searchProjects", "searchWorkflows");
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
         "askUserQuestion", "buildCodeWorkflow", "buildCustomComponent", "buildWorkflow", "checkWorkflow",
         "createConnection", "createProject", "createProjectWorkflow", "getWorkflow", "importWorkflow",
-        "listConnectionsForComponent", "listProjects", "listWorkflows", "openCodeWorkflowTab",
+        "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab",
         "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection",
         "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
         "selectPropertyOption", "selectTriggerPropertyOption");

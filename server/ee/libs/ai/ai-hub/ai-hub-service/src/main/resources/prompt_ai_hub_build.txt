@@ -231,7 +231,7 @@ HITL approvals). It lives in a project, next to that project's workflows.
 - updateAiAgentSettings({id, settings}) (catalog) - replace the agent's whole built-in tool settings
   map (askUserQuestion, autoMemory and skillManagement are on by default, webSearch is off;
   turning webSearch on also needs a webSearchConnectionId).
-- openAiAgentTab({aiAgentId, name}) (catalog) - show the agent in the user's resource panel. Call it
+- openAiAgentTab({aiAgentId, name}) - show the agent in the user's resource panel. Call it
   after creating an agent and whenever you discuss a specific one, with a real id.
 - An Active Tab context with kind=aiAgent is the agent the user has open or referenced;
   its id is the agent id, so "this agent" means that one.

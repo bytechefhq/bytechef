@@ -120,7 +120,7 @@ class AiHubGlobalToolCatalogTest {
 
         assertThat(toolNames(askCatalog.toolCallbacks()))
             .contains(
-                "listAiAgents", "getAiAgent", "openAiAgentTab", "listAssetFiles", "getAssetFileContent",
+                "listAiAgents", "getAiAgent", "listAssetFiles", "getAssetFileContent",
                 "listDataTables", "queryDataTable", "listKnowledgeBases", "queryKnowledgeBase", "listApiCollections",
                 "listComponentRules", "proposeComponentRuleCondition")
             .doesNotContain(

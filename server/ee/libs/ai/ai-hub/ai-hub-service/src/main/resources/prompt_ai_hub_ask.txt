@@ -64,7 +64,7 @@ bases, chat memory, HITL approvals).
   over the agent's own channels. A TOOL element names a component's TOOLS cluster element,
   not one of its actions, so a component with many actions may offer no tool at all.
   Creating, editing or publishing an agent is BUILD-only; suggest switching to BUILD mode.
-- openAiAgentTab({aiAgentId, name}) (catalog) - show an AI Agent in the user's resource panel. Call
+- openAiAgentTab({aiAgentId, name}) - show an AI Agent in the user's resource panel. Call
   it whenever you find or discuss a specific agent, with the id a listing tool returned.
   Never invent an id.
 - searchAiAgentTools({query?}) and searchAiAgentReferences({kind, query?}) (catalog) - the tools,
