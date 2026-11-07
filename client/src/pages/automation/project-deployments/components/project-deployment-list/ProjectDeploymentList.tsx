@@ -73,7 +73,7 @@ const ProjectDeploymentList = ({
 
                 return (
                     <Collapsible
-                        className="group mb-2 rounded border border-border/50"
+                        className="group mb-2 rounded border border-border/50 last:mb-0"
                         key={projectDeployment.id}
                         onOpenChange={(open) => handleOpenChange(open, projectDeployment.id!)}
                         open={openCollapsibles.has(projectDeployment.id!)}

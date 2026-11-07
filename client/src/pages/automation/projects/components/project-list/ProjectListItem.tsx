@@ -4,6 +4,7 @@ import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
@@ -18,7 +19,7 @@ import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConve
 import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
-import ProjectListItemDeployButton from '@/pages/automation/projects/components/project-list/ProjectListItemDeployButton';
+import ProjectListItemNewDeploymentMenuItem from '@/pages/automation/projects/components/project-list/ProjectListItemNewDeploymentMenuItem';
 import ProjectListItemPublishMenuItem from '@/pages/automation/projects/components/project-list/ProjectListItemPublishMenuItem';
 import ProjectListItemTabs, {
     ProjectListItemTabType,
@@ -91,6 +92,7 @@ const ProjectListItem = ({
 }: ProjectItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showProjectDeploymentDialog, setShowProjectDeploymentDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
     const [showProjectShareDialog, setShowProjectShareDialog] = useState(false);
     const [showPublishProjectDialog, setShowPublishProjectDialog] = useState(false);
@@ -229,21 +231,19 @@ const ProjectListItem = ({
         pullProjectFromGitMutation.mutate({id: project.id!});
     };
 
-    const [isProjectDeploymentDialogOpen, setIsProjectDeploymentDialogOpen] = useState(false);
-
-    const handleProjectDeploymentDialogOpen = async (event: MouseEvent<HTMLButtonElement>) => {
-        event.stopPropagation();
-
+    const handleNewDeploymentClick = () => {
         if (!currentWorkspaceId || !project.id) {
             return;
         }
 
-        await projectDeploymentsQuery.refetch();
+        setShowProjectDeploymentDialog(true);
+
+        projectDeploymentsQuery.refetch();
     };
 
     const handleProjectListItemClick = useCallback(
         (event: MouseEvent) => {
-            if (isProjectDeploymentDialogOpen) {
+            if (showProjectDeploymentDialog) {
                 return;
             }
 
@@ -263,7 +263,7 @@ const ProjectListItem = ({
 
             onTabChange(activeTab ? undefined : 'workflows');
         },
-        [activeTab, isProjectDeploymentDialogOpen, onTabChange]
+        [activeTab, onTabChange, showProjectDeploymentDialog]
     );
 
     return (
@@ -355,39 +355,16 @@ const ProjectListItem = ({
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
                             <div className="flex items-center space-x-2">
-                                {project.lastPublishedDate && project.lastProjectVersion ? (
-                                    <>
-                                        <Badge
-                                            className="flex space-x-1 border-transparent"
-                                            styleType="success-outline"
-                                            weight="semibold"
-                                        >
-                                            <span>V{project.lastProjectVersion - 1}</span>
+                                {isPublished ? (
+                                    <Badge
+                                        className="flex space-x-1 border-transparent"
+                                        styleType="success-outline"
+                                        weight="semibold"
+                                    >
+                                        <span>V{project.lastProjectVersion! - 1}</span>
 
-                                            <span>PUBLISHED</span>
-                                        </Badge>
-
-                                        <ButtonGroup>
-                                            <ProjectDeploymentDialog
-                                                onOpenChange={setIsProjectDeploymentDialogOpen}
-                                                onSuccess={openSavedProjectDeployment}
-                                                projectDeployment={{
-                                                    name: project.name,
-                                                    projectId: project.id,
-                                                }}
-                                                projectDeployments={projectDeploymentsQuery.data}
-                                                projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
-                                                redirectOnSubmit={false}
-                                                showTabs
-                                                triggerNode={
-                                                    <ProjectListItemDeployButton
-                                                        hasWorkflows={hasWorkflows}
-                                                        onClick={handleProjectDeploymentDialogOpen}
-                                                    />
-                                                }
-                                            />
-                                        </ButtonGroup>
-                                    </>
+                                        <span>PUBLISHED</span>
+                                    </Badge>
                                 ) : (
                                     <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
                                         <span>V{project.lastProjectVersion}</span>
@@ -426,64 +403,92 @@ const ProjectListItem = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <ProjectListItemPublishMenuItem
-                                    hasWorkflows={hasWorkflows}
-                                    onClick={() => setShowPublishProjectDialog(true)}
-                                />
+                                <DropdownMenuGroup aria-label="Project Actions">
+                                    <DropdownMenuItem
+                                        aria-label="Edit Project"
+                                        icon={<EditIcon />}
+                                        label="Edit"
+                                        onClick={() => setShowEditDialog(true)}
+                                    />
+
+                                    <ProjectListItemPublishMenuItem
+                                        hasWorkflows={hasWorkflows}
+                                        onClick={() => setShowPublishProjectDialog(true)}
+                                    />
+
+                                    <DropdownMenuItem
+                                        aria-label="Duplicate Project"
+                                        icon={<CopyIcon />}
+                                        label="Duplicate"
+                                        onClick={() => duplicateProjectMutation.mutate(project.id!)}
+                                    />
+
+                                    <DropdownMenuItem
+                                        aria-label="Share Project"
+                                        icon={<Share2Icon />}
+                                        label="Share"
+                                        onClick={() => setShowProjectShareDialog(true)}
+                                    />
+
+                                    {templatesSubmissionForm && (
+                                        <DropdownMenuItem
+                                            aria-label="Share with Community"
+                                            icon={<Share2Icon />}
+                                            label="Share with Community"
+                                            onClick={() => window.open(templatesSubmissionForm, '_blank')}
+                                        />
+                                    )}
+
+                                    <DropdownMenuItem
+                                        aria-label="Export Project"
+                                        icon={<DownloadIcon />}
+                                        label="Export"
+                                        onClick={() =>
+                                            (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
+                                        }
+                                    />
+                                </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    aria-label="Edit Project"
-                                    icon={<EditIcon />}
-                                    label="Edit"
-                                    onClick={() => setShowEditDialog(true)}
-                                />
-
-                                <DropdownMenuItem
-                                    aria-label="Duplicate Project"
-                                    icon={<CopyIcon />}
-                                    label="Duplicate"
-                                    onClick={() => duplicateProjectMutation.mutate(project.id!)}
-                                />
-
-                                {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
+                                <DropdownMenuGroup aria-label="Workflow Actions">
                                     <DropdownMenuItem
-                                        aria-label="View Workflows"
-                                        icon={<WorkflowIcon />}
-                                        label="View Workflows"
-                                        onClick={() =>
-                                            navigate(
-                                                `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
-                                            )
-                                        }
+                                        aria-label="New Workflow"
+                                        icon={<PlusIcon />}
+                                        label="New Workflow"
+                                        onSelect={() => setShowWorkflowDialog(true)}
                                     />
-                                )}
 
-                                <DropdownMenuItem
-                                    aria-label="Share Project"
-                                    icon={<Share2Icon />}
-                                    label="Share"
-                                    onClick={() => setShowProjectShareDialog(true)}
-                                />
-
-                                {templatesSubmissionForm && (
                                     <DropdownMenuItem
-                                        aria-label="Share with Community"
-                                        icon={<Share2Icon />}
-                                        label="Share with Community"
-                                        onClick={() => window.open(templatesSubmissionForm, '_blank')}
+                                        aria-label="Import Workflow"
+                                        icon={<UploadIcon />}
+                                        label="Import Workflow"
+                                        onSelect={() => hiddenFileInputRef.current?.click()}
                                     />
-                                )}
 
-                                <DropdownMenuItem
-                                    aria-label="Export Project"
-                                    icon={<DownloadIcon />}
-                                    label="Export"
-                                    onClick={() =>
-                                        (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
-                                    }
-                                />
+                                    {hasWorkflows && (
+                                        <DropdownMenuItem
+                                            aria-label="View Workflows"
+                                            icon={<WorkflowIcon />}
+                                            label="View Workflows"
+                                            onClick={() =>
+                                                navigate(
+                                                    `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
+                                                )
+                                            }
+                                        />
+                                    )}
+                                </DropdownMenuGroup>
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuGroup aria-label="Deployment Actions">
+                                    <ProjectListItemNewDeploymentMenuItem
+                                        hasWorkflows={hasWorkflows}
+                                        isPublished={isPublished}
+                                        onClick={handleNewDeploymentClick}
+                                    />
+                                </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
 
@@ -652,6 +657,21 @@ const ProjectListItem = ({
             />
 
             {showEditDialog && <ProjectDialog onClose={() => setShowEditDialog(false)} project={project} />}
+
+            {showProjectDeploymentDialog && (
+                <ProjectDeploymentDialog
+                    onClose={() => setShowProjectDeploymentDialog(false)}
+                    onSuccess={openSavedProjectDeployment}
+                    projectDeployment={{
+                        name: project.name,
+                        projectId: project.id,
+                    }}
+                    projectDeployments={projectDeploymentsQuery.data}
+                    projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+                    redirectOnSubmit={false}
+                    showTabs
+                />
+            )}
 
             {showProjectGitConfigurationDialog && (
                 <EEVersion hidden={true}>
