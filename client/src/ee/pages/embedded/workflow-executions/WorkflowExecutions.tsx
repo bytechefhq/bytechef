@@ -44,6 +44,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
 import useAutomationWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import FilterTitle from '@/shared/components/filters/FilterTitle';
+import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -220,6 +221,8 @@ export const WorkflowExecutions = () => {
         pageNumber: filterPageNumber,
         workflowId: filterWorkflowId,
     });
+
+    const initialLoadComplete = useInitialLoadComplete(workflowExecutionsIsLoading);
 
     const {data: integrationVersions} = useGetIntegrationVersionsQuery(
         filterIntegrationId!,
@@ -831,6 +834,7 @@ export const WorkflowExecutions = () => {
                 </div>
             }
             leftSidebarHeader={<Header position="sidebar" title="Workflow Executions" />}
+            leftSidebarHidden={!initialLoadComplete}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
