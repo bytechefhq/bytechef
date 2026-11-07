@@ -20,9 +20,9 @@ The page is available on Enterprise Edition only.
 
 ## What is recorded
 
-A record is written for every call that comes in through one of two surfaces:
+A record is written for every call that comes in through one of two sources:
 
-| Surface | Calls recorded |
+| Source | Calls recorded |
 |---|---|
 | **MCP** | Tool calls an AI client makes through an MCP server in the workspace: **component tools**, a component action exposed as a tool such as Slack's **Send Message**, and **workflow tools**, a project workflow exposed as a tool. |
 | **A2A** | Skill calls another agent makes through an A2A server in the workspace. Each skill runs a project workflow. |
@@ -54,7 +54,7 @@ Each call is one row, newest first:
 | **Status** | How the call ended, for example `SUCCESS`, `ERROR` or `TIMEOUT`. |
 | **Tool** | The tool name the AI client called, or the name of the A2A skill. |
 | **Type** | What was called: a **Component tool** or a **Workflow tool** through MCP, or a **Skill** through A2A. |
-| **Surface** | Where the call came in: **MCP** or **A2A**. |
+| **Source** | Where the call came in: **MCP** or **A2A**. |
 | **Server** | The MCP server or the A2A server the call came through. |
 | **Target** | What ran: the component and operation of a component tool, such as `slack / sendMessage`, or the name of the workflow a workflow tool or a skill ran. |
 | **Duration** | How long the call took, in milliseconds. |
@@ -83,7 +83,7 @@ the call returned:
 
 | Filter | Narrows the list to |
 |---|---|
-| **Surface** | Calls that came in through one surface. |
+| **Source** | Calls that came in through one source: **MCP Servers** or **A2A Servers**. |
 | **Status** | Calls that ended one way: Success, Error, Connection required, Timeout, Approval required, Approval denied or Suspended. |
 | **MCP Server** | Calls made through one MCP server. The filter appears when the workspace has at least one MCP server. |
 | **A2A Server** | Calls made through one A2A server. The filter appears when the workspace has at least one A2A server. |
