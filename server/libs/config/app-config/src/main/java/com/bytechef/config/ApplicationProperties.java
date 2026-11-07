@@ -5538,6 +5538,8 @@ public class ApplicationProperties {
         /**
          * Workflow execution configuration
          */
+        private Config config = new Config();
+
         private Execution execution = new Execution();
 
         /**
@@ -5555,6 +5557,10 @@ public class ApplicationProperties {
          */
         private TestOutput testOutput = new TestOutput();
 
+        public Config getConfig() {
+            return config;
+        }
+
         public Execution getExecution() {
             return execution;
         }
@@ -5571,6 +5577,10 @@ public class ApplicationProperties {
             return testOutput;
         }
 
+        public void setConfig(Config config) {
+            this.config = config;
+        }
+
         public void setExecution(Execution execution) {
             this.execution = execution;
         }
@@ -5585,6 +5595,19 @@ public class ApplicationProperties {
 
         public void setTestOutput(TestOutput testOutput) {
             this.testOutput = testOutput;
+        }
+
+        public static class Config {
+
+            private List<String> allowedPrefixes;
+
+            public List<String> getAllowedPrefixes() {
+                return allowedPrefixes;
+            }
+
+            public void setAllowedPrefixes(List<String> allowedPrefixes) {
+                this.allowedPrefixes = allowedPrefixes;
+            }
         }
 
         /**

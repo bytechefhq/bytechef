@@ -373,6 +373,10 @@ bytechef:
       # Concurrent executions in the synchronous, interactive lane (API Platform sync path, editor Test button)
       sync-concurrency-limit: 5
   workflow:
+    config:
+      # Property-name prefixes the config() workflow expression function may read (comma-separated); empty denies every
+      # lookup
+      allowed-prefixes:
     execution:
       agent:
         # Maximum nesting depth of sub-workflows called by AI agent tools default: 10

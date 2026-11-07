@@ -18,6 +18,9 @@
 
 package com.bytechef.evaluator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.core.env.Environment;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
@@ -32,6 +35,8 @@ import org.springframework.expression.spel.SpelMessage;
  */
 class Config implements MethodExecutor {
 
+    private static final String ALLOWED_PREFIXES_PROPERTY = "bytechef.workflow.config.allowed-prefixes";
+
     private final transient Environment environment;
 
     public Config(Environment environment) {
@@ -41,6 +46,12 @@ class Config implements MethodExecutor {
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
         String propertyName = (String) arguments[0];
+
+        if (propertyName == null || !isAllowed(propertyName)) {
+            throw new SpelEvaluationException(
+                SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE, propertyName, Environment.class);
+        }
+
         String value = environment.getProperty(propertyName);
 
         if (value == null) {
@@ -49,5 +60,39 @@ class Config implements MethodExecutor {
         }
 
         return new TypedValue(value);
+    }
+
+    private List<String> getAllowedPrefixes() {
+        List<String> allowedPrefixes = new ArrayList<>();
+
+        String[] commaSeparatedPrefixes = environment.getProperty(ALLOWED_PREFIXES_PROPERTY, String[].class);
+
+        if (commaSeparatedPrefixes != null) {
+            allowedPrefixes.addAll(Arrays.asList(commaSeparatedPrefixes));
+        }
+
+        for (int index = 0;; index++) {
+            String indexedPrefix = environment.getProperty(ALLOWED_PREFIXES_PROPERTY + "[" + index + "]");
+
+            if (indexedPrefix == null) {
+                break;
+            }
+
+            allowedPrefixes.add(indexedPrefix);
+        }
+
+        return allowedPrefixes;
+    }
+
+    private boolean isAllowed(String propertyName) {
+        for (String allowedPrefix : getAllowedPrefixes()) {
+            String trimmedAllowedPrefix = allowedPrefix.trim();
+
+            if (!trimmedAllowedPrefix.isEmpty() && propertyName.startsWith(trimmedAllowedPrefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

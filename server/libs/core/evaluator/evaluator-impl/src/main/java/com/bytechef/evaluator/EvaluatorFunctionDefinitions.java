@@ -1508,7 +1508,9 @@ class EvaluatorFunctionDefinitions implements EvaluatorFunctionDefinitionFactory
 
     static final EvaluatorFunctionDefinition CONFIG = function(EvaluatorFunctionName.CONFIG)
         .title("Config")
-        .description("Reads a configuration property value from the Spring Environment by property name.")
+        .description(
+            "Reads a configuration property value from the Spring Environment by property name. Only properties " +
+                "whose names start with a prefix listed in bytechef.workflow.config.allowed-prefixes can be read.")
         .category(EvaluatorFunctionCategory.UTILITY)
         .parameters(
             parameter("propertyName")
