@@ -11,28 +11,18 @@ import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
 import saveWorkflowDefinitionUpdate from '../../../utils/saveWorkflowDefinitionUpdate';
+import deriveObjectName from '../utils/deriveObjectName';
+import {fromWorkflowDefinitionInput} from '../utils/fromWorkflowDefinitionInput';
+import {toWorkflowDefinitionInput} from '../utils/toWorkflowDefinitionInput';
 
 const EMPTY_WORKFLOW_INPUT: WorkflowInputType = {
+    internalOnly: false,
     label: '',
     name: '',
     required: false,
     testValue: '',
     type: undefined,
 };
-
-/**
- * The REST model groups an input's component reference under componentReference, while the workflow definition
- * stores componentName, componentVersion and groupName as flat fields and rejects componentReference.
- */
-function toDefinitionInput(input: WorkflowInput): WorkflowInput {
-    const {componentReference, ...inputFields} = input;
-
-    if (!componentReference) {
-        return inputFields;
-    }
-
-    return {...inputFields, ...componentReference} as WorkflowInput;
-}
 
 interface UseWorkflowInputsProps {
     invalidateWorkflowQueries: () => void;
@@ -71,6 +61,7 @@ export default function useWorkflowInputs({
             testValue: workflowTestConfiguration?.inputs
                 ? workflowTestConfiguration?.inputs[currentInput?.name]
                 : undefined,
+            type: currentInput.componentReference ? 'component' : currentInput.type,
         };
     }
 
@@ -116,6 +107,7 @@ export default function useWorkflowInputs({
         form.reset({
             ...currentInput,
             testValue,
+            type: currentInput.componentReference ? 'component' : currentInput.type,
         });
     }
 
@@ -158,14 +150,30 @@ export default function useWorkflowInputs({
         return `${baseInputName}_${maxExistingNumber + 1}`;
     }
 
-    function saveWorkflowInput(formInput: WorkflowInputType) {
-        const {getValues} = form;
+    function saveWorkflowInput(input: WorkflowInputType) {
+        const {getValues, setError} = form;
 
-        const inputFields: WorkflowInputType = {...formInput};
+        if (input.name === 'vars') {
+            setError('name', {message: '"vars" is a reserved name.'});
 
-        delete inputFields.testValue;
+            return;
+        }
 
-        const input = toDefinitionInput(inputFields);
+        if (input.type === 'component') {
+            input.componentReference = getValues('componentReference');
+        }
+
+        const testValue = getValues().testValue;
+
+        if (input.type === 'field_mapping') {
+            input.objectName = deriveObjectName(testValue);
+        }
+
+        delete input['testValue'];
+
+        if (input.componentReference) {
+            delete input['type'];
+        }
 
         const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
@@ -175,21 +183,23 @@ export default function useWorkflowInputs({
             input.name = getFormattedInputName(input.name, previousInputs);
         }
 
+        const definitionInput = toWorkflowDefinitionInput(input);
+
         const applyInput = (inputs: WorkflowInput[]): WorkflowInput[] =>
             currentInputIndex === -1
-                ? [...inputs, input]
-                : inputs.map((existingInput, index) => (index === currentInputIndex ? input : existingInput));
+                ? [...inputs, definitionInput]
+                : inputs.map((existingInput, index) => (index === currentInputIndex ? definitionInput : existingInput));
 
         setWorkflow({
             ...workflow,
-            inputs: applyInput(previousInputs),
+            inputs: applyInput(previousInputs).map(fromWorkflowDefinitionInput),
         });
 
         saveWorkflowDefinitionUpdate({
             onError: () => {
                 setWorkflow({
                     ...useWorkflowDataStore.getState().workflow,
-                    inputs: previousInputs,
+                    inputs: previousInputs.map(fromWorkflowDefinitionInput),
                 });
             },
             onSuccess: () => {
@@ -232,7 +242,7 @@ export default function useWorkflowInputs({
 
         setWorkflow({
             ...workflow,
-            inputs: removeInput(originalInputs),
+            inputs: removeInput(originalInputs).map(fromWorkflowDefinitionInput),
         });
 
         setIsDeletePending(true);
@@ -241,7 +251,7 @@ export default function useWorkflowInputs({
             onError: () => {
                 setWorkflow({
                     ...useWorkflowDataStore.getState().workflow,
-                    inputs: originalInputs,
+                    inputs: originalInputs.map(fromWorkflowDefinitionInput),
                 });
 
                 setIsDeletePending(false);

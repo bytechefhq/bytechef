@@ -11,6 +11,21 @@ interface WorkflowInputsTableProps {
     workflowTestConfigurationInputs?: WorkflowTestConfiguration['inputs'];
 }
 
+const formatTestValue = (value: unknown): string => {
+    if (value == null) {
+        return '';
+    }
+
+    if (typeof value === 'object') {
+        return Object.values(value as Record<string, unknown>)
+            .filter((memberValue) => memberValue != null && memberValue !== '')
+            .map((memberValue) => String(memberValue))
+            .join(', ');
+    }
+
+    return String(value);
+};
+
 const WorkflowInputsTable = ({
     internalOnlyVisible,
     openDeleteDialog,
@@ -41,7 +56,8 @@ const WorkflowInputsTable = ({
 
         <TableBody>
             {workflowInputs?.map((input, index) => {
-                const testValue = workflowTestConfigurationInputs?.[input.name]?.toString();
+                const inputType = input.componentReference ? 'component' : input.type;
+                const testValue = formatTestValue(workflowTestConfigurationInputs?.[input.name]);
 
                 return (
                     <TableRow className="cursor-pointer border-b-border/50" key={`${input.name}-${index}`}>
@@ -53,8 +69,8 @@ const WorkflowInputsTable = ({
                             {input.label}
                         </TableCell>
 
-                        <TableCell className="truncate" title={input.type}>
-                            {input.type}
+                        <TableCell className="truncate" title={inputType}>
+                            {inputType}
                         </TableCell>
 
                         <TableCell>{input.required === true ? 'true' : 'false'}</TableCell>
@@ -67,6 +83,7 @@ const WorkflowInputsTable = ({
 
                         <TableCell className="flex justify-end">
                             <Button
+                                aria-label="Edit input"
                                 icon={<EditIcon />}
                                 onClick={() => openEditDialog(index)}
                                 size="icon"
@@ -74,6 +91,7 @@ const WorkflowInputsTable = ({
                             />
 
                             <Button
+                                aria-label="Delete input"
                                 icon={<Trash2Icon className="text-destructive" />}
                                 onClick={() => openDeleteDialog(index)}
                                 size="icon"

@@ -197,6 +197,7 @@ describe('useWorkflowInputs', () => {
 
         expect(result.current.currentInputIndex).toBe(-1);
         expect(result.current.form.getValues()).toEqual({
+            internalOnly: false,
             label: '',
             name: '',
             required: false,
@@ -235,7 +236,16 @@ describe('useWorkflowInputs', () => {
             });
         });
 
-        expect(sentDefinition().inputs).toEqual([{...definitionInput, label: 'Channel'}]);
+        expect(sentDefinition().inputs).toEqual([
+            {
+                componentName: 'slack',
+                componentVersion: 1,
+                groupName: 'channel',
+                label: 'Channel',
+                name: 'channel',
+                required: true,
+            },
+        ]);
     });
 
     it('stores the test value and refocuses the name field once the save lands', () => {
@@ -317,5 +327,30 @@ describe('useWorkflowInputs', () => {
         });
 
         expect(result.current.isDeleteDialogOpen).toBe(false);
+    });
+    it('rejects "vars" as a reserved input name and does not save', () => {
+        const {result} = renderInputs();
+
+        act(() => {
+            result.current.saveWorkflowInput({label: 'Vars', name: 'vars', required: false, type: 'string'} as never);
+        });
+
+        expect(updateWorkflowMutationMock.mutate).not.toHaveBeenCalled();
+        expect(result.current.form.getFieldState('name').error?.message).toBe('"vars" is a reserved name.');
+    });
+
+    it('accepts "varsCount" as an input name', () => {
+        const {result} = renderInputs();
+
+        act(() => {
+            result.current.saveWorkflowInput({
+                label: 'Vars Count',
+                name: 'varsCount',
+                required: false,
+                type: 'string',
+            } as never);
+        });
+
+        expect(updateWorkflowMutationMock.mutate).toHaveBeenCalled();
     });
 });
