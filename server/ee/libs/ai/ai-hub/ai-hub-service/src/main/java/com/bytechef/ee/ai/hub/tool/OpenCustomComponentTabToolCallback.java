@@ -8,13 +8,16 @@
 package com.bytechef.ee.ai.hub.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.NoSuchElementException;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.security.access.AccessDeniedException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -42,12 +45,16 @@ public class OpenCustomComponentTabToolCallback implements ToolCallback {
             "required": ["customComponentId", "name"]
         }""";
 
-    private final JsonMapper jsonMapper = new JsonMapper();
     private final @Nullable AiHubChatArtifactRecorder artifactRecorder;
+    private final CustomComponentFacade customComponentFacade;
+    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public OpenCustomComponentTabToolCallback(@Nullable AiHubChatArtifactRecorder artifactRecorder) {
+    public OpenCustomComponentTabToolCallback(
+        CustomComponentFacade customComponentFacade, @Nullable AiHubChatArtifactRecorder artifactRecorder) {
+
         this.artifactRecorder = artifactRecorder;
+        this.customComponentFacade = customComponentFacade;
     }
 
     @Override
@@ -79,15 +86,30 @@ public class OpenCustomComponentTabToolCallback implements ToolCallback {
                 return toolError("name is required");
             }
 
+            if (!isVisible(input.customComponentId())) {
+                return toolError(
+                    "Custom component " + input.customComponentId() + " was not found. Check the custom component id.");
+            }
+
             recordArtifact(toolContext, input);
 
             return jsonMapper.writeValueAsString(
                 new OpenCustomComponentTabOutput(true, input.customComponentId(), input.name()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
                 jsonMapper, OpenCustomComponentTabToolCallback.class, "openCustomComponentTab", exception);
+        }
+    }
+
+    private boolean isVisible(String customComponentId) {
+        try {
+            customComponentFacade.getCustomComponent(Long.parseLong(customComponentId));
+
+            return true;
+        } catch (AccessDeniedException | IllegalArgumentException | NoSuchElementException exception) {
+            return false;
         }
     }
 

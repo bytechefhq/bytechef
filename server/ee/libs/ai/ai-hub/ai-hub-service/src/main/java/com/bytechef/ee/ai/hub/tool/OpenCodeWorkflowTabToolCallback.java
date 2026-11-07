@@ -8,13 +8,18 @@
 package com.bytechef.ee.ai.hub.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.security.access.AccessDeniedException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -44,12 +49,16 @@ public class OpenCodeWorkflowTabToolCallback implements ToolCallback {
             "required": ["projectId", "language", "name"]
         }""";
 
-    private final JsonMapper jsonMapper = new JsonMapper();
     private final @Nullable AiHubChatArtifactRecorder artifactRecorder;
+    private final JsonMapper jsonMapper = new JsonMapper();
+    private final ProjectCodeWorkflowFacade projectCodeWorkflowFacade;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public OpenCodeWorkflowTabToolCallback(@Nullable AiHubChatArtifactRecorder artifactRecorder) {
+    public OpenCodeWorkflowTabToolCallback(
+        ProjectCodeWorkflowFacade projectCodeWorkflowFacade, @Nullable AiHubChatArtifactRecorder artifactRecorder) {
+
         this.artifactRecorder = artifactRecorder;
+        this.projectCodeWorkflowFacade = projectCodeWorkflowFacade;
     }
 
     @Override
@@ -86,15 +95,33 @@ public class OpenCodeWorkflowTabToolCallback implements ToolCallback {
                 return toolError("name is required");
             }
 
+            if (!isVisible(input.projectId())) {
+                return toolError(
+                    "Code workflow project " + input.projectId() + " was not found. Check the project id.");
+            }
+
             recordArtifact(toolContext, input);
 
             return jsonMapper.writeValueAsString(
                 new OpenCodeWorkflowTabOutput(true, input.projectId(), input.language(), input.name()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
                 jsonMapper, OpenCodeWorkflowTabToolCallback.class, "openCodeWorkflowTab", exception);
+        }
+    }
+
+    private boolean isVisible(String projectId) {
+        try {
+            long id = Long.parseLong(projectId);
+
+            List<Project> codeWorkflowProjects = projectCodeWorkflowFacade.getCodeWorkflowProjects();
+
+            return codeWorkflowProjects.stream()
+                .anyMatch(project -> Objects.equals(project.getId(), id));
+        } catch (AccessDeniedException | IllegalArgumentException exception) {
+            return false;
         }
     }
 

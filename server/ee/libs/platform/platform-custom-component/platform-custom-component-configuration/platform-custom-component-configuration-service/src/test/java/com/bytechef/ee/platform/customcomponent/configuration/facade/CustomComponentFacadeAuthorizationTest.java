@@ -38,6 +38,11 @@ class CustomComponentFacadeAuthorizationTest {
     }
 
     @Test
+    void testGetCustomComponentRequiresAdmin() {
+        assertAdminOnly("getCustomComponent");
+    }
+
+    @Test
     void testGetCustomComponentSourceRequiresAdmin() {
         assertAdminOnly("getCustomComponentSource");
     }
