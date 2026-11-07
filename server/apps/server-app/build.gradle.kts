@@ -112,6 +112,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-tool"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-tool"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    implementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
     implementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-tool"))

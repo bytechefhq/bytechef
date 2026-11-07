@@ -1,0 +1,21 @@
+dependencies {
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.ai:spring-ai-client-chat")
+    implementation("org.springframework.ai:spring-ai-model")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.security:spring-security-core")
+    implementation("org.springframework:spring-context")
+    implementation("tools.jackson.core:jackson-databind")
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    implementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation(project(":server:libs:test:test-support"))
+}

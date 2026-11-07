@@ -89,6 +89,7 @@ include("server:libs:automation:automation-asset-file:automation-asset-file-file
 include("server:libs:automation:automation-asset-file:automation-asset-file-graphql")
 include("server:libs:automation:automation-asset-file:automation-asset-file-rest")
 include("server:libs:automation:automation-asset-file:automation-asset-file-service")
+include("server:libs:automation:automation-asset-file:automation-asset-file-tool")
 include("server:libs:automation:automation-configuration:automation-configuration-api")
 include("server:libs:automation:automation-configuration:automation-configuration-graphql")
 include("server:libs:automation:automation-configuration:automation-configuration-instance-impl")
