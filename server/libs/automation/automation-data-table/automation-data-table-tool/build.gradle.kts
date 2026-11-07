@@ -7,9 +7,12 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework:spring-context")
     implementation("tools.jackson.core:jackson-databind")
+    implementation(project(":server:libs:ai:ai-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:platform:platform-data-table:platform-data-table-api"))
 
@@ -18,4 +21,5 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework:spring-webflux")
+    testImplementation(project(":server:libs:test:test-support"))
 }
