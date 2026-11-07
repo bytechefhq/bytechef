@@ -142,6 +142,22 @@ class IntegrationCodeWorkflowApiControllerIntTest {
     }
 
     @Test
+    void testDeployIntegrationRuby() {
+        byte[] bytes = "def handler; end".getBytes(StandardCharsets.UTF_8);
+
+        webTestClient
+            .post()
+            .uri("/internal/integrations/deploy")
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .bodyValue(multipartBody("integrationFile", "integration.rb", bytes).build())
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(integrationCodeWorkflowFacade).save(eq(bytes), eq(Language.RUBY));
+    }
+
+    @Test
     void testDeployIntegrationJava() {
         byte[] bytes = {
             0x50, 0x4b, 0x03, 0x04

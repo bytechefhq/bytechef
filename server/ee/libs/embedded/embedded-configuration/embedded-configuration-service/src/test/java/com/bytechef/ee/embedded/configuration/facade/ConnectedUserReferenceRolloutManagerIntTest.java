@@ -1311,6 +1311,42 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
+    void testRolloutOfOneAutomationWorkflowProjectNeverDanglesAnotherProjectsReference() {
+        long rolledOutProjectId = createAutomationWorkflowProject("Rollout Isolation A");
+        long otherProjectId = createAutomationWorkflowProject("Rollout Isolation B");
+
+        String rolledOutUuid = addWorkflow(rolledOutProjectId, SLACK_WORKFLOW_DEFINITION);
+        String otherUuid = addWorkflow(otherProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(rolledOutProjectId);
+        publishAndPinProject(otherProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow rolledOutReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, rolledOutUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow otherReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, otherUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.deleteProjectWorkflow(rolledOutUuid);
+        publishAndPinProject(rolledOutProjectId);
+
+        connectedUserReferenceRolloutManager.rollOut(rolledOutProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(connectedUserProjectWorkflowRepository.findById(rolledOutReference.getId()))
+            .get()
+            .satisfies(reference -> assertThat(reference.isDangling()).isTrue());
+        assertThat(connectedUserProjectWorkflowRepository.findById(otherReference.getId()))
+            .get()
+            .satisfies(reference -> {
+                assertThat(reference.isDangling()).isFalse();
+                assertThat(reference.getProjectDeploymentId()).isEqualTo(otherReference.getProjectDeploymentId());
+            });
+        assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(
+            otherReference.getProjectDeploymentId())).hasSize(1);
+    }
+
+    @Test
     void testRepublishWithoutAnyReferencedTemplateDeletesTheDeployment() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout All Removed");
 

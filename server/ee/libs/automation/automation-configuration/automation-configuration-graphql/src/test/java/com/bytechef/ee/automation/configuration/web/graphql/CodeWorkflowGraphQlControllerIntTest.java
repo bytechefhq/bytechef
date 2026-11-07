@@ -91,4 +91,22 @@ class CodeWorkflowGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("123");
     }
+
+    @Test
+    void testCreateCodeWorkflowWithPython() {
+        Project project = new Project();
+
+        project.setId(124L);
+
+        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(
+            eq(7L), eq("my-python-project"), eq(Language.PYTHON), isNull(), isNull(), isNull()))
+                .thenReturn(project);
+
+        graphQlTester
+            .document("mutation { createCodeWorkflow(workspaceId: 7, name: \"my-python-project\", language: PYTHON) }")
+            .execute()
+            .path("createCodeWorkflow")
+            .entity(String.class)
+            .isEqualTo("124");
+    }
 }

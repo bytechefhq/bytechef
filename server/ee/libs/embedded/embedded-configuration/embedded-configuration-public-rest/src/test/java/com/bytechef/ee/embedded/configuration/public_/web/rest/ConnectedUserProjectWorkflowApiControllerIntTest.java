@@ -1015,6 +1015,8 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     class CrossUser {
 
         private static final String OTHER_EXTERNAL_USER_ID = "someone-else@example.com";
+        private static final String INPUTS_PATH =
+            "/api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/inputs";
         private static final String PROVISION_PATH =
             "/api/embedded/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision";
         private static final String TENANT_ID = "test_tenant";
@@ -1073,6 +1075,37 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
 
             verify(connectedUserWorkflowReferenceFacade, never())
                 .deleteReference(any(), any(), any());
+        }
+
+        @Test
+        void testUpdateProjectWorkflowInputsCrossUserIsForbidden() {
+            webTestClient
+                .put()
+                .uri(INPUTS_PATH, EXTERNAL_USER_ID, WORKFLOW_UUID)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + createJwt(OTHER_EXTERNAL_USER_ID))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\"inputs\":{\"sheetName\":\"Leads\"}}")
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
+
+            verify(connectedUserProjectFacade, never()).updateProjectWorkflowInputs(any(), any(), any(), any());
+        }
+
+        @Test
+        void testUpdateProjectWorkflowInputsOwnUserReachesTheFacade() {
+            webTestClient
+                .put()
+                .uri(INPUTS_PATH, EXTERNAL_USER_ID, WORKFLOW_UUID)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + createJwt(EXTERNAL_USER_ID))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\"inputs\":{\"sheetName\":\"Leads\"}}")
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+            verify(connectedUserProjectFacade)
+                .updateProjectWorkflowInputs(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(), any());
         }
 
         @Test
