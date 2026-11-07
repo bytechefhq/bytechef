@@ -381,7 +381,7 @@ Two properties let administrators tighten how Java custom components are handled
 
 The same pair exists for Java code workflows: `bytechef.workflow.code-workflow.java-enabled` and `bytechef.workflow.code-workflow.java-loader`, with the same defaults. See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#component-configuration).
 
-## Scaffolding with the CLI
+## Scaffolding and deploying with the CLI
 
 The CLI can scaffold a Java component from scratch or from an OpenAPI spec:
 
@@ -392,6 +392,14 @@ bytechef component init --name my-component --open-api-path ./openapi.yaml --out
 `--name` and `--output-path` are required; `--open-api-path` accepts a local file or an `http(s)` URL. `--base-package-name` (default `com.bytechef.component`) and `--version` (default `1`) round out the options.
 
 That generates a full module skeleton - handler class, action and trigger stubs, tests, and a README template - that you fill in. The generated code is yours: it lives in your repo, you can edit it, and it ships through the same pipeline as a hand-written component.
+
+The CLI also deploys a built component - single-file JavaScript/Python/Ruby, or a Java `.jar` - to a running instance:
+
+```bash
+bytechef component deploy --file ./my-component.js
+```
+
+The profile token used for `component deploy` must be an admin platform API key, and the file extension selects the language server-side.
 
 <Callout title="Coming soon">
     A higher-level generator that turns an OpenAPI spec straight into a component, without the intermediate module, is on the roadmap. The CLI scaffolding above is the manual path available today. For a spec-driven connector that needs no code at all, see [API Connectors](/platform/settings/components/api-connectors).
