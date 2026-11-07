@@ -61,8 +61,20 @@ describe('WorkflowExecutionsTestOutput', () => {
 
         const statusRow = screen.getByTestId('workflow-test-output-pending-header');
 
-        expect(statusRow.querySelectorAll('[data-slot="skeleton"]').length).toBe(4);
+        expect(statusRow.querySelectorAll('[data-slot="skeleton"]').length).toBe(3);
+        expect(statusRow).toHaveTextContent('Starting');
         expect(screen.queryByText('Test Output')).not.toBeInTheDocument();
+    });
+
+    it('starts the task list placeholders at the top, where the execution tree starts its rows', () => {
+        render(<WorkflowExecutionsTestOutput workflowIsRunning />);
+
+        const taskList = screen.getByTestId('workflow-test-output-pending-tasks');
+
+        expect(taskList).toHaveClass('pt-3');
+        expect(taskList).not.toHaveTextContent('Starting');
+        expect(taskList.previousElementSibling).toBeNull();
+        expect(taskList.querySelectorAll('[data-slot="skeleton"]').length).toBe(2);
     });
 
     it('labels the panel Test Output when no run has started', () => {

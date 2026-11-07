@@ -98,7 +98,13 @@ const WorkflowExecutionsTestOutput = ({
                         className="flex w-full items-center gap-x-3 px-3 py-3"
                         data-testid="workflow-test-output-pending-header"
                     >
-                        <Skeleton className="h-6 w-28 rounded-full" />
+                        <span className="flex h-6 items-center gap-1">
+                            <RefreshCwIcon className="size-3 shrink-0 animate-spin text-content-neutral-secondary" />
+
+                            <span className="text-xs leading-4 font-medium text-content-neutral-secondary">
+                                Starting
+                            </span>
+                        </span>
 
                         <Skeleton className="h-4 w-36" />
 
@@ -128,15 +134,10 @@ const WorkflowExecutionsTestOutput = ({
                                     className="flex flex-col overflow-hidden"
                                     defaultSize={resizablePanelSize}
                                 >
-                                    <div className={twMerge(EXECUTIONS_PANEL_HEADER_CLASS_NAME, 'gap-1')}>
-                                        <RefreshCwIcon className="size-3 shrink-0 animate-spin text-content-neutral-secondary" />
-
-                                        <span className="text-xs leading-4 font-medium text-content-neutral-secondary">
-                                            Starting
-                                        </span>
-                                    </div>
-
-                                    <div className="ml-3 space-y-2 pr-4">
+                                    <div
+                                        className="ml-3 space-y-2 pt-3 pr-4"
+                                        data-testid="workflow-test-output-pending-tasks"
+                                    >
                                         <Skeleton className="h-14 w-full" />
 
                                         <Skeleton className="h-14 w-full" />
