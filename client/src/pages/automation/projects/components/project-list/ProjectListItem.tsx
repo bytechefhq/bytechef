@@ -25,6 +25,7 @@ import ProjectListItemTabs, {
     ProjectListItemTabType,
 } from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
@@ -273,6 +274,8 @@ const ProjectListItem = ({
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleProjectListItemClick(event)}
             >
+                <ListItemExpandButton label="Toggle project" />
+
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']/project:border-none">
                     <div
                         aria-label={project.id?.toString() ?? project.name}
@@ -328,8 +331,6 @@ const ProjectListItem = ({
                                               ? '1 deployment'
                                               : `${deploymentCount} deployments`}
                                     </span>
-
-                                    <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
                                 <div onClick={(event) => event.stopPropagation()}>
@@ -530,7 +531,7 @@ const ProjectListItem = ({
                 </div>
             </div>
 
-            <CollapsibleContent className="mx-3 mt-1 mb-3">
+            <CollapsibleContent className="mt-1 mr-3 mb-3 ml-11">
                 <ProjectListItemTabs
                     actions={
                         activeTab === 'workflows' && hasWorkflows ? (

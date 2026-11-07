@@ -15,6 +15,7 @@ import {
     NO_CONNECTED_USERS_REASON,
     NO_OTHER_CONFIGURATION_REASON,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
@@ -23,7 +24,6 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {
-    ChevronDownIcon,
     EllipsisVerticalIcon,
     FolderIcon,
     PencilIcon,
@@ -133,6 +133,8 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                 onClick={handleConfigurationListItemClick}
                 role="presentation"
             >
+                <ListItemExpandButton label="Toggle configuration" />
+
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center gap-2">
@@ -163,8 +165,6 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                                 <span className="mr-1">
                                     {workflowCount === 1 ? '1 workflow' : `${workflowCount} workflows`}
                                 </span>
-
-                                <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]/configuration:rotate-180" />
                             </CollapsibleTrigger>
                         </div>
                     </div>
@@ -285,7 +285,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                 </div>
             </div>
 
-            <CollapsibleContent>
+            <CollapsibleContent className="pl-8">
                 <AutomationWorkflowProjectConfigurationWorkflowList
                     configuration={configuration}
                     project={project}

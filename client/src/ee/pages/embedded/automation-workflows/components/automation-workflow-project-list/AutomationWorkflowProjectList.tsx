@@ -125,7 +125,7 @@ const AutomationWorkflowProjectList = ({
                         tags={tags}
                     />
 
-                    <CollapsibleContent className="mx-3 mt-1 mb-3">
+                    <CollapsibleContent className="mt-1 mr-3 mb-3 ml-11">
                         <AutomationWorkflowProjectListItemTabs
                             actions={
                                 (activeTabs[project.id] || 'workflows') === 'workflows'

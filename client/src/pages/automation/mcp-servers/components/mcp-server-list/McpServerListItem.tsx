@@ -4,11 +4,12 @@ import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServerDialog';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import McpServerListItemDropdownMenu from '@/shared/components/mcp-server/McpServerListItemDropdownMenu';
 import McpServerToolCounts from '@/shared/components/mcp-server/McpServerToolCounts';
 import {McpServer, Tag} from '@/shared/middleware/graphql';
-import {ChevronDown, ServerIcon} from 'lucide-react';
+import {ServerIcon} from 'lucide-react';
 
 import {McpProjectWorkflowItemType} from '../mcp-project-workflow-list/hooks/useMcpProjectList';
 import useMcpServerListItem from './hooks/useMcpServerListItem';
@@ -41,6 +42,8 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleMcpServerListItemClick(event)}
             >
+                <ListItemExpandButton label="Toggle MCP server" />
+
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center justify-between">
@@ -63,8 +66,6 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                                         mcpServer={mcpServer}
                                         workflowToolCount={mcpProjectWorkflows?.length || 0}
                                     />
-
-                                    <ChevronDown className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
                                 <div onClick={(event) => event.preventDefault()}>

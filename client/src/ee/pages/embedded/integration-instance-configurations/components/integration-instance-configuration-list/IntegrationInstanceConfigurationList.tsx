@@ -86,7 +86,7 @@ const IntegrationInstanceConfigurationList = ({
                                     showTags={showTags}
                                 />
 
-                                <CollapsibleContent>
+                                <CollapsibleContent className="pl-8">
                                     <IntegrationInstanceConfigurationWorkflowList
                                         componentDefinitions={componentDefinitions}
                                         componentName={integration.componentName}

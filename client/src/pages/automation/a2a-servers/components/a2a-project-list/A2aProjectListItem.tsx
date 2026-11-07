@@ -1,8 +1,10 @@
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+
 import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,8 +20,6 @@ import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectD
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {
-    ChevronDownIcon,
-    ChevronRightIcon,
     EditIcon,
     EllipsisVerticalIcon,
     FolderIcon,
@@ -109,19 +109,10 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
                 open={expanded}
             >
                 <div className="relative flex items-center gap-2.5 rounded-md px-3 py-2.5 hover:bg-surface-neutral-primary-hover">
-                    <CollapsibleTrigger asChild>
-                        <button
-                            aria-label={expanded ? 'Collapse project' : 'Expand project'}
-                            className="shrink-0 text-muted-foreground after:absolute after:inset-0 hover:text-foreground"
-                            type="button"
-                        >
-                            {expanded ? (
-                                <ChevronDownIcon className="size-4" />
-                            ) : (
-                                <ChevronRightIcon className="size-4" />
-                            )}
-                        </button>
-                    </CollapsibleTrigger>
+                    <ListItemExpandButton
+                        className="mr-0 after:absolute after:inset-0"
+                        label={expanded ? 'Collapse project' : 'Expand project'}
+                    />
 
                     <FolderIcon aria-hidden="true" className="size-6 shrink-0 text-content-neutral-secondary" />
 

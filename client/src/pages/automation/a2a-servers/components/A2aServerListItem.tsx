@@ -1,3 +1,5 @@
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+
 import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
@@ -23,7 +25,7 @@ import {
     useUpdateA2aServerTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, EditIcon, EllipsisVerticalIcon, NetworkIcon, PlusIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, NetworkIcon, PlusIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 import A2aServerConnect from './A2aServerConnect';
@@ -93,6 +95,8 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                 onClick={handleMcpServerListItemClick}
                 role="presentation"
             >
+                <ListItemExpandButton label="Toggle A2A server" />
+
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center gap-2">
@@ -115,8 +119,6 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                                 ref={toolsCollapsibleTriggerRef}
                             >
                                 {workflowCount === 1 ? '1 workflow skill' : `${workflowCount} workflow skills`}
-
-                                <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                             </CollapsibleTrigger>
 
                             <div data-interactive>
@@ -195,7 +197,7 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                 </div>
             </div>
 
-            <CollapsibleContent className="mx-3 mt-1 mb-3">
+            <CollapsibleContent className="mt-1 mr-3 mb-3 ml-11">
                 <Tabs onValueChange={setActiveTab} value={activeTab}>
                     <div className="flex items-center justify-between">
                         <TabsList>

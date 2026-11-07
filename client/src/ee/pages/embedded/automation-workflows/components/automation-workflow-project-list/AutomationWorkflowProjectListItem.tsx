@@ -11,10 +11,10 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {
-    ChevronDownIcon,
     DownloadIcon,
     EditIcon,
     EllipsisVerticalIcon,
@@ -99,6 +99,8 @@ const AutomationWorkflowProjectListItem = ({
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleProjectListItemClick(event)}
             >
+                <ListItemExpandButton label="Toggle project" />
+
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div aria-label={project.name} className="flex-1" data-testid="project-item">
                         <div className="flex items-center gap-2">
@@ -164,8 +166,6 @@ const AutomationWorkflowProjectListItem = ({
                                             ? '1 configuration'
                                             : `${project.configurationCount} configurations`}
                                     </span>
-
-                                    <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
                                 <div onClick={(event) => event.stopPropagation()}>
