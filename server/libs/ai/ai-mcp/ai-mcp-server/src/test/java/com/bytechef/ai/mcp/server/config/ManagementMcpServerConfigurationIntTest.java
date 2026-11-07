@@ -26,6 +26,7 @@ import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.modelcontextprotocol.server.McpAsyncServer;
@@ -53,6 +54,7 @@ class ManagementMcpServerConfigurationIntTest {
         "listProjects", "createProject", "searchWorkflows");
 
     private final ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
+        .withBean(ApplicationProperties.class, ApplicationProperties::new)
         .withBean(ProjectTools.class, () -> mock(ProjectTools.class))
         .withBean(ProjectWorkflowLifecycleTools.class, () -> mock(ProjectWorkflowLifecycleTools.class))
         .withBean(WorkspaceTools.class, () -> mock(WorkspaceTools.class))
