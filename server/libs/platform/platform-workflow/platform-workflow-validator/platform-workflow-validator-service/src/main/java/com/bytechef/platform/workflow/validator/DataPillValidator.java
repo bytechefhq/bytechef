@@ -21,6 +21,7 @@ import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -578,10 +579,16 @@ class DataPillValidator {
             boolean isLoopItemReference = (propertyName.equals("item") || propertyName.startsWith("item.")) &&
                 isLoopTask(referencedTaskName, taskNameToTypeMap);
 
-            if (referencedTaskIndex >= currentTaskIndex && !isLoopItemReference &&
-                !isVariablePropertyReference(referencedTaskName, propertyName, context) &&
-                !LoopReferenceUtils.isWithinSameLoopBody(currentTaskName, referencedTaskName, allTasksMap)) {
+            Optional<Boolean> graphReferenceAllowed = GraphReferenceUtils.isReferenceAllowed(
+                currentTaskName, referencedTaskName, allTasksMap);
 
+            boolean wrongTaskOrder = graphReferenceAllowed
+                .map(allowed -> !allowed)
+                .orElseGet(() -> referencedTaskIndex >= currentTaskIndex && !isLoopItemReference &&
+                    !isVariablePropertyReference(referencedTaskName, propertyName, context) &&
+                    !LoopReferenceUtils.isWithinSameLoopBody(currentTaskName, referencedTaskName, allTasksMap));
+
+            if (wrongTaskOrder) {
                 StringUtils.appendWithNewline(
                     "Wrong task order: You can't reference '" + dataPillExpression + "' in " + currentTaskName, errors);
                 context.stopProcessing = true;

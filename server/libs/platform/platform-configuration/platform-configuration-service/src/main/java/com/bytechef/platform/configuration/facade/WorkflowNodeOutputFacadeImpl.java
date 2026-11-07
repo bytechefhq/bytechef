@@ -51,6 +51,7 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.graph.GraphTransitionUtils;
 import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -308,6 +309,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 .flatMap(List::stream)
                 .map(WorkflowTask::new)
                 .toList();
+        } else if (Objects.equals(workflowNodeType.name(), "graph")) {
+            return getWorkflowTaskList(workflowTask.getParameters(), "nodes");
         } else {
             return getWorkflowTaskList(workflowTask.getParameters(), "iteratee");
         }
@@ -326,20 +329,23 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         for (WorkflowTask workflowTask : workflow.getTasks(true)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
+            List<WorkflowTask> scopeWorkflowTasks;
+            List<WorkflowTask> scopeMemberWorkflowTasks;
+
             if (!Objects.equals(workflowNodeType.name(), "loop")) {
                 continue;
             }
 
-            List<WorkflowTask> iterateeWorkflowTasks = getWorkflowTaskList(workflowTask.getParameters(), "iteratee");
+            scopeWorkflowTasks = getWorkflowTaskList(workflowTask.getParameters(), "iteratee");
+            scopeMemberWorkflowTasks = WorkflowTaskUtils.getTasks(scopeWorkflowTasks, null);
 
-            List<WorkflowTask> iterateeSubtreeWorkflowTasks = WorkflowTaskUtils.getTasks(iterateeWorkflowTasks, null);
+            boolean containsWorkflowNode = scopeMemberWorkflowTasks.stream()
+                .anyMatch(scopeMemberWorkflowTask -> Objects.equals(
+                    scopeMemberWorkflowTask.getName(), workflowNodeName));
 
-            boolean containsWorkflowNode = iterateeSubtreeWorkflowTasks.stream()
-                .anyMatch(iterateeWorkflowTask -> Objects.equals(iterateeWorkflowTask.getName(), workflowNodeName));
-
-            if (containsWorkflowNode && iterateeSubtreeWorkflowTasks.size() < repeatedScopeSize) {
-                repeatedScopeWorkflowTasks = iterateeWorkflowTasks;
-                repeatedScopeSize = iterateeSubtreeWorkflowTasks.size();
+            if (containsWorkflowNode && scopeMemberWorkflowTasks.size() < repeatedScopeSize) {
+                repeatedScopeWorkflowTasks = scopeWorkflowTasks;
+                repeatedScopeSize = scopeMemberWorkflowTasks.size();
             }
         }
 
@@ -360,6 +366,98 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         return new ArrayList<>(workflowTaskMap.values());
+    }
+
+    private static PreviousWorkflowTasks getPreviousWorkflowTasks(
+        Workflow workflow, @Nullable String lastWorkflowNodeName, @Nullable List<WorkflowTask> repeatedWorkflowTasks) {
+
+        List<WorkflowTask> pathWorkflowTasks = workflow.getTasks(lastWorkflowNodeName);
+
+        if (lastWorkflowNodeName == null) {
+            return new PreviousWorkflowTasks(pathWorkflowTasks, false);
+        }
+
+        List<WorkflowTask> previousWorkflowTasks = new ArrayList<>(
+            repeatedWorkflowTasks == null ? pathWorkflowTasks : repeatedWorkflowTasks);
+        boolean lastWorkflowNodeIncluded = repeatedWorkflowTasks != null;
+
+        for (WorkflowTask pathWorkflowTask : pathWorkflowTasks) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(pathWorkflowTask.getType());
+
+            if (!Objects.equals(workflowNodeType.name(), "graph")) {
+                continue;
+            }
+
+            List<WorkflowTask> graphMemberWorkflowTasks = getWorkflowTaskList(
+                pathWorkflowTask.getParameters(), "nodes");
+
+            if (Objects.equals(pathWorkflowTask.getName(), lastWorkflowNodeName)) {
+                previousWorkflowTasks.addAll(graphMemberWorkflowTasks);
+
+                continue;
+            }
+
+            List<String> graphMemberNames = graphMemberWorkflowTasks.stream()
+                .map(WorkflowTask::getName)
+                .toList();
+
+            String enclosingGraphMemberName = pathWorkflowTasks.stream()
+                .map(WorkflowTask::getName)
+                .filter(graphMemberNames::contains)
+                .reduce((firstName, secondName) -> secondName)
+                .orElse(null);
+
+            if (enclosingGraphMemberName == null) {
+                continue;
+            }
+
+            Set<String> precedingGraphMemberNames = GraphTransitionUtils.getPrecedingNodeNames(
+                MapUtils.getList(
+                    pathWorkflowTask.getParameters(), "transitions", new TypeReference<Map<String, ?>>() {},
+                    List.of()),
+                enclosingGraphMemberName, graphMemberNames);
+
+            boolean enclosingGraphMemberIsLastWorkflowNode = Objects.equals(
+                enclosingGraphMemberName, lastWorkflowNodeName);
+
+            if (enclosingGraphMemberIsLastWorkflowNode &&
+                precedingGraphMemberNames.contains(enclosingGraphMemberName)) {
+
+                lastWorkflowNodeIncluded = true;
+            }
+
+            List<WorkflowTask> reachableWorkflowTasks = new ArrayList<>();
+
+            for (WorkflowTask previousWorkflowTask : previousWorkflowTasks) {
+                String previousWorkflowTaskName = previousWorkflowTask.getName();
+
+                if (!graphMemberNames.contains(previousWorkflowTaskName)) {
+                    reachableWorkflowTasks.add(previousWorkflowTask);
+
+                    continue;
+                }
+
+                if (!Objects.equals(previousWorkflowTaskName, enclosingGraphMemberName)) {
+                    continue;
+                }
+
+                for (WorkflowTask graphMemberWorkflowTask : graphMemberWorkflowTasks) {
+                    String graphMemberName = graphMemberWorkflowTask.getName();
+
+                    if (precedingGraphMemberNames.contains(graphMemberName) &&
+                        !Objects.equals(graphMemberName, enclosingGraphMemberName)) {
+
+                        reachableWorkflowTasks.add(graphMemberWorkflowTask);
+                    }
+                }
+
+                reachableWorkflowTasks.add(previousWorkflowTask);
+            }
+
+            previousWorkflowTasks = reachableWorkflowTasks;
+        }
+
+        return new PreviousWorkflowTasks(previousWorkflowTasks, lastWorkflowNodeIncluded);
     }
 
     private static List<WorkflowTask> getWorkflowTaskList(Map<String, ?> parameters, String key) {
@@ -395,14 +493,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         List<WorkflowTask> repeatedWorkflowTasks = includeRepeatedTasks
             ? getRepeatedWorkflowTasks(workflow, lastWorkflowNodeName) : null;
 
-        List<WorkflowTask> workflowTasks = repeatedWorkflowTasks == null
-            ? workflow.getTasks(lastWorkflowNodeName) : repeatedWorkflowTasks;
+        PreviousWorkflowTasks previousWorkflowTasks = getPreviousWorkflowTasks(
+            workflow, lastWorkflowNodeName, repeatedWorkflowTasks);
 
-        for (WorkflowTask workflowTask : workflowTasks) {
-            if (repeatedWorkflowTasks == null && lastWorkflowNodeName != null &&
+        for (WorkflowTask workflowTask : previousWorkflowTasks.workflowTasks()) {
+            if (!previousWorkflowTasks.lastWorkflowNodeIncluded() && lastWorkflowNodeName != null &&
                 Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {
 
-                break;
+                continue;
             }
 
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
@@ -412,7 +510,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 Objects.equals(workflowNodeType.name(), "map") ||
                 Objects.equals(workflowNodeType.name(), "condition") ||
                 Objects.equals(workflowNodeType.name(), "branch") ||
-                Objects.equals(workflowNodeType.name(), "fork-join")) {
+                Objects.equals(workflowNodeType.name(), "fork-join") ||
+                Objects.equals(workflowNodeType.name(), "graph")) {
 
                 List<WorkflowTask> childWorkflowTasks = getChildWorkflowTasks(workflowTask, workflowNodeType);
 
@@ -439,6 +538,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         if (cached != null) {
             return cached;
         }
+
+        sampleOutputsCache.put(lastWorkflowNodeName, Map.of());
 
         Map<String, ?> result =
             doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId, false, sampleOutputsCache)
@@ -855,5 +956,9 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     private record WorkflowTaskDispatcherDynamicOutputResponse(
         OutputResponse outputResponse, OutputResponse variableOutputResponse) {
+    }
+
+    @SuppressFBWarnings("EI")
+    private record PreviousWorkflowTasks(List<WorkflowTask> workflowTasks, boolean lastWorkflowNodeIncluded) {
     }
 }
