@@ -26,6 +26,12 @@ public enum WebSearchProvider {
     BRAVE("brave", "Brave Search", "Fast web search that returns ranked result snippets."),
     FIRECRAWL("firecrawl", "Firecrawl", "Web search, web page scraping and website mapping.");
 
+    /**
+     * The Brave Search API address. Brave has no base URL application property, so this is the default a saved
+     * provider falls back to when it has no base URL of its own.
+     */
+    public static final String BRAVE_BASE_URL = "https://api.search.brave.com/res/v1";
+
     private static final String KEY_PREFIX = "ai.webSearchProvider.";
 
     private final String description;

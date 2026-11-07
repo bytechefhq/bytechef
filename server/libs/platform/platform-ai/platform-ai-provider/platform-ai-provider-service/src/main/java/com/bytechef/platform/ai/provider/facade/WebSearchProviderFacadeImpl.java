@@ -344,8 +344,7 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
         return switch (webSearchProvider) {
-            case BRAVE -> ai.getBrave()
-                .getBaseUrl();
+            case BRAVE -> WebSearchProvider.BRAVE_BASE_URL;
             case FIRECRAWL -> ai.getFirecrawl()
                 .getBaseUrl();
         };

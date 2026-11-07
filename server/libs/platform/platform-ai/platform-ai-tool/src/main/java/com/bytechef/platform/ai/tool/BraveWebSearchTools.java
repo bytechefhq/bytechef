@@ -36,7 +36,6 @@ import org.springframework.web.client.RestClient;
  */
 public class BraveWebSearchTools {
 
-    static final String BASE_URL = "https://api.search.brave.com/res/v1";
     private static final int MAX_COUNT = 20;
     private static final int MIN_COUNT = 1;
 
