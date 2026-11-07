@@ -35,6 +35,7 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
+import com.bytechef.platform.component.rule.ComponentRuleEnforcer;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -56,14 +57,23 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager) {
 
-        return new AiAgentChatAction(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager).build();
+        return of(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, List.of());
+    }
+
+    public static ChatActionDefinitionWrapper of(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager, List<ComponentRuleEnforcer> componentRuleEnforcers) {
+
+        return new AiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, componentRuleEnforcers)
+                .build();
     }
 
     private AiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        ToolCallingManager toolCallingManager, List<ComponentRuleEnforcer> componentRuleEnforcers) {
 
-        super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, componentRuleEnforcers);
     }
 
     private ChatActionDefinitionWrapper build() {

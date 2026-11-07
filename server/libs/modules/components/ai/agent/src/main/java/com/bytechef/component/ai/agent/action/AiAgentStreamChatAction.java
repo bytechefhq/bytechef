@@ -37,6 +37,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunct
 import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
+import com.bytechef.platform.component.rule.ComponentRuleEnforcer;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.context.EnvironmentContextThreadLocalAccessor;
@@ -74,15 +75,23 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager) {
 
-        return new AiAgentStreamChatAction(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager)
-            .build();
+        return of(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, List.of());
+    }
+
+    public static ActionDefinition of(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager, List<ComponentRuleEnforcer> componentRuleEnforcers) {
+
+        return new AiAgentStreamChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, componentRuleEnforcers)
+                .build();
     }
 
     private AiAgentStreamChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        ToolCallingManager toolCallingManager, List<ComponentRuleEnforcer> componentRuleEnforcers) {
 
-        super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, componentRuleEnforcers);
     }
 
     private ChatActionDefinitionWrapper build() {

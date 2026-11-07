@@ -21,22 +21,32 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
+import com.bytechef.platform.component.rule.ComponentRuleEnforcer;
+import com.bytechef.platform.component.rule.ComponentRuleEnforcer.Decision;
+import com.bytechef.platform.component.rule.ComponentRuleEnforcer.ToolCall;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.definition.DefaultToolDefinition;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @author Ivica Cardic
@@ -122,6 +132,121 @@ class ClusterElementToolCallbacksTest {
             clusterElement("aiAgentUtils/v1/grepTool", "grepTool_1"), Map.of(), actionContext))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContainingAll("grepTool", "aiAgentUtils", "boom");
+    }
+
+    @Test
+    void testEnforcedElementWrapsEachCallbackAndCarriesTheResolvedConnectionId() {
+        ComponentRuleEnforcer componentRuleEnforcer = mock(ComponentRuleEnforcer.class);
+        ClusterElementToolCallbacks enforcedClusterElementToolCallbacks = new ClusterElementToolCallbacks(
+            aiAgentToolFacade, clusterElementDefinitionService, List.of(componentRuleEnforcer));
+
+        ToolCallback facadeToolCallback = mock(ToolCallback.class);
+
+        when(facadeToolCallback.getToolDefinition()).thenReturn(
+            DefaultToolDefinition.builder()
+                .name("CREATE_AI_SKILL")
+                .description("Create an AI skill")
+                .inputSchema("{}")
+                .build());
+
+        when(clusterElementDefinitionService.getClusterElement(anyString(), anyInt(), anyString()))
+            .thenReturn(new Object());
+
+        ComponentConnection componentConnection = new ComponentConnection("aiAgentUtils", 1, 42L, Map.of(), null);
+
+        when(
+            aiAgentToolFacade.getFunctionToolCallback(
+                any(ClusterElement.class), any(ComponentConnection.class), any(ActionContext.class)))
+                    .thenReturn(facadeToolCallback);
+        when(componentRuleEnforcer.checkBeforeCall(any())).thenReturn(new Decision.Allow());
+
+        ActionContext actionContext =
+            mock(ActionContext.class, withSettings().extraInterfaces(ActionContextAware.class));
+
+        List<ToolCallback> toolCallbacks = enforcedClusterElementToolCallbacks.build(
+            clusterElement("aiAgentUtils/v1/createAiSkill", "createAiSkill_1"),
+            Map.of("createAiSkill_1", componentConnection), actionContext, List.of());
+
+        assertThat(toolCallbacks).hasSize(1);
+        assertThat(toolCallbacks.getFirst()).isInstanceOf(RuleEnforcingToolCallback.class);
+
+        toolCallbacks.getFirst()
+            .call("{}", null);
+
+        ArgumentCaptor<ToolCall> toolCallCaptor = ArgumentCaptor.forClass(ToolCall.class);
+
+        verify(componentRuleEnforcer).checkBeforeCall(toolCallCaptor.capture());
+
+        ToolCall toolCall = toolCallCaptor.getValue();
+
+        assertThat(toolCall.connectionId()).isEqualTo(42L);
+    }
+
+    @Test
+    void testAnAlreadyGovernedCallbackIsNotWrappedASecondTime() {
+        ComponentRuleEnforcer componentRuleEnforcer = mock(ComponentRuleEnforcer.class);
+        ClusterElementToolCallbacks enforcedClusterElementToolCallbacks = new ClusterElementToolCallbacks(
+            aiAgentToolFacade, clusterElementDefinitionService, List.of(componentRuleEnforcer));
+
+        RuleEnforcingToolCallback ruleEnforcingToolCallback = new RuleEnforcingToolCallback(
+            mock(ToolCallback.class), clusterElement("slack/v1/sendMessage", "slack_1"), List.of(componentRuleEnforcer),
+            null, mock(ActionContext.class, withSettings().extraInterfaces(ActionContextAware.class)), List.of(),
+            Map.of(), clusterElementDefinitionService);
+
+        DelegatingToolCallback delegatingToolCallback = new DelegatingToolCallback() {
+
+            @Override
+            public ToolCallback getDelegate() {
+                return ruleEnforcingToolCallback;
+            }
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return ruleEnforcingToolCallback.getToolDefinition();
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return ruleEnforcingToolCallback.call(toolInput);
+            }
+        };
+
+        ToolCallbackProviderFunction toolCallbackProviderFunction =
+            (inputParameters, connectionParameters, context) -> (ToolCallbackProvider) () -> new ToolCallback[] {
+                delegatingToolCallback
+            };
+
+        when(clusterElementDefinitionService.getClusterElement(anyString(), anyInt(), anyString()))
+            .thenReturn(toolCallbackProviderFunction);
+
+        List<ToolCallback> toolCallbacks = enforcedClusterElementToolCallbacks.build(
+            clusterElement("aiAgentUtils/v1/approvalGate", "approvalGate_1"), Map.of(), mock(ActionContext.class),
+            List.of());
+
+        assertThat(toolCallbacks).containsExactly(delegatingToolCallback);
+    }
+
+    @Test
+    void testRecordRuleApprovalResolutionForwardsTheDecisionToTheEnforcers() {
+        ComponentRuleEnforcer componentRuleEnforcer = mock(ComponentRuleEnforcer.class);
+        ClusterElementToolCallbacks enforcedClusterElementToolCallbacks = new ClusterElementToolCallbacks(
+            aiAgentToolFacade, clusterElementDefinitionService, List.of(componentRuleEnforcer));
+
+        enforcedClusterElementToolCallbacks.recordRuleApprovalResolution(
+            List.of(7L), "slack", "sendMessage", "SLACK_SEND_MESSAGE", false, "@jane", 11L);
+
+        ArgumentCaptor<ToolCall> toolCallCaptor = ArgumentCaptor.forClass(ToolCall.class);
+
+        verify(componentRuleEnforcer).recordApprovalResolution(
+            eq(List.of(7L)), toolCallCaptor.capture(), eq(false), eq("@jane"));
+
+        ToolCall toolCall = toolCallCaptor.getValue();
+
+        assertThat(toolCall.componentName()).isEqualTo("slack");
+        assertThat(toolCall.toolName()).isEqualTo("sendMessage");
+        assertThat(toolCall.toolCallName()).isEqualTo("SLACK_SEND_MESSAGE");
+        assertThat(toolCall.jobId()).isEqualTo(11L);
+        assertThat(toolCall.approvedBy()).isEqualTo("@jane");
     }
 
     private static ClusterElement clusterElement(String type, String workflowNodeName) {

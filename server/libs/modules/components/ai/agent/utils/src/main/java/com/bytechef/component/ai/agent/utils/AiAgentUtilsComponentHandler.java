@@ -58,6 +58,7 @@ import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
+import com.bytechef.platform.component.rule.ComponentRuleEnforcer;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;
@@ -88,7 +89,8 @@ public final class AiAgentUtilsComponentHandler implements ComponentHandler {
         AiAgentToolFacade aiAgentToolFacade, AiSkillFacade aiSkillFacade, ApplicationProperties applicationProperties,
         List<AiAgentUtilsClusterElementContributor> clusterElementContributors,
         ClusterElementDefinitionService clusterElementDefinitionService, AiAutoMemoryService aiAutoMemoryService,
-        ProjectDeploymentService projectDeploymentService, ProjectService projectService) {
+        ProjectDeploymentService projectDeploymentService, ProjectService projectService,
+        List<ComponentRuleEnforcer> componentRuleEnforcers) {
 
         ApplicationProperties.Ai.AgentUtils agentUtils = applicationProperties.getAi()
             .getAgentUtils();
@@ -101,9 +103,9 @@ public final class AiAgentUtilsComponentHandler implements ComponentHandler {
         AiAgentUtilsSmartWebFetchTool agentUtilsSmartWebFetchTool = new AiAgentUtilsSmartWebFetchTool(
             clusterElementDefinitionService, allowedPrivateHosts);
         AiAgentUtilsTaskTool agentUtilsTaskTool = new AiAgentUtilsTaskTool(
-            aiAgentToolFacade, clusterElementDefinitionService);
+            aiAgentToolFacade, clusterElementDefinitionService, componentRuleEnforcers);
         AiAgentUtilsApprovalGate agentUtilsApprovalGate = new AiAgentUtilsApprovalGate(
-            new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService),
+            new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService, componentRuleEnforcers),
             clusterElementDefinitionService);
 
         List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(

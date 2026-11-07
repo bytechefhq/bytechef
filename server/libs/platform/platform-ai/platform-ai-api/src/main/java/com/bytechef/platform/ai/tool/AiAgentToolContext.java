@@ -37,6 +37,8 @@ import org.springframework.ai.chat.model.ToolContext;
 @SuppressFBWarnings("EI")
 public record AiAgentToolContext(ActionContext actionContext, @Nullable SseTransport sseTransport) {
 
+    public static final String APPROVED_BY_KEY = "bytechef_approvedBy";
+
     public static final String KEY = "bytechef_aiAgentToolContext";
 
     public AiAgentToolContext {
