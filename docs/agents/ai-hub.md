@@ -91,6 +91,31 @@ Run errors are coded. `CopilotRunErrorCode` (`NO_AI_PROVIDER`, `SELECTED_MODEL_U
 cause onto it and the code rides the RUN_ERROR event. The client maps only `NO_AI_PROVIDER` to a dedicated message
 (`toRunErrorData.ts`, `RunErrorMessage.tsx`).
 
+## Sub-agent memory
+
+Each `buildWorkflow` / `importWorkflow` delegation on the hub replays that specialist's earlier calls in the same
+chat, so "make it shorter" refines the last draft instead of starting over. `AiHubConfiguration#wrapDelegate` wraps
+the delegate's chat client (outside `AiHubGatedToolFilterAdvisor`, whose `mutate()` would otherwise drop it) in
+`SubAgentContributingChatClient`, which runs a list of `SubAgentAdvisorContributor`s on every `call()` and `stream()`
+with the `ToolContext` the delegate forwarded through `.toolContext(...)`. The one contributor today is
+`SubAgentSessionMemoryContributor`:
+
+- The session is `SubAgentSessionMemoryContributor.sessionKey(threadId, agentTypeKey)`, `<threadId>:<agentTypeKey>`,
+  in the same store as the hub's own session, under `AiHubSessionMemory.SESSION_USER_ID`. The thread id comes per
+  call from `AgentToolInvocationContext.TOOL_CONTEXT_CONVERSATION_ID_KEY`, because the delegate chat clients are
+  shared by every conversation. Each specialist on a chat has its own session, and no session crosses chats.
+- `MAX_EVENTS = 10` is a read filter (`EventFilter.lastN`): it bounds what a call replays, not what is stored.
+- The advisor has the default order, outside the tool-calling loop, so only the specialist's user and assistant turns
+  are stored, not its tool calls.
+- With no conversation id in the `ToolContext` there is no memory, and a session store failure leaves the call
+  stateless instead of failing it.
+- The key suffix is the definition's `AgentType` key (`buildWorkflow`, `importWorkflow`). Deleting a chat deletes
+  `<threadId>:<key>` for every key in `AgentTypeRegistry.keys()`, because `SessionRepository` cannot list by prefix; a
+  key outside the registry would leave a session nothing deletes.
+
+Memory is hub only. Every other surface that builds the same delegates (the Copilot, the management MCP server) does
+so without `wrapDelegate`, so a specialist there starts from nothing on every call.
+
 ## The wrap site and the approval gate
 
 Every tool callback is wrapped in one place, `AiHubSpringAIAgent.Builder.build()`, via

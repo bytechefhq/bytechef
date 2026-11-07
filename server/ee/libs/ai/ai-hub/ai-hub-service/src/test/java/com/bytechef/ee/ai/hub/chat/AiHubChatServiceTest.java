@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.agui.server.LocalAgent;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ee.ai.hub.agent.AiHubChatStreamer;
 import com.bytechef.ee.ai.hub.agent.AiHubContinuationStarterImpl;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
@@ -37,6 +38,7 @@ import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -644,6 +646,40 @@ class AiHubChatServiceTest {
         chatService.delete(1L, WORKSPACE_ID, USER_ID);
 
         verify(eventPublisher).publishEvent(new AiHubChatDeletedEvent(1L, THREAD_ID));
+    }
+
+    @Test
+    void testDeletePurgesSpecialistSessionsAlongsideTheParentSession() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        verify(sessionService).delete(THREAD_ID);
+        verify(sessionService).delete(
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, CopilotAgentType.BUILD_WORKFLOW.key()));
+        verify(sessionService).delete(
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, CopilotAgentType.IMPORT_WORKFLOW.key()));
+        verify(chatRepository).delete(chat);
+    }
+
+    @Test
+    void testDeleteContinuesPurgingAfterASessionDeleteFails() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        doThrow(new IllegalStateException("session store unavailable")).when(sessionService)
+            .delete(THREAD_ID);
+
+        chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        verify(sessionService).delete(
+            SubAgentSessionMemoryContributor.sessionKey(THREAD_ID, CopilotAgentType.BUILD_WORKFLOW.key()));
+        verify(chatRepository).delete(chat);
     }
 
     @Test

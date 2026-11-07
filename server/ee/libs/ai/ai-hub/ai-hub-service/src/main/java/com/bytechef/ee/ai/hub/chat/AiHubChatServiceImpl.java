@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.hub.chat;
 
+import com.bytechef.ai.agent.tool.AgentTypeRegistry;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
@@ -18,6 +19,7 @@ import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
+import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
 import com.bytechef.ee.ai.hub.util.EnumOrdinals;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -758,13 +760,21 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             return;
         }
 
+        deleteSession(sessionMemory, threadId);
+
+        for (String agentTypeKey : AgentTypeRegistry.keys()) {
+            deleteSession(sessionMemory, SubAgentSessionMemoryContributor.sessionKey(threadId, agentTypeKey));
+        }
+    }
+
+    private void deleteSession(AiHubSessionMemory sessionMemory, String sessionId) {
         try {
             sessionMemory.sessionService()
-                .delete(threadId);
+                .delete(sessionId);
         } catch (RuntimeException exception) {
             log.warn(
                 "Failed to delete session messages for sessionId {}; leaving orphan messages for background cleanup",
-                threadId, exception);
+                sessionId, exception);
         }
     }
 
