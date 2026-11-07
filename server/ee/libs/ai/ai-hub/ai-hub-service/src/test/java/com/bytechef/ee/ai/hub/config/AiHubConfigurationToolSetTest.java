@@ -30,47 +30,102 @@ import org.springframework.ai.tool.ToolCallback;
 class AiHubConfigurationToolSetTest {
 
     @Test
-    void testAskToolsAreReadOnly() throws AGUIException {
+    void testAskPinsOnlyItsCoreTools() throws AGUIException {
         AiHubSpringAIAgent askAgent = AiHubAgentFixtures.withBuildWorkflow()
             .askAgent();
 
-        assertThat(toolNames(askAgent))
-            .contains(
-                "listProjects", "getWorkflow", "listProjectDeployments", "listConnectionsForComponent",
-                "askUserQuestion", "openWorkflowTab", "openWorkflowChatTab", "listWorkflowExecutions",
-                "getWorkflowExecution", "getAction", "getTrigger", "getClusterElement", "checkWorkflow",
-                "searchDocs")
-            .doesNotContain(
-                "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
-                "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition");
+        assertThat(toolNames(askAgent)).containsExactlyInAnyOrder(
+            "askUserQuestion", "checkWorkflow", "getWorkflow", "listProjects", "listWorkflows", "openWorkflowChatTab",
+            "openWorkflowTab", "searchProjects", "searchWorkflows");
     }
 
     @Test
-    void testBuildToolsAuthorThroughBuildWorkflowOnly() throws AGUIException {
+    void testAskCatalogHoldsTheDemotedReadTools() {
+        AiHubModeToolCallbacks askToolCallbacks = AiHubAgentFixtures.withBuildWorkflow()
+            .askToolCallbacks();
+
+        assertThat(toolNames(askToolCallbacks.unpinned())).containsExactlyInAnyOrder(
+            "getProject", "getProjectStatus", "listWorkflowExecutions", "getWorkflowExecution", "getAction",
+            "getTrigger", "getClusterElement", "searchDocs", "listProjectDeployments", "listConnectionsForComponent",
+            "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions");
+    }
+
+    @Test
+    void testAskToolsAreReadOnly() {
+        AiHubModeToolCallbacks askToolCallbacks = AiHubAgentFixtures.withBuildWorkflow()
+            .askToolCallbacks();
+
+        assertThat(toolNames(askToolCallbacks.toolCallbacks())).doesNotContain(
+            "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
+            "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition");
+    }
+
+    @Test
+    void testBuildPinsOnlyItsCoreTools() throws AGUIException {
         AiHubSpringAIAgent buildAgent = AiHubAgentFixtures.withBuildWorkflow()
             .buildAgent();
 
-        assertThat(toolNames(buildAgent))
-            .contains(
-                "createProject", "createProjectWorkflow", "deleteWorkflow", "createProjectDeployment",
-                "promoteWorkflow", "selectConnection", "createConnection", "buildWorkflow", "importWorkflow",
-                "openWorkflowTab", "openWorkflowChatTab", "listChatWorkflows", "createWorkflowChat")
-            .doesNotContain("updateWorkflow");
+        assertThat(toolNames(buildAgent)).containsExactlyInAnyOrder(
+            "askUserQuestion", "buildWorkflow", "checkWorkflow", "createConnection", "createProject",
+            "createProjectWorkflow", "getWorkflow", "importWorkflow", "listConnectionsForComponent", "listProjects",
+            "listWorkflows", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection", "searchProjects",
+            "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
+            "selectTriggerPropertyOption");
     }
 
     @Test
-    void testBuildToolsIncludeEveryAskTool() throws AGUIException {
-        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+    void testBuildCatalogHoldsTheDemotedTools() {
+        AiHubModeToolCallbacks buildToolCallbacks = AiHubAgentFixtures.withBuildWorkflow()
+            .buildToolCallbacks();
 
-        assertThat(toolNames(fixtures.buildAgent())).containsAll(toolNames(fixtures.askAgent()));
+        assertThat(toolNames(buildToolCallbacks.unpinned())).containsExactlyInAnyOrder(
+            "getProject", "getProjectStatus", "updateProject", "publishProject", "deleteProject", "deleteWorkflow",
+            "listWorkflowExecutions", "getWorkflowExecution", "getAction", "getTrigger", "getClusterElement",
+            "searchDocs", "listProjectDeployments", "createProjectDeployment", "updateProjectDeployment",
+            "deleteProjectDeployment", "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow",
+            "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
+            "listChatWorkflows", "createWorkflowChat");
     }
 
     @Test
-    void testToolNamesAreUniquePerAgent() throws AGUIException {
+    void testBuildToolsAuthorThroughBuildWorkflowOnly() {
+        AiHubModeToolCallbacks buildToolCallbacks = AiHubAgentFixtures.withBuildWorkflow()
+            .buildToolCallbacks();
+
+        assertThat(toolNames(buildToolCallbacks.toolCallbacks())).doesNotContain("updateWorkflow");
+    }
+
+    @Test
+    void testBuildToolsIncludeEveryAskTool() {
         AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
 
-        assertThat(toolNames(fixtures.askAgent())).doesNotHaveDuplicates();
-        assertThat(toolNames(fixtures.buildAgent())).doesNotHaveDuplicates();
+        AiHubModeToolCallbacks askToolCallbacks = fixtures.askToolCallbacks();
+        AiHubModeToolCallbacks buildToolCallbacks = fixtures.buildToolCallbacks();
+
+        assertThat(toolNames(buildToolCallbacks.toolCallbacks()))
+            .containsAll(toolNames(askToolCallbacks.toolCallbacks()));
+        assertThat(toolNames(buildToolCallbacks.pinned())).containsAll(toolNames(askToolCallbacks.pinned()));
+    }
+
+    @Test
+    void testToolNamesAreUniquePerAgent() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        AiHubModeToolCallbacks askToolCallbacks = fixtures.askToolCallbacks();
+        AiHubModeToolCallbacks buildToolCallbacks = fixtures.buildToolCallbacks();
+
+        assertThat(toolNames(askToolCallbacks.toolCallbacks())).doesNotHaveDuplicates();
+        assertThat(toolNames(buildToolCallbacks.toolCallbacks())).doesNotHaveDuplicates();
+    }
+
+    @Test
+    void testEveryPinnedToolNameIsAToolOfItsMode() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        assertThat(toolNames(fixtures.askToolCallbacks()
+            .toolCallbacks())).containsAll(AiHubConfiguration.ASK_PINNED_TOOL_NAMES);
+        assertThat(toolNames(fixtures.buildToolCallbacks()
+            .toolCallbacks())).containsAll(AiHubConfiguration.BUILD_PINNED_TOOL_NAMES);
     }
 
     @Test
@@ -129,8 +184,11 @@ class AiHubConfigurationToolSetTest {
     }
 
     private static List<String> toolNames(AiHubSpringAIAgent agent) {
-        return agent.pinnedToolCallbacks()
-            .stream()
+        return toolNames(agent.pinnedToolCallbacks());
+    }
+
+    private static List<String> toolNames(List<ToolCallback> toolCallbacks) {
+        return toolCallbacks.stream()
             .map(toolCallback -> toolCallback.getToolDefinition()
                 .name())
             .toList();
