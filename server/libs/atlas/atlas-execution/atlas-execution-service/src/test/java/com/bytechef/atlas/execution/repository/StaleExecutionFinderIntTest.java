@@ -20,7 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.ExecutionErrorToStringConverter;
@@ -36,7 +38,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +73,9 @@ public class StaleExecutionFinderIntTest {
     @Autowired
     private JobRepository jobRepository;
 
+    @Autowired
+    private TaskExecutionRepository taskExecutionRepository;
+
     @Test
     public void testStaleJobFinderMatchesOnlyMatchingStatusRowsPastCutoff() {
         Instant staleInstant = Instant.now()
@@ -91,6 +98,28 @@ public class StaleExecutionFinderIntTest {
             .doesNotContain(freshStartedJobId, staleCompletedJobId);
     }
 
+    @Test
+    public void testExecutionTimeLongerThanIntegerMillisRoundTrips() {
+        long jobId = saveJob(Job.Status.STARTED);
+        long taskExecutionId = saveTaskExecution(jobId);
+
+        TaskExecution taskExecution = taskExecutionRepository.findById(taskExecutionId)
+            .orElseThrow();
+
+        Instant now = Instant.now();
+
+        taskExecution.setStartDate(now.minus(Duration.ofDays(40)));
+        taskExecution.setEndDate(now);
+        taskExecution.setStatus(TaskExecution.Status.FAILED);
+
+        taskExecutionRepository.save(taskExecution);
+
+        TaskExecution savedTaskExecution = taskExecutionRepository.findById(taskExecutionId)
+            .orElseThrow();
+
+        assertThat(savedTaskExecution.getExecutionTime()).isGreaterThan(Integer.MAX_VALUE);
+    }
+
     private long saveJob(Job.Status status) {
         Job job = new Job();
 
@@ -100,6 +129,25 @@ public class StaleExecutionFinderIntTest {
         job = jobRepository.save(job);
 
         return Objects.requireNonNull(job.getId());
+    }
+
+    private long saveTaskExecution(long jobId) {
+        Map<String, Object> taskMap = new HashMap<>();
+
+        taskMap.put("name", "task1");
+        taskMap.put("type", "test/v1/noop");
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(taskMap))
+            .build();
+
+        taskExecution.setJobId(jobId);
+        taskExecution.setStatus(TaskExecution.Status.STARTED);
+        taskExecution.setTaskNumber(1);
+
+        taskExecution = taskExecutionRepository.save(taskExecution);
+
+        return Objects.requireNonNull(taskExecution.getId());
     }
 
     private void backdateJobLastModifiedDate(long jobId, Instant instant) {
