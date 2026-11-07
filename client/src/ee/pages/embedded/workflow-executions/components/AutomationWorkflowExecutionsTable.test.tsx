@@ -23,6 +23,12 @@ vi.mock('./EmbeddedWorkflowExecutionsDropdownMenu', () => ({
     ),
 }));
 
+vi.mock('@/ee/shared/queries/embedded/connectedUsers.queries', () => ({
+    useGetConnectedUserQuery: (id: number, enabled?: boolean) => ({
+        data: enabled ? {externalId: `external-${id}`, id} : undefined,
+    }),
+}));
+
 vi.mock('@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore', () => ({
     default: () => ({
         setWorkflowExecutionId: hoisted.setWorkflowExecutionId,
@@ -32,6 +38,7 @@ vi.mock('@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheet
 
 const data = [
     {
+        connectedUserId: 42,
         id: 3,
         job: {
             endDate: new Date('2026-10-20T10:00:02Z'),
@@ -40,7 +47,7 @@ const data = [
             status: 'COMPLETED',
         },
         project: {name: 'Order Processing'},
-        projectDeployment: {name: 'Load Test (acme-user-42)', projectVersion: 4},
+        projectDeployment: {name: '__EMBEDDED__acme-user-42__PRODUCTION', projectVersion: 4},
         workflow: {label: 'Heavy orders load test'},
     },
 ] as unknown as WorkflowExecution[];
@@ -67,6 +74,13 @@ describe('AutomationWorkflowExecutionsTable', () => {
 
         expect(headers.indexOf('Project')).toBe(headers.indexOf('Connected user') - 1);
         expect(screen.getByRole('cell', {name: 'Order Processing'})).toBeInTheDocument();
+    });
+
+    it('renders the connected user of each run instead of its internal deployment name', () => {
+        render(<AutomationWorkflowExecutionsTable data={data} />);
+
+        expect(screen.getByRole('cell', {name: 'external-42'})).toBeInTheDocument();
+        expect(screen.queryByText('__EMBEDDED__acme-user-42__PRODUCTION')).not.toBeInTheDocument();
     });
 
     it("renders each run's version from its deployment", () => {

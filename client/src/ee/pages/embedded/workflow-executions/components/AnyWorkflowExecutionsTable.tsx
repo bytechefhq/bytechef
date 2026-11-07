@@ -102,16 +102,15 @@ const AnyWorkflowExecutionsTable = ({data}: {data: AnyWorkflowExecutionRowI[]}) 
                 id: 'source',
             }),
             columnHelper.display({
-                cell: ({row}) =>
-                    row.original.automationWorkflowExecution ? (
-                        row.original.automationWorkflowExecution.projectDeployment?.name
-                    ) : (
-                        <EmbeddedWorkflowExecutionConnectedUser
-                            connectedUserId={
-                                row.original.integrationWorkflowExecution?.integrationInstance?.connectedUserId
-                            }
-                        />
-                    ),
+                cell: ({row}) => (
+                    <EmbeddedWorkflowExecutionConnectedUser
+                        connectedUserId={
+                            row.original.automationWorkflowExecution
+                                ? row.original.automationWorkflowExecution.connectedUserId
+                                : row.original.integrationWorkflowExecution?.integrationInstance?.connectedUserId
+                        }
+                    />
+                ),
                 header: 'Connected user',
                 id: 'connectedUser',
             }),
