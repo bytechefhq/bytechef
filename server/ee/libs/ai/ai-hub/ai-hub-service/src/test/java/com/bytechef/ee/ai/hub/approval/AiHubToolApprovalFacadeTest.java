@@ -28,6 +28,8 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.ForbiddenException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
+import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.User;
@@ -83,6 +85,7 @@ class AiHubToolApprovalFacadeTest {
     private ToolCallback gatedDelegate;
     private AiHubChat chat;
     private AiHubToolApprovalFacadeImpl facade;
+    private List<AiHubGlobalToolCatalog> globalToolCatalogs;
 
     @BeforeEach
     void setUp() {
@@ -93,6 +96,7 @@ class AiHubToolApprovalFacadeTest {
         continuationStarter = mock(AiHubContinuationStarter.class);
 
         gatedDelegate = callback(TOOL_NAME);
+        globalToolCatalogs = new ArrayList<>();
 
         when(pinnedToolCallbacks.pinnedToolCallbacks(Mode.BUILD)).thenReturn(List.of(gatedDelegate));
         when(pinnedToolCallbacks.pinnedToolCallbacks(Mode.ASK)).thenReturn(List.of());
@@ -373,6 +377,42 @@ class AiHubToolApprovalFacadeTest {
     }
 
     @Test
+    void testApproveFindsACatalogToolOfTheApprovalsMode() {
+        ToolCallback catalogTool = callback("listComponents");
+
+        when(catalogTool.call(anyString(), any())).thenReturn("[]");
+
+        globalToolCatalogs.add(
+            new AiHubGlobalToolCatalog(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID, List.of(catalogTool)));
+
+        pendingApproval("listComponents", "BUILD");
+
+        AiHubToolApprovalFacade.Resolution resolution = facade.resolve(WORKSPACE_ID, 99L, true, null);
+
+        assertThat(resolution.approval()
+            .getStatus()).isEqualTo(AiHubToolApproval.Status.APPROVED);
+
+        verify(catalogTool).call(anyString(), any());
+    }
+
+    @Test
+    void testApproveIgnoresTheCatalogOfTheOtherMode() {
+        ToolCallback catalogTool = callback("listComponents");
+
+        globalToolCatalogs.add(
+            new AiHubGlobalToolCatalog(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID, List.of(catalogTool)));
+
+        pendingApproval("listComponents", "BUILD");
+
+        AiHubToolApprovalFacade.Resolution resolution = facade.resolve(WORKSPACE_ID, 99L, true, null);
+
+        assertThat(resolution.approval()
+            .getStatus()).isEqualTo(AiHubToolApproval.Status.FAILED);
+
+        verify(catalogTool, never()).call(anyString(), any());
+    }
+
+    @Test
     void testApproveWithoutAnyPinnedToolSourceMarksFailed() {
         pendingApproval(TOOL_NAME, "BUILD");
 
@@ -471,7 +511,7 @@ class AiHubToolApprovalFacadeTest {
         AiHubPinnedToolCallbacks pinnedToolCallbacksSource, AiHubContinuationStarter continuationStarterSource) {
 
         return new AiHubToolApprovalFacadeImpl(
-            approvalService, chatService, userService, provider(pinnedToolCallbacksSource),
+            approvalService, chatService, userService, provider(pinnedToolCallbacksSource), globalToolCatalogProvider(),
             provider(continuationStarterSource), securityContextRehydrator, transactionManager, clock);
     }
 
@@ -524,6 +564,15 @@ class AiHubToolApprovalFacadeTest {
         when(user.getAuthorityIds()).thenReturn(List.of());
 
         return user;
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider() {
+        ObjectProvider<AiHubGlobalToolCatalog> objectProvider = mock(ObjectProvider.class);
+
+        when(objectProvider.orderedStream()).thenAnswer(invocation -> globalToolCatalogs.stream());
+
+        return objectProvider;
     }
 
     @SuppressWarnings("unchecked")

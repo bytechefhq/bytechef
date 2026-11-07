@@ -66,6 +66,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.tool.ToolCallback;
@@ -191,7 +192,8 @@ public final class AiHubAgentFixtures {
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
             chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
+            toolSearchAdvisorProvider());
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -207,7 +209,8 @@ public final class AiHubAgentFixtures {
             artifactRecorder,
             securityContextRehydrator, approvalGate, policy, inFlightRunRegistryProvider(),
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
+            toolSearchAdvisorProvider());
     }
 
     @SuppressWarnings("unchecked")
@@ -284,6 +287,11 @@ public final class AiHubAgentFixtures {
         when(provider.getIfAvailable()).thenReturn(bean);
 
         return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchAdvisorProvider() {
+        return mock(ObjectProvider.class);
     }
 
     @SuppressWarnings("unchecked")
