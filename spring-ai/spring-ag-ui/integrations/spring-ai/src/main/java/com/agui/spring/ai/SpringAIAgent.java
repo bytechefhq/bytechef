@@ -15,6 +15,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.ToolAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
@@ -497,10 +498,12 @@ public class SpringAIAgent extends LocalAgent {
             }
         }
 
-        try {
-            chatRequest = chatRequest.advisors(createToolCallingAdvisor());
-        } catch (RuntimeException e) {
-            throw new AGUIException("Could not add the tool calling advisor", e);
+        if (this.advisors.stream().noneMatch(ToolAdvisor.class::isInstance)) {
+            try {
+                chatRequest = chatRequest.advisors(createToolCallingAdvisor());
+            } catch (RuntimeException e) {
+                throw new AGUIException("Could not add the tool calling advisor", e);
+            }
         }
 
         if (Objects.nonNull(this.chatMemory)) {

@@ -4,6 +4,7 @@ import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.AgentSubscriberParams;
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.event.BaseEvent;
+import com.agui.core.event.RunErrorEvent;
 import com.agui.core.event.TextMessageContentEvent;
 import com.agui.core.event.ToolCallResultEvent;
 import com.agui.core.exception.AGUIException;
@@ -11,6 +12,7 @@ import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.agui.core.type.EventType;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -19,6 +21,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import reactor.core.publisher.Flux;
@@ -69,6 +72,32 @@ class SpringAIAgentTurnEndingTest {
             .filteredOn(event -> event instanceof TextMessageContentEvent)
             .extracting(event -> ((TextMessageContentEvent) event).getDelta())
             .containsExactly("Great choices!");
+    }
+
+    @Test
+    void shouldUseTheToolAdvisorTheAgentSupplies() throws AGUIException, InterruptedException {
+        var chatModel = new AskThenAnswerChatModel();
+
+        var builder = SpringAIAgent.builder()
+            .agentId("test")
+            .chatModel(chatModel)
+            .systemMessage("system")
+            .state(new State())
+            .toolCallback(new AskUserToolCallback())
+            .advisor(
+                ToolCallingAdvisor.builder()
+                    .toolCallingManager(
+                        new TurnEndingToolCallingManager(ToolCallingManager.builder().build(), toolResponse -> true))
+                    .build());
+
+        var events = runToCompletion(new SpringAIAgent(builder));
+
+        assertThat(chatModel.streamCalls).hasValue(1);
+        assertThat(events).noneMatch(event -> event instanceof RunErrorEvent);
+        assertThat(events)
+            .extracting(BaseEvent::getType)
+            .last()
+            .isEqualTo(EventType.RUN_FINISHED);
     }
 
     private static SpringAIAgent newAgent(ChatModel chatModel, boolean endsTurn) throws AGUIException {
