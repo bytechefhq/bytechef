@@ -12,7 +12,9 @@ import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
+import {isDevelopmentOnlyHref} from '@/shared/navigation/developmentOnlyRoutes';
 import {isStandaloneRoute} from '@/shared/navigation/standaloneRoutes';
+import {useDevelopmentOnlyRouteGuard} from '@/shared/navigation/useDevelopmentOnlyRouteGuard';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -207,15 +209,13 @@ function App() {
 
     useFetchInterceptor();
 
+    useDevelopmentOnlyRouteGuard();
+
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
-        if (
-            currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT &&
-            edition === EditionType.EE &&
-            navItem.href === '/automation/projects'
-        ) {
+        if (isDevelopmentOnlyHref(navItem.href) && currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT) {
             return false;
         }
 
@@ -239,11 +239,7 @@ function App() {
     });
 
     const filteredEmbeddedNavigation = embeddedNavigation.filter((navItem) => {
-        if (currentEnvironmentId !== 0 && navItem.href === '/embedded/integrations') {
-            return false;
-        }
-
-        if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT && navItem.href === '/embedded/automation-workflows') {
+        if (isDevelopmentOnlyHref(navItem.href) && currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT) {
             return false;
         }
 
