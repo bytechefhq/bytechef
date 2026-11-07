@@ -41,7 +41,7 @@ public class SpaWebFilter extends OncePerRequestFilter {
         }
 
         nonSpaPathPrefixes.addAll(
-            Arrays.asList("/actuator", "/api", "/graphql", "/graphiql", "/icons", "/v3/api-docs"));
+            Arrays.asList("/actuator", "/api", "/graphql", "/graphiql", "/icons", "/scalar", "/v3/api-docs"));
     }
 
     /**

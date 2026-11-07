@@ -80,7 +80,7 @@ public abstract class AbstractApplication implements InitializingBean {
                 \tTenant mode: {}
                 \tProfile(s): {}
                 \tGraphiQL: \t{}
-                \tSwaggerUI: \t{}
+                \tScalar: \t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
             protocol,
@@ -94,7 +94,7 @@ public abstract class AbstractApplication implements InitializingBean {
             checkNull(environment.getProperty("bytechef.tenant.mode")),
             activeProfiles,
             getUiUrl(Arrays.asList(activeProfiles), protocol, serverPort, contextPath, "graphiql"),
-            getUiUrl(Arrays.asList(activeProfiles), protocol, serverPort, contextPath, "swagger-ui.html"));
+            getUiUrl(Arrays.asList(activeProfiles), protocol, serverPort, contextPath, "scalar"));
     }
 
     private static String getHostAddress() {
@@ -113,7 +113,7 @@ public abstract class AbstractApplication implements InitializingBean {
     private static String getUiUrl(
         List<String> activeProfiles, String protocol, String serverPort, String contextPath, String path) {
 
-        return activeProfiles.contains("api-docs")
+        return activeProfiles.contains("api-docs") || activeProfiles.contains("dev")
             ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + path)
             : "-";
     }

@@ -9,7 +9,7 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
-    implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
+    implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.scalar)
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-cache")

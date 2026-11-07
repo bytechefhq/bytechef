@@ -81,7 +81,7 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
-    implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
+    implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.scalar)
     implementation("org.springframework.ai:spring-ai-starter-model-anthropic")
     implementation("org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc")
     implementation("org.springframework.ai:spring-ai-starter-model-chat-memory-repository-redis")
