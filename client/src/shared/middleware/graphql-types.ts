@@ -1094,6 +1094,7 @@ export type ClusterElementDefinition = {
   outputFunctionDefined: Scalars['Boolean']['output'];
   outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
   properties: Array<Property>;
+  riskLevel?: Maybe<RiskLevel>;
   title?: Maybe<Scalars['String']['output']>;
   type?: Maybe<ClusterElementType>;
 };
@@ -1173,6 +1174,46 @@ export enum ComponentOperationType {
   ClusterElement = 'CLUSTER_ELEMENT',
   Trigger = 'TRIGGER'
 }
+
+export type ComponentRule = {
+  __typename?: 'ComponentRule';
+  componentIcon?: Maybe<Scalars['String']['output']>;
+  componentName: Scalars['String']['output'];
+  componentTitle?: Maybe<Scalars['String']['output']>;
+  condition: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  phase: ComponentRulePhase;
+  ruleAction: ComponentRuleActionType;
+  strict: Scalars['Boolean']['output'];
+  toolName?: Maybe<Scalars['String']['output']>;
+  toolRiskLevel?: Maybe<RiskLevel>;
+  /** The workspace this rule governs. Null means the rule applies to every workspace in the tenant. */
+  workspaceId?: Maybe<Scalars['ID']['output']>;
+};
+
+export enum ComponentRuleActionType {
+  Block = 'BLOCK',
+  RequireApproval = 'REQUIRE_APPROVAL',
+  Tag = 'TAG'
+}
+
+export enum ComponentRulePhase {
+  After = 'AFTER',
+  Before = 'BEFORE'
+}
+
+export type ComponentRuleSettings = {
+  __typename?: 'ComponentRuleSettings';
+  approvalExpiresInHours: Scalars['Int']['output'];
+  /**
+   * True when this workspace has no override of its own and is therefore following the tenant default, so the
+   * client can say so. Always false when workspaceId was null, since the tenant default inherits from nothing.
+   */
+  inherited: Scalars['Boolean']['output'];
+  observeMode: Scalars['Boolean']['output'];
+};
 
 export type ConfigurationMoveResult = {
   __typename?: 'ConfigurationMoveResult';
@@ -2352,6 +2393,8 @@ export type Mutation = {
   deleteAutomationProject: Scalars['Boolean']['output'];
   deleteAutomationProjectConfiguration: Scalars['Boolean']['output'];
   deleteAutomationProjectWorkflow: Scalars['Boolean']['output'];
+  /** Deletes a rule. Admin-only. */
+  deleteComponentRule: Scalars['Boolean']['output'];
   deleteConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteCustomComponent: Scalars['Boolean']['output'];
@@ -2433,6 +2476,13 @@ export type Mutation = {
   revokeRegisteredClientGrants: Scalars['Boolean']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
+  /**
+   * Creates a rule when id is absent, updates that rule when it is present. Rejects a BLOCK or REQUIRE_APPROVAL rule
+   * in the AFTER phase — the tool has already run by then — and a condition that is not a valid ByteChef formula
+   * expression, as typed errors. Admin-only; saving a rule whose workspaceId is null additionally requires a tenant
+   * administrator, since such a rule applies to every workspace in the tenant.
+   */
+  saveComponentRule: ComponentRule;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
@@ -2490,6 +2540,11 @@ export type Mutation = {
   updateAutomationProjectConfigurationWorkflow: Scalars['Boolean']['output'];
   updateAutomationProjectWorkflow: Scalars['Boolean']['output'];
   updateAutomationProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
+  /**
+   * Sets rule settings for the given workspace. A null workspaceId sets the tenant default. Observe mode evaluates
+   * every rule and enforces none. Admin-only.
+   */
+  updateComponentRuleSettings: ComponentRuleSettings;
   /**
    * Replace an existing connection's authorization parameters. A parameter that is not submitted is cleared.
    * Succeeding means the values were stored, not that they work.
@@ -2918,6 +2973,11 @@ export type MutationDeleteAutomationProjectWorkflowArgs = {
 };
 
 
+export type MutationDeleteComponentRuleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteConnectedUserMcpServerArgs = {
   connectedUserId: Scalars['ID']['input'];
   mcpServerId: Scalars['ID']['input'];
@@ -3314,6 +3374,20 @@ export type MutationSaveClusterElementTestOutputArgs = {
 };
 
 
+export type MutationSaveComponentRuleArgs = {
+  componentName: Scalars['String']['input'];
+  condition: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  enabled: Scalars['Boolean']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
+  phase: ComponentRulePhase;
+  ruleAction: ComponentRuleActionType;
+  strict: Scalars['Boolean']['input'];
+  toolName?: InputMaybe<Scalars['String']['input']>;
+  workspaceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
 export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   connectionId: Scalars['Long']['input'];
   environmentId: Scalars['Long']['input'];
@@ -3573,6 +3647,13 @@ export type MutationUpdateAutomationProjectWorkflowArgs = {
 export type MutationUpdateAutomationProjectWorkflowPermissionExpressionArgs = {
   permissionExpression?: InputMaybe<Scalars['String']['input']>;
   workflowUuid: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateComponentRuleSettingsArgs = {
+  approvalExpiresInHours: Scalars['Int']['input'];
+  observeMode: Scalars['Boolean']['input'];
+  workspaceId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -4186,6 +4267,17 @@ export type Query = {
   componentDefinitionVersions: Array<ComponentDefinition>;
   componentDefinitions: Array<ComponentDefinition>;
   componentPropertyDisplayConditions: Scalars['Map']['output'];
+  /**
+   * Rule settings for the given workspace: its own override if it has one, else the tenant default. A null
+   * workspaceId asks for the tenant default directly. Admin-only.
+   */
+  componentRuleSettings: ComponentRuleSettings;
+  /**
+   * Lists configured component rules. Omit componentName to list every rule in the tenant, which is what the flat
+   * Rules list renders. Omit workspaceId, or pass null, to list every rule regardless of the workspace it governs;
+   * passing a workspaceId narrows to that workspace's own rules plus the tenant-wide ones. Admin-only.
+   */
+  componentRules: Array<ComponentRule>;
   connectedUser?: Maybe<ConnectedUser>;
   connectedUserCodeWorkflowReferences: Array<ConnectedUserCodeWorkflowReference>;
   connectedUserMcpServers: Array<ConnectedUserMcpServer>;
@@ -4745,6 +4837,17 @@ export type QueryComponentPropertyDisplayConditionsArgs = {
   operationName: Scalars['String']['input'];
   operationType: ComponentOperationType;
   parameters?: InputMaybe<Scalars['Map']['input']>;
+};
+
+
+export type QueryComponentRuleSettingsArgs = {
+  workspaceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryComponentRulesArgs = {
+  componentName?: InputMaybe<Scalars['String']['input']>;
+  workspaceId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -5409,6 +5512,13 @@ export type ResponseDefinitionInput = {
   schema?: InputMaybe<Scalars['String']['input']>;
   statusCode: Scalars['String']['input'];
 };
+
+export enum RiskLevel {
+  Critical = 'CRITICAL',
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM'
+}
 
 export type ScriptTestExecution = {
   __typename?: 'ScriptTestExecution';

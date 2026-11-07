@@ -2307,6 +2307,53 @@ export type TriggerExecutionFileLogsExistQueryVariables = Exact<{
 
 export type TriggerExecutionFileLogsExistQuery = { triggerExecutionFileLogsExist: boolean };
 
+export type ComponentRuleSettingsQueryVariables = Exact<{
+  workspaceId?: string | number | null | undefined;
+}>;
+
+
+export type ComponentRuleSettingsQuery = { componentRuleSettings: { observeMode: boolean, approvalExpiresInHours: number, inherited: boolean } };
+
+export type ComponentRulesQueryVariables = Exact<{
+  componentName?: string | null | undefined;
+  workspaceId?: string | number | null | undefined;
+}>;
+
+
+export type ComponentRulesQuery = { componentRules: Array<{ id: string, componentName: string, componentTitle: string | null, componentIcon: string | null, toolName: string | null, toolRiskLevel: Types.RiskLevel | null, phase: Types.ComponentRulePhase, ruleAction: Types.ComponentRuleActionType, condition: string, description: string | null, enabled: boolean, strict: boolean, workspaceId: string | null }> };
+
+export type DeleteComponentRuleMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteComponentRuleMutation = { deleteComponentRule: boolean };
+
+export type SaveComponentRuleMutationVariables = Exact<{
+  id?: string | number | null | undefined;
+  componentName: string;
+  toolName?: string | null | undefined;
+  phase: Types.ComponentRulePhase;
+  ruleAction: Types.ComponentRuleActionType;
+  condition: string;
+  description?: string | null | undefined;
+  enabled: boolean;
+  strict: boolean;
+  workspaceId?: string | number | null | undefined;
+}>;
+
+
+export type SaveComponentRuleMutation = { saveComponentRule: { id: string, componentName: string, componentTitle: string | null, componentIcon: string | null, toolName: string | null, toolRiskLevel: Types.RiskLevel | null, phase: Types.ComponentRulePhase, ruleAction: Types.ComponentRuleActionType, condition: string, description: string | null, enabled: boolean, strict: boolean, workspaceId: string | null } };
+
+export type UpdateComponentRuleSettingsMutationVariables = Exact<{
+  observeMode: boolean;
+  approvalExpiresInHours: number;
+  workspaceId?: string | number | null | undefined;
+}>;
+
+
+export type UpdateComponentRuleSettingsMutation = { updateComponentRuleSettings: { observeMode: boolean, approvalExpiresInHours: number } };
+
 export type AdminApiKeysQueryVariables = Exact<{
   environmentId: string | number;
 }>;
@@ -11341,6 +11388,157 @@ export const useTriggerExecutionFileLogsExistQuery = <
       {
     queryKey: ['triggerExecutionFileLogsExist', variables],
     queryFn: fetcher<TriggerExecutionFileLogsExistQuery, TriggerExecutionFileLogsExistQueryVariables>(TriggerExecutionFileLogsExistDocument, variables),
+    ...options
+  }
+    )};
+
+export const ComponentRuleSettingsDocument = new TypedDocumentString(`
+    query ComponentRuleSettings($workspaceId: ID) {
+  componentRuleSettings(workspaceId: $workspaceId) {
+    observeMode
+    approvalExpiresInHours
+    inherited
+  }
+}
+    `);
+
+export const useComponentRuleSettingsQuery = <
+      TData = ComponentRuleSettingsQuery,
+      TError = unknown
+    >(
+      variables?: ComponentRuleSettingsQueryVariables,
+      options?: Omit<UseQueryOptions<ComponentRuleSettingsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentRuleSettingsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ComponentRuleSettingsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['ComponentRuleSettings'] : ['ComponentRuleSettings', variables],
+    queryFn: fetcher<ComponentRuleSettingsQuery, ComponentRuleSettingsQueryVariables>(ComponentRuleSettingsDocument, variables),
+    ...options
+  }
+    )};
+
+export const ComponentRulesDocument = new TypedDocumentString(`
+    query ComponentRules($componentName: String, $workspaceId: ID) {
+  componentRules(componentName: $componentName, workspaceId: $workspaceId) {
+    id
+    componentName
+    componentTitle
+    componentIcon
+    toolName
+    toolRiskLevel
+    phase
+    ruleAction
+    condition
+    description
+    enabled
+    strict
+    workspaceId
+  }
+}
+    `);
+
+export const useComponentRulesQuery = <
+      TData = ComponentRulesQuery,
+      TError = unknown
+    >(
+      variables?: ComponentRulesQueryVariables,
+      options?: Omit<UseQueryOptions<ComponentRulesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentRulesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ComponentRulesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['ComponentRules'] : ['ComponentRules', variables],
+    queryFn: fetcher<ComponentRulesQuery, ComponentRulesQueryVariables>(ComponentRulesDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteComponentRuleDocument = new TypedDocumentString(`
+    mutation DeleteComponentRule($id: ID!) {
+  deleteComponentRule(id: $id)
+}
+    `);
+
+export const useDeleteComponentRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteComponentRuleMutation, TError, DeleteComponentRuleMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteComponentRuleMutation, TError, DeleteComponentRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['DeleteComponentRule'],
+    mutationFn: (variables?: DeleteComponentRuleMutationVariables) => fetcher<DeleteComponentRuleMutation, DeleteComponentRuleMutationVariables>(DeleteComponentRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SaveComponentRuleDocument = new TypedDocumentString(`
+    mutation SaveComponentRule($id: ID, $componentName: String!, $toolName: String, $phase: ComponentRulePhase!, $ruleAction: ComponentRuleActionType!, $condition: String!, $description: String, $enabled: Boolean!, $strict: Boolean!, $workspaceId: ID) {
+  saveComponentRule(
+    id: $id
+    componentName: $componentName
+    toolName: $toolName
+    phase: $phase
+    ruleAction: $ruleAction
+    condition: $condition
+    description: $description
+    enabled: $enabled
+    strict: $strict
+    workspaceId: $workspaceId
+  ) {
+    id
+    componentName
+    componentTitle
+    componentIcon
+    toolName
+    toolRiskLevel
+    phase
+    ruleAction
+    condition
+    description
+    enabled
+    strict
+    workspaceId
+  }
+}
+    `);
+
+export const useSaveComponentRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SaveComponentRuleMutation, TError, SaveComponentRuleMutationVariables, TContext>) => {
+    
+    return useMutation<SaveComponentRuleMutation, TError, SaveComponentRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['SaveComponentRule'],
+    mutationFn: (variables?: SaveComponentRuleMutationVariables) => fetcher<SaveComponentRuleMutation, SaveComponentRuleMutationVariables>(SaveComponentRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateComponentRuleSettingsDocument = new TypedDocumentString(`
+    mutation UpdateComponentRuleSettings($observeMode: Boolean!, $approvalExpiresInHours: Int!, $workspaceId: ID) {
+  updateComponentRuleSettings(
+    observeMode: $observeMode
+    approvalExpiresInHours: $approvalExpiresInHours
+    workspaceId: $workspaceId
+  ) {
+    observeMode
+    approvalExpiresInHours
+  }
+}
+    `);
+
+export const useUpdateComponentRuleSettingsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateComponentRuleSettingsMutation, TError, UpdateComponentRuleSettingsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateComponentRuleSettingsMutation, TError, UpdateComponentRuleSettingsMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateComponentRuleSettings'],
+    mutationFn: (variables?: UpdateComponentRuleSettingsMutationVariables) => fetcher<UpdateComponentRuleSettingsMutation, UpdateComponentRuleSettingsMutationVariables>(UpdateComponentRuleSettingsDocument, variables)(),
     ...options
   }
     )};
