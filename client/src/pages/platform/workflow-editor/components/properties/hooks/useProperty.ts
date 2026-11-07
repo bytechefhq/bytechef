@@ -70,7 +70,7 @@ import {Control, FieldValues, FormState} from 'react-hook-form';
 import sanitizeHtml from 'sanitize-html';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {getTask} from '../../../utils/getTask';
+import {getClusterRootTask} from '../../../utils/getClusterRootTask';
 import {computeFromAiToggle} from './fromAiToggle';
 
 const getStringValueValidation = (
@@ -612,10 +612,11 @@ export const useProperty = ({
             return undefined;
         }
 
-        const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+        const workflowDefinition = JSON.parse(workflow.definition);
 
-        const mainClusterRootTask = getTask({
-            tasks: workflowDefinitionTasks,
+        const mainClusterRootTask = getClusterRootTask({
+            tasks: workflowDefinition.tasks,
+            triggers: workflowDefinition.triggers,
             workflowNodeName: mainClusterRootName,
         });
 

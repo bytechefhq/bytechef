@@ -1,4 +1,4 @@
-import {WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 
 interface ClusterElementLikeI {
     clusterElements?: unknown;
@@ -32,7 +32,14 @@ function containsClusterElement(clusterElements: unknown, elementName: string): 
 
 export default function findClusterElementRootTaskName(
     tasks: Array<WorkflowTask> | undefined,
-    elementName: string
+    elementName: string,
+    triggers?: Array<WorkflowTrigger>
 ): string | undefined {
-    return tasks?.find((task) => containsClusterElement(task.clusterElements, elementName))?.name;
+    const taskRootName = tasks?.find((task) => containsClusterElement(task.clusterElements, elementName))?.name;
+
+    if (taskRootName) {
+        return taskRootName;
+    }
+
+    return triggers?.find((trigger) => containsClusterElement(trigger.clusterElements, elementName))?.name;
 }

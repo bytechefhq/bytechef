@@ -1,7 +1,13 @@
-import {ClusterElementItemType, ClusterElementsType} from '@/shared/types';
-import {describe, expect, it} from 'vitest';
+import {ClusterElementItemType, ClusterElementsType, NodeDataType} from '@/shared/types';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {clearClusterElementPositions} from './clearAllClusterElementPositions';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import clearAllClusterElementPositions, {clearClusterElementPositions} from './clearAllClusterElementPositions';
+
+const {saveWorkflowDefinitionMock} = vi.hoisted(() => ({saveWorkflowDefinitionMock: vi.fn()}));
+
+vi.mock('./saveWorkflowDefinition', () => ({default: saveWorkflowDefinitionMock}));
 
 function makeClusterElement(
     name: string,
@@ -162,5 +168,48 @@ describe('clearClusterElementPositions', () => {
         expect(topStep.metadata?.ui?.nodePosition).toBeUndefined();
         expect(midStep.metadata?.ui?.nodePosition).toBeUndefined();
         expect(deepStep.metadata?.ui?.nodePosition).toBeUndefined();
+    });
+});
+
+describe('clearAllClusterElementPositions', () => {
+    beforeEach(() => {
+        saveWorkflowDefinitionMock.mockReset();
+        useWorkflowDataStore.setState({
+            workflow: {
+                definition: JSON.stringify({
+                    tasks: [],
+                    triggers: [
+                        {
+                            clusterElements: {
+                                voiceAgent: {
+                                    metadata: {ui: {nodePosition: {x: 40, y: 20}}},
+                                    name: 'voiceAgent_1',
+                                    parameters: {},
+                                    type: 'deepgram/v1/voiceAgent',
+                                },
+                            },
+                            name: 'trigger_1',
+                            parameters: {},
+                            type: 'browser/v1/voiceSession',
+                        },
+                    ],
+                }),
+                id: 'workflow-1',
+            },
+        } as Parameters<typeof useWorkflowDataStore.setState>[0]);
+        useWorkflowEditorStore.setState({
+            rootClusterElementNodeData: {componentName: 'browser', workflowNodeName: 'trigger_1'} as NodeDataType,
+        });
+    });
+
+    it('clears the element positions of a trigger cluster root', () => {
+        clearAllClusterElementPositions({updateWorkflowMutation: {mutate: vi.fn()} as never});
+
+        expect(saveWorkflowDefinitionMock).toHaveBeenCalledTimes(1);
+
+        const {nodeData} = saveWorkflowDefinitionMock.mock.calls[0][0];
+
+        expect(nodeData.workflowNodeName).toBe('trigger_1');
+        expect(nodeData.clusterElements.voiceAgent.metadata.ui.nodePosition).toBeUndefined();
     });
 });

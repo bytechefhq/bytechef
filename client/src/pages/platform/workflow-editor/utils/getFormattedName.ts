@@ -19,7 +19,12 @@ export default function getFormattedName(componentName: string, reservedNames?: 
 
     const allTasks = getAllTasksRecursively(workflowDefinition.tasks);
 
-    const clusterElementNames = allTasks.map((task: WorkflowTask) => {
+    const allClusterRoots: Array<WorkflowTask> = [
+        ...allTasks,
+        ...((workflowDefinition.triggers ?? []) as Array<WorkflowTask>),
+    ];
+
+    const clusterElementNames = allClusterRoots.map((task: WorkflowTask) => {
         const elementNames: string[] = [];
 
         const {clusterElements} = task;

@@ -456,3 +456,41 @@ describe('WorkflowNode reset position action', () => {
         expect(recordedContextMenuProps.value?.hasSavedPosition).toBe(true);
     });
 });
+
+describe('WorkflowNode trigger cluster root', () => {
+    const VOICE_SESSION_TRIGGER_DATA = {
+        clusterFrame: {clusterRootId: 'trigger_1', contentOrigin: {x: 32, y: 40}, height: 320, width: 640},
+        clusterRoot: true,
+        componentName: 'browser',
+        label: 'Browser Voice Session',
+        name: 'trigger_1',
+        operationName: 'voiceSession',
+        trigger: true,
+        version: 1,
+        workflowNodeName: 'trigger_1',
+    } as unknown as NodeDataType;
+
+    beforeEach(() => {
+        dataStoreState.definition = '{}';
+        directionStoreState.layoutDirection = 'TB';
+        editorStoreState.renamingNodeName = undefined;
+        recordedContextMenuProps.value = undefined;
+    });
+
+    it('offers copy and cut but not delete or disable on a trigger drawn as a box', () => {
+        renderNode(VOICE_SESSION_TRIGGER_DATA, 'trigger_1');
+
+        expect(recordedContextMenuProps.value).toMatchObject({
+            showCopyAction: true,
+            showCutAction: true,
+            showDeleteAction: false,
+            showDisableAction: false,
+        });
+    });
+
+    it('keeps the trigger own rename and info actions on a trigger drawn as a box', () => {
+        renderNode(VOICE_SESSION_TRIGGER_DATA, 'trigger_1');
+
+        expect(recordedContextMenuProps.value).toMatchObject({showInfoAction: true, showRenameAction: true});
+    });
+});

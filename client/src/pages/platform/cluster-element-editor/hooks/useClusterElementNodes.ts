@@ -1,5 +1,5 @@
 import {DEFAULT_NODE_POSITION} from '@/shared/constants';
-import {ComponentDefinitionApi} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionApi, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ClusterElementItemType, ClusterElementsType, NestedClusterRootComponentDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
@@ -11,7 +11,7 @@ import useClusterElementsViewMode from '../../workflow-editor/hooks/useClusterEl
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
 import collectClusterElementsSignature from '../../workflow-editor/utils/collectClusterElementsSignature';
-import {getTask} from '../../workflow-editor/utils/getTask';
+import {getClusterRootTask} from '../../workflow-editor/utils/getClusterRootTask';
 import {getFilteredClusterElementTypes, isPlainObject} from '../utils/clusterElementsUtils';
 import createClusterElementsEdges from '../utils/createClusterElementsEdges';
 import createClusterElementsNodes from '../utils/createClusterElementsNodes';
@@ -70,12 +70,14 @@ export default function useClusterElementNodes(
 
     const clusterRootIdsKey = clusterRootIds.join(',');
 
-    const workflowDefinitionTasks = useMemo(() => {
+    const workflowDefinitionNodes = useMemo((): {tasks: Array<WorkflowTask>; triggers: Array<WorkflowTrigger>} => {
         if (!workflow.definition) {
-            return [];
+            return {tasks: [], triggers: []};
         }
 
-        return JSON.parse(workflow.definition).tasks || [];
+        const workflowDefinition = JSON.parse(workflow.definition);
+
+        return {tasks: workflowDefinition.tasks || [], triggers: workflowDefinition.triggers || []};
     }, [workflow.definition]);
 
     const clusterElementsSignature = useMemo(() => {
@@ -85,7 +87,7 @@ export default function useClusterElementNodes(
 
         return clusterRootIds
             .map((clusterRootId) => {
-                const task = getTask({tasks: workflowDefinitionTasks, workflowNodeName: clusterRootId});
+                const task = getClusterRootTask({...workflowDefinitionNodes, workflowNodeName: clusterRootId});
 
                 return task
                     ? `${clusterRootId}:${task.type}:${collectClusterElementsSignature(task.clusterElements)}`
@@ -93,13 +95,13 @@ export default function useClusterElementNodes(
             })
             .join('|');
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [clusterRootIdsKey, workflow.definition, workflowDefinitionTasks]);
+    }, [clusterRootIdsKey, workflow.definition, workflowDefinitionNodes]);
 
     const clusterElementsByRootId = useMemo(() => {
         const clusterElementsMap: Record<string, ClusterElementsType | undefined> = {};
 
         for (const clusterRootId of clusterRootIds) {
-            const task = getTask({tasks: workflowDefinitionTasks, workflowNodeName: clusterRootId});
+            const task = getClusterRootTask({...workflowDefinitionNodes, workflowNodeName: clusterRootId});
 
             clusterElementsMap[clusterRootId] = task ? task.clusterElements || {} : undefined;
         }
@@ -151,7 +153,7 @@ export default function useClusterElementNodes(
                 continue;
             }
 
-            const task = getTask({tasks: workflowDefinitionTasks, workflowNodeName: clusterRootId});
+            const task = getClusterRootTask({...workflowDefinitionNodes, workflowNodeName: clusterRootId});
 
             const cachedDefinition = clusterRootComponentDefinitions[clusterRootId];
 

@@ -35,8 +35,8 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore, {type WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {mapHandlePosition} from '../utils/directionUtils';
+import {getClusterRootTask} from '../utils/getClusterRootTask';
 import {getDisabledNodeReferences} from '../utils/getDisabledNodeReferences';
-import {getTask} from '../utils/getTask';
 import {getContextFromTaskNodeData} from '../utils/getTaskDispatcherContext';
 import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
 import handleDeleteTask from '../utils/handleDeleteTask';
@@ -817,10 +817,10 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
                 if (isClusterElement && mainClusterRootName && workflow.definition) {
                     const workflowDefinition = JSON.parse(workflow.definition);
-                    const workflowDefinitionTasks = workflowDefinition.tasks ?? [];
 
-                    const mainClusterRootTask = getTask({
-                        tasks: workflowDefinitionTasks,
+                    const mainClusterRootTask = getClusterRootTask({
+                        tasks: workflowDefinition.tasks,
+                        triggers: workflowDefinition.triggers,
                         workflowNodeName: mainClusterRootName,
                     });
 
@@ -1122,8 +1122,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     onToggleDisabled={handleToggleDisabledClick}
                     showCopyAction
                     showCutAction
-                    showDeleteAction
-                    showDisableAction
+                    showDeleteAction={!data.trigger || triggerCount > 1}
+                    showDisableAction={!data.trigger}
                     showInfoAction
                     showRenameAction
                 >

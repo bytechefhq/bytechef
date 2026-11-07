@@ -93,12 +93,17 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
 
     let {type} = nodeData ?? {};
 
-    if (trigger) {
+    const existingTriggers: Array<WorkflowTrigger> = workflowDefinition.triggers ?? [];
+
+    const isTrigger = !!trigger || existingTriggers.some((existingTrigger) => existingTrigger.name === name);
+
+    if (isTrigger) {
         if (!type) {
             type = `${componentName}/v${version}/${operationName}`;
         }
 
         const newTrigger: WorkflowTrigger = {
+            ...(clusterElements ? {clusterElements} : {}),
             description,
             label,
             metadata,
@@ -106,8 +111,6 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
             parameters,
             type,
         };
-
-        const existingTriggers: Array<WorkflowTrigger> = workflowDefinition.triggers ?? [];
 
         executeWorkflowMutation({
             definitionUpdate: {triggers: upsertTrigger(existingTriggers, newTrigger)},

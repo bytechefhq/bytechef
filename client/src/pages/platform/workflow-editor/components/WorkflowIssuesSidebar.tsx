@@ -47,7 +47,8 @@ const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
 
     const handleIssueClick = useCallback(
         (issue: WorkflowIssueI) => {
-            const targetNodeName = findClusterElementRootTaskName(workflow.tasks, issue.nodeName) ?? issue.nodeName;
+            const targetNodeName =
+                findClusterElementRootTaskName(workflow.tasks, issue.nodeName, workflow.triggers) ?? issue.nodeName;
 
             const node = nodes.find((currentNode) => (currentNode.data as NodeDataType).name === targetNodeName);
 
@@ -58,7 +59,7 @@ const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
                 );
             }
         },
-        [nodes, workflow.tasks]
+        [nodes, workflow.tasks, workflow.triggers]
     );
 
     return (

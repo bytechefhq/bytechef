@@ -388,3 +388,71 @@ describe('useClusterElementNodes', () => {
         expect(result.current.nodesByRootId).toBe(nodesByRootIdBeforeSave);
     });
 });
+
+describe('useClusterElementNodes with a trigger cluster root', () => {
+    const BROWSER_DEFINITION: ComponentDefinition = {
+        clusterElement: false,
+        clusterElementTypes: [
+            {label: 'Voice Agent', multipleElements: false, name: 'VOICE_AGENT'},
+            {label: 'Tools', multipleElements: true, name: 'TOOLS'},
+        ],
+        clusterRoot: true,
+        connectionRequired: false,
+        name: 'browser',
+        version: 1,
+    };
+
+    const TRIGGER_ROOT_IDS = ['trigger_1'];
+
+    let queryClient: QueryClient;
+
+    function wrapper({children}: {children: ReactNode}) {
+        return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    }
+
+    beforeEach(() => {
+        queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+
+        useWorkflowDataStore.setState({
+            workflow: {
+                definition: JSON.stringify({
+                    tasks: [],
+                    triggers: [
+                        {
+                            clusterElements: {
+                                tools: [],
+                                voiceAgent: {label: 'Deepgram', name: 'voiceAgent_1', type: 'deepgram/v1/voiceAgent'},
+                            },
+                            label: 'Browser Voice Session',
+                            name: 'trigger_1',
+                            type: 'browser/v1/voiceSession',
+                        },
+                    ],
+                }),
+                id: 'workflow_1',
+            },
+        } as Parameters<typeof useWorkflowDataStore.setState>[0]);
+        useWorkflowEditorStore.setState({
+            clusterRootComponentDefinitions: {trigger_1: BROWSER_DEFINITION},
+            nestedClusterRootsComponentDefinitions: {
+                deepgram: {
+                    actionClusterElementTypes: {},
+                    clusterElementClusterElementTypes: {},
+                    clusterElementTypes: [],
+                },
+            },
+            rootClusterElementNodeData: undefined,
+        });
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'box'});
+    });
+
+    it('builds the voice agent element of a trigger root, parented to that trigger', async () => {
+        const {result} = renderHook(() => useClusterElementNodes(TRIGGER_ROOT_IDS), {wrapper});
+
+        await waitFor(() => {
+            expect(result.current.nodesByRootId.trigger_1.map((node) => node.id)).toContain('voiceAgent_1');
+        });
+
+        expect(result.current.nodesByRootId.trigger_1.every((node) => node.parentId === 'trigger_1')).toBe(true);
+    });
+});

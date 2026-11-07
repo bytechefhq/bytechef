@@ -745,3 +745,60 @@ describe('handleDeleteTask', () => {
         expect(updatedDefinition.tasks[0].parameters.iteratee).toEqual({});
     });
 });
+
+describe('handleDeleteTask cluster element of a trigger cluster root', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockWorkflowState = {};
+    });
+
+    afterEach(() => {
+        clearAllWorkflowMutations();
+    });
+
+    it('removes a tool from the trigger it hangs off and leaves the tasks untouched', () => {
+        const tasks = [makeTask('logger_1')];
+        const triggers = [
+            {
+                clusterElements: {
+                    tools: [{name: 'httpClient_1', parameters: {}, type: 'httpClient/v1/get'}],
+                    voiceAgent: {name: 'voiceAgent_1', parameters: {}, type: 'deepgram/v1/voiceAgent'},
+                },
+                name: 'trigger_1',
+                parameters: {},
+                type: 'browser/v1/voiceSession',
+            },
+        ];
+        const workflow = {
+            ...makeWorkflow(tasks),
+            definition: JSON.stringify({tasks, triggers}, null, SPACE),
+        };
+        const mutation = makeMockMutation();
+
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            data: {
+                clusterElementType: 'tools',
+                componentName: 'httpClient',
+                name: 'httpClient_1',
+                parentClusterRootId: 'trigger_1',
+                topLevelClusterRootId: 'trigger_1',
+                workflowNodeName: 'httpClient_1',
+            } as NodeDataType,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            updateWorkflowMutation: mutation,
+            workflow,
+        });
+
+        expect(mutation.mutate).toHaveBeenCalledOnce();
+
+        const updatedDefinition = JSON.parse(
+            (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0].workflow.definition
+        );
+
+        expect(updatedDefinition.tasks.map((task: WorkflowTask) => task.name)).toEqual(['logger_1']);
+        expect(updatedDefinition.triggers[0].clusterElements.tools).toEqual([]);
+        expect(updatedDefinition.triggers[0].clusterElements.voiceAgent.name).toBe('voiceAgent_1');
+    });
+});

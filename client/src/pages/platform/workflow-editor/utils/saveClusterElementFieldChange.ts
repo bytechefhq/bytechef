@@ -5,8 +5,8 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {updateClusterRootElementField, updateNestedClusterElementField} from './clusterElementsFieldChangeUtils';
+import {getClusterRootTask} from './getClusterRootTask';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
-import {getTask} from './getTask';
 import {resolveMainClusterRootName} from './resolveClusterRootId';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
@@ -54,10 +54,11 @@ export default function saveClusterElementFieldChange({
         return;
     }
 
-    const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+    const workflowDefinition = JSON.parse(workflow.definition);
 
-    const mainClusterRootTask = getTask({
-        tasks: workflowDefinitionTasks,
+    const mainClusterRootTask = getClusterRootTask({
+        tasks: workflowDefinition.tasks,
+        triggers: workflowDefinition.triggers,
         workflowNodeName: mainClusterRootName,
     });
 

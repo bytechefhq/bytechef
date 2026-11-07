@@ -1,4 +1,4 @@
-import {WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
 
 import findClusterElementRootTaskName from '../findClusterElementRootTaskName';
@@ -38,5 +38,27 @@ describe('findClusterElementRootTaskName', () => {
     it('returns undefined for a regular node or an unknown name', () => {
         expect(findClusterElementRootTaskName(tasks, 'logger_1')).toBeUndefined();
         expect(findClusterElementRootTaskName(undefined, 'openAi_1')).toBeUndefined();
+    });
+});
+
+describe('findClusterElementRootTaskName with trigger cluster roots', () => {
+    const triggers = [
+        {
+            clusterElements: {
+                tools: [{name: 'httpClient_2', type: 'httpClient/v1/get'}],
+                voiceAgent: {name: 'voiceAgent_1', type: 'deepgram/v1/voiceAgent'},
+            },
+            name: 'trigger_1',
+            type: 'browser/v1/voiceSession',
+        },
+    ] as Array<WorkflowTrigger>;
+
+    it('matches an element that hangs off a trigger', () => {
+        expect(findClusterElementRootTaskName(tasks, 'voiceAgent_1', triggers)).toBe('trigger_1');
+        expect(findClusterElementRootTaskName(tasks, 'httpClient_2', triggers)).toBe('trigger_1');
+    });
+
+    it('still resolves an element of a task to its task root', () => {
+        expect(findClusterElementRootTaskName(tasks, 'openAi_1', triggers)).toBe('aiAgent_1');
     });
 });

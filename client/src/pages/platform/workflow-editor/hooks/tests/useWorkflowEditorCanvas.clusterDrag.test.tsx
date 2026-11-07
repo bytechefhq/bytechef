@@ -282,3 +282,92 @@ describe('useWorkflowEditorCanvas cluster element dragging, nested a level deepe
         expect(getSavedNestedElementPosition()).toEqual({x: 220, y: 180});
     });
 });
+
+describe('useWorkflowEditorCanvas cluster element dragging inside a trigger box', () => {
+    const TRIGGER_ID = 'trigger_1';
+
+    beforeEach(() => {
+        editorContext.updateWorkflowMutation = updateWorkflowMutationMock;
+        updateWorkflowMutationMock.mutate.mockClear();
+
+        clearAllWorkflowMutations();
+
+        useWorkflowDataStore.setState({
+            edges: [],
+            nodes: [
+                {
+                    data: {
+                        clusterFrame: {clusterRootId: TRIGGER_ID, height: 320, width: 640},
+                        clusterRoot: true,
+                        trigger: true,
+                        workflowNodeName: TRIGGER_ID,
+                    },
+                    id: TRIGGER_ID,
+                    position: {x: 0, y: 0},
+                    type: 'workflow',
+                },
+                {
+                    data: {
+                        clusterElementType: 'voiceAgent',
+                        parentClusterRootId: TRIGGER_ID,
+                        workflowNodeName: 'voiceAgent_1',
+                    },
+                    draggable: true,
+                    id: 'voiceAgent_1',
+                    measured: {height: 60, width: 200},
+                    parentId: TRIGGER_ID,
+                    position: toClusterFrameChildPosition({x: 0, y: 0}),
+                    type: 'workflow',
+                },
+            ],
+            savedPositionCrossAxisShift: 0,
+            workflow: {
+                definition: JSON.stringify({
+                    tasks: [],
+                    triggers: [
+                        {
+                            clusterElements: {
+                                tools: [],
+                                voiceAgent: {
+                                    metadata: {ui: {nodePosition: {x: 0, y: 0}}},
+                                    name: 'voiceAgent_1',
+                                    type: 'deepgram/v1/voiceAgent',
+                                },
+                            },
+                            name: TRIGGER_ID,
+                            type: 'browser/v1/voiceSession',
+                        },
+                    ],
+                }),
+                id: 'workflow-1',
+                nodeNames: [],
+                tasks: [],
+                triggers: [{clusterRoot: true, name: TRIGGER_ID, type: 'browser/v1/voiceSession'}],
+                version: 3,
+            },
+        });
+    });
+
+    it('persists a dropped voice agent position into the trigger it hangs off', () => {
+        const {result} = renderCanvas();
+
+        act(() => {
+            result.current.handleNodeDragStop({} as MouseEvent, {
+                ...findNode('voiceAgent_1'),
+                position: toClusterFrameChildPosition({x: 220, y: 140}),
+            });
+        });
+
+        expect(updateWorkflowMutationMock.mutate).toHaveBeenCalled();
+
+        const [[mutationVariables]] = updateWorkflowMutationMock.mutate.mock.calls.slice(-1);
+
+        const savedDefinition = JSON.parse((mutationVariables as {workflow: {definition: string}}).workflow.definition);
+
+        expect(savedDefinition.tasks).toEqual([]);
+        expect(savedDefinition.triggers[0].clusterElements.voiceAgent.metadata.ui.nodePosition).toEqual({
+            x: 220,
+            y: 140,
+        });
+    });
+});

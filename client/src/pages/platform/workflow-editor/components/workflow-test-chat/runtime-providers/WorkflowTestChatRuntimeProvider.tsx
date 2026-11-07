@@ -13,6 +13,7 @@ import {
     AssistantRuntimeProvider,
     AuiConfig,
     CompositeAttachmentAdapter,
+    RealtimeVoiceAdapter,
     SimpleImageAttachmentAdapter,
     SimpleTextAttachmentAdapter,
     type SuggestionConfig,
@@ -54,8 +55,10 @@ const WORKFLOW_TEST_CHAT_SUGGESTIONS: SuggestionConfig[] = [
 
 export function WorkflowTestChatRuntimeProvider({
     children,
+    voiceAdapter,
 }: Readonly<{
     children: ReactNode;
+    voiceAdapter?: RealtimeVoiceAdapter;
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
@@ -156,6 +159,7 @@ export function WorkflowTestChatRuntimeProvider({
                 new SimpleImageAttachmentAdapter(),
                 new SimpleTextAttachmentAdapter(),
             ]),
+            ...(voiceAdapter ? {voice: voiceAdapter} : {}),
         },
         convertMessage,
         isRunning,

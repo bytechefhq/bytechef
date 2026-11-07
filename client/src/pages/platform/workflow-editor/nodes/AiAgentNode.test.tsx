@@ -11,21 +11,37 @@ import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedSto
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import AiAgentNode from './AiAgentNode';
 
-const {testNodeStatesState} = vi.hoisted(() => ({
+const {handleDeleteTaskMock, handleDeleteTriggerMock, recordedMenuProps, testNodeStatesState} = vi.hoisted(() => ({
+    handleDeleteTaskMock: vi.fn(),
+    handleDeleteTriggerMock: vi.fn(),
+    recordedMenuProps: {
+        contextMenu: undefined as Record<string, unknown> | undefined,
+        dropdownMenu: undefined as Record<string, unknown> | undefined,
+    },
     testNodeStatesState: {value: {} as Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED'}>},
 }));
 
 vi.mock('@xyflow/react', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@xyflow/react')>()),
-    Handle: ({type}: {type: string}) => <div data-testid={`handle-${type}`} />,
+    Handle: ({className, type}: {className?: string; type: string}) => (
+        <div className={className} data-testid={`handle-${type}`} />
+    ),
 }));
 
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu', () => ({
-    default: ({children}: {children: ReactNode}) => <div>{children}</div>,
+    default: ({children, ...contextMenuProps}: {children: ReactNode}) => {
+        recordedMenuProps.contextMenu = contextMenuProps;
+
+        return <div>{children}</div>;
+    },
 }));
 
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodeDropdownMenu', () => ({
-    default: () => null,
+    default: (dropdownMenuProps: Record<string, unknown>) => {
+        recordedMenuProps.dropdownMenu = dropdownMenuProps;
+
+        return null;
+    },
 }));
 
 vi.mock('../providers/workflowEditorProvider', () => ({
@@ -51,6 +67,10 @@ vi.mock('../hooks/useNodeClick', () => ({
 vi.mock('./ClusterFrameShell', () => ({
     default: ({children}: {children: ReactNode}) => <div>{children}</div>,
 }));
+
+vi.mock('../utils/handleDeleteTask', () => ({default: handleDeleteTaskMock}));
+
+vi.mock('../utils/handleDeleteTrigger', () => ({default: handleDeleteTriggerMock}));
 
 const AI_AGENT_DATA = {
     clusterElements: {},
@@ -205,5 +225,87 @@ describe('AiAgentNode', () => {
         expect(nodeClassName(container)).toContain('opacity-50');
         expect(nodeClassName(container)).toContain('grayscale');
         expect(screen.queryByTitle(DISABLED_BADGE_TITLE)).not.toBeInTheDocument();
+    });
+});
+
+describe('AiAgentNode trigger cluster root', () => {
+    const VOICE_SESSION_TRIGGER_DATA = {
+        clusterRoot: true,
+        componentName: 'browser',
+        label: 'Browser Voice Session',
+        name: 'trigger_1',
+        operationName: 'voiceSession',
+        trigger: true,
+        version: 1,
+        workflowNodeName: 'trigger_1',
+    } as unknown as NodeDataType;
+
+    function setWorkflowTriggers(triggers: Array<{name: string; type: string}>) {
+        useWorkflowDataStore.setState({
+            workflow: {definition: '{}', id: 'workflow-1', nodeNames: [], tasks: [], triggers, version: 1},
+        });
+    }
+
+    beforeEach(() => {
+        handleDeleteTaskMock.mockReset();
+        handleDeleteTriggerMock.mockReset();
+        recordedMenuProps.contextMenu = undefined;
+        recordedMenuProps.dropdownMenu = undefined;
+        testNodeStatesState.value = {};
+
+        setWorkflowTriggers([{name: 'trigger_1', type: 'browser/v1/voiceSession'}]);
+
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
+        useClusterFrameCollapsedStore.setState({collapsedByWorkflowId: {}});
+    });
+
+    it('offers no task-only actions on the only trigger of the workflow', () => {
+        renderNode(VOICE_SESSION_TRIGGER_DATA);
+
+        const expectedActions = {
+            showCopyAction: false,
+            showCutAction: false,
+            showDeleteAction: false,
+            showDisableAction: false,
+            showInfoAction: true,
+            showRenameAction: true,
+        };
+
+        expect(recordedMenuProps.contextMenu).toMatchObject(expectedActions);
+        expect(recordedMenuProps.dropdownMenu).toMatchObject(expectedActions);
+    });
+
+    it('deletes the trigger through the trigger path when the workflow has another trigger', () => {
+        setWorkflowTriggers([
+            {name: 'trigger_1', type: 'browser/v1/voiceSession'},
+            {name: 'trigger_2', type: 'webhook/v1/onReceive'},
+        ]);
+
+        renderNode(VOICE_SESSION_TRIGGER_DATA);
+
+        expect(recordedMenuProps.contextMenu?.showDeleteAction).toBe(true);
+
+        (recordedMenuProps.contextMenu?.onDelete as () => void)();
+
+        expect(handleDeleteTriggerMock).toHaveBeenCalledWith(expect.objectContaining({triggerName: 'trigger_1'}));
+        expect(handleDeleteTaskMock).not.toHaveBeenCalled();
+    });
+
+    it('hides the incoming handle of a trigger card', () => {
+        renderNode(VOICE_SESSION_TRIGGER_DATA);
+
+        expect(screen.getByTestId('handle-target')).toHaveClass('hidden');
+    });
+
+    it('keeps every task action and the incoming handle on an agent task', () => {
+        renderNode(AI_AGENT_DATA);
+
+        expect(recordedMenuProps.contextMenu).toMatchObject({
+            showCopyAction: true,
+            showCutAction: true,
+            showDeleteAction: true,
+            showDisableAction: true,
+        });
+        expect(screen.getByTestId('handle-target')).not.toHaveClass('hidden');
     });
 });

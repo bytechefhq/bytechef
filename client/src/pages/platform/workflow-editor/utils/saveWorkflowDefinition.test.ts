@@ -996,3 +996,68 @@ describe('saveWorkflowDefinition', () => {
         });
     });
 });
+
+describe('saveWorkflowDefinition trigger cluster root', () => {
+    const voiceAgent = {name: 'voiceAgent_1', parameters: {}, type: 'deepgram/v1/voiceAgent'};
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockWorkflowState = makeWorkflowState(
+            [],
+            [{name: 'trigger_1', parameters: {}, type: 'browser/v1/voiceSession'}]
+        );
+    });
+
+    afterEach(() => {
+        clearAllWorkflowMutations();
+    });
+
+    function getSavedDefinition(mutation: ReturnType<typeof makeMutation>) {
+        return JSON.parse((mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0].workflow.definition);
+    }
+
+    it('keeps clusterElements on a trigger through save', async () => {
+        const mutation = makeMutation();
+
+        await saveWorkflowDefinition({
+            nodeData: {
+                clusterElements: {voiceAgent},
+                componentName: 'browser',
+                name: 'trigger_1',
+                operationName: 'voiceSession',
+                parameters: {},
+                trigger: true,
+                version: 1,
+                workflowNodeName: 'trigger_1',
+            } as unknown as NodeDataType,
+            updateWorkflowMutation: mutation,
+        });
+
+        const savedDefinition = getSavedDefinition(mutation);
+
+        expect(savedDefinition.triggers[0].clusterElements.voiceAgent.type).toBe('deepgram/v1/voiceAgent');
+    });
+
+    it('saves a cluster root found among the triggers back into that trigger rather than as a new task', async () => {
+        const mutation = makeMutation();
+
+        await saveWorkflowDefinition({
+            decorative: true,
+            nodeData: {
+                clusterElements: {tools: [], voiceAgent},
+                componentName: 'browser',
+                name: 'trigger_1',
+                parameters: {},
+                type: 'browser/v1/voiceSession',
+                workflowNodeName: 'trigger_1',
+            } as unknown as NodeDataType,
+            updateWorkflowMutation: mutation,
+        });
+
+        const savedDefinition = getSavedDefinition(mutation);
+
+        expect(savedDefinition.tasks).toEqual([]);
+        expect(savedDefinition.triggers).toHaveLength(1);
+        expect(savedDefinition.triggers[0].clusterElements).toEqual({tools: [], voiceAgent});
+    });
+});

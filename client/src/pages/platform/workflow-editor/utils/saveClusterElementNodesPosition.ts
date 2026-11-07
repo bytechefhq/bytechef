@@ -3,7 +3,7 @@ import {ClusterElementItemType, UpdateWorkflowMutationType} from '@/shared/types
 
 import useClusterElementsDataStore from '../../cluster-element-editor/stores/useClusterElementsDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
-import {getTask} from './getTask';
+import {getClusterRootTask} from './getClusterRootTask';
 import {removeClusterElementPosition} from './removeClusterElementPosition';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import updateClusterElementsPositions from './updateClusterElementsPositions';
@@ -34,10 +34,11 @@ export default function saveClusterElementNodesPosition({
         return;
     }
 
-    const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+    const workflowDefinition = JSON.parse(workflow.definition);
 
-    const mainClusterRootTask = getTask({
-        tasks: workflowDefinitionTasks,
+    const mainClusterRootTask = getClusterRootTask({
+        tasks: workflowDefinition.tasks,
+        triggers: workflowDefinition.triggers,
         workflowNodeName: mainClusterRootName,
     });
 

@@ -28,3 +28,49 @@ describe('upsertTrigger', () => {
         expect(result[1].name).toBe('trigger_2');
     });
 });
+
+describe('upsertTrigger cluster elements', () => {
+    const clusterElements = {
+        tools: [{name: 'httpClient_1', parameters: {}, type: 'httpClient/v1/get'}],
+        voiceAgent: {name: 'voiceAgent_1', parameters: {}, type: 'deepgram/v1/voiceAgent'},
+    };
+
+    it('keeps the existing cluster elements when the replacement carries none', () => {
+        const existing = [{clusterElements, name: 'trigger_1', type: 'browser/v1/voiceSession'}] as WorkflowTrigger[];
+        const next = {name: 'trigger_1', parameters: {}, type: 'browser/v1/voiceSession'} as WorkflowTrigger;
+
+        expect(upsertTrigger(existing, next)[0].clusterElements).toEqual(clusterElements);
+    });
+
+    it('takes the replacement cluster elements when it carries them', () => {
+        const existing = [{clusterElements, name: 'trigger_1', type: 'browser/v1/voiceSession'}] as WorkflowTrigger[];
+        const next = {
+            clusterElements: {tools: []},
+            name: 'trigger_1',
+            type: 'browser/v1/voiceSession',
+        } as WorkflowTrigger;
+
+        expect(upsertTrigger(existing, next)[0].clusterElements).toEqual({tools: []});
+    });
+});
+
+describe('upsertTrigger cluster elements across a type change', () => {
+    const clusterElements = {
+        tools: [{name: 'httpClient_1', parameters: {}, type: 'httpClient/v1/get'}],
+        voiceAgent: {name: 'voiceAgent_1', parameters: {}, type: 'deepgram/v1/voiceAgent'},
+    };
+
+    it('drops the existing cluster elements when the replacement is a different trigger type', () => {
+        const existing = [{clusterElements, name: 'trigger_1', type: 'browser/v1/voiceSession'}] as WorkflowTrigger[];
+        const next = {name: 'trigger_1', parameters: {}, type: 'manual/v1/manual'} as WorkflowTrigger;
+
+        expect(upsertTrigger(existing, next)[0].clusterElements).toBeUndefined();
+    });
+
+    it('keeps the existing cluster elements when the same trigger type is saved without them', () => {
+        const existing = [{clusterElements, name: 'trigger_1', type: 'browser/v1/voiceSession'}] as WorkflowTrigger[];
+        const next = {label: 'Voice', name: 'trigger_1', type: 'browser/v1/voiceSession'} as WorkflowTrigger;
+
+        expect(upsertTrigger(existing, next)[0].clusterElements).toEqual(clusterElements);
+    });
+});

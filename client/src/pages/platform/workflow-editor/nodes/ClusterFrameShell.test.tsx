@@ -16,7 +16,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import ClusterFrameShell from './ClusterFrameShell';
 
 vi.mock('@xyflow/react', () => ({
-    Handle: () => null,
+    Handle: ({className, id}: {className?: string; id?: string}) => <div className={className} data-testid={id} />,
     Position: {Bottom: 'bottom', Left: 'left', Right: 'right', Top: 'top'},
 }));
 
@@ -338,5 +338,94 @@ describe('ClusterFrameShell', () => {
         expect(useCopilotStore.getState().context.source).toBe(Source.CLUSTER_ELEMENT);
         expect(useCopilotStore.getState().context.parameters.taskName).toBe('aiAgent_1');
         expect(useWorkflowEditorStore.getState().rootClusterElementNodeData?.workflowNodeName).toBe('aiAgent_1');
+    });
+});
+
+describe('ClusterFrameShell trigger cluster root', () => {
+    const TRIGGER_ROOT_DATA = {
+        clusterFrame: {clusterRootId: 'trigger_1', height: 320, width: 640},
+        componentName: 'browser',
+        label: 'Browser Voice Session',
+        name: 'trigger_1',
+        trigger: true,
+        workflowNodeName: 'trigger_1',
+    } as unknown as NodeDataType;
+
+    beforeEach(() => {
+        editorContext.updateWorkflowMutation = updateWorkflowMutationMock;
+        saveWorkflowDefinitionMock.mockReset();
+
+        useWorkflowEditorStore.setState({
+            clusterElementsCanvasOpen: false,
+            clusterFrameLockedByRootId: {},
+            rootClusterElementNodeData: undefined,
+        });
+        useClusterFrameCollapsedStore.setState({collapsedByWorkflowId: {}});
+        useWorkflowDataStore.setState({
+            workflow: {
+                definition: JSON.stringify({
+                    tasks: [],
+                    triggers: [
+                        {
+                            clusterElements: {
+                                tools: [],
+                                voiceAgent: {
+                                    metadata: {ui: {nodePosition: {x: 40, y: 20}}},
+                                    name: 'voiceAgent_1',
+                                    type: 'deepgram/v1/voiceAgent',
+                                },
+                            },
+                            name: 'trigger_1',
+                            type: 'browser/v1/voiceSession',
+                        },
+                    ],
+                }),
+                id: 'workflow-1',
+                nodeNames: [],
+                version: 1,
+            },
+        });
+        applicationInfoStore.setState({featureFlags: {}});
+    });
+
+    it('clears the voice agent position of a trigger box when Reset layout is used', () => {
+        render(
+            <ClusterFrameShell data={TRIGGER_ROOT_DATA} nodeId="trigger_1">
+                <div>root card</div>
+            </ClusterFrameShell>
+        );
+
+        act(() => {
+            screen.getByRole('button', {name: 'Reset layout'}).click();
+        });
+
+        expect(saveWorkflowDefinitionMock).toHaveBeenCalledTimes(1);
+
+        const [[callArguments]] = saveWorkflowDefinitionMock.mock.calls;
+
+        expect(callArguments.nodeData.workflowNodeName).toBe('trigger_1');
+        expect(callArguments.nodeData.componentName).toBe('browser');
+        expect(callArguments.nodeData.clusterElements.voiceAgent.metadata.ui.nodePosition).toBeUndefined();
+    });
+
+    it('hides the chain target handle of a trigger box but keeps its source handle', () => {
+        render(
+            <ClusterFrameShell data={TRIGGER_ROOT_DATA} nodeId="trigger_1">
+                <div>root card</div>
+            </ClusterFrameShell>
+        );
+
+        expect(screen.getByTestId('trigger_1-top')).toHaveClass('hidden');
+        expect(screen.getByTestId('trigger_1-bottom')).not.toHaveClass('hidden');
+    });
+
+    it('keeps the chain target handle of a task box', () => {
+        render(
+            <ClusterFrameShell data={CLUSTER_ROOT_DATA} nodeId="aiAgent_1">
+                <div>root card</div>
+            </ClusterFrameShell>
+        );
+
+        expect(screen.getByTestId('aiAgent_1-top')).not.toHaveClass('hidden');
     });
 });

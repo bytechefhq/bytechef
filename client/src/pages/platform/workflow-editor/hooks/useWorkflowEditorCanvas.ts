@@ -51,7 +51,7 @@ import {
     buildDraggingPlaceholderState,
     computePlaceholderDragPosition,
 } from '../utils/dragTrailingPlaceholder';
-import {getTask} from '../utils/getTask';
+import {getClusterRootTask} from '../utils/getClusterRootTask';
 import {extractLayoutDirection} from '../utils/layoutDirectionDefinitionUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
 import {resolveClusterRootId} from '../utils/resolveClusterRootId';
@@ -84,14 +84,13 @@ function saveDraggedClusterElementPosition({
 }: SaveDraggedClusterElementPositionProps) {
     const {nodes: currentNodes, workflow: currentWorkflow} = useWorkflowDataStore.getState();
 
-    const workflowDefinitionTasks = currentWorkflow.definition
-        ? (JSON.parse(currentWorkflow.definition).tasks ?? [])
-        : [];
+    const workflowDefinition = currentWorkflow.definition ? JSON.parse(currentWorkflow.definition) : {};
 
     const topLevelClusterRootId = resolveClusterRootId(draggedNode.data as NodeDataType) ?? parentClusterRootId;
 
-    const clusterRootTask = getTask({
-        tasks: workflowDefinitionTasks,
+    const clusterRootTask = getClusterRootTask({
+        tasks: workflowDefinition.tasks,
+        triggers: workflowDefinition.triggers,
         workflowNodeName: topLevelClusterRootId,
     });
 

@@ -29,6 +29,7 @@ import buildWorkflowGraph from '../utils/buildWorkflowGraph';
 import {layoutClusterFrames} from '../utils/clusterFrame/layoutClusterFrames';
 import {getElkLayoutElements} from '../utils/elkLayoutUtils';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
+import getBoxModeClusterRootIds from '../utils/getBoxModeClusterRootIds';
 import {getEffectivelyDisabledTaskNames} from '../utils/getEffectivelyDisabledTaskNames';
 import isElkLayoutSupported from '../utils/isElkLayoutSupported';
 import {createLayoutRetryState, onLayoutFailure, onLayoutSuccess} from '../utils/layoutRetryController';
@@ -178,7 +179,9 @@ export default function useLayout({
 
             return previousTriggers.every(
                 (trigger, index) =>
-                    trigger.name === nextTriggers[index].name && trigger.type === nextTriggers[index].type
+                    trigger.name === nextTriggers[index].name &&
+                    trigger.type === nextTriggers[index].type &&
+                    trigger.clusterRoot === nextTriggers[index].clusterRoot
             );
         }
     );
@@ -222,12 +225,8 @@ export default function useLayout({
             return getReadOnlyFramedClusterRootIds(readOnlyWorkflowTasks);
         }
 
-        return clusterElementsViewMode === 'box'
-            ? (tasks ?? [])
-                  .filter((task) => task.clusterRoot && !collapsedClusterRootIds?.[task.name])
-                  .map((task) => task.name)
-            : [];
-    }, [clusterElementsViewMode, collapsedClusterRootIds, isReadOnlyWorkflow, readOnlyWorkflowTasks, tasks]);
+        return getBoxModeClusterRootIds({clusterElementsViewMode, collapsedClusterRootIds, tasks, triggers});
+    }, [clusterElementsViewMode, collapsedClusterRootIds, isReadOnlyWorkflow, readOnlyWorkflowTasks, tasks, triggers]);
 
     const {definitionsReady, edgesByRootId, nodesByRootId} = useClusterElementNodes(
         boxModeClusterRootIds,

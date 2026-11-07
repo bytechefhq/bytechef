@@ -8,9 +8,9 @@ import {
     convertNameToSnakeCase,
     initializeClusterElementsObject,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {getClusterRootTask} from './getClusterRootTask';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
-import {getTask} from './getTask';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import processClusterElementsHierarchy from './processClusterElementsHierarchy';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
@@ -46,8 +46,11 @@ export default async function addClusterElementToClusterRoot({
         return undefined;
     }
 
-    const clusterRootTask = getTask({
-        tasks: JSON.parse(workflow.definition).tasks,
+    const workflowDefinition = JSON.parse(workflow.definition);
+
+    const clusterRootTask = getClusterRootTask({
+        tasks: workflowDefinition.tasks,
+        triggers: workflowDefinition.triggers,
         workflowNodeName: clusterRootId,
     });
 

@@ -3,7 +3,7 @@ import {ClusterElementItemType, ClusterElementsType, UpdateWorkflowMutationType}
 import {isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
-import {getTask} from './getTask';
+import {getClusterRootTask} from './getClusterRootTask';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface ClearAllClusterElementPositionsProps {
@@ -66,11 +66,12 @@ export default function clearAllClusterElementPositions({
         return;
     }
 
-    const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+    const workflowDefinition = JSON.parse(workflow.definition);
 
     const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-        ? getTask({
-              tasks: workflowDefinitionTasks,
+        ? getClusterRootTask({
+              tasks: workflowDefinition.tasks,
+              triggers: workflowDefinition.triggers,
               workflowNodeName: rootClusterElementNodeData.workflowNodeName,
           })
         : undefined;

@@ -65,4 +65,30 @@ describe('getFormattedName', () => {
 
         expect(getFormattedName('httpClient', new Set(['httpClientDraft', 'httpClient_4']))).toBe('httpClient_5');
     });
+
+    it('counts the element names inside a trigger cluster root, in single slots and lists alike', () => {
+        setWorkflowState({
+            tasks: [],
+            triggers: [
+                {
+                    clusterElements: {
+                        tools: [
+                            {
+                                clusterElements: {model: {name: 'openAi_3', type: 'openAi/v1/model'}},
+                                name: 'httpClient_1',
+                                type: 'httpClient/v1/get',
+                            },
+                        ],
+                        voiceAgent: {name: 'deepgram_2', type: 'deepgram/v1/voiceAgent'},
+                    },
+                    name: 'trigger_1',
+                    type: 'browser/v1/voiceSession',
+                },
+            ],
+        });
+
+        expect(getFormattedName('httpClient')).toBe('httpClient_2');
+        expect(getFormattedName('deepgram')).toBe('deepgram_3');
+        expect(getFormattedName('openAi')).toBe('openAi_4');
+    });
 });

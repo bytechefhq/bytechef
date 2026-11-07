@@ -42,3 +42,27 @@ describe('buildTriggerNodes', () => {
         expect(triggerNodes[0].data.componentName).toBe('unknown');
     });
 });
+
+describe('buildTriggerNodes cluster-root triggers', () => {
+    const voiceSessionTrigger = {
+        clusterRoot: true,
+        name: 'trigger_1',
+        type: 'browser/v1/voiceSession',
+    } as WorkflowTrigger;
+
+    it('types a cluster-root trigger as a cluster root', () => {
+        const browserDefinitions = [{icon: '<svg/>', name: 'browser', title: 'Browser'}] as ComponentDefinitionBasic[];
+
+        const {triggerNodes} = buildTriggerNodes([voiceSessionTrigger], browserDefinitions, 1200);
+
+        expect(triggerNodes[0].type).toBe('clusterRoot');
+        expect(triggerNodes[0].data.trigger).toBe(true);
+    });
+
+    it('types a cluster-root trigger as a cluster root when its component definition is missing', () => {
+        const {triggerNodes} = buildTriggerNodes([voiceSessionTrigger], definitions, 1200);
+
+        expect(triggerNodes[0].type).toBe('clusterRoot');
+        expect(triggerNodes[0].data.trigger).toBe(true);
+    });
+});

@@ -7,9 +7,14 @@ export default function upsertTrigger(triggers: WorkflowTrigger[], newTrigger: W
         return [...triggers, newTrigger];
     }
 
+    const existingTrigger = triggers[existingIndex];
+
+    const keptClusterElements = existingTrigger.type === newTrigger.type ? existingTrigger.clusterElements : undefined;
+
     const mergedTrigger: WorkflowTrigger = {
         ...newTrigger,
-        metadata: newTrigger.metadata ?? triggers[existingIndex].metadata,
+        clusterElements: newTrigger.clusterElements ?? keptClusterElements,
+        metadata: newTrigger.metadata ?? existingTrigger.metadata,
     };
 
     return [...triggers.slice(0, existingIndex), mergedTrigger, ...triggers.slice(existingIndex + 1)];
