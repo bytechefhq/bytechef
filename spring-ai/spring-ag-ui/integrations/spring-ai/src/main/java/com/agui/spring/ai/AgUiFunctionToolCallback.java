@@ -6,9 +6,12 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.lang.Nullable;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class AgUiFunctionToolCallback implements ToolCallback {
+
+    public static final String TOOL_CALL_ID_KEY = "agUiToolCallId";
 
     private final ToolCallback toolCallback;
 
@@ -38,7 +41,7 @@ public class AgUiFunctionToolCallback implements ToolCallback {
         String result;
 
         try {
-            result = this.toolCallback.call(toolInput, toolContext);
+            result = this.toolCallback.call(toolInput, withToolCallId(toolContext, toolCallId));
         } catch (RuntimeException | Error throwable) {
             this.listener.onToolCallFailed(toolCallId, throwable);
 
@@ -48,6 +51,18 @@ public class AgUiFunctionToolCallback implements ToolCallback {
         this.listener.onToolCallFinished(toolCallId, result);
 
         return result;
+    }
+
+    private static ToolContext withToolCallId(@Nullable ToolContext toolContext, String toolCallId) {
+        if (toolContext == null) {
+            return null;
+        }
+
+        var context = new HashMap<>(toolContext.getContext());
+
+        context.put(TOOL_CALL_ID_KEY, toolCallId);
+
+        return new ToolContext(context);
     }
 
 }

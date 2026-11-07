@@ -297,6 +297,10 @@ public class SpringAIAgent extends LocalAgent {
         return Collections.emptyMap();
     }
 
+    protected Map<String, Object> toolContext(RunAgentInput input, AgentSubscriber subscriber) {
+        return this.toolContext(input);
+    }
+
     /**
      * Hook for subclasses to contribute per-invocation {@link ToolCallback} instances on top of the static set
      * configured at builder time. The returned list is concatenated with the builder-supplied
@@ -519,7 +523,7 @@ public class SpringAIAgent extends LocalAgent {
             }
         }
 
-        Map<String, Object> toolContext = this.toolContext(input);
+        Map<String, Object> toolContext = this.toolContext(input, subscriber);
 
         if (toolContext != null && !toolContext.isEmpty()) {
             try {
