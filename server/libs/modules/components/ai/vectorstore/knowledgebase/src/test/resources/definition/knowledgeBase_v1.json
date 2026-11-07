@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
     "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
-    "delete": [ ],
+    "search": [ ],
     "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
-    "search": [ ]
+    "delete": [ ]
   },
   "actions": [ {
     "batch": false,
@@ -1240,8 +1240,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ ],
-    "search": [ ]
+    "search": [ ],
+    "vectorStore": [ ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -2180,6 +2180,72 @@
       "label": "Vector Store",
       "multipleElements": false,
       "required": true
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "writeAsDocument",
+    "description": "Upsert source records into the target Knowledge Base as documents. FULL_REPLACE mode tombstones documents whose source_record_id is not seen this run; PARTIAL mode skips the tombstone sweep for backfills and partial-update workflows.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "ID of the KnowledgeBaseSource that owns this sync.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Knowledge Base Source ID",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "sourceId",
+      "options": [ ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "FULL_REPLACE",
+      "description": "FULL_REPLACE = tombstone records not seen this run (default); PARTIAL = leave unseen records untouched (use for backfills / partial updates).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Sync mode",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "mode",
+      "options": [ {
+        "description": null,
+        "label": "FULL_REPLACE",
+        "value": "FULL_REPLACE"
+      }, {
+        "description": null,
+        "label": "PARTIAL",
+        "value": "PARTIAL"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "Write as Knowledge Base Document",
+    "type": {
+      "name": "DESTINATION",
+      "key": "destination",
+      "label": "Destination",
+      "multipleElements": false,
+      "required": false
     },
     "workflowNodeDescription": null
   } ],
