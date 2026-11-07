@@ -188,6 +188,11 @@ public class ConfigurationApplicationIntTest {
     }
 
     @Test
+    void testDataTablesQueryIsServed() {
+        assertThat(applicationContext.containsBean("dataTableGraphQlController")).isTrue();
+    }
+
+    @Test
     void testContextLoads() {
     }
 
@@ -276,6 +281,7 @@ public class ConfigurationApplicationIntTest {
             "bytechef.platform.configuration.remote.v1.WorkflowRemoteService",
             "bytechef.platform.configuration.remote.v1.WorkflowTestConfigurationRemoteService",
             "bytechef.platform.notification.remote.v1.NotificationRemoteService",
+            "bytechef.platform.data.table.remote.v1.DataTableRemoteService",
             "bytechef.platform.codeworkflow.configuration.remote.v1.CodeWorkflowContainerRemoteService");
         assertThat(serviceNames).doesNotContain(
             "bytechef.atlas.execution.remote.v1.JobRemoteService",
