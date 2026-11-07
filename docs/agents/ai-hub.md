@@ -131,8 +131,17 @@ workspace has no active guardrail, or the EE guardrails module is absent, the ca
   blocked call stores nothing.
 - A `BLOCK` violation throws `AiGuardrailViolationException` out of the delegate's `ChatClient` call; its message
   carries the category, never the matched content.
-- The parent agent does not re-scan a delegate's tool result, and the hub's own top-level turns are not guarded on
-  this branch.
+- The parent agent does not re-scan a delegate's tool result.
+
+The ASK and BUILD agents get the same advisor on every turn: `AiHubSpringAIAgent#resolveChatClient` mutates the
+resolved client (the default one or an override) to add it as a default advisor, keyed on
+`AiHubStateKeys.VERIFIED_WORKSPACE_ID`. `AiHubConfiguration` hands each agent bean the `AiGuardrails` bean and one
+`AiGuardrailMetrics` tagged `ai_hub`, which the BUILD bean shares with its delegates. Without an `AiGuardrails` bean, or
+with no active guardrail for the workspace, the client is returned untouched. The advisor is a plain call/stream advisor,
+not a tool-calling advisor, and runs outside the per-request `ToolCallingAdvisor` and the session memory advisor: it sees
+the user input once before the tool loop and the final completion on its way to the client. Streamed completions are
+redacted only when `response-scan-streaming-enabled` is on as well as `scanResponses`. The hub's session memory sits
+inside it, so it stores the redacted user input but the model's unredacted output.
 
 ## The wrap site and the approval gate
 

@@ -33,6 +33,12 @@ import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
+import com.bytechef.ee.platform.ai.guardrails.advisor.AiGuardrailsAdvisor;
+import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsSettingsTarget;
+import com.bytechef.platform.ai.guardrails.GuardrailSurface;
+import com.bytechef.platform.ai.guardrails.RestorationDestination;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -94,6 +100,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         ChatClient resolve(State state);
     }
 
+    private final @Nullable AiGuardrails aiGuardrails;
+    private final @Nullable AiGuardrailMetrics aiGuardrailMetrics;
     private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
     private final @Nullable Mode mode;
     private final List<ToolCallback> pinnedToolCallbacks;
@@ -104,6 +112,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     protected AiHubSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder);
 
+        this.aiGuardrails = builder.aiGuardrails;
+        this.aiGuardrailMetrics = builder.aiGuardrailMetrics;
         this.overrideChatClientResolver = builder.overrideChatClientResolver;
         this.mode = builder.mode;
         this.pinnedToolCallbacks = List.copyOf(builder.pendingToolCallbacks);
@@ -333,6 +343,10 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
     @Override
     protected ChatClient resolveChatClient(RunAgentInput input) {
+        return attachGuardrailsAdvisor(resolveConfiguredChatClient(input), input);
+    }
+
+    private ChatClient resolveConfiguredChatClient(RunAgentInput input) {
         if (overrideChatClientResolver == null) {
             return resolveDefaultChatClient(input);
         }
@@ -360,6 +374,27 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         } catch (AGUIException exception) {
             throw new IllegalStateException(exception.getMessage(), exception);
         }
+    }
+
+    private ChatClient attachGuardrailsAdvisor(ChatClient chatClient, RunAgentInput input) {
+        if (aiGuardrails == null || aiGuardrailMetrics == null) {
+            return chatClient;
+        }
+
+        State state = input.state();
+        Long workspaceId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.VERIFIED_WORKSPACE_ID));
+        AiGuardrailsSettingsTarget target = AiGuardrailsSettingsTarget.resolve(null, workspaceId);
+
+        if (!aiGuardrails.isActive(target)) {
+            return chatClient;
+        }
+
+        AiGuardrailsAdvisor aiGuardrailsAdvisor = new AiGuardrailsAdvisor(
+            aiGuardrails, target, aiGuardrailMetrics, GuardrailSurface.AI_HUB, RestorationDestination.CONVERSATION);
+
+        return chatClient.mutate()
+            .defaultAdvisors(aiGuardrailsAdvisor)
+            .build();
     }
 
     /**
@@ -475,6 +510,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             "AI Hub tools must be ToolCallbacks so they pass the approval gate; use toolCallbacks(...)";
 
         private String agentId = "ai_hub";
+        private @Nullable AiGuardrails aiGuardrails;
+        private @Nullable AiGuardrailMetrics aiGuardrailMetrics;
         private @Nullable OverrideChatClientResolver overrideChatClientResolver;
         private @Nullable SecurityContextRehydrator securityContextRehydrator;
         private @Nullable AiHubApprovalGate approvalGate;
@@ -495,6 +532,16 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             @Nullable WebSearchToolCallbackProvider webSearchToolCallbackProvider) {
 
             this.webSearchToolCallbackProvider = webSearchToolCallbackProvider;
+
+            return this;
+        }
+
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
+        public Builder aiGuardrails(
+            @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
+
+            this.aiGuardrails = aiGuardrails;
+            this.aiGuardrailMetrics = aiGuardrailMetrics;
 
             return this;
         }
