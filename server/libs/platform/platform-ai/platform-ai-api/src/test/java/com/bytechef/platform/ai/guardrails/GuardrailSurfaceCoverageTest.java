@@ -102,12 +102,14 @@ class GuardrailSurfaceCoverageTest {
     void testEverySurfaceNameIsRegistered() {
         assertTrue(
             GuardrailSurface.ALL.containsAll(
-                Set.of(GuardrailSurface.AI_AGENT, GuardrailSurface.AI_HUB, GuardrailSurface.COPILOT)),
+                Set.of(
+                    GuardrailSurface.AI_AGENT, GuardrailSurface.AI_HUB, GuardrailSurface.COPILOT,
+                    GuardrailSurface.MCP_AUTOMATION, GuardrailSurface.MCP_EMBEDDED)),
             "GuardrailSurface.ALL must list every declared surface; a surface missing from it resolves its own "
                 + "policy and reports its own metrics under a name nothing else uses.");
 
         assertTrue(
-            GuardrailSurface.ALL.size() == 3,
+            GuardrailSurface.ALL.size() == 5,
             "A surface was added or removed without updating this test. Adding one is a real change: it introduces a "
                 + "place where workspace data reaches a model, so the addition should be reviewed rather than "
                 + "absorbed. Found: " + GuardrailSurface.ALL);

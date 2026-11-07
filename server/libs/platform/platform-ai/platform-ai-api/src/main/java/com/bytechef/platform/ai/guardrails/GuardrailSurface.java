@@ -29,7 +29,11 @@ public final class GuardrailSurface {
 
     public static final String COPILOT = "copilot";
 
-    public static final Set<String> ALL = Set.of(AI_AGENT, AI_HUB, COPILOT);
+    public static final String MCP_AUTOMATION = McpOutboundRedactorProvider.SURFACE_AUTOMATION;
+
+    public static final String MCP_EMBEDDED = McpOutboundRedactorProvider.SURFACE_EMBEDDED;
+
+    public static final Set<String> ALL = Set.of(AI_AGENT, AI_HUB, COPILOT, MCP_AUTOMATION, MCP_EMBEDDED);
 
     private GuardrailSurface() {
     }
