@@ -149,12 +149,12 @@ build_runtime_job_image() {
 }
 
 build_bytechef_image() {
-    echo "Validating Node.js version required for client build..."
+    echo "Validating Node.js version required for the client and MCP App widget builds..."
     node "$root_dir/client/scripts/check-node-version.mjs" || exit 1
 
     cd "$root_dir/server/apps/server-app" || exit 1
 
-    "$root_dir/gradlew" clean build -Pprod || exit 1
+    "$root_dir/gradlew" clean build -Pprod -PbuildMcpApps || exit 1
 
     # bytechef/bytechef is layered on top of bytechef/bytechef-server, so the server image has to exist first.
     for tag in $tags; do
