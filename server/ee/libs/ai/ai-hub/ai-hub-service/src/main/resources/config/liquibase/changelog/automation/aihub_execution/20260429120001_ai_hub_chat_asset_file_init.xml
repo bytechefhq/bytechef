@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260429120001" author="Ivica Cardic">
+        <createTable tableName="ai_hub_chat_asset_file">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="chat_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_hub_chat_asset_file_chat"
+                             references="ai_hub_chat(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="asset_file_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_hub_chat_asset_file_asset_file"
+                             references="asset_file(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="relationship" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="ai_hub_chat_asset_file"
+                             columnNames="chat_id, asset_file_id, relationship"
+                             constraintName="uk_ai_hub_chat_asset_file_triple"/>
+
+        <createIndex tableName="ai_hub_chat_asset_file"
+                     indexName="idx_ai_hub_chat_asset_file_chat">
+            <column name="chat_id"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <createIndex tableName="ai_hub_chat_asset_file"
+                     indexName="idx_ai_hub_chat_asset_file_asset_file">
+            <column name="asset_file_id"/>
+        </createIndex>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_ai_hub_chat_asset_file_authored_once
+            ON ai_hub_chat_asset_file (asset_file_id)
+            WHERE relationship = 0
+        </sql>
+    </changeSet>
+</databaseChangeLog>
