@@ -7,12 +7,16 @@
 
 package com.bytechef.ee.platform.data.table.remote.client.service;
 
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.DataTableInfosResponse;
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.EnvironmentRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -21,7 +25,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class RemoteDataTableServiceClient implements DataTableService {
+public class RemoteDataTableServiceClient extends AbstractRemoteDataTableClient implements DataTableService {
+
+    public RemoteDataTableServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        super(grpcChannels, objectMapper);
+    }
+
+    @Override
+    public void addColumn(String baseName, ColumnSpec columnSpec, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public void createTable(String baseName, List<ColumnSpec> columnSpecs, long environmentId) {
@@ -34,27 +47,12 @@ public class RemoteDataTableServiceClient implements DataTableService {
     }
 
     @Override
-    public void addColumn(String baseName, ColumnSpec columnSpec, long environmentId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void removeColumn(String baseName, String columnName, long environmentId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void renameColumn(String baseName, String fromColumnName, String toColumnName, long environmentId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean dropTable(String baseName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<DataTableInfo> listTables(long environmentId) {
+    public void duplicateTable(String fromBaseName, String toBaseName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
@@ -69,12 +67,28 @@ public class RemoteDataTableServiceClient implements DataTableService {
     }
 
     @Override
-    public void renameTable(String fromBaseName, String toBaseName, long environmentId) {
+    public List<DataTableInfo> listTables(long environmentId) {
+        DataTableInfosResponse dataTableInfosResponse = call(
+            () -> getStub().listTables(
+                EnvironmentRequest.newBuilder()
+                    .setEnvironmentId(environmentId)
+                    .build()));
+
+        return dataTableProtoMapper.toDataTableInfos(dataTableInfosResponse.getDataTableInfos());
+    }
+
+    @Override
+    public void removeColumn(String baseName, String columnName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void duplicateTable(String fromBaseName, String toBaseName, long environmentId) {
+    public void renameColumn(String baseName, String fromColumnName, String toColumnName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void renameTable(String fromBaseName, String toBaseName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 }

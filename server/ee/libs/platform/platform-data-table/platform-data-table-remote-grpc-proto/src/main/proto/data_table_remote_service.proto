@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package bytechef.platform.data.table.remote.v1;
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.data.table.remote.grpc.proto";
+
+service DataTableRemoteService {
+  rpc ListTables(EnvironmentRequest) returns (DataTableInfosResponse);
+  rpc ListRows(ListRowsRequest) returns (DataTableRowsResponse);
+  rpc FindRows(FindRowsRequest) returns (DataTableRowsResponse);
+  rpc GetRow(RowIdRequest) returns (DataTableRowResponse);
+  rpc InsertRows(InsertRowsRequest) returns (DataTableRowsResponse);
+  rpc UpdateRow(UpdateRowRequest) returns (DataTableRowResponse);
+  rpc UpdateRows(UpdateRowsRequest) returns (DataTableRowsResponse);
+  rpc DeleteRows(DeleteRowsRequest) returns (DataTableRowsResponse);
+  rpc DeleteAllRows(TableRequest) returns (DataTableRowsResponse);
+  rpc AddWebhook(AddWebhookRequest) returns (AddWebhookResponse);
+  rpc RemoveWebhook(RemoveWebhookRequest) returns (RemoveWebhookResponse);
+}
+
+message EnvironmentRequest {
+  int64 environment_id = 1;
+}
+
+message TableRequest {
+  string base_name = 1;
+  int64 environment_id = 2;
+}
+
+message DataTableInfosResponse {
+  bytes data_table_infos = 1;
+}
+
+message ListRowsRequest {
+  string base_name = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+  int64 environment_id = 4;
+}
+
+message FindRowsRequest {
+  string base_name = 1;
+  bytes condition_groups = 2;
+  optional bytes sort = 3;
+  int32 limit = 4;
+  int32 offset = 5;
+  int64 environment_id = 6;
+}
+
+message RowIdRequest {
+  string base_name = 1;
+  int64 id = 2;
+  int64 environment_id = 3;
+}
+
+message InsertRowsRequest {
+  string base_name = 1;
+  bytes row_values = 2;
+  int64 environment_id = 3;
+}
+
+message UpdateRowRequest {
+  string base_name = 1;
+  int64 id = 2;
+  bytes values = 3;
+  int64 environment_id = 4;
+}
+
+message UpdateRowsRequest {
+  string base_name = 1;
+  bytes condition_groups = 2;
+  bytes values = 3;
+  int64 environment_id = 4;
+}
+
+message DeleteRowsRequest {
+  string base_name = 1;
+  bytes condition_groups = 2;
+  int64 environment_id = 3;
+}
+
+message DataTableRowResponse {
+  optional bytes row = 1;
+}
+
+message DataTableRowsResponse {
+  bytes rows = 1;
+}
+
+message AddWebhookRequest {
+  string base_name = 1;
+  string workflow_execution_id = 2;
+  string url = 3;
+  string type = 4;
+  int64 environment_id = 5;
+}
+
+message AddWebhookResponse {
+  int64 id = 1;
+}
+
+message RemoveWebhookRequest {
+  int64 id = 1;
+}
+
+message RemoveWebhookResponse {
+}
