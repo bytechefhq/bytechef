@@ -1833,6 +1833,24 @@ public class ApplicationProperties {
                 return vertexGemini;
             }
 
+            @org.jspecify.annotations.Nullable
+            public String getProviderApiKey(String providerKey) {
+                return switch (providerKey) {
+                    case "ai.provider.anthropic" -> anthropic.getApiKey();
+                    case "ai.provider.azureOpenAi" -> azureOpenAi.getApiKey();
+                    case "ai.provider.deepseek" -> deepSeek.getApiKey();
+                    case "ai.provider.groq" -> groq.getApiKey();
+                    case "ai.provider.mistral" -> mistral.getApiKey();
+                    case "ai.provider.nvidia" -> nvidia.getApiKey();
+                    case "ai.provider.ollama" -> ollama.getApiKey();
+                    case "ai.provider.openAi" -> openAi.getApiKey();
+                    case "ai.provider.perplexity" -> perplexity.getApiKey();
+                    case "ai.provider.stability" -> stability.getApiKey();
+                    case "ai.provider.vertexGemini" -> vertexGemini.getApiKey();
+                    default -> null;
+                };
+            }
+
 //            public void setAmazonBedrockAnthropic2(AmazonBedrockAnthropic2 amazonBedrockAnthropic2) {
 //                this.amazonBedrockAnthropic2 = amazonBedrockAnthropic2;
 //            }
