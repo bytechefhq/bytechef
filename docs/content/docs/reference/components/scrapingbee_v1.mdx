@@ -1,0 +1,455 @@
+---
+title: "ScrapingBee"
+description: "ScrapingBee is a web scraping API that renders pages in headless browsers and rotates proxies, returning HTML, Markdown, screenshots, CSS or AI-extracted data, and Google search results."
+---
+
+
+Categories: Helpers, Artificial Intelligence
+
+
+Type: scrapingbee/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | API Key | STRING | The API key from your ScrapingBee dashboard. | true |
+
+
+
+## Connection Setup
+
+### Find your API Key
+
+1. Sign in to your ScrapingBee dashboard at [app.scrapingbee.com](https://app.scrapingbee.com).
+2. Copy the API key shown on the dashboard.
+3. Paste it here to create the connection.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Scrape URL
+Name: scrapeUrl
+
+`Scrape a web page through ScrapingBee's headless browsers and rotating proxies, and return its content as HTML, Markdown or plain text.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The full URL of the page to scrape, including the protocol (e.g. https://example.com). | true |
+| outputFormat | Output Format | STRING <details> <summary> Options </summary> <span>HTML</span>, <span>MARKDOWN</span>, <span>TEXT</span> </details> | Format of the returned page content. | true |
+| render_js | Render JavaScript | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Render the page in a headless browser. Enabled by default by ScrapingBee and costs 5 credits per request; disable it for static pages to pay 1 credit. | false |
+| proxyType | Proxy Type | STRING <details> <summary> Options </summary> <span>STANDARD</span>, <span>PREMIUM</span>, <span>STEALTH</span> </details> | Proxy pool to route the request through. Premium proxies cost 10 credits (25 with JavaScript rendering); stealth proxies cost 75 credits and require JavaScript rendering. | false |
+| country_code | Country Code | STRING | ISO 3166-1 alpha-2 country code of the proxy exit location (e.g. us, de). Requires a premium or stealth proxy. | false |
+| wait | Wait | INTEGER | Additional time in milliseconds to wait for the page to render. | false |
+| wait_for | Wait For | STRING | CSS or XPath selector to wait for in the DOM before returning the response. | false |
+| wait_browser | Wait Browser | STRING <details> <summary> Options </summary> <span>domcontentloaded</span>, <span>load</span>, <span>networkidle0</span>, <span>networkidle2</span> </details> | Browser condition to wait for before returning the response. | false |
+| block_ads | Block Ads | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Block ads on the page. | false |
+| block_resources | Block Resources | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Block images and CSS on the page. Enabled by default by ScrapingBee. | false |
+| device | Device | STRING <details> <summary> Options </summary> <span>desktop</span>, <span>mobile</span> </details> | Device the request is sent from. | false |
+| js_scenario | JavaScript Scenario | STRING | JSON instructions executed in the browser before the page is returned, e.g. &#123;"instructions": [&#123;"click": "#button"&#125;, &#123;"wait": 1000&#125;]&#125;. Requires JavaScript rendering. | false |
+| cookies | Cookies | STRING | Cookies to send with the request, e.g. name_1=value_1;name_2=value_2. | false |
+| session_id | Session ID | INTEGER | Route requests that share this ID through the same IP address for five minutes (0 to 10000000). | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Scrape URL",
+  "name" : "scrapeUrl",
+  "parameters" : {
+    "url" : "",
+    "outputFormat" : "",
+    "render_js" : false,
+    "proxyType" : "",
+    "country_code" : "",
+    "wait" : 1,
+    "wait_for" : "",
+    "wait_browser" : "",
+    "block_ads" : false,
+    "block_resources" : false,
+    "device" : "",
+    "js_scenario" : "",
+    "cookies" : "",
+    "session_id" : 1
+  },
+  "type" : "scrapingbee/v1/scrapeUrl"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+
+### Extract Data
+Name: extractData
+
+`Scrape a web page and extract structured JSON data from it using CSS or XPath selectors.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The full URL of the page to scrape, including the protocol (e.g. https://example.com). | true |
+| extract_rules | Extract Rules | STRING | JSON object mapping each output key to a CSS or XPath selector, e.g. &#123;"title": "h1", "links": &#123;"selector": "a", "type": "list", "output": "@href"&#125;&#125;. | true |
+| render_js | Render JavaScript | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Render the page in a headless browser. Enabled by default by ScrapingBee and costs 5 credits per request; disable it for static pages to pay 1 credit. | false |
+| proxyType | Proxy Type | STRING <details> <summary> Options </summary> <span>STANDARD</span>, <span>PREMIUM</span>, <span>STEALTH</span> </details> | Proxy pool to route the request through. Premium proxies cost 10 credits (25 with JavaScript rendering); stealth proxies cost 75 credits and require JavaScript rendering. | false |
+| country_code | Country Code | STRING | ISO 3166-1 alpha-2 country code of the proxy exit location (e.g. us, de). Requires a premium or stealth proxy. | false |
+| wait | Wait | INTEGER | Additional time in milliseconds to wait for the page to render. | false |
+| wait_for | Wait For | STRING | CSS or XPath selector to wait for in the DOM before returning the response. | false |
+| wait_browser | Wait Browser | STRING <details> <summary> Options </summary> <span>domcontentloaded</span>, <span>load</span>, <span>networkidle0</span>, <span>networkidle2</span> </details> | Browser condition to wait for before returning the response. | false |
+| block_ads | Block Ads | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Block ads on the page. | false |
+| block_resources | Block Resources | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Block images and CSS on the page. Enabled by default by ScrapingBee. | false |
+| device | Device | STRING <details> <summary> Options </summary> <span>desktop</span>, <span>mobile</span> </details> | Device the request is sent from. | false |
+| js_scenario | JavaScript Scenario | STRING | JSON instructions executed in the browser before the page is returned, e.g. &#123;"instructions": [&#123;"click": "#button"&#125;, &#123;"wait": 1000&#125;]&#125;. Requires JavaScript rendering. | false |
+| cookies | Cookies | STRING | Cookies to send with the request, e.g. name_1=value_1;name_2=value_2. | false |
+| session_id | Session ID | INTEGER | Route requests that share this ID through the same IP address for five minutes (0 to 10000000). | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Extract Data",
+  "name" : "extractData",
+  "parameters" : {
+    "url" : "",
+    "extract_rules" : "",
+    "render_js" : false,
+    "proxyType" : "",
+    "country_code" : "",
+    "wait" : 1,
+    "wait_for" : "",
+    "wait_browser" : "",
+    "block_ads" : false,
+    "block_resources" : false,
+    "device" : "",
+    "js_scenario" : "",
+    "cookies" : "",
+    "session_id" : 1
+  },
+  "type" : "scrapingbee/v1/extractData"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### AI Extract
+Name: aiExtract
+
+`Scrape a web page and let ScrapingBee's AI extract the requested information, either as an answer to a natural-language query or as structured JSON described by extraction rules. Costs 5 credits on top of the regular request cost.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The full URL of the page to scrape, including the protocol (e.g. https://example.com). | true |
+| extractionType | Extraction Type | STRING <details> <summary> Options </summary> <span title="Describe the information to extract in natural language.">QUERY</span>, <span title="Describe each output field in a JSON object.">RULES</span> </details> | How the information to extract is described. | true |
+| ai_query | Query | STRING | The information to extract from the page, e.g. "price of the product". | true |
+| ai_extract_rules | Extract Rules | STRING | JSON object mapping each output key to a description of the data, e.g. &#123;"price": "the product price in dollars", "categories": &#123;"description": "all product categories", "type": "list"&#125;&#125;. | true |
+| ai_selector | AI Selector | STRING | CSS selector that limits the AI extraction to part of the page, improving accuracy and speed. | false |
+| render_js | Render JavaScript | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Render the page in a headless browser. Enabled by default by ScrapingBee and costs 5 credits per request; disable it for static pages to pay 1 credit. | false |
+| proxyType | Proxy Type | STRING <details> <summary> Options </summary> <span>STANDARD</span>, <span>PREMIUM</span>, <span>STEALTH</span> </details> | Proxy pool to route the request through. Premium proxies cost 10 credits (25 with JavaScript rendering); stealth proxies cost 75 credits and require JavaScript rendering. | false |
+| country_code | Country Code | STRING | ISO 3166-1 alpha-2 country code of the proxy exit location (e.g. us, de). Requires a premium or stealth proxy. | false |
+| wait | Wait | INTEGER | Additional time in milliseconds to wait for the page to render. | false |
+| wait_for | Wait For | STRING | CSS or XPath selector to wait for in the DOM before returning the response. | false |
+| wait_browser | Wait Browser | STRING <details> <summary> Options </summary> <span>domcontentloaded</span>, <span>load</span>, <span>networkidle0</span>, <span>networkidle2</span> </details> | Browser condition to wait for before returning the response. | false |
+| block_ads | Block Ads | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Block ads on the page. | false |
+| block_resources | Block Resources | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Block images and CSS on the page. Enabled by default by ScrapingBee. | false |
+| device | Device | STRING <details> <summary> Options </summary> <span>desktop</span>, <span>mobile</span> </details> | Device the request is sent from. | false |
+| js_scenario | JavaScript Scenario | STRING | JSON instructions executed in the browser before the page is returned, e.g. &#123;"instructions": [&#123;"click": "#button"&#125;, &#123;"wait": 1000&#125;]&#125;. Requires JavaScript rendering. | false |
+| cookies | Cookies | STRING | Cookies to send with the request, e.g. name_1=value_1;name_2=value_2. | false |
+| session_id | Session ID | INTEGER | Route requests that share this ID through the same IP address for five minutes (0 to 10000000). | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "AI Extract",
+  "name" : "aiExtract",
+  "parameters" : {
+    "url" : "",
+    "extractionType" : "",
+    "ai_query" : "",
+    "ai_extract_rules" : "",
+    "ai_selector" : "",
+    "render_js" : false,
+    "proxyType" : "",
+    "country_code" : "",
+    "wait" : 1,
+    "wait_for" : "",
+    "wait_browser" : "",
+    "block_ads" : false,
+    "block_resources" : false,
+    "device" : "",
+    "js_scenario" : "",
+    "cookies" : "",
+    "session_id" : 1
+  },
+  "type" : "scrapingbee/v1/aiExtract"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Take Screenshot
+Name: takeScreenshot
+
+`Render a web page in a headless browser and return a PNG screenshot of it.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The full URL of the page to scrape, including the protocol (e.g. https://example.com). | true |
+| screenshot_full_page | Full Page | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Capture the full height of the page instead of only the visible viewport. | false |
+| screenshot_selector | Selector | STRING | CSS selector of a single element to capture instead of the whole page. | false |
+| window_width | Window Width | INTEGER | Width of the browser viewport in pixels. Defaults to 1920. | false |
+| window_height | Window Height | INTEGER | Height of the browser viewport in pixels. Defaults to 1080. | false |
+| render_js | Render JavaScript | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Render the page in a headless browser. Enabled by default by ScrapingBee and costs 5 credits per request; disable it for static pages to pay 1 credit. | false |
+| proxyType | Proxy Type | STRING <details> <summary> Options </summary> <span>STANDARD</span>, <span>PREMIUM</span>, <span>STEALTH</span> </details> | Proxy pool to route the request through. Premium proxies cost 10 credits (25 with JavaScript rendering); stealth proxies cost 75 credits and require JavaScript rendering. | false |
+| country_code | Country Code | STRING | ISO 3166-1 alpha-2 country code of the proxy exit location (e.g. us, de). Requires a premium or stealth proxy. | false |
+| wait | Wait | INTEGER | Additional time in milliseconds to wait for the page to render. | false |
+| wait_for | Wait For | STRING | CSS or XPath selector to wait for in the DOM before returning the response. | false |
+| wait_browser | Wait Browser | STRING <details> <summary> Options </summary> <span>domcontentloaded</span>, <span>load</span>, <span>networkidle0</span>, <span>networkidle2</span> </details> | Browser condition to wait for before returning the response. | false |
+| block_ads | Block Ads | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Block ads on the page. | false |
+| block_resources | Block Resources | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Block images and CSS on the page. Enabled by default by ScrapingBee. | false |
+| device | Device | STRING <details> <summary> Options </summary> <span>desktop</span>, <span>mobile</span> </details> | Device the request is sent from. | false |
+| js_scenario | JavaScript Scenario | STRING | JSON instructions executed in the browser before the page is returned, e.g. &#123;"instructions": [&#123;"click": "#button"&#125;, &#123;"wait": 1000&#125;]&#125;. Requires JavaScript rendering. | false |
+| cookies | Cookies | STRING | Cookies to send with the request, e.g. name_1=value_1;name_2=value_2. | false |
+| session_id | Session ID | INTEGER | Route requests that share this ID through the same IP address for five minutes (0 to 10000000). | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Take Screenshot",
+  "name" : "takeScreenshot",
+  "parameters" : {
+    "url" : "",
+    "screenshot_full_page" : false,
+    "screenshot_selector" : "",
+    "window_width" : 1,
+    "window_height" : 1,
+    "render_js" : false,
+    "proxyType" : "",
+    "country_code" : "",
+    "wait" : 1,
+    "wait_for" : "",
+    "wait_browser" : "",
+    "block_ads" : false,
+    "block_resources" : false,
+    "device" : "",
+    "js_scenario" : "",
+    "cookies" : "",
+    "session_id" : 1
+  },
+  "type" : "scrapingbee/v1/takeScreenshot"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+
+
+### Google Search
+Name: googleSearch
+
+`Search Google through ScrapingBee and return the parsed results page as JSON. Costs 10 credits per light request and 15 credits per regular request.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| search | Search | STRING | The text to search for. Google search operators such as site: are supported. | true |
+| search_type | Search Type | STRING <details> <summary> Options </summary> <span>classic</span>, <span>news</span>, <span>maps</span>, <span>images</span>, <span>shopping</span>, <span>ai_mode</span> </details> | The type of Google search to run. | false |
+| country_code | Country Code | STRING | ISO 3166 country code the search is run from (e.g. us, gb, de). Defaults to us. | false |
+| device | Device | STRING <details> <summary> Options </summary> <span>desktop</span>, <span>mobile</span> </details> | Device the search is run from. | false |
+| page | Page | INTEGER | The results page to return, starting at 1. | false |
+| light_request | Light Request | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Run a faster, cheaper request (10 credits) instead of a full browser request (15 credits). Enabled by default by ScrapingBee; AI overviews are only returned when it is disabled. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Google Search",
+  "name" : "googleSearch",
+  "parameters" : {
+    "search" : "",
+    "search_type" : "",
+    "country_code" : "",
+    "device" : "",
+    "page" : 1,
+    "light_request" : false
+  },
+  "type" : "scrapingbee/v1/googleSearch"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| meta_data | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
+| organic_results | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(position), STRING\(title), STRING\(url), STRING\(displayed_url), STRING\(description)&#125;] </details> |  |
+| related_queries | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> |  |
+| questions | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> |  |
+| top_stories | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> |  |
+| news_results | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> |  |
+| local_results | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> |  |
+| knowledge_graph | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "meta_data" : { },
+  "organic_results" : [ {
+    "position" : 1,
+    "title" : "",
+    "url" : "",
+    "displayed_url" : "",
+    "description" : ""
+  } ],
+  "related_queries" : [ { } ],
+  "questions" : [ { } ],
+  "top_stories" : [ { } ],
+  "news_results" : [ { } ],
+  "local_results" : [ { } ],
+  "knowledge_graph" : { }
+}
+```
+
+
+
+
+### Get Usage
+Name: getUsage
+
+`Get the API credit consumption and concurrency usage of the ScrapingBee account. Limited to 6 calls per minute.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Usage",
+  "name" : "getUsage",
+  "type" : "scrapingbee/v1/getUsage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| max_api_credit | INTEGER | Total API credits available in the current billing period. |
+| used_api_credit | INTEGER | API credits used in the current billing period. |
+| max_concurrency | INTEGER | Maximum number of concurrent requests allowed. |
+| current_concurrency | INTEGER | Number of requests currently running. |
+| renewal_subscription_date | STRING | Date the subscription renews. |
+
+
+
+
+#### Output Example
+```json
+{
+  "max_api_credit" : 1,
+  "used_api_credit" : 1,
+  "max_concurrency" : 1,
+  "current_concurrency" : 1,
+  "renewal_subscription_date" : ""
+}
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
