@@ -61,6 +61,8 @@ JavaScript and Python components are written as a single source file and uploade
 
 Opening a **JavaScript or Python** component navigates to its detail page: an editable **Monaco source editor** with **Save** and **Publish** buttons. **Save** is compile-gated - the edited source is loaded before it is persisted, and invalid source is rejected with the loader's error rather than being saved.
 
+When Copilot is enabled, the sparkle button in the header opens the [AI Copilot](/platform/automation/build/ai-copilot) panel scoped to the open component: **Ask** explains the source, and **Build** edits it. The editor reloads the component after each Copilot turn.
+
 **Java** components do not open the editor; their source lives in your build. Instead the list row expands inline via its chevron to show the resolved definition - the component's actions and triggers - read-only. Attempting to edit Java source is rejected as `JAVA_SOURCE_NOT_EDITABLE`.
 
 {/* TODO screenshot: custom component detail page - Monaco source editor with a JavaScript component open, the header showing the component title + language badge, Back arrow, and Save button */}
