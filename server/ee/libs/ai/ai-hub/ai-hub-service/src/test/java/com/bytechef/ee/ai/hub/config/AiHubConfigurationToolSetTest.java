@@ -60,7 +60,26 @@ class AiHubConfigurationToolSetTest {
         assertThat(toolNames(askToolCallbacks.toolCallbacks())).doesNotContain(
             "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
             "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition",
-            "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel");
+            "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel", "data_analyst", "image_generator",
+            "slide_builder", "generateImage", "createSlideDeck");
+    }
+
+    @Test
+    void testWritingSubAgentsAreBuildOnly() throws AGUIException {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        List<String> subAgentToolNames = List.of("data_analyst", "image_generator", "slide_builder");
+
+        assertThat(toolNames(fixtures.askAgent())).doesNotContainAnyElementsOf(subAgentToolNames);
+        assertThat(toolNames(fixtures.askToolCallbacks()
+            .toolCallbacks())).doesNotContainAnyElementsOf(subAgentToolNames);
+        assertThat(toolNames(fixtures.askGlobalToolCatalog()
+            .toolCallbacks())).doesNotContainAnyElementsOf(subAgentToolNames);
+        assertThat(AiHubConfiguration.ASK_PINNED_TOOL_NAMES).doesNotContainAnyElementsOf(subAgentToolNames);
+
+        assertThat(toolNames(fixtures.buildAgent())).containsAll(subAgentToolNames);
+        assertThat(toolNames(fixtures.buildGlobalToolCatalog()
+            .toolCallbacks())).doesNotContainAnyElementsOf(subAgentToolNames);
     }
 
     @Test
@@ -73,13 +92,15 @@ class AiHubConfigurationToolSetTest {
             "addKnowledgeBaseDocument", "aggregateDataTable", "askUserQuestion", "buildWorkflow", "checkWorkflow",
             "cloneAssetFile", "cloneDataTable", "cloneKnowledgeBase", "createAiAgent", "createAssetFile",
             "createAssetFileFromUrl", "createBinaryAssetFile", "createConnection", "createDataTable",
-            "createDataTableFromCsv", "createKnowledgeBase", "createProject", "createProjectWorkflow", "getAiAgent",
-            "getAssetFileContent", "getWorkflow", "importWorkflow", "listAiAgents", "listAssetFiles",
+            "createDataTableFromCsv", "createKnowledgeBase", "createProject", "createProjectWorkflow", "data_analyst",
+            "getAiAgent", "getAssetFileContent", "getWorkflow", "image_generator", "importWorkflow", "listAiAgents",
+            "listAssetFiles",
             "listConnectionsForComponent", "listDataTables", "listKnowledgeBases", "listProjects", "listWorkflows",
             "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable", "queryKnowledgeBase",
             "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects",
             "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
-            "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings",
+            "selectTriggerPropertyOption", "slide_builder", "updateAiAgent", "updateAiAgentElement",
+            "updateAiAgentSettings",
             "updateAssetFileContent", "updateDataTableRow");
     }
 

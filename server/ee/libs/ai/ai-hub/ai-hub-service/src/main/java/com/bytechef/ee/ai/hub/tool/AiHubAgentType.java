@@ -18,7 +18,10 @@ public enum AiHubAgentType implements AgentType {
 
     AI_HUB_ASK("ai_hub_ask"),
     AI_HUB_BUILD("ai_hub_build"),
-    RESEARCH("research");
+    RESEARCH("research"),
+    DATA_ANALYST("data_analyst"),
+    IMAGE_GENERATOR("image_generator"),
+    SLIDE_BUILDER("slide_builder");
 
     private final String key;
 

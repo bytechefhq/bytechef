@@ -50,6 +50,7 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.AiHubSubAgentToolCallbackFactory;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
@@ -138,13 +139,14 @@ public class AiHubConfiguration {
         "aggregateDataTable", "askUserQuestion", "buildWorkflow", "checkWorkflow", "cloneAssetFile", "cloneDataTable",
         "cloneKnowledgeBase", "createAiAgent", "createAssetFile", "createAssetFileFromUrl", "createBinaryAssetFile",
         "createConnection", "createDataTable", "createDataTableFromCsv", "createKnowledgeBase", "createProject",
-        "createProjectWorkflow", "getAiAgent", "getAssetFileContent", "getWorkflow", "importWorkflow", "listAiAgents",
-        "listAssetFiles", "listConnectionsForComponent", "listDataTables", "listKnowledgeBases", "listProjects",
-        "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable",
-        "queryKnowledgeBase", "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools",
-        "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
-        "selectPropertyOption", "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement",
-        "updateAiAgentSettings", "updateAssetFileContent", "updateDataTableRow");
+        "createProjectWorkflow", "data_analyst", "getAiAgent", "getAssetFileContent", "getWorkflow", "image_generator",
+        "importWorkflow", "listAiAgents", "listAssetFiles", "listConnectionsForComponent", "listDataTables",
+        "listKnowledgeBases", "listProjects", "listWorkflows", "openAiAgentTab", "openWorkflowChatTab",
+        "openWorkflowTab", "queryDataTable", "queryKnowledgeBase", "saveWorkflowTestConnection",
+        "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows",
+        "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption",
+        "slide_builder", "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings", "updateAssetFileContent",
+        "updateDataTableRow");
 
     private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
     private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
@@ -218,7 +220,8 @@ public class AiHubConfiguration {
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
         AiHubToolApprovalPolicy toolApprovalPolicy,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
-        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider,
+        ObjectProvider<AiHubSubAgentToolCallbackFactory> subAgentToolCallbackFactoriesProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             buildProjectToolCallbacks(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools));
@@ -245,6 +248,7 @@ public class AiHubConfiguration {
                 (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy),
                 (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
                     new UserRequestForwardingToolCallback(toolCallback), workspaceFacade)));
+        toolCallbacks.addAll(subAgentToolCallbacks(subAgentToolCallbackFactoriesProvider));
 
         requireBuildWorkflow(toolCallbacks);
 
@@ -554,6 +558,14 @@ public class AiHubConfiguration {
         return writable
             ? knowledgeBaseToolCallbacksFactory.writeToolCallbacks()
             : knowledgeBaseToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> subAgentToolCallbacks(
+        ObjectProvider<AiHubSubAgentToolCallbackFactory> subAgentToolCallbackFactoriesProvider) {
+
+        return subAgentToolCallbackFactoriesProvider.orderedStream()
+            .map(AiHubSubAgentToolCallbackFactory::create)
+            .toList();
     }
 
     static List<ToolCallback> openAiAgentTabToolCallbacks(
