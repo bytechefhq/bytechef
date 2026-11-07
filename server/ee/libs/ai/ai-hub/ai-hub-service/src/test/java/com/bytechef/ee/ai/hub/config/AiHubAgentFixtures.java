@@ -256,7 +256,7 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, askToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider());
+            toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry));
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -267,7 +267,7 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, buildToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider());
+            toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry));
     }
 
     public AiHubModeToolCallbacks askToolCallbacks() {

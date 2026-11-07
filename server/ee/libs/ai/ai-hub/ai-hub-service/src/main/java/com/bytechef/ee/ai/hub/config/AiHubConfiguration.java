@@ -228,9 +228,7 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
 
         AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
-        AiGuardrailMetrics aiGuardrailMetrics = aiGuardrails == null
-            ? null
-            : new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), GuardrailSurface.AI_HUB);
+        AiGuardrailMetrics aiGuardrailMetrics = aiGuardrailMetrics(aiGuardrails, meterRegistryProvider);
 
         toolCallbacks.addAll(
             intelligentToolCallbacks(
@@ -298,9 +296,7 @@ public class AiHubConfiguration {
         toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
 
         AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
-        AiGuardrailMetrics aiGuardrailMetrics = aiGuardrails == null
-            ? null
-            : new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), GuardrailSurface.AI_HUB);
+        AiGuardrailMetrics aiGuardrailMetrics = aiGuardrailMetrics(aiGuardrails, meterRegistryProvider);
 
         toolCallbacks.addAll(
             intelligentToolCallbacks(
@@ -326,14 +322,17 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
-        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider)
         throws AGUIException {
+
+        AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
 
         return buildAgent(
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, aiHubAskToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider);
+            toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider));
     }
 
     @Bean(defaultCandidate = false)
@@ -345,14 +344,17 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
-        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider)
         throws AGUIException {
+
+        AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
 
         return buildAgent(
             AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, aiHubBuildToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider);
+            toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider));
     }
 
     /**
@@ -777,7 +779,8 @@ public class AiHubConfiguration {
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
-        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
+        @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics)
         throws AGUIException {
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
@@ -800,7 +803,21 @@ public class AiHubConfiguration {
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
         webSearchToolCallbackProviderProvider.ifAvailable(builder::webSearchToolCallbackProvider);
 
+        if (aiGuardrails != null) {
+            builder.aiGuardrails(aiGuardrails, aiGuardrailMetrics);
+        }
+
         return builder.build();
+    }
+
+    private static @Nullable AiGuardrailMetrics aiGuardrailMetrics(
+        @Nullable AiGuardrails aiGuardrails, ObjectProvider<MeterRegistry> meterRegistryProvider) {
+
+        if (aiGuardrails == null) {
+            return null;
+        }
+
+        return new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), GuardrailSurface.AI_HUB);
     }
 
     private static String readSystemPrompt(Resource systemPromptResource) {
