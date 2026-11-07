@@ -743,6 +743,8 @@ include("server:ee:libs:platform:platform-component:platform-component-remote-cl
 include("server:ee:libs:platform:platform-component:platform-component-remote-rest")
 include("server:ee:libs:platform:platform-component:platform-component-runner-aws-batch")
 include("server:ee:libs:platform:platform-component:platform-component-runner-kubernetes")
+include("server:ee:libs:platform:platform-component-rule:platform-component-rule-api")
+include("server:ee:libs:platform:platform-component-rule:platform-component-rule-service")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-api")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-client")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-rest")
