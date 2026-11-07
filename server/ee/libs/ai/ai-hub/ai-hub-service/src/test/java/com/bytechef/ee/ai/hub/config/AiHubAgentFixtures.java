@@ -9,7 +9,6 @@ package com.bytechef.ee.ai.hub.config;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -174,7 +173,7 @@ public final class AiHubAgentFixtures {
             mock(ClusterElementDefinitionFacade.class), new PropertyOptionsResolver(securityContextRehydrator),
             mock(ObjectProvider.class), mock(ScopedConnectionGuard.class));
 
-        when(intelligentToolCatalog.getByNames(anySet(), eq(IntelligentToolVariant.BUILD), any(), any()))
+        when(intelligentToolCatalog.getByNames(anySet(), any(IntelligentToolVariant.class), any(), any()))
             .thenAnswer(invocation -> {
                 Set<String> names = invocation.getArgument(0);
                 BiFunction<ToolCallback, Object, ToolCallback> callbackDecorator = invocation.getArgument(3);
@@ -193,7 +192,10 @@ public final class AiHubAgentFixtures {
 
     public static AiHubAgentFixtures withBuildWorkflow() {
         return new AiHubAgentFixtures(
-            Set.of("buildWorkflow", "importWorkflow", "buildCustomComponent", "buildCodeWorkflow"));
+            Set.of(
+                "buildWorkflow", "importWorkflow", "buildCustomComponent", "buildCodeWorkflow",
+                "explainCustomComponent",
+                "explainCodeWorkflow"));
     }
 
     public AiHubSpringAIAgent askAgent() throws AGUIException {
@@ -247,8 +249,9 @@ public final class AiHubAgentFixtures {
             aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
             availableProvider(apiCollectionToolCallbacksFactory), availableProvider(componentRuleToolCallbacksFactory),
-            availableProvider(aiAgentFacade), interactivePickerToolCallbacks, projectWorkflowFacade, chatService,
-            chatAccessPolicy,
+            availableProvider(aiAgentFacade), availableProvider(customComponentFacade),
+            availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, intelligentToolCatalog,
+            workspaceFacade, projectWorkflowFacade, chatService, chatAccessPolicy, policy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 
