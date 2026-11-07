@@ -98,8 +98,9 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         return noInputs && noConnections;
     }, [workflow]);
 
-    const {connectedUserWorkflowUuid, useGetComponentDefinitionsQuery} = useWorkflowEditor();
-    const {integrationId} = useParams();
+    const {codeWorkflow, codeWorkflowLanguage, connectedUserWorkflowUuid, useGetComponentDefinitionsQuery} =
+        useWorkflowEditor();
+    const {integrationId, projectId} = useParams();
 
     const embeddedAutomationEditorMatch = useMatch(EMBEDDED_AUTOMATION_EDITOR_PATH);
 
@@ -176,30 +177,38 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         openIssuesSidebar();
     };
 
-    const getCopilotSource = () => {
-        if (connectedUserWorkflowUuid) {
-            return Source.WORKFLOW_BUILDER_EMBEDDED;
-        }
-
-        if (integrationId) {
-            return Source.WORKFLOW_EDITOR_EMBEDDED;
-        }
-
-        return embeddedAutomationEditorMatch ? Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION : Source.WORKFLOW_EDITOR;
-    };
-
     const handleCopilotClick = () => {
         const {context: currentContext} = useCopilotStore.getState();
 
+        const isCodeWorkflow = codeWorkflow === true && !!codeWorkflowLanguage;
+
+        const source = connectedUserWorkflowUuid
+            ? Source.WORKFLOW_BUILDER_EMBEDDED
+            : integrationId
+              ? isCodeWorkflow
+                  ? Source.CODE_WORKFLOW_EMBEDDED
+                  : Source.WORKFLOW_EDITOR_EMBEDDED
+              : isCodeWorkflow
+                ? Source.CODE_WORKFLOW
+                : embeddedAutomationEditorMatch
+                  ? Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION
+                  : Source.WORKFLOW_EDITOR;
+
+        const keepMode = isWorkflowEditorSource(source)
+            ? isWorkflowEditorSource(currentContext.source)
+            : currentContext.source === source;
+
         setContext({
             ...currentContext,
-            mode: isWorkflowEditorSource(currentContext.source) ? currentContext.mode : MODE.ASK,
+            mode: keepMode ? currentContext.mode : MODE.ASK,
             parameters: connectedUserWorkflowUuid
                 ? {workflowUuid: connectedUserWorkflowUuid}
-                : integrationId
-                  ? {integrationId}
-                  : {},
-            source: getCopilotSource(),
+                : {
+                      ...(integrationId ? {integrationId} : {}),
+                      ...(isCodeWorkflow ? {language: codeWorkflowLanguage} : {}),
+                      ...(isCodeWorkflow && !integrationId && projectId ? {projectId} : {}),
+                  },
+            source,
         });
 
         if (!copilotPanelOpen) {

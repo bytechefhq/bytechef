@@ -8,6 +8,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useWorkflowLayout} from './useWorkflowLayout';
 
 const hoisted = vi.hoisted(() => ({
+    codeWorkflow: undefined as boolean | undefined,
+    codeWorkflowLanguage: undefined as string | undefined,
     matchedPath: undefined as string | undefined,
     routeParams: {} as Record<string, string | undefined>,
 }));
@@ -19,6 +21,8 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
     useWorkflowEditor: () => ({
+        codeWorkflow: hoisted.codeWorkflow,
+        codeWorkflowLanguage: hoisted.codeWorkflowLanguage,
         useGetComponentDefinitionsQuery: () => ({data: undefined, error: null, isLoading: false}),
     }),
 }));
@@ -37,6 +41,8 @@ vi.mock('@/shared/queries/platform/workflowTestConfigurations.queries', () => ({
 
 beforeEach(() => {
     hoisted.matchedPath = undefined;
+    hoisted.codeWorkflow = undefined;
+    hoisted.codeWorkflowLanguage = undefined;
     hoisted.routeParams = {};
 
     useCopilotPanelStore.setState({copilotPanelOpen: false});
@@ -79,6 +85,43 @@ describe('useWorkflowLayout', () => {
             source: Source.WORKFLOW_EDITOR_EMBEDDED,
         });
         expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
+    });
+
+    it('opens the code workflow Copilot in Ask for a project code workflow', () => {
+        hoisted.codeWorkflow = true;
+        hoisted.codeWorkflowLanguage = 'PYTHON';
+        hoisted.routeParams = {projectId: '1', projectWorkflowId: '2'};
+
+        const {result} = renderHook(() => useWorkflowLayout());
+
+        act(() => {
+            result.current.handleCopilotClick();
+        });
+
+        expect(useCopilotStore.getState().context).toEqual({
+            mode: MODE.ASK,
+            parameters: {language: 'PYTHON', projectId: '1'},
+            source: Source.CODE_WORKFLOW,
+        });
+        expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
+    });
+
+    it('opens the embedded code workflow Copilot in Ask for an integration code workflow', () => {
+        hoisted.codeWorkflow = true;
+        hoisted.codeWorkflowLanguage = 'JAVASCRIPT';
+        hoisted.routeParams = {integrationId: '7'};
+
+        const {result} = renderHook(() => useWorkflowLayout());
+
+        act(() => {
+            result.current.handleCopilotClick();
+        });
+
+        expect(useCopilotStore.getState().context).toEqual({
+            mode: MODE.ASK,
+            parameters: {integrationId: '7', language: 'JAVASCRIPT'},
+            source: Source.CODE_WORKFLOW_EMBEDDED,
+        });
     });
 
     it('opens the embedded automation workflow editor Copilot on the embedded automation editor route', () => {
