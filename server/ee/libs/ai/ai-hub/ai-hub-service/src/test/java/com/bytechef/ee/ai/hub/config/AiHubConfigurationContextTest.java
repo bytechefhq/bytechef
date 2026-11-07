@@ -52,10 +52,13 @@ import com.bytechef.ee.ai.hub.approval.repository.AiHubToolApprovalRuleRepositor
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicyImpl;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactServiceImpl;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileFacadeImpl;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAssetFileServiceImpl;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatServiceImpl;
 import com.bytechef.ee.ai.hub.chat.TitleGenerationService;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatArtifactRepository;
+import com.bytechef.ee.ai.hub.chat.repository.AiHubChatAssetFileRepository;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
@@ -400,6 +403,7 @@ class AiHubConfigurationContextTest {
             .withUserConfiguration(
                 AiHubConfiguration.class, InFlightAiHubRunRegistry.class, AiHubChatStreamer.class,
                 AiHubContinuationStarterImpl.class, AiHubChatServiceImpl.class, AiHubChatArtifactServiceImpl.class,
+                AiHubChatAssetFileServiceImpl.class, AiHubChatAssetFileFacadeImpl.class,
                 AiHubChatAccessPolicyImpl.class, AiHubToolApprovalServiceImpl.class,
                 AiHubToolApprovalRuleServiceImpl.class, AiHubToolApprovalPolicyImpl.class,
                 AiHubToolApprovalFacadeImpl.class, AiHubToolApprovalRuleFacadeImpl.class, AiHubApprovalGate.class,
@@ -426,6 +430,7 @@ class AiHubConfigurationContextTest {
             .withBean(SecurityContextRehydrator.class, () -> fixtures.securityContextRehydrator)
             .withBean(AiHubChatRepository.class, () -> mock(AiHubChatRepository.class))
             .withBean(AiHubChatArtifactRepository.class, () -> mock(AiHubChatArtifactRepository.class))
+            .withBean(AiHubChatAssetFileRepository.class, () -> mock(AiHubChatAssetFileRepository.class))
             .withBean(AiHubToolApprovalRepository.class, () -> mock(AiHubToolApprovalRepository.class))
             .withBean(AiHubToolApprovalRuleRepository.class, () -> mock(AiHubToolApprovalRuleRepository.class))
             .withBean(JsonMapper.class, () -> JsonMapper.builder()
