@@ -123,7 +123,10 @@ public final class AiHubAgentFixtures {
         null);
 
     private final AiHubConfiguration configuration = new AiHubConfiguration(
-        new ClassPathResource("prompt_ai_hub_ask.txt"), new ClassPathResource("prompt_ai_hub_build.txt"));
+        new ClassPathResource("prompt_ai_hub_ask.txt"),
+        new ClassPathResource("prompt/ai_hub_auto_memory_tools_read_only_system_prompt.md"),
+        new ClassPathResource("prompt/ai_hub_auto_memory_tools_system_prompt.md"),
+        new ClassPathResource("prompt_ai_hub_build.txt"));
 
     @SuppressWarnings("unchecked")
     public AiHubAgentFixtures(Set<String> catalogToolNames) {
@@ -190,7 +193,7 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, askToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider());
+            toolSearchAdvisorProvider(), availableProvider(null), availableProvider(null));
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -201,7 +204,7 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, buildToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider());
+            toolSearchAdvisorProvider(), availableProvider(null), availableProvider(null));
     }
 
     public AiHubModeToolCallbacks askToolCallbacks() {

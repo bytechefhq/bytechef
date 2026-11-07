@@ -30,6 +30,7 @@ import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRe
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory.BuiltInSessionStore;
 import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
+import com.bytechef.ee.ai.hub.agent.AiHubToolCallbackWrappers;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.RunStopAdvisor;
 import com.bytechef.ee.ai.hub.agent.WebhookBridgeAgent;
@@ -43,6 +44,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
+import com.bytechef.ee.ai.hub.skill.AiHubSkillsToolProvider;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
@@ -52,9 +54,11 @@ import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
+import com.bytechef.ee.ai.hub.tool.memory.AiHubAutoMemoryToolsAdvisor;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -135,15 +139,22 @@ public class AiHubConfiguration {
     private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
 
     private final Resource promptAiHubAskResource;
+    private final Resource promptAiHubAutoMemoryToolsReadOnlyResource;
+    private final Resource promptAiHubAutoMemoryToolsResource;
     private final Resource promptAiHubBuildResource;
     private final State state = new State();
 
     @SuppressFBWarnings("EI")
     public AiHubConfiguration(
         @Value("classpath:prompt_ai_hub_ask.txt") Resource promptAiHubAskResource,
+        @Value("classpath:prompt/ai_hub_auto_memory_tools_read_only_system_prompt.md") //
+        Resource promptAiHubAutoMemoryToolsReadOnlyResource,
+        @Value("classpath:prompt/ai_hub_auto_memory_tools_system_prompt.md") Resource promptAiHubAutoMemoryToolsResource,
         @Value("classpath:prompt_ai_hub_build.txt") Resource promptAiHubBuildResource) {
 
         this.promptAiHubAskResource = promptAiHubAskResource;
+        this.promptAiHubAutoMemoryToolsReadOnlyResource = promptAiHubAutoMemoryToolsReadOnlyResource;
+        this.promptAiHubAutoMemoryToolsResource = promptAiHubAutoMemoryToolsResource;
         this.promptAiHubBuildResource = promptAiHubBuildResource;
     }
 
@@ -230,14 +241,16 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
-        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
+        ObjectProvider<AiAutoMemoryService> aiAutoMemoryServiceProvider,
+        ObjectProvider<AiHubSkillsToolProvider> skillsToolProviderProvider)
         throws AGUIException {
 
         return buildAgent(
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, aiHubAskToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider);
+            toolSearchToolCallAdvisorProvider, aiAutoMemoryServiceProvider, skillsToolProviderProvider);
     }
 
     @Bean(defaultCandidate = false)
@@ -249,14 +262,16 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
-        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
+        ObjectProvider<AiAutoMemoryService> aiAutoMemoryServiceProvider,
+        ObjectProvider<AiHubSkillsToolProvider> skillsToolProviderProvider)
         throws AGUIException {
 
         return buildAgent(
             AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, aiHubBuildToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider);
+            toolSearchToolCallAdvisorProvider, aiAutoMemoryServiceProvider, skillsToolProviderProvider);
     }
 
     /**
@@ -480,7 +495,9 @@ public class AiHubConfiguration {
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
-        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
+        ObjectProvider<AiAutoMemoryService> aiAutoMemoryServiceProvider,
+        ObjectProvider<AiHubSkillsToolProvider> skillsToolProviderProvider)
         throws AGUIException {
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
@@ -499,11 +516,30 @@ public class AiHubConfiguration {
         builder.advisor(aiHubSessionMemory.createSessionMemoryAdvisor());
         builder.advisor(aiHubSessionMemory.createTurnEndingToolResultAdvisor(approvalGate::recordToolCallId));
         toolSearchToolCallAdvisorProvider.ifAvailable(builder::advisor);
+        aiAutoMemoryServiceProvider.ifAvailable(
+            aiAutoMemoryService -> builder.advisor(
+                autoMemoryToolsAdvisor(aiAutoMemoryService, mode, securityContextRehydrator)));
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
         webSearchToolCallbackProviderProvider.ifAvailable(builder::webSearchToolCallbackProvider);
+        skillsToolProviderProvider.ifAvailable(builder::skillsToolProvider);
 
         return builder.build();
+    }
+
+    private AiHubAutoMemoryToolsAdvisor autoMemoryToolsAdvisor(
+        AiAutoMemoryService aiAutoMemoryService, Mode mode, SecurityContextRehydrator securityContextRehydrator) {
+
+        boolean readOnly = mode != Mode.BUILD;
+
+        return AiHubAutoMemoryToolsAdvisor.builder()
+            .aiAutoMemoryService(aiAutoMemoryService)
+            .memorySystemPrompt(
+                readOnly ? promptAiHubAutoMemoryToolsReadOnlyResource : promptAiHubAutoMemoryToolsResource)
+            .readOnly(readOnly)
+            .toolCallbackWrapper(
+                toolCallback -> AiHubToolCallbackWrappers.wrap(toolCallback, securityContextRehydrator))
+            .build();
     }
 
     private static String readSystemPrompt(Resource systemPromptResource) {
