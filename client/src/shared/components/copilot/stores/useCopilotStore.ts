@@ -54,8 +54,16 @@ export interface ClusterElementCopilotParametersI {
     taskName?: string;
 }
 
+export interface DataTableCopilotParametersI {
+    dataTableId?: string;
+}
+
 export interface IntentCopilotParametersI {
     intent: string;
+}
+
+export interface KnowledgeBaseCopilotParametersI {
+    knowledgeBaseId?: string;
 }
 
 export interface WorkflowCodeEditorCopilotParametersI {
@@ -86,7 +94,9 @@ export type CopilotContextParametersType =
     | AiAgentCopilotParametersI
     | CodeEditorCopilotParametersI
     | ClusterElementCopilotParametersI
+    | DataTableCopilotParametersI
     | IntentCopilotParametersI
+    | KnowledgeBaseCopilotParametersI
     | WorkflowCodeEditorCopilotParametersI
     | WorkflowEditorCopilotParametersI
     | WorkflowExecutionCopilotParametersI

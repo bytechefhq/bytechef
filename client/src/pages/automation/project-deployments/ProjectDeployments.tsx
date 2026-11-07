@@ -15,6 +15,9 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ListGroupHeader from '@/shared/components/ListGroupHeader';
 import OpenInButton from '@/shared/components/OpenInButton';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -22,12 +25,16 @@ import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
-import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
+import {
+    ProjectDeploymentKeys,
+    useGetWorkspaceProjectDeploymentsQuery,
+} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useQueryClient} from '@tanstack/react-query';
 import {FolderIcon, RefreshCwIcon, TagIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -168,6 +175,16 @@ const ProjectDeployments = () => {
 
     const isFirstRun = !isFiltered && projectDeployments?.length === 0;
 
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        return registerPostTurn(Source.PROJECT_DEPLOYMENT, () => {
+            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+        });
+    }, [queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
             header={
@@ -178,6 +195,8 @@ const ProjectDeployments = () => {
                         projectDeployments &&
                         projectDeployments.length > 0 && (
                             <div className="flex items-center gap-x-2">
+                                <CopilotButton source={Source.PROJECT_DEPLOYMENT} />
+
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
