@@ -46,6 +46,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -385,6 +386,39 @@ class WebhookBridgeAgentResumeTest {
     }
 
     @Test
+    void testResumeBodyForwardsTheClientAttachments() throws AGUIException {
+        AtomicReference<String> capturedRequestBody = new AtomicReference<>();
+
+        httpServer.createContext("/resume", exchange -> {
+            capturedRequestBody.set(readBody(exchange));
+
+            byte[] response = "{\"message\":\"done\"}".getBytes(StandardCharsets.UTF_8);
+
+            exchange.getResponseHeaders()
+                .set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody()
+                .write(response);
+            exchange.close();
+        });
+
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(newWorkflowChat()));
+
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
+
+        Map<String, Object> attachment = Map.of("name", "notes.txt", "contentType", "text/plain", "base64", "aGk=");
+
+        newAgent().runAgent(
+            parametersOf(buildInput("hello", Map.of("attachments", List.of(attachment)))), subscriber);
+
+        verify(subscriber, timeout(5000)).onRunFinalized(any());
+        assertThat(capturedRequestBody.get())
+            .contains("\"attachments\":[{")
+            .contains("\"name\":\"notes.txt\"")
+            .contains("\"base64\":\"aGk=\"");
+    }
+
+    @Test
     void testResumeRequestIsSentOverHttp11WithoutAnUpgradeHeader() throws AGUIException {
         AtomicReference<String> upgradeHeader = new AtomicReference<>();
 
@@ -510,7 +544,7 @@ class WebhookBridgeAgentResumeTest {
         return new WebhookBridgeAgent(
             webhookFacade, chatService, resumeRegistry, jsonMapper, mock(WorkflowChatMetrics.class),
             new AiHubSessionMemory(sessionRepository, null),
-            guard, jobFacade, inFlightRunRegistry);
+            guard, jobFacade, inFlightRunRegistry, null);
     }
 
     private static AiHubChat newWorkflowChat() {
@@ -530,12 +564,19 @@ class WebhookBridgeAgentResumeTest {
     }
 
     private static com.agui.core.agent.RunAgentInput buildInput(String userMessageText) {
+        return buildInput(userMessageText, null);
+    }
+
+    private static com.agui.core.agent.RunAgentInput buildInput(
+        String userMessageText, Map<String, Object> forwardedProps) {
+
         UserMessage userMessage = new UserMessage();
 
         userMessage.setContent(userMessageText);
 
         return new com.agui.core.agent.RunAgentInput(
-            THREAD_ID, "run-1", new State(), List.<BaseMessage>of(userMessage), List.of(), List.of(), null);
+            THREAD_ID, "run-1", new State(), List.<BaseMessage>of(userMessage), List.of(), List.of(),
+            forwardedProps);
     }
 
     private static RunAgentParameters parametersOf(com.agui.core.agent.RunAgentInput input) {

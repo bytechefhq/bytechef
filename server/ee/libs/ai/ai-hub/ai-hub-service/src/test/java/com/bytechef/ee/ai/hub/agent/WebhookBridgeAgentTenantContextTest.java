@@ -110,6 +110,6 @@ class WebhookBridgeAgentTenantContextTest {
                 InMemorySessionRepository.builder()
                     .build(),
                 null),
-            guard, null, new InFlightAiHubRunRegistry());
+            guard, null, new InFlightAiHubRunRegistry(), null);
     }
 }

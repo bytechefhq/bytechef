@@ -18,19 +18,24 @@ import com.agui.core.message.BaseMessage;
 import com.agui.core.message.Role;
 import com.agui.server.LocalAgent;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.automation.assetfile.domain.AssetFile;
+import com.bytechef.automation.assetfile.service.AssetFileSystemFacade;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -39,6 +44,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +87,8 @@ public class WebhookBridgeAgent extends LocalAgent {
 
     private static final String WORKFLOW_QUESTION_TOOL_NAME = "askWorkflowQuestion";
 
+    private static final int MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024;
+
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
     private final AiHubChatService chatService;
     private final WebhookResumeRegistry resumeRegistry;
@@ -91,13 +100,16 @@ public class WebhookBridgeAgent extends LocalAgent {
     @Nullable
     private final JobFacade jobFacade;
     private final InFlightAiHubRunRegistry inFlightRunRegistry;
+    @Nullable
+    private final AssetFileSystemFacade assetFileSystemFacade;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public WebhookBridgeAgent(
         WebhookWorkflowExecutor webhookWorkflowExecutor, AiHubChatService chatService,
         WebhookResumeRegistry resumeRegistry, JsonMapper jsonMapper, WorkflowChatMetrics metrics,
         AiHubSessionMemory sessionMemory, WorkflowChatGuard guard,
-        @Nullable JobFacade jobFacade, InFlightAiHubRunRegistry inFlightRunRegistry) throws AGUIException {
+        @Nullable JobFacade jobFacade, InFlightAiHubRunRegistry inFlightRunRegistry,
+        @Nullable AssetFileSystemFacade assetFileSystemFacade) throws AGUIException {
 
         super("webhook-bridge-agent", null, null, "(unused, the webhook bridge bypasses the LLM)", List.of());
 
@@ -110,6 +122,7 @@ public class WebhookBridgeAgent extends LocalAgent {
         this.guard = guard;
         this.jobFacade = jobFacade;
         this.inFlightRunRegistry = inFlightRunRegistry;
+        this.assetFileSystemFacade = assetFileSystemFacade;
         this.resumeHttpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
             .connectTimeout(Duration.ofSeconds(5))
@@ -206,7 +219,7 @@ public class WebhookBridgeAgent extends LocalAgent {
             return;
         }
 
-        WebhookRequest webhookRequest = buildWebhookRequest(userMessage, chat);
+        WebhookRequest webhookRequest = buildWebhookRequest(userMessage, chat, input.forwardedProps());
 
         boolean streamingPath = hasStreamingTask(workflowExecutionId) || !webhookTriggerFlags.workflowSyncExecution();
 
@@ -389,7 +402,7 @@ public class WebhookBridgeAgent extends LocalAgent {
                     "message", userMessage,
                     "chatId", chat.getThreadId(),
                     "conversationId", conversationId(chat),
-                    "attachments", List.of()));
+                    "attachments", extractAttachments(input.forwardedProps())));
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(resumeUrl))
@@ -832,7 +845,9 @@ public class WebhookBridgeAgent extends LocalAgent {
         return null;
     }
 
-    private static WebhookRequest buildWebhookRequest(String userMessage, AiHubChat chat) {
+    private WebhookRequest buildWebhookRequest(
+        String userMessage, AiHubChat chat, @Nullable Object forwardedProps) {
+
         String threadId = chat.getThreadId();
         String conversationId = conversationId(chat);
 
@@ -841,7 +856,7 @@ public class WebhookBridgeAgent extends LocalAgent {
         bodyContent.put("message", userMessage);
         bodyContent.put("chatId", threadId);
         bodyContent.put("conversationId", conversationId);
-        bodyContent.put("attachments", List.of());
+        bodyContent.put("attachments", promoteAttachments(extractAttachments(forwardedProps), chat));
 
         Map<String, List<String>> parameters = new HashMap<>();
 
@@ -853,6 +868,99 @@ public class WebhookBridgeAgent extends LocalAgent {
             Map.of(), parameters,
             new WebhookRequest.WebhookBodyImpl(bodyContent, ContentType.JSON, "application/json", null),
             WebhookMethod.POST);
+    }
+
+    private List<Object> promoteAttachments(List<?> rawAttachments, AiHubChat chat) {
+        List<Object> attachments = new ArrayList<>(rawAttachments.size());
+
+        for (Object rawAttachment : rawAttachments) {
+            if (!(rawAttachment instanceof Map<?, ?> attachmentMap)) {
+                metrics.recordAttachmentFailure("malformed");
+
+                continue;
+            }
+
+            try {
+                BridgedFileEntry bridgedFileEntry = promoteAttachment(attachmentMap, chat);
+
+                if (bridgedFileEntry != null) {
+                    attachments.add(bridgedFileEntry);
+                }
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Failed to store workflow chat attachment; dropping. name={} contentType={}",
+                    attachmentMap.get("name"), attachmentMap.get("contentType"), exception);
+
+                metrics.recordAttachmentFailure(
+                    exception instanceof IllegalArgumentException ? "decode_failure" : "upload_failure");
+            }
+        }
+
+        return attachments;
+    }
+
+    private @Nullable BridgedFileEntry promoteAttachment(Map<?, ?> attachmentMap, AiHubChat chat) {
+        Object base64Object = attachmentMap.get("base64");
+
+        if (!(base64Object instanceof String base64String) || base64String.isBlank()) {
+            metrics.recordAttachmentFailure("missing_payload");
+
+            return null;
+        }
+
+        long estimatedDecodedBytes = (long) base64String.length() * 3L / 4L;
+
+        if (estimatedDecodedBytes > MAX_ATTACHMENT_BYTES) {
+            log.warn(
+                "Workflow chat attachment exceeds the {} MB cap; dropping. name={} estimatedSize={} bytes",
+                MAX_ATTACHMENT_BYTES / (1024 * 1024), attachmentMap.get("name"), estimatedDecodedBytes);
+
+            metrics.recordAttachmentFailure("too_large");
+
+            return null;
+        }
+
+        if (assetFileSystemFacade == null) {
+            metrics.recordAttachmentFailure("unavailable");
+
+            return null;
+        }
+
+        Object nameObject = attachmentMap.get("name");
+
+        String filename = nameObject instanceof String nameString && !nameString.isBlank()
+            ? nameString : "attachment-" + UUID.randomUUID();
+
+        Object contentTypeObject = attachmentMap.get("contentType");
+
+        String contentType = contentTypeObject instanceof String contentTypeString && !contentTypeString.isBlank()
+            ? contentTypeString : "application/octet-stream";
+
+        byte[] bytes = Base64.getDecoder()
+            .decode(base64String);
+
+        Environment environment = chat.getEnvironment();
+
+        AssetFile assetFile = assetFileSystemFacade.createFromUpload(
+            chatService.getWorkspaceId(chat.getId()), environment.ordinal(), filename, contentType,
+            new ByteArrayInputStream(bytes));
+
+        FileEntry storedFileEntry = assetFile.getFile();
+
+        return new BridgedFileEntry(
+            assetFile.getName(), storedFileEntry.getExtension(), assetFile.getMimeType(), storedFileEntry.getUrl());
+    }
+
+    private static List<?> extractAttachments(@Nullable Object forwardedProps) {
+        if (!(forwardedProps instanceof Map<?, ?> propsMap)) {
+            return List.of();
+        }
+
+        if (propsMap.get("attachments") instanceof List<?> attachments) {
+            return attachments;
+        }
+
+        return List.of();
     }
 
     private static String conversationId(AiHubChat chat) {
