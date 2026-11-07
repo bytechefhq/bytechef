@@ -19,7 +19,7 @@ vi.mock('@/components/ComboBox/ComboBox', () => ({
     default: ({'aria-label': ariaLabel, items}: {'aria-label'?: string; items: Array<ComboBoxItemType>}) => (
         <ul aria-label={ariaLabel}>
             {items.map((item) => (
-                <li data-testid="combo-box-item" key={item.value}>
+                <li data-label={item.label} data-testid="combo-box-item" key={item.value}>
                     {item.value}
                 </li>
             ))}
@@ -38,8 +38,8 @@ const externalInvocationsState = () => ({
     handleMcpServerChange: vi.fn(),
     handleOutcomeChange: vi.fn(),
     handlePaginationClick: vi.fn(),
+    handleSourceChange: vi.fn(),
     handleStartDateChange: vi.fn(),
-    handleSurfaceChange: vi.fn(),
     refetchExternalInvocations: vi.fn(),
 });
 
@@ -75,7 +75,7 @@ const externalInvocationLog = {
     mcpServerId: 11,
     operationName: 'sendMessage',
     outcome: 'SUCCESS',
-    surface: 'MCP_AUTOMATION',
+    source: 'MCP_SERVER',
     toolName: 'slack_sendMessage',
     workflowName: null,
 };
@@ -87,22 +87,28 @@ const recordedExternalInvocationsState = () => ({
 
 const renderedItemValues = () => screen.getAllByTestId('combo-box-item').map((item) => item.textContent);
 
+const renderedItemLabels = () =>
+    screen.getAllByTestId('combo-box-item').map((item) => `${item.textContent}=${item.dataset.label}`);
+
 describe('ExternalInvocations', () => {
     beforeEach(() => {
         hoisted.useExternalInvocationsMock.mockReset();
         hoisted.useExternalInvocationsMock.mockReturnValue(externalInvocationsState());
     });
 
-    it('offers the automation MCP and A2A surfaces on the automation page', () => {
+    it('offers the automation MCP and A2A sources on the automation page', () => {
         hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
         renderExternalInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         const itemValues = renderedItemValues();
 
-        expect(itemValues).toEqual(expect.arrayContaining(['A2A', 'MCP_AUTOMATION']));
-        expect(itemValues).not.toContain('MCP_EMBEDDED');
-        expect(screen.getByText('Surface', {selector: 'label'})).toBeInTheDocument();
+        expect(itemValues).toEqual(expect.arrayContaining(['A2A_SERVER', 'MCP_SERVER']));
+        expect(itemValues).not.toContain('API_ACTION');
+        expect(renderedItemLabels()).toEqual(
+            expect.arrayContaining(['A2A_SERVER=A2A Servers', 'MCP_SERVER=MCP Servers'])
+        );
+        expect(screen.getByText('Source', {selector: 'label'})).toBeInTheDocument();
         expect(screen.getByRole('cell', {name: 'MCP'})).toBeInTheDocument();
     });
 
@@ -117,7 +123,7 @@ describe('ExternalInvocations', () => {
                     kind: 'WORKFLOW',
                     mcpServerId: null,
                     operationName: null,
-                    surface: 'A2A',
+                    source: 'A2A_SERVER',
                     toolName: 'Summarize',
                 },
             ],
@@ -137,17 +143,16 @@ describe('ExternalInvocations', () => {
         expect(screen.getByRole('cell', {name: 'Sales MCP'})).toBeInTheDocument();
     });
 
-    it('offers only the embedded surfaces on the embedded page', () => {
+    it('offers only the embedded sources on the embedded page', () => {
         hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
         renderExternalInvocations({environmentId: 1, type: PlatformType.Embedded});
 
         const itemValues = renderedItemValues();
 
-        expect(itemValues).toEqual(
-            expect.arrayContaining(['EMBEDDED_API_ACTION', 'EMBEDDED_API_TOOL', 'MCP_EMBEDDED'])
-        );
-        expect(itemValues).not.toContain('MCP_AUTOMATION');
+        expect(itemValues).toEqual(expect.arrayContaining(['API_ACTION', 'API_TOOL', 'MCP_SERVER']));
+        expect(itemValues).not.toContain('A2A_SERVER');
+        expect(renderedItemLabels()).toContain('MCP_SERVER=MCP Servers');
     });
 
     it('offers a paused run as an outcome filter', () => {
@@ -172,7 +177,7 @@ describe('ExternalInvocations', () => {
         renderExternalInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         expect(screen.getByText('First-run guide')).toBeInTheDocument();
-        expect(screen.queryByText('Surface')).not.toBeInTheDocument();
+        expect(screen.queryByText('Source')).not.toBeInTheDocument();
         expect(screen.queryByRole('table')).not.toBeInTheDocument();
         expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
     });
@@ -283,15 +288,15 @@ describe('ExternalInvocations', () => {
     });
 
     it.each([
-        ['A2A', false, true],
-        ['MCP_AUTOMATION', true, false],
+        ['A2A_SERVER', false, true],
+        ['MCP_SERVER', true, false],
         [undefined, true, true],
     ])(
-        'with the %s surface selected shows the MCP server filter %s and the A2A server filter %s',
-        (surface, mcp, a2a) => {
+        'with the %s source selected shows the MCP server filter %s and the A2A server filter %s',
+        (source, mcp, a2a) => {
             hoisted.useExternalInvocationsMock.mockReturnValue({
                 ...recordedExternalInvocationsState(),
-                filterSurface: surface,
+                filterSource: source,
             });
 
             renderExternalInvocations({

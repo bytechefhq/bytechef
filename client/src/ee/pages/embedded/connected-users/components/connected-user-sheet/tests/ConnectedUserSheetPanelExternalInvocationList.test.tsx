@@ -30,7 +30,7 @@ const externalInvocationLog = {
     mcpServerId: 11,
     operationName: 'sendMessage',
     outcome: 'SUCCESS',
-    surface: 'MCP_EMBEDDED',
+    source: 'MCP_SERVER',
     toolName: 'SLACK_SEND_MESSAGE',
 };
 
@@ -73,7 +73,7 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
         );
 
         expect(screen.getByText('SLACK_SEND_MESSAGE')).toBeInTheDocument();
-        expect(screen.getByText('Embedded MCP')).toBeInTheDocument();
+        expect(screen.getByText('MCP')).toBeInTheDocument();
         expect(screen.getByText('slack / sendMessage')).toBeInTheDocument();
         expect(
             screen.queryByText('No external invocations have been recorded for this user yet.')
