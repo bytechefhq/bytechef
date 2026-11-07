@@ -77,9 +77,21 @@ describe('WorkflowTriggerAndComponentsRow', () => {
         expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(2);
     });
 
-    it('renders only the components for a workflow without a trigger', () => {
+    it('shows a workflow without a trigger as a manual one, like the editor does', () => {
         renderRow({triggers: [], workflowTriggerComponentNames: []});
 
+        expect(screen.getByText('Manual')).toBeInTheDocument();
+        expect(useGetComponentDefinitionQueryMock).toHaveBeenCalledWith(
+            {componentName: 'manual', componentVersion: 1},
+            true
+        );
+        expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(3);
+    });
+
+    it('shows no trigger when the workflow does not carry its triggers', () => {
+        renderRow({});
+
+        expect(screen.queryByText('Manual')).not.toBeInTheDocument();
         expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(3);
     });
 
