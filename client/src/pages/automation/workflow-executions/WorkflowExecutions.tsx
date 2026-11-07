@@ -4,6 +4,7 @@ import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -12,13 +13,21 @@ import {
     getProjectDeploymentLabel,
     getWorkflowExecutionsFilters,
 } from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
+import {
+    getWorkflowExecutionsSourceDeploymentHeader,
+    getWorkflowExecutionsSources,
+} from '@/pages/automation/workflow-executions/utils/workflowExecutionsSources';
 import FilterTitle from '@/shared/components/filters/FilterTitle';
+import useEeEdition from '@/shared/edition/useEeEdition';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Project} from '@/shared/middleware/automation/configuration';
-import {GetWorkflowExecutionsPageJobStatusEnum} from '@/shared/middleware/automation/workflow/execution';
+import {
+    GetWorkflowExecutionsPageJobStatusEnum,
+    GetWorkflowExecutionsPageSourceEnum,
+} from '@/shared/middleware/automation/workflow/execution';
 import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -73,6 +82,7 @@ export const WorkflowExecutions = () => {
         filterPageNumber,
         filterProjectDeploymentId,
         filterProjectId,
+        filterSource,
         filterStartDate,
         filterStatus,
         filterWorkflowId,
@@ -81,6 +91,7 @@ export const WorkflowExecutions = () => {
         handlePaginationClick,
         handleProjectChange,
         handleProjectDeploymentChange,
+        handleSourceChange,
         handleStartDateChange,
         handleStatusChange,
         handleWorkflowChange,
@@ -97,7 +108,13 @@ export const WorkflowExecutions = () => {
         workflows,
     } = useWorkflowExecutions();
 
+    const eeEdition = useEeEdition();
+
     const initialLoadComplete = useInitialLoadComplete(workflowExecutionsIsLoading);
+
+    const deploymentHeader = getWorkflowExecutionsSourceDeploymentHeader(filterSource);
+
+    const sources = useMemo(() => getWorkflowExecutionsSources(eeEdition), [eeEdition]);
 
     const activeFilters = useMemo(
         () =>
@@ -201,6 +218,27 @@ export const WorkflowExecutions = () => {
             leftSidebarBody={
                 <div className="space-y-4 px-2">
                     <div className="flex flex-col space-y-2">
+                        <Label>Type</Label>
+
+                        <Select
+                            onValueChange={(value) => handleSourceChange(value as GetWorkflowExecutionsPageSourceEnum)}
+                            value={filterSource}
+                        >
+                            <SelectTrigger aria-label="Type" className="w-full bg-background">
+                                <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {sources.map((source) => (
+                                    <SelectItem key={source.value} value={source.value}>
+                                        {source.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="flex flex-col space-y-2">
                         <Label>Status</Label>
 
                         <ComboBox items={jobStatusOptions} onChange={handleStatusChange} value={filterStatus} />
@@ -236,31 +274,35 @@ export const WorkflowExecutions = () => {
                         />
                     </div>
 
-                    <div className="flex flex-col space-y-2">
-                        <Label>Deployment</Label>
+                    {filterSource === GetWorkflowExecutionsPageSourceEnum.Project && (
+                        <div className="flex flex-col space-y-2">
+                            <Label>Deployment</Label>
 
-                        <ComboBox
-                            emptyMessage={!projectDeployments ? 'Loading...' : 'No item found.'}
-                            items={[
-                                ANY_FILTER_OPTION,
-                                ...(projectDeployments?.map((projectDeployment) => ({
-                                    label: (
-                                        <span className="flex items-center">
-                                            <span className="mr-1">{getProjectDeploymentLabel(projectDeployment)}</span>
+                            <ComboBox
+                                emptyMessage={!projectDeployments ? 'Loading...' : 'No item found.'}
+                                items={[
+                                    ANY_FILTER_OPTION,
+                                    ...(projectDeployments?.map((projectDeployment) => ({
+                                        label: (
+                                            <span className="flex items-center">
+                                                <span className="mr-1">
+                                                    {getProjectDeploymentLabel(projectDeployment)}
+                                                </span>
 
-                                            <span className="text-xs text-content-neutral-secondary">
-                                                {projectDeployment?.tags?.map((tag) => tag.name).join(', ')}
+                                                <span className="text-xs text-content-neutral-secondary">
+                                                    {projectDeployment?.tags?.map((tag) => tag.name).join(', ')}
+                                                </span>
                                             </span>
-                                        </span>
-                                    ),
-                                    value: projectDeployment.id,
-                                })) ?? []),
-                            ]}
-                            onChange={handleProjectDeploymentChange}
-                            onOpen={() => setFiltersInteracted(true)}
-                            value={filterProjectDeploymentId}
-                        />
-                    </div>
+                                        ),
+                                        value: projectDeployment.id,
+                                    })) ?? []),
+                                ]}
+                                onChange={handleProjectDeploymentChange}
+                                onOpen={() => setFiltersInteracted(true)}
+                                value={filterProjectDeploymentId}
+                            />
+                        </div>
+                    )}
 
                     <div className="flex flex-col space-y-2">
                         <Label>Workflow</Label>
@@ -285,7 +327,10 @@ export const WorkflowExecutions = () => {
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
                 {workflowExecutions && workflowExecutions.length > 0 ? (
-                    <WorkflowExecutionsTable workflowExecutions={workflowExecutions} />
+                    <WorkflowExecutionsTable
+                        deploymentHeader={deploymentHeader}
+                        workflowExecutions={workflowExecutions}
+                    />
                 ) : (
                     emptyState
                 )}
