@@ -45,10 +45,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
-import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentLoader;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,15 +71,9 @@ public final class KnowledgeBaseLoadAction {
     public static ActionDefinition of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
         ClusterElementDefinitionService clusterElementDefinitionService,
-        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseDocumentLoader knowledgeBaseDocumentLoader, KnowledgeBaseService knowledgeBaseService) {
 
-        VectorStore kbVectorStore = createVectorStore(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentFacade, knowledgeBaseDocumentService,
-            knowledgeBaseFileStorage,
-            knowledgeBaseService, vectorStore);
+        VectorStore kbVectorStore = createVectorStore(knowledgeBaseDocumentLoader, vectorStore);
 
         return action(LOAD)
             .title("Load Data")

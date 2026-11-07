@@ -32,10 +32,7 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
-import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentLoader;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.List;
 import java.util.Map;
@@ -51,15 +48,9 @@ public class KnowledgeBaseLoadTool {
 
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
-        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseDocumentLoader knowledgeBaseDocumentLoader, KnowledgeBaseService knowledgeBaseService) {
 
-        VectorStore kbVectorStore = createVectorStore(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentFacade, knowledgeBaseDocumentService,
-            knowledgeBaseFileStorage,
-            knowledgeBaseService, vectorStore);
+        VectorStore kbVectorStore = createVectorStore(knowledgeBaseDocumentLoader, vectorStore);
 
         return ComponentDsl.<MultipleConnectionsToolFunction>clusterElement(LOAD)
             .title("Load Knowledge Base Documents")

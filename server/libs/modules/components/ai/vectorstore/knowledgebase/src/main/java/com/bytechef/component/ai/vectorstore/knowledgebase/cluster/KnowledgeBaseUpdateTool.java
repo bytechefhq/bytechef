@@ -44,9 +44,7 @@ import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
-import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentLoader;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.List;
@@ -64,15 +62,10 @@ public class KnowledgeBaseUpdateTool {
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
         KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
-        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseDocumentLoader knowledgeBaseDocumentLoader,
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService) {
 
-        VectorStore kbVectorStore = createVectorStore(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentFacade, knowledgeBaseDocumentService,
-            knowledgeBaseFileStorage,
-            knowledgeBaseService, vectorStore);
+        VectorStore kbVectorStore = createVectorStore(knowledgeBaseDocumentLoader, vectorStore);
 
         return ComponentDsl.<MultipleConnectionsToolFunction>clusterElement(UPDATE)
             .title("Update Knowledge Base Documents")
