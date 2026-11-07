@@ -127,7 +127,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
     }, []);
 
     return (
-        <Collapsible className="rounded border border-border/50">
+        <Collapsible className="rounded border border-border/50" defaultOpen>
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={handleConfigurationListItemClick}

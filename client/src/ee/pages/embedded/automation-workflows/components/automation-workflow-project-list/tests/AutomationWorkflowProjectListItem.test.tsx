@@ -100,6 +100,43 @@ describe('AutomationWorkflowProjectListItem', () => {
             );
         });
 
+        it('should group the project and workflow actions with Edit first', async () => {
+            await openMenu();
+
+            expect(screen.getByRole('group', {name: 'Project Actions'})).toHaveTextContent('EditPublishExport');
+            expect(screen.getByRole('group', {name: 'Workflow Actions'})).toHaveTextContent(
+                'New WorkflowImport Workflow'
+            );
+        });
+
+        it('should download the project when Export is clicked', async () => {
+            const originalLocation = window.location;
+
+            Object.defineProperty(window, 'location', {configurable: true, value: {href: ''}});
+
+            try {
+                await openMenu();
+
+                await userEvent.click(screen.getByRole('menuitem', {name: 'Export Project'}));
+
+                expect(window.location.href).toBe('/api/automation/internal/projects/project-1/export');
+            } finally {
+                Object.defineProperty(window, 'location', {configurable: true, value: originalLocation});
+            }
+        });
+
+        it('should show the project description in a styled tooltip on the project name', async () => {
+            renderItem({description: 'A catalog code project'});
+
+            const projectNameButton = screen.getByRole('button', {name: 'Alpha Project'});
+
+            expect(projectNameButton).not.toHaveAttribute('title');
+
+            await userEvent.hover(projectNameButton);
+
+            expect(await screen.findByRole('tooltip')).toHaveTextContent('A catalog code project');
+        });
+
         it('should publish the project when Publish is clicked', async () => {
             await openMenu();
 

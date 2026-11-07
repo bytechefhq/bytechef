@@ -155,8 +155,6 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         expect(document.querySelector('svg.lucide-sliders-horizontal')).toBeInTheDocument();
 
-        await user.click(screen.getByText('STAGING'));
-
         await user.click(await screen.findByRole('button', {name: 'Mailer'}));
 
         const state = useAutomationWorkflowExecutionsSheetStore.getState();
@@ -172,8 +170,6 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         renderItem({project: {...project, workflowTemplates: []}});
 
-        await user.click(screen.getByText('STAGING'));
-
         await user.click(await screen.findByRole('button', {name: 'Mailer'}));
 
         const state = useAutomationWorkflowExecutionsSheetStore.getState();
@@ -182,20 +178,20 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         expect(state.workflow).toEqual({label: 'Mailer', workflowId: 'pinned-wf-1', workflowUuid: 'wf-1'});
     });
 
-    it('starts collapsed and expands and collapses the workflows when the row is clicked', async () => {
+    it('starts expanded and collapses and expands the workflows when the row is clicked', async () => {
         const user = userEvent.setup();
 
         renderItem();
-
-        expect(screen.queryByRole('button', {name: 'Mailer'})).not.toBeInTheDocument();
-
-        await user.click(screen.getByText('STAGING'));
 
         expect(screen.getByRole('button', {name: 'Mailer'})).toBeInTheDocument();
 
         await user.click(screen.getByText('STAGING'));
 
         expect(screen.queryByRole('button', {name: 'Mailer'})).not.toBeInTheDocument();
+
+        await user.click(screen.getByText('STAGING'));
+
+        expect(screen.getByRole('button', {name: 'Mailer'})).toBeInTheDocument();
     });
 
     it('shows the newer version hint when the project published a later version', () => {
@@ -448,8 +444,6 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         const user = userEvent.setup();
 
         renderItem();
-
-        await user.click(screen.getByText('STAGING'));
 
         mocks.enableWorkflowMutate.mockImplementation((_variables, options: {onSuccess: () => void}) =>
             options.onSuccess()
