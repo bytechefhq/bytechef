@@ -26,8 +26,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T19:50:22.860139+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T21:07:27.330073+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowExecutionModel {
+
+  private @Nullable Long connectedUserId;
 
   private List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> focusPath = new ArrayList<>();
 
@@ -102,6 +104,27 @@ public class WorkflowExecutionModel {
     this.project = project;
     this.projectDeployment = projectDeployment;
     this.workflow = workflow;
+  }
+
+  public WorkflowExecutionModel connectedUserId(@Nullable Long connectedUserId) {
+    this.connectedUserId = connectedUserId;
+    return this;
+  }
+
+  /**
+   * The id of the connected user the embedded workflow ran for; empty for a workflow that does not belong to a connected user.
+   * @return connectedUserId
+   */
+  
+  @Schema(name = "connectedUserId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the connected user the embedded workflow ran for; empty for a workflow that does not belong to a connected user.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectedUserId")
+  public @Nullable Long getConnectedUserId() {
+    return connectedUserId;
+  }
+
+  @JsonProperty("connectedUserId")
+  public void setConnectedUserId(@Nullable Long connectedUserId) {
+    this.connectedUserId = connectedUserId;
   }
 
   public WorkflowExecutionModel focusPath(List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> focusPath) {
@@ -352,7 +375,8 @@ public class WorkflowExecutionModel {
       return false;
     }
     WorkflowExecutionModel workflowExecution = (WorkflowExecutionModel) o;
-    return Objects.equals(this.focusPath, workflowExecution.focusPath) &&
+    return Objects.equals(this.connectedUserId, workflowExecution.connectedUserId) &&
+        Objects.equals(this.focusPath, workflowExecution.focusPath) &&
         Objects.equals(this.id, workflowExecution.id) &&
         Objects.equals(this.job, workflowExecution.job) &&
         Objects.equals(this.project, workflowExecution.project) &&
@@ -367,13 +391,14 @@ public class WorkflowExecutionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(focusPath, id, job, project, projectDeployment, projectVersion, source, sourceName, taskExecutionCount, triggerExecution, workflow);
+    return Objects.hash(connectedUserId, focusPath, id, job, project, projectDeployment, projectVersion, source, sourceName, taskExecutionCount, triggerExecution, workflow);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowExecutionModel {\n");
+    sb.append("    connectedUserId: ").append(toIndentedString(connectedUserId)).append("\n");
     sb.append("    focusPath: ").append(toIndentedString(focusPath)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
