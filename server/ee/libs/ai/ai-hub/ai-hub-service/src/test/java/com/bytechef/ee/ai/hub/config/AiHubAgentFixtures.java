@@ -55,6 +55,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.ResearchToolCallbackFactory;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
@@ -210,7 +211,7 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, askToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider());
+            researchToolCallbackFactoryProvider(), toolSearchAdvisorProvider());
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -221,7 +222,7 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, buildToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider());
+            researchToolCallbackFactoryProvider(), toolSearchAdvisorProvider());
     }
 
     public AiHubModeToolCallbacks askToolCallbacks() {
@@ -270,6 +271,11 @@ public final class AiHubAgentFixtures {
             .ifAvailable(any());
 
         return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectProvider<ResearchToolCallbackFactory> researchToolCallbackFactoryProvider() {
+        return mock(ObjectProvider.class);
     }
 
     @SuppressWarnings("unchecked")

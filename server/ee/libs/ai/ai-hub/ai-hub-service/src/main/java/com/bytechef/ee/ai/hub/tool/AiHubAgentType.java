@@ -17,7 +17,8 @@ import com.bytechef.ai.agent.tool.AgentType;
 public enum AiHubAgentType implements AgentType {
 
     AI_HUB_ASK("ai_hub_ask"),
-    AI_HUB_BUILD("ai_hub_build");
+    AI_HUB_BUILD("ai_hub_build"),
+    RESEARCH("research");
 
     private final String key;
 
