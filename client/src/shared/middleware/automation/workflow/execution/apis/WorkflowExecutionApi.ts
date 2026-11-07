@@ -96,6 +96,10 @@ export interface GetWorkflowExecutionsPageRequest {
      */
     environmentId?: number;
     /**
+     * Where the executed workflows are exposed. PROJECT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project.
+     */
+    source?: GetWorkflowExecutionsPageSourceEnum;
+    /**
      * The status of an executed job
      */
     jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
@@ -375,6 +379,10 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
             queryParameters['environmentId'] = requestParameters['environmentId'];
         }
 
+        if (requestParameters['source'] != null) {
+            queryParameters['source'] = requestParameters['source'];
+        }
+
         if (requestParameters['jobStatus'] != null) {
             queryParameters['jobStatus'] = requestParameters['jobStatus'];
         }
@@ -447,6 +455,16 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 
 }
 
+/**
+ * @export
+ */
+export const GetWorkflowExecutionsPageSourceEnum = {
+    Project: 'PROJECT',
+    McpServer: 'MCP_SERVER',
+    A2AServer: 'A2A_SERVER',
+    ApiCollection: 'API_COLLECTION',
+} as const;
+export type GetWorkflowExecutionsPageSourceEnum = typeof GetWorkflowExecutionsPageSourceEnum[keyof typeof GetWorkflowExecutionsPageSourceEnum];
 /**
  * @export
  */
