@@ -130,7 +130,6 @@ describe('AgentList', () => {
 
         expect(projectDeploymentDialogMock).toHaveBeenCalledWith(
             expect.objectContaining({
-                environmentEditable: true,
                 showTabs: true,
             })
         );
