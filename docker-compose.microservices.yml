@@ -18,6 +18,7 @@
 # BYTECHEF_WORKER_REPLICAS to change that.
 
 x-bytechef-environment: &bytechef-environment
+  BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED: ${BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED:-false}
   BYTECHEF_AUDIT_ENABLED: ${BYTECHEF_AUDIT_ENABLED:-false}
   BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
   BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
@@ -86,6 +87,20 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
 
+  pgvector:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: bytechef_vectorstore
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - pgvector:/var/lib/postgresql/data
+
   rabbitmq:
     image: rabbitmq:4-management-alpine
     environment:
@@ -153,6 +168,15 @@ services:
       target: app
       args:
         APP_NAME: configuration-app
+    depends_on:
+      <<: *bytechef-app-depends-on
+      pgvector:
+        condition: service_healthy
+    environment:
+      <<: *bytechef-environment
+      BYTECHEF_AI_VECTORSTORE_PGVECTOR_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      BYTECHEF_AI_VECTORSTORE_PGVECTOR_URL: jdbc:postgresql://pgvector:5432/bytechef_vectorstore
+      BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME: postgres
 
   connection-app:
     <<: *bytechef-app
@@ -220,4 +244,5 @@ services:
 
 volumes:
   file-storage:
+  pgvector:
   postgres:
