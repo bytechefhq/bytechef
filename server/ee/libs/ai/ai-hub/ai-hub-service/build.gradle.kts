@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-tool"))
 
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.assertj:assertj-core")
@@ -55,6 +56,9 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-api"))
+    testImplementation(project(":server:libs:core:evaluator:evaluator-api"))
+    testImplementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-component-rule:platform-component-rule-api"))
     testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     testImplementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
