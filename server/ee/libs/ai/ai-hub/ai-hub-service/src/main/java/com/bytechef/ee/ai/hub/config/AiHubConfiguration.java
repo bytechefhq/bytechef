@@ -58,6 +58,7 @@ import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
 import com.bytechef.ee.ai.hub.subagent.WorkspaceAdvisorContributor;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.AiHubChatToolToolCallbacks;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
@@ -68,6 +69,7 @@ import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubChatBindingToolCallbackResolver;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
@@ -204,7 +206,8 @@ public class AiHubConfiguration {
         AiHubSessionMemory aiHubSessionMemory,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
         @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider,
-        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider) {
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
+        ObjectProvider<AiHubChatToolToolCallbacks> chatToolToolCallbacksProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             List.of(ToolCallbacks.from(readProjectTools, readProjectWorkflowTools, workflowExecutionTools)));
@@ -237,6 +240,9 @@ public class AiHubConfiguration {
                 intelligentToolCatalog, ASK_INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.ASK, toolApprovalPolicy,
                 workspaceFacade, aiHubSessionMemory, aiGuardrails, aiGuardrailMetrics));
 
+        chatToolToolCallbacksProvider.ifAvailable(
+            chatToolToolCallbacks -> toolCallbacks.addAll(chatToolToolCallbacks.read()));
+
         return new AiHubModeToolCallbacks(toolCallbacks, ASK_PINNED_TOOL_NAMES);
     }
 
@@ -266,7 +272,8 @@ public class AiHubConfiguration {
         AiHubToolApprovalPolicy toolApprovalPolicy, AiHubSessionMemory aiHubSessionMemory,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
         @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider,
-        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider) {
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
+        ObjectProvider<AiHubChatToolToolCallbacks> chatToolToolCallbacksProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             buildProjectToolCallbacks(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools));
@@ -305,6 +312,9 @@ public class AiHubConfiguration {
                 intelligentToolCatalog, INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, toolApprovalPolicy,
                 workspaceFacade, aiHubSessionMemory, aiGuardrails, aiGuardrailMetrics));
 
+        chatToolToolCallbacksProvider.ifAvailable(
+            chatToolToolCallbacks -> toolCallbacks.addAll(chatToolToolCallbacks.write()));
+
         requireBuildWorkflow(toolCallbacks);
 
         return new AiHubModeToolCallbacks(toolCallbacks, BUILD_PINNED_TOOL_NAMES);
@@ -325,7 +335,8 @@ public class AiHubConfiguration {
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
-        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider)
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider)
         throws AGUIException {
 
         AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
@@ -334,7 +345,8 @@ public class AiHubConfiguration {
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, aiHubAskToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider));
+            toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider),
+            chatBindingToolCallbackResolverProvider);
     }
 
     @Bean(defaultCandidate = false)
@@ -347,7 +359,8 @@ public class AiHubConfiguration {
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
-        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider)
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider)
         throws AGUIException {
 
         AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
@@ -356,7 +369,8 @@ public class AiHubConfiguration {
             AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, aiHubBuildToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider));
+            toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider),
+            chatBindingToolCallbackResolverProvider);
     }
 
     /**
@@ -783,7 +797,8 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
-        @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics)
+        @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider)
         throws AGUIException {
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
@@ -805,6 +820,7 @@ public class AiHubConfiguration {
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
         webSearchToolCallbackProviderProvider.ifAvailable(builder::webSearchToolCallbackProvider);
+        chatBindingToolCallbackResolverProvider.ifAvailable(builder::chatToolBindingResolver);
 
         if (aiGuardrails != null) {
             builder.aiGuardrails(aiGuardrails, aiGuardrailMetrics);

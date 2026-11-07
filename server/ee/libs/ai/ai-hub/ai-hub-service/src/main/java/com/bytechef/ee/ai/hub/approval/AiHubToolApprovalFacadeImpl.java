@@ -17,6 +17,7 @@ import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.ForbiddenException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubChatBindingToolCallbackResolver;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubClusterElementToolCallbacks;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
@@ -67,6 +68,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
     private final ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider;
     private final ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider;
     private final ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider;
+    private final ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider;
     private final ObjectProvider<AiHubContinuationStarter> continuationStarterProvider;
     private final @Nullable SecurityContextRehydrator securityContextRehydrator;
     private final TransactionTemplate transactionTemplate;
@@ -79,12 +81,14 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
         ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider,
         ObjectProvider<AiHubContinuationStarter> continuationStarterProvider,
         @Nullable SecurityContextRehydrator securityContextRehydrator, PlatformTransactionManager transactionManager) {
 
         this(
             approvalService, chatService, userService, pinnedToolCallbacksProvider, globalToolCatalogProvider,
-            clusterElementToolCallbacksProvider, continuationStarterProvider, securityContextRehydrator,
+            clusterElementToolCallbacksProvider, chatBindingToolCallbackResolverProvider, continuationStarterProvider,
+            securityContextRehydrator,
             transactionManager, Clock.systemUTC());
     }
 
@@ -94,6 +98,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
         ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider,
         ObjectProvider<AiHubContinuationStarter> continuationStarterProvider,
         @Nullable SecurityContextRehydrator securityContextRehydrator, PlatformTransactionManager transactionManager,
         Clock clock) {
@@ -104,6 +109,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
         this.pinnedToolCallbacksProvider = pinnedToolCallbacksProvider;
         this.globalToolCatalogProvider = globalToolCatalogProvider;
         this.clusterElementToolCallbacksProvider = clusterElementToolCallbacksProvider;
+        this.chatBindingToolCallbackResolverProvider = chatBindingToolCallbackResolverProvider;
         this.continuationStarterProvider = continuationStarterProvider;
         this.securityContextRehydrator = securityContextRehydrator;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
@@ -212,7 +218,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
     }
 
     private @Nullable String execute(AiHubToolApproval approval, AiHubChat chat, long workspaceId) {
-        Optional<ToolCallback> callbackOptional = findCallback(approval);
+        Optional<ToolCallback> callbackOptional = findCallback(approval, chat);
 
         if (callbackOptional.isEmpty()) {
             approval.setStatus(AiHubToolApproval.Status.FAILED);
@@ -263,7 +269,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
         }
     }
 
-    private Optional<ToolCallback> findCallback(AiHubToolApproval approval) {
+    private Optional<ToolCallback> findCallback(AiHubToolApproval approval, AiHubChat chat) {
         Mode mode = BUILD_MODE.equals(approval.getMode()) ? Mode.BUILD : Mode.ASK;
 
         AiHubPinnedToolCallbacks pinnedToolCallbacks = pinnedToolCallbacksProvider.getIfAvailable();
@@ -294,6 +300,12 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
             return catalogCallback;
         }
 
+        Optional<ToolCallback> chatToolCallback = findChatToolCallback(approval, chat, mode);
+
+        if (chatToolCallback.isPresent()) {
+            return chatToolCallback;
+        }
+
         AiHubClusterElementToolCallbacks clusterElementToolCallbacks =
             clusterElementToolCallbacksProvider.getIfAvailable();
 
@@ -303,6 +315,28 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
 
         return clusterElementToolCallbacks.findToolCallback(mode, approval.getToolName())
             .map(ToolCallback.class::cast);
+    }
+
+    private Optional<ToolCallback> findChatToolCallback(AiHubToolApproval approval, AiHubChat chat, Mode mode) {
+        AiHubChatBindingToolCallbackResolver chatBindingToolCallbackResolver =
+            chatBindingToolCallbackResolverProvider.getIfAvailable();
+
+        if (chatBindingToolCallbackResolver == null) {
+            return Optional.empty();
+        }
+
+        try {
+            return chatBindingToolCallbackResolver.resolve(chat.getThreadId(), approval.getRequestedByUserId(), mode)
+                .stream()
+                .filter(callback -> hasName(callback, approval.getToolName()))
+                .findFirst();
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Resolving the chat tools of chat {} for approval {} failed", chat.getId(), approval.getId(),
+                exception);
+
+            return Optional.empty();
+        }
     }
 
     private static boolean hasName(ToolCallback callback, String toolName) {

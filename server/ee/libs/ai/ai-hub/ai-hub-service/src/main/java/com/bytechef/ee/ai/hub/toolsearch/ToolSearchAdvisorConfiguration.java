@@ -17,8 +17,11 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.AiHubToolCallbackWrappers;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatToolFacade;
 import com.bytechef.ee.ai.hub.config.AiHubPgVectorConfiguration;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
+import com.bytechef.ee.ai.hub.mcpserver.AiHubMcpToolCallbackProvider;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -129,6 +132,44 @@ public class ToolSearchAdvisorConfiguration {
             new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, propertyOptionsResolver));
     }
 
+    @Bean
+    @Nullable
+    AiHubChatBindingToolCallbackResolver aiHubChatBindingToolCallbackResolver(
+        ObjectProvider<AiHubChatService> chatServiceProvider,
+        ObjectProvider<AiHubChatToolFacade> chatToolFacadeProvider,
+        ObjectProvider<ClusterElementDefinitionService> clusterElementDefinitionServiceProvider,
+        ObjectProvider<ClusterElementDefinitionFacade> clusterElementDefinitionFacadeProvider,
+        ObjectProvider<ConnectionDefinitionService> connectionDefinitionServiceProvider,
+        ObjectProvider<WorkspaceConnectionFacade> workspaceConnectionFacadeProvider,
+        ObjectProvider<PropertyOptionsResolver> propertyOptionsResolverProvider,
+        ObjectProvider<AiHubMcpToolCallbackProvider> mcpToolCallbackProviderProvider) {
+
+        AiHubChatService chatService = chatServiceProvider.getIfAvailable();
+        AiHubChatToolFacade chatToolFacade = chatToolFacadeProvider.getIfAvailable();
+        ClusterElementDefinitionService clusterElementDefinitionService =
+            clusterElementDefinitionServiceProvider.getIfAvailable();
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade =
+            clusterElementDefinitionFacadeProvider.getIfAvailable();
+        ConnectionDefinitionService connectionDefinitionService = connectionDefinitionServiceProvider.getIfAvailable();
+        WorkspaceConnectionFacade workspaceConnectionFacade = workspaceConnectionFacadeProvider.getIfAvailable();
+        PropertyOptionsResolver propertyOptionsResolver = propertyOptionsResolverProvider.getIfAvailable();
+
+        if (chatService == null || chatToolFacade == null || clusterElementDefinitionService == null ||
+            clusterElementDefinitionFacade == null || connectionDefinitionService == null ||
+            workspaceConnectionFacade == null || propertyOptionsResolver == null) {
+
+            log.warn("AI Hub chat tools are unavailable: the chat, component and connection services are missing");
+
+            return null;
+        }
+
+        return new AiHubChatBindingToolCallbackResolver(
+            chatService, chatToolFacade, clusterElementDefinitionService, clusterElementDefinitionFacade,
+            connectionDefinitionService,
+            new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, propertyOptionsResolver),
+            mcpToolCallbackProviderProvider.getIfAvailable());
+    }
+
     @Bean(defaultCandidate = false)
     @Nullable
     ToolSearchToolCallingAdvisor aiHubAskToolSearchToolCallAdvisor(
@@ -137,14 +178,16 @@ public class ToolSearchAdvisorConfiguration {
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         ObjectProvider<SecurityContextRehydrator> securityContextRehydratorProvider,
         ToolSearchCatalogWarmup toolSearchCatalogWarmup, ObjectProvider<AiHubApprovalGate> approvalGateProvider,
-        ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider) {
+        ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider,
+        ObjectProvider<ToolSearchCatalogFeeder> toolSearchCatalogFeederProvider) {
 
         return buildModeAdvisor(
             Mode.ASK, toolSearchPgVectorStoreProvider.getIfAvailable(),
             observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP),
             findCatalog(globalToolCatalogProvider, ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID),
             clusterElementToolCallbacksProvider.getIfAvailable(), securityContextRehydratorProvider.getIfAvailable(),
-            toolSearchCatalogWarmup, approvalGateProvider.getIfAvailable());
+            toolSearchCatalogWarmup, approvalGateProvider.getIfAvailable(),
+            toolSearchCatalogFeederProvider.getIfAvailable());
     }
 
     @Bean(defaultCandidate = false)
@@ -155,14 +198,16 @@ public class ToolSearchAdvisorConfiguration {
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         ObjectProvider<SecurityContextRehydrator> securityContextRehydratorProvider,
         ToolSearchCatalogWarmup toolSearchCatalogWarmup, ObjectProvider<AiHubApprovalGate> approvalGateProvider,
-        ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider) {
+        ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider,
+        ObjectProvider<ToolSearchCatalogFeeder> toolSearchCatalogFeederProvider) {
 
         return buildModeAdvisor(
             Mode.BUILD, toolSearchPgVectorStoreProvider.getIfAvailable(),
             observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP),
             findCatalog(globalToolCatalogProvider, ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID),
             clusterElementToolCallbacksProvider.getIfAvailable(), securityContextRehydratorProvider.getIfAvailable(),
-            toolSearchCatalogWarmup, approvalGateProvider.getIfAvailable());
+            toolSearchCatalogWarmup, approvalGateProvider.getIfAvailable(),
+            toolSearchCatalogFeederProvider.getIfAvailable());
     }
 
     @Bean
@@ -170,7 +215,8 @@ public class ToolSearchAdvisorConfiguration {
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> askToolSearchToolCallAdvisorProvider,
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
-        ObjectProvider<ToolSearchToolCallingAdvisor> buildToolSearchToolCallAdvisorProvider) {
+        ObjectProvider<ToolSearchToolCallingAdvisor> buildToolSearchToolCallAdvisorProvider,
+        ObjectProvider<ToolSearchCatalogFeeder> toolSearchCatalogFeederProvider) {
 
         return new ToolSearchSessionEvictor(
             () -> {
@@ -180,7 +226,8 @@ public class ToolSearchAdvisorConfiguration {
                 buildToolSearchToolCallAdvisorProvider.ifAvailable(advisors::add);
 
                 return advisors;
-            });
+            },
+            toolSearchCatalogFeederProvider::getIfAvailable);
     }
 
     static @Nullable ToolSearchToolCallingAdvisor buildModeAdvisor(
@@ -189,6 +236,19 @@ public class ToolSearchAdvisorConfiguration {
         @Nullable AiHubClusterElementToolCallbacks clusterElementToolCallbacks,
         @Nullable SecurityContextRehydrator securityContextRehydrator,
         ToolSearchCatalogWarmup toolSearchCatalogWarmup, @Nullable AiHubApprovalGate approvalGate) {
+
+        return buildModeAdvisor(
+            mode, toolSearchPgVectorStore, observationRegistry, globalToolCatalog, clusterElementToolCallbacks,
+            securityContextRehydrator, toolSearchCatalogWarmup, approvalGate, null);
+    }
+
+    static @Nullable ToolSearchToolCallingAdvisor buildModeAdvisor(
+        Mode mode, @Nullable VectorStore toolSearchPgVectorStore, ObservationRegistry observationRegistry,
+        @Nullable AiHubGlobalToolCatalog globalToolCatalog,
+        @Nullable AiHubClusterElementToolCallbacks clusterElementToolCallbacks,
+        @Nullable SecurityContextRehydrator securityContextRehydrator,
+        ToolSearchCatalogWarmup toolSearchCatalogWarmup, @Nullable AiHubApprovalGate approvalGate,
+        @Nullable ToolSearchCatalogFeeder toolSearchCatalogFeeder) {
 
         if (globalToolCatalog == null) {
             return null;
@@ -206,7 +266,8 @@ public class ToolSearchAdvisorConfiguration {
         }
 
         ToolIndex searcher = new CatalogToolIndex(
-            toolSearchPgVectorStore, searchSessionIds(mode, globalToolCatalog, clusterElementToolCallbacks));
+            toolSearchPgVectorStore, searchSessionIds(mode, globalToolCatalog, clusterElementToolCallbacks),
+            toolSearchCatalogFeeder == null ? null : threadId -> ToolSearchCatalogFeeder.userSessionId(mode, threadId));
 
         Supplier<Map<String, ToolCallback>> callbackMapSupplier = MemoizationUtils.memoize(
             () -> catalogCallbackMap(
@@ -214,7 +275,19 @@ public class ToolSearchAdvisorConfiguration {
 
         return new PinnedToolSearchToolCallingAdvisor(
             buildToolCallingManager(observationRegistry, callbackMapSupplier), searcher, MAX_SEARCH_RESULTS,
-            ChatMemory.CONVERSATION_ID, callbackMapSupplier, toolSearchCatalogWarmup::warmUp);
+            ChatMemory.CONVERSATION_ID, callbackMapSupplier, toolSearchCatalogWarmup::warmUp,
+            userToolIndexer(mode, toolSearchCatalogFeeder));
+    }
+
+    static PinnedToolSearchToolCallingAdvisor.UserToolIndexer userToolIndexer(
+        Mode mode, @Nullable ToolSearchCatalogFeeder toolSearchCatalogFeeder) {
+
+        if (toolSearchCatalogFeeder == null) {
+            return (threadId, toolCallbacks) -> {};
+        }
+
+        return (threadId, toolCallbacks) -> toolSearchCatalogFeeder.populateUserTools(
+            ToolSearchCatalogFeeder.userSessionId(mode, threadId), toolCallbacks);
     }
 
     static Map<String, ToolCallback> catalogCallbackMap(

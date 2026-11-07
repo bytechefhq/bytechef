@@ -12,6 +12,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.mcpserver.AiHubMcpToolCallback;
 import com.bytechef.ee.ai.hub.toolsearch.ClusterElementToolCallback;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
@@ -98,9 +99,7 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
 
         ClusterElementToolCallback clusterElementToolCallback = clusterElementToolCallback();
 
-        boolean gated = clusterElementToolCallback == null
-            ? decision.isGated(toolName)
-            : decision.isComponentToolGated(toolName, clusterElementToolCallback.getClusterElementName());
+        boolean gated = isGated(decision, toolName, clusterElementToolCallback);
 
         if (!gated) {
             return delegate.call(toolInput, toolContext);
@@ -154,6 +153,24 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
 
             return REFUSED_RESULT;
         }
+    }
+
+    private boolean isGated(
+        AiHubToolApprovalPolicy.Decision decision, String toolName,
+        @Nullable ClusterElementToolCallback clusterElementToolCallback) {
+
+        if (clusterElementToolCallback != null) {
+            return decision.isComponentToolGated(toolName, clusterElementToolCallback.getClusterElementName()) ||
+                (clusterElementToolCallback.isRequiresApproval() && !decision.exempt()
+                    .contains(toolName));
+        }
+
+        if (DelegatingToolCallback.unwrap(delegate) instanceof AiHubMcpToolCallback mcpToolCallback) {
+            return decision.isGated(toolName) || (!mcpToolCallback.isReadOnly() && !decision.exempt()
+                .contains(toolName));
+        }
+
+        return decision.isGated(toolName);
     }
 
     private @Nullable ClusterElementToolCallback clusterElementToolCallback() {

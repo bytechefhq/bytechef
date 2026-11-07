@@ -48,6 +48,10 @@ bytechef:
     hub:
       # Whether the AI Hub is enabled
       enabled: false
+      mcp-server:
+        # Hosts a user's AI Hub MCP server URL may use even when they resolve to a private or loopback address
+        # (comma-separated, matched exactly). Empty blocks every private address.
+        allowed-hosts:
     knowledge-base:
       enabled: false
       maxSizeBytes: 1073741824

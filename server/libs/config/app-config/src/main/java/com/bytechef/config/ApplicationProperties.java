@@ -1349,12 +1349,35 @@ public class ApplicationProperties {
 
             private boolean enabled;
 
+            private McpServer mcpServer = new McpServer();
+
             public boolean isEnabled() {
                 return enabled;
             }
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public McpServer getMcpServer() {
+                return mcpServer;
+            }
+
+            public void setMcpServer(McpServer mcpServer) {
+                this.mcpServer = mcpServer;
+            }
+
+            public static class McpServer {
+
+                private List<String> allowedHosts = List.of();
+
+                public List<String> getAllowedHosts() {
+                    return allowedHosts;
+                }
+
+                public void setAllowedHosts(List<String> allowedHosts) {
+                    this.allowedHosts = allowedHosts == null ? List.of() : List.copyOf(allowedHosts);
+                }
             }
         }
 

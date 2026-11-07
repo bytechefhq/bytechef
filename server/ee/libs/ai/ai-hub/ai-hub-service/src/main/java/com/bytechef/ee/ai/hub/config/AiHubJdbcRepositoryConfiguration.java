@@ -21,7 +21,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @ConditionalOnBean(AbstractJdbcConfiguration.class)
 @EnableJdbcRepositories(
     basePackages = {
-        "com.bytechef.ee.ai.hub.chat.repository", "com.bytechef.ee.ai.hub.approval.repository"
+        "com.bytechef.ee.ai.hub.chat.repository", "com.bytechef.ee.ai.hub.approval.repository",
+        "com.bytechef.ee.ai.hub.mcpserver.repository"
     })
 public class AiHubJdbcRepositoryConfiguration {
 }
