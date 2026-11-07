@@ -130,10 +130,9 @@ public class IntegrationTools {
 
         try {
             IntegrationDTO integrationDTO = new IntegrationDTO(
-                null, componentName, componentVersion, null, null, StringUtils.trimToNull(description), null, null,
-                null, List.of(), List.of(), null, null, null, null, null,
-                multipleInstances != null && multipleInstances,
-                StringUtils.trimToNull(name), null, List.of(), null, 0);
+                null, false, null, componentName, componentVersion, null, null, StringUtils.trimToNull(description),
+                null, null, null, List.of(), List.of(), null, null, null, null, null,
+                multipleInstances != null && multipleInstances, StringUtils.trimToNull(name), null, List.of(), null, 0);
 
             long integrationId = integrationFacade.createIntegration(integrationDTO);
 
@@ -167,9 +166,10 @@ public class IntegrationTools {
             String newDescription = description != null ? description : existing.description();
 
             IntegrationDTO integrationDTO = new IntegrationDTO(
-                existing.category(), existing.componentName(), existing.componentVersion(), existing.createdBy(),
-                existing.createdDate(), newDescription, existing.developmentConfigurationCount(),
-                existing.icon(), existing.id(), existing.integrationVersions(), existing.integrationWorkflowIds(),
+                existing.category(), existing.codeWorkflow(), existing.codeWorkflowLanguage(), existing.componentName(),
+                existing.componentVersion(), existing.createdBy(), existing.createdDate(), newDescription,
+                existing.developmentConfigurationCount(), existing.icon(), existing.id(),
+                existing.integrationVersions(), existing.integrationWorkflowIds(),
                 existing.lastModifiedBy(), existing.lastModifiedDate(), existing.lastPublishedDate(),
                 existing.lastStatus(), existing.lastIntegrationVersion(), existing.multipleInstances(), newName,
                 existing.permissionExpression(), existing.tags(), existing.title(), existing.version());
