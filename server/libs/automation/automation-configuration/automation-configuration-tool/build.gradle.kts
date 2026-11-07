@@ -37,6 +37,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework:spring-webflux")
+    testImplementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     testImplementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
