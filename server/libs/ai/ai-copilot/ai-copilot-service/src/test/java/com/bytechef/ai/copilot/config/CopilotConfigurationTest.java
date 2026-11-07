@@ -34,6 +34,7 @@ import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.ai.tool.DataTableTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
+import com.bytechef.automation.ai.tool.SimulationTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
 import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
@@ -290,8 +291,8 @@ class CopilotConfigurationTest {
         Set<String> toolNames = new HashSet<>();
 
         for (Class<?> toolsClass : List.of(
-            ProjectWorkflowTools.class, TaskTools.class, ScriptTools.class, WorkflowValidatorTools.class,
-            WorkflowInstructionTools.class)) {
+            ProjectWorkflowTools.class, TaskTools.class, ScriptTools.class, SimulationTools.class,
+            WorkflowValidatorTools.class, WorkflowInstructionTools.class)) {
 
             for (Method method : toolsClass.getMethods()) {
                 Tool tool = method.getAnnotation(Tool.class);

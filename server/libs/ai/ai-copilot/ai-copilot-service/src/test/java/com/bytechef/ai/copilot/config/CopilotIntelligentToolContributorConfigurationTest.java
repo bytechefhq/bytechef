@@ -45,6 +45,7 @@ import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadSkillsTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
+import com.bytechef.automation.ai.tool.SimulationTools;
 import com.bytechef.automation.ai.tool.SkillsTools;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.ai.tool.model.ProjectWorkflowInfo;
@@ -356,11 +357,13 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             .thenReturn(List.of(mock(ToolCallback.class)));
 
         ChatClient beanClient = copilotConfiguration.workflowEditorBuildSubAgentChatClient(
-            chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
+            chatModel, projectWorkflowTools, taskTools, scriptTools, mock(SimulationTools.class),
+            mock(ComponentTools.class),
             subAgentAskRelayProvider);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(
-            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
+            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, mock(SimulationTools.class),
+            mock(ComponentTools.class),
             subAgentAskRelayProvider,
             webSearchToolCallbackProvider);
 
@@ -461,11 +464,13 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider = emptySubAgentAskRelayProvider();
 
         ChatClient beanClient = copilotConfiguration.workflowEditorBuildSubAgentChatClient(
-            chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
+            chatModel, projectWorkflowTools, taskTools, scriptTools, mock(SimulationTools.class),
+            mock(ComponentTools.class),
             subAgentAskRelayProvider);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(
-            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
+            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, mock(SimulationTools.class),
+            mock(ComponentTools.class),
             subAgentAskRelayProvider,
             mock(WebSearchToolCallbackProvider.class));
 

@@ -51,6 +51,7 @@ import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadSkillsTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
+import com.bytechef.automation.ai.tool.SimulationTools;
 import com.bytechef.automation.ai.tool.SkillsTools;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -499,7 +500,7 @@ public class CopilotConfiguration {
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools,
-        ComponentTools componentTools, TaskTools taskTools, ScriptTools scriptTools,
+        ComponentTools componentTools, TaskTools taskTools, ScriptTools scriptTools, SimulationTools simulationTools,
         WorkflowExecutionTools workflowExecutionTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, PermissionService permissionService,
         SecurityContextRehydrator securityContextRehydrator,
@@ -508,7 +509,7 @@ public class CopilotConfiguration {
 
         List<Object> tools = new ArrayList<>(
             List.of(
-                projectWorkflowTools, componentTools, taskTools, scriptTools, workflowExecutionTools,
+                projectWorkflowTools, componentTools, taskTools, scriptTools, simulationTools, workflowExecutionTools,
                 workflowValidatorTools, workflowInstructionTools));
 
         if (dataTableTools != null) {
@@ -841,10 +842,11 @@ public class CopilotConfiguration {
     @Bean
     ChatClient workflowEditorBuildSubAgentChatClient(
         ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        ComponentTools componentTools, ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
+        SimulationTools simulationTools, ComponentTools componentTools,
+        ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
 
         return buildWorkflowEditorBuildSubAgentChatClient(
-            chatModel, projectWorkflowTools, taskTools, scriptTools, componentTools,
+            chatModel, projectWorkflowTools, taskTools, scriptTools, simulationTools, componentTools,
             hasAskTool(subAgentAskRelayProvider), List.of());
     }
 
@@ -852,7 +854,8 @@ public class CopilotConfiguration {
     IntelligentToolChatClientFactory workflowEditorBuildSubAgentChatClientFactory(
         @Qualifier("workflowEditorBuildSubAgentChatClient") ChatClient workflowEditorBuildSubAgentChatClient,
         ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        ComponentTools componentTools, ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider,
+        SimulationTools simulationTools, ComponentTools componentTools,
+        ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider,
         WebSearchToolCallbackProvider webSearchToolCallbackProvider) {
 
         boolean askToolAvailable = hasAskTool(subAgentAskRelayProvider);
@@ -867,13 +870,14 @@ public class CopilotConfiguration {
 
             return buildWorkflowEditorBuildSubAgentChatClient(
                 candidateChatModel == null ? chatModel : candidateChatModel, projectWorkflowTools, taskTools,
-                scriptTools, componentTools, askToolAvailable, webSearchToolCallbacks);
+                scriptTools, simulationTools, componentTools, askToolAvailable, webSearchToolCallbacks);
         };
     }
 
     private ChatClient buildWorkflowEditorBuildSubAgentChatClient(
         ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        ComponentTools componentTools, boolean askToolAvailable, List<ToolCallback> webSearchToolCallbacks) {
+        SimulationTools simulationTools, ComponentTools componentTools, boolean askToolAvailable,
+        List<ToolCallback> webSearchToolCallbacks) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(clusterElementLookupToolCallbacks(componentTools));
 
@@ -887,7 +891,8 @@ public class CopilotConfiguration {
             .defaultSystem(buildWorkflowSubAgentSystemPrompt(askToolAvailable))
             .defaultTools(
                 withDataTableTools(
-                    projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools, workflowInstructionTools))
+                    projectWorkflowTools, taskTools, scriptTools, simulationTools, workflowValidatorTools,
+                    workflowInstructionTools))
             .defaultToolCallbacks(toolCallbacks)
             .build();
     }
