@@ -1,121 +1,130 @@
 ---
 title: Testing Voice In The Editor
-description: Test voice workflows directly from the workflow editor's Playground panel, without deploying or embedding them.
+description: Test voice workflows directly from the workflow editor's test panel, iterating on the Voice Agent cluster element without deploying.
 ee: true
 comingSoon: true
 ---
 
-The workflow editor's **Playground** panel includes a mic button when the open workflow has a voice
-trigger. Click it to speak directly to your workflow without going through the embedded chat widget or
-AI Hub - useful for iterating on prompts, models, and turn-taking behavior while building the workflow.
+The workflow editor's test panel switches to a voice layout when the open workflow's trigger is a
+`browser/v1/voiceSession` with a configured Voice Agent. Use it to iterate on prompts, models, and
+tools without publishing the workflow.
 
-## When the mic button appears
+## When the mic appears
 
-The mic icon only renders when the open workflow has at least one trigger carrying a `websocketTasks`
-extension - i.e. the embedded sub-workflow that runs during the voice session. Practically:
+The test panel checks two things on the workflow's trigger:
 
-- Open a workflow with a `browser/v1/voiceSession` trigger → mic appears
-- Open a workflow with no voice trigger → no mic
-- Open a brand-new workflow → no mic until you add the trigger and save
+- Its type is `browser/v1/voiceSession`.
+- Its **Voice Agent** slot (the cluster element beside Tools on the trigger) has an element
+  configured.
 
-Adding the trigger does NOT require deploying the workflow. The editor's test path resolves the **draft**
-workflow definition directly via the workflow service, so you can iterate on the trigger configuration
-and click mic without publishing.
+Both true → the panel renders the voice layout and you can start a session. The trigger exists but
+the Voice Agent slot is empty → the panel renders the hint "Add a Voice Agent to the trigger to test
+with voice" instead of a session start control. No voice trigger at all → the panel renders the
+ordinary text chat thread.
+
+Saving the trigger's configuration is enough - deploying or publishing the workflow is not required.
+The test path reads the workflow's **draft** definition directly.
 
 ## How testing differs from production voice
 
-The editor's test path uses a separate WebSocket endpoint:
+The editor's test path is a separate endpoint from the deployed trigger:
 
 ```
-production:   wss://host/api/automation/webhooks/{webhookId}/wss
-editor test:  wss://host/api/platform/internal/workflow-tests/{workflowId}/wss
+production:   wss://host/api/automation/webhooks/{webhookId}/wss?sessionToken=…
+editor test:  wss://host/api/platform/internal/workflow-tests/{workflowId}/wss?sessionToken=…&environmentId=…
 ```
 
-Both terminate in the same handler class but key off different identifiers. The editor path:
+Both terminate in the same handler, but the editor path works in an environment the production path
+doesn't need - connections for the trigger's Voice Agent (and any Tools) are resolved from the
+workflow's **test configuration** for that environment, not from a deployment's connection
+bindings. The session token is minted from
+`POST /api/platform/internal/workflow-tests/{workflowId}/voice-session-token?environmentId=…`,
+which requires permission to edit the workflow in that environment, and the token is bound to it:
+the session runs in the environment the token was minted for. An embedded user confined to one
+environment always gets a token for their own environment, whatever the request names, and an
+`environmentId` on the socket upgrade itself is ignored.
 
-- Is gated by your ByteChef session cookie (no cross-origin embedding)
-- Reads the workflow's draft definition (no publish required)
-- Mints session tokens via `POST /api/platform/internal/workflow-tests/{workflowId}/voice-session-token`
-- Runs the same audio bridge / inter-task chain wiring as production
-
-What you test in the editor is what your customers will get from the embedded widget or AI Hub.
+One functional difference matters for iteration: **the editor test path never resumes a dropped
+session.** Production sessions reconnect automatically within a 30-second window after an
+unexpected close; every editor test session ends for good the moment its socket closes, and
+starting the mic again always begins a brand-new session under a fresh id. This is deliberate -
+you don't want a stale test connection quietly resurrected while you're mid-edit. Test sessions do honour the same session limit as
+deployed ones: the trigger's `sessionLimitSeconds`, or the server's 30-minute maximum when it is `0`.
 
 ## Click flow
 
-1. Click the mic icon in the Playground header. The icon flips to a red mic-off when active.
-2. The browser prompts for microphone permission. Grant it. (If you've denied it before, you'll need to
-   re-grant via browser site settings - see Troubleshooting below.)
-3. A status banner appears: "Connecting microphone…"
-4. Once the WS is open and Deepgram has accepted the audio: the banner flips to "🎙 Listening… click mic
-   to end." (Or "🔊 Assistant is speaking…" once it responds.)
-5. Speak. Transcripts and assistant responses appear in the chat thread as they arrive.
-6. Click the mic again (now showing the mic-off icon) to end the session.
+1. Open the test panel. If the trigger's Voice Agent slot is configured, you'll see the voice
+   layout with a start control.
+2. Start the session and grant microphone permission when the browser prompts. If you've denied it
+   before, re-grant it through the browser's site settings.
+3. The status line tracks the session: connecting, then listening or speaking once the provider
+   responds.
+4. While a tool call is in flight, the status line shows `Looking that up… (<tool name>)`.
+5. If the connection drops mid-test, the status line would show `Reconnecting…` on a normal
+   deployed session - but since the editor test path never resumes, a dropped socket here simply
+   ends the run.
+6. When the session ends, the status line shows `Ended: <reason>` with underscores replaced by
+   spaces (for example `Ended: client closed`, `Ended: session limit`, or `Ended: silence timeout`) -
+   not the raw `endReason` value.
 
 ## Iteration loop
 
-Voice testing is the fastest way to evaluate prompt + model changes:
+1. Edit the Voice Agent element's prompt, greeting, or model.
+2. Save the workflow.
+3. Start the session, speak, listen to the response.
+4. Repeat.
 
-1. Edit the system prompt or LLM model in the Deepgram voiceAgent task
-2. Save the workflow
-3. Click mic, speak, listen
-4. Repeat
-
-Each click of the mic starts a fresh session - the previous Deepgram WS closes, a new sub-workflow job
-spawns, and chat memory resets (unless you've configured a fixed `threadId` on a streaming agent task).
-This is the right semantics for prompt iteration; you don't want the previous test's context bleeding
-into the next.
-
-For multi-turn conversation memory across sessions, set a stable `threadId` on the agent task (e.g.
-`${callSid}` interpolates per-session; `'editor-test'` reuses across all editor sessions).
-
-## Cost during testing
-
-Every editor voice session bills you for real Deepgram usage. A 1-minute test = ~$0.13. The 30-minute
-max-session-duration cap applies in the editor too. For prompt iteration, keep sessions short and exit
-explicitly via the mic-off button.
+Each session is independent - there's no cross-session memory beyond what the provider itself keeps
+in-call, and there's no continuation job during iteration (that only fires when a session hosted by
+the *deployed* trigger ends). To see the continuation job's behavior - the transcript and tool calls
+reaching your workflow's later tasks - publish the workflow and test through the deployed webhook
+instead (see the [quickstart](./quickstart)).
 
 ## Browser requirements
 
-Same as production voice: Chrome 66+, Firefox 76+, or Safari 14.1+. The mic button is disabled with a
-tooltip explaining why on unsupported browsers - no silent failures.
+Same as production voice: Chrome 66+, Firefox 76+, or Safari 14.1+, all of which support the
+`AudioWorklet` API the capture path needs.
 
 ## Troubleshooting
 
-### Mic button doesn't appear
+### No voice layout, just the text chat panel
 
-The workflow doesn't have a voice trigger. Add a `browser/v1/voiceSession` trigger with an embedded
-sub-workflow under `websocketTasks`. See the [Voice Quickstart](./quickstart).
+The open workflow's trigger isn't `browser/v1/voiceSession`. Check the trigger's type.
 
-### Mic button greyed out
+### "Add a Voice Agent to the trigger to test with voice"
 
-Either the browser is unsupported (hover for the tooltip explaining why) or the workflow hasn't been
-saved yet (the test path requires a persisted workflow id).
+The trigger is a voice session trigger, but its Voice Agent slot is empty. Click the slot on the
+trigger's cluster box, pick a provider (Deepgram, OpenAI, or ElevenLabs), and configure it - see the
+[quickstart](./quickstart#step-2---add-the-trigger-and-pick-a-voice-agent).
 
-### "Workflow has no websocketTasks defined on its trigger"
+### Session starts but ends immediately with a provider error
 
-The trigger exists but the `websocketTasks` extension is missing or empty. Re-open the trigger config
-and add the sub-workflow under "Real-Time Workflow".
+Check the connection selected on the Voice Agent element - an invalid or expired API key surfaces as
+a single `error` event, then the session closes with `endReason: provider_error`. On a deployed
+workflow that start failure still runs the post-call workflow, with an empty transcript; a disabled
+workflow or a trigger with no Voice Agent is refused instead, and nothing runs.
 
-### Audio works but no response
+### No audio in either direction
 
-Almost always a sample-rate mismatch. The trigger's `sampleRate` (16000 by default) must match the
-Deepgram task's `audioInputSampleRate`. The output sample rate (`audioOutputSampleRate`, typically
-24000) is independent.
+Check the browser's developer console and network tab for the WS connection. If the socket opens but
+no `connected` event follows, the trigger's Voice Agent element failed to start - check the server
+log for "The voice session trigger has no Voice Agent" (an empty slot) or a provider-specific
+connection error.
 
-### Permission denied / mic button does nothing
+### Testing an ElevenLabs agent and tools never fire
 
-The browser remembers permission decisions per origin. Reset via:
-- Chrome: chrome://settings/content/microphone
-- Firefox: about:preferences#privacy → Permissions → Microphone
-- Safari: Safari → Settings → Websites → Microphone
+Client tool names on the ElevenLabs agent must exactly match your ByteChef Tools element names.
+ByteChef logs a warning at session start for every ByteChef tool the ElevenLabs agent has no
+matching client tool for.
 
-Reload after resetting.
+### Session ends sooner than expected
 
-### Session closes after 30 minutes
-
-The server enforces a 30-minute max-session-duration to bound Deepgram cost. If you're testing long
-conversations, close and re-open the mic between iterations.
+Check the trigger's **Silence timeout (seconds)** property - only inbound caller audio resets it, so
+a long stretch of the assistant talking without the caller responding can still trigger it; `0`
+disables the silence timeout entirely. Check **Session limit (seconds)** too - its `0` behaves
+differently: it doesn't disable the limit, it falls back to the server's configured maximum session
+duration instead.
 
 ## What's next
 
-- [Voice Quickstart](./quickstart) - initial workflow setup
+- [Voice quickstart](./quickstart) - full workflow setup, providers, and the post-call workflow

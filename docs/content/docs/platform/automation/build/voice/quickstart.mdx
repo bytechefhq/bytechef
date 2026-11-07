@@ -1,183 +1,224 @@
 ---
 title: Voice Quickstart
-description: Build your first browser voice workflow with a Deepgram voice agent, test it in the editor, and wire it to the chat widget or AI Hub.
+description: Build a browser voice workflow with a Voice Agent cluster element, test it in the editor, and connect a browser client to it.
 ee: true
 comingSoon: true
 ---
 
-Set up your first voice workflow in ~5 minutes. You'll end up with a workflow that lets you (or your customers) speak to a Deepgram-powered AI assistant directly from the browser.
+Build a workflow that lets a browser speak to an AI voice agent. The **Browser Voice Session**
+trigger hosts the call; a **Voice Agent** cluster element on that trigger answers the caller for as
+long as the session lasts; your workflow's own tasks run afterwards, once, with the finished
+transcript as input.
 
 ## What you'll build
 
 ```
-microphone → ByteChef WebSocket → Deepgram voiceAgent (STT + LLM + TTS) → speaker
+mic --PCM16--> ByteChef WebSocket --> Voice Agent element --> provider (STT+LLM+TTS) --> speaker
+                                          |
+                                (optional Tools, called by the provider mid-call)
+                                          |
+                          call ends --> continuation job --> your workflow's tasks
 ```
 
-The Deepgram **voiceAgent** action is an all-in-one component: speech-to-text, LLM reasoning, and text-to-speech all happen at Deepgram over a single WebSocket. ByteChef proxies the audio bytes; you don't need to wire STT, agent, and TTS as separate tasks.
-
-This is the recommended v1 setup. Splitting the chain across providers (e.g. Deepgram STT + Anthropic LLM + ElevenLabs TTS) is possible, but stick with all-in-one for your first voice workflow.
+No workflow job runs while the call is live - the trigger hands the session to the Voice Agent
+element, and your workflow's tasks (summarize the call, notify a channel, write a CRM record, ...)
+run once, after the caller hangs up, as an ordinary job whose input is the session summary.
 
 ## Prerequisites
 
-- ByteChef Automation Pro or Enterprise (browser voice is not in Community Edition today)
-- A Deepgram account with an API key - get one free at [console.deepgram.com](https://console.deepgram.com). The free tier covers ~45 minutes of voice agent usage.
-- A modern browser: Chrome 66+, Firefox 76+, or Safari 14.1+ (older browsers don't support the `AudioWorklet` API)
+- ByteChef Enterprise (browser voice is not available in Community Edition)
+- An account and API key with one of the supported providers: Deepgram, OpenAI, or ElevenLabs
+- A modern browser: Chrome 66+, Firefox 76+, or Safari 14.1+ (older browsers lack the
+  `AudioWorklet` API browser voice needs)
 
-## Step 1 - Connect Deepgram
+## Step 1 - Connect a provider
 
-In ByteChef, go to **Connections** → **New Connection** → search for **Deepgram**. Paste your API key. Save.
+Three providers plug into the Voice Agent slot today. Each is a single all-in-one component: the
+provider does speech-to-text, LLM reasoning and text-to-speech itself, over one WebSocket. ByteChef
+never runs its own LLM during the call - the `aiAgent` component and its memory/guardrails are not
+in the loop while a session is live.
 
-You'll need the connection ID in step 3. You can find it in the URL of the connection's detail page.
+| Provider | Where the agent is configured | Tool calling | Output audio rate | Phone calls |
+|---|---|---|---|---|
+| **Deepgram Voice Agent** | In the workflow - prompt, greeting, LLM provider/model, TTS provider/voice | Tools registered as functions per session | Configurable (`outputSampleRate`, default 24 kHz) | Not available here - browser only |
+| **OpenAI Realtime** | In the workflow - model, instructions, voice, greeting | Tools sent in the session config | Fixed at 24 kHz (OpenAI's Realtime API always emits 24 kHz PCM16) | Not available here - use OpenAI Realtime's own SIP telephony |
+| **ElevenLabs Conversational AI** | On ElevenLabs - prompt, voice, LLM and tools all live on the ElevenLabs agent; the workflow only optionally overrides prompt/first message/language | By **name matching**: your ByteChef Tools element names must exactly match the client tool names configured on the ElevenLabs agent | Decided by ElevenLabs, reported back on connect (default assumed 16 kHz) | Not available here - use ElevenLabs' own Twilio import or SIP trunking |
 
-## Step 2 - Import the example workflow
+None of the three place or receive phone calls through ByteChef. If you need a phone number, use
+the provider's own telephony (ElevenLabs Conversational AI, OpenAI Realtime SIP, or a dedicated
+platform like Vapi/Retell) with ByteChef as the tools and post-call backend behind it - see
+[Limits](#limits) below.
 
-The repo ships a working example at `docs/examples/voice/deepgram-voiceagent.json`. Either copy that file's contents into a new workflow in ByteChef, or create the workflow manually:
+Create the connection: **Connections** → **New Connection** → search for **Deepgram**, **OpenAI**,
+or **ElevenLabs** → enter the API key → save.
 
-1. **Workflows** → **New Workflow**
-2. Add a trigger: search for **Browser** → **Browser Voice Session**
-3. Configure the trigger:
-   - **Real-Time Workflow**: any name (e.g. `voice-subflow-1`)
-   - **Audio Sample Rate**: 16 kHz
-   - **Echo Cancellation**: on
-   - **Noise Suppression**: on
-4. In the trigger's "Real-Time Workflow" editor (the embedded sub-workflow), add **Deepgram → Voice Agent** as the only task:
-   - **System Prompt**: defines the agent's behavior. Example: "You are a helpful assistant for ByteChef. Keep responses concise and natural for spoken delivery."
-   - **Greeting**: the assistant's opening line (e.g. "Hi! How can I help?")
-   - **LLM Provider** + **LLM Model**: e.g. OpenAI / gpt-4o-mini, or Anthropic / claude-3-5-sonnet
-   - **TTS Provider** + **TTS Voice**: e.g. Deepgram / aura-asteria-en (a friendly female voice)
-   - **Audio Input/Output Encoding**: linear16 (must match the trigger's sample rate)
-   - **Connection**: the Deepgram connection you created in step 1
+## Step 2 - Add the trigger and pick a Voice Agent
 
-## Step 3 - Test from the workflow editor
+1. **Workflows** → **New Workflow**.
+2. Add a trigger: search for **Browser** → **Browser Voice Session**.
+3. The trigger renders on the canvas as a cluster-root box with two slots side by side: **Voice
+   Agent** (required, exactly one) and **Tools** (optional, any number). Click the **Voice Agent**
+   slot to open the component picker - it lists only components that declare a Voice Agent cluster
+   element (Deepgram, OpenAI, ElevenLabs). Pick one.
+4. This opens the node details panel for that element. Fill in its properties (system
+   prompt/instructions, greeting, model, and for ElevenLabs the agent to use) and select the
+   connection you created in Step 1.
+5. Configure the trigger's own properties (click the trigger box itself, not the Voice Agent slot):
+   - **Audio Sample Rate** - 16 kHz or 24 kHz, for both inbound mic capture and outbound playback
+     buffering (16 kHz is the default and works with every provider; OpenAI resamples 16 kHz input
+     to the 24 kHz its Realtime API requires internally, so you don't need to match it by hand)
+   - **Echo Cancellation** / **Noise Suppression** - browser-side audio processing, on by default
+   - **Session limit (seconds)** - hard cap on a call's length, default 150 (2.5 minutes); `0` falls
+     back to the server's configured maximum
+   - **Silence timeout (seconds)** - ends the call after this much silence from the caller, default
+     120; `0` disables it
 
-The fastest way to verify the workflow works:
+## Step 3 - Add Tools (optional)
 
-1. Open the workflow in the editor
-2. Click the **mic icon** in the Playground panel header (top-right). The mic icon only appears when the workflow has a `websocketTasks` extension - you'll see it once you've added the trigger + agent above.
-3. Grant microphone permission
-4. Wait for the assistant's greeting (1-2 seconds)
-5. Speak naturally - the assistant should respond
+Click the **Tools** slot beside Voice Agent to attach any action as a callable tool, the same way
+you would on an AI Agent task. The provider calls a tool by name mid-conversation; the result goes
+back into the same call so the agent can speak it.
 
-If you don't hear anything:
+Tools run through the same policy stack as AI Agent tools - Component Rules, the tool execution
+recorder, guardrail redaction - with one exception: **there is no human-in-the-loop inside a call.**
+A voice session has no job to suspend, so a tool that requires approval (an approval-gated
+Component Rule, or a tool that itself raises an approval request) answers with "This action requires
+approval and is not available during a voice call." instead of running. Design voice-callable tools
+to either not need approval or to degrade gracefully when it's unavailable.
 
-- Check the browser's developer console for errors
-- Check the trigger's `audioInputSampleRate` matches the trigger's `sampleRate` (both should be 16000)
-- Check the Deepgram connection has a valid API key
-- Verify your browser is one of the supported versions
+For ElevenLabs specifically: the tool must also be declared as a client tool on the ElevenLabs
+agent itself, under the same name as your ByteChef Tools element. ByteChef checks this once per
+session and logs a warning for any mismatch - it never modifies your ElevenLabs agent.
 
-## Step 4 - Deploy
+## Step 4 - Test from the editor
 
-Once the workflow works in the editor, publish it. You'll get a webhook URL like:
+1. Open the workflow in the editor and open the test panel.
+2. Because the trigger is `browser/v1/voiceSession` and its Voice Agent slot is filled in, the panel
+   shows a voice layout instead of the text chat thread. If the Voice Agent slot is still empty, the
+   panel shows "Add a Voice Agent to the trigger to test with voice" instead.
+3. Start the session, grant microphone permission, and speak. The status line reports what's
+   happening - including `Looking that up… (<tool name>)` while a tool call is in flight.
+4. The editor test path reads the workflow's **draft** definition, so you can iterate on the prompt
+   or model and test again without publishing. Unlike production, the editor test path never
+   reconnects - a dropped connection ends that test run outright, and starting the mic again opens a
+   fresh session.
 
-```
-https://your-bytechef-instance.com/api/automation/webhooks/abc123
-```
+## Step 5 - Deploy and use the call in your workflow
 
-That URL is what you'll paste into the embedded chat widget, AI Hub voice settings, or any other frontend that needs voice.
+Publish the workflow. The trigger's webhook accepts voice-session upgrades the same way it accepts
+whatever else your webhook trigger normally does.
 
-## Step 5 - Wire up a frontend
+When the call ends, ByteChef runs the rest of your workflow's tasks once, with the session summary
+as the trigger's output:
 
-Three places voice can run:
+- `sessionId`, `startedAt`, `durationSeconds`
+- `endReason` - `client_closed` (the caller hung up, or dropped and did not reconnect within 30 seconds),
+  `session_limit`, `silence_timeout`, `provider_closed` (the voice provider ended the call itself),
+  `provider_error`, or `server_shutdown` (the server stopped mid-call)
+- `transcript` - an ordered list of `{role, text, at}` entries
+- `toolCalls` - an ordered list of `{name, arguments, result, at}` entries
 
-### Workflow editor (already working from step 3)
+A minimal two-task follow-up: summarize the call, then post it somewhere.
 
-You're done. The editor's test panel uses the workflow's draft definition directly.
+1. **AI Agent → Chat** - prompt: `Summarize this call in two sentences:\n${trigger.transcript}`
+2. **Slack → Send Message** - text: `Voice call ended (${trigger.endReason}): ${steps.summarize.output}`
 
-### Embedded chat widget on your customer's site
+## Step 6 - Wire up a frontend
 
-```tsx
-import {AutomationChatModal} from '@bytechef/automation-chat';
+The editor test panel (Step 4) is one way to reach the trigger; a deployed workflow is reached directly:
 
-<AutomationChatModal
-    config={{
-        webhookUrl: 'https://your-bytechef-instance.com/api/automation/webhooks/abc123',
-        voiceWebhookUrl: 'https://your-bytechef-instance.com/api/automation/webhooks/abc123',
-    }}
-/>
-```
+### Direct WebSocket integration
 
-If you embed the widget inside an `<iframe>`, the iframe element MUST have `allow="microphone"` or `getUserMedia` will be silently denied:
+Mint a single-use session token with `POST /api/automation/webhooks/{webhookId}/voice-session-token`,
+then open `wss://your-instance/api/automation/webhooks/{webhookId}/wss?sessionToken=…`. This is what
+the editor test panel does under the hood.
 
-```html
-<iframe src="https://your-site.com/chat" allow="microphone"></iframe>
-```
+## Limits
 
-See the [widget README](https://github.com/bytechefhq/bytechef/blob/master/sdks/frontend/automation/chat/library/README.md) for the full config reference.
-
-### AI Hub composer
-
-AI Hub voice ships with **two routing paths**, chosen per-workspace by the admin. Both are mutually exclusive - setting one clears the other server-side.
-
-#### Path A - Workflow webhook (the v1 default)
-
-1. Workspace **Admin** → **AI Hub Settings** (gear icon in composer) → select **Workflow webhook (Path A)**
-2. Paste the webhook URL from step 4
-3. Save
-4. Open any AI Hub task and click the mic button
-
-Voice runs through YOUR workflow's agent - the system prompt, model, and tools you configured in step 2. AI Hub's own chat agent (with its built-in tools and memory) is **not** active during voice mode on Path A. Recommended when you want voice to share the exact behaviour and tools of an existing browser-voice workflow.
-
-#### Path B - Native AI Hub voice
-
-1. Create a **Deepgram** connection holding the API key (Connections → New Connection)
-2. Workspace **Admin** → **AI Hub Settings** → select **Native AI Hub voice (Path B)**
-3. Pick **Deepgram** from the provider dropdown
-4. Paste the Connection ID from step 1
-5. Optional: override **Voice ID** (defaults to `aura-asteria-en`)
-6. Save
-7. Open any AI Hub chat and click the mic button
-
-How it works: Deepgram does STT and TTS only; AI Hub's routing agent runs the LLM in between. Your workspace's configured LLM provider (set in admin → AI gateway settings), task overlay, tools, and chat memory continuity all apply to voice turns the same way they apply to text turns. The session is bound to the AI Hub chat's threadId so voice and text turns share the same session memory - ask the same chat something in voice mode, then switch to text, and the LLM remembers the voice turn.
-
-> **Want Deepgram's all-in-one voiceAgent (STT + LLM + TTS) instead?** Use Path A with a Deepgram voiceAgent component in your workflow. That gives you full pipeline control and is the supported way to run "provider runs everything" voice.
-
-Current limitations:
-- Sentence-buffered TTS, not token-by-token (v1.3 work).
-- No barge-in interruption when the user starts speaking while the assistant is still talking (v1.3 work - Deepgram emits the signal, we just don't act on it yet).
-- Only Deepgram is wired; ElevenLabs is planned for v1.3.
-
-## Costs
-
-Deepgram voiceAgent is billed per-minute by Deepgram (not by ByteChef). At time of writing:
-
-- Voice Agent end-to-end: ~$0.13/minute
-- Just STT (if you split the chain): ~$0.0043/minute (Nova-2)
-- Just TTS (Aura): ~$0.015/minute
-
-A 5-minute voice call = ~$0.65. Production deployments should set per-workspace concurrent-session limits to prevent runaway costs.
-
-ByteChef does not currently meter or charge for voice minutes - your Deepgram bill is your own to manage. Per-workspace billing is planned for v1.1.
+- **Session limit** - the trigger's `sessionLimitSeconds` (default 150s), or the server's configured
+  maximum when the trigger's is `0`.
+- **Silence timeout** - the trigger's `silenceTimeoutSeconds` (default 120s; `0` disables it). Only
+  inbound caller audio resets the timer - the assistant talking does not.
+- **Reconnect** - a browser-side drop that the server didn't initiate is retried automatically (fresh
+  token, same session id) up to three times with backoff. The server keeps a dropped session alive
+  for 30 seconds waiting for that reconnect; a resume attempt outside that window, or with an unknown
+  session id, starts a brand-new session instead. Audio buffered during the gap is dropped, not
+  replayed. Hanging up on purpose is different: the client closes with `client_closed` and the
+  session ends at once, with no resume window.
+- **Multiple server replicas** - a live call is held in memory by the server that accepted its
+  WebSocket, so a reconnect resumes the call only if it reaches that same server. Behind a load
+  balancer with more than one replica, configure session affinity for the voice path
+  `/webhooks/{id}/wss`, for example cookie-based affinity on the ingress. Client-IP affinity also works,
+  but it breaks when the caller's network changes, which is a common cause of the drop itself. A
+  page embedded on another site only sends an affinity cookie set with `SameSite=None; Secure`.
+  Without affinity, a reconnect that lands on another replica starts a new call: the caller hears the
+  greeting again, the original call ends as `client_closed` after 30 seconds, and the post-call
+  workflow runs twice, each run with part of the transcript. Editor test sessions never resume, so
+  they are unaffected.
+- **Disabled workflows** - a voice session for a disabled workflow is refused: minting a session
+  token returns 404, and a socket opened with an earlier token gets an error frame and is closed
+  without a continuation job.
+- **Provider errors** - a provider error ends the session as `provider_error`, except for OpenAI
+  Realtime errors that concern a single client event (`conversation_already_has_active_response`,
+  `invalid_value`), which are logged and the call continues. A
+  rejected `session.update` is always fatal. A provider that cannot connect at all also ends as
+  `provider_error` and still runs the post-call workflow, with an empty transcript - unlike a
+  disabled workflow or a missing Voice Agent, which are refused and run nothing.
+- **Muted callers** - while the caller is muted, the browser sends a keepalive control frame every
+  15 seconds, so muting does not trip the silence timeout. The keepalive never reaches the provider.
+- **No Voice Agent** - a deployed trigger without a Voice Agent refuses the session with an error
+  and a policy close; no post-call run happens, because no call took place.
+- **Session tokens are required** - the webhook WebSocket endpoint only serves voice sessions; an
+  upgrade without a `sessionToken` is refused.
+- **No phone calls.** This trigger is browser-only. See the design spec's Non-goals section
+  (`docs/superpowers/specs/2026-09-08-voice-cluster-element-redesign-design.md`) for what phone
+  voice looks like instead.
 
 ## Troubleshooting
 
-### Mic button doesn't appear
+### The Voice Agent slot has no options
 
-Voice requires a `websocketTasks` extension on the workflow trigger. Make sure you added the embedded sub-workflow with the Deepgram task in step 2.
+The picker only lists components that declare a Voice Agent cluster element. Make sure you created
+a connection for Deepgram, OpenAI, or ElevenLabs first - the component itself is always visible, but
+without a connection you can't save the element.
 
-### Mic button is disabled with a tooltip about browser support
+### Test panel shows the text chat, not voice
 
-Your browser doesn't support `AudioWorklet`. Upgrade to Chrome 66+, Firefox 76+, or Safari 14.1+.
+The trigger isn't `browser/v1/voiceSession`, or its type doesn't match exactly. Check the trigger's
+component and operation.
 
-### "Voice requires https://" error
+### Test panel shows "Add a Voice Agent to the trigger to test with voice"
 
-The browser blocks `getUserMedia` on insecure origins. Either run ByteChef behind HTTPS (production) or use `http://localhost` (development).
+The trigger exists but its Voice Agent slot is empty. Click the slot and pick a provider (Step 2).
 
-### Mic permission denied
+### Mic button greyed out or a browser-support message
 
-The browser remembers permission decisions per origin. Reset via the browser's site settings (chrome://settings/content/microphone or equivalent) and reload the page.
+The browser doesn't support `AudioWorklet`. Upgrade to Chrome 66+, Firefox 76+, or Safari 14.1+.
 
 ### "Invalid or expired session token" on WS upgrade
 
-The voice-session-token is single-use and TTL 60 seconds. If you see this, you're likely opening the WS more than once with the same token, or your client clock is significantly skewed. The hook handles this automatically by minting a fresh token per session start.
+The session token is single-use with a short TTL. This usually means the WS was opened twice with
+the same token, or the client clock is significantly skewed. The editor mints a fresh
+token per session start automatically - this only surfaces with a hand-rolled integration.
 
-### No audio response from the assistant
+### No audio, or the assistant never responds
 
-Most often a mismatch between the trigger's `sampleRate` and the Deepgram action's `audioInputSampleRate` / `audioOutputSampleRate`. Both sides should agree (typically 16000 for input, 24000 for output).
+- Check the browser console and network tab for the WS connection status.
+- Confirm the connection's API key is valid for the chosen provider.
+- For ElevenLabs, confirm the agent id resolves (the picker calls `GET /v1/convai/agents`) and that
+  the agent isn't disabled.
 
-### Session ends after 30 minutes
+### A tool never runs, and the agent just says it can't help
 
-Server-side max-duration enforcement kicks in at 30 minutes per session. This is a cost-protection guard. Configurable in `WebhookWebSocketHandler` if you self-host.
+For ElevenLabs, the client tool name on the ElevenLabs agent must exactly match your ByteChef Tools
+element's name. Check the server logs for a "has no client tool named" warning at session start.
+
+### The agent says an action "requires approval and is not available"
+
+That tool (or a Component Rule covering it) requires human approval, which has no meaning inside a
+live call - there's no job to suspend. Either remove the approval requirement for voice-callable
+tools, or route that action through a text-based workflow instead.
 
 ## Next steps
 
-- [Testing voice workflows in the editor](./editor-testing) - iterate on prompts and models without deploying
+- [Testing voice workflows in the editor](./editor-testing) - the full iteration loop
