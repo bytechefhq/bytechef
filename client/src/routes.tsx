@@ -936,7 +936,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <AiHubEnabled>
-                                                    <LazyLoadWrapper hasLeftSidebar>
+                                                    <LazyLoadWrapper>
                                                         <AiHub />
                                                     </LazyLoadWrapper>
                                                 </AiHubEnabled>
@@ -950,7 +950,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <AiHubEnabled>
-                                                    <LazyLoadWrapper hasLeftSidebar>
+                                                    <LazyLoadWrapper>
                                                         <AiHub />
                                                     </LazyLoadWrapper>
                                                 </AiHubEnabled>
