@@ -9,7 +9,10 @@ package com.bytechef.ee.embedded.workflow.execution.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job.Status;
+import com.bytechef.ee.embedded.workflow.execution.dto.EmbeddedWorkflowExecutionDTO;
+import com.bytechef.ee.embedded.workflow.execution.facade.EmbeddedWorkflowExecutionFacade;
 import com.bytechef.ee.embedded.workflow.execution.facade.IntegrationWorkflowExecutionFacade;
+import com.bytechef.ee.embedded.workflow.execution.web.rest.model.EmbeddedWorkflowExecutionModel;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -39,14 +42,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkflowExecutionApiController implements WorkflowExecutionApi {
 
     private final ConversionService conversionService;
+    private final EmbeddedWorkflowExecutionFacade embeddedWorkflowExecutionFacade;
     private final IntegrationWorkflowExecutionFacade integrationWorkflowExecutionFacade;
 
     @SuppressFBWarnings("EI")
     public WorkflowExecutionApiController(
-        ConversionService conversionService, IntegrationWorkflowExecutionFacade integrationWorkflowExecutionFacade) {
+        ConversionService conversionService, EmbeddedWorkflowExecutionFacade embeddedWorkflowExecutionFacade,
+        IntegrationWorkflowExecutionFacade integrationWorkflowExecutionFacade) {
 
         this.conversionService = conversionService;
+        this.embeddedWorkflowExecutionFacade = embeddedWorkflowExecutionFacade;
         this.integrationWorkflowExecutionFacade = integrationWorkflowExecutionFacade;
+    }
+
+    @Override
+    public ResponseEntity<Page> getAnyWorkflowExecutionsPage(
+        Long workspaceId, Long environmentId, String jobStatus, OffsetDateTime jobStartDate,
+        OffsetDateTime jobEndDate, Long connectedUserId, Integer pageNumber) {
+
+        return ResponseEntity.ok(
+            embeddedWorkflowExecutionFacade
+                .getWorkflowExecutions(
+                    environmentId, jobStatus == null ? null : Status.valueOf(jobStatus),
+                    jobStartDate == null ? null : jobStartDate.toInstant(),
+                    jobEndDate == null ? null : jobEndDate.toInstant(), connectedUserId, workspaceId, pageNumber)
+                .map(this::toEmbeddedWorkflowExecutionModel));
     }
 
     @Override
@@ -92,6 +112,26 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
                     connectedUserId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(
                     workflowExecutionDTO, WorkflowExecutionBasicModel.class)));
+    }
+
+    private EmbeddedWorkflowExecutionModel toEmbeddedWorkflowExecutionModel(
+        EmbeddedWorkflowExecutionDTO embeddedWorkflowExecutionDTO) {
+
+        EmbeddedWorkflowExecutionDTO.Source source = embeddedWorkflowExecutionDTO.source();
+
+        EmbeddedWorkflowExecutionModel embeddedWorkflowExecutionModel = new EmbeddedWorkflowExecutionModel(
+            EmbeddedWorkflowExecutionModel.SourceEnum.fromValue(source.name()));
+
+        if (source == EmbeddedWorkflowExecutionDTO.Source.AUTOMATION) {
+            embeddedWorkflowExecutionModel.setAutomationWorkflowExecution(
+                embeddedWorkflowExecutionDTO.automationWorkflowExecution());
+        } else {
+            embeddedWorkflowExecutionModel.setIntegrationWorkflowExecution(
+                conversionService.convert(
+                    embeddedWorkflowExecutionDTO.integrationWorkflowExecution(), WorkflowExecutionBasicModel.class));
+        }
+
+        return embeddedWorkflowExecutionModel;
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
