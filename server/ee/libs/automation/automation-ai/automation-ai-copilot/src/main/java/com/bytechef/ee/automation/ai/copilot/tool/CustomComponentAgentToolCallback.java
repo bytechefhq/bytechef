@@ -48,6 +48,15 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
             describes one that doesn't exist, or updates/deletes an existing one named or identified by id in
             the request.""";
 
+    private static final String EXPLAIN_DESCRIPTION =
+        """
+            Delegate a question about custom components to a read-only Custom Component subagent.
+            Custom components are single-file, user-authored components (JavaScript, Python) that add
+            new actions to the platform. The subagent lists custom components, reads their source and explains
+            what they do and how they work; it cannot create, change, publish or delete a custom component.
+            Prefer calling it over reasoning about custom components directly. The result is a synthesised
+            markdown report.""";
+
     private static final String INPUT_SCHEMA =
         """
             {
@@ -61,22 +70,44 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
+    private final CopilotAgentType agentType;
     private final IntelligentToolChatClientFactory chatClientFactory;
     private final @Nullable SubAgentChatModelResolver chatModelResolver;
+    private final String description;
+    private final String toolName;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CustomComponentAgentToolCallback(
         IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
 
+        this("buildCustomComponent", DESCRIPTION, CopilotAgentType.BUILD_CUSTOM_COMPONENT, chatClientFactory,
+            chatModelResolver);
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    private CustomComponentAgentToolCallback(
+        String toolName, String description, CopilotAgentType agentType,
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
+        this.agentType = agentType;
         this.chatClientFactory = chatClientFactory;
         this.chatModelResolver = chatModelResolver;
+        this.description = description;
+        this.toolName = toolName;
+    }
+
+    public static CustomComponentAgentToolCallback readOnly(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
+        return new CustomComponentAgentToolCallback(
+            "explainCustomComponent", EXPLAIN_DESCRIPTION, CopilotAgentType.EXPLAIN_CUSTOM_COMPONENT, chatClientFactory,
+            chatModelResolver);
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("buildCustomComponent")
-            .description(DESCRIPTION)
+            .name(toolName)
+            .description(description)
             .inputSchema(INPUT_SCHEMA)
             .build();
     }
@@ -106,7 +137,7 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
                 chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
             String result = CurrentAgentContext.callWith(
-                CopilotAgentType.BUILD_CUSTOM_COMPONENT, parentAgent,
+                agentType, parentAgent,
                 () -> customComponentChatClient.prompt(request)
                     .toolContext(parentContext)
                     .call()
@@ -121,7 +152,7 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "buildCustomComponent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "{} rejected malformed tool input: {} — first 200 chars of input: {}", toolName,
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
@@ -130,7 +161,7 @@ public class CustomComponentAgentToolCallback implements ToolCallback {
             return ToolErrors.toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                CustomComponentAgentToolCallback.class, "buildCustomComponent", exception);
+                CustomComponentAgentToolCallback.class, toolName, exception);
         }
     }
 

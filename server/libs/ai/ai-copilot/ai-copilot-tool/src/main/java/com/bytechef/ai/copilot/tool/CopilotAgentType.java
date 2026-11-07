@@ -80,7 +80,9 @@ public enum CopilotAgentType implements AgentType {
     CONFIGURE_MCP_SERVER("configureMcpServer"),
     BUILD_AI_AGENT("buildAiAgent"),
     BUILD_CUSTOM_COMPONENT("buildCustomComponent"),
-    BUILD_CODE_WORKFLOW("buildCodeWorkflow");
+    BUILD_CODE_WORKFLOW("buildCodeWorkflow"),
+    EXPLAIN_CUSTOM_COMPONENT("explainCustomComponent"),
+    EXPLAIN_CODE_WORKFLOW("explainCodeWorkflow");
 
     private final String key;
 

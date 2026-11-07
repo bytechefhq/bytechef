@@ -14,10 +14,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.agent.tool.AgentType;
+import com.bytechef.ai.agent.tool.CurrentAgentContext;
+import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -225,6 +234,59 @@ class CustomComponentAgentToolCallbackTest {
             .isTrue();
         assertThat(node.get("error")
             .asText()).contains("buildCustomComponent failed");
+    }
+
+    @Test
+    void testReadOnlyToolDefinitionHasANonWritingNameAndDescription() {
+        CustomComponentAgentToolCallback callback =
+            CustomComponentAgentToolCallback.readOnly(chatModel -> mock(ChatClient.class), null);
+
+        assertThat(callback.getToolDefinition()
+            .name()).isEqualTo("explainCustomComponent");
+        assertThat(callback.getToolDefinition()
+            .description()).contains("read-only")
+                .doesNotContain("in build mode");
+        assertThat(callback.getToolDefinition()
+            .inputSchema()).contains("\"request\"");
+    }
+
+    @Test
+    void testReadOnlyCallbackRunsTheSubagentAsTheExplainAgent() {
+        assertSubagentRunsAs(
+            CustomComponentAgentToolCallback::readOnly, CopilotAgentType.EXPLAIN_CUSTOM_COMPONENT);
+    }
+
+    @Test
+    void testBuildCallbackRunsTheSubagentAsTheBuildAgent() {
+        assertSubagentRunsAs(CustomComponentAgentToolCallback::new, CopilotAgentType.BUILD_CUSTOM_COMPONENT);
+    }
+
+    private static void assertSubagentRunsAs(
+        BiFunction<IntelligentToolChatClientFactory, SubAgentChatModelResolver, CustomComponentAgentToolCallback> constructor,
+        CopilotAgentType expectedAgentType) {
+
+        List<AgentType> agentTypes = new ArrayList<>();
+
+        ChatClient chatClient = mock(ChatClient.class);
+        ChatClientRequestSpec requestSpec = mock(ChatClientRequestSpec.class);
+        CallResponseSpec responseSpec = mock(CallResponseSpec.class);
+
+        when(chatClient.prompt(anyString())).thenReturn(requestSpec);
+        stubToolContext(requestSpec);
+        when(requestSpec.call()).thenReturn(responseSpec);
+        when(responseSpec.content()).thenAnswer(invocation -> {
+            AgentBinding agentBinding = CurrentAgentContext.current();
+
+            agentTypes.add(agentBinding.agentName());
+
+            return "report";
+        });
+
+        CustomComponentAgentToolCallback callback = constructor.apply(chatModel -> chatClient, null);
+
+        callback.call("{\"request\":\"what does it do\"}");
+
+        assertThat(agentTypes).containsExactly(expectedAgentType);
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {
