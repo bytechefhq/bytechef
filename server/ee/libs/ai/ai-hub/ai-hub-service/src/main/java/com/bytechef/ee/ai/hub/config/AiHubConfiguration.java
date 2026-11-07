@@ -124,15 +124,19 @@ public class AiHubConfiguration {
     static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of("buildWorkflow", "importWorkflow");
 
     static final Set<String> ASK_PINNED_TOOL_NAMES = Set.of(
-        "askUserQuestion", "checkWorkflow", "getWorkflow", "listProjects", "listWorkflows", "openWorkflowChatTab",
-        "openWorkflowTab", "searchProjects", "searchWorkflows");
+        "askUserQuestion", "checkWorkflow", "getAiAgent", "getWorkflow", "listAiAgents", "listProjects",
+        "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "searchAiAgentReferences",
+        "searchAiAgentTools", "searchProjects", "searchWorkflows");
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
-        "askUserQuestion", "buildWorkflow", "checkWorkflow", "createConnection", "createProject",
-        "createProjectWorkflow", "getWorkflow", "importWorkflow", "listConnectionsForComponent", "listProjects",
-        "listWorkflows", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection", "searchProjects",
-        "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
-        "selectTriggerPropertyOption");
+        "addAiAgentChannel", "addAiAgentElement", "askUserQuestion", "buildWorkflow", "checkWorkflow",
+        "createAiAgent", "createConnection", "createProject", "createProjectWorkflow", "deleteAiAgentChannel",
+        "deleteAiAgentElement", "getAiAgent", "getWorkflow", "importWorkflow", "listAiAgents",
+        "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab", "openWorkflowChatTab",
+        "openWorkflowTab", "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools",
+        "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
+        "selectPropertyOption", "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement",
+        "updateAiAgentSettings");
 
     private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
     private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
