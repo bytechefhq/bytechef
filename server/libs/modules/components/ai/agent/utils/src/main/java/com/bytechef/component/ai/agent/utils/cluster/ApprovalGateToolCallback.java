@@ -16,33 +16,17 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
-import static com.bytechef.component.definition.approval.ApprovalChannelFunction.EXPIRES_AT;
-import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_DESCRIPTION;
-import static com.bytechef.component.definition.approval.ApprovalChannelFunction.FORM_TITLE;
-import static com.bytechef.component.definition.approval.ApprovalChannelFunction.PUBLIC_URL;
-import static com.bytechef.component.definition.approval.ApprovalChannelFunction.RESUME_ID;
-import static com.bytechef.component.definition.approval.ApprovalChannelFunction.RESUME_URL;
-import static com.bytechef.component.definition.approval.ApprovalChannelFunction.SHORT_RESUME_ID;
-
 import com.bytechef.component.ai.llm.tool.GatedToolCallback;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.platform.ai.tool.GatedToolSuspension;
-import com.bytechef.platform.ai.tool.GatedToolSuspension.ApprovalRequest;
-import com.bytechef.platform.ai.tool.ToolSuspension;
-import com.bytechef.platform.ai.tool.ToolSuspensionException;
+import com.bytechef.component.ai.llm.tool.ToolApprovalRequests;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
-import com.bytechef.platform.component.definition.ActionContextAware.ApprovalLinks;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -52,15 +36,7 @@ import org.springframework.ai.tool.definition.ToolDefinition;
  */
 public class ApprovalGateToolCallback implements GatedToolCallback {
 
-    private static final Logger log = LoggerFactory.getLogger(ApprovalGateToolCallback.class);
-
-    private static final String CHAT_APPROVAL_CHANNEL_COMPONENT = "chat";
-    private static final String CHAT_APPROVAL_CHANNEL_NAME = "chat";
-
-    static final String EDITOR_ENVIRONMENT_RESULT =
-        "The tool '%s' needs human approval, and approval requests cannot be sent in a workflow editor test run, so " +
-            "the tool was not run. Do not perform the action; tell the user that it needs approval, which is only " +
-            "possible when the workflow runs outside the editor.";
+    static final String EDITOR_ENVIRONMENT_RESULT = ToolApprovalRequests.EDITOR_ENVIRONMENT_RESULT;
 
     private final ToolCallback delegate;
     private final @Nullable String gateName;
@@ -119,110 +95,20 @@ public class ApprovalGateToolCallback implements GatedToolCallback {
 
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
-        if (actionContext.isEditorEnvironment()) {
-            return EDITOR_ENVIRONMENT_RESULT.formatted(getName());
-        }
+        String toolName = getName();
 
-        Instant now = Instant.now();
-
-        Instant expiresAt =
-            now.plus(approvalExpiry != null ? approvalExpiry : ActionContextAware.DEFAULT_APPROVAL_EXPIRY);
-
-        ApprovalLinks approvalLinks = actionContext.getApprovalLinks(expiresAt);
-
-        if (approvalLinks == null) {
-            throw new ToolSuspensionException(
-                "Cannot raise an approval request for tool '" + getName() + "'. Ensure the server's public URL is " +
-                    "configured and the workflow is running in a proper execution context.",
-                new IllegalStateException("No resume URL is available"));
-        }
+        Instant expiresAt = Instant.now()
+            .plus(approvalExpiry != null ? approvalExpiry : ActionContextAware.DEFAULT_APPROVAL_EXPIRY);
 
         String formTitle = gateName == null || gateName.isBlank()
-            ? "Approve tool call: " + getName() : gateName + ": approve tool call " + getName();
+            ? "Approve tool call: " + toolName : gateName + ": approve tool call " + toolName;
         String formDescription =
-            "The AI agent wants to call the tool '" + getName() + "' with these arguments:\n\n" + toolInput;
+            "The AI agent wants to call the tool '" + toolName + "' with these arguments:\n\n" + toolInput;
 
-        try {
-            deliverApprovalRequest(approvalLinks, formTitle, formDescription, expiresAt);
-        } catch (RuntimeException exception) {
-            throw new ToolSuspensionException(
-                "The approval request for tool '" + getName() + "' could not be sent: " + exception.getMessage(),
-                exception);
-        }
-
-        GatedToolSuspension gatedToolSuspension = new GatedToolSuspension(
-            getName(), toolInput, new ApprovalRequest(formTitle, formDescription, approvalLinks.formUrl(), now));
-
-        Map<String, Object> continueParameters = gatedToolSuspension.toContinueParameters();
-
-        actionContext.suspend(new ActionContext.Suspend(continueParameters, expiresAt));
-
-        return ToolSuspension.suspendedToolResult(actionContext);
-    }
-
-    private void deliverApprovalRequest(
-        ApprovalLinks approvalLinks, String formTitle, String formDescription, Instant expiresAt) {
-
-        String formUrl = approvalLinks.formUrl();
-
-        Map<String, Object> serverOwnedParameters = new HashMap<>();
-
-        serverOwnedParameters.put(FORM_TITLE, formTitle);
-        serverOwnedParameters.put(FORM_DESCRIPTION, formDescription);
-        serverOwnedParameters.put(EXPIRES_AT, expiresAt.toString());
-        serverOwnedParameters.put(PUBLIC_URL, approvalLinks.publicUrl());
-        serverOwnedParameters.put(RESUME_ID, approvalLinks.resumeId());
-        serverOwnedParameters.put(RESUME_URL, approvalLinks.resumeUrl());
-
-        if (approvalLinks.shortResumeId() != null) {
-            serverOwnedParameters.put(SHORT_RESUME_ID, approvalLinks.shortResumeId());
-        }
-
-        if (approvalChannelClusterElements.isEmpty()) {
-            clusterElementDefinitionService.executeApprovalChannel(
-                CHAT_APPROVAL_CHANNEL_COMPONENT, 1, CHAT_APPROVAL_CHANNEL_NAME, serverOwnedParameters, formUrl,
-                null, actionContext);
-
-            return;
-        }
-
-        int deliveredCount = 0;
-        Exception lastException = null;
-
-        for (ClusterElement approvalChannel : approvalChannelClusterElements) {
-            ComponentConnection componentConnection = componentConnections.get(
-                approvalChannel.getWorkflowNodeName());
-
-            Map<String, Object> mergedInputParameters = new HashMap<>(approvalChannel.getParameters());
-
-            mergedInputParameters.putAll(serverOwnedParameters);
-
-            if (approvalLinks.shortResumeId() == null) {
-                mergedInputParameters.remove(SHORT_RESUME_ID);
-            }
-
-            try {
-                clusterElementDefinitionService.executeApprovalChannel(
-                    approvalChannel.getComponentName(), approvalChannel.getComponentVersion(),
-                    approvalChannel.getClusterElementName(), mergedInputParameters, formUrl, componentConnection,
-                    actionContext);
-
-                deliveredCount++;
-            } catch (Exception exception) {
-                lastException = exception;
-
-                log.warn(
-                    "Approval channel {}/{} failed to deliver the tool-gate approval request",
-                    approvalChannel.getComponentName(), approvalChannel.getClusterElementName(), exception);
-            }
-        }
-
-        if (deliveredCount == 0) {
-            throw new IllegalStateException(
-                "None of the " + approvalChannelClusterElements.size() + " configured approval channels could " +
-                    "deliver the approval request for tool '" + getName() + "'.",
-                lastException);
-        }
+        return ToolApprovalRequests.raise(
+            new ToolApprovalRequests.Request(
+                toolName, toolInput, formTitle, formDescription, expiresAt, approvalChannelClusterElements,
+                componentConnections, Map.of(), clusterElementDefinitionService, actionContext));
     }
 
     private String getName() {

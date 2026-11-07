@@ -29,7 +29,9 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiAgentComponentDefinition;
+import com.bytechef.platform.component.rule.ComponentRuleEnforcer;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import java.util.List;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.stereotype.Component;
 
@@ -43,10 +45,10 @@ public class AiAgentComponentHandler implements ComponentHandler {
 
     public AiAgentComponentHandler(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        ToolCallingManager toolCallingManager, List<ComponentRuleEnforcer> componentRuleEnforcers) {
 
-        final ActionDefinition aiAgentChatActionDefinition =
-            AiAgentChatAction.of(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        final ActionDefinition aiAgentChatActionDefinition = AiAgentChatAction.of(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, componentRuleEnforcers);
 
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
             component(AI_AGENT)
@@ -56,7 +58,9 @@ public class AiAgentComponentHandler implements ComponentHandler {
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
                     aiAgentChatActionDefinition,
-                    AiAgentStreamChatAction.of(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager))
+                    AiAgentStreamChatAction.of(
+                        aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+                        componentRuleEnforcers))
                 .clusterElements(AiAgentChatTool.of(aiAgentChatActionDefinition)));
     }
 

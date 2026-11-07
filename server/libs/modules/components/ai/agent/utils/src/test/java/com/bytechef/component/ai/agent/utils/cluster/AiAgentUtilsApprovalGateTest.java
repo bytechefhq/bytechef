@@ -19,10 +19,12 @@ package com.bytechef.component.ai.agent.utils.cluster;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -96,7 +98,7 @@ class AiAgentUtilsApprovalGateTest {
 
     @Test
     void testWrapsEveryCallbackOfEveryGatedElementExactlyOnce() {
-        when(clusterElementToolCallbacks.build(any(), any(), any()))
+        when(clusterElementToolCallbacks.build(any(), any(), any(ActionContext.class), anyList()))
             .thenReturn(List.of(mock(ToolCallback.class), mock(ToolCallback.class)));
 
         List<ToolCallback> toolCallbacks = approvalGate.buildGatedToolCallbacks(

@@ -42,6 +42,7 @@ import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallTar
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementFailureAttributingChatModel;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
+import com.bytechef.platform.component.rule.ComponentRuleEnforcer;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
@@ -77,13 +78,20 @@ public class AiAgentUtilsTaskTool {
 
     public final ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> clusterElementDefinition;
 
-    @SuppressFBWarnings("EI")
     public AiAgentUtilsTaskTool(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService) {
 
+        this(aiAgentToolFacade, clusterElementDefinitionService, List.of());
+    }
+
+    @SuppressFBWarnings("EI")
+    public AiAgentUtilsTaskTool(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        List<ComponentRuleEnforcer> componentRuleEnforcers) {
+
         this.clusterElementDefinitionService = clusterElementDefinitionService;
-        this.clusterElementToolCallbacks =
-            new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService);
+        this.clusterElementToolCallbacks = new ClusterElementToolCallbacks(
+            aiAgentToolFacade, clusterElementDefinitionService, componentRuleEnforcers);
 
         this.clusterElementDefinition =
             ComponentDsl.<MultipleConnectionsToolCallbackProviderFunction>clusterElement(TASK_TOOL)
