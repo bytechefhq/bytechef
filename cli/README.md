@@ -171,13 +171,18 @@ The **frontend** variants of the embedded API (connected-user session token, for
 the AI Gateway and webhook endpoints are intentionally not exposed as CLI commands — their auth or
 inbound-call model doesn't fit a CLI.
 
-## Component scaffolding
+## Component scaffolding and deployment
 
 ```bash
 bytechef component init --name my-component --open-api-path ./openapi.yaml --output-path .
+
+# Deploy a custom component (single-file JS/Python/Ruby, or a Java .jar) to a running instance
+bytechef component deploy --file ./my-component.js
 ```
 
-`component init` is local-only and contacts no instance.
+`component init` is local-only and contacts no instance. `component deploy` sends to
+`<host>/api/platform/v1` with `Authorization: Bearer <token>`; the profile token used must be an admin
+platform API key, and the file extension selects the language server-side.
 
 ## Exit codes
 
