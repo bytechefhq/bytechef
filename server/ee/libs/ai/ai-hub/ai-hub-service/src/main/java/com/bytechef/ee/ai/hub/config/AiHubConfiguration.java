@@ -50,8 +50,10 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
+import com.bytechef.ee.ai.hub.subagent.SubAgentAdvisorContributor;
 import com.bytechef.ee.ai.hub.subagent.SubAgentContributingChatClient;
 import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
+import com.bytechef.ee.ai.hub.subagent.WorkspaceAdvisorContributor;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
@@ -74,7 +76,10 @@ import com.bytechef.ee.automation.ai.tool.contextstore.ContextStoreToolCallbacks
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.ee.automation.promotion.PromotionResourceType;
 import com.bytechef.ee.automation.promotion.facade.EnvironmentPromotionFacade;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
+import com.bytechef.platform.ai.guardrails.GuardrailSurface;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -83,6 +88,7 @@ import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -195,7 +201,8 @@ public class AiHubConfiguration {
         AiHubChatAccessPolicy chatAccessPolicy, AiHubToolApprovalPolicy toolApprovalPolicy,
         AiHubSessionMemory aiHubSessionMemory,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
-        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider,
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             List.of(ToolCallbacks.from(readProjectTools, readProjectWorkflowTools, workflowExecutionTools)));
@@ -219,10 +226,16 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(openCustomComponentTabToolCallbacks(customComponentFacadeProvider, null));
         toolCallbacks.addAll(openCodeWorkflowTabToolCallbacks(projectCodeWorkflowFacadeProvider, null));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
+
+        AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
+        AiGuardrailMetrics aiGuardrailMetrics = aiGuardrails == null
+            ? null
+            : new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), GuardrailSurface.AI_HUB);
+
         toolCallbacks.addAll(
             intelligentToolCallbacks(
                 intelligentToolCatalog, ASK_INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.ASK, toolApprovalPolicy,
-                workspaceFacade, aiHubSessionMemory));
+                workspaceFacade, aiHubSessionMemory, aiGuardrails, aiGuardrailMetrics));
 
         return new AiHubModeToolCallbacks(toolCallbacks, ASK_PINNED_TOOL_NAMES);
     }
@@ -252,7 +265,8 @@ public class AiHubConfiguration {
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
         AiHubToolApprovalPolicy toolApprovalPolicy, AiHubSessionMemory aiHubSessionMemory,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
-        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider,
+        ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             buildProjectToolCallbacks(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools));
@@ -282,10 +296,16 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
         toolCallbacks.add(new ListChatWorkflowsToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
+
+        AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
+        AiGuardrailMetrics aiGuardrailMetrics = aiGuardrails == null
+            ? null
+            : new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), GuardrailSurface.AI_HUB);
+
         toolCallbacks.addAll(
             intelligentToolCallbacks(
                 intelligentToolCatalog, INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, toolApprovalPolicy,
-                workspaceFacade, aiHubSessionMemory));
+                workspaceFacade, aiHubSessionMemory, aiGuardrails, aiGuardrailMetrics));
 
         requireBuildWorkflow(toolCallbacks);
 
@@ -673,12 +693,14 @@ public class AiHubConfiguration {
     static List<ToolCallback> intelligentToolCallbacks(
         IntelligentToolCatalog intelligentToolCatalog, Set<String> toolNames, IntelligentToolVariant variant,
         AiHubToolApprovalPolicy toolApprovalPolicy, WorkspaceFacade workspaceFacade,
-        AiHubSessionMemory aiHubSessionMemory) {
+        AiHubSessionMemory aiHubSessionMemory, @Nullable AiGuardrails aiGuardrails,
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
 
         return intelligentToolCatalog.getByNames(
             toolNames, variant,
             (chatClient, definition) -> wrapDelegate(
-                AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy), definition, aiHubSessionMemory),
+                AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy), definition, aiHubSessionMemory,
+                aiGuardrails, aiGuardrailMetrics),
             (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
                 new UserRequestForwardingToolCallback(toolCallback), workspaceFacade));
     }
@@ -724,12 +746,28 @@ public class AiHubConfiguration {
     }
 
     private static ChatClient wrapDelegate(
-        ChatClient chatClient, IntelligentToolDefinition definition, AiHubSessionMemory aiHubSessionMemory) {
+        ChatClient chatClient, IntelligentToolDefinition definition, AiHubSessionMemory aiHubSessionMemory,
+        @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
 
         AgentType agentType = definition.agentType();
 
         return SubAgentContributingChatClient.wrap(
-            chatClient, List.of(new SubAgentSessionMemoryContributor(aiHubSessionMemory, agentType.key())));
+            chatClient, delegateContributors(agentType.key(), aiHubSessionMemory, aiGuardrails, aiGuardrailMetrics));
+    }
+
+    static List<SubAgentAdvisorContributor> delegateContributors(
+        String agentTypeKey, AiHubSessionMemory aiHubSessionMemory, @Nullable AiGuardrails aiGuardrails,
+        @Nullable AiGuardrailMetrics aiGuardrailMetrics) {
+
+        List<SubAgentAdvisorContributor> contributors = new ArrayList<>();
+
+        if (aiGuardrails != null && aiGuardrailMetrics != null) {
+            contributors.add(new WorkspaceAdvisorContributor(aiGuardrails, aiGuardrailMetrics));
+        }
+
+        contributors.add(new SubAgentSessionMemoryContributor(aiHubSessionMemory, agentTypeKey));
+
+        return List.copyOf(contributors);
     }
 
     private AiHubSpringAIAgent buildAgent(

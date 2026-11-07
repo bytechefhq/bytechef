@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:ee:libs:automation:automation-promotion:automation-promotion-api"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-service"))
 
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.assertj:assertj-core")
