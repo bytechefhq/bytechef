@@ -47,7 +47,8 @@ public enum Source {
     CODE_WORKFLOW,
     CODE_WORKFLOW_EMBEDDED(WorkflowOwner.INTEGRATION, false),
     WORKFLOW_EDITOR_EMBEDDED(WorkflowOwner.INTEGRATION, false),
-    WORKFLOW_EXECUTION_EMBEDDED(WorkflowOwner.INTEGRATION, false);
+    WORKFLOW_EXECUTION_EMBEDDED(WorkflowOwner.INTEGRATION, false),
+    CUSTOM_COMPONENT;
 
     private final WorkflowOwner workflowOwner;
     private final boolean buildOnly;
