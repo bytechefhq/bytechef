@@ -56,6 +56,7 @@ import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenAiAgentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.ResearchToolCallbackFactory;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
@@ -263,6 +264,7 @@ public class AiHubConfiguration {
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<ResearchToolCallbackFactory> researchToolCallbackFactoryProvider,
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
         throws AGUIException {
@@ -271,7 +273,7 @@ public class AiHubConfiguration {
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, aiHubAskToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider);
+            researchToolCallbackFactoryProvider, toolSearchToolCallAdvisorProvider);
     }
 
     @Bean(defaultCandidate = false)
@@ -282,6 +284,7 @@ public class AiHubConfiguration {
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<ResearchToolCallbackFactory> researchToolCallbackFactoryProvider,
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
         throws AGUIException {
@@ -290,7 +293,7 @@ public class AiHubConfiguration {
             AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, aiHubBuildToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider);
+            researchToolCallbackFactoryProvider, toolSearchToolCallAdvisorProvider);
     }
 
     /**
@@ -587,6 +590,7 @@ public class AiHubConfiguration {
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<ResearchToolCallbackFactory> researchToolCallbackFactoryProvider,
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
         throws AGUIException {
 
@@ -609,6 +613,7 @@ public class AiHubConfiguration {
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
         webSearchToolCallbackProviderProvider.ifAvailable(builder::webSearchToolCallbackProvider);
+        researchToolCallbackFactoryProvider.ifAvailable(builder::researchToolCallbackFactory);
 
         return builder.build();
     }

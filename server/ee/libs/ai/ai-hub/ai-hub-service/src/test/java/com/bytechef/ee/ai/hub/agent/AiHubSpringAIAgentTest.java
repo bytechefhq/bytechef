@@ -20,8 +20,10 @@ import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGateToolCallback;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
+import com.bytechef.ee.ai.hub.tool.ResearchToolCallbackFactory;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
@@ -32,12 +34,14 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -131,6 +135,50 @@ class AiHubSpringAIAgentTest {
             .extracting(toolCallback -> toolCallback.getToolDefinition()
                 .name())
             .doesNotContain("braveWebSearch");
+    }
+
+    @Test
+    void testOffersTheResearchToolAlongsideTheWebSearchTools() throws AGUIException {
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
+        ToolCallback webSearchToolCallback = namedToolCallback("webSearch");
+
+        when(webSearchToolCallbackProvider.getToolCallbacks(2)).thenReturn(List.of(webSearchToolCallback));
+
+        AiHubSpringAIAgent agent = newAgentBuilder()
+            .webSearchToolCallbackProvider(webSearchToolCallbackProvider)
+            .researchToolCallbackFactory(newResearchToolCallbackFactory())
+            .build();
+
+        State state = verifiedState();
+
+        state.set(AiHubStateKeys.VERIFIED_ENVIRONMENT_ID, 2L);
+
+        assertThat(agent.additionalToolCallbacks(newInput(state)))
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactly("webSearch", "research");
+        assertThat(agent.pinnedToolCallbacks())
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .doesNotContain("research");
+    }
+
+    @Test
+    void testOffersNoResearchToolWithoutWebSearchTools() throws AGUIException {
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
+
+        when(webSearchToolCallbackProvider.getToolCallbacks(2)).thenReturn(List.of());
+
+        AiHubSpringAIAgent agent = newAgentBuilder()
+            .webSearchToolCallbackProvider(webSearchToolCallbackProvider)
+            .researchToolCallbackFactory(newResearchToolCallbackFactory())
+            .build();
+
+        State state = verifiedState();
+
+        state.set(AiHubStateKeys.VERIFIED_ENVIRONMENT_ID, 2L);
+
+        assertThat(agent.additionalToolCallbacks(newInput(state))).isEmpty();
     }
 
     @Test
@@ -278,6 +326,25 @@ class AiHubSpringAIAgentTest {
 
     private static ToolResponseMessage.ToolResponse toolResponse(String responseData) {
         return new ToolResponseMessage.ToolResponse("call-1", "someTool", responseData);
+    }
+
+    private static ResearchToolCallbackFactory newResearchToolCallbackFactory() {
+        return new ResearchToolCallbackFactory(
+            candidateChatModel -> mock(ChatClient.class), null, null, mock(AiHubChatService.class),
+            new JsonMapper());
+    }
+
+    private static ToolCallback namedToolCallback(String name) {
+        ToolCallback toolCallback = mock(ToolCallback.class);
+
+        when(toolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name(name)
+                .description("Search the web")
+                .inputSchema("{}")
+                .build());
+
+        return toolCallback;
     }
 
     private static AiHubSpringAIAgent newAgent() throws AGUIException {
