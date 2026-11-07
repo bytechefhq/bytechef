@@ -291,6 +291,11 @@ components:
         - "projectDeployment"
         - "workflow"
       properties:
+        connectedUserId:
+          description: "The id of the connected user the embedded workflow ran for; empty for a workflow that does not belong to a connected user."
+          type: "integer"
+          format: "int64"
+          readOnly: true
         focusPath:
           description: "The path from a top-level task execution to the task execution to focus, set when the execution is loaded lazily. It ends at the earliest failed leaf task execution that was not retried, under the latest attempt of its top-level task, else at the last started or last created task execution. It is empty when no such task execution can be resolved, for example when the job has no task executions. When it is set, the job's task executions are the top-level ones only and their children are loaded through the children endpoint."
           type: "array"
