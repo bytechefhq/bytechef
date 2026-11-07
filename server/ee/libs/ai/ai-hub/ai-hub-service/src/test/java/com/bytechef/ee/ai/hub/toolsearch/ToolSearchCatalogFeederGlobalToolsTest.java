@@ -18,6 +18,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ai.agent.BaseToolFunction;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -40,6 +43,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @ExtendWith(MockitoExtension.class)
 @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
 class ToolSearchCatalogFeederGlobalToolsTest {
+
+    @Mock
+    private ClusterElementDefinitionService clusterElementDefinitionService;
 
     @Mock
     private VectorToolIndex vectorToolIndex;
@@ -66,7 +72,8 @@ class ToolSearchCatalogFeederGlobalToolsTest {
     @Test
     void testMetaTableIsSchemaQualifiedToTheConfiguredSchema() {
         ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            clusterElementDefinitionService, vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate,
+            "public",
             "ai_hub_tool_search_vector_store");
 
         when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
@@ -83,9 +90,63 @@ class ToolSearchCatalogFeederGlobalToolsTest {
     }
 
     @Test
+    void testPopulateSourcesToolsFromStubEnumeration() {
+        ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
+            clusterElementDefinitionService, vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate,
+            "public", "ai_hub_tool_search_vector_store");
+
+        when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
+            .thenThrow(new EmptyResultDataAccessException(1));
+        when(clusterElementDefinitionService.getClusterElementDefinitionStubs(BaseToolFunction.TOOLS))
+            .thenReturn(List.of());
+
+        feeder.populateClusterElementTools();
+
+        verify(clusterElementDefinitionService).getClusterElementDefinitionStubs(BaseToolFunction.TOOLS);
+        verify(clusterElementDefinitionService, never()).getClusterElementDefinitions(BaseToolFunction.TOOLS);
+    }
+
+    @Test
+    void testClusterElementToolsAreIndexedUnderTheReadAndWriteSessions() {
+        ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
+            clusterElementDefinitionService, vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate,
+            "public", "ai_hub_tool_search_vector_store");
+
+        when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
+            .thenThrow(new EmptyResultDataAccessException(1));
+        List<ClusterElementDefinition> clusterElementDefinitions = List.of(
+            clusterElementDefinition("slack", "sendMessage", "Send message"),
+            clusterElementDefinition("slack", "listChannels", "List channels"),
+            clusterElementDefinition("slack", "untitled", null));
+
+        when(clusterElementDefinitionService.getClusterElementDefinitionStubs(BaseToolFunction.TOOLS))
+            .thenReturn(clusterElementDefinitions);
+
+        feeder.populateClusterElementTools();
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<ToolReference>> readReferencesCaptor = ArgumentCaptor.forClass(List.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<ToolReference>> writeReferencesCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(vectorToolIndex).indexTools(
+            eq(ToolSearchCatalogFeeder.CLUSTER_ELEMENT_READ_SESSION_ID), readReferencesCaptor.capture());
+        verify(vectorToolIndex).indexTools(
+            eq(ToolSearchCatalogFeeder.CLUSTER_ELEMENT_WRITE_SESSION_ID), writeReferencesCaptor.capture());
+
+        assertThat(readReferencesCaptor.getValue())
+            .extracting(ToolReference::toolName)
+            .containsExactly("slack_listChannels");
+        assertThat(writeReferencesCaptor.getValue())
+            .extracting(ToolReference::toolName)
+            .containsExactly("slack_sendMessage");
+    }
+
+    @Test
     void testReindexDeletesStaleRowsFromEarlierJvmRunsByMetadata() {
         ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            clusterElementDefinitionService, vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate,
+            "public",
             "ai_hub_tool_search_vector_store");
 
         when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
@@ -106,7 +167,8 @@ class ToolSearchCatalogFeederGlobalToolsTest {
     @Test
     void testPopulateGlobalToolsIndexesEachToolWithNonBlankSummary() {
         ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            clusterElementDefinitionService, vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate,
+            "public",
             "ai_hub_tool_search_vector_store");
 
         when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
@@ -131,7 +193,8 @@ class ToolSearchCatalogFeederGlobalToolsTest {
     @Test
     void testPopulateGlobalToolsSkipsWhenHashUnchanged() {
         ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            clusterElementDefinitionService, vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate,
+            "public",
             "ai_hub_tool_search_vector_store");
 
         when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
@@ -158,7 +221,8 @@ class ToolSearchCatalogFeederGlobalToolsTest {
     @Test
     void testChangedEmbeddingModelReindexesAnUnchangedCatalog() {
         ToolSearchCatalogFeeder feeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate, "public",
+            clusterElementDefinitionService, vectorToolIndex, "OPENAI:text-embedding-3-small", pgVectorJdbcTemplate,
+            "public",
             "ai_hub_tool_search_vector_store");
 
         when(pgVectorJdbcTemplate.queryForObject(any(), eq(String.class), any()))
@@ -177,12 +241,27 @@ class ToolSearchCatalogFeederGlobalToolsTest {
             .thenReturn(hashCaptor.getValue());
 
         ToolSearchCatalogFeeder otherModelFeeder = new ToolSearchCatalogFeeder(
-            vectorToolIndex, "OLLAMA:nomic-embed-text", pgVectorJdbcTemplate, "public",
+            clusterElementDefinitionService, vectorToolIndex, "OLLAMA:nomic-embed-text", pgVectorJdbcTemplate, "public",
             "ai_hub_tool_search_vector_store");
 
         otherModelFeeder.populateGlobalTools(
             "ai_hub_tool_catalog:global:ask", List.of(toolCallback("listProjects", "List all projects")));
 
         verify(vectorToolIndex).indexTools(eq("ai_hub_tool_catalog:global:ask"), any());
+    }
+
+    private static ClusterElementDefinition clusterElementDefinition(
+        String componentName, String clusterElementName, String title) {
+
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        lenient().when(clusterElementDefinition.getComponentName())
+            .thenReturn(componentName);
+        lenient().when(clusterElementDefinition.getName())
+            .thenReturn(clusterElementName);
+        lenient().when(clusterElementDefinition.getTitle())
+            .thenReturn(title);
+
+        return clusterElementDefinition;
     }
 }
