@@ -16,6 +16,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.automation.ai.tool.AssetFileToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
@@ -24,6 +25,8 @@ import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.datatable.DataTableToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -161,6 +164,9 @@ public class AiHubConfiguration {
         ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider,
+        ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
+        ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
+        ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
@@ -177,6 +183,9 @@ public class AiHubConfiguration {
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(aiAgentFlatCrudToolCallbacks(aiAgentToolCallbacksFactoryProvider, false));
+        toolCallbacks.addAll(assetFileFlatCrudToolCallbacks(assetFileToolCallbacksFactoryProvider, false));
+        toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider, false));
+        toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, null));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
@@ -193,6 +202,9 @@ public class AiHubConfiguration {
         ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider,
+        ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
+        ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
+        ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
@@ -212,6 +224,9 @@ public class AiHubConfiguration {
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(aiAgentFlatCrudToolCallbacks(aiAgentToolCallbacksFactoryProvider, true));
+        toolCallbacks.addAll(assetFileFlatCrudToolCallbacks(assetFileToolCallbacksFactoryProvider, true));
+        toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider, true));
+        toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
@@ -486,6 +501,51 @@ public class AiHubConfiguration {
         return writable
             ? aiAgentToolCallbacksFactory.writeToolCallbacks()
             : aiAgentToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> assetFileFlatCrudToolCallbacks(
+        ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider, boolean writable) {
+
+        AssetFileToolCallbacksFactory assetFileToolCallbacksFactory = assetFileToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (assetFileToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? assetFileToolCallbacksFactory.writeToolCallbacks()
+            : assetFileToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> dataTableFlatCrudToolCallbacks(
+        ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider, boolean writable) {
+
+        DataTableToolCallbacksFactory dataTableToolCallbacksFactory = dataTableToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (dataTableToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? dataTableToolCallbacksFactory.writeToolCallbacks()
+            : dataTableToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> knowledgeBaseFlatCrudToolCallbacks(
+        ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider, boolean writable) {
+
+        KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = knowledgeBaseToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (knowledgeBaseToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? knowledgeBaseToolCallbacksFactory.writeToolCallbacks()
+            : knowledgeBaseToolCallbacksFactory.readToolCallbacks();
     }
 
     static List<ToolCallback> openAiAgentTabToolCallbacks(

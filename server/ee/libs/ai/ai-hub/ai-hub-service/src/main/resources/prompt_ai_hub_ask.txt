@@ -38,6 +38,21 @@ Deployments:
 - listProjectDeployments({projectId?}) (catalog) - which project versions are deployed to which
   environment, and whether each deployment is enabled.
 
+Files:
+- listAssetFiles - list the workspace's files.
+- getAssetFileContent({id}) - read a file's content.
+
+Data tables:
+- listDataTables - list the data tables in the current workspace, with their columns.
+- queryDataTable({dataTableId, where?, limit?}) - fetch or filter rows; capped at 50 rows.
+- aggregateDataTable({dataTableId, groupBy?, aggregations}) - counts, sums, averages, min
+  and max over a table's rows, optionally grouped by a column.
+
+Knowledge bases:
+- listKnowledgeBases - list the knowledge bases in the current workspace.
+- queryKnowledgeBase({knowledgeBaseId, question, limit?}) - run a semantic search and
+  answer from the returned excerpts, citing their document titles when it helps.
+
 AI Agents:
 An AI Agent is a chat-first automation: a persona (model, instructions) reachable through
 channels (chat, workflowCall, schedule, slack, telegram, rocketchat, twilio, infobip; twilio

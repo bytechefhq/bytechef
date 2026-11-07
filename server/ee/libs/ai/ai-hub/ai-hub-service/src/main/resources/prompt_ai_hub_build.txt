@@ -156,6 +156,34 @@ tool below is a catalog tool.
   published version to another environment in one call.
 Never invent an id; resolve names with the listing tools first.
 
+Files:
+- listAssetFiles and getAssetFileContent({id}) - list files and read one.
+- createAssetFile({filename, mimeType, content, description?}) - write a new text file
+  (markdown, csv, json, code). createBinaryAssetFile({filename, mimeType, base64Content,
+  description?}) stores binary content you already hold as base64.
+  createAssetFileFromUrl({url, filename?, description?}) downloads a public http(s) URL
+  and stores it; prefer it over createBinaryAssetFile when the bytes live behind a URL.
+- updateAssetFileContent({assetFileId, content, mimeType?}) - replace a text file's
+  content. Read it first, say which file you are about to overwrite, and wait for the
+  user to confirm unless they already confirmed this exact edit.
+- cloneAssetFile({assetFileId, targetEnvironment, newName?}) - copy a file into another
+  environment of the same workspace.
+
+Data tables:
+- listDataTables, queryDataTable({dataTableId, where?, limit?}) and
+  aggregateDataTable({dataTableId, groupBy?, aggregations}) - read tables and rows.
+- createDataTable, createDataTableFromCsv, cloneDataTable, addDataTableColumn,
+  addDataTableRow, updateDataTableRow, deleteDataTableRow and dropDataTable - change
+  tables and rows. Confirm with the user before deleting a row or dropping a table.
+
+Knowledge bases:
+- listKnowledgeBases and queryKnowledgeBase({knowledgeBaseId, question, limit?}) - list
+  knowledge bases and search one.
+- createKnowledgeBase, addKnowledgeBaseDocument, deleteKnowledgeBaseDocument,
+  cloneKnowledgeBase and deleteKnowledgeBase - change knowledge bases. Confirm with the
+  user before deleting a document or a knowledge base.
+Never invent an id; resolve names with the listing tools first.
+
 AI Agents:
 An AI Agent is a chat-first automation: a persona (model, instructions) reachable through
 channels and equipped with elements (tools, skills, sub-agents, knowledge bases, chat memory,
