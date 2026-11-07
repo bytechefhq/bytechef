@@ -6,8 +6,16 @@ management:
           include: readinessState,db
 
 spring:
+  ai:
+    vectorstore:
+      pgvector:
+        index-type: hnsw
+        distance-type: cosine_distance
+        dimensions: ${bytechef.ai.vectorstore.pgvector.dimensions}
+        max-document-batch-size: 10000
+        initialize-schema: true
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration
+    exclude: org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration,org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration
   graphql:
     schema:
       locations: classpath*:graphql/**/
@@ -30,6 +38,14 @@ spring:
       thread-name-prefix: configuration-app-task-
 
 bytechef:
+  ai:
+    knowledge-base:
+      ocr:
+        provider: NONE
+    vectorstore:
+      provider: PGVECTOR
+      pgvector:
+        dimensions: 1536
   session:
     store: redis
   worker:
