@@ -48,6 +48,7 @@ import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.DataTableTools;
+import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
@@ -735,6 +736,39 @@ public class CopilotConfiguration {
             .state(state)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
+    }
+
+    @Bean
+    McpServerSpringAIAgent mcpServerAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel,
+        ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider,
+        @Value("classpath:prompt_mcp_server_ask.txt") Resource promptMcpServerAskResource,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        throws AGUIException {
+
+        return McpServerSpringAIAgent.builder()
+            .agentId(CopilotAgentType.MCP_SERVER_ASK.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptMcpServerAskResource))
+            .state(state)
+            .toolCallbacks(
+                mcpServerAskToolCallbacks(
+                    securityContextRehydrator, mcpServerToolCallbacksFactoryProvider.getIfAvailable()))
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+    }
+
+    List<ToolCallback> mcpServerAskToolCallbacks(
+        SecurityContextRehydrator securityContextRehydrator,
+        @Nullable McpServerToolCallbacksFactory mcpServerToolCallbacksFactory) {
+
+        if (mcpServerToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return wrapTools(securityContextRehydrator, new ArrayList<>(mcpServerToolCallbacksFactory.readToolCallbacks()));
     }
 
     @Bean
