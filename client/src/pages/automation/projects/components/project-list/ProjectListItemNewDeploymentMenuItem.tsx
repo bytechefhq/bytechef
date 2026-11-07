@@ -8,16 +8,24 @@ interface ProjectListItemNewDeploymentMenuItemProps {
     onClick: () => void;
 }
 
+const getDisabledReason = (hasWorkflows: boolean, isPublished: boolean) => {
+    if (!hasWorkflows) {
+        return 'Add a workflow before deploying the project.';
+    }
+
+    if (!isPublished) {
+        return 'Publish the project before deploying it.';
+    }
+
+    return undefined;
+};
+
 const ProjectListItemNewDeploymentMenuItem = ({
     hasWorkflows,
     isPublished,
     onClick,
 }: ProjectListItemNewDeploymentMenuItemProps) => {
-    const disabledReason = !hasWorkflows
-        ? 'Add a workflow before deploying the project.'
-        : !isPublished
-          ? 'Publish the project before deploying it.'
-          : undefined;
+    const disabledReason = getDisabledReason(hasWorkflows, isPublished);
 
     return (
         <Tooltip>
