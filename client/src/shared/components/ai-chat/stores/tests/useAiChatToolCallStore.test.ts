@@ -76,6 +76,77 @@ describe('aiChatToolCallStore', () => {
         expect(entry.progress.map((entry) => entry.text)).toEqual(['Fetching results', 'Synthesizing answer']);
     });
 
+    it('addProgress coalesces a step identical to the latest one', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+        aiChatToolCallStore.getState().addProgress('call-1', 'Searching components');
+        aiChatToolCallStore.getState().addProgress('call-1', 'Searching components');
+        aiChatToolCallStore.getState().addProgress('call-1', 'Saving the workflow');
+        aiChatToolCallStore.getState().addProgress('call-1', 'Searching components');
+
+        expect(aiChatToolCallStore.getState().toolCalls['call-1'].progress.map((step) => step.text)).toEqual([
+            'Searching components',
+            'Saving the workflow',
+            'Searching components',
+        ]);
+    });
+
+    it('startProgress and finishProgress set the label and the outcome of a running call', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+        aiChatToolCallStore.getState().startProgress('call-1', 'Build a Gmail to Slack workflow');
+        aiChatToolCallStore.getState().finishProgress('call-1', 'failed');
+
+        const entry = aiChatToolCallStore.getState().toolCalls['call-1'];
+
+        expect(entry.progressLabel).toBe('Build a Gmail to Slack workflow');
+        expect(entry.progressOutcome).toBe('failed');
+    });
+
+    it('addProgress ignores steps after the delegate finished', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+        aiChatToolCallStore.getState().addProgress('call-1', 'Searching components');
+        aiChatToolCallStore.getState().finishProgress('call-1', 'done');
+        aiChatToolCallStore.getState().addProgress('call-1', 'Saving the workflow');
+
+        expect(aiChatToolCallStore.getState().toolCalls['call-1'].progress).toHaveLength(1);
+    });
+
+    it('startProgress and finishProgress ignore a call that is no longer running', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+        aiChatToolCallStore.getState().completeToolCall('call-1', {ok: true}, false);
+        aiChatToolCallStore.getState().startProgress('call-1', 'Late label');
+        aiChatToolCallStore.getState().finishProgress('call-1', 'failed');
+
+        const entry = aiChatToolCallStore.getState().toolCalls['call-1'];
+
+        expect(entry.progressLabel).toBeUndefined();
+        expect(entry.progressOutcome).toBeUndefined();
+    });
+
+    it('keeps the progress label and outcome through every terminal transition', () => {
+        const store = aiChatToolCallStore.getState();
+
+        for (const toolCallId of ['call-complete', 'call-fail-chat', 'call-fail-all']) {
+            store.startToolCall(toolCallId, 'buildWorkflow', 0, toolCallId === 'call-fail-chat' ? 'chat-1' : 'chat-2');
+            store.startProgress(toolCallId, 'Build it');
+            store.finishProgress(toolCallId, 'failed');
+        }
+
+        store.completeToolCall('call-complete', {error: 'boom'}, true);
+        store.failRunningInChat('chat-1', {error: 'switched'}, 'aborted');
+        store.failAllRunning({error: 'network'});
+
+        const {toolCalls} = aiChatToolCallStore.getState();
+
+        expect(toolCalls['call-complete'].status).toBe('error');
+        expect(toolCalls['call-fail-chat'].status).toBe('aborted');
+        expect(toolCalls['call-fail-all'].status).toBe('error');
+
+        for (const toolCallId of ['call-complete', 'call-fail-chat', 'call-fail-all']) {
+            expect(toolCalls[toolCallId].progressLabel).toBe('Build it');
+            expect(toolCalls[toolCallId].progressOutcome).toBe('failed');
+        }
+    });
+
     it('findRunningToolCallByName returns the most recent running call with that name', () => {
         aiChatToolCallStore.getState().startToolCall('call-1', 'research', 0);
         aiChatToolCallStore.getState().startToolCall('call-2', 'workflowBuilder', 0);

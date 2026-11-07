@@ -20,11 +20,15 @@ export interface SubagentProgressEntryI {
     timestamp: number;
 }
 
+export type SubagentProgressOutcomeType = 'done' | 'failed';
+
 export interface ToolCallEntryI {
     args?: Record<string, unknown>;
     chatId?: string;
     messageIndex: number;
     progress: SubagentProgressEntryI[];
+    progressLabel?: string;
+    progressOutcome?: SubagentProgressOutcomeType;
     progressiveOutput: string;
     result?: unknown;
     status: ToolCallStatusType;
@@ -49,6 +53,7 @@ interface ToolCallStateI {
     failAllRunning: (errorResult: unknown, status?: 'aborted' | 'error') => void;
     failRunningInChat: (chatId: string, errorResult: unknown, status?: 'aborted' | 'error') => void;
     findRunningToolCallByName: (toolName: string, chatId?: string) => RunningToolCallEntryType | undefined;
+    finishProgress: (toolCallId: string, outcome: SubagentProgressOutcomeType) => void;
     order: string[];
     /** Drops the entries of `chatId` attached to the message at `fromMessageIndex` or any later one. */
     removeFromMessageIndex: (chatId: string, fromMessageIndex: number) => void;
@@ -56,6 +61,7 @@ interface ToolCallStateI {
     resetForChat: (chatId: string | undefined) => void;
     /** Moves the entries of `chatId` down by `offset` messages, after that many messages were inserted before them. */
     shiftMessageIndexes: (chatId: string, offset: number) => void;
+    startProgress: (toolCallId: string, label: string) => void;
     startToolCall: (toolCallId: string, toolName: string, messageIndex: number, chatId?: string) => void;
     toolCalls: Record<string, ToolCallEntryI>;
     updateToolCallArgs: (toolCallId: string, args: Record<string, unknown>) => void;
@@ -126,6 +132,8 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                     chatId: existing.chatId,
                     messageIndex: existing.messageIndex,
                     progress: existing.progress,
+                    progressLabel: existing.progressLabel,
+                    progressOutcome: existing.progressOutcome,
                     progressiveOutput: existing.progressiveOutput,
                     result,
                     status: isError ? 'error' : 'success',
@@ -166,7 +174,11 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
             set((state) => {
                 const existing = state.toolCalls[toolCallId];
 
-                if (!existing || existing.status !== 'running') {
+                if (!existing || existing.status !== 'running' || existing.progressOutcome !== undefined) {
+                    return state;
+                }
+
+                if (existing.progress.at(-1)?.text === text) {
                     return state;
                 }
 
@@ -178,6 +190,40 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                             ...existing,
                             progress: [...existing.progress, {text, timestamp: Date.now()}],
                         },
+                    },
+                };
+            }),
+
+        startProgress: (toolCallId, label) =>
+            set((state) => {
+                const existing = state.toolCalls[toolCallId];
+
+                if (!existing || existing.status !== 'running') {
+                    return state;
+                }
+
+                return {
+                    ...state,
+                    toolCalls: {
+                        ...state.toolCalls,
+                        [toolCallId]: {...existing, progressLabel: label, progressOutcome: undefined},
+                    },
+                };
+            }),
+
+        finishProgress: (toolCallId, outcome) =>
+            set((state) => {
+                const existing = state.toolCalls[toolCallId];
+
+                if (!existing || existing.status !== 'running') {
+                    return state;
+                }
+
+                return {
+                    ...state,
+                    toolCalls: {
+                        ...state.toolCalls,
+                        [toolCallId]: {...existing, progressOutcome: outcome},
                     },
                 };
             }),
@@ -196,6 +242,8 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                             chatId: entry.chatId,
                             messageIndex: entry.messageIndex,
                             progress: entry.progress,
+                            progressLabel: entry.progressLabel,
+                            progressOutcome: entry.progressOutcome,
                             progressiveOutput: entry.progressiveOutput,
                             result: errorResult,
                             status,
@@ -229,6 +277,8 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                             chatId: entry.chatId,
                             messageIndex: entry.messageIndex,
                             progress: entry.progress,
+                            progressLabel: entry.progressLabel,
+                            progressOutcome: entry.progressOutcome,
                             progressiveOutput: entry.progressiveOutput,
                             result: errorResult,
                             status,
