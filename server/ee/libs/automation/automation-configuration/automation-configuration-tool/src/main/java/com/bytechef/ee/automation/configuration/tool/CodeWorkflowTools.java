@@ -12,6 +12,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.ee.automation.configuration.tool.exception.CodeWorkflowToolErrorType;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
+import com.bytechef.ee.platform.customcomponent.tool.AutomationToolFailures;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -64,11 +65,10 @@ public class CodeWorkflowTools {
             }
 
             return "Created code workflow project " + project.getId() + " (" + project.getName() + ").";
-        } catch (Exception e) {
-            log.error("createCodeWorkflow({}): Failed to create code workflow project", name, e);
-
-            throw new ExecutionException(
-                "Failed to create code workflow project: " + e.getMessage(), e, CodeWorkflowToolErrorType.CREATE);
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "createCodeWorkflow(" + name + ")", "Failed to create code workflow project", exception,
+                CodeWorkflowToolErrorType.CREATE);
         }
     }
 
@@ -86,11 +86,9 @@ public class CodeWorkflowTools {
             }
 
             return "Updated code workflow project " + projectId + ".";
-        } catch (Exception e) {
-            log.error("updateCodeWorkflowSource({}): Failed to update code workflow source", projectId, e);
-
-            throw new ExecutionException(
-                "Failed to update code workflow source: " + e.getMessage(), e,
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "updateCodeWorkflowSource(" + projectId + ")", "Failed to update code workflow source", exception,
                 CodeWorkflowToolErrorType.UPDATE_SOURCE);
         }
     }

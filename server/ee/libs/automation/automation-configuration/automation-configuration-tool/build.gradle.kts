@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
+    testImplementation("org.springframework.security:spring-security-core")
     testImplementation("org.springframework:spring-webflux")
     testImplementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     testImplementation(project(":server:libs:test:test-support"))

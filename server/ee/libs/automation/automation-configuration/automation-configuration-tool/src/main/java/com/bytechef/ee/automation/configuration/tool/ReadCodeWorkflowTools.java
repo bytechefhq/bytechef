@@ -12,7 +12,7 @@ import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupp
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowInfo;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.ee.automation.configuration.tool.exception.CodeWorkflowToolErrorType;
-import com.bytechef.exception.ExecutionException;
+import com.bytechef.ee.platform.customcomponent.tool.AutomationToolFailures;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -57,11 +57,10 @@ public class ReadCodeWorkflowTools {
             }
 
             return source;
-        } catch (Exception e) {
-            log.error("getCodeWorkflowSource({}): Failed to get code workflow source", projectId, e);
-
-            throw new ExecutionException(
-                "Failed to get code workflow source: " + e.getMessage(), e, CodeWorkflowToolErrorType.GET_SOURCE);
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "getCodeWorkflowSource(" + projectId + ")", "Failed to get code workflow source", exception,
+                CodeWorkflowToolErrorType.GET_SOURCE);
         }
     }
 
@@ -81,11 +80,10 @@ public class ReadCodeWorkflowTools {
             }
 
             return codeWorkflowProjectInfos;
-        } catch (Exception e) {
-            log.error("listCodeWorkflows(): Failed to list code workflow projects", e);
-
-            throw new ExecutionException(
-                "Failed to list code workflow projects: " + e.getMessage(), e, CodeWorkflowToolErrorType.LIST);
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "listCodeWorkflows()", "Failed to list code workflow projects", exception,
+                CodeWorkflowToolErrorType.LIST);
         }
     }
 

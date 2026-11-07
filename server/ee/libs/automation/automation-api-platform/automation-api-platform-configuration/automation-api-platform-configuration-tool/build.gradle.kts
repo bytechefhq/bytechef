@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.security:spring-security-core")
     implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))

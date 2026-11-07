@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @version ee
@@ -272,5 +273,98 @@ class CodeWorkflowToolsTest {
             .isInstanceOf(ExecutionException.class)
             .extracting(thrown -> ((ExecutionException) thrown).getErrorKey())
             .isEqualTo(CodeWorkflowToolErrorType.LIST.getErrorKey());
+    }
+
+    @Test
+    void testCreateCodeWorkflowReportsTheExceptionTypeInsteadOfItsMessage() {
+        CodeWorkflowTools tools = new CodeWorkflowTools(projectCodeWorkflowFacade);
+
+        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(anyLong(), anyString(), any()))
+            .thenThrow(new IllegalStateException("jdbc:postgresql://db.internal:5432/bytechef refused"));
+
+        assertThatThrownBy(() -> tools.createCodeWorkflow(1L, "my-code-project", "JAVASCRIPT"))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to create code workflow project: IllegalStateException");
+    }
+
+    @Test
+    void testCreateCodeWorkflowReportsAccessDeniedWithoutItsMessage() {
+        CodeWorkflowTools tools = new CodeWorkflowTools(projectCodeWorkflowFacade);
+
+        when(projectCodeWorkflowFacade.createEmptyCodeWorkflow(anyLong(), anyString(), any()))
+            .thenThrow(new AccessDeniedException("Access Denied for user admin@localhost.com"));
+
+        assertThatThrownBy(() -> tools.createCodeWorkflow(1L, "my-code-project", "JAVASCRIPT"))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage(
+                "Failed to create code workflow project: not permitted, the current user lacks permission for " +
+                    "this operation");
+    }
+
+    @Test
+    void testUpdateCodeWorkflowSourceKeepsAUserFacingMessage() {
+        CodeWorkflowTools tools = new CodeWorkflowTools(projectCodeWorkflowFacade);
+
+        doThrow(new IllegalArgumentException("Project 5 is not a code workflow"))
+            .when(projectCodeWorkflowFacade)
+            .updateCodeWorkflowSource(5L, "content");
+
+        assertThatThrownBy(() -> tools.updateCodeWorkflowSource(5L, "content"))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to update code workflow source: Project 5 is not a code workflow");
+    }
+
+    @Test
+    void testUpdateCodeWorkflowSourceRethrowsAnExecutionExceptionUnchanged() {
+        CodeWorkflowTools tools = new CodeWorkflowTools(projectCodeWorkflowFacade);
+
+        ExecutionException executionException = new ExecutionException(
+            "Source does not compile", CodeWorkflowToolErrorType.UPDATE_SOURCE);
+
+        doThrow(executionException)
+            .when(projectCodeWorkflowFacade)
+            .updateCodeWorkflowSource(5L, "content");
+
+        assertThatThrownBy(() -> tools.updateCodeWorkflowSource(5L, "content"))
+            .isSameAs(executionException);
+    }
+
+    @Test
+    void testUpdateCodeWorkflowSourceReportsTheExceptionTypeInsteadOfItsMessage() {
+        CodeWorkflowTools tools = new CodeWorkflowTools(projectCodeWorkflowFacade);
+
+        doThrow(new IllegalStateException("/var/lib/bytechef/code-workflows/5.js is locked"))
+            .when(projectCodeWorkflowFacade)
+            .updateCodeWorkflowSource(5L, "content");
+
+        assertThatThrownBy(() -> tools.updateCodeWorkflowSource(5L, "content"))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to update code workflow source: IllegalStateException");
+    }
+
+    @Test
+    void testGetCodeWorkflowSourceReportsTheExceptionTypeInsteadOfItsMessage() {
+        ReadCodeWorkflowTools tools = new ReadCodeWorkflowTools(
+            projectCodeWorkflowFacade, projectCodeWorkflowInfoSupplier);
+
+        when(projectCodeWorkflowFacade.getCodeWorkflowSource(3L))
+            .thenThrow(new IllegalStateException("/var/lib/bytechef/code-workflows/3.js is missing"));
+
+        assertThatThrownBy(() -> tools.getCodeWorkflowSource(3L))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to get code workflow source: IllegalStateException");
+    }
+
+    @Test
+    void testListCodeWorkflowsReportsTheExceptionTypeInsteadOfItsMessage() {
+        ReadCodeWorkflowTools tools = new ReadCodeWorkflowTools(
+            projectCodeWorkflowFacade, projectCodeWorkflowInfoSupplier);
+
+        when(projectCodeWorkflowFacade.getCodeWorkflowProjects())
+            .thenThrow(new IllegalStateException("connection to db.internal refused"));
+
+        assertThatThrownBy(tools::listCodeWorkflows)
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to list code workflow projects: IllegalStateException");
     }
 }

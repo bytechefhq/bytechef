@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @version ee
@@ -194,5 +195,44 @@ class CustomComponentToolsTest {
 
         assertThatThrownBy(tools::listCustomComponents)
             .isInstanceOf(ExecutionException.class);
+    }
+
+    @Test
+    void testCreateCustomComponentReportsTheExceptionTypeInsteadOfItsMessage() {
+        CustomComponentTools tools = new CustomComponentTools(customComponentFacade);
+
+        when(customComponentFacade.createEmptyCustomComponent(anyString(), any()))
+            .thenThrow(new IllegalStateException("jdbc:postgresql://db.internal:5432/bytechef refused"));
+
+        assertThatThrownBy(() -> tools.createCustomComponent("my-component", CustomComponent.Language.JAVASCRIPT))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to create custom component: IllegalStateException");
+    }
+
+    @Test
+    void testDeleteCustomComponentReportsAccessDeniedWithoutItsMessage() {
+        CustomComponentTools tools = new CustomComponentTools(customComponentFacade);
+
+        doThrow(new AccessDeniedException("Access Denied for user user@localhost.com"))
+            .when(customComponentFacade)
+            .delete(9L);
+
+        assertThatThrownBy(() -> tools.deleteCustomComponent(9L))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage(
+                "Failed to delete custom component: not permitted, the current user lacks permission for this " +
+                    "operation");
+    }
+
+    @Test
+    void testGetCustomComponentSourceReportsTheExceptionTypeInsteadOfItsMessage() {
+        ReadCustomComponentTools tools = new ReadCustomComponentTools(customComponentFacade);
+
+        when(customComponentFacade.getCustomComponentSource(3L))
+            .thenThrow(new IllegalStateException("/var/lib/bytechef/custom-components/3.js is missing"));
+
+        assertThatThrownBy(() -> tools.getCustomComponentSource(3L))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to get custom component source: IllegalStateException");
     }
 }
