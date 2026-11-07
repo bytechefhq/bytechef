@@ -18,8 +18,11 @@ const {
     currentChatKindRef,
     currentWorkspaceIdRef,
     dismissMock,
+    pushToTalkRef,
     retryMock,
     setTextMock,
+    startPushToTalkMock,
+    stopPushToTalkMock,
     uploadMock,
     uploadsRef,
 } = vi.hoisted(() => ({
@@ -35,8 +38,17 @@ const {
     currentChatKindRef: {current: 'STANDARD' as 'AGENT_CHAT' | 'STANDARD' | 'WORKFLOW_CHAT'},
     currentWorkspaceIdRef: {current: 3 as number | undefined},
     dismissMock: vi.fn(),
+    pushToTalkRef: {
+        current: {
+            isRecording: false,
+            isTranscribing: false,
+            onTranscript: undefined as ((text: string) => void) | undefined,
+        },
+    },
     retryMock: vi.fn(),
     setTextMock: vi.fn(),
+    startPushToTalkMock: vi.fn(),
+    stopPushToTalkMock: vi.fn(),
     uploadMock: vi.fn(),
     uploadsRef: {current: [] as Array<{error?: string; file: File; status: 'error' | 'success' | 'uploading'}>},
 }));
@@ -95,6 +107,19 @@ vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat', () => ({
     default: () => ({id: 7, kind: currentChatKindRef.current, ...currentChatAgentRef.current}),
 }));
 
+vi.mock('@/shared/hooks/usePushToTalk', () => ({
+    usePushToTalk: ({onTranscript}: {onTranscript: (text: string) => void}) => {
+        pushToTalkRef.current.onTranscript = onTranscript;
+
+        return {
+            isRecording: pushToTalkRef.current.isRecording,
+            isTranscribing: pushToTalkRef.current.isTranscribing,
+            start: startPushToTalkMock,
+            stop: stopPushToTalkMock,
+        };
+    },
+}));
+
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: (state: {currentWorkspaceId: number | undefined}) => unknown) =>
         selector({currentWorkspaceId: currentWorkspaceIdRef.current}),
@@ -128,6 +153,7 @@ describe('AiHubChatComposer', () => {
         currentChatKindRef.current = 'STANDARD';
         currentWorkspaceIdRef.current = 3;
         uploadsRef.current = [];
+        pushToTalkRef.current = {isRecording: false, isTranscribing: false, onTranscript: undefined};
 
         aiHubStore.setState({chatId: 'thread-7', messages: [], mode: MODE.BUILD});
         aiHubChatsStore.setState({currentChatId: 7});
@@ -558,6 +584,54 @@ describe('AiHubChatComposer', () => {
             expect(cancelRunMock).toHaveBeenCalledTimes(1);
             expect(cancelAiHubRunMock).toHaveBeenCalledTimes(1);
             expect(cancelAiHubRunMock).toHaveBeenCalledWith({id: '7', runId: 'run-1', workspaceId: '3'});
+        });
+    });
+
+    describe('push-to-talk', () => {
+        it('starts recording when the mic is clicked', () => {
+            renderComposer();
+
+            fireEvent.click(screen.getByRole('button', {name: 'Start voice input'}));
+
+            expect(startPushToTalkMock).toHaveBeenCalledTimes(1);
+            expect(stopPushToTalkMock).not.toHaveBeenCalled();
+        });
+
+        it('stops recording when the mic is clicked while recording', () => {
+            pushToTalkRef.current.isRecording = true;
+
+            renderComposer();
+
+            fireEvent.click(screen.getByRole('button', {name: 'Stop voice input'}));
+
+            expect(stopPushToTalkMock).toHaveBeenCalledTimes(1);
+            expect(startPushToTalkMock).not.toHaveBeenCalled();
+        });
+
+        it('disables the mic while the clip is transcribed', () => {
+            pushToTalkRef.current.isTranscribing = true;
+
+            renderComposer();
+
+            expect(screen.getByRole('button', {name: 'Start voice input'})).toBeDisabled();
+        });
+
+        it('appends the transcript to the draft', () => {
+            composerTextRef.current = 'Build a workflow';
+
+            renderComposer();
+
+            pushToTalkRef.current.onTranscript?.('that syncs leads');
+
+            expect(setTextMock).toHaveBeenCalledWith('Build a workflow that syncs leads');
+        });
+
+        it('puts the transcript into an empty draft as is', () => {
+            renderComposer();
+
+            pushToTalkRef.current.onTranscript?.('hello');
+
+            expect(setTextMock).toHaveBeenCalledWith('hello');
         });
     });
 });

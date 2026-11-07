@@ -29,6 +29,7 @@ import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stor
 import ChatToolChips from '@/ee/pages/automation/ai-hub/tools/ChatToolChips';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
+import {usePushToTalk} from '@/shared/hooks/usePushToTalk';
 import {useCancelAiHubRunMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ComposerPrimitive, useAui} from '@assistant-ui/react';
@@ -36,6 +37,7 @@ import {
     ArrowUpIcon,
     HexagonIcon,
     Loader2Icon,
+    MicIcon,
     PaperclipIcon,
     RadioTowerIcon,
     RotateCcwIcon,
@@ -90,7 +92,28 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
 
     const aui = useAui();
 
+    const {
+        isRecording: isVoiceRecording,
+        isTranscribing: isVoiceTranscribing,
+        start: startPushToTalk,
+        stop: stopPushToTalk,
+    } = usePushToTalk({
+        onTranscript: (text) => {
+            const currentText = aui.composer.getState().text;
+
+            aui.composer.setText(currentText ? `${currentText} ${text}` : text);
+        },
+    });
+
     const isWorkflowChat = isWebhookBridgedChat(currentChat?.kind);
+
+    const handleMicClick = useCallback(() => {
+        if (isVoiceRecording) {
+            stopPushToTalk();
+        } else {
+            void startPushToTalk();
+        }
+    }, [isVoiceRecording, startPushToTalk, stopPushToTalk]);
 
     const handleCancelTurn = useCallback(() => {
         const runId = chatId != null ? aiHubRunStateStore.getState().runIdByChat[chatId] : undefined;
@@ -439,6 +462,25 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                         <ModeSwitch
                             build={mode === MODE.BUILD}
                             onBuildChange={(build) => setMode(build ? MODE.BUILD : MODE.ASK)}
+                        />
+
+                        <Button
+                            aria-label={isVoiceRecording ? 'Stop voice input' : 'Start voice input'}
+                            className="size-8 rounded-full"
+                            disabled={isVoiceTranscribing}
+                            icon={
+                                isVoiceTranscribing ? (
+                                    <Loader2Icon className="size-4 animate-spin" />
+                                ) : isVoiceRecording ? (
+                                    <SquareIcon className="size-3.5 animate-pulse fill-current text-content-destructive" />
+                                ) : (
+                                    <MicIcon className="size-4" />
+                                )
+                            }
+                            onClick={handleMicClick}
+                            size="icon"
+                            type="button"
+                            variant="ghost"
                         />
 
                         {isRunning ? (
