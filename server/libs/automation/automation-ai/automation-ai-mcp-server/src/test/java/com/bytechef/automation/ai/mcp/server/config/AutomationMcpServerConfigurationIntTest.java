@@ -30,6 +30,8 @@ import com.bytechef.automation.ai.mcp.server.spi.McpServerWorkspaceToolCallbackC
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.platform.ai.guardrails.McpOutboundRedactor;
+import com.bytechef.platform.ai.guardrails.McpOutboundRedactorProvider;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -38,7 +40,9 @@ import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import io.modelcontextprotocol.server.McpAsyncServerExchange;
 import io.modelcontextprotocol.server.McpServerFeatures;
+import io.modelcontextprotocol.spec.McpSchema;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -74,6 +78,7 @@ class AutomationMcpServerConfigurationIntTest {
     private McpToolService mcpToolService;
 
     private McpComponentService mcpComponentService;
+    private ObjectProvider<McpOutboundRedactorProvider> mcpOutboundRedactorProviderProvider;
     private McpProjectService mcpProjectServiceTarget;
     private McpServerService mcpServerServiceTarget;
     private AutomationMcpToolFacade mcpToolFacade;
@@ -96,6 +101,8 @@ class AutomationMcpServerConfigurationIntTest {
         reset(mcpProjectServiceTarget, mcpServerServiceTarget, mcpToolServiceTarget);
 
         mcpComponentService = mock(McpComponentService.class);
+        mcpOutboundRedactorProviderProvider = (ObjectProvider<McpOutboundRedactorProvider>) mock(
+            ObjectProvider.class);
         mcpToolFacade = mock(AutomationMcpToolFacade.class);
         workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
         workspaceToolProviders = (ObjectProvider<McpServerWorkspaceToolCallbackContributor>) mock(
@@ -200,7 +207,7 @@ class AutomationMcpServerConfigurationIntTest {
 
         assertThat(toolSpecifications).isEmpty();
         verify(mcpProjectServiceTarget, never()).getMcpServerMcpProjects(1L);
-        verify(workspaceMcpServerService, never()).fetchMcpServerWorkspaceId(1L);
+        verify(workspaceToolProviders, never()).orderedStream();
     }
 
     @Test
@@ -315,14 +322,113 @@ class AutomationMcpServerConfigurationIntTest {
         verify(workspaceToolProvider, never()).getFunctionToolCallbacks(any());
     }
 
+    @Test
+    void testEveryToolResultIsRedactedWithTheServersWorkspacePolicy() {
+        McpServer mcpServer = new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
+
+        mcpServer.setId(1L);
+
+        McpComponent mcpComponent = new McpComponent();
+
+        mcpComponent.setId(2L);
+
+        McpTool mcpTool = new McpTool("componentTool", Map.of(), 2L);
+
+        mcpTool.setId(3L);
+
+        McpServerWorkspaceToolCallbackContributor workspaceToolProvider =
+            mock(McpServerWorkspaceToolCallbackContributor.class);
+        McpOutboundRedactorProvider mcpOutboundRedactorProvider = mock(McpOutboundRedactorProvider.class);
+        McpOutboundRedactor mcpOutboundRedactor = text -> text.replace("bob@acme.io", "[REDACTED_EMAIL_ADDRESS]");
+
+        when(mcpServerServiceTarget.getMcpServer("secret")).thenReturn(mcpServer);
+        when(mcpComponentService.getMcpServerMcpComponents(1L)).thenReturn(List.of(mcpComponent));
+        when(mcpToolServiceTarget.getMcpComponentMcpTools(2L)).thenReturn(List.of(mcpTool));
+        when(mcpToolFacade.getFunctionToolCallback(mcpTool))
+            .thenReturn(functionToolCallback("componentTool", "contact bob@acme.io"));
+        when(mcpProjectServiceTarget.getMcpServerMcpProjects(1L)).thenReturn(List.of());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.of(99L));
+        when(workspaceToolProviders.orderedStream()).thenReturn(Stream.of(workspaceToolProvider));
+        when(workspaceToolProvider.getFunctionToolCallbacks(99L))
+            .thenReturn(List.of(functionToolCallback("workspaceTool", "contact bob@acme.io")));
+        when(mcpOutboundRedactorProviderProvider.getIfAvailable()).thenReturn(mcpOutboundRedactorProvider);
+        when(mcpOutboundRedactorProvider.fetchRedactor(99L, McpOutboundRedactorProvider.SURFACE_AUTOMATION))
+            .thenReturn(Optional.of(mcpOutboundRedactor));
+
+        List<McpServerFeatures.AsyncToolSpecification> toolSpecifications = buildToolSpecifications(Set.of());
+
+        assertThat(toolSpecifications).hasSize(2);
+
+        for (McpServerFeatures.AsyncToolSpecification toolSpecification : toolSpecifications) {
+            McpSchema.CallToolResult callToolResult = toolSpecification.callHandler()
+                .apply(
+                    mock(McpAsyncServerExchange.class),
+                    new McpSchema.CallToolRequest(toolSpecification.tool()
+                        .name(), Map.of()))
+                .block();
+
+            assertThat(callToolResult).isNotNull();
+            assertThat(callToolResult.content())
+                .singleElement()
+                .isInstanceOfSatisfying(
+                    McpSchema.TextContent.class,
+                    textContent -> assertThat(textContent.text())
+                        .contains("[REDACTED_EMAIL_ADDRESS]")
+                        .doesNotContain("bob@acme.io"));
+        }
+    }
+
+    @Test
+    void testToolResultIsUnchangedWithoutTheGuardrailsProvider() {
+        McpServer mcpServer = new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT);
+
+        mcpServer.setId(1L);
+
+        McpComponent mcpComponent = new McpComponent();
+
+        mcpComponent.setId(2L);
+
+        McpTool mcpTool = new McpTool("componentTool", Map.of(), 2L);
+
+        mcpTool.setId(3L);
+
+        when(mcpServerServiceTarget.getMcpServer("secret")).thenReturn(mcpServer);
+        when(mcpComponentService.getMcpServerMcpComponents(1L)).thenReturn(List.of(mcpComponent));
+        when(mcpToolServiceTarget.getMcpComponentMcpTools(2L)).thenReturn(List.of(mcpTool));
+        when(mcpToolFacade.getFunctionToolCallback(mcpTool))
+            .thenReturn(functionToolCallback("componentTool", "contact bob@acme.io"));
+        when(mcpProjectServiceTarget.getMcpServerMcpProjects(1L)).thenReturn(List.of());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.empty());
+
+        List<McpServerFeatures.AsyncToolSpecification> toolSpecifications = buildToolSpecifications(Set.of());
+
+        McpSchema.CallToolResult callToolResult = toolSpecifications.getFirst()
+            .callHandler()
+            .apply(mock(McpAsyncServerExchange.class), new McpSchema.CallToolRequest("componentTool", Map.of()))
+            .block();
+
+        assertThat(callToolResult).isNotNull();
+        assertThat(callToolResult.content())
+            .singleElement()
+            .isInstanceOfSatisfying(
+                McpSchema.TextContent.class,
+                textContent -> assertThat(textContent.text()).contains("bob@acme.io"));
+    }
+
     private List<McpServerFeatures.AsyncToolSpecification> buildToolSpecifications(Set<String> principalAuthorities) {
         return AutomationMcpServerConfiguration.buildToolSpecifications(
             "secret", principalAuthorities, mcpComponentService, mcpProjectService, mcpServerService, mcpToolService,
-            mcpToolFacade, workspaceToolProviders, workspaceMcpServerService);
+            mcpToolFacade, mcpOutboundRedactorProviderProvider, workspaceToolProviders, workspaceMcpServerService);
     }
 
     private static FunctionToolCallback<Map<String, Object>, Object> functionToolCallback(String toolName) {
-        Function<Map<String, Object>, Object> toolFunction = request -> "ok";
+        return functionToolCallback(toolName, "ok");
+    }
+
+    private static FunctionToolCallback<Map<String, Object>, Object> functionToolCallback(
+        String toolName, String toolResult) {
+
+        Function<Map<String, Object>, Object> toolFunction = request -> toolResult;
 
         return FunctionToolCallback.builder(toolName, toolFunction)
             .inputType(Map.class)

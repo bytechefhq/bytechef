@@ -27,14 +27,18 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.server.facade.AutomationMcpToolFacade;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.ai.guardrails.McpOutboundRedactor;
+import com.bytechef.platform.ai.guardrails.McpOutboundRedactorProvider;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.modelcontextprotocol.server.McpAsyncServerExchange;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.ObjectProvider;
 import reactor.core.publisher.Mono;
 
 /**
@@ -50,9 +54,18 @@ class ApprovalElicitingToolSpecificationsTest {
         .build();
 
     private static final long MCP_SERVER_ID = 7L;
+    private static final Long WORKSPACE_ID = 3L;
+    private static final String SURFACE = "mcp_automation";
 
     private final AutomationMcpToolFacade mcpToolFacade = mock(AutomationMcpToolFacade.class);
     private final McpAsyncServerExchange exchange = mock(McpAsyncServerExchange.class);
+
+    private ObjectProvider<McpOutboundRedactorProvider> mcpOutboundRedactorProviderProvider;
+
+    @BeforeEach
+    void setUp() {
+        mcpOutboundRedactorProviderProvider = emptyProvider();
+    }
 
     @Test
     void testOrdinaryResultPassesThroughWithoutElicitation() {
@@ -97,6 +110,102 @@ class ApprovalElicitingToolSpecificationsTest {
 
         assertThat(firstText(result)).contains("done");
         assertThat(firstText(result)).doesNotContain("approval_required");
+    }
+
+    @Test
+    void testAcceptedElicitationRedactsTheResumedRunOutput() {
+        stubServerSideResolution();
+        stubUrlCapability();
+
+        when(exchange.createElicitation(any())).thenReturn(
+            Mono.just(
+                McpSchema.ElicitResult.builder(McpSchema.ElicitResult.Action.ACCEPT)
+                    .build()));
+        when(mcpToolFacade.awaitApprovedWorkflowRun(42L))
+            .thenReturn(Map.of("message", "contact bob@acme.io"));
+
+        mcpOutboundRedactorProviderProvider =
+            providerReturning(text -> text.replace("bob@acme.io", "[REDACTED_EMAIL_ADDRESS]"));
+
+        McpSchema.CallToolResult result = call(pendingApprovalResult());
+
+        assertThat(firstText(result)).contains("[REDACTED_EMAIL_ADDRESS]");
+        assertThat(firstText(result)).doesNotContain("bob@acme.io");
+    }
+
+    @Test
+    void testResumedRunOutputFailsClosedWhenRedactionThrows() {
+        stubServerSideResolution();
+        stubUrlCapability();
+
+        when(exchange.createElicitation(any())).thenReturn(
+            Mono.just(
+                McpSchema.ElicitResult.builder(McpSchema.ElicitResult.Action.ACCEPT)
+                    .build()));
+        when(mcpToolFacade.awaitApprovedWorkflowRun(42L))
+            .thenReturn(Map.of("message", "contact bob@acme.io"));
+
+        mcpOutboundRedactorProviderProvider = providerReturning(text -> {
+            throw new IllegalStateException("detector exploded");
+        });
+
+        McpSchema.CallToolResult result = call(pendingApprovalResult());
+
+        assertThat(result.isError())
+            .as("the raw resumed-run output must never be returned when redaction fails")
+            .isTrue();
+        assertThat(firstText(result)).doesNotContain("bob@acme.io");
+    }
+
+    @Test
+    void testRedactsTheFailureMessageOfARunThatFailedAfterApproval() {
+        stubServerSideResolution();
+        stubUrlCapability();
+
+        when(exchange.createElicitation(any())).thenReturn(
+            Mono.just(
+                McpSchema.ElicitResult.builder(McpSchema.ElicitResult.Action.ACCEPT)
+                    .build()));
+        when(mcpToolFacade.awaitApprovedWorkflowRun(42L))
+            .thenThrow(new IllegalStateException("the provider rejected contact bob@acme.io"));
+
+        mcpOutboundRedactorProviderProvider =
+            providerReturning(text -> text.replace("bob@acme.io", "[REDACTED_EMAIL_ADDRESS]"));
+
+        McpSchema.CallToolResult result = call(pendingApprovalResult());
+
+        assertThat(result.isError()).isTrue();
+        assertThat(firstText(result))
+            .as("a run failure's message is as payload-derived as its output")
+            .contains("[REDACTED_EMAIL_ADDRESS]")
+            .doesNotContain("bob@acme.io");
+    }
+
+    @Test
+    void testDropsTheFailureMessageWhenRedactingItFails() {
+        stubServerSideResolution();
+        stubUrlCapability();
+
+        when(exchange.createElicitation(any())).thenReturn(
+            Mono.just(
+                McpSchema.ElicitResult.builder(McpSchema.ElicitResult.Action.ACCEPT)
+                    .build()));
+        when(mcpToolFacade.awaitApprovedWorkflowRun(42L))
+            .thenThrow(new IllegalStateException("the provider rejected contact bob@acme.io"));
+
+        mcpOutboundRedactorProviderProvider = providerReturning(text -> {
+            throw new IllegalStateException("detector exploded");
+        });
+
+        McpSchema.CallToolResult result = call(pendingApprovalResult());
+
+        assertThat(result.isError())
+            .as("a run failure must still surface as a tool error")
+            .isTrue();
+        assertThat(firstText(result))
+            .as("the raw failure message must never be the fallback when redacting it fails")
+            .contains("The workflow run failed after the approval was resolved")
+            .doesNotContain("bob@acme.io");
     }
 
     @Test
@@ -207,11 +316,31 @@ class ApprovalElicitingToolSpecificationsTest {
             TOOL, (currentExchange, request) -> Mono.just(innerResult));
 
         McpServerFeatures.AsyncToolSpecification decorated = ApprovalElicitingToolSpecifications.decorate(
-            innerSpecification, mcpToolFacade, MCP_SERVER_ID);
+            innerSpecification, mcpToolFacade, MCP_SERVER_ID, mcpOutboundRedactorProviderProvider, WORKSPACE_ID,
+            SURFACE);
 
         return decorated.callHandler()
             .apply(exchange, new McpSchema.CallToolRequest("run_workflow", Map.of()))
             .block();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<McpOutboundRedactorProvider> emptyProvider() {
+        ObjectProvider<McpOutboundRedactorProvider> providerProvider = mock(ObjectProvider.class);
+
+        when(providerProvider.getIfAvailable()).thenReturn(null);
+
+        return providerProvider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<McpOutboundRedactorProvider> providerReturning(McpOutboundRedactor redactor) {
+        ObjectProvider<McpOutboundRedactorProvider> providerProvider = mock(ObjectProvider.class);
+
+        when(providerProvider.getIfAvailable())
+            .thenReturn((workspaceId, surface) -> Optional.of(redactor));
+
+        return providerProvider;
     }
 
     private void stubServerSideResolution() {
