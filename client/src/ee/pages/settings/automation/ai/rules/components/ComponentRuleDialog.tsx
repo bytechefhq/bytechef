@@ -16,6 +16,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Textarea} from '@/components/ui/textarea';
 import {type ComponentRuleItemType} from '@/ee/pages/settings/automation/ai/rules/components/ComponentRuleList';
 import RiskLevelBadge from '@/ee/pages/settings/automation/ai/rules/components/RiskLevelBadge';
+import useComponentRuleCopilot from '@/ee/pages/settings/automation/ai/rules/hooks/useComponentRuleCopilot';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {AUTHORITIES} from '@/shared/constants';
 import {
@@ -28,6 +29,7 @@ import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/compo
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
+import {SparklesIcon} from 'lucide-react';
 import {type ReactNode, useEffect, useMemo, useState} from 'react';
 
 const ALL_TOOLS_VALUE = '__all_tools__';
@@ -83,6 +85,13 @@ const ComponentRuleDialog = ({componentRule, onOpenChange, open}: ComponentRuleD
 
     const saveComponentRuleMutation = useSaveComponentRuleMutation();
 
+    const {handleCopilotClose, openCopilot} = useComponentRuleCopilot({
+        componentName,
+        currentCondition: condition,
+        onConditionGenerated: setCondition,
+        toolName: toolName === ALL_TOOLS_VALUE ? undefined : toolName,
+    });
+
     const conditionHelpText = useMemo<ReactNode[]>(() => {
         const helpText: ReactNode[] = [
             'A ByteChef formula expression over ',
@@ -115,6 +124,14 @@ const ComponentRuleDialog = ({componentRule, onOpenChange, open}: ComponentRuleD
         setToolName(ALL_TOOLS_VALUE);
     };
 
+    const handleDialogOpenChange = (nextOpen: boolean) => {
+        if (!nextOpen) {
+            handleCopilotClose();
+        }
+
+        onOpenChange(nextOpen);
+    };
+
     const handleSave = () => {
         const normalizedCondition = condition.replace(/\s+/g, ' ').trim();
 
@@ -141,7 +158,7 @@ const ComponentRuleDialog = ({componentRule, onOpenChange, open}: ComponentRuleD
                 onSuccess: () => {
                     queryClient.invalidateQueries({queryKey: ['ComponentRules']});
 
-                    onOpenChange(false);
+                    handleDialogOpenChange(false);
                 },
             }
         );
@@ -172,7 +189,7 @@ const ComponentRuleDialog = ({componentRule, onOpenChange, open}: ComponentRuleD
     }, [phase, ruleAction]);
 
     return (
-        <Dialog onOpenChange={onOpenChange} open={open}>
+        <Dialog onOpenChange={handleDialogOpenChange} open={open}>
             <DialogContent size="md">
                 <DialogMain>
                     <DialogHeader
@@ -358,7 +375,20 @@ const ComponentRuleDialog = ({componentRule, onOpenChange, open}: ComponentRuleD
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="component-rule-condition">Condition</Label>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="component-rule-condition">Condition</Label>
+
+                                    <Button
+                                        disabled={!componentName}
+                                        onClick={openCopilot}
+                                        size="sm"
+                                        type="button"
+                                        variant="ghost"
+                                    >
+                                        <SparklesIcon className="mr-1 size-4" />
+                                        Generate with AI
+                                    </Button>
+                                </div>
 
                                 <Textarea
                                     className="font-mono text-xs"
