@@ -1,143 +1,136 @@
 import Button from '@/components/Button/Button';
-import {
-    Dialog,
-    DialogBody,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogMain,
-    DialogTrigger,
-} from '@/components/Dialog';
+import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
+import {Note} from '@/components/Note';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
-import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
-import {getCookie} from '@/shared/util/cookie-utils';
-import {Suspense, lazy, useRef, useState} from 'react';
+import {TriangleAlertIcon} from 'lucide-react';
+import {Suspense, lazy, useCallback, useMemo, useState} from 'react';
+
+import {generateSchemaFromSample} from './utils/generateSchemaFromSample';
 
 import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
-const fetchGenerateSchema = async (data: string): Promise<Response> => {
-    return await fetch('/api/platform/internal/generate-schema', {
-        body: data,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
-        },
-        method: 'POST',
-    }).then((response) => response);
-};
+const GENERATION_ERROR_MESSAGE = 'Could not generate a schema from this sample. Please try again.';
 
-const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newSchema: SchemaRecordType) => void}) => {
-    const [curSchema, setCurSchema] = useState<SchemaRecordType | undefined>();
-    const [open, setOpen] = useState<boolean>(true);
+const OVERWRITE_WARNING_MESSAGE = 'Generating will replace your current schema.';
 
-    const editorRef = useRef<StandaloneCodeEditorType | null>(null);
+interface PropertyJsonSchemaBuilderSampleDataDialogProps {
+    onGenerate: (newSchema: SchemaRecordType) => void;
+    onOpenChange: (open: boolean) => void;
+    open: boolean;
+    schema?: SchemaRecordType;
+}
 
-    const handleEditorOnChange = (value: string | undefined) => {
-        const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
+const PropertyJsonSchemaBuilderSampleDataDialog = ({
+    onGenerate,
+    onOpenChange,
+    open,
+    schema,
+}: PropertyJsonSchemaBuilderSampleDataDialogProps) => {
+    const [errorMessage, setErrorMessage] = useState<string | undefined>();
+    const [generating, setGenerating] = useState(false);
+    const [sample, setSample] = useState('');
 
-        if (!placeholder) {
-            return;
+    const sampleIsValidJson = useMemo(() => {
+        if (!sample.trim()) {
+            return false;
         }
 
-        placeholder.style.display = value ? 'none' : 'block';
+        try {
+            JSON.parse(sample);
 
-        if (value != null) {
-            try {
-                setCurSchema(JSON.parse(value));
-
-                /* eslint-disable @typescript-eslint/no-unused-vars */
-            } catch (e) {
-                // thrown if value is not valid JSON
-            }
+            return true;
+        } catch {
+            return false;
         }
-    };
+    }, [sample]);
 
-    const handleOnSubmit = () => {
-        if (curSchema) {
-            fetchGenerateSchema(JSON.stringify(curSchema)).then((response) => {
-                if (response.ok) {
-                    response.json().then((data) => {
-                        if (onChange) {
-                            onChange({...data});
-                        }
-                    });
+    const schemaHasProperties = useMemo(
+        () => Object.keys((schema?.properties as SchemaRecordType | undefined) ?? {}).length > 0,
+        [schema]
+    );
 
-                    setCurSchema(undefined);
-                    setOpen(false);
-                }
-            });
+    const handleEditorMount = useCallback((editor: StandaloneCodeEditorType) => {
+        editor.focus();
+    }, []);
+
+    const handleEditorChange = useCallback((value: string | undefined) => {
+        setSample(value ?? '');
+        setErrorMessage(undefined);
+    }, []);
+
+    const handleGenerateClick = useCallback(async () => {
+        setGenerating(true);
+        setErrorMessage(undefined);
+
+        try {
+            const newSchema = await generateSchemaFromSample(sample);
+
+            onGenerate(newSchema);
+
+            setSample('');
+
+            onOpenChange(false);
+        } catch {
+            setErrorMessage(GENERATION_ERROR_MESSAGE);
+        } finally {
+            setGenerating(false);
         }
-    };
-
-    const handleEditorOnMount = (editor: StandaloneCodeEditorType) => {
-        editorRef.current = editor;
-
-        const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
-
-        if (!placeholder) {
-            return;
-        }
-
-        placeholder.style.display = curSchema ? 'none' : 'block';
-
-        setTimeout(() => editor.focus(), 0);
-    };
-
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            setCurSchema(undefined);
-        }
-
-        setOpen(open);
-    };
+    }, [onGenerate, onOpenChange, sample]);
 
     return (
-        <Dialog onOpenChange={handleOpenChange} open={open}>
-            <DialogTrigger asChild>
-                <Button label="Generate" variant="outline" />
-            </DialogTrigger>
+        <Dialog onOpenChange={onOpenChange} open={open}>
+            <DialogContent onInteractOutside={(event) => event.preventDefault()} size="lg">
+                <DialogMain className="min-h-[600px]">
+                    <DialogHeader
+                        description="Paste a sample JSON payload. Its structure is used to infer the schema."
+                        title="Generate Schema From Sample"
+                    />
 
-            <DialogContent
-                onFocusOutside={(event) => event.preventDefault()}
-                onOpenAutoFocus={(event) => {
-                    event.preventDefault();
+                    <DialogBody className="flex flex-col">
+                        {schemaHasProperties && (
+                            <Note content={OVERWRITE_WARNING_MESSAGE} icon={<TriangleAlertIcon />} />
+                        )}
 
-                    setTimeout(() => editorRef.current?.focus(), 0);
-                }}
-                onPointerDownOutside={(event) => event.preventDefault()}
-                size="lg"
-            >
-                <DialogMain>
-                    <DialogHeader description="Generate JSON schema from sample JSON" title="Sample JSON" />
-
-                    <DialogBody>
-                        <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
+                        <div className="relative flex-1 overflow-hidden rounded-md border border-border/50">
                             <div className="absolute inset-0">
                                 <Suspense fallback={<MonacoEditorLoader />}>
                                     <MonacoEditor
-                                        className="bg-transparent"
+                                        className="size-full"
                                         defaultLanguage="json"
-                                        onChange={handleEditorOnChange}
-                                        onMount={handleEditorOnMount}
-                                        value={JSON.stringify(curSchema, null, SPACE)}
+                                        onChange={handleEditorChange}
+                                        onMount={handleEditorMount}
+                                        options={{
+                                            automaticLayout: true,
+                                            folding: true,
+                                            fontSize: 12,
+                                            lineNumbers: 'on',
+                                            minimap: {enabled: false},
+                                            scrollBeyondLastLine: false,
+                                            tabSize: 2,
+                                            wordWrap: 'on',
+                                        }}
+                                        value={sample}
                                     />
                                 </Suspense>
-
-                                <div
-                                    className="pointer-events-none absolute top-[-2px] left-[70px] h-full text-sm text-muted-foreground"
-                                    id="monaco-placeholder"
-                                >
-                                    {EDITOR_PLACEHOLDER}
-                                </div>
                             </div>
                         </div>
+
+                        {errorMessage && (
+                            <p className="text-sm text-destructive" role="alert">
+                                {errorMessage}
+                            </p>
+                        )}
                     </DialogBody>
 
                     <DialogFooter>
-                        <Button disabled={!curSchema} label="Generate" onClick={handleOnSubmit} type="submit" />
+                        <Button
+                            disabled={!sampleIsValidJson || generating}
+                            label={generating ? 'Generating...' : 'Generate'}
+                            onClick={handleGenerateClick}
+                        />
                     </DialogFooter>
                 </DialogMain>
             </DialogContent>
