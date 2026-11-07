@@ -50,7 +50,16 @@ dependencies {
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api")) {
         isTransitive = false
     }
+    testImplementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-api")) {
+        isTransitive = false
+    }
+    testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-api")) {
+        isTransitive = false
+    }
     testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:platform:platform-data-table:platform-data-table-api")) {
+        isTransitive = false
+    }
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api")) {
         isTransitive = false
     }
