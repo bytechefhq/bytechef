@@ -28,6 +28,7 @@ import com.bytechef.platform.data.table.configuration.exception.DataTableErrorTy
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +50,16 @@ public class DataTableServiceImpl implements DataTableService {
 
     private static final Logger log = LoggerFactory.getLogger(DataTableServiceImpl.class);
     private final DataTableRepository dataTableRepository;
+    private final DataTableStorageService dataTableStorageService;
     private final JdbcTemplate jdbcTemplate;
 
     @SuppressFBWarnings("EI")
-    public DataTableServiceImpl(DataTableRepository dataTableRepository, JdbcTemplate jdbcTemplate) {
+    public DataTableServiceImpl(
+        DataTableRepository dataTableRepository, DataTableStorageService dataTableStorageService,
+        JdbcTemplate jdbcTemplate) {
+
         this.dataTableRepository = dataTableRepository;
+        this.dataTableStorageService = dataTableStorageService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -189,6 +195,8 @@ public class DataTableServiceImpl implements DataTableService {
 
         String createSql = "CREATE TABLE " + escapeIdentifier(toPhysicalName) +
             " (\"id\" BIGSERIAL PRIMARY KEY" + (userColumnsSql.isEmpty() ? "" : ", " + userColumnsSql) + ")";
+
+        dataTableStorageService.checkWithinLimit(dataTableStorageService.getTableBytes(fromPhysicalName));
 
         jdbcTemplate.execute(createSql);
 
