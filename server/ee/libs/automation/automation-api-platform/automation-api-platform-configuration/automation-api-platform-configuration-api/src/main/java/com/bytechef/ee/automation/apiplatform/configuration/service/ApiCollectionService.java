@@ -30,6 +30,8 @@ public interface ApiCollectionService {
 
     List<ApiCollection> getApiCollections(Long workspaceId, Environment environment, Long projectId, Long tagId);
 
+    List<ApiCollection> getProjectDeploymentApiCollections(long projectDeploymentId);
+
     ApiCollection update(ApiCollection apiCollection);
 
     ApiCollection update(long id, List<Long> tagIds);

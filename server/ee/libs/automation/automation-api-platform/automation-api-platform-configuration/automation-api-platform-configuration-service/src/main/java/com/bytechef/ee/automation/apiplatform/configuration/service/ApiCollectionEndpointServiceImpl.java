@@ -61,6 +61,12 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ApiCollectionEndpoint> getProjectDeploymentWorkflowApiEndpoints(long projectDeploymentWorkflowId) {
+        return apiEndpointRepository.findAllByProjectDeploymentWorkflowId(projectDeploymentWorkflowId);
+    }
+
+    @Override
     public ApiCollectionEndpoint update(ApiCollectionEndpoint apiCollectionEndpoint) {
         Assert.notNull(apiCollectionEndpoint, "'apiCollectionEndpoint' must not be null");
         Assert.notNull(apiCollectionEndpoint.getId(), "id");

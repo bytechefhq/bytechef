@@ -75,6 +75,12 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ApiCollection> getProjectDeploymentApiCollections(long projectDeploymentId) {
+        return apiCollectionRepository.findAllByProjectDeploymentId(projectDeploymentId);
+    }
+
+    @Override
     public ApiCollection update(ApiCollection apiCollection) {
         Assert.notNull(apiCollection, "'openApiCollection' must not be null");
         Assert.notNull(apiCollection.getCollectionVersion(), "'collectionVersion' must not be null");

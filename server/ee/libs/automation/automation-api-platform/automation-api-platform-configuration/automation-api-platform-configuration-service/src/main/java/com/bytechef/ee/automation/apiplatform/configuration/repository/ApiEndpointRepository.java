@@ -21,4 +21,6 @@ import org.springframework.stereotype.Repository;
 public interface ApiEndpointRepository extends ListCrudRepository<ApiCollectionEndpoint, Long> {
 
     List<ApiCollectionEndpoint> findByApiCollectionIdOrderByHttpMethod(long apiCollectionId);
+
+    List<ApiCollectionEndpoint> findAllByProjectDeploymentWorkflowId(long projectDeploymentWorkflowId);
 }

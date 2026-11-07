@@ -25,5 +25,7 @@ public interface ApiCollectionEndpointService {
 
     List<ApiCollectionEndpoint> getApiEndpoints(long apiCollectionId);
 
+    List<ApiCollectionEndpoint> getProjectDeploymentWorkflowApiEndpoints(long projectDeploymentWorkflowId);
+
     ApiCollectionEndpoint update(ApiCollectionEndpoint apiCollectionEndpoint);
 }
