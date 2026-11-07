@@ -124,6 +124,7 @@ const AutomationProjectCodeWorkflow = lazy(
     () => import('@/ee/pages/embedded/automation-project-code-workflow/AutomationProjectCodeWorkflow')
 );
 const Automation = lazy(() => import('@/ee/pages/embedded/automation/Automation'));
+const ComponentRules = lazy(() => import('@/ee/pages/settings/automation/ai/rules/ComponentRules'));
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
 const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
 const CustomComponentDetail = lazy(
@@ -247,6 +248,18 @@ const currentWorkspaceSettingsRoutes = {
                 </PrivateRoute>
             ),
             path: 'ai-hub/tool-approvals',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <ComponentRules />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'ai/rules',
         },
     ],
 };

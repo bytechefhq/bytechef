@@ -29,6 +29,10 @@ const automationSectionNavItems: SettingsNavItemI[] = [
         title: 'API Keys',
     },
     {
+        href: `${AUTOMATION_SETTINGS_PATH}/ai/rules`,
+        title: 'Agent Rules',
+    },
+    {
         items: [
             {
                 href: MEMORIES_SETTINGS_PATH,
