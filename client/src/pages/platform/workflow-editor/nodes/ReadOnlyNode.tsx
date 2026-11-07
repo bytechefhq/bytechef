@@ -24,6 +24,8 @@ const MAX_VISIBLE_CLUSTER_ELEMENT_ICONS = 5;
 const ReadOnlyNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
+    const isHorizontal = layoutDirection === 'LR';
+
     const changeHighlights = useWorkflowChangeHighlight();
     const workflowTestNodeStates = useWorkflowTestNodeStates();
 
@@ -104,16 +106,27 @@ const ReadOnlyNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 )}
             </div>
 
-            <div className="ml-2 flex w-full min-w-max flex-col items-start">
-                <div className="flex items-center gap-1">
-                    <span className="font-semibold">{data.title || data.label}</span>
+            <div
+                className={twMerge(
+                    'ml-2 flex w-full min-w-max flex-col items-start',
+                    isHorizontal && 'absolute top-full ml-0 w-auto max-w-[150px] min-w-0 items-center text-center'
+                )}
+            >
+                <div className={twMerge('flex items-center gap-1', isHorizontal && 'w-full justify-center')}>
+                    <span className={twMerge('font-semibold', isHorizontal && 'truncate')}>
+                        {data.title || data.label}
+                    </span>
 
                     {data.disabled && <DisabledNodeBadge trigger={!!data.trigger} />}
                 </div>
 
-                {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
+                {data.operationName && (
+                    <pre className={twMerge('text-sm', isHorizontal && 'w-full truncate')}>{data.operationName}</pre>
+                )}
 
-                <span className="text-sm text-content-neutral-secondary">{data.workflowNodeName || data.name}</span>
+                <span className={twMerge('text-sm text-content-neutral-secondary', isHorizontal && 'w-full truncate')}>
+                    {data.workflowNodeName || data.name}
+                </span>
             </div>
 
             <Handle

@@ -26,6 +26,7 @@
         "check:node": "node scripts/check-node-version.mjs",
         "build": "npm run check:node && tsc && vite build",
         "build:cloud": "npm run check:node && tsc && vite build --mode cloud",
+        "build:mcp-workflow-editor": "vite build --config vite.config.mcp-workflow-editor.mts",
         "serve": "vite preview",
         "test": "vitest run",
         "test:watch": "vitest watch",
@@ -53,6 +54,8 @@
         "@hookform/resolvers": "^5.9.1",
         "@lingui/core": "^6.9.1",
         "@lingui/react": "^6.9.1",
+        "@modelcontextprotocol/ext-apps": "1.7.4",
+        "@modelcontextprotocol/sdk": "1.29.0",
         "@monaco-editor/react": "^4.7.0",
         "@radix-ui/colors": "^3.0.0",
         "@radix-ui/react-accordion": "^1.2.21",
@@ -211,6 +214,7 @@
         "typescript-eslint": "^8.71.1",
         "vite": "^8.3.4",
         "vite-bundle-analyzer": "^1.3.9",
+        "vite-plugin-singlefile": "^2.3.4",
         "vitest": "^5.0.3"
     },
     "msw": {

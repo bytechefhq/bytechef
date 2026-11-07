@@ -1,4 +1,5 @@
 dist
+dist-mcp-apps
 dist-ssr
 *.local
 

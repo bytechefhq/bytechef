@@ -26,6 +26,7 @@ export default [
         ignores: [
             'node_modules',
             'dist',
+            'dist-mcp-apps',
             'src/components/assistant-ui',
             'src/components/ui',
             'src/hooks/use-toast.ts',
