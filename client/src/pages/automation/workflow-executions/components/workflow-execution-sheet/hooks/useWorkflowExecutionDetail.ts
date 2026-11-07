@@ -141,10 +141,11 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
 
     const jobFailedWithNoExecutions = !job?.taskExecutions?.length && job?.status === JobStatusEnum.Failed;
 
-    const jobFailureError = job?.error ?? {
-        message: 'Workflow execution failed before any executions were created.',
-        stackTrace: [],
-    };
+    const jobFailureError = job?.error ??
+        triggerExecution?.error ?? {
+            message: 'Workflow execution failed before any executions were created.',
+            stackTrace: [],
+        };
 
     const isTriggerExecution = isSameExecution(selectedItem, triggerExecution);
 
