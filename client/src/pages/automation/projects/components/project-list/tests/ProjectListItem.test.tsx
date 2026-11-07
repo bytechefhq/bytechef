@@ -136,7 +136,7 @@ it('offers New Deployment on the deployments tab and opens the saved deployment'
 
     expect(screen.getByLabelText('Create Deployment')).toBeEnabled();
 
-    fireEvent.click(screen.getAllByText('Save deployment false')[1]);
+    fireEvent.click(screen.getByText('Save deployment false'));
 
     expect(onTabChange).toHaveBeenCalledWith('deployments', 42);
 });
@@ -159,19 +159,70 @@ it('hides New Deployment until the project is published', () => {
     expect(screen.queryByLabelText('Create Deployment')).not.toBeInTheDocument();
 });
 
-it('opens the deployments tab on a saved development deployment', () => {
+const openNewDeploymentFromMenu = async () => {
+    await userEvent.click(screen.getByLabelText('More Project Actions'));
+
+    await userEvent.click(screen.getByRole('menuitem', {name: 'New Deployment'}));
+};
+
+it('removes the Deploy button from the project row', () => {
     renderProjectListItem();
+
+    expect(screen.queryByRole('button', {name: 'Deploy'})).not.toBeInTheDocument();
+});
+
+it('groups the project, workflow and deployment actions in the menu', async () => {
+    renderProjectListItem();
+
+    await userEvent.click(screen.getByLabelText('More Project Actions'));
+
+    expect(screen.getByRole('group', {name: 'Project Actions'})).toHaveTextContent('EditPublish');
+    expect(screen.getByRole('group', {name: 'Workflow Actions'})).toHaveTextContent(
+        'New WorkflowImport WorkflowView Workflows'
+    );
+    expect(screen.getByRole('group', {name: 'Deployment Actions'})).toHaveTextContent('New Deployment');
+});
+
+it('opens the workflow dialog from the New Workflow menu item', async () => {
+    renderProjectListItem();
+
+    await userEvent.click(screen.getByLabelText('More Project Actions'));
+
+    await userEvent.click(screen.getByRole('menuitem', {name: 'New Workflow'}));
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+});
+
+it('opens the file picker from the Import Workflow menu item', async () => {
+    renderProjectListItem();
+
+    const fileInput = screen.getByTestId('7-importWorkflowHiddenInput') as HTMLInputElement;
+    const clickSpy = vi.spyOn(fileInput, 'click');
+
+    await userEvent.click(screen.getByLabelText('More Project Actions'));
+
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Import Workflow'}));
+
+    expect(clickSpy).toHaveBeenCalled();
+});
+
+it('opens the deployments tab on a saved development deployment', async () => {
+    renderProjectListItem();
+
+    await openNewDeploymentFromMenu();
 
     fireEvent.click(screen.getByText('Save deployment false'));
 
     expect(onTabChange).toHaveBeenCalledWith('deployments', 42);
 });
 
-it('opens the deployments page in production after deploying to production', () => {
+it('opens the deployments page in production after deploying to production', async () => {
     environmentStore.setState({currentEnvironmentId: 0});
     hoisted.navigate.mockReset();
 
     renderProjectListItem();
+
+    await openNewDeploymentFromMenu();
 
     fireEvent.click(screen.getByText('Save production deployment false'));
 
