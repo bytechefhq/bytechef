@@ -364,14 +364,18 @@ export function useWorkflowTestStream({
             },
             start: (data) => {
                 try {
-                    const startData = typeof data === 'string' ? JSON.parse(data) : (data as {jobId: number});
+                    const startData =
+                        typeof data === 'string' ? JSON.parse(data) : (data as {jobId: number; triggerName?: string});
 
                     const jobId = String(startData.jobId);
 
                     resetWorkflowTestNodeStates(workflowId);
-                    setWorkflowTestNodeState(getTestRunTriggerName(useWorkflowDataStore.getState().workflow), {
-                        status: 'COMPLETED',
-                    });
+                    setWorkflowTestNodeState(
+                        startData.triggerName || getTestRunTriggerName(useWorkflowDataStore.getState().workflow),
+                        {
+                            status: 'COMPLETED',
+                        }
+                    );
 
                     progressOwnedNodeNamesRef.current.clear();
                     questionShownRef.current = false;
