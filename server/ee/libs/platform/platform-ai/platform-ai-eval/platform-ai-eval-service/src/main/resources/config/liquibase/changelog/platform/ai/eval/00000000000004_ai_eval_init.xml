@@ -152,4 +152,24 @@
                                  baseTableName="ai_eval_execution" baseColumnNames="score_id"
                                  referencedTableName="ai_eval_score" referencedColumnNames="id"/>
     </changeSet>
+
+    <changeSet id="00000000000004-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="ai_observability_trace"/>
+            <tableExists tableName="ai_observability_span"/>
+        </preConditions>
+
+        <addForeignKeyConstraint constraintName="fk_ai_eval_score_trace"
+                                 baseTableName="ai_eval_score" baseColumnNames="trace_id"
+                                 referencedTableName="ai_observability_trace" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <addForeignKeyConstraint constraintName="fk_ai_eval_score_span"
+                                 baseTableName="ai_eval_score" baseColumnNames="span_id"
+                                 referencedTableName="ai_observability_span" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+        <addForeignKeyConstraint constraintName="fk_ai_eval_exec_trace"
+                                 baseTableName="ai_eval_execution" baseColumnNames="trace_id"
+                                 referencedTableName="ai_observability_trace" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
 </databaseChangeLog>
