@@ -4,11 +4,97 @@ All URIs are relative to */api/embedded/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
+| [**getAnyWorkflowExecutionsPage**](WorkflowExecutionApi.md#getanyworkflowexecutionspage) | **GET** /workflow-executions/any | Get integration and automation workflow executions |
 | [**getWorkflowExecution**](WorkflowExecutionApi.md#getworkflowexecution) | **GET** /workflow-executions/{id} | Get workflow executions by id |
 | [**getWorkflowExecutionTaskExecution**](WorkflowExecutionApi.md#getworkflowexecutiontaskexecution) | **GET** /workflow-executions/{id}/task-executions/{taskExecutionId} | Get a task execution by id |
 | [**getWorkflowExecutionTaskExecutionChildren**](WorkflowExecutionApi.md#getworkflowexecutiontaskexecutionchildren) | **GET** /workflow-executions/{id}/task-executions/{taskExecutionId}/children | Get a page of task execution children |
 | [**getWorkflowExecutionsPage**](WorkflowExecutionApi.md#getworkflowexecutionspage) | **GET** /workflow-executions | Get Integration workflow executions |
 
+
+
+## getAnyWorkflowExecutionsPage
+
+> Page getAnyWorkflowExecutionsPage(workspaceId, environmentId, jobStatus, jobStartDate, jobEndDate, connectedUserId, pageNumber)
+
+Get integration and automation workflow executions
+
+Get the integration and automation workflow executions of connected users together, newest first.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowExecutionApi,
+} from '';
+import type { GetAnyWorkflowExecutionsPageRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowExecutionApi();
+
+  const body = {
+    // number | The id of the workspace whose automation workflow executions are returned.
+    workspaceId: 789,
+    // number | The id of an environment. (optional)
+    environmentId: 789,
+    // 'CREATED' | 'STARTED' | 'STOPPED' | 'FAILED' | 'COMPLETED' | 'PAYMENT_REQUIRED' | The status of an executed job (optional)
+    jobStatus: jobStatus_example,
+    // Date | The start date of a job. (optional)
+    jobStartDate: 2013-10-20T19:20:30+01:00,
+    // Date | The end date of a job. (optional)
+    jobEndDate: 2013-10-20T19:20:30+01:00,
+    // number | The id of a connected user. (optional)
+    connectedUserId: 789,
+    // number | The number of the page to return. (optional)
+    pageNumber: 56,
+  } satisfies GetAnyWorkflowExecutionsPageRequest;
+
+  try {
+    const data = await api.getAnyWorkflowExecutionsPage(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **workspaceId** | `number` | The id of the workspace whose automation workflow executions are returned. | [Defaults to `undefined`] |
+| **environmentId** | `number` | The id of an environment. | [Optional] [Defaults to `undefined`] |
+| **jobStatus** | `CREATED`, `STARTED`, `STOPPED`, `FAILED`, `COMPLETED`, `PAYMENT_REQUIRED` | The status of an executed job | [Optional] [Defaults to `undefined`] [Enum: CREATED, STARTED, STOPPED, FAILED, COMPLETED, PAYMENT_REQUIRED] |
+| **jobStartDate** | `Date` | The start date of a job. | [Optional] [Defaults to `undefined`] |
+| **jobEndDate** | `Date` | The end date of a job. | [Optional] [Defaults to `undefined`] |
+| **connectedUserId** | `number` | The id of a connected user. | [Optional] [Defaults to `undefined`] |
+| **pageNumber** | `number` | The number of the page to return. | [Optional] [Defaults to `0`] |
+
+### Return type
+
+[**Page**](Page.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The page of embedded workflow executions. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## getWorkflowExecution

@@ -4,6 +4,7 @@ export * from './AuthorizationType';
 export * from './ClusterElementCall';
 export * from './ClusterElementCallRecord';
 export * from './ComponentConnection';
+export * from './EmbeddedWorkflowExecution';
 export * from './ExecutionError';
 export * from './FocusPathElement';
 export * from './IntegrationBasic';
