@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -195,6 +196,22 @@ class ClusterElementDefinitionServiceTest {
         assertEquals(1, clusterElementDefinitions.size());
         assertEquals("openai", clusterElementDefinitions.getFirst()
             .getName());
+    }
+
+    @Test
+    void testGetClusterElementDefinitionStubsReadsTheIndexStubsWithoutLoadingComponents() {
+        ComponentDefinition componentDefinition = createComponentDefinitionWithModelAndChatMemory();
+
+        when(componentDefinitionRegistry.getStaticComponentDefinitions()).thenReturn(List.of(componentDefinition));
+
+        List<ClusterElementDefinition> clusterElementDefinitions =
+            clusterElementDefinitionService.getClusterElementDefinitionStubs(
+                new ClusterElementType("MODEL", "model", "Model"));
+
+        assertEquals(1, clusterElementDefinitions.size());
+        assertEquals("openai", clusterElementDefinitions.getFirst()
+            .getName());
+        verify(componentDefinitionRegistry, never()).getComponentDefinitions();
     }
 
     @Test
