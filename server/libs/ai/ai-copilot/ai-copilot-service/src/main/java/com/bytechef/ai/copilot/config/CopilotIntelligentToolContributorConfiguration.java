@@ -71,6 +71,8 @@ class CopilotIntelligentToolContributorConfiguration {
         ObjectProvider<IntelligentToolChatClientFactory> skillsAskFactoryProvider,
         @Qualifier("skillsBuildSubAgentChatClientFactory") //
         ObjectProvider<IntelligentToolChatClientFactory> skillsBuildFactoryProvider,
+        @Qualifier("workflowExecutionAskSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionAskFactoryProvider,
         @Qualifier("workflowExecutionBuildSubAgentChatClientFactory") //
         ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
         ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
@@ -111,8 +113,8 @@ class CopilotIntelligentToolContributorConfiguration {
                 chatClientFactory -> new SkillsAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
                 "debugWorkflowExecution", CopilotAgentType.DEBUG_WORKFLOW_EXECUTION, Set.of(),
-                variant -> variant == IntelligentToolVariant.BUILD
-                    ? workflowExecutionBuildFactoryProvider.getIfAvailable() : null,
+                variant -> factoryForVariant(
+                    variant, workflowExecutionAskFactoryProvider, workflowExecutionBuildFactoryProvider),
                 chatClientFactory -> new WorkflowExecutionAgentToolCallback(chatClientFactory, chatModelResolver)));
 
         return () -> definitions;

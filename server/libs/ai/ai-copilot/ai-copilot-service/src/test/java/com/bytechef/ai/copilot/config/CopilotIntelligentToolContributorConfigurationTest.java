@@ -97,6 +97,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         new DelegateCase("writeScript", IntelligentToolVariant.BUILD, "codeEditorBuild"),
         new DelegateCase("authorSkill", IntelligentToolVariant.ASK, "skillsAsk"),
         new DelegateCase("authorSkill", IntelligentToolVariant.BUILD, "skillsBuild"),
+        new DelegateCase("debugWorkflowExecution", IntelligentToolVariant.ASK, "workflowExecutionAsk"),
         new DelegateCase("debugWorkflowExecution", IntelligentToolVariant.BUILD, "workflowExecutionBuild"));
 
     private final CopilotIntelligentToolContributorConfiguration configuration =
@@ -144,6 +145,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         IntelligentToolContributor contributor = configuration.copilotIntelligentToolContributor(
             emptyProvider(), emptyProvider(), present((IntelligentToolChatClientFactory) chatModel -> chatClient),
             emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(),
+            emptyProvider(),
             emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)),
             emptyProvider());
 
@@ -183,6 +185,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         IntelligentToolContributor contributor = configuration.copilotIntelligentToolContributor(
             emptyProvider(), emptyProvider(), present((IntelligentToolChatClientFactory) chatModel -> chatClient),
             emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(),
+            emptyProvider(),
             emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)),
             emptyProvider());
 
@@ -212,6 +215,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         IntelligentToolContributor contributor = configuration.copilotIntelligentToolContributor(
             emptyProvider(), present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)), emptyProvider(),
+            present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
@@ -386,6 +390,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class)),
             emptyProvider(), emptyProvider());
 
@@ -405,6 +410,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         DelegateFixture codeEditorBuild = codeEditorBuildFixture(copilotConfiguration, defaultChatModel);
         DelegateFixture skillsAsk = skillsAskFixture(copilotConfiguration, defaultChatModel);
         DelegateFixture skillsBuild = skillsBuildFixture(copilotConfiguration, defaultChatModel);
+        DelegateFixture workflowExecutionAsk = workflowExecutionAskFixture(copilotConfiguration, defaultChatModel);
         DelegateFixture workflowExecutionBuild = workflowExecutionBuildFixture(copilotConfiguration, defaultChatModel);
 
         IntelligentToolContributor contributor = configuration.copilotIntelligentToolContributor(
@@ -412,6 +418,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             present(converterBuild.factory()), present(clusterElementAsk.factory()),
             present(clusterElementBuild.factory()), present(codeEditorAsk.factory()),
             present(codeEditorBuild.factory()), present(skillsAsk.factory()), present(skillsBuild.factory()),
+            present(workflowExecutionAsk.factory()),
             present(workflowExecutionBuild.factory()),
             present(mock(SubAgentChatModelResolver.class)),
             emptyProvider(), emptyProvider());
@@ -426,6 +433,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             Map.entry("codeEditorBuild", codeEditorBuild.beanClient()),
             Map.entry("skillsAsk", skillsAsk.beanClient()),
             Map.entry("skillsBuild", skillsBuild.beanClient()),
+            Map.entry("workflowExecutionAsk", workflowExecutionAsk.beanClient()),
             Map.entry("workflowExecutionBuild", workflowExecutionBuild.beanClient()));
 
         return new RealDefinitions(contributor.getIntelligentToolDefinitions(), beanClientsByKey);
@@ -595,6 +603,24 @@ final class CopilotIntelligentToolContributorConfigurationTest {
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.skillsBuildSubAgentChatClientFactory(
             beanClient, readProjectTools, readProjectWorkflowTools, skillsTools, componentTools);
+
+        return new DelegateFixture(beanClient, factory);
+    }
+
+    private static DelegateFixture workflowExecutionAskFixture(
+        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+
+        WorkflowExecutionTools workflowExecutionTools = mock(WorkflowExecutionTools.class);
+        ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
+        ComponentTools componentTools = mock(ComponentTools.class);
+        Resource promptResource = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
+
+        ChatClient beanClient = copilotConfiguration.workflowExecutionAskSubAgentChatClient(
+            chatModel, workflowExecutionTools, readProjectWorkflowTools, componentTools, promptResource);
+
+        IntelligentToolChatClientFactory factory =
+            copilotConfiguration.workflowExecutionAskSubAgentChatClientFactory(
+                beanClient, workflowExecutionTools, readProjectWorkflowTools, componentTools, promptResource);
 
         return new DelegateFixture(beanClient, factory);
     }
