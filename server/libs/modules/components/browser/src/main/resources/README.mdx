@@ -1,0 +1,21 @@
+### Voice Session trigger
+
+The **Voice Session** trigger starts when a customer opens a voice session from a web page, and lets them talk to a
+voice agent. It is a cluster root with two slots:
+
+- **Voice Agent** (required): the provider element that answers the call, such as OpenAI Realtime, Deepgram or
+  ElevenLabs.
+- **Tools** (optional): tools the voice agent may call during the conversation.
+
+The conversation runs outside the workflow engine while the caller is connected. When the session ends, the rest of the
+workflow runs once with the session's transcript, tool calls, duration and end reason.
+
+### Session limits
+
+- **Silence timeout** ends the session after that many seconds without caller audio; `0` disables it.
+- **Session limit** is the longest a session may last; `0` uses the server's maximum session duration (30 minutes).
+
+### Notes
+
+- The trigger itself needs no connection; each Voice Agent element uses its own provider connection.
+- A session is refused when the workflow is disabled or the trigger has no Voice Agent, and nothing runs in that case.
