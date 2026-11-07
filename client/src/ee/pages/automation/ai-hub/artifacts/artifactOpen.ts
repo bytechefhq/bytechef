@@ -109,8 +109,15 @@ export function handleArtifactQuickOpen(artifact: AiHubChatArtifactI): void {
     });
 }
 
+const REMOVABLE_ARTIFACT_KINDS: AiHubArtifactKindType[] = [
+    'AI_AGENT_REFERENCED',
+    'CODE_WORKFLOW_REFERENCED',
+    'CUSTOM_COMPONENT_REFERENCED',
+    'WORKFLOW_REFERENCED',
+];
+
 export function isArtifactRemovable(artifact: AiHubChatArtifactI): boolean {
-    return artifact.kind === 'WORKFLOW_REFERENCED' || artifact.kind === 'AI_AGENT_REFERENCED';
+    return REMOVABLE_ARTIFACT_KINDS.includes(artifact.kind);
 }
 
 export function isArtifactClickable(artifact: AiHubChatArtifactI): boolean {
