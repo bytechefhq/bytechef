@@ -33,6 +33,7 @@ vi.mock('@assistant-ui/react', () => ({
     },
     useAui: () => ({
         composer: {getState: () => ({text: ''}), setText: vi.fn()},
+        subscribe: () => () => {},
         thread: {cancelRun: vi.fn()},
     }),
     useExternalStoreRuntime: vi.fn(() => ({thread: {composer: {setText: vi.fn()}}})),
@@ -40,6 +41,7 @@ vi.mock('@assistant-ui/react', () => ({
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useAiSkillsQuery: () => ({data: undefined}),
     useCancelAiHubRunMutation: () => ({mutate: vi.fn()}),
     useResolveAiHubToolApprovalMutation: () => ({mutateAsync: hoisted.resolveMutateAsync}),
 }));

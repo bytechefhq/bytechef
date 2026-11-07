@@ -31,6 +31,7 @@ vi.mock('@assistant-ui/react', () => ({
             getState: () => ({text: composerTextRef.current}),
             setText: setTextMock,
         },
+        subscribe: () => () => {},
         thread: {cancelRun: cancelRunMock},
     }),
 }));
@@ -44,6 +45,7 @@ vi.mock('@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu', () =>
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useAiSkillsQuery: () => ({data: undefined}),
     useCancelAiHubRunMutation: () => ({mutate: cancelAiHubRunMock}),
 }));
 
@@ -86,7 +88,7 @@ describe('AiHubChatComposer', () => {
         aiHubStore.setState({chatId: 'thread-7', messages: [], mode: MODE.BUILD});
         aiHubChatsStore.setState({currentChatId: 7});
         aiHubRunStateStore.setState({runIdByChat: {}, runningByChat: {}});
-        aiHubComposerStore.setState({referencedResources: [], resourcePickerOpen: false});
+        aiHubComposerStore.setState({referencedResources: [], resourcePickerOpen: false, selectedSkills: []});
         aiHubTabsStore.getState().reset();
     });
 
@@ -107,6 +109,20 @@ describe('AiHubChatComposer', () => {
 
         expect(screen.getByRole('textbox', {name: 'Message input'})).toBeDisabled();
         expect(screen.getByRole('button', {name: 'Send message'})).toBeDisabled();
+    });
+
+    it('renders a chip for each armed skill and removes it on X', () => {
+        aiHubComposerStore.setState({selectedSkills: [{id: 'skill-1', name: 'email-digest'}]});
+
+        renderComposer();
+
+        expect(screen.getByTestId('skill-chip')).toBeInTheDocument();
+        expect(screen.getByText('email-digest')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByLabelText('Remove email-digest'));
+
+        expect(aiHubComposerStore.getState().selectedSkills).toEqual([]);
+        expect(screen.queryByText('email-digest')).not.toBeInTheDocument();
     });
 
     it('switches between Build and Ask mode', () => {

@@ -4,7 +4,7 @@ import {aiHubComposerStore} from '../useAiHubComposerStore';
 
 describe('useAiHubComposerStore', () => {
     beforeEach(() => {
-        aiHubComposerStore.setState({referencedResources: [], resourcePickerOpen: false});
+        aiHubComposerStore.setState({referencedResources: [], resourcePickerOpen: false, selectedSkills: []});
     });
 
     describe('addReference', () => {
@@ -40,6 +40,31 @@ describe('useAiHubComposerStore', () => {
                 ownsTab: true,
                 tabId: 'tab-1',
             });
+        });
+    });
+
+    describe('skills', () => {
+        it('adds a skill once and removes it by id', () => {
+            aiHubComposerStore.getState().addSkill({id: 'skill-1', name: 'research'});
+            aiHubComposerStore.getState().addSkill({id: 'skill-1', name: 'research'});
+            aiHubComposerStore.getState().addSkill({id: 'skill-2', name: 'digest'});
+
+            expect(aiHubComposerStore.getState().selectedSkills).toEqual([
+                {id: 'skill-1', name: 'research'},
+                {id: 'skill-2', name: 'digest'},
+            ]);
+
+            aiHubComposerStore.getState().removeSkill('skill-1');
+
+            expect(aiHubComposerStore.getState().selectedSkills).toEqual([{id: 'skill-2', name: 'digest'}]);
+        });
+
+        it('clears the armed skills with the rest of the composer state', () => {
+            aiHubComposerStore.getState().addSkill({id: 'skill-1', name: 'research'});
+
+            aiHubComposerStore.getState().clear();
+
+            expect(aiHubComposerStore.getState().selectedSkills).toEqual([]);
         });
     });
 
