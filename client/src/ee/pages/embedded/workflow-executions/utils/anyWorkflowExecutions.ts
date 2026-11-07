@@ -12,6 +12,7 @@ export interface AnyWorkflowExecutionRowI {
     automationWorkflowExecution?: AutomationWorkflowExecution;
     integrationWorkflowExecution?: EmbeddedWorkflowExecution;
     job?: AutomationWorkflowExecution['job'] | EmbeddedWorkflowExecution['job'];
+    triggerExecution?: AutomationWorkflowExecution['triggerExecution'] | EmbeddedWorkflowExecution['triggerExecution'];
     workflow?: AutomationWorkflowExecution['workflow'] | EmbeddedWorkflowExecution['workflow'];
 }
 
@@ -29,6 +30,7 @@ export const toAnyWorkflowExecutionRow = (json: object): AnyWorkflowExecutionRow
         return {
             automationWorkflowExecution,
             job: automationWorkflowExecution.job,
+            triggerExecution: automationWorkflowExecution.triggerExecution,
             workflow: automationWorkflowExecution.workflow,
         };
     }
@@ -39,6 +41,7 @@ export const toAnyWorkflowExecutionRow = (json: object): AnyWorkflowExecutionRow
     return {
         integrationWorkflowExecution,
         job: integrationWorkflowExecution?.job,
+        triggerExecution: integrationWorkflowExecution?.triggerExecution,
         workflow: integrationWorkflowExecution?.workflow,
     };
 };

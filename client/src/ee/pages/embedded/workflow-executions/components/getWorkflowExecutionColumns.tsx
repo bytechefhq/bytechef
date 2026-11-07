@@ -4,13 +4,17 @@ import WorkflowExecutionBadge from '@/shared/components/workflow-executions/Work
 import {coreTableFeatures} from '@/shared/util/table-features';
 import {ColumnDef, RowData, createColumnHelper} from '@tanstack/react-table';
 
+interface TimedExecutionI {
+    endDate?: Date;
+    startDate?: Date;
+    status?: string;
+}
+
 interface ExecutionRowI {
-    job?: {
-        endDate?: Date;
+    job?: TimedExecutionI & {
         id?: string;
-        startDate?: Date;
-        status?: string;
     };
+    triggerExecution?: TimedExecutionI;
     workflow?: {
         label?: string;
     };
@@ -28,8 +32,10 @@ export function getWorkflowExecutionColumns<TData extends RowData & ExecutionRow
 }: GetWorkflowExecutionColumnsProps<TData>) {
     const columnHelper = createColumnHelper<typeof coreTableFeatures, TData>();
 
+    const getTimedExecution = (row: TData): TimedExecutionI | undefined => row.job ?? row.triggerExecution;
+
     return [
-        columnHelper.accessor((row) => row.job, {
+        columnHelper.accessor((row) => getTimedExecution(row), {
             cell: (info) => <WorkflowExecutionBadge status={info.getValue()?.status || ''} />,
             header: 'Status',
             id: 'status',
@@ -40,12 +46,12 @@ export function getWorkflowExecutionColumns<TData extends RowData & ExecutionRow
             id: 'workflow',
         }),
         ...middleColumns,
-        columnHelper.accessor((row) => row.job, {
+        columnHelper.accessor((row) => getTimedExecution(row), {
             cell: (info) => getJobDuration(info.getValue()),
             header: 'Duration',
             id: 'duration',
         }),
-        columnHelper.accessor((row) => row.job, {
+        columnHelper.accessor((row) => getTimedExecution(row), {
             cell: (info) => getJobExecutionDate(info.getValue()),
             header: 'Execution date',
             id: 'executionDate',
