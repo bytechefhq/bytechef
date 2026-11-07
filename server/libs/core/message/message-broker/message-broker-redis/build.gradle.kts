@@ -8,3 +8,12 @@ dependencies {
     api(project(":server:libs:core:message:message-broker:message-broker-redis-control"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-api"))
 }
+
+dependencies {
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.springframework:spring-test")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+}
