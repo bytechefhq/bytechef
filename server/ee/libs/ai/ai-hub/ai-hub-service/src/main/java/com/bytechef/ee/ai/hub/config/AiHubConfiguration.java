@@ -69,6 +69,7 @@ import com.bytechef.ee.ai.hub.tool.OpenCodeWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenCustomComponentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.ResearchToolCallbackFactory;
 import com.bytechef.ee.ai.hub.tool.RunChatWorkflowToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
@@ -349,6 +350,7 @@ public class AiHubConfiguration {
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<ResearchToolCallbackFactory> researchToolCallbackFactoryProvider,
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
@@ -363,7 +365,8 @@ public class AiHubConfiguration {
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, aiHubAskToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider),
+            researchToolCallbackFactoryProvider, toolSearchToolCallAdvisorProvider, aiGuardrails,
+            aiGuardrailMetrics(aiGuardrails, meterRegistryProvider),
             chatBindingToolCallbackResolverProvider, aiAutoMemoryServiceProvider,
             skillsToolProviderProvider);
     }
@@ -376,6 +379,7 @@ public class AiHubConfiguration {
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<ResearchToolCallbackFactory> researchToolCallbackFactoryProvider,
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
@@ -390,7 +394,8 @@ public class AiHubConfiguration {
             AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, aiHubBuildToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider),
+            researchToolCallbackFactoryProvider, toolSearchToolCallAdvisorProvider, aiGuardrails,
+            aiGuardrailMetrics(aiGuardrails, meterRegistryProvider),
             chatBindingToolCallbackResolverProvider, aiAutoMemoryServiceProvider,
             skillsToolProviderProvider);
     }
@@ -818,6 +823,7 @@ public class AiHubConfiguration {
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<ResearchToolCallbackFactory> researchToolCallbackFactoryProvider,
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
         @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics,
         ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider,
@@ -854,6 +860,7 @@ public class AiHubConfiguration {
         }
 
         skillsToolProviderProvider.ifAvailable(builder::skillsToolProvider);
+        researchToolCallbackFactoryProvider.ifAvailable(builder::researchToolCallbackFactory);
 
         return builder.build();
     }

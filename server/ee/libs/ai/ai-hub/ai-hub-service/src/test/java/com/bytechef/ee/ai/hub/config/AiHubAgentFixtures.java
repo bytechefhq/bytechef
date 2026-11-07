@@ -56,6 +56,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.ResearchToolCallbackFactory;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.automation.ai.tool.ApiCollectionToolCallbacksFactory;
 import com.bytechef.ee.automation.ai.tool.componentrule.ComponentRuleToolCallbacksFactory;
@@ -267,7 +268,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, askToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry),
+            researchToolCallbackFactoryProvider(), toolSearchAdvisorProvider(), availableProvider(aiGuardrails),
+            availableProvider(meterRegistry),
             availableProvider(null), availableProvider(null),
             availableProvider(null));
     }
@@ -289,7 +291,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, buildToolCallbacks(catalog), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry),
+            researchToolCallbackFactoryProvider(), toolSearchAdvisorProvider(), availableProvider(aiGuardrails),
+            availableProvider(meterRegistry),
             availableProvider(null), availableProvider(null),
             availableProvider(null));
     }
@@ -357,6 +360,11 @@ public final class AiHubAgentFixtures {
             .ifAvailable(any());
 
         return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectProvider<ResearchToolCallbackFactory> researchToolCallbackFactoryProvider() {
+        return mock(ObjectProvider.class);
     }
 
     @SuppressWarnings("unchecked")

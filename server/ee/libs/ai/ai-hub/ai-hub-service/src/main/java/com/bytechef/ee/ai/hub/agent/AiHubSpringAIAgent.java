@@ -32,6 +32,7 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.progress.SubagentProgressEmitter;
 import com.bytechef.ee.ai.hub.skill.AiHubSkillsToolProvider;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
+import com.bytechef.ee.ai.hub.tool.ResearchToolCallbackFactory;
 import com.bytechef.ee.ai.hub.toolsearch.ClusterElementToolCallback;
 import com.bytechef.ee.ai.hub.toolsearch.PinnedToolSearchToolCallingAdvisor;
 import com.bytechef.ee.ai.hub.toolsearch.PinnedToolSearchToolCallingAdvisor.UserToolCallbacks;
@@ -120,6 +121,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
     private final @Nullable Mode mode;
     private final List<ToolCallback> pinnedToolCallbacks;
+    private final @Nullable ResearchToolCallbackFactory researchToolCallbackFactory;
     private final @Nullable SecurityContextRehydrator securityContextRehydrator;
     private final @Nullable AiHubSkillsToolProvider skillsToolProvider;
     private final List<ToolCallback> toolCallbacks;
@@ -135,6 +137,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         this.overrideChatClientResolver = builder.overrideChatClientResolver;
         this.mode = builder.mode;
         this.pinnedToolCallbacks = List.copyOf(builder.pendingToolCallbacks);
+        this.researchToolCallbackFactory = builder.researchToolCallbackFactory;
         this.securityContextRehydrator = builder.securityContextRehydrator;
         this.skillsToolProvider = builder.skillsToolProvider;
         this.toolCallbacks = List.copyOf(builder.wrappedToolCallbacks);
@@ -165,7 +168,13 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
      */
     @Override
     protected List<ToolCallback> additionalToolCallbacks(RunAgentInput input) {
-        List<ToolCallback> additionalToolCallbacks = new ArrayList<>(webSearchToolCallbacks(input));
+        List<ToolCallback> webSearchToolCallbacks = webSearchToolCallbacks(input);
+
+        List<ToolCallback> additionalToolCallbacks = new ArrayList<>(webSearchToolCallbacks);
+
+        if (researchToolCallbackFactory != null && !webSearchToolCallbacks.isEmpty()) {
+            additionalToolCallbacks.add(researchToolCallbackFactory.create(webSearchToolCallbacks));
+        }
 
         additionalToolCallbacks.addAll(skillToolCallbacks(input));
 
@@ -646,6 +655,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         private @Nullable AiHubApprovalGate approvalGate;
         private @Nullable ChatToolBindingResolver chatToolBindingResolver;
         private @Nullable Mode mode;
+        private @Nullable ResearchToolCallbackFactory researchToolCallbackFactory;
         private @Nullable WebSearchToolCallbackProvider webSearchToolCallbackProvider;
         private @Nullable AiHubSkillsToolProvider skillsToolProvider;
         private final List<ToolCallback> pendingToolCallbacks = new ArrayList<>();
@@ -680,6 +690,13 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder skillsToolProvider(@Nullable AiHubSkillsToolProvider skillsToolProvider) {
             this.skillsToolProvider = skillsToolProvider;
+
+            return this;
+        }
+
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
+        public Builder researchToolCallbackFactory(@Nullable ResearchToolCallbackFactory researchToolCallbackFactory) {
+            this.researchToolCallbackFactory = researchToolCallbackFactory;
 
             return this;
         }
