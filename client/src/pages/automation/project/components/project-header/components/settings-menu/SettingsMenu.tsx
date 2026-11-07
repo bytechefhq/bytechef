@@ -183,16 +183,16 @@ const SettingsMenu = ({
                                         value={resolvedFirstTab.value}
                                     >
                                         {resolvedFirstTab.label}
-                                </TabsTrigger>
+                                    </TabsTrigger>
 
-                                <TabsTrigger
-                                    aria-label="Project tab"
-                                    className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
-                                    value="project"
-                                >
-                                    Project
-                                </TabsTrigger>
-                            </TabsList>
+                                    <TabsTrigger
+                                        aria-label="Project tab"
+                                        className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
+                                        value="project"
+                                    >
+                                        Project
+                                    </TabsTrigger>
+                                </TabsList>
                             )}
 
                             {resolvedFirstTab && (
