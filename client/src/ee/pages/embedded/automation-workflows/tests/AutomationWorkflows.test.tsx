@@ -480,10 +480,6 @@ describe('AutomationWorkflows', () => {
         await user.click(screen.getByText('1 workflow'));
         await user.click(screen.getByRole('tab', {name: 'Configurations'}));
 
-        const workflowCountToggles = await screen.findAllByText('1 workflow');
-
-        await user.click(workflowCountToggles[workflowCountToggles.length - 1]);
-
         await user.click(await screen.findByRole('button', {name: 'Mailer'}));
 
         expect(await screen.findByText('Executions sheet Mail Project wf-uuid-13')).toBeInTheDocument();

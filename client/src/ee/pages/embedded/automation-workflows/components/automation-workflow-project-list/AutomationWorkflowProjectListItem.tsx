@@ -4,6 +4,7 @@ import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
@@ -14,6 +15,7 @@ import TagList from '@/shared/components/TagList';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {
     ChevronDownIcon,
+    DownloadIcon,
     EditIcon,
     EllipsisVerticalIcon,
     FolderIcon,
@@ -102,22 +104,45 @@ const AutomationWorkflowProjectListItem = ({
                         <div className="flex items-center gap-2">
                             <FolderIcon aria-hidden="true" className="size-6 shrink-0 text-content-neutral-secondary" />
 
-                            <button
-                                className="text-base font-semibold"
-                                onClick={(event) => {
-                                    event.stopPropagation();
+                            {project.description ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            className="text-base font-semibold"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
 
-                                    if (project.workflowTemplates.length > 0) {
-                                        onSelectWorkflow(project.workflowTemplates[0].workflowUuid);
-                                    } else {
-                                        workflowsCollapsibleTriggerRef.current?.click();
-                                    }
-                                }}
-                                title={project.description || undefined}
-                                type="button"
-                            >
-                                {project.name}
-                            </button>
+                                                if (project.workflowTemplates.length > 0) {
+                                                    onSelectWorkflow(project.workflowTemplates[0].workflowUuid);
+                                                } else {
+                                                    workflowsCollapsibleTriggerRef.current?.click();
+                                                }
+                                            }}
+                                            type="button"
+                                        >
+                                            {project.name}
+                                        </button>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>{project.description}</TooltipContent>
+                                </Tooltip>
+                            ) : (
+                                <button
+                                    className="text-base font-semibold"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+
+                                        if (project.workflowTemplates.length > 0) {
+                                            onSelectWorkflow(project.workflowTemplates[0].workflowUuid);
+                                        } else {
+                                            workflowsCollapsibleTriggerRef.current?.click();
+                                        }
+                                    }}
+                                    type="button"
+                                >
+                                    {project.name}
+                                </button>
+                            )}
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
@@ -203,35 +228,48 @@ const AutomationWorkflowProjectListItem = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    aria-label="Publish Project"
-                                    icon={<SendIcon />}
-                                    label="Publish"
-                                    onClick={() => onPublishProject(project.id)}
-                                />
+                                <DropdownMenuGroup aria-label="Project Actions">
+                                    <DropdownMenuItem
+                                        aria-label="Edit Project"
+                                        icon={<EditIcon />}
+                                        label="Edit"
+                                        onClick={() => onEditProject(project)}
+                                    />
+
+                                    <DropdownMenuItem
+                                        aria-label="Publish Project"
+                                        icon={<SendIcon />}
+                                        label="Publish"
+                                        onClick={() => onPublishProject(project.id)}
+                                    />
+
+                                    <DropdownMenuItem
+                                        aria-label="Export Project"
+                                        icon={<DownloadIcon />}
+                                        label="Export"
+                                        onClick={() =>
+                                            (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
+                                        }
+                                    />
+                                </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    aria-label="New Workflow"
-                                    icon={<PlusIcon />}
-                                    label="New Workflow"
-                                    onClick={() => onCreateWorkflow(project.id)}
-                                />
+                                <DropdownMenuGroup aria-label="Workflow Actions">
+                                    <DropdownMenuItem
+                                        aria-label="New Workflow"
+                                        icon={<PlusIcon />}
+                                        label="New Workflow"
+                                        onClick={() => onCreateWorkflow(project.id)}
+                                    />
 
-                                <DropdownMenuItem
-                                    aria-label="Import Workflow"
-                                    icon={<UploadIcon />}
-                                    label="Import Workflow"
-                                    onClick={() => onImportWorkflow(project.id)}
-                                />
-
-                                <DropdownMenuItem
-                                    aria-label="Edit Project"
-                                    icon={<EditIcon />}
-                                    label="Edit"
-                                    onClick={() => onEditProject(project)}
-                                />
+                                    <DropdownMenuItem
+                                        aria-label="Import Workflow"
+                                        icon={<UploadIcon />}
+                                        label="Import Workflow"
+                                        onClick={() => onImportWorkflow(project.id)}
+                                    />
+                                </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
 

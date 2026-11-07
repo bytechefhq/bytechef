@@ -187,6 +187,64 @@ describe('IntegrationListItem', () => {
             expect(screen.getByTestId('integration-publish-dialog')).toBeInTheDocument();
         });
 
+        it('should group the integration, workflow and configuration actions', async () => {
+            await openMenu();
+
+            expect(screen.getByRole('group', {name: 'Integration Actions'})).toHaveTextContent('EditPublish');
+            expect(screen.getByRole('group', {name: 'Workflow Actions'})).toHaveTextContent(
+                'New WorkflowImport WorkflowView Workflows'
+            );
+            expect(screen.getByRole('group', {name: 'Configuration Actions'})).toHaveTextContent('New Configuration');
+        });
+
+        it('should open the workflow dialog when New Workflow is clicked', async () => {
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'New Workflow'}));
+
+            expect(screen.getByTestId('workflow-dialog')).toBeInTheDocument();
+        });
+
+        it('should open the file picker when Import Workflow is clicked in the actions menu', async () => {
+            await openMenu();
+
+            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+            const clickSpy = vi.spyOn(fileInput, 'click');
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Import Workflow'}));
+
+            expect(clickSpy).toHaveBeenCalled();
+        });
+
+        it('should open a Development configuration dialog when New Configuration is clicked', async () => {
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'New Configuration'}));
+
+            expect(screen.getByText('Configuration dialog for integration 1 in environment 0')).toBeInTheDocument();
+        });
+
+        it('should disable New Configuration and explain why until the integration is published', async () => {
+            renderItem({lastPublishedDate: undefined});
+
+            const menuTrigger = screen
+                .getAllByRole('button')
+                .filter((button) => button.getAttribute('aria-haspopup') === 'menu')
+                .pop();
+
+            await userEvent.click(menuTrigger!);
+
+            const newConfigurationMenuItem = screen.getByRole('menuitem', {name: 'New Configuration'});
+
+            expect(newConfigurationMenuItem).toHaveAttribute('data-disabled');
+
+            await userEvent.hover(newConfigurationMenuItem.parentElement!);
+
+            expect(await screen.findByRole('tooltip')).toHaveTextContent(
+                'Publish the integration before configuring it.'
+            );
+        });
+
         it('should ask for confirmation when Delete is clicked', async () => {
             await openMenu();
 

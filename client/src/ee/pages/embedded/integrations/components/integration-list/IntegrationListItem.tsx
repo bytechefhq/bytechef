@@ -4,6 +4,7 @@ import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
@@ -39,6 +40,7 @@ import {
     EllipsisVerticalIcon,
     PlusIcon,
     SendIcon,
+    SettingsIcon,
     Trash2Icon,
     UploadIcon,
     WorkflowIcon,
@@ -66,6 +68,7 @@ const IntegrationListItem = ({
     workflowsContent,
 }: IntegrationItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showIntegrationInstanceConfigurationDialog, setShowIntegrationInstanceConfigurationDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showPublishIntegrationDialog, setShowPublishIntegrationDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
@@ -330,14 +333,36 @@ const IntegrationListItem = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    icon={<EditIcon />}
-                                    label="Edit"
-                                    onClick={() => setShowEditDialog(true)}
-                                />
+                                <DropdownMenuGroup aria-label="Integration Actions">
+                                    <DropdownMenuItem
+                                        icon={<EditIcon />}
+                                        label="Edit"
+                                        onClick={() => setShowEditDialog(true)}
+                                    />
 
-                                {integration?.integrationWorkflowIds &&
-                                    integration?.integrationWorkflowIds.length > 0 && (
+                                    <DropdownMenuItem
+                                        icon={<SendIcon />}
+                                        label="Publish"
+                                        onClick={() => setShowPublishIntegrationDialog(true)}
+                                    />
+                                </DropdownMenuGroup>
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuGroup aria-label="Workflow Actions">
+                                    <DropdownMenuItem
+                                        icon={<PlusIcon />}
+                                        label="New Workflow"
+                                        onSelect={() => setShowWorkflowDialog(true)}
+                                    />
+
+                                    <DropdownMenuItem
+                                        icon={<UploadIcon />}
+                                        label="Import Workflow"
+                                        onSelect={() => hiddenFileInputRef.current?.click()}
+                                    />
+
+                                    {workflowCount > 0 && (
                                         <DropdownMenuItem
                                             icon={<WorkflowIcon />}
                                             label="View Workflows"
@@ -348,12 +373,30 @@ const IntegrationListItem = ({
                                             }
                                         />
                                     )}
+                                </DropdownMenuGroup>
 
-                                <DropdownMenuItem
-                                    icon={<SendIcon />}
-                                    label="Publish"
-                                    onClick={() => setShowPublishIntegrationDialog(true)}
-                                />
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuGroup aria-label="Configuration Actions">
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <span className="block">
+                                                <DropdownMenuItem
+                                                    disabled={!isPublished}
+                                                    icon={<SettingsIcon />}
+                                                    label="New Configuration"
+                                                    onSelect={() => setShowIntegrationInstanceConfigurationDialog(true)}
+                                                />
+                                            </span>
+                                        </TooltipTrigger>
+
+                                        {!isPublished && (
+                                            <TooltipContent>
+                                                Publish the integration before configuring it.
+                                            </TooltipContent>
+                                        )}
+                                    </Tooltip>
+                                </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
 
@@ -453,6 +496,18 @@ const IntegrationListItem = ({
             />
 
             {showEditDialog && <IntegrationDialog integration={integration} onClose={() => setShowEditDialog(false)} />}
+
+            {showIntegrationInstanceConfigurationDialog && (
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={
+                        {
+                            environmentId: DEVELOPMENT_ENVIRONMENT,
+                            integrationId: integration.id,
+                        } as IntegrationInstanceConfiguration
+                    }
+                    onClose={() => setShowIntegrationInstanceConfigurationDialog(false)}
+                />
+            )}
 
             {showPublishIntegrationDialog && !!integration.id && (
                 <IntegrationPublishDialog

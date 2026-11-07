@@ -11,7 +11,7 @@ import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/provide
 import WorkflowGroupCardSkeleton from '@/shared/components/WorkflowGroupCardSkeleton';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {AlertTriangleIcon, PlusIcon, SendIcon, Settings2Icon} from 'lucide-react';
+import {AlertTriangleIcon, SendIcon, Settings2Icon} from 'lucide-react';
 import {useMemo} from 'react';
 
 interface IntegrationInstanceConfigurationsPanelProps {
@@ -109,7 +109,7 @@ const IntegrationInstanceConfigurationsPanel = ({
                                         integrationId: integration.id,
                                     } as IntegrationInstanceConfiguration
                                 }
-                                triggerNode={<Button icon={<PlusIcon />} label="Create Configuration" />}
+                                triggerNode={<Button label="Create Configuration" />}
                             />
                         }
                         description="Create an instance configuration to run this integration's workflows here."
