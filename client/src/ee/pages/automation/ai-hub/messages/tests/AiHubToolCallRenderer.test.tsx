@@ -237,6 +237,18 @@ describe('AiHubToolCallFallback', () => {
             expect(screen.getByRole('status')).toHaveTextContent('Researching the web...');
         });
 
+        it.each([
+            ['data_analyst', 'Analyzing data...'],
+            ['image_generator', 'Generating image...'],
+            ['slide_builder', 'Building slides...'],
+        ])('shows a labeled row for a running %s call', (toolName, label) => {
+            aiChatToolCallStore.getState().startToolCall('call-1', toolName, 0);
+
+            renderInFlight(toolName);
+
+            expect(screen.getByRole('status')).toHaveTextContent(label);
+        });
+
         it('shows a generic running row for any other running call', () => {
             aiChatToolCallStore.getState().startToolCall('call-1', 'listWorkflows', 0);
 
