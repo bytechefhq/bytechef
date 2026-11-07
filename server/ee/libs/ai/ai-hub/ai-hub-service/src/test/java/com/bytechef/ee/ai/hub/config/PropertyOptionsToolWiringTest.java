@@ -9,8 +9,6 @@ package com.bytechef.ee.ai.hub.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.agui.core.exception.AGUIException;
-import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -22,11 +20,11 @@ import org.junit.jupiter.api.Test;
 class PropertyOptionsToolWiringTest {
 
     @Test
-    void testAskRegistersTheReadPickers() throws AGUIException {
-        AiHubSpringAIAgent askAgent = AiHubAgentFixtures.withBuildWorkflow()
-            .askAgent();
+    void testAskRegistersTheReadPickers() {
+        AiHubModeToolCallbacks askToolCallbacks = AiHubAgentFixtures.withBuildWorkflow()
+            .askToolCallbacks();
 
-        assertThat(toolNames(askAgent))
+        assertThat(toolNames(askToolCallbacks))
             .contains(
                 "listConnectionsForComponent", "lookupActionPropertyOptions", "lookupTriggerPropertyOptions",
                 "lookupClusterElementPropertyOptions", "askUserQuestion")
@@ -36,11 +34,11 @@ class PropertyOptionsToolWiringTest {
     }
 
     @Test
-    void testBuildRegistersEveryPicker() throws AGUIException {
-        AiHubSpringAIAgent buildAgent = AiHubAgentFixtures.withBuildWorkflow()
-            .buildAgent();
+    void testBuildRegistersEveryPicker() {
+        AiHubModeToolCallbacks buildToolCallbacks = AiHubAgentFixtures.withBuildWorkflow()
+            .buildToolCallbacks();
 
-        assertThat(toolNames(buildAgent))
+        assertThat(toolNames(buildToolCallbacks))
             .contains(
                 "listConnectionsForComponent", "selectConnection", "lookupActionPropertyOptions",
                 "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions", "selectPropertyOption",
@@ -49,8 +47,8 @@ class PropertyOptionsToolWiringTest {
             .doesNotContain("lookupPropertyOptions");
     }
 
-    private static List<String> toolNames(AiHubSpringAIAgent agent) {
-        return agent.pinnedToolCallbacks()
+    private static List<String> toolNames(AiHubModeToolCallbacks modeToolCallbacks) {
+        return modeToolCallbacks.toolCallbacks()
             .stream()
             .map(toolCallback -> toolCallback.getToolDefinition()
                 .name())

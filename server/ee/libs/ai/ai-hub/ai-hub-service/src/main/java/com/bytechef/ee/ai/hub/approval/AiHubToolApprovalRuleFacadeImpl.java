@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.audit.AiHubAuditEvents;
 import com.bytechef.ee.ai.hub.audit.AiHubAuditMapper;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
@@ -19,6 +20,9 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,15 +40,18 @@ public class AiHubToolApprovalRuleFacadeImpl implements AiHubToolApprovalRuleFac
     private static final String VIEWER_ROLE = "VIEWER";
 
     private final AiHubPinnedToolCallbacks pinnedToolCallbacks;
+    private final ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider;
     private final AiHubToolApprovalRuleService ruleService;
     private final PermissionService permissionService;
 
     @SuppressFBWarnings("EI")
     public AiHubToolApprovalRuleFacadeImpl(
-        AiHubPinnedToolCallbacks pinnedToolCallbacks, AiHubToolApprovalRuleService ruleService,
+        AiHubPinnedToolCallbacks pinnedToolCallbacks,
+        ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider, AiHubToolApprovalRuleService ruleService,
         PermissionService permissionService) {
 
         this.pinnedToolCallbacks = pinnedToolCallbacks;
+        this.globalToolCatalogProvider = globalToolCatalogProvider;
         this.ruleService = ruleService;
         this.permissionService = permissionService;
     }
@@ -61,9 +68,14 @@ public class AiHubToolApprovalRuleFacadeImpl implements AiHubToolApprovalRuleFac
 
     @Override
     public List<String> getDefaultToolNames() {
-        return Arrays.stream(Mode.values())
+        Stream<ToolCallback> pinnedToolCallbackStream = Arrays.stream(Mode.values())
             .flatMap(mode -> pinnedToolCallbacks.pinnedToolCallbacks(mode)
-                .stream())
+                .stream());
+        Stream<ToolCallback> catalogToolCallbackStream = globalToolCatalogProvider.orderedStream()
+            .flatMap(globalToolCatalog -> globalToolCatalog.toolCallbacks()
+                .stream());
+
+        return Stream.concat(pinnedToolCallbackStream, catalogToolCallbackStream)
             .map(toolCallback -> toolCallback.getToolDefinition()
                 .name())
             .filter(AiHubToolApprovalDefaults::isGatedByDefault)

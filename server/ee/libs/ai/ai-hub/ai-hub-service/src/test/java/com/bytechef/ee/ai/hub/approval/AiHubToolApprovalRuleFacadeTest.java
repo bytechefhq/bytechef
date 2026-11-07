@@ -20,6 +20,7 @@ import com.agui.core.exception.AGUIException;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.config.AiHubAgentFixtures;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -49,6 +51,7 @@ class AiHubToolApprovalRuleFacadeTest {
 
     private AiHubSpringAIAgent askAgent;
     private AiHubSpringAIAgent buildAgent;
+    private List<AiHubGlobalToolCatalog> globalToolCatalogs;
     private AiHubToolApprovalRuleFacadeImpl facade;
 
     @BeforeEach
@@ -57,10 +60,11 @@ class AiHubToolApprovalRuleFacadeTest {
 
         askAgent = fixtures.askAgent();
         buildAgent = fixtures.buildAgent();
+        globalToolCatalogs = List.of(fixtures.askGlobalToolCatalog(), fixtures.buildGlobalToolCatalog());
 
         facade = new AiHubToolApprovalRuleFacadeImpl(
             mode -> mode == Mode.BUILD ? buildAgent.pinnedToolCallbacks() : askAgent.pinnedToolCallbacks(),
-            ruleService, permissionService);
+            globalToolCatalogProvider(), ruleService, permissionService);
     }
 
     @AfterEach
@@ -197,15 +201,45 @@ class AiHubToolApprovalRuleFacadeTest {
             .allMatch(facade.getDefaultToolNames()::contains);
     }
 
+    @Test
+    void testGetDefaultToolNamesListsTheGatedToolsOfTheCatalogs() {
+        assertThat(toolNames(askAgent.pinnedToolCallbacks()))
+            .doesNotContainAnyElementsOf(facade.getDefaultToolNames());
+        assertThat(toolNames(buildAgent.pinnedToolCallbacks()))
+            .doesNotContainAnyElementsOf(facade.getDefaultToolNames());
+        assertThat(facade.getDefaultToolNames()).contains("deleteProject", "promoteWorkflow");
+    }
+
     private List<String> registeredToolNames() {
-        return Stream.concat(
-            askAgent.pinnedToolCallbacks()
-                .stream(),
-            buildAgent.pinnedToolCallbacks()
-                .stream())
+        Stream<ToolCallback> catalogToolCallbacks = globalToolCatalogs.stream()
+            .flatMap(globalToolCatalog -> globalToolCatalog.toolCallbacks()
+                .stream());
+
+        return toolNames(
+            Stream.concat(
+                Stream.concat(
+                    askAgent.pinnedToolCallbacks()
+                        .stream(),
+                    buildAgent.pinnedToolCallbacks()
+                        .stream()),
+                catalogToolCallbacks)
+                .toList());
+    }
+
+    private static List<String> toolNames(List<ToolCallback> toolCallbacks) {
+        return toolCallbacks.stream()
             .map(ToolCallback::getToolDefinition)
             .map(ToolDefinition::name)
             .toList();
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider() {
+        ObjectProvider<AiHubGlobalToolCatalog> provider = mock(ObjectProvider.class);
+
+        when(provider.orderedStream()).thenAnswer(invocation -> globalToolCatalogs.stream());
+
+        return provider;
     }
 
     private static void authenticate(String authority) {

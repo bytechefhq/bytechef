@@ -22,6 +22,7 @@ import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.config.AiHubAgentFixtures;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -80,10 +81,14 @@ class AiHubBuildAgentApprovalGateTest {
 
         Map<String, Object> toolContext = buildAgent.toolContext(newInput());
 
-        ToolCallback deleteProject = buildAgent.toolCallbacks()
+        AiHubGlobalToolCatalog buildGlobalToolCatalog = fixtures.buildGlobalToolCatalog();
+
+        ToolCallback deleteProject = buildGlobalToolCatalog.toolCallbacks()
             .stream()
             .filter(toolCallback -> "deleteProject".equals(toolCallback.getToolDefinition()
                 .name()))
+            .map(toolCallback -> AiHubToolCallbackWrappers.wrap(
+                toolCallback, fixtures.securityContextRehydrator, fixtures.approvalGate))
             .findFirst()
             .orElseThrow();
 

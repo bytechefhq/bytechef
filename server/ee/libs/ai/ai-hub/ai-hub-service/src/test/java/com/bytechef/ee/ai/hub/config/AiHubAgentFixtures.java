@@ -49,6 +49,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -187,12 +188,8 @@ public final class AiHubAgentFixtures {
         throws AGUIException {
 
         return configuration.aiHubAskSpringAIAgent(
-            sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools, workflowExecutionTools,
-            componentToolsProvider(), persistedWorkflowCheckerProvider(), projectServiceProvider(),
-            deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
-            chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
-            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
+            sessionMemory, defaultChatModel, askToolCallbacks(), securityContextRehydrator, approvalGate,
+            inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
             toolSearchAdvisorProvider());
     }
 
@@ -202,15 +199,36 @@ public final class AiHubAgentFixtures {
         throws AGUIException {
 
         return configuration.aiHubBuildSpringAIAgent(
-            sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools, workflowExecutionTools,
-            componentToolsProvider(), persistedWorkflowCheckerProvider(), projectServiceProvider(),
-            deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
-            workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
-            artifactRecorder,
-            securityContextRehydrator, approvalGate, policy, inFlightRunRegistryProvider(),
-            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
+            sessionMemory, defaultChatModel, buildToolCallbacks(), securityContextRehydrator, approvalGate,
+            inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
             toolSearchAdvisorProvider());
+    }
+
+    public AiHubModeToolCallbacks askToolCallbacks() {
+        return configuration.aiHubAskToolCallbacks(
+            readProjectTools, readProjectWorkflowTools, workflowExecutionTools, componentToolsProvider(),
+            persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
+            interactivePickerToolCallbacks, projectWorkflowFacade, chatService, chatAccessPolicy,
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
+    }
+
+    public AiHubGlobalToolCatalog askGlobalToolCatalog() {
+        return configuration.aiHubAskGlobalToolCatalog(
+            askToolCallbacks(), componentToolsProvider(), availableProvider(null), availableProvider(null));
+    }
+
+    public AiHubGlobalToolCatalog buildGlobalToolCatalog() {
+        return configuration.aiHubBuildGlobalToolCatalog(
+            buildToolCallbacks(), componentToolsProvider(), availableProvider(null), availableProvider(null));
+    }
+
+    public AiHubModeToolCallbacks buildToolCallbacks() {
+        return configuration.aiHubBuildToolCallbacks(
+            projectTools, projectWorkflowLifecycleTools, workflowExecutionTools, componentToolsProvider(),
+            persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
+            interactivePickerToolCallbacks, intelligentToolCatalog, workspaceFacade, projectWorkflowFacade,
+            projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 
     @SuppressWarnings("unchecked")
