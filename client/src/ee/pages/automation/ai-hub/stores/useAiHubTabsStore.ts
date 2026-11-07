@@ -9,6 +9,21 @@ export interface AiHubAiAgentTabI {
     name: string;
 }
 
+export interface AiHubCodeWorkflowTabI {
+    id: string;
+    kind: 'codeWorkflow';
+    language: string;
+    name: string;
+    projectId: string;
+}
+
+export interface AiHubCustomComponentTabI {
+    customComponentId: string;
+    id: string;
+    kind: 'customComponent';
+    name: string;
+}
+
 export interface AiHubWorkflowTabI {
     id: string;
     kind: 'workflow';
@@ -18,10 +33,21 @@ export interface AiHubWorkflowTabI {
     workflowId: string;
 }
 
-export type AiHubTabType = AiHubAiAgentTabI | AiHubWorkflowTabI;
+export type AiHubTabType = AiHubAiAgentTabI | AiHubCodeWorkflowTabI | AiHubCustomComponentTabI | AiHubWorkflowTabI;
 
 export interface OpenAiAgentTabArgsI {
     aiAgentId: string;
+    name: string;
+}
+
+export interface OpenCodeWorkflowTabArgsI {
+    language: string;
+    name: string;
+    projectId: string;
+}
+
+export interface OpenCustomComponentTabArgsI {
+    customComponentId: string;
     name: string;
 }
 
@@ -51,6 +77,8 @@ interface AiHubTabsStateI {
     closeTab: (tabId: string) => void;
     /** Opens an AI Agent tab, or focuses and renames the existing tab of the same agent. */
     openAiAgentTab: (aiAgent: OpenAiAgentTabArgsI) => string;
+    openCodeWorkflowTab: (codeWorkflow: OpenCodeWorkflowTabArgsI) => string;
+    openCustomComponentTab: (customComponent: OpenCustomComponentTabArgsI) => string;
     openTabs: AiHubTabType[];
     /**
      * Opens a workflow tab, or focuses the existing one. A workflow tab is project-scoped: opening another workflow of
@@ -67,7 +95,18 @@ interface AiHubTabsStateI {
     snapshotsByChatId: Record<number, ChatTabsSnapshotI>;
 }
 
-export const getTabGenericId = (tab: AiHubTabType): string => (tab.kind === 'aiAgent' ? tab.aiAgentId : tab.workflowId);
+export const getTabGenericId = (tab: AiHubTabType): string => {
+    switch (tab.kind) {
+        case 'aiAgent':
+            return tab.aiAgentId;
+        case 'codeWorkflow':
+            return tab.projectId;
+        case 'customComponent':
+            return tab.customComponentId;
+        case 'workflow':
+            return tab.workflowId;
+    }
+};
 
 export const attachTab = (open: () => string): {ownsTab: boolean; tabId: string} => {
     const openTabCountBefore = aiHubTabsStore.getState().openTabs.length;
@@ -137,6 +176,87 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                             aiAgentId,
                             id: getRandomId(),
                             kind: 'aiAgent',
+                            name,
+                        };
+
+                        tabIdToReturn = newTab.id;
+
+                        return {
+                            ...state,
+                            activeTabId: newTab.id,
+                            openTabs: [...state.openTabs, newTab],
+                            rightPanelOpen: true,
+                        };
+                    });
+
+                    return tabIdToReturn;
+                },
+                openCodeWorkflowTab: ({language, name, projectId}) => {
+                    let tabIdToReturn = '';
+
+                    set((state) => {
+                        const existing = state.openTabs.find(
+                            (tab) => tab.kind === 'codeWorkflow' && tab.projectId === projectId
+                        );
+
+                        if (existing) {
+                            tabIdToReturn = existing.id;
+
+                            return {
+                                ...state,
+                                activeTabId: existing.id,
+                                openTabs: state.openTabs.map((tab) =>
+                                    tab.id === existing.id && tab.kind === 'codeWorkflow'
+                                        ? {...tab, language, name}
+                                        : tab
+                                ),
+                                rightPanelOpen: true,
+                            };
+                        }
+
+                        const newTab: AiHubCodeWorkflowTabI = {
+                            id: getRandomId(),
+                            kind: 'codeWorkflow',
+                            language,
+                            name,
+                            projectId,
+                        };
+
+                        tabIdToReturn = newTab.id;
+
+                        return {
+                            ...state,
+                            activeTabId: newTab.id,
+                            openTabs: [...state.openTabs, newTab],
+                            rightPanelOpen: true,
+                        };
+                    });
+
+                    return tabIdToReturn;
+                },
+                openCustomComponentTab: ({customComponentId, name}) => {
+                    let tabIdToReturn = '';
+
+                    set((state) => {
+                        const existing = state.openTabs.find(
+                            (tab) => tab.kind === 'customComponent' && tab.customComponentId === customComponentId
+                        );
+
+                        if (existing) {
+                            tabIdToReturn = existing.id;
+
+                            return {
+                                ...state,
+                                activeTabId: existing.id,
+                                openTabs: state.openTabs.map((tab) => (tab.id === existing.id ? {...tab, name} : tab)),
+                                rightPanelOpen: true,
+                            };
+                        }
+
+                        const newTab: AiHubCustomComponentTabI = {
+                            customComponentId,
+                            id: getRandomId(),
+                            kind: 'customComponent',
                             name,
                         };
 
